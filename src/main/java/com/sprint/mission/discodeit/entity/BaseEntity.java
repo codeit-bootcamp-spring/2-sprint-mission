@@ -7,10 +7,10 @@ public class BaseEntity {
     private Long createdAt;
     private Long modifiedAt;
 
-    public BaseEntity(UUID id, Long createdAt, Long modifiedAt) {
-        this.id = id;
-        this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt;
+    public BaseEntity() {
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.modifiedAt = this.createdAt;
     }
 
     public UUID getId() {
