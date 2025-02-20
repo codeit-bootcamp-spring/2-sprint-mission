@@ -26,8 +26,8 @@ class MessageServiceTest {
 
     @Test
     void 메세지_단건_조회() {
-        List<MessageDto> messages = messageService.findById(messageDto.messageId());
+        MessageDto message = messageService.findById(messageDto.messageId());
 
-        assertThat(messages.get(0).context()).isEqualTo(CONTEXT);
+        assertThat(message.context()).isEqualTo(CONTEXT);
     }
 }
