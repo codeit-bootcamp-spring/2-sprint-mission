@@ -65,4 +65,17 @@ public class User extends BaseEntity{
         if (avatar != null) setAvatar(avatar);
         if (status != null) setStatus(status);
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "nickname='" + nickname + '\'' +
+                ", email='" + email + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", status='" + status + '\'' +
+                ", id='" + getId() + '\'' +
+                ", createdAt='" + getCreatedAt() + '\'' +
+                ", modifiedAt='" + getModifiedAt() + '\'' +
+                '}';
+    }
 }
