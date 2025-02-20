@@ -47,4 +47,10 @@ public class Channel extends BaseEntity {
     public String getDescription() {
         return description;
     }
+
+    public void update(User owner, String title, String description) {
+        if (owner != null) setOwner(owner);
+        if (title != null) setTitle(title);
+        if (description != null) setDescription(description);
+    }
 }
