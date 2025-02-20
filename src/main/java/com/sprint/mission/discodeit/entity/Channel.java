@@ -21,7 +21,7 @@ public class Channel extends BaseEntity {
     public String toString() {
         return "Channel{" +
                 "id=" + id +
-                "name='" + name + '\'' +
+                ", name='" + name + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
