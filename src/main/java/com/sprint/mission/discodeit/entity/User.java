@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
-import java.util.List;
-
 public class User extends BaseEntity{
     private String nickname;
     private String email;
@@ -46,7 +43,7 @@ public class User extends BaseEntity{
         this.status = status;
     }
 
-    public String getUserName() {
+    public String getNickname() {
         return nickname;
     }
 
