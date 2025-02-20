@@ -10,8 +10,8 @@ public class User {
     private String name;
     private String password;
 
-    public User(String name, String password) {
-        this.id = UUID.randomUUID();
+    public User(UUID id, String name, String password) {
+        this.id = id;
         this.createdAt = Instant.now().getEpochSecond();
         this.updatedAt = createdAt;
         this.name = name;
@@ -27,20 +27,12 @@ public class User {
         return this.name.equals(name);
     }
 
-    public boolean isSameId(UUID id) {
-        return this.id.equals(id);
-    }
-
     private void updatedAt() {
         this.updatedAt = Instant.now().getEpochSecond();
     }
 
     public UUID getId() {
         return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
     }
 
     public Long getUpdatedAt() {

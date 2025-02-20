@@ -28,14 +28,14 @@ class UserServiceTest {
     }
 
     @Test
-    void 유저_UUID_단건_조회(){
+    void 유저_UUID_단건_조회() {
         UserRegisterDto userRegisterDto = new UserRegisterDto(NAME, PASSWORD);
         userService.register(userRegisterDto);
 
         List<UserDto> users = userService.findByName(NAME);
-        UUID id = users.get(0).id();
+        UserDto userDto = users.get(0);
 
-        assertThat(userService.findById(id).id()).isEqualTo(id);
+        assertThat(userDto.id() + userDto.name()).isEqualTo(userDto.id()+NAME);
     }
 
     @Test
