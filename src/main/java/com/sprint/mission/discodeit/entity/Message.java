@@ -7,17 +7,17 @@ public class Message {
     private UUID id;
     private final Long createdAt;
     private Long updatedAt;
-    private String name;
+    private String context;
 
-    public Message(String name) {
+    public Message(String context) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
         this.updatedAt = createdAt;
-        this.name = name;
+        this.context = context;
     }
 
-    public void updateName(String name){
-        this.name = name;
+    public void updateName(String name) {
+        this.context = name;
         updatedAt();
     }
 
@@ -27,6 +27,10 @@ public class Message {
 
     public UUID getId() {
         return id;
+    }
+
+    public String getContext() {
+        return context;
     }
 
     public Long getCreatedAt() {
