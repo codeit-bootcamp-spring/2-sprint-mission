@@ -31,5 +31,10 @@ public class Message extends BaseEntity {
     public String getContent() {
         return content;
     }
+
+    public void update(User sender, String content) {
+        if (sender != null) setSender(sender);
+        if (content != null) setContent(content);
+    }
 }
 
