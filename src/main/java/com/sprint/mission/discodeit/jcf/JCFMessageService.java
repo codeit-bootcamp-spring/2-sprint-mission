@@ -3,14 +3,13 @@ package com.sprint.mission.discodeit.jcf;
 import com.sprint.mission.application.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> messages = new HashMap<>();
+    private final Map<UUID, Message> messages = new LinkedHashMap<>();
 
     @Override
     public MessageDto create(String context) {
