@@ -19,6 +19,9 @@ class UserServiceTest {
     @BeforeEach
     void init() {
         userService = new JCFUserService();
+
+        UserRegisterDto userRegisterDto = new UserRegisterDto(NAME, PASSWORD);
+        userService.register(userRegisterDto);
     }
 
     @Test
@@ -29,20 +32,14 @@ class UserServiceTest {
 
     @Test
     void 유저_UUID_단건_조회() {
-        UserRegisterDto userRegisterDto = new UserRegisterDto(NAME, PASSWORD);
-        userService.register(userRegisterDto);
-
         List<UserDto> users = userService.findByName(NAME);
         UserDto userDto = users.get(0);
 
-        assertThat(userDto.id() + userDto.name()).isEqualTo(userDto.id()+NAME);
+        assertThat(userDto.id() + userDto.name()).isEqualTo(userDto.id() + NAME);
     }
 
     @Test
     void 유저_이름_단건_조회() {
-        UserRegisterDto userRegisterDto = new UserRegisterDto(NAME, PASSWORD);
-        userService.register(userRegisterDto);
-
         List<UserDto> users = userService.findByName(NAME);
         UserDto userDto = users.get(0);
 
@@ -51,11 +48,9 @@ class UserServiceTest {
 
     @Test
     void 유저_이름_다수_조회() {
-        UserRegisterDto userHwang = new UserRegisterDto(NAME, PASSWORD);
         UserRegisterDto userOtherHwang = new UserRegisterDto(NAME, PASSWORD + "123");
         UserRegisterDto userKim = new UserRegisterDto("KIM", PASSWORD);
 
-        userService.register(userHwang);
         userService.register(userOtherHwang);
         userService.register(userKim);
 
