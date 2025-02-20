@@ -15,4 +15,6 @@ public interface UserService {
     UserDto register(UserRegisterDto userRegisterDto);
 
     void updateNameById(UUID id, String name);
+
+    void remove(UUID id);
 }

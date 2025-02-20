@@ -49,6 +49,12 @@ public class JCFUserService implements UserService {
     public void updateNameById(UUID id, String name) {
         UserDto userDto = findById(id);
         User user = users.get(userDto.id());
+
         user.updateName(name);
+    }
+
+    @Override
+    public void remove(UUID id) {
+        users.remove(id);
     }
 }

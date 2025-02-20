@@ -67,4 +67,12 @@ class UserServiceTest {
 
         assertThat(initUser.name()).isNotEqualTo(updatedUserInfo.name());
     }
+
+    @Test
+    void 유저_삭제(){
+        userService.remove(initUser.id());
+
+        assertThatThrownBy(() -> userService.findById(initUser.id()))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
