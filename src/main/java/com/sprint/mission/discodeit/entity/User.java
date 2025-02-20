@@ -18,28 +18,28 @@ public class User extends BaseEntity{
         setStatus(status);
     }
 
-    public void setNickname(String nickname) {
+    private void setNickname(String nickname) {
         if (nickname == null || nickname.isEmpty() || nickname.length() > 32) {
             throw new IllegalArgumentException("유효하지 않은 닉네임입니다.");
         }
         this.nickname = nickname;
     }
 
-    public void setEmail(String email) {
+    private void setEmail(String email) {
         if (email == null || email.isEmpty() || !email.contains("@")) {
             throw new IllegalArgumentException("유효하지 않은 이메일입니다.");
         }
         this.email = email;
     }
 
-    public void setAvatar(String avatar) {
+    private void setAvatar(String avatar) {
         if (avatar == null) {
             throw new IllegalArgumentException("유효하지 않은 아바타(사진)입니다.");
         }
         this.avatar = avatar;
     }
 
-    public void setStatus(String status) {
+    private void setStatus(String status) {
         if (status == null || status.length() > 100) {
             throw new IllegalArgumentException("유효하지 않은 상태메세지입니다.");
         }
