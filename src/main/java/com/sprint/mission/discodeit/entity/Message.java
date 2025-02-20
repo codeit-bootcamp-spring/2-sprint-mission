@@ -10,14 +10,14 @@ public class Message extends BaseEntity {
         setContent(content);
     }
 
-    public void setSender(User sender) {
+    private void setSender(User sender) {
         if (sender == null) {
             throw new IllegalArgumentException("유효하지 않은 송신자입니다");
         }
         this.sender = sender;
     }
 
-    public void setContent(String content) {
+    private void setContent(String content) {
         if (content == null || content.isEmpty()) {
             throw new IllegalArgumentException("유효하지 않은 메세지입니다.");
         }
