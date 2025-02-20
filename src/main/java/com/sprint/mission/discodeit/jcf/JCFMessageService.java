@@ -42,4 +42,9 @@ public class JCFMessageService implements MessageService {
         messages.get(id)
                 .updateContext(context);
     }
+
+    @Override
+    public void remove(UUID id) {
+        messages.remove(id);
+    }
 }
