@@ -61,4 +61,11 @@ public class User extends BaseEntity{
     public String getStatus() {
         return status;
     }
+
+    public void update(String nickname, String email, String avatar, String status) {
+        if (nickname != null) setNickname(nickname);
+        if (email != null) setEmail(email);
+        if (avatar != null) setAvatar(avatar);
+        if (status != null) setStatus(status);
+    }
 }
