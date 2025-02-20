@@ -1,31 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
+public class Channel extends BaseEntity {
+    private String name;
 
-public class Channel {
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
-
-    public Channel() {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
+    public Channel(String name) {
+        super();
+        this.name = name;
     }
 
-    public UUID getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
-    public Long getCreatedAt() {
-        return createdAt;
+    public void updateName(String name) {
+        this.name = name;
+        updateUpdatedAt();
     }
 
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void updateUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "id=" + id +
+                "name='" + name + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }
