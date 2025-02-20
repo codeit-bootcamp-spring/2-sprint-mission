@@ -4,20 +4,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Domain {
-    protected int id;
-    protected Long createdAt, updatedAt;
+    protected String id;
+    protected String name;
+    protected Long createdAt;
 
     //지역변수
     private SimpleDateFormat dayTime = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
 
-    public Domain(int id) {
+    public Domain(String id, String name) {
         this.id = id;
+        this.name = name;
         this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
     }
 
     //GETTER
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -26,12 +27,4 @@ public class Domain {
         return createdAt;
     }
 
-    public Long getUpdatedAt() {
-        System.out.println("수정 시각: " + dayTime.format(new Date(updatedAt)));
-        return updatedAt;
-    }
-
-    public void update() {
-        this.updatedAt = System.currentTimeMillis();
-    }
 }
