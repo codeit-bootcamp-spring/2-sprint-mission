@@ -33,6 +33,13 @@ public class Message extends BaseEntity {
         return isEdited;
     }
 
+    public void updateContent(String newContent) {
+        validateContent(newContent);
+        this.content = newContent;
+        this.isEdited = true;
+        super.updateUpdatedAt();
+    }
+
     private void validateSender(User sender) {
         if (sender == null) {
             throw new IllegalArgumentException("sender 가 null 일 수는 없다!!!");
