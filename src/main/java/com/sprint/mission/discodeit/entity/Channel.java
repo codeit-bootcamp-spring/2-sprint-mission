@@ -5,16 +5,21 @@ import java.util.List;
 import java.util.UUID;
 
 public class Channel extends Common {
+
+    // 해당 채널의 주인
+    private final User user;
     // 채널명
     private String channelName;
     // 해당 채널의 유저리스트
     private List<User> users = new ArrayList<>();
 
-    public Channel(String channelName, List<User> users) {
+    public Channel(User user, String channelName) {
         // super() 하지 않아도 기본 생성자는 컴파일러가 자동으로 삽입
+        this.user = user;
         this.channelName = channelName;
-        this.users = users;
     }
+
+    public User getUser() {return user; }
 
     public String getChannelName() {
         return channelName;
@@ -29,8 +34,13 @@ public class Channel extends Common {
         this.channelName = channelName;
     }
 
-    // 유저 수정 - 채널에 유저가 들어가고 나갈 수 있음
-    public void updateUsers(List<User> users) {
-        this.users = users;
+    // 유저 추가 - 유저가 채널에 들어올 경우
+    public void addUsers(User user) {
+        users.add(user);
+    }
+
+    // 유저 삭제 - 유저가 채널에 나갈 경우
+    public void removeUsers(User user) {
+        users.remove(user);
     }
 }
