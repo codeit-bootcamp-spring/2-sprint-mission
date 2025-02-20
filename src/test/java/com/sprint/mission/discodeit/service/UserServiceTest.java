@@ -12,17 +12,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class UserServiceTest {
-    private static UserService userService;
-    private static final String NAME = "황지환";
     private static final String PASSWORD = "password";
-    private UserDto registeredUserInfo;
+    private static final String NAME = "황지환";
+    private static UserService userService;
+    private UserDto initUser;
 
     @BeforeEach
     void init() {
         userService = new JCFUserService();
 
-        UserRegisterDto userRegisterDto = new UserRegisterDto(NAME, PASSWORD);
-        registeredUserInfo = userService.register(userRegisterDto);
+        UserRegisterDto initUser = new UserRegisterDto(NAME, PASSWORD);
+        this.initUser = userService.register(initUser);
     }
 
     @Test
@@ -33,7 +33,7 @@ class UserServiceTest {
 
     @Test
     void 유저_UUID_단건_조회() {
-        UUID id = registeredUserInfo.id();
+        UUID id = initUser.id();
         UserDto userDto = userService.findById(id);
 
         assertThat(userDto.id()).isEqualTo(id);
@@ -56,5 +56,15 @@ class UserServiceTest {
         userService.register(userKim);
 
         assertThat(userService.findByName(NAME)).hasSize(2);
+    }
+
+    @Test
+    void 유저_이름_수정(){
+        String userName = "김철수";
+        userService.updateNameById(initUser.id(), userName);
+
+        UserDto updatedUserInfo = userService.findById(initUser.id());
+
+        assertThat(initUser.name()).isNotEqualTo(updatedUserInfo.name());
     }
 }
