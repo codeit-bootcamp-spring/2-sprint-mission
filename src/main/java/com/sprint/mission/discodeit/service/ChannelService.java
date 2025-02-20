@@ -4,11 +4,12 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ChannelService {
     Channel createChannel(User owner, String title, String description);
-    Channel getChannelById(Long channelId);
+    Channel getChannelById(UUID channelId);
     List<Channel> getChannels();
-    Channel updateChannel(Long channelId, User owner, String title, String description);
-    boolean deleteChannelById(Long channelId);
+    Channel updateChannel(UUID channelId, User owner, String title, String description);
+    boolean deleteChannelById(UUID channelId);
 }
