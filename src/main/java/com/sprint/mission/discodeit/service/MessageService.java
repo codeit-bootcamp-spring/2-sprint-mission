@@ -6,6 +6,10 @@ import java.util.UUID;
 
 public interface MessageService {
     MessageDto create(String context);
+
     MessageDto findById(UUID id);
+
     List<MessageDto> findAll();
+
+    void updateContextById(UUID id, String context);
 }

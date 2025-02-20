@@ -36,4 +36,10 @@ public class JCFMessageService implements MessageService {
                 .map(message -> new MessageDto(message.getKey(), message.getValue().getContext()))
                 .toList();
     }
+
+    @Override
+    public void updateContextById(UUID id, String context) {
+        messages.get(id)
+                .updateContext(context);
+    }
 }

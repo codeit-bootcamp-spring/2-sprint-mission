@@ -16,8 +16,8 @@ public class Message {
         this.context = context;
     }
 
-    public void updateName(String name) {
-        this.context = name;
+    public void updateContext(String context) {
+        this.context = context;
         updatedAt();
     }
 
