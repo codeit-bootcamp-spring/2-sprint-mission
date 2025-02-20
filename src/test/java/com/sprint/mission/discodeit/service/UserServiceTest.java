@@ -15,13 +15,14 @@ class UserServiceTest {
     private static UserService userService;
     private static final String NAME = "황지환";
     private static final String PASSWORD = "password";
+    private UserDto registeredUserInfo;
 
     @BeforeEach
     void init() {
         userService = new JCFUserService();
 
         UserRegisterDto userRegisterDto = new UserRegisterDto(NAME, PASSWORD);
-        userService.register(userRegisterDto);
+        registeredUserInfo = userService.register(userRegisterDto);
     }
 
     @Test
@@ -32,10 +33,10 @@ class UserServiceTest {
 
     @Test
     void 유저_UUID_단건_조회() {
-        List<UserDto> users = userService.findByName(NAME);
-        UserDto userDto = users.get(0);
+        UUID id = registeredUserInfo.id();
+        UserDto userDto = userService.findById(id);
 
-        assertThat(userDto.id() + userDto.name()).isEqualTo(userDto.id() + NAME);
+        assertThat(userDto.id()).isEqualTo(id);
     }
 
     @Test

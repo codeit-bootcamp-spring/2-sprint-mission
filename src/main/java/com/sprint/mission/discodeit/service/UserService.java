@@ -12,5 +12,7 @@ public interface UserService {
 
     List<UserDto> findAll();
 
-    void register(UserRegisterDto userRegisterDto);
+    UserDto register(UserRegisterDto userRegisterDto);
+
+//    void updateNameById(UUID id, String name);
 }

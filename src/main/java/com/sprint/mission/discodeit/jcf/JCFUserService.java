@@ -38,8 +38,10 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void register(UserRegisterDto userRegisterDto) {
-        UUID id = UUID.randomUUID(); // TODO: 2/20/25 Id가 UUID에 의존하지 않도록 수정 요망
-        users.put(id, new User(id, userRegisterDto.name(), userRegisterDto.password()));
+    public UserDto register(UserRegisterDto userRegisterDto) {
+        User user = new User(userRegisterDto.name(), userRegisterDto.password());
+        users.put(user.getId(), user);
+
+        return new UserDto(user.getId(), user.getName());
     }
 }

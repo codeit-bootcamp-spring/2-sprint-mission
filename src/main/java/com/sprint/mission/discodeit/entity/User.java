@@ -10,8 +10,8 @@ public class User {
     private String name;
     private String password;
 
-    public User(UUID id, String name, String password) {
-        this.id = id;
+    public User(String name, String password) {
+        this.id = UUID.randomUUID(); // TODO: 2/20/25 Id가 UUID에 의존하지 않도록 수정 요망
         this.createdAt = Instant.now().getEpochSecond();
         this.updatedAt = createdAt;
         this.name = name;
