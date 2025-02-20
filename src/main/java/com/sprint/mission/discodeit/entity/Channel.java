@@ -15,21 +15,21 @@ public class Channel extends BaseEntity {
         setDescription(description);
     }
 
-    public void setOwner(User owner) {
+    private void setOwner(User owner) {
         if (owner == null) {
             throw new IllegalArgumentException("유효하지 않은 오너입니다.");
         }
         this.owner = owner;
     }
 
-    public void setTitle(String title) {
+    private void setTitle(String title) {
         if (title == null || title.isEmpty()) {
             throw new IllegalArgumentException("유효하지 않은 서버 이름입니다.");
         }
         this.title = title;
     }
 
-    public void setDescription(String description) {
+    private void setDescription(String description) {
         if (description == null) {
             throw new IllegalArgumentException("유효하지 않은 서버 설명입니다.");
         }
