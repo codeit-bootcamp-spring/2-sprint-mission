@@ -16,13 +16,17 @@ public class Channel {
         this.name = name;
     }
 
-    public void updateName(String name){
+    public void updateName(String name) {
         this.name = name;
         updatedAt();
     }
 
     private void updatedAt() {
         this.updatedAt = Instant.now().getEpochSecond();
+    }
+
+    public String getName() {
+        return name;
     }
 
     public UUID getId() {
