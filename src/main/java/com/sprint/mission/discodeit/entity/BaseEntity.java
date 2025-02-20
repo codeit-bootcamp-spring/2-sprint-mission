@@ -25,7 +25,7 @@ public class BaseEntity {
         return modifiedAt;
     }
 
-    public void setModifiedAt(Long modifiedAt) {
-        this.modifiedAt = modifiedAt;
+    public void updateModifiedAt() {
+        this.modifiedAt = System.currentTimeMillis();
     }
 }

@@ -64,6 +64,8 @@ public class User extends BaseEntity{
         if (email != null) setEmail(email);
         if (avatar != null) setAvatar(avatar);
         if (status != null) setStatus(status);
+
+        updateModifiedAt();
     }
 
     @Override
