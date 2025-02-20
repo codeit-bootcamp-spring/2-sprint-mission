@@ -4,34 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Channel {
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
-
+public class Channel extends Common {
     // 채널명
     private String channelName;
     // 해당 채널의 유저리스트
     private List<User> users = new ArrayList<>();
 
     public Channel(String channelName, List<User> users) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
+        // super() 하지 않아도 기본 생성자는 컴파일러가 자동으로 삽입
         this.channelName = channelName;
         this.users = users;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
     }
 
     public String getChannelName() {
@@ -40,14 +22,6 @@ public class Channel {
 
     public List<User> getUsers() {
         return users;
-    }
-
-
-    // id, createdAt은 생성하고 바뀔 일이 없다.
-
-    // 업데이트시간 수정
-    public void updateUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     // 채널명 수정

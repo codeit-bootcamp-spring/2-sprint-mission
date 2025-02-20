@@ -2,11 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-public class Message {
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
-
+public class Message extends Common{
     // 메시지 내용
     private String content;
     // 메시지를 보낸 유저
@@ -16,25 +12,11 @@ public class Message {
     private Channel channel;
 
     public Message(String content, User sender, Channel channel) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
         this.content = content;
         this.sender = sender;
         this.channel = channel;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
 
     public String getContent() {
         return content;
@@ -48,12 +30,7 @@ public class Message {
         return channel;
     }
 
-    // id, 그리고 Channel과 Sender는 객체 생성할 때 정해지고 바뀔 일이 없다.
-
-    // 수정 날짜 수정
-    public void updateUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    // channel과 sender는 객체 생성할 때 정해지고 바뀔 일이 없다.
 
     // 메시지 수정
     public void updateContent(String content) {
