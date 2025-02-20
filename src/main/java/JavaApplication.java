@@ -12,8 +12,8 @@ import java.util.*;
 
 public class JavaApplication {
     static UserService userService = new JCFService();
-    static MessageService messageService = new JCFMessage();
     static ChannelService channelService = new JCFChannel();
+    static MessageService messageService = new JCFMessage(userService, channelService);
 
     public static void main(String[] args) {
         for(int i = 0; i<5; i++){
