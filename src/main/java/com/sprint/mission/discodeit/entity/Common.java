@@ -4,8 +4,8 @@ import java.util.UUID;
 
 // 겹치는 필드, 메소드 등을 Common으로 따로 빼주는게 좋을 것 같음
 public abstract class Common {
-    private UUID id;
-    private Long createdAt;
+    private final UUID id;
+    private final Long createdAt;
     private Long updatedAt;
 
     public UUID getId() {
