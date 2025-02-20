@@ -43,4 +43,13 @@ public class Channel extends Common {
     public void removeUsers(User user) {
         users.remove(user);
     }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "user=" + user +
+                ", channelName='" + channelName + '\'' +
+                ", users=" + users +
+                '}';
+    }
 }

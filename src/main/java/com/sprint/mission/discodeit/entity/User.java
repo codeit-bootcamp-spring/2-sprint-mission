@@ -53,4 +53,14 @@ public class User extends Common{
     public void removeRole(String role) {
         roles.remove(role);
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", roles=" + roles +
+                '}';
+    }
 }

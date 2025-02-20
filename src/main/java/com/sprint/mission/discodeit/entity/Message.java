@@ -17,7 +17,6 @@ public class Message extends Common{
         this.channel = channel;
     }
 
-
     public String getContent() {
         return content;
     }
@@ -37,7 +36,12 @@ public class Message extends Common{
         this.content = content;
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return "Message{" +
+                "content='" + content + '\'' +
+                ", sender=" + sender +
+                ", channel=" + channel +
+                '}';
+    }
 }
