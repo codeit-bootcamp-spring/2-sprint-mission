@@ -30,6 +30,13 @@ public class User extends BaseEntity {
     public void updateUserName(String newUserName) {
         validateUserName(newUserName);
         this.userName = newUserName;
+        super.updateUpdatedAt();
+    }
+
+    public void updateUserPassword(String newPassword) {
+        validatePassword(newPassword);
+        this.password = newPassword;
+        super.updateUpdatedAt();
     }
 
     private void validateUserName(String userName) {
