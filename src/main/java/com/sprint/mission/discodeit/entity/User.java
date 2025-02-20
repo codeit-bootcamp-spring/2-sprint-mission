@@ -8,17 +8,27 @@ public class User {
     private final Long createdAt;
     private Long updatedAt;
     private String name;
+    private String password;
 
-    public User(String name) {
+    public User(String name, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
         this.updatedAt = createdAt;
         this.name = name;
+        this.password = password;
     }
 
-    public void updateName(String name){
+    public void updateName(String name) {
         this.name = name;
         updatedAt();
+    }
+
+    public boolean isSameName(String name) {
+        return this.name.equals(name);
+    }
+
+    public boolean isSameId(UUID id) {
+        return this.id.equals(id);
     }
 
     private void updatedAt() {
@@ -35,5 +45,9 @@ public class User {
 
     public Long getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getName() {
+        return name;
     }
 }
