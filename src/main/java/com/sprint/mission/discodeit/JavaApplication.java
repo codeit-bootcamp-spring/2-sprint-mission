@@ -21,9 +21,11 @@ public class JavaApplication {
         Channel channel1 = new Channel("General");
         channelService.createChannel(channel1);
 
-        // Create Messages
         Message message1 = new Message("Hello, world!", user1.getId(), channel1.getId());
-        messageService.createMessage(message1);
+        // Create Messages
+        if (userService.getUser(user1.getId()) != null && channelService.getChannel(channel1.getId()) != null) {
+            messageService.createMessage(message1);
+        }
 
         // Read Users
         System.out.println("All Users: " + userService.getAllUsers());
@@ -33,8 +35,10 @@ public class JavaApplication {
         userService.updateUser(user1.getId(), "AliceUpdated");
         System.out.println("Updated User1: " + userService.getUser(user1.getId()).getUsername());
 
-        // Delete User
-        userService.deleteUser(user2.getId());
+        // Delete User with Validation
+        if (messageService.getAllMessages().stream().noneMatch(m -> m.getUserId().equals(user2.getId()))) {
+            userService.deleteUser(user2.getId());
+        }
         System.out.println("All Users After Deletion: " + userService.getAllUsers());
 
         // Read Channels
@@ -47,8 +51,11 @@ public class JavaApplication {
         // Read Messages
         System.out.println("All Messages: " + messageService.getAllMessages());
 
-        // Update Message
-        messageService.updateMessage(message1.getId(), "Updated Message");
+        // Update Message with Validation
+        Message messageToUpdate = messageService.getMessage(message1.getId());
+        if (messageToUpdate != null && userService.getUser(messageToUpdate.getUserId()) != null) {
+            messageService.updateMessage(message1.getId(), "Updated Message");
+        }
         System.out.println("Updated Message: " + messageService.getMessage(message1.getId()).getContent());
 
         // Delete Message
@@ -56,9 +63,3 @@ public class JavaApplication {
         System.out.println("All Messages After Deletion: " + messageService.getAllMessages());
     }
 }
-
-// Commit and Tagging Instructions
-// After implementing the main class and CRUD tests, commit the changes and create a tag:
-// git add .
-// git commit -m "Implement main application with CRUD test cases"
-// git tag sprint1-main
