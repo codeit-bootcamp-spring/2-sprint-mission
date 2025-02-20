@@ -4,7 +4,7 @@
 # 스프린트 미션1 - 프로젝트 마일스톤
 ### 기본
 - [x] 프로젝트 초기화 (Java, Gradle)
-- [ ] 도메인 모델 구현
+- [x] 도메인 모델 구현
 - [ ] 서비스 인터페이스 설계 및 구현체 구현
 - [ ] 각 도메인 모델별 CRUD
 - [ ] JCFx메모리 기반
@@ -17,22 +17,22 @@
 - 패키지명: com.sprint.mission.discodeit.entity
 - 도메인 모델 정의
 - 공통
-- [ ] id: 객체를 식별하기 위한 id로 UUID 타입으로 선언합니다.
-- [ ] createdAt, updatedAt: 각각 객체의 생성, 수정 시간을 유닉스 타임스탬프로 나타내기 위한 필드로 Long 타입으로 선언합니다.
-- [ ] User, Channel, Message
+- [x] id: 객체를 식별하기 위한 id로 UUID 타입으로 선언합니다.
+- [x] createdAt, updatedAt: 각각 객체의 생성, 수정 시간을 유닉스 타임스탬프로 나타내기 위한 필드로 Long 타입으로 선언합니다.
+- [x] User, Channel, Message
 
 - 생성자
-- [ ] id는 생성자에서 초기화하세요.
-- [ ] createdAt는 생성자에서 초기화하세요.
-- [ ] id, createdAt, updatedAt을 제외한 필드는 생성자의 파라미터를 통해 초기화하세요.
+- [x] id는 생성자에서 초기화하세요.
+- [x] createdAt는 생성자에서 초기화하세요.
+- [x] id, createdAt, updatedAt을 제외한 필드는 생성자의 파라미터를 통해 초기화하세요.
 
 - 메소드
-- [ ] 각 필드를 반환하는 Getter 함수를 정의하세요.
-- [ ] 필드를 수정하는 update 함수를 정의하세요.
+- [x] 각 필드를 반환하는 Getter 함수를 정의하세요.
+- [x] 필드를 수정하는 update 함수를 정의하세요.
 
 ## 서비스 설계 및 구현
 -  도메인 모델 별 CRUD(생성, 읽기, 모두 읽기, 수정, 삭제) 기능을 인터페이스로 선언하세요.
-  - [ ] 인터페이스 패키지명: com.sprint.mission.discodeit.service
+  - 인터페이스 패키지명: com.sprint.mission.discodeit.service
   - [ ] 인터페이스 네이밍 규칙: [도메인 모델 이름]Service
   - [ ] User, Channel, Message
 
