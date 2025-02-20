@@ -9,14 +9,19 @@ import java.util.Scanner;
 
 public class JCFMessageService implements MessageService {
     @Override
-    public Message write(Channel channel) {
+    public Message write() {
         Scanner sc = new Scanner(System.in);
 
-        System.out.printf("채널명을 입력하시오.\n채널명: ");
+        System.out.println("메시지를 입력하시오: ");
         String txt = sc.nextLine();
         Message message = new TextMessage(txt);
 
+        return message;
+    }
 
-        return null;
+    @Override
+    public Message randomWrite() {
+        Message message = new TextMessage("A");
+        return message;
     }
 }

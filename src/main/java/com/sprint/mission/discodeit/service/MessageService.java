@@ -4,5 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 
 public interface MessageService {
-    Message write(Channel channel);
+    Message write();
+
+    Message randomWrite();
 }

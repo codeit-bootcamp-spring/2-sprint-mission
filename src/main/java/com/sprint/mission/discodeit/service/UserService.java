@@ -7,4 +7,5 @@ public interface UserService {
 
     User updateName(User user);
 
+    User randomRegister();
 }

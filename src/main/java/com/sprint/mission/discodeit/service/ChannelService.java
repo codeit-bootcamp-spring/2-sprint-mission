@@ -6,8 +6,10 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.util.Scanner;
 
 public interface ChannelService {
-    Channel register( );
+    Channel register(Message message);
 
     Channel update(Channel channel);
+
+    Channel testRegister(Message message);
 
 }

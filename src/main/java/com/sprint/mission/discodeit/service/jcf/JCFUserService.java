@@ -35,4 +35,11 @@ public class JCFUserService implements UserService {
 
         return user;
     }
+
+    @Override
+    public User randomRegister() {
+        User user = new User("a", "b");
+        System.out.println("사용자 생성 성공");
+        return user;
+    }
 }

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ServerService;
 
+import java.util.Collection;
 import java.util.Scanner;
 
 public class JCFServerService implements ServerService {
@@ -79,15 +80,30 @@ public class JCFServerService implements ServerService {
 
     @Override
     public void printAllChannels() {
-        server.channels.entrySet().stream()
-                .forEach(System.out::println);
+        Collection<Channel> values = server.channels.values();
+        for (Channel channel : values){
+            System.out.println("--------------------------------------------");
+            System.out.println(channel);
+            System.out.println("--------------------------------------------");
+        }
+    }
+
+    @Override
+    public void printAllUsers() {
+        Collection<User> values = server.users.values();
+        for (User user : values){
+            System.out.println("--------------------------------------------");
+            System.out.println(user);
+            System.out.println("--------------------------------------------");
+        }
+
     }
 
     @Override
     public void addUser(User user) {
         server.users.put(user.getId(), user);
         server.update();
-        System.out.println("사용자가 추가되었습니다.");
+        System.out.println("사용자가 서버에 추가되었습니다.");
     }
 
     @Override
@@ -140,9 +156,5 @@ public class JCFServerService implements ServerService {
         }
     }
 
-    @Override
-    public void printAllUsers() {
-        server.users.entrySet().stream()
-                .forEach(System.out::println);
-    }
+
 }

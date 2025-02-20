@@ -54,5 +54,13 @@ public class User {
         this.updatedAt = System.currentTimeMillis();
     }
 
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "\ncreatedAt=" + dayTime.format(new Date(createdAt)) +
+                ",\nupdatedAt=" + dayTime.format(new Date(updatedAt)) +
+                ",\nid='" + id + '\'' +
+                ",\nname='" + name + '\'' +
+                '}';
+    }
 }
