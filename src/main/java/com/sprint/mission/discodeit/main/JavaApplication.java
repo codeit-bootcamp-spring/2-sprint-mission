@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.main;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.DuplicatedUserException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
@@ -20,9 +21,12 @@ public class JavaApplication {
         User user6 = userService.createUser("Mr.delete", "delete@naver.com", "XXXXX", "I am gonna be deleted soon");
         User user7 = userService.createUser("Oreo", "delete2@naver.com", "", "");
 
+        try {
+            User user8 = userService.createUser("나오지 마", "Jamie@naver.com", "korean", "I am Korean"); // 이메일 중복이므로 생성 안 하고 null 반환
+        } catch (DuplicatedUserException e) {
+            System.out.println(e.getMessage());
+        }
 
-        User user8 = userService.createUser("나오지 마", "Jamie@naver.com", "korean", "I am Korean"); // 이메일 중복이므로 생성 안 하고 null 반환
-        if (user8 != null) System.out.println("이거 나오면 안된다. 중복 이메일 계정이 생성된거임");
         userService.getUsers().stream().forEach(System.out::println);
         System.out.println("=========== 유저 생성 및 전체 조회 테스트 끝 ===========");
         System.out.println();

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.DuplicatedUserException;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
@@ -23,8 +24,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public User createUser(String nickname, String email, String avatar, String status) {
-        //TODO: 이메일 중복 유저 생성시 Exception 던지기 customException만들기 (DuplicatedUserException)
-        if(getUserByEmail(email) != null) return null;
+        if(getUserByEmail(email) != null) {
+            throw new DuplicatedUserException("이메일 중복입니다.");
+        }
 
         User user = new User(nickname, email, avatar, status);
         users.put(user.getId(), user);
