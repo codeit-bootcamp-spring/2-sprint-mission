@@ -19,7 +19,12 @@ public interface ChannelService {
     List<Channel> getAllChannels();
 
     // 채널 수정
-    void updateChannel(Channel channel);
+    // channelName도 변경 안되게 막아놔서 바꿀게 채널의 Users 필드밖에 없음
+    // -> Users를 삭제하거나 추가하는 메소드 두개로 분리
+    // void updateChannel(Channel channel);
+    void addUsersToChannel(User user, Channel channel);
+    void removeUsersFromChannel(User user, Channel channel);
+
 
     // 채널 삭제
     void deleteChannel(String channelName);
