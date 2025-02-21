@@ -21,15 +21,15 @@ public class JCFUserService implements UserService {
     // 유저 생성
     @Override
     public void createUser(User user) {
-        if(user == null) {
+        if (user == null) {
             throw new IllegalArgumentException("생성하려는 유저 정보가 올바르지 않습니다.");
         }
         // 필수 입력 항목이 하나라도 빠지면 Exception 발생
-        if(user.getUsername().isEmpty() || user.getPassword().isEmpty() || user.getNickname().isEmpty()) {
+        if (user.getUsername().isEmpty() || user.getPassword().isEmpty() || user.getNickname().isEmpty()) {
             throw new IllegalArgumentException("필수 입력 항목을 빠뜨리셨습니다.");
         }
         // 중복 유저 방지, username을 기준으로 회원을 찾거나 수정하므로 중복이 생기면 안된다.
-        if(data.stream().
+        if (data.stream().
                 anyMatch(u -> u.getUsername().equals(user.getUsername()))) {
             // 처음엔 data.stream().filter(u -> u.getUsername().equals(user.getUsername()).findFirst().isPresent()로 작성하였으나,
             // anyMatch를 사용하는게 더 간편해 보여 사용
@@ -42,14 +42,14 @@ public class JCFUserService implements UserService {
     @Override
     public User getUser(String username) {
         User findUser = null;
-        for(User user : data) {
-            if(user.getUsername().equals(username)) {
+        for (User user : data) {
+            if (user.getUsername().equals(username)) {
                 findUser = user;
                 break;
             }
         }
 
-        if(findUser == null) {
+        if (findUser == null) {
             throw new IllegalArgumentException("존재하지 않는 유저 입니다.");
         }
 
@@ -69,25 +69,58 @@ public class JCFUserService implements UserService {
     // 유저 수정
     @Override
     public void updateUser(User user) { // 매개변수로 도대체 뭘 받아야 효율적일지 모르겟다. 필드별로 받기 vs User 객체로 받기
-        if(user == null) {
+        if (user == null) {
             throw new IllegalArgumentException("수정 정보가 존재하지 않습니다.");
         }
 
         // 필수 입력 항목이 하나라도 빠지면 Exception 발생 (username은 아이디이므로 수정X)
-        if(user.getPassword().isEmpty() || user.getNickname().isEmpty()) {
+        if (user.getPassword().isEmpty() || user.getNickname().isEmpty()) {
             throw new IllegalArgumentException("필수 입력 항목을 빠뜨리셨습니다.");
         }
 
         User findUser = getUser(user.getUsername()); // getUser 메소드로 반환되는 User 객체는 data 리스트에 이미 존재하는 객체의 참조 -> findUser를 수정하면 data의 해당 객체도 수정됨
 
         // 존재하지 않는 회원 정보를 수정하려고 할 때
-        if(findUser == null) {
+        if (findUser == null) {
             throw new IllegalArgumentException("존재하지 않는 회원입니다.");
         }
 
         findUser.updateUpdatedAt(System.currentTimeMillis());
         findUser.updateNickname(user.getNickname());
         findUser.updatePassword(user.getPassword());
+    }
+
+    // 권한 추가
+    @Override
+    public void addRole(String role, String username) {
+        if (role == null) {
+            throw new IllegalArgumentException("추가할 권한이 없습니다.");
+        }
+        if (username == null) {
+            throw new IllegalArgumentException("username이 존재하지 않습니다.");
+        }
+
+        User findUser = getUser(username);
+        findUser.addRole(role);
+    }
+
+
+    // 권한 삭제
+    @Override
+    public void removeRole(String role, String username) {
+        if (role == null) {
+            throw new IllegalArgumentException("삭제할 권한이 없습니다.");
+        }
+        if (username == null) {
+            throw new IllegalArgumentException("username이 존재하지 않습니다.");
+        }
+
+        User findUser = getUser(username);
+        // 해당 role이 있는지 먼저 확인
+        if (!findUser.getRoles().stream().anyMatch(r -> r.equals(role))) {
+            throw new IllegalArgumentException("해당 유저에게 해당 권한은 존재하지 않습니다.");
+        }
+        findUser.removeRole(role);
     }
 
     // 유저 삭제
