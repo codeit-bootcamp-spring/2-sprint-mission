@@ -9,7 +9,7 @@ import java.util.ArrayDeque;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
-    private ChannelRepository channelRepository;
+    private final ChannelRepository channelRepository;
 
     public JCFChannelService() {
         this.channelRepository = new ChannelRepository();
