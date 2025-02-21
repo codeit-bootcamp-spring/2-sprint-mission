@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Channel extends Common {
+
+    // 필드 선언
     private String channelName;
     private String description;
-    private List<Message> messages;
 
-    public Channel(String channelName, String description)  {
+    // 생선자 선언
+    public Channel(String channelName, String description) {
         this.channelName = channelName;
         this.description = description;
-        this.messages = new ArrayList<Message>();
     }
 
+    // getter
     public String getChannelName() {
         return channelName;
     }
@@ -22,10 +24,8 @@ public class Channel extends Common {
         return description;
     }
 
-    public List<Message> getMessages() {
-        return messages;
-    }
 
+    // 채널 업데이트 메소드 선언
     public void updateChannel(String channelName, String description) {
         this.channelName = channelName;
         this.description = description;

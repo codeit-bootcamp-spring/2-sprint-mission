@@ -10,8 +10,8 @@ public class Tesst {
 
 
         System.out.println("----------------------------생성--------------------------------");
-        userService.createUser("KANG", "homea90@naver.com");
-        userService.createUser("KANG", "h90@naver.com");
+//        userService.createUser("KANG", "homea90@naver.com");
+//        userService.createUser("KANG", "h90@naver.com");
 //        userService.createUser("JO", "whrbfl@naver.com");
 //        userService.createUser("PARK", "park@naver.com");
 //        userService.createUser("KIM", "kim@naver.com");

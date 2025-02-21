@@ -11,23 +11,19 @@ public class JCFUserService implements UserService {
     private final List<User> data;
 
     public JCFUserService() {
-        this.data = new ArrayList<>();
+        data = new ArrayList<>();
     }
 
 
     // 사용자 생성
     @Override
-    public void createUser(String name, String mail) {
-        data.add(new User(name, mail));
+    public void createUser(User user) {
+        data.add(user);
         System.out.println("---------------------[사용자 등록]-------------------------");
-        System.out.println("[완료]\n이름: " + name + "\n메일: " + mail);
-        for (User u : data) {
-            if (u.getName().equals(name) && u.getEmail().equals(mail)) {
-                System.out.println("사용자 ID: " + u.getId());
-                System.out.println("생성시간: " + u.getCreatedAtFormatted());
-                System.out.println("업데이트 시간: " + u.getupdatedAttFormatted());
-            }
-        }
+        System.out.println("이름: " + user.getName() + "\n메일: " + user.getEmail());
+        System.out.println("사용자 ID: " + user.getId());
+        System.out.println("생성 시간: "+ user.getCreatedAtFormatted());
+        System.out.println("생성 시간: "+ user.getupdatedAttFormatted());
         System.out.println("---------------------------------------------------------");
     }
 
