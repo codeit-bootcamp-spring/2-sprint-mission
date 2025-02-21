@@ -32,9 +32,9 @@ public class Message extends BaseEntity {
         return content;
     }
 
-    public void update(User sender, String content) {
-        if (sender != null) setSender(sender);
+    public void update(String content) {
         if (content != null) setContent(content);
+        updateModifiedAt();
     }
 
     @Override

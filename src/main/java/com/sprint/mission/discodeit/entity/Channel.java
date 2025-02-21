@@ -53,6 +53,8 @@ public class Channel extends BaseEntity {
         if (owner != null) setOwner(owner);
         if (title != null) setTitle(title);
         if (description != null) setDescription(description);
+
+        updateModifiedAt();
     }
 
     @Override
