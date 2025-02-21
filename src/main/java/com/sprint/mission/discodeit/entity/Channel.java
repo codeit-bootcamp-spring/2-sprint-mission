@@ -11,7 +11,7 @@ public class Channel extends BaseEntity {
         return channelName;
     }
 
-    public void updateChannelName(String channelName) {
-        this.channelName = channelName;
+    public void updateChannelName(String newChannelName) {
+        this.channelName = newChannelName;
     }
 }

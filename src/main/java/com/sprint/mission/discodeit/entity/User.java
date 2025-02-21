@@ -11,7 +11,7 @@ public class User extends BaseEntity {
         return userName;
     }
 
-    public void updateUsername(String userName) {
-        this.userName = userName;
+    public void updateUsername(String newUserName) {
+        this.userName = newUserName;
     }
 }
