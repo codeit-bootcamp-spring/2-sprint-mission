@@ -6,7 +6,7 @@ public class User {
     private final UUID uid;
     private final Long userCreateAt;
     private Long userUpdateAt;
-    private final String userName;
+    private String userName;
     private String nickName;
 
     public User(String userName, String nickName) {
@@ -36,18 +36,19 @@ public class User {
         return nickName;
     }
 
-    public Long userUpdateAtUpdate(){
+    public void userUpdate(String userName, String nickName){
         userUpdateAt = System.currentTimeMillis();
-        return userUpdateAt;
-    }
-
-    public void nickNameUpdate(String userName){
+        this.userName = userName;
         this.nickName = nickName;
     }
 
     @Override
     public String toString(){
-        return "[uid: " + uid + ", userCreateAt: " + userCreateAt + ", userUpdateAt: " + userUpdateAt + ", userName: " + userName + "]";
+        return "[uid: " + uid +
+                ", userCreateAt: " + userCreateAt +
+                ", userUpdateAt: " + userUpdateAt +
+                ", userName: " + userName +
+                ", nickName: " + nickName + "]";
     }
 
 }
