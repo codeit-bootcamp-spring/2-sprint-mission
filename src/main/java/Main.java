@@ -17,17 +17,17 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-//            System.out.println("\n===== 채팅 시스템 메뉴 =====");
-//            System.out.println("1. 유저 생성");
-//            System.out.println("2. 채널 생성");
-//            System.out.println("3. 유저를 채널에 추가");
-//            System.out.println("4. 메시지 보내기");
-//            System.out.println("5. 특정 채널의 메시지 보기");
-//            System.out.println("6. 특정 메시지 삭제");
-//            System.out.println("7. 채널에서 유저 삭제");
-//            System.out.println("8. 모든 유저 및 채널 조회");
-//            System.out.println("9. 종료");
-//            System.out.print("메뉴를 선택하세요: ");
+            System.out.println("\n===== 채팅 시스템 메뉴 =====");
+            System.out.println("1. 유저 생성");
+            System.out.println("2. 채널 생성");
+            System.out.println("3. 유저를 채널에 추가");
+            System.out.println("4. 메시지 보내기");
+            System.out.println("5. 특정 채널의 메시지 보기");
+            System.out.println("6. 특정 메시지 삭제");
+            System.out.println("7. 채널에서 유저 삭제");
+            System.out.println("8. 모든 유저 및 채널 조회");
+            System.out.println("9. 종료");
+            System.out.print("메뉴를 선택하세요: ");
 
             int choice = scanner.nextInt();
             scanner.nextLine(); // 개행 문자 제거
