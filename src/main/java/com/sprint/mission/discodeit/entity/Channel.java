@@ -1,18 +1,22 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Channel extends BaseEntity {
     private String channelName;
-    private Set<User> participants;
+    private TreeSet<User> participants;
     private List<Message> messages;
 
-    public Channel(String channelName) {
+    public Channel(String channelName, User... participants) {
+        validChannelName(channelName);
+
         this.channelName = channelName;
-        participants = new TreeSet<User>();
+        if (participants == null || participants.length == 0) {     // 자기자신과의 채팅을 허용하냐 마냐 (허용하면 : == 0 / 허용하지 않으면 : <= 1
+            throw new IllegalArgumentException("최소 1명의 사용자가 입력되어야 합니다!!!");
+        }
+        this.participants = Arrays.stream(participants)
+                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(User::getUserName))));       // Comparator.comparing(User::getUserName) (user1, user2) -> user1.getUserName().compareTo(user2.getUserName())
         messages = new ArrayList<>();
     }
 
@@ -20,7 +24,7 @@ public class Channel extends BaseEntity {
         return channelName;
     }
 
-    public Set<User> getParticipants() {
+    public TreeSet<User> getParticipants() {
         return participants;
     }
 
