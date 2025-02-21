@@ -1,9 +1,14 @@
 package com.sprint.mission.discodeit.main;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.DuplicatedUserException;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+
+import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
@@ -21,6 +26,7 @@ public class JavaApplication {
         User user6 = userService.createUser("Mr.delete", "delete@naver.com", "XXXXX", "I am gonna be deleted soon");
         User user7 = userService.createUser("Oreo", "delete2@naver.com", "", "");
 
+        System.out.println("=========== 바로 아래에 중복된 이메일 떠야 함 ===========");
         try {
             User user8 = userService.createUser("나오지 마", "Jamie@naver.com", "korean", "I am Korean"); // 이메일 중복이므로 생성 안 하고 null 반환
         } catch (DuplicatedUserException e) {
@@ -49,6 +55,7 @@ public class JavaApplication {
         userService.updateUser(user3.getId(), "Nice", null, "");
         System.out.println(userService.getUserById(user3.getId()));
         System.out.println("=========== 유저 update 테스트 끝 ===========");
+        System.out.println();
 
         // 유저 삭제
         System.out.println("=========== 유저 삭제 테스트 ===========");
@@ -60,6 +67,66 @@ public class JavaApplication {
         System.out.println("'Mr.delete' 삭제 성공 여부: " + userService.deleteUserByEmail(user6.getEmail()));
         System.out.println("=========== 삭제 이후: 5명이여야 함 ===========");
         userService.getUsers().stream().forEach(System.out::println);
+        System.out.println("=========== 유저 삭제 테스트 끝===========");
+        System.out.println();
+
+
+
+        //////////////////////
+        //체널 등록 테스트
+        ChannelService channelService = JCFChannelService.getInstance();
+        System.out.println("=========== 채널 생성 및 전체 채널 리스트 조회 테스트 ===========");
+        System.out.println("=========== 예상 결과: 채널 4개 나옴 ===========");
+        Channel channel1 = channelService.createChannel(user1.getId(), "sb02", "코드잇 스프린트 2기");
+        Channel channel2 = channelService.createChannel(user2.getId(), "스프링 공부방", "스프링 공부하는중");
+        Channel channel3 = channelService.createChannel(user2.getId(), "이거거거거", "아아아아아");
+        Channel channel4 = channelService.createChannel(user3.getId(), "스프링 공부방", "다른 방 베낌");
+
+        channelService.getAllChannels().stream().forEach(System.out::println);
+        System.out.println("=========== 채널 생성 및 전체 채널 리스트 조회 테스트 끝 ===========");
+        System.out.println();
+
+        //조회 테스트
+        System.out.println("=========== 채널 조회 테스트 ===========");
+        System.out.println("=========== 채널 주인 조회: Han이 나와야 함 ===========");
+        UUID ownerId1 = channelService.getChannelOwnerId(channel1.getId());
+        System.out.println(userService.getUserById(ownerId1));
+        System.out.println("=========== 특정 제목의 채널들 조회: '스프링 공부방' 채널이 2개 나와야 함 ===========");
+        channelService.getChannelsByTitle("스프링 공부방").stream().forEach(System.out::println);
+        System.out.println("=========== 채널 id로 채널 조회: sb02 방이 나와야 함 ===========");
+        System.out.println(channelService.getChannelByChannelId(channel1.getId()));
+        System.out.println("=========== 채널 조회 테스트 끝 ===========");
+        System.out.println();
+
+        //채널 멤버 추가 및 조회 테스트
+        System.out.println("=========== 채널 멤버 추가,삭제 및 조회 테스트 ===========");
+        channelService.addUserToChannel(channel1.getId(), user1.getId());
+        channelService.addUserToChannel(channel1.getId(), user2.getId());
+        channelService.addUserToChannel(channel1.getId(), user2.getId());
+        channelService.addUserToChannel(channel1.getId(), user3.getId());
+        System.out.println("=========== Han, Kim, Nice가 나와야 함 ===========");
+        channelService.getChannelMembers(channel1.getId()).stream().forEach((u) -> {
+            System.out.println(userService.getUserById(u));
+        });
+        System.out.println("=========== Kim, Han(오너여서 제거 안 됨) 삭제 시도: Han, Nice가 나와야 함 ===========");
+        channelService.deleteUserFromChannel(channel1.getId(), user1.getId());
+        channelService.deleteUserFromChannel(channel1.getId(), user2.getId());
+        channelService.getChannelMembers(channel1.getId()).stream().forEach((u) -> {
+            System.out.println(userService.getUserById(u));
+        });
+        System.out.println("=========== 채널 멤버 추가,삭제 및 조회 테스트 끝 ===========");
+        System.out.println();
+
+        //채널 삭제 테스트
+        System.out.println("=========== 채널 삭제 테스트 ===========");
+        System.out.println("=========== 채널 목록: 4개 ===========");
+        channelService.getAllChannels().stream().forEach(System.out::println);
+
+        System.out.println("=========== 채널 하나 삭제: 3개 남아야 함 ===========");
+        channelService.deleteChannelByChannelId(channel4.getId());
+        channelService.getAllChannels().stream().forEach(System.out::println);
+        System.out.println("=========== 채널 삭제 테스트 끝===========");
+        System.out.println();
 
     }
 }
