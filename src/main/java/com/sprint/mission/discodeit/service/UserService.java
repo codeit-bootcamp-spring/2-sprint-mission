@@ -20,6 +20,12 @@ public interface UserService {
     // 유저 수정
     void updateUser(User user);
 
+    // 권한 추가
+    void addRole(String role, String username);
+
+    // 권한 삭제
+    void removeRole(String role, String username);
+
     // 유저 삭제
     void deleteUser(String username);
 
