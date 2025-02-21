@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+
 import java.util.*;
 
 

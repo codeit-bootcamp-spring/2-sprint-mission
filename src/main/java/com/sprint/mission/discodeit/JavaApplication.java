@@ -23,9 +23,7 @@ public class JavaApplication {
 
         Message message1 = new Message("Hello, world!", user1.getId(), channel1.getId());
         // Create Messages
-        if (userService.getUser(user1.getId()) != null && channelService.getChannel(channel1.getId()) != null) {
-            messageService.createMessage(message1);
-        }
+        messageService.createMessage(message1);
 
         // Read Users
         System.out.println("All Users: " + userService.getAllUsers());
