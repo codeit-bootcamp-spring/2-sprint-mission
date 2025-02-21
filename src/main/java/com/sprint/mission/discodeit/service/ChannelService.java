@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface ChannelService {
     // 채널 생성
-    void createChannel(User user, String channelName);
+    void createChannel(Channel channel);
 
     // 채널 하나 읽기
     // UUID id를 파라미터로 사용해 불러오기엔, UUID는 난수값이라 미리 알기가 힘들고 Channel DB를 따로 사용하지 않으므로 알길이 없음
