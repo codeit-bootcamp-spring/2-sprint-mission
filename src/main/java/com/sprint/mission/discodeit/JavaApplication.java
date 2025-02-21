@@ -9,8 +9,9 @@ public class JavaApplication {
         // Initialize services
         JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService();
-        JCFMessageService messageService = new JCFMessageService();
+        JCFMessageService messageService = new JCFMessageService(userService,channelService);
 
+        //df
         // Create Users
         User user1 = new User("Alice");
         User user2 = new User("Bob");
@@ -50,10 +51,9 @@ public class JavaApplication {
         System.out.println("All Messages: " + messageService.getAllMessages());
 
         // Update Message with Validation
-        Message messageToUpdate = messageService.getMessage(message1.getId());
-        if (messageToUpdate != null && userService.getUser(messageToUpdate.getUserId()) != null) {
-            messageService.updateMessage(message1.getId(), "Updated Message");
-        }
+
+        messageService.updateMessage(message1.getId(), "Updated Message");
+
         System.out.println("Updated Message: " + messageService.getMessage(message1.getId()).getContent());
 
         // Delete Message

@@ -9,13 +9,17 @@ public class JCFMessageService implements MessageService {
     private JCFUserService userService;
     private JCFChannelService channelService;
 
+    public JCFMessageService(JCFUserService userService, JCFChannelService channelService) {
+        this.userService = userService;
+        this.channelService = channelService;
+    }
 
     public void createMessage(Message message) {
         if(userService.getUser(message.getUserId()) != null && channelService.getChannel(message.getChannelId()) != null)
         {
             data.put(message.getId(), message);
         }
-
+        else System.out.println("User not found");
     }
     public Message getMessage(UUID id) { return data.get(id); }
     public List<Message> getAllMessages() { return new ArrayList<>(data.values()); }

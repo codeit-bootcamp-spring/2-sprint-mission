@@ -7,6 +7,8 @@ public class Message extends Entity {
     private final UUID userId;
     private final UUID channelId;
 
+
+
     public Message(String content, UUID userId, UUID channelId) {
         super();
         this.content = content;
