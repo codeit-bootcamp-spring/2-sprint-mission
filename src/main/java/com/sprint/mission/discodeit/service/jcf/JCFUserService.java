@@ -23,6 +23,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User createUser(String nickname, String email, String avatar, String status) {
+        //TODO: 이메일 중복 유저 생성시 Exception 던지기 customException만들기 (DuplicatedUserException)
         if(getUserByEmail(email) != null) return null;
 
         User user = new User(nickname, email, avatar, status);
