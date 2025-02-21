@@ -47,7 +47,7 @@ public class JavaApplication {
                             System.out.println("\n===사용자 조회 ===");
                             System.out.print("사용자 이름 입력: ");
                             String username2 = sc.nextLine();
-                            userService.fu(username2);
+                            userService.foundUser(username2);
                             break;
 
                         case "3":
