@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.entity;
 public class User extends BaseEntity {
     private String userName;
 
-    public String getUserName() {
-        return userName;
+    public User (String userName) {
+        this.userName = userName;
     }
 
     public String getUsername() {
