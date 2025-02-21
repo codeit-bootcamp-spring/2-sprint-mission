@@ -33,7 +33,7 @@ public class UserRepository {
 
     // id가 유효하지 않을 때의 예외처리?
     public void deleteUser(UUID userId) {
-        boolean removed = this.users.removeIf(user -> user.getId().equals(userId));
+        boolean removed = this.users.removeIf(user -> Objects.equals(user.getId(), userId));
         if (!removed) {
             throw new IllegalArgumentException("삭제할 id를 가진 사용자가 존재하지 않습니다!!!");
         }
