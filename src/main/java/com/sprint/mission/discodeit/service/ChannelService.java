@@ -20,4 +20,7 @@ public interface ChannelService {
 
     void removeUserFromChannel(Channel channel, String userName); //유저 삭제
     void removeMessageFromChannel(Channel channel, Message message); //메세지 삭제
+
+    void validateChannelExists(String channelName); // 채널 존재 확인
+
 }

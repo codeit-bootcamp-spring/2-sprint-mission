@@ -17,4 +17,6 @@ public interface UserService {
 
     void deleteUser(User user);   //유저 삭제
     void deleteChannel(User user, String channelName);   //유저 채널 삭제
+
+    void validateUserExists(String username);   //유저 존재 확인
 }
