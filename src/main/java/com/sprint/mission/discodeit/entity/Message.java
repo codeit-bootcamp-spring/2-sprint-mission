@@ -1,16 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.UUID;
+
 public class Message extends BaseEntity {
-    private User sender;
+    private UUID sender;
     private String content;
 
-    public Message(User sender, String content) {
+    protected Message(UUID sender, String content) {
         super();
         setSender(sender);
         setContent(content);
     }
 
-    private void setSender(User sender) {
+    private void setSender(UUID sender) {
         if (sender == null) {
             throw new IllegalArgumentException("유효하지 않은 송신자입니다");
         }
@@ -24,7 +26,7 @@ public class Message extends BaseEntity {
         this.content = content;
     }
 
-    public User getSender() {
+    public UUID getSender() {
         return sender;
     }
 
