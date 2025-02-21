@@ -86,11 +86,9 @@ public class JCFUserService implements UserService {
         userNameToId.remove(userName);
     }
 
-    public boolean uidExists(UUID userId) {
-        if(!(userData.containsKey(userId))){
-            System.out.println("존재하지 않는 사용자입니다.");
-            return false;
+    public void uidExists(UUID userId) {
+        if(!(userData.containsKey(userId))) {
+            throw new IllegalArgumentException();
         }
-        return true;
     }
 }

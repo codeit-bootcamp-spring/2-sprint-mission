@@ -48,7 +48,7 @@ public class User {
                 ", userCreateAt: " + userCreateAt +
                 ", userUpdateAt: " + userUpdateAt +
                 ", userName: " + userName +
-                ", nickName: " + nickName + "]";
+                ", nickName: " + nickName + "]\n";
     }
 
 }

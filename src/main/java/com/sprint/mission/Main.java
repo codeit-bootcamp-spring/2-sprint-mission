@@ -1,5 +1,6 @@
 package com.sprint.mission;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.jcf.JCFUserService;
@@ -70,7 +71,7 @@ public class Main {
                 case 2:
                     System.out.println("<모든 사용자의 정보 출력>\n");
                     try{
-                        System.out.println(userService.getAllUsers());
+                        System.out.print(userService.getAllUsers());
                     }catch(IllegalArgumentException e){
                         System.out.println(e.getMessage());
                     }
@@ -116,7 +117,7 @@ public class Main {
                         String deleteUserName = sc.nextLine();
                         userService.deleteUser(deleteUserName);
                         System.out.println("완료되었습니다.\n<모든 사용자의 정보 출력>");
-                        System.out.println(userService.getAllUsers());
+                        System.out.print(userService.getAllUsers());
                     }catch(IllegalArgumentException e){
                         System.out.println(e.getMessage());
                     }
@@ -135,25 +136,62 @@ public class Main {
             if(choice == 7) return;
             switch(choice){
                 case 1:
-                    System.out.print("채널 ID 입력: ");
-                    UUID channelId = UUID.fromString(sc.nextLine());
-                    String getChannel = channelService.getChannel(channelId);
-                    if(getChannel == null){
-                        System.out.println("존재하지 않는 채널입니다.");
-                        break;
+                    try{
+                        System.out.print("채널 ID 입력: ");
+                        UUID channelId = UUID.fromString(sc.nextLine());
+                        System.out.print(channelService.getChannel(channelId));
+                    }catch(IllegalArgumentException e){
+                        System.out.println("채널 조회에 실패하였습니다.");
                     }
-                    System.out.println(getChannel);
                     break;
                 case 2:
+                    System.out.println("<모든 채널의 정보 출력>\n");
+                    try{
+                        System.out.println(channelService.getAllChannels());
+                    }catch(IllegalArgumentException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case 3:
                     try{
-                        System.out.print("서버를 생성할 사용자 ID 입력: ");
+                        System.out.print("채널을 생성할 사용자 ID 입력: ");
                         UUID userId = UUID.fromString(sc.nextLine());
-                        if(!(userService.uidExists(userId))){ break;}
+                        userService.uidExists(userId);
                         System.out.print("채널명 입력: ");
                         channelService.registerChannel(sc.nextLine(), userId);
+                        System.out.println("완료되었습니다.");
                     }catch(IllegalArgumentException e){
+                        System.out.println("채널 등록에 실패하였습니다.");
+                    }
+                    break;
+                case 4:
+                    try{
+                        System.out.print("채널ID 입력: ");
+                        UUID channelId = UUID.fromString(sc.nextLine());
+                        System.out.print("새로운 채널명 입력: ");
+                        channelService.updateChannel(channelId, sc.nextLine());
+                        System.out.println("완료되었습니다.");
+                    }catch (IllegalArgumentException e){
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 5:
+                    System.out.println("<수정된 채널 정보 출력>\n");
+                    List<Channel> updatedChannels = channelService.getUpdatedChannels();
+                    if(updatedChannels.isEmpty()){
+                        System.out.println("수정된 채널 정보가 존재하지 않습니다.");
+                        break;
+                    }
+                    System.out.println(updatedChannels);
+                    break;
+                case 6:
+                    try{
+                        System.out.print("채널ID 입력: ");
+                        UUID channelId = UUID.fromString(sc.nextLine());
+                        channelService.deleteChannel(channelId);
+                        System.out.println("완료되었습니다.\n<모든 채널의 정보 출력>");
+                        System.out.print(channelService.getAllChannels());
+                    }catch (IllegalArgumentException e){
                         System.out.println(e.getMessage());
                     }
                     break;
