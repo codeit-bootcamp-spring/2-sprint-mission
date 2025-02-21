@@ -9,12 +9,12 @@ import java.util.UUID;
 
 public interface MessageService {
     // CRUD(생성, 읽기, 모두 읽기, 수정, 삭제)
-    void createMessage(User user, Channel channel, String content); //메세지 생성
+    void createMessage(String userName, String channelName, String content); //메세지 생성
 
     Message getMessageById(UUID uuid);
-    List<Message> getMessagesByUserAndChannel(User user, Channel channel); //특정 유저가 특정 채널에서 작성한 메세지 확인
-    List<Message> getChannelMessages(Channel channel); //채널내 모든 메세지 확인
-    List<Message> getUserMessages(User user); //유저의 모든 메세지 확인
+    List<Message> getMessagesByUserAndChannel(String userName, String channelName); //특정 유저가 특정 채널에서 작성한 메세지 확인
+    List<Message> getChannelMessages(String channelName); //채널내 모든 메세지 확인
+    List<Message> getUserMessages(String userName); //유저의 모든 메세지 확인
 
     void updateMessage(UUID messageId, String newContent); //메세지 내용 수정
 

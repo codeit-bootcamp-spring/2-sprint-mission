@@ -13,8 +13,8 @@ public interface UserService {
     List<User> getAllUsers();   //모든 유저 조회
 
     void updateUsername(User user, String newUsername);   //유저 이름 변경
-    void addChannel(User user, Channel channel);  //유저 채널 추가
+    void addChannel(User user, String channelName);  //유저 채널 추가
 
     void deleteUser(User user);   //유저 삭제
-    void deleteChannel(User user, Channel channel);   //유저 채널 삭제
+    void deleteChannel(User user, String channelName);   //유저 채널 삭제
 }
