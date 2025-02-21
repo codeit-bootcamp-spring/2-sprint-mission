@@ -7,29 +7,28 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
+    private final Map<UUID, User> userRepository;
 
-    Map<UUID, User> userRepository = new HashMap<>();
+    public JCFUserService() {
+        this.userRepository = new HashMap<>();
+    }
 
     @Override
-    public void saveUser(User user) {
+    public User saveUser(String name) {
+        User user = new User(name);
         userRepository.put(user.getId(), user);
+        return user;
     }
 
     @Override
     public void findAll() {
-        List<User> userList = userRepository.values().stream().toList();
-
-        if(userList.isEmpty()){
-            System.out.println("등록된 유저가 없습니다.");
-        }else {
-            for (User user : userList) {
-                System.out.println("유저 ID: " + user.getId());
-                System.out.println("유저 이름: " + user.getName());
-                System.out.println("유저 생성 일자: " + TimeFormatter.format(user.getCreatedAt()));
-                System.out.println("유저 수정 일자: " + TimeFormatter.format(user.getUpdatedAt()));
-                System.out.println("----------------------------------");
-            }
-        }
+        userRepository.values().stream()
+                .findFirst()
+                .ifPresentOrElse(
+                        user -> userRepository.values()
+                                .forEach(System.out::println),
+                        () -> System.out.println("유저가 없습니다.")
+                );
     }
 
     @Override
@@ -58,7 +57,7 @@ public class JCFUserService implements UserService {
             System.out.println("없는 유저 입니다.");
         }
         userRepository.get(id).setName(name);
-        userRepository.get(id).setUpdatedAt(System.currentTimeMillis());
+        userRepository.get(id).setUpdatedAt();
     }
 
     @Override
