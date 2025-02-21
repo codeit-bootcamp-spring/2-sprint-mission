@@ -65,7 +65,6 @@ public class JavaApplication {
                         String userToJoin = scanner.nextLine();
                         Channel channel = channelService.getChannel(channelToJoin);
                         if (channel != null) {
-                            userService.validateUserExists(userToJoin);
                             channelService.addUserToChannel(channel, userToJoin);
                             System.out.println(userToJoin + "님이 " + channelToJoin + " 채널에 추가됨.");
                         } else {
@@ -80,11 +79,9 @@ public class JavaApplication {
                     try {
                         System.out.print("유저 이름 입력: ");
                         String sender = scanner.nextLine();
-                        userService.validateUserExists(sender);
 
                         System.out.print("채널 이름 입력: ");
                         String targetChannel = scanner.nextLine();
-                        channelService.validateChannelExists(targetChannel);
 
                         System.out.print("메시지 입력: ");
                         String messageContent = scanner.nextLine();
@@ -135,10 +132,8 @@ public class JavaApplication {
                     try {
                         System.out.print("채널 이름 입력: ");
                         String channelToRemove = scanner.nextLine();
-
                         System.out.print("삭제할 유저 이름 입력: ");
                         String userToRemove = scanner.nextLine();
-
 
                         Channel channelForRemoval = channelService.getChannel(channelToRemove);
                         if (channelForRemoval != null) {
