@@ -1,30 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
-
-public class User {
-    private final UUID id;
+public class User extends BaseEntity {
     private String name;
-    private final Long createdAt;
-    private Long updatedAt;
 
     public User(String name) {
+        super();
         this.name = name;
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
     }
 
     public String getName() {
@@ -33,9 +14,16 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+        setUpdatedAt();
     }
 
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }
