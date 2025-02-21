@@ -2,20 +2,21 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Channel extends BaseEntity {
-    private User owner;
+    private UUID owner;
     private String title;
     private String description;
 
-    public Channel(User owner, String title, String description) {
+    public Channel(UUID owner, String title, String description) {
         super();
         setOwner(owner);
         setTitle(title);
         setDescription(description);
     }
 
-    private void setOwner(User owner) {
+    private void setOwner(UUID owner) {
         if (owner == null) {
             throw new IllegalArgumentException("유효하지 않은 오너입니다.");
         }
@@ -36,7 +37,7 @@ public class Channel extends BaseEntity {
         this.description = description;
     }
 
-    public User getOwner() {
+    public UUID getOwner() {
         return owner;
     }
 
@@ -48,7 +49,7 @@ public class Channel extends BaseEntity {
         return description;
     }
 
-    public void update(User owner, String title, String description) {
+    public void update(UUID owner, String title, String description) {
         if (owner != null) setOwner(owner);
         if (title != null) setTitle(title);
         if (description != null) setDescription(description);
