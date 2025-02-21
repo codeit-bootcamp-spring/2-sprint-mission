@@ -39,7 +39,7 @@ public class Main {
                             String username = scanner.nextLine();
                             userService.createUser(username);
                             System.out.println("유저 생성 완료: " + username);
-                        } catch (IllegalArgumentException  e) {
+                        } catch (Exception   e) {
                             System.out.println("오류 발생: " + e.getMessage());
                         }
                         break;
@@ -50,7 +50,7 @@ public class Main {
                             String channelName = scanner.nextLine();
                             channelService.createChannel(channelName);
                             System.out.println("채널 생성 완료: " + channelName);
-                        } catch (IllegalArgumentException  e) {
+                        } catch (Exception   e) {
                             System.out.println("오류 발생: " + e.getMessage());
                         }
                         break;
@@ -69,7 +69,7 @@ public class Main {
                             } else {
                                 System.out.println("채널이 존재하지 않습니다.");
                             }
-                        } catch (IllegalArgumentException  e) {
+                        } catch (Exception   e) {
                             System.out.println("오류 발생: " + e.getMessage());
                         }
                         break;
@@ -88,7 +88,7 @@ public class Main {
                             String messageContent = scanner.nextLine();
                             messageService.createMessage(sender, targetChannel, messageContent);
                             System.out.println("메시지 전송 완료.");
-                        } catch (IllegalArgumentException  e) {
+                        } catch (Exception   e) {
                             System.out.println("오류 발생: " + e.getMessage());
                         }
                         break;
@@ -106,7 +106,7 @@ public class Main {
                                     System.out.println(msg.getSender() + ": " + msg.getContent() + " [" + msg.getUuid() + "]");
                                 }
                             }
-                        } catch (IllegalArgumentException  e) {
+                        } catch (Exception   e) {
                             System.out.println("오류 발생: " + e.getMessage());
                         }
                         break;
@@ -118,13 +118,13 @@ public class Main {
                             UUID messageId;
                             try {
                                 messageId = UUID.fromString(messageIdInput);
-                            } catch (IllegalArgumentException e) {
+                            } catch (Exception  e) {
                                 System.out.println("오류 발생: 잘못된 UUID 형식입니다. 올바른 메시지 ID를 입력하세요.");
                                 break;
                             }
                             messageService.deleteMessage(messageId);
                             System.out.println("메시지 삭제 완료.");
-                        } catch (IllegalArgumentException  e) {
+                        } catch (Exception   e) {
                             System.out.println("오류 발생: " + e.getMessage());
                         }
                         break;
@@ -145,7 +145,7 @@ public class Main {
                             } else {
                                 System.out.println("해당 채널이 존재하지 않습니다.");
                             }
-                        } catch (IllegalArgumentException  e) {
+                        } catch (Exception   e) {
                             System.out.println("오류 발생: " + e.getMessage());
                         }
                         break;
@@ -155,7 +155,7 @@ public class Main {
                             System.out.println("\n===== 모든 유저 및 채널 조회 =====");
                             System.out.println("유저 목록: " + userService.getAllUsers());
                             System.out.println("채널 목록: " + channelService.getAllChannels());
-                        } catch (IllegalArgumentException  e) {
+                        } catch (Exception   e) {
                             System.out.println("오류 발생: " + e.getMessage());
                         }
                         break;
