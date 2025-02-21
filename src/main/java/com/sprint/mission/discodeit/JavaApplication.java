@@ -13,9 +13,10 @@ import java.util.UUID;
 public class JavaApplication {
     public static void main(String[] args) {
         // 서비스 초기화
-        JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService();
-        JCFMessageService messageService = new JCFMessageService();
+        JCFUserService userService = new JCFUserService(channelService);
+        JCFMessageService messageService = new JCFMessageService(userService, channelService);
+
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
