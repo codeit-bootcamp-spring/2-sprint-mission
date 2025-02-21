@@ -10,6 +10,5 @@ public interface MessageService {
     void create(Message message);
     Optional<Message> read(UUID id);
     List<Message> readAll();
-    void update(Message message);
     void delete(UUID id);
 }

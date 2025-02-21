@@ -7,7 +7,7 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
     private final Map<UUID, User> data = new HashMap<>();
-    // UUID를 키로 사용하여 User 객체를 저장 / 일반적으로 키는 Stirng UUID Integer 타입(변하지 않는 값)
+    // UUID를 키로 사용하여 User 객체를 저장 / 일반적으로 키는 String UUID Integer 타입(변하지 않는 값)
 
     @Override
     public void create(User entity) {
