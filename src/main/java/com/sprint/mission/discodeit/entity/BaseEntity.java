@@ -28,4 +28,13 @@ public class BaseEntity {
     public void updateModifiedAt() {
         this.modifiedAt = System.currentTimeMillis();
     }
+
+    @Override
+    public String toString() {
+        return "BaseEntity{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", modifiedAt=" + modifiedAt +
+                '}';
+    }
 }

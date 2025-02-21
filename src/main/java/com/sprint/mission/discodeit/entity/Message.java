@@ -36,5 +36,14 @@ public class Message extends BaseEntity {
         if (sender != null) setSender(sender);
         if (content != null) setContent(content);
     }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "sender=" + sender +
+                ", content='" + content + '\'' +
+                super.toString() +
+                '}';
+    }
 }
 

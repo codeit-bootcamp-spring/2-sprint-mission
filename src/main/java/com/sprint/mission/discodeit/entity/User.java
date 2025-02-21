@@ -74,9 +74,7 @@ public class User extends BaseEntity{
                 ", email='" + email + '\'' +
                 ", avatar='" + avatar + '\'' +
                 ", status='" + status + '\'' +
-                ", id='" + getId() + '\'' +
-                ", createdAt='" + getCreatedAt() + '\'' +
-                ", modifiedAt='" + getModifiedAt() + '\'' +
+                super.toString() +
                 '}';
     }
 }

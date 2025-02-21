@@ -54,4 +54,14 @@ public class Channel extends BaseEntity {
         if (title != null) setTitle(title);
         if (description != null) setDescription(description);
     }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "owner=" + owner +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                super.toString() +
+                '}';
+    }
 }
