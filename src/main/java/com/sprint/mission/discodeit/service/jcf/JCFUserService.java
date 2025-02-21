@@ -13,6 +13,7 @@ public class JCFUserService implements UserService {
     private final List<User> data;
 
     // 생성자에서 data 필드 초기화
+    // 요구사항엔 이렇게 적혀있는데, 항상 빈 배열로 초기화 할거면 왜 필드가 아니라 생성자에서 초기화하라고 했을까..?
     public JCFUserService() {
         data = new ArrayList<>();
     }
@@ -52,7 +53,7 @@ public class JCFUserService implements UserService {
             throw new IllegalArgumentException("존재하지 않는 유저 입니다.");
         }
 
-        // Optional<User> findUser = data.stream().filter(u -> u.getId().equals(id)).findFirst().orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저 입니다.");
+        // User findUser = data.stream().filter(u -> u.getId().equals(id)).findFirst().orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저 입니다.");
         // 뭐가 더 좋은 방식일까요?
 
         return findUser;
