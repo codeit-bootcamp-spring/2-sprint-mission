@@ -3,32 +3,36 @@ package com.sprint.mission.discodeit.entity;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Channel {
-    private String channelname;
-    private Set<User> members;
+public class Channel extends BaseEntity {
+    private String channelName;
+    private Set<String> members;
     private Set<Message> messages;
 
-    public Channel(String channelname) {
+    public Channel(String channelName) {
         super();
-        this.channelname = channelname;
+        this.channelName = channelName;
         this.members = new HashSet<>();
         this.messages = new HashSet<>();
     }
 
-    public String getChannelname() {
-        return channelname;
+    public String getChannelName() {
+        return channelName;
     }
 
-    public void updateChannelname(String channelname) {
-        this.channelname = channelname;
+    public void updateChannelName(String channelName) {
+        this.channelName = channelName;
     }
 
-    public Set<User> getMembers() {
+    public Set<String> getMembers() {
         return members;
     }
 
-    public void updateMembers(User newMember) {
+    public void updateMembers(String newMember) {
         this.members.add(newMember);
+    }
+
+    public void removeMember(String member) {
+        this.members.remove(member);
     }
 
     public Set<Message> getMessages() {
@@ -37,5 +41,17 @@ public class Channel {
 
     public void updateMessages(Message newMessages) {
         this.messages.add(newMessages);
+    }
+
+    public void removeMessage(Message message) {
+        this.messages.remove(message);
+    }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "channelname ='" + channelName + '\'' +
+                ", members= " + members +
+                '}';
     }
 }
