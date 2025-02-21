@@ -47,6 +47,14 @@ public class Channel extends BaseEntity {
         this.messages.remove(message);
     }
 
+    public boolean isUserInChannel(String userName){
+        return this.members.contains(userName);
+    }
+
+    public boolean isMessageInChannel(Message message){
+        return this.members.contains(message);
+    }
+
     @Override
     public String toString() {
         return "Channel{" +

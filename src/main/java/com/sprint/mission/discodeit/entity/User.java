@@ -29,6 +29,14 @@ public class User extends BaseEntity{
         this.joinedChannels.add(newChannel);
     }
 
+    public void removeJoinedChannel(String channelName) {
+        this.joinedChannels.remove(channelName);
+    }
+
+    public boolean isJoinedChannel(String channelName) {
+        return this.joinedChannels.contains(channelName);
+    }
+
     @Override
     public String toString() {
         return "User{" +
