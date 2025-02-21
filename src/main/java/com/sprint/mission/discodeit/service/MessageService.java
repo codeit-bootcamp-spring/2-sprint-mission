@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.util.UUID;
 
 public interface MessageService {
-    void saveMessage(Message meesage);
+    Message saveMessage(String text);
     void findAll();
     void findById(UUID id);
     void delete(UUID id);
