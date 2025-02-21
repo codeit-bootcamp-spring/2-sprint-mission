@@ -4,8 +4,19 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
-public class JCFService implements UserService {
+public class JCFUserService implements UserService {
     HashMap<UUID, User> users = new HashMap<>();
+
+    private static JCFUserService userService;
+
+    private JCFUserService() {}
+
+    public static JCFUserService getInstance() {
+        if(userService == null){
+            userService = new JCFUserService();
+        }
+        return userService;
+    }
 
     @Override
     public void create(User user) {

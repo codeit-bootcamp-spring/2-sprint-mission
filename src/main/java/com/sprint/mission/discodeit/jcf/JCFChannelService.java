@@ -5,8 +5,21 @@ import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
 
-public class JCFChannel implements ChannelService{
+public class JCFChannelService implements ChannelService{
+
+    private static JCFChannelService jcfChannel;
+
     HashMap<UUID, Channel> channels = new HashMap<>();
+
+    private JCFChannelService(){}
+
+    public static JCFChannelService getInstance(){
+        if(jcfChannel == null){
+            jcfChannel = new JCFChannelService();
+        }
+
+        return jcfChannel;
+    }
 
     @Override
     public void create(Channel channel) {

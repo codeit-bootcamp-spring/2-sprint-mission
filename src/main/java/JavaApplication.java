@@ -1,9 +1,9 @@
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.jcf.JCFChannel;
-import com.sprint.mission.discodeit.jcf.JCFMessage;
-import com.sprint.mission.discodeit.jcf.JCFService;
+import com.sprint.mission.discodeit.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.jcf.JCFUserService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -11,9 +11,9 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JavaApplication {
-    static UserService userService = new JCFService();
-    static ChannelService channelService = new JCFChannel();
-    static MessageService messageService = new JCFMessage(userService, channelService);
+    static UserService userService = JCFUserService.getInstance();
+    static ChannelService channelService = JCFChannelService.getInstance();
+    static MessageService messageService = JCFMessageService.getInstance(userService, channelService);;
 
     public static void main(String[] args) {
         for(int i = 0; i<5; i++){
