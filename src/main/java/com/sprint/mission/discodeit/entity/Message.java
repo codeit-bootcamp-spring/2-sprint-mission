@@ -8,7 +8,7 @@ public class Message extends BaseEntity {
 
     protected Message(UUID senderId, String content) {
         super();
-        setSenderId(sender);
+        setSenderId(senderId);
         setContent(content);
     }
 
