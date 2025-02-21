@@ -9,10 +9,22 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
+    private volatile static JCFChannelService instance = null;
     private final Map<UUID, Channel> channelRepository;
 
     public JCFChannelService() {
         this.channelRepository = new HashMap<>();
+    }
+
+    public static JCFChannelService getInstance() {
+        if (instance == null) {
+            synchronized (JCFChannelService.class) {
+                if (instance == null) {
+                    instance = new JCFChannelService();
+                }
+            }
+        }
+        return instance;
     }
 
     @Override

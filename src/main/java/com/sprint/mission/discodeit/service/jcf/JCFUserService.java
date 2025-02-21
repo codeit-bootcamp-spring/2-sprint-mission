@@ -7,11 +7,24 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
+    private volatile static JCFUserService instance = null;
     private final Map<UUID, User> userRepository;
 
     public JCFUserService() {
         this.userRepository = new HashMap<>();
     }
+
+    public static JCFUserService getInstance() {
+        if (instance == null) {
+            synchronized (JCFUserService.class) {
+                if (instance == null) {
+                    instance = new JCFUserService();
+                }
+            }
+        }
+        return instance;
+    }
+
 
     @Override
     public User saveUser(String name) {
