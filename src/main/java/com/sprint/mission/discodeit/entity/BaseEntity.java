@@ -7,10 +7,10 @@ public class BaseEntity {
     protected Long createAt;
     protected Long updateAt;
 
-    public BaseEntity(UUID id, Long createAt, Long updateAt) {
-        this.id = id;
-        this.createAt = createAt;
-        this.updateAt = updateAt;
+    public BaseEntity() {
+        this.id = UUID.randomUUID();
+        this.createAt = System.currentTimeMillis();
+        this.updateAt = createAt;
     }
 
     public UUID getId() {
@@ -25,3 +25,4 @@ public class BaseEntity {
         return updateAt;
     }
 }
+
