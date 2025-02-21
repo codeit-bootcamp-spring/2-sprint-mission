@@ -32,12 +32,4 @@ public class Channel {
     public UUID getId() {
         return id;
     }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
 }

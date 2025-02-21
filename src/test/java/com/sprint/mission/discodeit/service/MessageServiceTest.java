@@ -10,43 +10,43 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class MessageServiceTest {
-    private MessageService messageService;
-    private MessageDto initMessage;
     private static final String CONTEXT = "안녕하세요";
+    private MessageService messageService;
+    private MessageDto setUpMessage;
 
     @BeforeEach
     void setUp() {
         messageService = new JCFMessageService();
-        initMessage = messageService.create(CONTEXT);
+        setUpMessage = messageService.create(CONTEXT);
     }
 
     @Test
     void 메세지_생성() {
-        assertThat(initMessage.context()).isEqualTo(CONTEXT);
+        assertThat(setUpMessage.context()).isEqualTo(CONTEXT);
     }
 
     @Test
     void 메세지_단건_조회() {
-        MessageDto message = messageService.findById(initMessage.messageId());
+        MessageDto message = messageService.findById(setUpMessage.messageId());
 
         assertThat(message.context())
                 .isEqualTo(CONTEXT);
     }
 
     @Test
-    void 메세지_내용_수정(){
-        messageService.updateContextById(initMessage.messageId(), "안녕1하세요");
+    void 메세지_내용_수정() {
+        messageService.updateContext(setUpMessage.messageId(), "안녕1하세요");
 
-        assertThat(messageService.findById(initMessage.messageId()).context())
+        assertThat(messageService.findById(setUpMessage.messageId()).context())
                 .isNotEqualTo(CONTEXT);
     }
 
     @Test
-    void 메세지_삭제(){
-        messageService.remove(initMessage.messageId());
-        UUID initId = initMessage.messageId();
+    void 메세지_삭제() {
+        messageService.delete(setUpMessage.messageId());
+        UUID initId = setUpMessage.messageId();
 
-        assertThatThrownBy(()->messageService.findById(initId))
+        assertThatThrownBy(() -> messageService.findById(initId))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

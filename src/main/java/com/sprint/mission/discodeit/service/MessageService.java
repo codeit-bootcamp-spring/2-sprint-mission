@@ -11,7 +11,7 @@ public interface MessageService {
 
     List<MessageDto> findAll();
 
-    void updateContextById(UUID id, String context);
+    void updateContext(UUID id, String context);
 
-    void remove(UUID id);
+    void delete(UUID id);
 }

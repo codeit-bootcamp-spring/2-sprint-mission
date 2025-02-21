@@ -32,12 +32,4 @@ public class Message {
     public String getContext() {
         return context;
     }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
 }

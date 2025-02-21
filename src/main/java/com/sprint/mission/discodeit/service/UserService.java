@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
+    UserDto register(UserRegisterDto userRegisterDto);
+
     UserDto findById(UUID id);
 
     List<UserDto> findByName(String name);
 
     List<UserDto> findAll();
 
-    UserDto register(UserRegisterDto userRegisterDto);
+    void updateName(UUID id, String name);
 
-    void updateNameById(UUID id, String name);
-
-    void remove(UUID id);
+    void delete(UUID id);
 }

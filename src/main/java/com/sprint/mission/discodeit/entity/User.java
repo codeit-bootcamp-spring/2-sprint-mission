@@ -35,11 +35,11 @@ public class User {
         return id;
     }
 
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 }

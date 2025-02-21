@@ -14,26 +14,26 @@ import org.junit.jupiter.api.Test;
 class UserServiceTest {
     private static final String PASSWORD = "password";
     private static final String NAME = "황지환";
-    private static UserService userService;
-    private UserDto initUser;
+    private UserService userService;
+    private UserDto setUpUser;
 
     @BeforeEach
     void init() {
         userService = new JCFUserService();
 
-        UserRegisterDto initUser = new UserRegisterDto(NAME, PASSWORD);
-        this.initUser = userService.register(initUser);
+        this.setUpUser = userService.register(new UserRegisterDto(NAME, PASSWORD));
     }
 
     @Test
     void 유저_UUID_단건_조회_예외테스트() {
-        assertThatThrownBy(() -> userService.findById(UUID.randomUUID()))
+        UUID id = UUID.randomUUID();
+        assertThatThrownBy(() -> userService.findById(id))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void 유저_UUID_단건_조회() {
-        UUID id = initUser.id();
+        UUID id = setUpUser.id();
         UserDto userDto = userService.findById(id);
 
         assertThat(userDto.id()).isEqualTo(id);
@@ -59,20 +59,21 @@ class UserServiceTest {
     }
 
     @Test
-    void 유저_이름_수정(){
+    void 유저_이름_수정() {
         String userName = "김철수";
-        userService.updateNameById(initUser.id(), userName);
+        userService.updateName(setUpUser.id(), userName);
 
-        UserDto updatedUserInfo = userService.findById(initUser.id());
+        UserDto updatedUserInfo = userService.findById(setUpUser.id());
 
-        assertThat(initUser.name()).isNotEqualTo(updatedUserInfo.name());
+        assertThat(setUpUser.name()).isNotEqualTo(updatedUserInfo.name());
     }
 
     @Test
-    void 유저_삭제(){
-        userService.remove(initUser.id());
+    void 유저_삭제() {
+        UUID id = setUpUser.id();
+        userService.delete(id);
 
-        assertThatThrownBy(() -> userService.findById(initUser.id()))
+        assertThatThrownBy(() -> userService.findById(id))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }
