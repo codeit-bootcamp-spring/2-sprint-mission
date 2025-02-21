@@ -5,8 +5,8 @@ import java.util.UUID;
 public class ChannelMessage extends Message {
     UUID channelId;
 
-    public ChannelMessage(UUID sender, String content, UUID channelId) {
-        super(sender, content);
+    public ChannelMessage(UUID senderId, String content, UUID channelId) {
+        super(senderId, content);
         this.channelId = channelId;
     }
 

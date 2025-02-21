@@ -5,8 +5,8 @@ import java.util.UUID;
 public class PrivateMessage extends Message {
     private UUID receiverId;
 
-    public PrivateMessage(UUID sender, String content, UUID receiverId) {
-        super(sender, content);
+    public PrivateMessage(UUID senderId, String content, UUID receiverId) {
+        super(senderId, content);
         this.receiverId = receiverId;
     }
 
