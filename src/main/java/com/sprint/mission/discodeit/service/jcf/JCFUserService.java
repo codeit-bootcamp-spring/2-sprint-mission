@@ -22,8 +22,7 @@ public class JCFUserService implements UserService {
         if (id == null) {
             throw new IllegalArgumentException("null 인 id 값이 들어왔습니다!!!");
         }
-        return userRepository.findUserById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 id를 가진 사용자가 존재하지 않습니다!!!"));
+        return userRepository.findUserById(id);
     }
 
     public Set<User> readAllUsers() {
