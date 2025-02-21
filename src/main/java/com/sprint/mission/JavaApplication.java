@@ -13,7 +13,7 @@ public class JavaApplication {
     public static void main(String[] args) {
         JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService();
-        JCFMessageService messageService = new JCFMessageService();
+        JCFMessageService messageService = new JCFMessageService(userService, channelService);
 
         // 유저 등록
         User user1 = userService.saveUser("user1");

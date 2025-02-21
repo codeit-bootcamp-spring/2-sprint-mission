@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,10 +12,26 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
+    private volatile static JCFMessageService instance = null;
+    private final UserService userService;
+    private final ChannelService channelService;
     private final Map<UUID, Message> messageRepository;
 
-    public JCFMessageService() {
+    public JCFMessageService(UserService userService, ChannelService channelService) {
         this.messageRepository = new HashMap<>();
+        this.userService = userService;
+        this.channelService = channelService;
+    }
+
+    public static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
+        if (instance == null) {
+            synchronized (JCFMessageService.class) {
+                if(instance == null) {
+                    instance = new JCFMessageService(userService, channelService);
+                }
+            }
+        }
+        return instance;
     }
 
     @Override
