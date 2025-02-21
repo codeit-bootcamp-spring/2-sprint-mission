@@ -16,6 +16,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message getMessageById(UUID messageId) {
+        if(!messages.containsKey(messageId)){
+            throw new NoSuchElementException("존재하지 않는 메세지ID 입니다.");
+        }
         return messages.get(messageId);
     }
 
@@ -57,6 +60,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID messageId, String newContent) {
+        if(!messages.containsKey(messageId)){
+            throw new NoSuchElementException("존재하지 않는 메세지ID 입니다.");
+        }
         Message message = messages.get(messageId);
         message.updateContent(newContent);
         messages.put(messageId, message);
@@ -64,6 +70,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void deleteMessage(UUID messageId) {
+        if(!messages.containsKey(messageId)){
+            throw new NoSuchElementException("존재하지 않는 메세지ID 입니다.");
+        }
         messages.remove(messageId);
     }
 }

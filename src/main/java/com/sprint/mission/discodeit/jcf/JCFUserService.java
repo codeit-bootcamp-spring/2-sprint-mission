@@ -13,21 +13,33 @@ public class JCFUserService implements UserService {
 
     @Override
     public void createUser(String username) {
+        if (users.containsKey(username)) {
+            throw new IllegalArgumentException("이미 존재하는 유저입니다.");
+        }
         users.put(username, new User(username));
     }
 
     @Override
     public User getUser(String username) {
+        if (!users.containsKey(username)) {
+            throw new IllegalArgumentException("존재하지 않는 유저입니다. ");
+        }
         return users.get(username);
     }
 
     @Override
     public List<User> getAllUsers() {
+        if (users.isEmpty()) {
+            throw new IllegalArgumentException("현재 유저가 없습니다. ");
+        }
         return new ArrayList<User>(users.values());
     }
 
     @Override
     public void updateUsername(User user, String newUsername) {
+        if (users.containsKey(newUsername)) {
+            throw new IllegalArgumentException("이미 존재하는 유저명입니다.");
+        }
         users.remove(user.getUsername());
         user.updateUsername(newUsername);
         users.put(newUsername, user);
@@ -35,6 +47,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public void addChannel(User user, String channel) {
+        if (!user.isJoinedChannel(channel)) {
+            throw new IllegalArgumentException("가입되어있지 않은 채널입니다. ");
+        }
         user.updateJoinedChannel(channel);
         users.put(user.getUsername(), user);
     }
@@ -45,8 +60,14 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void deleteChannel(User user, String channel) {
-        user.updateJoinedChannel(channel);
+    public void deleteChannel(User user, String channelName) {
+        user.removeJoinedChannel(channelName);
         users.put(user.getUsername(), user);
+    }
+
+    public void validateUserExists(String username){
+        if (!users.containsKey(username)) {
+            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+        }
     }
 }
