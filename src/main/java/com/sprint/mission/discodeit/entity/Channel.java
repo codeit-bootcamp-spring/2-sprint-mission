@@ -58,9 +58,9 @@ public class Channel extends BaseEntity {
     @Override
     public String toString() {
         return "Channel{" +
-                "owner=" + owner +
-                ", title='" + title + '\'' +
+                "title='" + title + '\'' +
                 ", description='" + description + '\'' +
+                ", owner=" + owner +
                 super.toString() +
                 '}';
     }
