@@ -2,10 +2,7 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class UserRepository {
     Set<User> users;
@@ -25,15 +22,18 @@ public class UserRepository {
         this.users.add(newUser);        // Set 은 add 과정에서 중복을 처리한다.이때 내부적으로 equals()와 hashcode()를 활용하기 때문에
     }                                   // User 클래스에서 equals()와 hashcode()를 오버라이드 하면 중복을 처리하며 add를 수행한다.
 
-    public Optional<User> findUserById(UUID id) {
+    public User findUserById(UUID userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("null값을 가지는 userId가 들어왔습니다!!!");
+        }
         return  this.users.stream()
-                    .filter(user -> user.getId().equals(id))
-                    .findFirst();
+                    .filter(user -> Objects.equals(user.getId(), userId))
+                    .findFirst().orElseThrow(() -> new IllegalArgumentException("해당 userId를 가진 User 를 찾을 수 없습니다!!!"));
     }
 
     // id가 유효하지 않을 때의 예외처리?
-    public void deleteUser(UUID id) {
-        boolean removed = this.users.removeIf(user -> user.getId().equals(id));
+    public void deleteUser(UUID userId) {
+        boolean removed = this.users.removeIf(user -> user.getId().equals(userId));
         if (!removed) {
             throw new IllegalArgumentException("삭제할 id를 가진 사용자가 존재하지 않습니다!!!");
         }
