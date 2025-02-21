@@ -7,9 +7,14 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    Channel createChannel(User owner, String title, String description);
-    Channel getChannelById(UUID channelId);
-    List<Channel> getChannels();
-    Channel updateChannel(UUID channelId, User owner, String title, String description);
+    Channel createChannel(UUID ownerId, String title, String description);
+    User getChannelOwner(UUID channelId);
+    Channel getChannelByChannelId(UUID channelId);
+    List<Channel> getChannelsByTitle(String title);
+    List<Channel> getChannelsByUserId(UUID userId);
+    List<Channel> getAllChannels();
+    Channel updateChannel(UUID channelId, UUID ownerId, String title, String description);
     boolean deleteChannelById(UUID channelId);
+    Channel addUserToChannel(UUID channelId, UUID userId);
+    Channel deleteUserFromChannel(UUID channelId, UUID userId);
 }
