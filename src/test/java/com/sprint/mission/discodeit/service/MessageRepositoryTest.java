@@ -4,20 +4,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sprint.mission.application.MessageDto;
-import com.sprint.mission.discodeit.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repo.MessageRepository;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class MessageServiceTest {
+class MessageRepositoryTest {
     private static final String CONTEXT = "안녕하세요";
-    private MessageService messageService;
+    private MessageRepository messageRepository;
     private MessageDto setUpMessage;
 
     @BeforeEach
     void setUp() {
-        messageService = new JCFMessageService();
-        setUpMessage = messageService.create(CONTEXT);
+        messageRepository = new JCFMessageRepository();
+        setUpMessage = messageRepository.create(CONTEXT);
     }
 
     @Test
@@ -27,7 +28,7 @@ class MessageServiceTest {
 
     @Test
     void 메세지_단건_조회() {
-        MessageDto message = messageService.findById(setUpMessage.messageId());
+        MessageDto message = messageRepository.findById(setUpMessage.messageId());
 
         assertThat(message.context())
                 .isEqualTo(CONTEXT);
@@ -35,18 +36,18 @@ class MessageServiceTest {
 
     @Test
     void 메세지_내용_수정() {
-        messageService.updateContext(setUpMessage.messageId(), "안녕1하세요");
+        messageRepository.updateContext(setUpMessage.messageId(), "안녕1하세요");
 
-        assertThat(messageService.findById(setUpMessage.messageId()).context())
+        assertThat(messageRepository.findById(setUpMessage.messageId()).context())
                 .isNotEqualTo(CONTEXT);
     }
 
     @Test
     void 메세지_삭제() {
-        messageService.delete(setUpMessage.messageId());
+        messageRepository.delete(setUpMessage.messageId());
         UUID initId = setUpMessage.messageId();
 
-        assertThatThrownBy(() -> messageService.findById(initId))
+        assertThatThrownBy(() -> messageRepository.findById(initId))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

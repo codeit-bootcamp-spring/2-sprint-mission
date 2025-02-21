@@ -3,13 +3,13 @@ package com.sprint.mission.discodeit.jcf;
 import com.sprint.mission.application.UserDto;
 import com.sprint.mission.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.repo.UserRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class JCFUserService implements UserService {
+public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> users = new HashMap<>();
 
     @Override

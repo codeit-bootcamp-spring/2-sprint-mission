@@ -5,43 +5,44 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.application.UserDto;
 import com.sprint.mission.application.UserRegisterDto;
-import com.sprint.mission.discodeit.jcf.JCFUserService;
+import com.sprint.mission.discodeit.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repo.UserRepository;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class UserServiceTest {
+class UserRepositoryTest {
     private static final String PASSWORD = "password";
     private static final String NAME = "황지환";
-    private UserService userService;
+    private UserRepository userRepository;
     private UserDto setUpUser;
 
     @BeforeEach
     void init() {
-        userService = new JCFUserService();
+        userRepository = new JCFUserRepository();
 
-        this.setUpUser = userService.register(new UserRegisterDto(NAME, PASSWORD));
+        this.setUpUser = userRepository.register(new UserRegisterDto(NAME, PASSWORD));
     }
 
     @Test
     void 유저_UUID_단건_조회_예외테스트() {
         UUID id = UUID.randomUUID();
-        assertThatThrownBy(() -> userService.findById(id))
+        assertThatThrownBy(() -> userRepository.findById(id))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void 유저_UUID_단건_조회() {
         UUID id = setUpUser.id();
-        UserDto userDto = userService.findById(id);
+        UserDto userDto = userRepository.findById(id);
 
         assertThat(userDto.id()).isEqualTo(id);
     }
 
     @Test
     void 유저_이름_단건_조회() {
-        List<UserDto> users = userService.findByName(NAME);
+        List<UserDto> users = userRepository.findByName(NAME);
         UserDto userDto = users.get(0);
 
         assertThat(userDto.name()).isEqualTo(NAME);
@@ -52,18 +53,18 @@ class UserServiceTest {
         UserRegisterDto userOtherHwang = new UserRegisterDto(NAME, PASSWORD + "123");
         UserRegisterDto userKim = new UserRegisterDto("KIM", PASSWORD);
 
-        userService.register(userOtherHwang);
-        userService.register(userKim);
+        userRepository.register(userOtherHwang);
+        userRepository.register(userKim);
 
-        assertThat(userService.findByName(NAME)).hasSize(2);
+        assertThat(userRepository.findByName(NAME)).hasSize(2);
     }
 
     @Test
     void 유저_이름_수정() {
         String userName = "김철수";
-        userService.updateName(setUpUser.id(), userName);
+        userRepository.updateName(setUpUser.id(), userName);
 
-        UserDto updatedUserInfo = userService.findById(setUpUser.id());
+        UserDto updatedUserInfo = userRepository.findById(setUpUser.id());
 
         assertThat(setUpUser.name()).isNotEqualTo(updatedUserInfo.name());
     }
@@ -71,9 +72,9 @@ class UserServiceTest {
     @Test
     void 유저_삭제() {
         UUID id = setUpUser.id();
-        userService.delete(id);
+        userRepository.delete(id);
 
-        assertThatThrownBy(() -> userService.findById(id))
+        assertThatThrownBy(() -> userRepository.findById(id))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }
