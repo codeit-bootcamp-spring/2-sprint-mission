@@ -3,11 +3,18 @@ package com.sprint.mission.discodeit.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    Map<String, Channel> channels = new HashMap<String, Channel>();
+    private final Map<String, Channel> channels = new HashMap<String, Channel>();
+    private final UserService userService;
+
+    public JCFChannelService(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public void createChannel(String channelName) {
@@ -45,6 +52,8 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void addUserToChannel(Channel channel, String userName) {
+        userService.validateUserExists(userName);
+
         if(channel.isUserInChannel(userName)){
             throw new IllegalArgumentException("이미 가입되어 있는 유저입니다.");
         }

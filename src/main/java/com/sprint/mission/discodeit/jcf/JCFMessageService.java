@@ -1,15 +1,27 @@
 package com.sprint.mission.discodeit.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    Map<UUID, Message> messages = new HashMap<UUID, Message>();
+    private final Map<UUID, Message> messages = new HashMap<UUID, Message>();
+    private final UserService userService;
+    private final ChannelService channelService;
+
+    public JCFMessageService(UserService userService, ChannelService channelService) {
+        this.userService = userService;
+        this.channelService = channelService;
+    }
 
     @Override
     public void createMessage(String userName, String channelName, String content) {
+        userService.validateUserExists(userName);
+        channelService.validateChannelExists(channelName);
+
         Message message = new Message(userName, channelName, content);
         messages.put(message.getUuid(), message);
     }
@@ -24,6 +36,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> getMessagesByUserAndChannel(String userName, String channelName) {
+        userService.validateUserExists(userName);
+        channelService.validateChannelExists(channelName);
+
         List<Message> messages = new ArrayList<>();
         for (Message message : this.messages.values()) {
             if (message.getSender().equals(userName) && message.getChannel().equals(channelName)) {
@@ -36,6 +51,8 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> getChannelMessages(String channelName) {
+        channelService.validateChannelExists(channelName);
+
         List<Message> messages = new ArrayList<>();
         for (Message message : this.messages.values()) {
             if (message.getChannel().equals(channelName)) {
@@ -48,6 +65,8 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> getUserMessages(String userName) {
+        userService.validateUserExists(userName);
+
         List<Message> messages = new ArrayList<>();
         for (Message message : this.messages.values()) {
             if (message.getSender().equals(userName)) {

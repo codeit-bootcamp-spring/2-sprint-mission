@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
@@ -9,7 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 public class JCFUserService implements UserService {
-    Map<String, User> users = new HashMap<String, User>();
+    private final Map<String, User> users = new HashMap<String, User>();
+    private final ChannelService channelService;
+
+
+    public JCFUserService(ChannelService channelService) {
+        this.channelService = channelService;
+    }
+
+
 
     @Override
     public void createUser(String username) {
@@ -47,6 +56,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public void addChannel(User user, String channel) {
+        channelService.validateChannelExists(channel);
+
         if (!user.isJoinedChannel(channel)) {
             throw new IllegalArgumentException("가입되어있지 않은 채널입니다. ");
         }
@@ -61,6 +72,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public void deleteChannel(User user, String channelName) {
+        channelService.validateChannelExists(channelName);
+
         user.removeJoinedChannel(channelName);
         users.put(user.getUsername(), user);
     }
