@@ -1,9 +1,12 @@
 package com.sprint.mission;
+
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.jcf.JCFUserService;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -11,6 +14,7 @@ public class Main {
     static Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
         JCFUserService userService = JCFUserService.getInstance();
+        JCFChannelService channelService = JCFChannelService.getInstance();
 
         while(true){
             System.out.println("=============================");
@@ -21,9 +25,13 @@ public class Main {
             System.out.println("=============================");
             int choice = sc.nextInt();
             sc.nextLine();
+
             switch (choice){
                 case 1:
                     userMenu(userService);
+                    break;
+                case 2:
+                    channelMenu(channelService, userService);
                     break;
                 case 4:
                     return;
@@ -60,31 +68,41 @@ public class Main {
                     System.out.print(userService.getUser(findUser));
                     break;
                 case 2:
-                    System.out.println("모든 사용자의 정보 출력\n");
-                    System.out.println(userService.getAllUsers());
+                    System.out.println("<모든 사용자의 정보 출력>\n");
+                    try{
+                        System.out.println(userService.getAllUsers());
+                    }catch(IllegalArgumentException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case 3:
-                    System.out.print("고유한 사용자명 입력: ");
-                    String userName = sc.nextLine();
-                    System.out.print("별명 입력: ");
-                    String nickName = sc.nextLine();
-                    userService.registerUser(userName, nickName);
+                    try{
+                        System.out.print("고유한 사용자명 입력: ");
+                        String userName = sc.nextLine();
+                        System.out.print("별명 입력: ");
+                        String nickName = sc.nextLine();
+                        userService.registerUser(userName, nickName);
+                        System.out.println("완료되었습니다.");
+                    }catch(IllegalArgumentException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case 4:
-                    System.out.print("사용자명 입력: ");
-                    String oldUserName = sc.nextLine();
-                    if(!(userService.userNameExists(oldUserName))){
-                        System.out.println("존재하지 않는 사용자명입니다.");
-                         break;
+                    try{
+                        System.out.print("사용자명 입력: ");
+                        String oldUserName = sc.nextLine();
+                        System.out.print("새로운 사용자명 입력: ");
+                        String newUserName = sc.nextLine();
+                        System.out.print("새로운 별명 입력: ");
+                        String newNickName = sc.nextLine();
+                        userService.updateName(oldUserName, newUserName, newNickName);
+                        System.out.println("완료되었습니다.");
+                    }catch(IllegalArgumentException e){
+                        System.out.println(e.getMessage());
                     }
-                    System.out.print("새로운 사용자명 입력: ");
-                    String newUserName = sc.nextLine();
-                    System.out.print("새로운 별명 입력: ");
-                    String newNickName = sc.nextLine();
-                    userService.updateName(oldUserName, newUserName, newNickName);
                     break;
                 case 5:
-                    System.out.println("수정된 사용자 정보 출력\n");
+                    System.out.println("<수정된 사용자 정보 출력>\n");
                     List<User> updatedUsers = userService.getUpdatedUsers();
                     if(updatedUsers.isEmpty()){
                         System.out.println("수정된 사용자 정보가 존재하지 않습니다.");
@@ -93,12 +111,51 @@ public class Main {
                     System.out.println(updatedUsers);
                     break;
                 case 6:
-                    System.out.print("사용자명 입력: ");
-                    String deleteUserName = sc.nextLine();
-                    System.out.println(userService.deleteUser(deleteUserName));
+                    try {
+                        System.out.print("사용자명 입력: ");
+                        String deleteUserName = sc.nextLine();
+                        userService.deleteUser(deleteUserName);
+                        System.out.println("완료되었습니다.\n<모든 사용자의 정보 출력>");
+                        System.out.println(userService.getAllUsers());
+                    }catch(IllegalArgumentException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 default:
                     System.out.println("잘못된 입력입니다.");
+                    break;
+            }
+        }
+    }
+
+    public static void channelMenu(JCFChannelService channelService, JCFUserService userService) {
+        while (true) {
+            int choice = crudMenu();
+
+            if(choice == 7) return;
+            switch(choice){
+                case 1:
+                    System.out.print("채널 ID 입력: ");
+                    UUID channelId = UUID.fromString(sc.nextLine());
+                    String getChannel = channelService.getChannel(channelId);
+                    if(getChannel == null){
+                        System.out.println("존재하지 않는 채널입니다.");
+                        break;
+                    }
+                    System.out.println(getChannel);
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    try{
+                        System.out.print("서버를 생성할 사용자 ID 입력: ");
+                        UUID userId = UUID.fromString(sc.nextLine());
+                        if(!(userService.uidExists(userId))){ break;}
+                        System.out.print("채널명 입력: ");
+                        channelService.registerChannel(sc.nextLine(), userId);
+                    }catch(IllegalArgumentException e){
+                        System.out.println(e.getMessage());
+                    }
                     break;
             }
         }

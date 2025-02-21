@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,19 +30,24 @@ public class JCFUserService implements UserService {
         return userinstance;
     }
 
-    @Override
-    public String getUser(String userName) {
+    public void containsUserNameToId(String userName){
         if(!(userNameToId.containsKey(userName))){
-            return "존재하지 않는 사용자명입니다.";
+            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
         }
-        return userData.get(userNameToId.get(userName)).toString();
     }
 
     @Override
-    public String getAllUsers(){
-        return userData.values().stream()
-                .map(User::toString)
-                .collect(Collectors.joining("\n"));
+    public User getUser(String userName) {
+        containsUserNameToId(userName);
+        return userData.get(userNameToId.get(userName));
+    }
+
+    @Override
+    public List<User> getAllUsers(){
+        if(userData.isEmpty()){
+            throw new IllegalArgumentException("데이터가 존재하지 않습니다.");
+        }
+        return new ArrayList<>(userData.values());
     }
 
     @Override
@@ -53,8 +60,7 @@ public class JCFUserService implements UserService {
     @Override
     public void registerUser(String userName, String nickName) {
         if(userNameToId.containsKey(userName)){
-            System.out.println("존재하는 사용자명입니다.");
-            return;
+            throw new IllegalArgumentException("존재하는 사용자명입니다.");
         }
         User user = new User(userName, nickName);
         UUID uid = user.getUid();
@@ -63,16 +69,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean userNameExists(String userName) {
-        return userNameToId.containsKey(userName);
-    }
-
-    @Override
     public void updateName(String oldUserName, String newUserName, String newNickName) {
-        if(!(userNameToId.containsKey(oldUserName))){
-             System.out.println("존재하지 않는 사용자입니다.");
-             return;
-        }
+        containsUserNameToId(oldUserName);
         UUID uid = userNameToId.get(oldUserName);
         User user = userData.get(uid);
         user.userUpdate(newUserName, newNickName);
@@ -81,14 +79,18 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public String deleteUser(String userName) {
-        if(!(userNameToId.containsKey(userName))){
-            return "존재하지 않는 사용자입니다.";
-        }
+    public void deleteUser(String userName) {
+        containsUserNameToId(userName);
         UUID uid = userNameToId.get(userName);
         userData.remove(uid);
         userNameToId.remove(userName);
-        return getAllUsers();
     }
 
+    public boolean uidExists(UUID userId) {
+        if(!(userData.containsKey(userId))){
+            System.out.println("존재하지 않는 사용자입니다.");
+            return false;
+        }
+        return true;
+    }
 }
