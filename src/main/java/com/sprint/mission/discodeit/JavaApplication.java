@@ -99,14 +99,14 @@ public class JavaApplication {
 
 
         // message service 테스트 (UserService와 동일한 방식으로 테스트)
-        MessageService messageService = new JCFMessageService();
+        MessageService messageService = new JCFMessageService(userService, channelService);
 
         // 등록
         System.out.println("\n\n=== Message 등록 테스트 ===");
         System.out.println("등록 결과:");
         Message message1 = messageService.createMessage(user1.getId(), channel1.getId(), user1.getName() + "님이 " + channel1.getName() + " 채널에서 메세지를 작성했습니다.");
         Message message2 = messageService.createMessage(user2.getId(), channel2.getId(), user2.getName() + "님이 " + channel2.getName() + " 채널에서 메세지를 작성했습니다.");
-        Message message3 = messageService.createMessage(user3.getId(), channel2.getId(), user3.getName() + "님이 " + channel2.getName() + " 채널에서 메세지를 작성했습니다.");
+        Message message3 = messageService.createMessage(user4.getId(), channel2.getId(), user4.getName() + "님이 " + channel2.getName() + " 채널에서 메세지를 작성했습니다.");
         messageService.getAllMessages().forEach(System.out::println);
 
         // 조회 (단건)
@@ -132,5 +132,18 @@ public class JavaApplication {
         messageService.deleteMessage(message3.getId());
         // 조회를 통해 삭제되었는지 확인
         messageService.getAllMessages().forEach(System.out::println);
+
+        // 존재하지 않는 User로 메세지 생성 검증
+        System.out.println("\n=== 존재하지 않는 유저로 메세지 생성 검증 ===");
+        Message invalidMessage1 = messageService.createMessage(UUID.randomUUID(), channel1.getId(), "존재하지 않는 유저로 메세지 생성");
+        if(invalidMessage1 == null)
+            System.out.println("존재하지 않는 유저이므로 메세지를 보낼 수 없습니다.");
+
+        // 존재하지 않는 Channel로 메세지 생성 검증
+        System.out.println("\n=== 존재하지 않는 채널로 메세지 생성 검증 ===");
+        Message invalidMessage2 = messageService.createMessage(user1.getId(), UUID.randomUUID(), "존재하지 않는 채널로 메세지 생성");
+        if(invalidMessage2 == null)
+            System.out.println("존재하지 않는 채널이므로 메세지를 보낼 수 없습니다.");
+
     }
 }
