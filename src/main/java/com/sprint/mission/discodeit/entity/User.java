@@ -58,4 +58,17 @@ public class User extends BaseEntity {
 
         // 비밀번호 패턴 검증 예외처리 추가로 필요
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return super.getId().equals(user.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return super.getId().hashCode();
+    }
 }
