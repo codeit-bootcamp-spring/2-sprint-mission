@@ -34,6 +34,10 @@ public class User extends Common{
         return nickname;
     }
 
+    public List<String> getRoles() {
+        return roles;
+    }
+
     // username은 아이디 변경이 불가능하므로 update 필요 X
 
     public void updatePassword(String password) {
