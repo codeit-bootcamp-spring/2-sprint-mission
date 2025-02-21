@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.service.TimeFormatter;
+
 public class Message extends BaseEntity{
     private String text;
 
@@ -22,8 +24,8 @@ public class Message extends BaseEntity{
         return "Message{" +
                 "id=" + id +
                 ", text='" + text + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
+                ", createdAt=" + TimeFormatter.format(createdAt) +
+                ", updatedAt=" + TimeFormatter.format(updatedAt) +
                 '}';
     }
 }
