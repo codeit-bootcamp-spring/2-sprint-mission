@@ -18,26 +18,31 @@ public class JCFUserService implements UserService {
         this.userRepository.addUser(newUser);
     }
 
-    public User readUser(UUID id) {
-        if (id == null) {
-            throw new IllegalArgumentException("null 인 id 값이 들어왔습니다!!!");
-        }
-        return userRepository.findUserById(id);
+    public User readUser(UUID userId) {
+        validateUserId(userId);
+        return userRepository.findUserById(userId);
     }
 
     public Set<User> readAllUsers() {
         return userRepository.getUsers();
     }
 
-    public void updateUserName(UUID id, String newUserName) {
-        readUser(id).updateUserName(newUserName);
+    public void updateUserName(UUID userId, String newUserName) {
+        readUser(userId).updateUserName(newUserName);
     }
 
-    public void updatePassword(UUID id, String newPassword) {
-        readUser(id).updateUserPassword(newPassword);
+    public void updatePassword(UUID userId, String newPassword) {
+        readUser(userId).updateUserPassword(newPassword);
     }
 
-    public void deleteUser(UUID id) {
-        userRepository.deleteUser(id);
+    public void deleteUser(UUID userId) {
+        validateUserId(userId);
+        userRepository.deleteUser(userId);
+    }
+
+    public void validateUserId(UUID userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("null 인 id 값이 들어왔습니다!!!");
+        }
     }
 }
