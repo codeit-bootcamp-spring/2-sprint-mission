@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.service.TimeFormatter;
+
 public class User extends BaseEntity {
     private String name;
+
 
     public User(String name) {
         super();
@@ -22,8 +25,8 @@ public class User extends BaseEntity {
         return "User{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
+                ", createdAt=" + TimeFormatter.format(createdAt) +
+                ", updatedAt=" + TimeFormatter.format(updatedAt) +
                 '}';
     }
 }
