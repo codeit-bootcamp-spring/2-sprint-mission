@@ -6,14 +6,25 @@ import com.sprint.mission.discodeit.service.*;
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
+    private volatile static JCFMessageService intance = null;
     private final Map<UUID, Message> data;
     private final UserService userService;
     private final ChannelService channelService;
 
-    public JCFMessageService(UserService userService, ChannelService channelService) {
+    private JCFMessageService(UserService userService, ChannelService channelService) {
         this.data = new HashMap<>();
         this.userService = userService;
         this.channelService = channelService;
+    }
+
+    public static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
+        if (intance == null) {
+            synchronized (JCFMessageService.class) {
+                if (intance == null)
+                    intance = new JCFMessageService(userService, channelService);
+            }
+        }
+        return intance;
     }
 
     @Override

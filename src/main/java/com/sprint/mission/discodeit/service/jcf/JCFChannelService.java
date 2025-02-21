@@ -6,10 +6,21 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
+    private volatile static JCFChannelService instance = null;
     private final Map<UUID, Channel> data;
 
-    public JCFChannelService() {
+    private JCFChannelService() {
         this.data = new HashMap<>();
+    }
+
+    public static JCFChannelService getInstance() {
+        if (instance == null) {
+            synchronized (JCFChannelService.class) {
+                if (instance == null)
+                    instance = new JCFChannelService();
+            }
+        }
+        return instance;
     }
 
     @Override

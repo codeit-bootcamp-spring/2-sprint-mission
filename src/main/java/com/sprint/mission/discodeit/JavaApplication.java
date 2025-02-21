@@ -12,7 +12,7 @@ public class JavaApplication {
     public static void main(String[] args){
 
         // user service 테스트
-        UserService userService = new JCFUserService();
+        UserService userService = JCFUserService.getInstance();
 
         // 등록
         System.out.println("\n\n=== User 등록 테스트 ===");
@@ -52,7 +52,7 @@ public class JavaApplication {
         
 
         // channel service 테스트 (UserService와 동일한 방식으로 테스트)
-        ChannelService channelService = new JCFChannelService();
+        ChannelService channelService = JCFChannelService.getInstance();
 
         // 등록
         System.out.println("\n\n=== Channel 등록 테스트 ===");
@@ -99,7 +99,7 @@ public class JavaApplication {
 
 
         // message service 테스트 (UserService와 동일한 방식으로 테스트)
-        MessageService messageService = new JCFMessageService(userService, channelService);
+        MessageService messageService = JCFMessageService.getInstance(userService, channelService);
 
         // 등록
         System.out.println("\n\n=== Message 등록 테스트 ===");
