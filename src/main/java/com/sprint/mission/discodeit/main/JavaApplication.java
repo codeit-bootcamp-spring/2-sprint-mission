@@ -165,6 +165,23 @@ public class JavaApplication {
 
         System.out.println("=========== 채널 기준 메세지 조회 테스트: 채널 1에 메세지 3개 ===========");
         messageService.getChannelMessagesByChannelId(channel1.getId()).stream().forEach(System.out::println);
+        System.out.println("=========== 채널 메세지 조회 테스트 끝 ===========");
+        System.out.println();
+
+        System.out.println("=========== 메세지 변경 테스트: 변경 이전 내용:안녕하세요 ===========");
+        System.out.println(messageService.getMessageById(pm1.getId()));
+        System.out.println("=========== 메세지 변경 테스트: 변경 이후 내용:헬로우 ===========");
+        messageService.updateMessage(pm1.getId(), "헬로우");
+        System.out.println(messageService.getMessageById(pm1.getId()));
+        System.out.println("=========== 메세지 수정 테스트 끝 ===========");
+        System.out.println();
+
+        System.out.println("=========== 메세지 삭제 테스트: Han이 보낸 헬로우 메세지 삭제 ===========");
+        messageService.deleteMessage(pm1.getId());
+        System.out.println("=========== 송신자 기준 메세지 목록: 4개여야 삭제된거임 ===========");
+        messageService.getMessagesBySenderId(user1.getId()).stream().forEach(System.out::println);
+        System.out.println("=========== 수신자 기준 메세지 목록: 1개여야 삭제된거임 ===========");
+        messageService.getPrivateMessagesByReceiverId(user2.getId()).stream().forEach(System.out::println);
 
 
     }

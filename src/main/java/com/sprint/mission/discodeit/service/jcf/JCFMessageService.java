@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelMessage;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.PrivateMessage;
@@ -105,11 +106,32 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message updateMessage(UUID messageId, String content) {
-        return null;
+        Message message = messages.get(messageId);
+        if (message == null) {
+            return null;
+        }
+        message.update(content);
+
+        return message;
     }
 
     @Override
     public boolean deleteMessage(UUID messageId) {
-        return false;
+        Message message = messages.get(messageId);
+        if (message == null) {
+            return false;
+        }
+
+        messageIdsBySender.get(message.getSenderId()).remove(messageId);
+
+        if (message instanceof PrivateMessage) {
+            privateMessageIdsByReceiver.get(((PrivateMessage) message).getReceiverId()).remove(messageId);
+        } else if (message instanceof ChannelMessage) {
+            channelMessageIdsByChannel.get(((ChannelMessage) message).getChannelId()).remove(messageId);
+        }
+
+        messages.remove(messageId);
+
+        return true;
     }
 }
