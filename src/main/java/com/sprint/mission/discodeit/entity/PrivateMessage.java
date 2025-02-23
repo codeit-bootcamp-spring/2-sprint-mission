@@ -13,4 +13,12 @@ public class PrivateMessage extends Message {
     public UUID getReceiverId() {
         return receiverId;
     }
+
+    @Override
+    public String toString() {
+        return "PrivateMessage{" +
+                "receiverId=" + receiverId +
+                super.toString() +
+                '}';
+    }
 }

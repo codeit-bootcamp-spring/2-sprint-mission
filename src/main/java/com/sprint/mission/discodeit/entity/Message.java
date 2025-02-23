@@ -41,11 +41,9 @@ public class Message extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Message{" +
-                "sender=" + senderId +
+        return "sender=" + senderId +
                 ", content='" + content + '\'' +
-                super.toString() +
-                '}';
+                super.toString();
     }
 }
 

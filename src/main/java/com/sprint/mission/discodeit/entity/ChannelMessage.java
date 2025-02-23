@@ -13,4 +13,12 @@ public class ChannelMessage extends Message {
     public UUID getChannelId() {
         return channelId;
     }
+
+    @Override
+    public String toString() {
+        return "ChannelMessage{" +
+                "channelId=" + channelId +
+                super.toString() +
+                '}';
+    }
 }
