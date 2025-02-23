@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class JCFChannelService implements ChannelService {
     private static JCFChannelService instance;
@@ -102,5 +103,15 @@ public class JCFChannelService implements ChannelService {
 
         membersByChannel.get(channelId).remove(userId);
         return getChannelByChannelId(channelId);
+    }
+
+    protected boolean isChannelMember(UUID channelId, UUID userId) {
+        Set<UUID> channelMembers = membersByChannel.get(channelId);
+        if (channelMembers == null) {
+            return false;
+        }
+
+        return channelMembers.stream()
+                .anyMatch(memberId -> memberId.equals(userId));
     }
 }
