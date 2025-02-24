@@ -23,8 +23,8 @@ public class JavaApplication {
 
         // 1. JCFUserService 테스트
         // 1.1 등록
+        User user = new User("성준", "1234", "고기"); // 계속 써야하므로 여기에 선언
         try {
-            User user = new User("성준", "1234", "고기");
             User user2 = new User("희준", "1234", "생선");
             User user3 = new User("태환", "1234", "무민");
             // User user3 = new User("성준","4567", "마늘"); - 중복 username 등록 불가
@@ -55,9 +55,9 @@ public class JavaApplication {
             String username = "성준"; // username값을 알아야 수정 가능, 얘는 수정 X, 만약 username을 틀리게 입력할 경우 -> 예외 발생
             String password = "수정1234"; // 어떻게 수정할지 값을 받음, 입력 안하면 예외 발생
             String nickname = "수정고기"; // 어떻게 수정할지 값을 받음, 입력 안하면 예외 발생
-            User user = new User(username, password, nickname);
+            User updateUser = new User(username, password, nickname);
 
-            userService.updateUser(user);
+            userService.updateUser(updateUser);
 
             // 권한 추가
             String role1 = "admin";
@@ -132,18 +132,23 @@ public class JavaApplication {
         }
 
         // 2.3 수정
+        User user1 = new User("새로운유저", "1234", "나는야새유저");
+        User user2 = new User("삭제될유저", "1234", "나는야삭제될유저");
+        String channelName1 = "성준의채널";
+        String channelName2 = "태환의채널";
         try {
-            String channelName = "성준의채널";
             // 권한에 대한 고민 - 채널을 변경하려는 유저에게 관리자 권한이 있어야 채널 수정이 되는게 아닐까?
-            // 유저 추가
-            User user1 = new User("새로운유저", "1234", "나는야새유저");
-            User user2 = new User("삭제될유저", "1234", "나는야삭제될유저");
-            Channel channel = channelService.getChannel(channelName);
-            channelService.addUsersToChannel(user1, channel);
-            // 유저 삭제
-            channelService.removeUsersFromChannel(user2, channel);
-
+            channelService.addUsersToChannel(user, user1, channelName1); // "성준의채널"은 "성준"의 채널이므로 정상적으로 수정
+            channelService.addUsersToChannel(user, user2, channelName1);
+            channelService.addUsersToChannel(user, user2, channelName2); // "태환의채널"은 "성준"의 채널이 아니므로 예외 발생
         } catch(IllegalArgumentException e) {
+            System.out.println("채널 수정 예외 발생: " + e.getMessage());
+        }
+
+        try {
+            // 유저 삭제
+            channelService.removeUsersFromChannel(user, user2, channelName1);
+        } catch (IllegalArgumentException e) {
             System.out.println("채널 수정 예외 발생: " + e.getMessage());
         }
 
@@ -160,7 +165,7 @@ public class JavaApplication {
 
         // 2.5 삭제
         try {
-            channelService.deleteChannel("태환의채널");
+            channelService.deleteChannel(user,"태환의채널");
         } catch(IllegalArgumentException e) {
             System.out.println("채널 삭제 예외 발생: " + e.getMessage());
         }
@@ -173,11 +178,12 @@ public class JavaApplication {
             System.out.println("유저 삭제 예외 발생: " + e.getMessage());
         }
 
+
+
         System.out.println();
 
         System.out.println("=== 메시지 관련 기능 ===");
         // 3. JCFMessageService 테스트
-        User user = userService.getUser("성준");
         Channel channel = channelService.getChannel("성준의채널");
         Message message1 = new Message("안녕하세요 메시지 테스트1", user, channel);
         UUID id = message1.getId();
@@ -232,6 +238,8 @@ public class JavaApplication {
         } catch (IllegalArgumentException e) {
             System.out.println("메시지 삭제 조회 예외 발생: " + e.getMessage());
         }
+
+
 
     }
 }

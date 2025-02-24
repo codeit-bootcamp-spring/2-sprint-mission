@@ -53,33 +53,46 @@ public class JCFChannelService implements ChannelService {
     // 채널 수정
     // 유저 추가
     @Override
-    public void addUsersToChannel(User user, Channel channel) {
+    public void addUsersToChannel(User requestUser, User user, String channelName) {
         // 매개변수 - Channel 객체로 가져오는 것 보다 channelName만 가져오는게 나을지도?..
         // 현재는 메소드에서 channel.channelName만 사용하긴하는데, Channel을 쓰는게 확장성이 더 좋을 것 같기도
         // <-> 객체 째로 가져오면 넘 무겁지 않나? (고민)
         if (user == null) {
             throw new IllegalArgumentException("추가할 유저가 존재하지 않습니다.");
         }
-        if (channel == null) {
+
+        Channel findChannel = getChannel(channelName);
+
+        if (findChannel == null) {
             throw new IllegalArgumentException("수정할 채널이 존재하지 않습니다.");
         }
 
-        Channel findChannel = getChannel(channel.getChannelName());
+        // 채널 수정 시 요청을 하는 User(requestUser)가 해당 채널의 주인이어야한다.
+        if (!requestUser.equals(findChannel.getUser())) {
+            throw new IllegalArgumentException("수정할 채널의 주인이 아닙니다.");
+        }
 
         findChannel.updateUpdatedAt(System.currentTimeMillis());
         findChannel.addUsers(user);
     }
+
     // 유저 삭제
     @Override
-    public void removeUsersFromChannel(User user, Channel channel) {
+    public void removeUsersFromChannel(User requestUser, User user, String channelName) {
         if (user == null) {
             throw new IllegalArgumentException("삭제할 유저가 존재하지 않습니다.");
         }
-        if (channel == null) {
+
+        Channel findChannel = getChannel(channelName);
+
+        if (findChannel == null) {
             throw new IllegalArgumentException("수정할 채널이 존재하지 않습니다.");
         }
 
-        Channel findChannel = getChannel(channel.getChannelName());
+        // 채널 수정 시 요청을 하는 User(requestUser)가 해당 채널의 주인이어야한다.
+        if (!requestUser.getUsername().equals(findChannel.getUser().getUsername())) {
+            throw new IllegalArgumentException("수정할 채널의 주인이 아닙니다.");
+        }
 
         findChannel.updateUpdatedAt(System.currentTimeMillis());
         findChannel.removeUsers(user);
@@ -88,7 +101,7 @@ public class JCFChannelService implements ChannelService {
 
     // 채널 삭제
     @Override
-    public void deleteChannel(String channelName) {
+    public void deleteChannel(User user, String channelName) {
         Channel findChannel = getChannel(channelName);
         data.remove(findChannel);
     }

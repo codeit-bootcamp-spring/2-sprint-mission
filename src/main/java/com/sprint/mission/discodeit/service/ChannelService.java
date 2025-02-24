@@ -22,12 +22,11 @@ public interface ChannelService {
     // channelName도 변경 안되게 막아놔서 바꿀게 채널의 Users 필드밖에 없음
     // -> Users를 삭제하거나 추가하는 메소드 두개로 분리
     // void updateChannel(Channel channel);
-    void addUsersToChannel(User user, Channel channel);
-    void removeUsersFromChannel(User user, Channel channel);
-
+    void addUsersToChannel(User requestUser, User user, String channelName);
+    void removeUsersFromChannel(User requestUser, User user, String channelName);
 
     // 채널 삭제
-    void deleteChannel(String channelName);
+    void deleteChannel(User requestUser, String channelName);
 
 
 }
