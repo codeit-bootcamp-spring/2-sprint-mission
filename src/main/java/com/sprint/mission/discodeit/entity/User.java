@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import javax.management.relation.Role;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class User extends Common{
     // 아이디 - 디스코드에서는 이메일 사용
@@ -12,9 +10,20 @@ public class User extends Common{
     private String password;
     // 닉네임
     private String nickname;
+
+    // 유저가 들어가있는 채널 목록 - 유저가 디스코드에 접속했을 때, 본인의 채널 목록을 보여줘야하므로 필요
+    // 중복 예외 처리가 따로 필요하지 않고, 중복만 방지하면서 순서 유지가 필요 -> LinkedHashSet 사용
+    private Set<Channel> channels = new LinkedHashSet<>();
+
+    // 유저가 남긴 메시지 목록 - 유저가 어떤 채널에 어떤 메시지를 남겼는지 관리 목적에서 필요
+    // 중복이 있어도 됨 -> List 사용
+    private List<Message> messages = new ArrayList<>();
+
     // 권한 - 채널 여러개의 권한이 필요하므로 List로 생성
-    // 채널마다 관리자 권한명을 다르게 해줘야함 -> enum보단 String 사용?
-    private List<String> roles = new ArrayList<>();
+    // 중복을 허용하면 안되니까 Set이 더 나으려나요? vs List로 하고 중복일 경우 예외처리
+    // => 로직상으로 중복돼도 별다른 문제가 없고, 단순히 중복 자체만 방지하면 되니까 Set 사용?
+    // <-> 중복 회원 가입은 로직상으로 반드시 막아야 하므로 List로 하고 예외처리까지 해주기
+    private Set<String> roles = new HashSet<>();
 
     public User(String username, String password, String nickname) {
         this.username = username;
@@ -34,7 +43,7 @@ public class User extends Common{
         return nickname;
     }
 
-    public List<String> getRoles() {
+    public Set<String> getRoles() {
         return roles;
     }
 
