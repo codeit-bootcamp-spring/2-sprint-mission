@@ -12,9 +12,11 @@ public class User extends BaseEntity {
         return username;
     }
 
-    public void updateUsername(String newUsername) {
+    public User updateUsername(String newUsername) {
         this.username = newUsername;
         update();
+
+        return this;
     }
 
 }

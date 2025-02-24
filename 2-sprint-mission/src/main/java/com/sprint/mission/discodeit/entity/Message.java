@@ -12,7 +12,9 @@ public class Message extends BaseEntity {
         return message;
     }
 
-    public void updateMessage(String message) {
+    public Message updateMessage(String message) {
         this.message = message;
+
+        return this;
     }
 }
