@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.*;
 
 public class UserRepository {
-    Set<User> users;
+    private Set<User> users;
 
     public UserRepository() {
         this.users = new HashSet<User>();
