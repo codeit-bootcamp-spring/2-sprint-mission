@@ -1,8 +1,10 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.jcf.JCFUserService;
 import com.sprint.mission.menu.ChannelMenu;
+import com.sprint.mission.menu.MessageMenu;
 import com.sprint.mission.menu.UserMenu;
 
 import java.util.Scanner;
@@ -12,6 +14,7 @@ public class JavaApplication {
     public static void main(String[] args) {
         JCFUserService userService = JCFUserService.getInstance();
         JCFChannelService channelService = JCFChannelService.getInstance();
+        JCFMessageService messageService = JCFMessageService.getInstance();
 
         while(true){
             System.out.println("=============================");
@@ -31,7 +34,7 @@ public class JavaApplication {
                     ChannelMenu.display(channelService, userService);
                     break;
                 case 3:
-
+                    MessageMenu.display(messageService);
                     break;
                 case 4:
                     return;

@@ -6,17 +6,52 @@ public class Message {
     private final UUID mid;
     private final Long messageCreateAt;
     private Long messageUpdateAt;
-    private UUID cid;
-    private UUID uid;
+    private final Channel channel;
+    private final User user;
     private String messageContent;
 
-    public Message(UUID cid, UUID uid, String messageContent){
+    public Message(Channel channel, User user, String messageContent){
         this.mid = UUID.randomUUID();
         this.messageCreateAt = System.currentTimeMillis();
-        this.cid = cid;
-        this.uid = uid;
+        this.channel = channel;
+        this.user = user;
         this.messageContent = messageContent;
     }
 
+    public UUID getMid() {
+        return mid;
+    }
+
+    public Long getMessageCreateAt() {
+        return messageCreateAt;
+    }
+
+    public Long getMessageUpdateAt() {
+        return messageUpdateAt;
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public String getMessageContent() {
+        return messageContent;
+    }
+
+    @Override
+    public String toString() {
+        return "[mid: " + mid +
+                ", cid: " + channel.getCid() +
+                ", channelName: " + channel.getChannelName() +
+                ", userName: " + user.getUserName() +
+                ", nickName: " + user.getNickName() +
+                ", messageCreateAt: " + messageCreateAt +
+                ", messageUpdateAt: " + messageUpdateAt +
+                "\n\t, messageContent: " + messageContent + "]\n";
+    }
 
 }
