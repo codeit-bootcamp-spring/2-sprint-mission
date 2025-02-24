@@ -7,10 +7,16 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class MessageRepository {
-    private LinkedList<Message> messages;
+    private final LinkedList<Message> messages = new LinkedList<>();
 
-    public MessageRepository() {
-        messages = new LinkedList<>();
+    private static class SingletonHolder {
+        private static final MessageRepository INSTANCE = new MessageRepository();
+    }
+
+    private MessageRepository() {}
+
+    public static MessageRepository getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     public void addMessage(Message newMessage) {
