@@ -2,10 +2,13 @@ package com.sprint.mission.view.output;
 
 import com.sprint.mission.model.entity.User;
 import java.util.List;
+import java.util.Optional;
+import javax.swing.text.html.Option;
 
 public class UserOutput {
+
     public void creatOutput(User user) {
-        System.out.println(user.getUsername() + " 님 회원가입이 완료 되었습니다 ~ !");
+        System.out.println(user.getUsername().toString() + " 님 회원가입이 완료 되었습니다 ~ !");
     }
 
     public void updatedOutput() {
@@ -19,10 +22,12 @@ public class UserOutput {
         }
     }
 
-    public void getEmailOutput(String userEmail) {
-        if(userEmail == null || userEmail.isEmpty()) {
+    public void getEmailOutput(Optional<User> optionUser) {
+        if (optionUser == null || !optionUser.isPresent()) {
             System.out.println("회원 정보를 찾을 수 없습니다 ");
+        } else {
+            User user = optionUser.get();
+            System.out.println(user.getUsername().toString() +" 님 찾았습니다");
         }
-            System.out.println(userEmail + " 님 찾았습니다");
     }
 }

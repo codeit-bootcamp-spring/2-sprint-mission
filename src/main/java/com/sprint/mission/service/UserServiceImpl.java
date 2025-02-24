@@ -20,6 +20,7 @@ public class UserServiceImpl implements UserService {
     public void createUser(String username, String email, String password) {
 
         User newUser = new User(username, password, email);
+        users.add(newUser);
         userOutput.creatOutput(newUser);
     }
 
@@ -41,12 +42,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void getEmailUser(String email) {
-        Optional<User> user = users.stream()
+        Optional<User> user = Optional.ofNullable(users.stream()
                 .filter(u -> u.getEmail().equals(email))
-                .findFirst();
+                .findFirst()
+                .orElse(null));
 
         if(user.isPresent()) {
-            userOutput.getEmailOutput(user.toString());
+            userOutput.getEmailOutput(user);
         }else{
             userOutput.getEmailOutput(null);
         }
