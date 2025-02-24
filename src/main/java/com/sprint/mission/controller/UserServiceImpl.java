@@ -22,4 +22,17 @@ public class UserServiceImpl implements UserService {
         userOutput.creatResponse(newUser);
     }
 
+
+    @Override
+    public void updateUser(String email, String username, String password) {
+        for(User u : users) {
+            if(u.getEmail().equals(email)) {
+                u.update(username, password);
+                userOutput.UpdatedResponse();
+            }
+        }
+    }
+
+
+
 }

@@ -16,7 +16,7 @@ public class UserInput {
         this.scanner = new Scanner(System.in);
     }
 
-    public void creatInput() {
+    public void creatRequest() {
         System.out.println("사용자을 입력해주세요");
         String username = scanner.nextLine().trim();
 
@@ -27,5 +27,18 @@ public class UserInput {
         String password = scanner.nextLine().trim();
 
         userService.createUser(username, email, password);
+    }
+
+    public void updateInput() {
+
+        System.out.print("이메일 입력해주세요: ");
+        String email = scanner.nextLine().trim();
+
+        System.out.print("변경 할 이름을 입력해주세요: ");
+        String username = scanner.nextLine().trim();
+
+        System.out.print("변경 할 비밀번호 입력해주세요: ");
+        String password = scanner.nextLine().trim();
+        userService.updateUser(email, username, password);
     }
 }
