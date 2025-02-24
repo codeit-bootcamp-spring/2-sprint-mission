@@ -1,12 +1,16 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
 
@@ -87,5 +91,30 @@ public class JCFMessageService implements MessageService {
 
         data.remove(findMessage);
 
+    }
+    // 해당 채널의 메시지 전체 조회
+    @Override
+    public List<Message> getAllMessagesByChannel(String channelName) {
+        List<Message> findMessages = getAllMessages();
+        return findMessages.stream().filter(m -> m.getChannel().getChannelName().equals(channelName))
+                .collect(Collectors.toList());
+    }
+
+    // 해당 채널의 해당 유저의 메시지만 검색
+    @Override
+    public List<Message> searchMessageByChannelAndUser(String username, String channelName) {
+        List<Message> messages = getAllMessages();
+        return messages.stream()
+                .filter(m -> m.getChannel().getChannelName().equals(channelName) && m.getSender().getUsername().equals(username))
+                .collect(Collectors.toList());
+    }
+
+    // 해당 채널의 메시지를 포함 내용으로 검색
+    @Override
+    public List<Message> searchMessagesContaining(String channelName, String content) {
+        List<Message> messages = getAllMessages();
+        return messages.stream()
+                .filter(m -> m.getContent().contains(content))
+                .collect(Collectors.toList());
     }
 }

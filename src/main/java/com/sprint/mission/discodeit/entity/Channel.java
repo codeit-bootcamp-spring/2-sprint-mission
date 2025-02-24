@@ -25,6 +25,7 @@ public class Channel extends Common {
         // super() 하지 않아도 기본 생성자는 컴파일러가 자동으로 삽입
         this.owner = user;
         this.channelName = channelName;
+        users.add(user);
     }
 
     public User getOwner() {return owner; }

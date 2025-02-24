@@ -188,11 +188,11 @@ public class JavaApplication {
         // 3. JCFMessageService 테스트
         Channel channel1 = channelService.getChannel("성준의채널");
         Channel channel2 = channelService.getChannel("태환의채널");
-        Message message1 = new Message("메시지1", user, channel1);
-        Message message2 = new Message("메시지2", user, channel1);
-        Message message3 = new Message("메시지3", user, channel1);
+        channelService.addUsersToChannel(user2, user, channelName2);
+        Message message1 = new Message("메시지1", user, channel2);
+        Message message2 = new Message("메시지2", user, channel2);
+        Message message3 = new Message("메시지3", user, channel2);
         UUID id1 = message1.getId();
-        UUID id2 = message2.getId();
         // 3.1 등록
         try {
             messageService.createMessage(message1);
@@ -277,7 +277,7 @@ public class JavaApplication {
             System.out.println("유저 - 채널 동기화 예외 발생: " + e.getMessage());
         }
 
-        // 4.2 유저 - 메시지 동기화 (유저가 메시지를 보내면, 유저의 메시지 목록에도 해당 메시지 추가)
+        // 4.2 유저 - 메시지 동기화
         try {
             System.out.println("=== 유저 - 메시지 동기화 ===");
             // 유저가 메시지를 보내면, 유저의 메시지 목록에도 해당 메시지 추가
@@ -324,16 +324,35 @@ public class JavaApplication {
         }
 
 
-        // 4.4 해당 채널의 해당 유저의 메시지만 검색
+        // 4.4  해당 채널의 해당 유저의 메시지만 검색
+        System.out.println("=== 채널 + 유저 검색 ===");
+        User user5 = new User("유저5", "1234","검색확인용");
+        userService.createUser(user5);
+        Channel channel4 = new Channel(user5,"검색확인용채널");
+        channelService.createChannel(channel4);
+        Message message4 = new Message("검색확인", user5, channel4);
+        channelService.addUsersToChannel(user5, user2, channel4.getChannelName());
+        Message message5 = new Message("전체메시지", user2, channel4);
+        Message message6 = new Message("검색확인2", user2, channel4);
+        messageService.createMessage(message4);
+        messageService.createMessage(message5);
+        messageService.createMessage(message6);
+        List<Message> findMessageByChannel = messageService.getAllMessagesByChannel(channel4.getChannelName());
+        System.out.print("채널의 전체 메시지 : ");
+        findMessageByChannel.stream().forEach(m -> System.out.print(m.getContent() + " "));
+        System.out.println();
+        List<Message> findMessageByChannelAndUser = messageService.searchMessageByChannelAndUser("유저5", "검색확인용채널");
+        System.out.print("채널에서 유저명으로 검색 : ");
+        findMessageByChannelAndUser.stream().forEach(m -> System.out.print(m.getContent() + " "));
+        System.out.println();
 
 
         // 4.5 해당 채널의 메시지에 포함된 내용으로 검색
-
-
-
-
-
-
+        System.out.println("=== 채널 + 메시지 검색 === ");
+        List<Message> findMessagesContainingContent = messageService.searchMessagesContaining("검색확인용채널", "검색");
+        System.out.print("'검색' 키워드가 들어간 메시지 : ");
+        findMessagesContainingContent.stream().forEach(m -> System.out.print(m.getContent() + " "));
+        System.out.println();
 
     }
 }
