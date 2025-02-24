@@ -75,6 +75,16 @@ public class User extends Common{
         channels.remove(channel);
     }
 
+    // 메시지 추가
+    public void addMessage(Message message) {
+        messages.add(message);
+    }
+
+    // 메시지 삭제
+    public void deleteMessage(Message message) {
+        messages.remove(message);
+    }
+
 
 
 

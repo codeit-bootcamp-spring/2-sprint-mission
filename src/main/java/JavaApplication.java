@@ -186,10 +186,11 @@ public class JavaApplication {
 
         System.out.println("=== 메시지 관련 기능 ===");
         // 3. JCFMessageService 테스트
-        Channel channel = channelService.getChannel("성준의채널");
-        Message message1 = new Message("메시지1", user, channel);
-        Message message2 = new Message("메시지2", user, channel);
-        Message message3 = new Message("메시지3", user, channel);
+        Channel channel1 = channelService.getChannel("성준의채널");
+        Channel channel2 = channelService.getChannel("태환의채널");
+        Message message1 = new Message("메시지1", user, channel1);
+        Message message2 = new Message("메시지2", user, channel1);
+        Message message3 = new Message("메시지3", user, channel1);
         UUID id1 = message1.getId();
         UUID id2 = message2.getId();
         // 3.1 등록
@@ -253,6 +254,7 @@ public class JavaApplication {
         // 4. 임의로 추가한 기능
         System.out.println();
         System.out.println("=== 확장 기능 ===");
+        System.out.println("=== 유저 - 채널 동기화 ===");
         // 4.1 유저 - 채널 동기화 (채널에 유저를 추가/삭제 하면, 유저의 채널 목록에도 해당 채널 추가)
         try {
             channelService.addUsersToChannel(user, newUser, channelName1);
@@ -271,17 +273,49 @@ public class JavaApplication {
             System.out.println("성준의채널 삭제");
             System.out.print("유저명 '새로운유저'의 가입채널목록 : ");;
             newUser.getChannels().stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
+            System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println("유저 - 채널 동기화 예외 발생: " + e.getMessage());
         }
 
         // 4.2 유저 - 메시지 동기화 (유저가 메시지를 보내면, 유저의 메시지 목록에도 해당 메시지 추가)
         try {
-
-
+            System.out.println("=== 유저 - 메시지 동기화 ===");
+            channelService.addUsersToChannel(user2, newUser, channelName2); // 채널에 유저가 있어야 메시지 넣기 가능 - 없으면 예외 발생
+            Message synMessage1 = new Message("메시지동기화1", newUser, channel2);
+            Message synMessage2 = new Message("메시지동기화2", newUser, channel2);
+            messageService.createMessage(synMessage1);
+            messageService.createMessage(synMessage2);
+            System.out.println("유저 - 메시지 동기화 확인 ");
+            System.out.print("유저명 '새로운유저'의 메시지목록 : ");
+            newUser.getMessages().stream().forEach((m) -> System.out.print(m.getContent() + " "));
+            System.out.println();
+            messageService.deleteMessage(synMessage1.getId(), newUser);
+            System.out.println("메시지동기화1 삭제");
+            System.out.print("유저명 '새로운유저'의 메시지목록 : ");
+            newUser.getMessages().stream().forEach((m) -> System.out.print(m.getContent() + " "));
+            System.out.println();
+            // 채널에서 유저 내보낼 시 해당 채널 유저의 메시지도 삭제돼야함
+            channelService.removeUsersFromChannel(user2, newUser, channelName2);
+            System.out.println("'새로운유저'가 '태환의채널'에서 쓴 메시지 모두 삭제");
+            System.out.print("유저명 '새로운유저'의 메시지목록 : ");
+            newUser.getMessages().stream().forEach((m) -> System.out.print(m.getContent() + " "));
         } catch(IllegalArgumentException e) {
             System.out.println("유저 - 메시지 동기화 예외 발생: " + e.getMessage()) ;
         }
+
+        // 4.3 채널 - 메시지 동기화 (채널에 메시지가 보내지면, 채널의 메시지 목록에도 해당 메시지 추가)
+
+
+
+        // 채널 삭제 시에 메시지도 삭제돼야함
+
+
+        // 4.4 해당 채널의 해당 유저의 메시지만 검색
+
+
+        // 4.5 해당 채널의 메시지에 포함된 내용으로 검색
+
 
 
 

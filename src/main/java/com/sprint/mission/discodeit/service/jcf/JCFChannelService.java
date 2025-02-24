@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
 
@@ -94,6 +96,12 @@ public class JCFChannelService implements ChannelService {
 
         // user의 필드에도 채널 삭제
         user.removeChannel(findChannel);
+        // user의 필드에도 해당 채널의 메시지 전부 삭제
+        // user.getMessages().stream().filter(m -> m.getChannel().equals(findChannel)).forEach(m -> user.deleteMessage(m));
+        // -> Stream 순회 도중 원본 컬렉션이 바뀌면 ConcurrentModificationException 발생
+        List<Message> findMessages = user.getMessages().stream().filter(m -> m.getChannel().equals(findChannel)).collect(Collectors.toList());
+        findMessages.stream().forEach(m -> m.getSender().deleteMessage(m));
+        // 해당 메시지를 List로 받고, 그 List를 돌면서 다시 삭제하면 해결
     }
 
 
@@ -108,7 +116,8 @@ public class JCFChannelService implements ChannelService {
         }
 
         // 채널 삭제 시 User의 Channel 목록에서도 삭제
-        findChannel.getUsers().forEach(u -> u.getChannels().remove(findChannel));
+        // findChannel.getUsers().forEach(u -> u.getChannels().remove(findChannel)); - Stream 순회 도중 원본 컬렉션이 바뀌면 ConcurrentModificationException 발생
+
 
         data.remove(findChannel);
     }

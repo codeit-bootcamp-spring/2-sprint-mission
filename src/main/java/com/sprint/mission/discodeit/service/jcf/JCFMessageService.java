@@ -19,6 +19,11 @@ public class JCFMessageService implements MessageService {
     // 메시지 생성
     @Override
     public void createMessage(Message message) {
+
+        // 해당 채널의 유저인지 확인
+        if(!message.getChannel().getUsers().contains(message.getSender())) {
+            throw new IllegalArgumentException("해당 채널의 유저가 아닙니다.");
+        }
         if (message == null) {
             throw new IllegalArgumentException("생성하려는 메시지 정보가 올바르지 않습니다.");
         }
@@ -27,6 +32,8 @@ public class JCFMessageService implements MessageService {
         }
 
         data.add(message);
+        // 메시지를 생성하면 User의 Message 목록에도 추가 (양방향 유지)
+        message.getSender().addMessage(message);
     }
 
     // 메시지 단건 조회
@@ -72,6 +79,9 @@ public class JCFMessageService implements MessageService {
         if (!owner.equals(findMessage.getChannel().getOwner()) && !owner.equals(findMessage.getSender())) {
             throw new IllegalArgumentException("메시지 작성자나 관리자만 삭제할 수 있습니다.");
         }
+
+        // 메시지 삭제 시 사용자의 messages 필드에도 삭제되게끔!
+        findMessage.getSender().getMessages().remove(findMessage);
 
         data.remove(findMessage);
 
