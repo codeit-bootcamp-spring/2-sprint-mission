@@ -33,17 +33,11 @@ public class JCFUserService implements UserService {
     @Override
     public User find(String identifier) {
         for (User user : userList) {
-            if (user.getUserId().equals(identifier)) {
-                return user;
-            }
-            if (user.getUserName().equals(identifier)) {
-                return user;
-            }
-            if (user.getUserEmail().equals(identifier)) {
+            if (user.getUserId().equals(identifier) || user.getUserName().equals(identifier) || user.getUserEmail().equals(identifier)) {
                 return user;
             }
         }
-        return null;
+        throw new IllegalArgumentException("사용자를 찾을 수 없습니다: " + identifier);
     }
 
     @Override
@@ -66,8 +60,6 @@ public class JCFUserService implements UserService {
         }
         return null;
     }
-
-
 
     @Override
     public void delete(String identifier) {

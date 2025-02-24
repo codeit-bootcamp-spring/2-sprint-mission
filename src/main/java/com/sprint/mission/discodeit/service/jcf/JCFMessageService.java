@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 
@@ -11,11 +12,17 @@ public class JCFMessageService implements MessageService {
     private final List<Message> messageList;
 
     public JCFMessageService() {
-        this.messageList = new ArrayList<Message>();
+        this.messageList = new ArrayList<>();
     }
 
     @Override
     public Message create(Message message) {
+        if (message.getUser() == null || message.getChannel() == null) {
+            throw new IllegalArgumentException("메시지를 보내는 사용자와 채널은 반드시 존재해야 합니다.");
+        }
+        if (!message.getChannel().getUsers().contains(message.getUser())) {
+            throw new IllegalArgumentException("메시지를 보내는 사용자가 채널에 속해있지않습니다.");
+        }
         messageList.add(message);
         return message;
     }
@@ -40,15 +47,10 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message update(String userId, Message message) {
-        for (int i = 0; i < messageList.size(); i++) {
-            Message existingMessage = messageList.get(i);
-            if (existingMessage.getUser().getId().equals(userId)) {
-                existingMessage.setMessage(message.getMessage());  // 메시지 업데이트
-                return existingMessage;
-            }
-        }
-        return null;
+    public List<Message> findByChannel(Channel channel) {
+        return messageList.stream()
+                .filter(message -> message.getChannel().equals(channel))
+                .collect(Collectors.toList());
     }
 
     @Override
