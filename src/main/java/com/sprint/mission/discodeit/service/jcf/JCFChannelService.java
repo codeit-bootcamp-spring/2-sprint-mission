@@ -1,0 +1,56 @@
+package com.sprint.mission.discodeit.service.jcf;
+
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.service.ChannelService;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+
+public class JCFChannelService implements ChannelService {
+    private final Map<UUID, Channel> channelData;
+
+    public JCFChannelService() {
+        this.channelData = new HashMap<>();
+    }
+
+    @Override
+    public void create(String channelName) {
+        Channel channel = new Channel(channelName);
+        channelData.put(channel.getId(), channel);
+    }
+
+    @Override
+    public Channel read(String channelName) {
+        return channelData.values().stream()
+                .filter(channel -> channel.getChannelName().equals(channelName))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public Map<UUID, Channel> readAll() {
+        return channelData;
+    }
+
+    @Override
+    public void update(String channelName) {       //채널명 수정
+        Channel channel = read(channelName);
+        channel.updateChannel(channelName);
+    }
+
+    @Override
+    public void delete(String channelName) {
+        Channel channel = read(channelName);
+        channelData.remove(channel.getId());
+    }
+
+    @Override
+    public String toString() {
+        return "JCFChannelService{" +
+                "channelData=" + channelData +
+                '}';
+    }
+}
