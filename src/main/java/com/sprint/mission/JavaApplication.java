@@ -16,6 +16,10 @@ public class JavaApplication {
         JCFChannelService channelService = JCFChannelService.getInstance();
         JCFMessageService messageService = JCFMessageService.getInstance();
 
+        userService.initializeServices(channelService);
+        channelService.initializeServices(messageService, userService);
+        messageService.initializeServices(channelService, userService);
+
         while(true){
             System.out.println("=============================");
             System.out.println("1. 유저");
@@ -31,13 +35,16 @@ public class JavaApplication {
                     UserMenu.display(userService);
                     break;
                 case 2:
-                    ChannelMenu.display(channelService, userService);
+                    ChannelMenu.display(channelService);
                     break;
                 case 3:
                     MessageMenu.display(messageService);
                     break;
                 case 4:
                     return;
+                default:
+                    System.out.println("잘못된 입력입니다.");
+                    break;
             }
 
         }

@@ -12,12 +12,10 @@ import java.util.stream.Collectors;
 
 
 public class JCFUserService implements UserService {
-    // JCF를 활용해 데이터를 저장할 수 있는 필드를 final로 선언&생성자에서 초기화.
-    // 싱글톤으로 만들어서 users를 유지할 수 있도록 함.
-    //private final Map<String, User> users;
     private final Map<UUID, User> userData;
     private final Map<String, UUID> userNameToId;
     private static JCFUserService userinstance;
+    private JCFChannelService channelService;
 
     private JCFUserService() {
         this.userData = new HashMap<>();
@@ -28,6 +26,10 @@ public class JCFUserService implements UserService {
             userinstance = new JCFUserService();
         }
         return userinstance;
+    }
+
+    public void initializeServices(JCFChannelService channelService) {
+        this.channelService = channelService;
     }
 
     public void containsUserNameToId(String userName){
@@ -83,16 +85,6 @@ public class JCFUserService implements UserService {
         UUID uid = userNameToId.get(userName);
         userData.remove(uid);
         userNameToId.remove(userName);
-    }
-
-    public void uidExists(UUID userId) {
-        if(!(userData.containsKey(userId))) {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    public User getUserById(UUID userId) {
-        uidExists(userId);
-        return userData.get(userId);
+        channelService.deleteChannelByuid(uid);
     }
 }
