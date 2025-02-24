@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Comparable<User> {
     private String userName;
     private String userEmail;
     private String password;
@@ -70,5 +70,21 @@ public class User extends BaseEntity {
     @Override
     public int hashCode() {
         return super.getId().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "\nUser\n"
+                + "userName: " + userName + '\n'
+                + "userEmail: " + userEmail + '\n'
+                + "password: " + password + '\n'
+                + "id: " + super.getId() + '\n'
+                + "createdAt: " + super.getCreatedAt() + '\n'
+                + "updatedAt: " + super.getUpdatedAt() + '\n';
+    }
+
+    @Override
+    public int compareTo(User other) {
+        return this.userName.compareTo(other.userName);
     }
 }
