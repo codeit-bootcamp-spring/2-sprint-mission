@@ -33,11 +33,19 @@ public class JCFUserService implements UserService {
 
     @Override
     public User updateUserName(UUID id, String username){
-        return data.get(id).updateUsername(username);
+        User user = data.get(id).updateUsername(username);
+        data.put(id, user);
+        return user;
     }
 
     @Override
     public void deleteUser(UUID id){
-        data.remove(id);
+            data.remove(id);
+
+    }
+
+    @Override
+    public boolean isDeleted(UUID id){
+        return data.containsKey(id);
     }
 }

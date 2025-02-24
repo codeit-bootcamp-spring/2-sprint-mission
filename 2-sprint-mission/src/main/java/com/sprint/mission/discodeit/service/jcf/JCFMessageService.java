@@ -32,7 +32,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message updateMessage(UUID id, String message){
-        return data.get(id).updateMessage(message);
+        Message newmessage = data.get(id).updateMessage(message);
+        data.put(id, newmessage);
+        return newmessage;
     }
 
     @Override

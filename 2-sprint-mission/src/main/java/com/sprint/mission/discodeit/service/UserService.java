@@ -19,4 +19,6 @@ public interface UserService {
 
     //삭제
     void deleteUser(UUID id);
+
+    boolean isDeleted(UUID id);
 }
