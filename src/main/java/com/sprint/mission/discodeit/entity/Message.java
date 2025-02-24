@@ -63,4 +63,14 @@ public class Message extends BaseEntity {
         // 매개변수로 channel들이 저장된 리스트 같은 것을 전달하기에는 너무 지저분해질 것 같다.
         // 어떻게 검사할지는 나중에 작성해야될 듯
     }
+
+    @Override
+    public String toString() {
+        return "\nMessage\n"
+                + "sender: " + sender + "\n"
+                + "content: " + content + "\n"
+                + "channel: " + channel + "\n"
+                + "isEdited: " + isEdited + "\n"
+                + super.toString() + "\n";
+    }
 }
