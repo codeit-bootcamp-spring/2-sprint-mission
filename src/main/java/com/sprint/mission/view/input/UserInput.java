@@ -1,6 +1,6 @@
 package com.sprint.mission.view.input;
 
-import com.sprint.mission.controller.UserService;
+import com.sprint.mission.service.UserService;
 import java.util.Scanner;
 
 public class UserInput {

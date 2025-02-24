@@ -1,4 +1,4 @@
-package com.sprint.mission.controller;
+package com.sprint.mission.service;
 
 import com.sprint.mission.model.entity.User;
 import com.sprint.mission.view.output.UserOutput;

@@ -1,4 +1,4 @@
-package com.sprint.mission.controller;
+package com.sprint.mission.service;
 
 public interface UserService {
 
