@@ -34,6 +34,8 @@ public class JCFMessageService implements MessageService {
         data.add(message);
         // 메시지를 생성하면 User의 Message 목록에도 추가 (양방향 유지)
         message.getSender().addMessage(message);
+        // 메시지를 생성하면 Channel의 Message 목록에도 추가 (양방향 유지)
+        message.getChannel().addMessage(message);
     }
 
     // 메시지 단건 조회

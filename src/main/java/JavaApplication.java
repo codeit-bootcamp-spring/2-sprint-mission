@@ -260,19 +260,16 @@ public class JavaApplication {
             // 채널에 유저를 추가하면, 유저의 채널 목록에도 해당 채널 추가
             channelService.addUsersToChannel(user, newUser, channelName1);
             channelService.addUsersToChannel(user2, newUser, channelName2);
-            System.out.println("1. 유저 - 채널 동기화 확인");
             System.out.print("유저명 '새로운유저'의 가입채널목록 : ");
             newUser.getChannels().stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
             System.out.println();
             // 채널에 유저를 삭제하면, 유저의 채널 목록에서 해당 채널 삭제
             channelService.removeUsersFromChannel(user2, newUser, channelName2);
-            System.out.println("2. 태환의채널 탈퇴");
             System.out.print("유저명 '새로운유저'의 가입채널목록 : ");;
             newUser.getChannels().stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
             System.out.println();
             // 채널을 아예 삭제했을 때, User의 채널 목록에도 삭제돼야함.
             channelService.deleteChannel(user,channelName1);
-            System.out.println("3. 성준의채널 삭제");
             System.out.print("유저명 '새로운유저'의 가입채널목록 : ");;
             newUser.getChannels().stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
             System.out.println();
@@ -289,21 +286,19 @@ public class JavaApplication {
             Message synMessage2 = new Message("메시지동기화2", newUser, channel2);
             messageService.createMessage(synMessage1);
             messageService.createMessage(synMessage2);
-            System.out.println("1. 유저 - 메시지 동기화 확인 ");
             System.out.print("유저명 '새로운유저'의 메시지목록 : ");
             newUser.getMessages().stream().forEach((m) -> System.out.print(m.getContent() + " "));
             System.out.println();
             // 메시지가 삭제되면, 유저의 메시지 목록에도 해당 메시지 삭제
             messageService.deleteMessage(synMessage1.getId(), newUser);
-            System.out.println("2. 메시지동기화1 삭제");
             System.out.print("유저명 '새로운유저'의 메시지목록 : ");
             newUser.getMessages().stream().forEach((m) -> System.out.print(m.getContent() + " "));
             System.out.println();
             // 채널에서 유저 내보낼 시 해당 채널 유저의 메시지도 삭제돼야함
             channelService.removeUsersFromChannel(user2, newUser, channelName2);
-            System.out.println("3. '새로운유저'가 '태환의채널'에서 쓴 메시지 모두 삭제");
             System.out.print("유저명 '새로운유저'의 메시지목록 : ");
             newUser.getMessages().stream().forEach((m) -> System.out.print(m.getContent() + " "));
+            System.out.println();
         } catch(IllegalArgumentException e) {
             System.out.println("유저 - 메시지 동기화 예외 발생: " + e.getMessage()) ;
         }
@@ -312,19 +307,21 @@ public class JavaApplication {
         try {
             System.out.println("=== 채널 - 메시지 동기화 ===");
             // 채널에 메시지가 보내지면, 채널의 메시지 목록에도 해당 메시지 추가
-            //Message newMessage =
-
-            System.out.println("1. 유저 - 메시지 동기화 확인 ");
-
-            // 채널 삭제 시에 메시지도 전부 삭제돼야함
+            channelService.addUsersToChannel(user2, newUser, channelName2);
+            Message newMessage = new Message("새메시지1", newUser, channel2);
+            messageService.createMessage(newMessage);
+            System.out.print("채널명 '태환의채널'의 메시지목록 : ");
+            channel2.getMessages().stream().forEach(m -> System.out.print(m.getContent() + " "));
+            System.out.println();
+            // 채널 삭제 시에 유저의 해당 채널 메시지도 전부 삭제돼야함
+            channelService.deleteChannel(user2, channelName2);
+            System.out.print("'새로운유저'의 메시지 목록 : ");
+            newUser.getMessages().stream().forEach(m -> System.out.print(m.getContent()+ " "));
+            System.out.println();
 
         } catch (IllegalArgumentException e) {
             System.out.println("채널 - 메시지 동기화 예외 발생: " + e.getMessage());
         }
-
-
-
-
 
 
         // 4.4 해당 채널의 해당 유저의 메시지만 검색

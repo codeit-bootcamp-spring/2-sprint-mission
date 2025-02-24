@@ -51,6 +51,16 @@ public class Channel extends Common {
         users.remove(user);
     }
 
+    // 메시지 추가
+    public void addMessage(Message message) {
+        messages.add(message);
+    }
+
+    // 메시지 삭제
+    public void removeMessage(Message message) {
+        messages.remove(message);
+    }
+
 
     @Override
     public String toString() {

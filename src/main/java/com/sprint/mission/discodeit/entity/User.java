@@ -87,7 +87,6 @@ public class User extends Common{
 
 
 
-
     // 권한 추가
     public void addRole(String role) {
         roles.add(role);

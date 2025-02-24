@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,6 +119,11 @@ public class JCFChannelService implements ChannelService {
         // 채널 삭제 시 User의 Channel 목록에서도 삭제
         List<User> users = findChannel.getUsers().stream().collect(Collectors.toList());
         users.stream().forEach(u -> u.removeChannel(findChannel));
+        // 채널 삭제 시 User의 Message 목록에서도 삭제
+        List<Message> messages = findChannel.getMessages(); // 해당 채널의 메시지들을 찾고,
+        users.stream().forEach(u -> messages.stream().forEach(m -> u.deleteMessage(m)));  // 해당 유저에서 메시지를 삭제
+        // cascade를 사용하면 해결할 수 있지만.. JPA를 사용하지 않는 자바 수준에서는 직접 지워주는게 답인지 고민
+        // 이 부분에 대한 예외 처리는? 예외 처리에 대한 공부가 필요.
         data.remove(findChannel);
     }
 }
