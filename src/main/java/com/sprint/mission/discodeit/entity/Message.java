@@ -9,7 +9,7 @@ public class Message extends Common{
     // 채널에 보내는 메시지 이므로 보낸 유저만 있으면 될 것 같다
     private final User sender;
     // 메시지가 보내지는 채널
-    private Channel channel;
+    private final Channel channel;
 
     public Message(String content, User sender, Channel channel) {
         this.content = content;
