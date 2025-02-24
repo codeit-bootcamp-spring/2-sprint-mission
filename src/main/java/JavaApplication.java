@@ -1,4 +1,5 @@
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -10,6 +11,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
@@ -99,7 +101,6 @@ public class JavaApplication {
 
 
 
-
         // 2. JCFChannelService 테스트
         System.out.println("=== 채널 관련 기능 ===");
         // 2.1 등록
@@ -133,6 +134,7 @@ public class JavaApplication {
         // 2.3 수정
         try {
             String channelName = "성준의채널";
+            // 권한에 대한 고민 - 채널을 변경하려는 유저에게 관리자 권한이 있어야 채널 수정이 되는게 아닐까?
             // 유저 추가
             User user1 = new User("새로운유저", "1234", "나는야새유저");
             User user2 = new User("삭제될유저", "1234", "나는야삭제될유저");
@@ -173,14 +175,63 @@ public class JavaApplication {
 
         System.out.println();
 
-
         System.out.println("=== 메시지 관련 기능 ===");
+        // 3. JCFMessageService 테스트
+        User user = userService.getUser("성준");
+        Channel channel = channelService.getChannel("성준의채널");
+        Message message1 = new Message("안녕하세요 메시지 테스트1", user, channel);
+        UUID id = message1.getId();
+        // 3.1 등록
+        try {
+            Message message2 = new Message("안녕하세요 메시지 테스트2", user, channel);
+            messageService.createMessage(message1);
+            messageService.createMessage(message2);
+        } catch(IllegalArgumentException e) {
+            System.out.println("메시지 등록 예외 발생: " + e.getMessage());
+        }
 
+        // 3.2 조회
+        try {
+            // 3.2.1 단건 조회
+            Message findMessage = messageService.getMessage(id);
+            System.out.println("메시지 조회 : " + findMessage.getContent());
+            // 3.2.2 다건 조회
+            List<Message> findMessages = messageService.getAllMessages();
+            System.out.println("메시지 다건 조회 : " + findMessages);
+        } catch (IllegalArgumentException e) {
+            System.out.println("메시지 조회 예외 발생: " + e.getMessage());
+        }
 
+        // 3.3 수정
+        try {
+            Message updateMessage = new Message("안녕하세요 메시지 수정됐는지 테스트1", user, channel);
+            messageService.updateMessage(id, updateMessage);
+        } catch(IllegalArgumentException e) {
+            System.out.println("메시지 수정 예외 발생: " + e.getMessage());
+        }
 
+        // 3.4 수정된 데이터 조회
+        try {
+            Message findMessage = messageService.getMessage(id);
+            System.out.println("메시지 수정 조회 : " + findMessage.getContent());
+        } catch(IllegalArgumentException e) {
+            System.out.println("메시지 수정 조회 예외 발생: " + e.getMessage());
+        }
 
+        // 3.5 삭제
+        try {
+            messageService.deleteMessage(id);
+        } catch(IllegalArgumentException e) {
+            System.out.println("메시지 삭제 예외 발생: " + e.getMessage());
+        }
 
-
+        // 3.6 삭제된 데이터 조회
+        try {
+            List<Message> findMessages = messageService.getAllMessages();
+            System.out.println("메시지 삭제 조회 : " + findMessages);
+        } catch (IllegalArgumentException e) {
+            System.out.println("메시지 삭제 조회 예외 발생: " + e.getMessage());
+        }
 
     }
 }
