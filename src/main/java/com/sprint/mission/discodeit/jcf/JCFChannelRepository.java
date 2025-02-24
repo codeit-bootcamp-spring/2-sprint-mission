@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.jcf;
 
 import com.sprint.mission.application.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.repo.ChannelRepository;
+import com.sprint.mission.discodeit.infra.ChannelRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

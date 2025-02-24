@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.jcf;
 
 import com.sprint.mission.application.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repo.MessageRepository;
+import com.sprint.mission.discodeit.infra.MessageRepository;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

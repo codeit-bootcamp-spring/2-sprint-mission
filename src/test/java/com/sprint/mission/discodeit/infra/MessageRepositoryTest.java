@@ -1,11 +1,10 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sprint.mission.application.MessageDto;
 import com.sprint.mission.discodeit.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repo.MessageRepository;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

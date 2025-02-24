@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.jcf;
 import com.sprint.mission.application.UserDto;
 import com.sprint.mission.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repo.UserRepository;
+import com.sprint.mission.discodeit.infra.UserRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

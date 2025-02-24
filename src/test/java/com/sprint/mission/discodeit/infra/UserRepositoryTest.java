@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.infra;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.sprint.mission.application.UserDto;
 import com.sprint.mission.application.UserRegisterDto;
 import com.sprint.mission.discodeit.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.repo.UserRepository;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;

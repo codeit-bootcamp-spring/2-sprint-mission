@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repo;
+package com.sprint.mission.discodeit.infra;
 
 import com.sprint.mission.application.UserDto;
 import com.sprint.mission.application.UserRegisterDto;
