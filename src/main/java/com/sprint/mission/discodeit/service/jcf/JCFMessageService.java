@@ -10,8 +10,8 @@ import java.util.UUID;
 public class JCFMessageService implements MessageService {
     private final MessageRepository messageRepository;
 
-    public JCFMessageService() {
-        messageRepository = new MessageRepository();
+    public JCFMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
     }
 
     @Override
