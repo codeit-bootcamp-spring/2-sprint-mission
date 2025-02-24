@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class ChannelRepository {
-    ArrayDeque<Channel> channels;
+    private ArrayDeque<Channel> channels;
 
     public ArrayDeque<Channel> getChannels() {
         return channels;
