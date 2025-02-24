@@ -62,4 +62,15 @@ public class Channel extends BaseEntity {
             throw new IllegalArgumentException("channelName 은 null 이거나 공백일 수 없다!!!");
         }
     }
+
+    @Override
+    public String toString() {
+        return "\nChannel\n"
+                + "channelName: " + channelName + '\n'
+                + "participants:\n" + participants + '\n'
+                + "messages: " + messages + '\n'
+                + "id: " + super.getId() + '\n'
+                + "createdAt: " + super.getCreatedAt() + '\n'
+                + "updatedAt: " + super.getUpdatedAt() + '\n';
+    }
 }
