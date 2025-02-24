@@ -8,14 +8,20 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class ChannelRepository {
-    private ArrayDeque<Channel> channels;
+    private final ArrayDeque<Channel> channels = new ArrayDeque<>();
+
+    private static class SingletonHolder {
+        private static final ChannelRepository INSTANCE = new ChannelRepository();
+    }
+
+    private ChannelRepository() {}
+
+    public static ChannelRepository getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
 
     public ArrayDeque<Channel> getChannels() {
         return channels;
-    }
-
-    public ChannelRepository() {
-        this.channels = new ArrayDeque<>();
     }
 
     public void addChannel(Channel channel) {
