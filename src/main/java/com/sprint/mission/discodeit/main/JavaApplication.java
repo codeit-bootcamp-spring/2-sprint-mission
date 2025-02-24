@@ -1,23 +1,29 @@
 package com.sprint.mission.discodeit.main;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 public class JavaApplication {
     public static void main(String[] args) {
         UserService userService = new JCFUserService();
         ChannelService channelService = new JCFChannelService();
+        MessageService messageService = new JCFMessageService(userService, channelService);
 
         User user1 = userService.createUser("Kim");
         User user2 = userService.createUser("Lee");
+        User user3 = userService.createUser("Park");
 
         System.out.println("=== 유저 등록 완료 ===");
         System.out.println("User 1: " + user1.getId() + " | Name: " + user1.getUsername());
         System.out.println("User 2: " + user2.getId() + " | Name: " + user2.getUsername());
+        System.out.println("User 3: " + user3.getId() + " | Name: " + user3.getUsername());
 
         User fetchedUser = userService.getUser(user1.getId());
         System.out.println("=== 유저 조회 ===");
@@ -45,10 +51,12 @@ public class JavaApplication {
 
         Channel channel1 = channelService.createChannel("Channel1");
         Channel channel2 = channelService.createChannel("Channel2");
+        Channel channel3 = channelService.createChannel("Channel3");
 
         System.out.println("=== 채널 등록 완료 ===");
         System.out.println("Channel 1: " + channel1.getId() + " | Name: " + channel1.getChannelName());
         System.out.println("Channel 2: " + channel2.getId() + " | Name: " + channel2.getChannelName());
+        System.out.println("Channel 3: " + channel3.getId() + " | Name: " + channel3.getChannelName());
 
         Channel fetchedChannel1 = channelService.getChannel(channel1.getId());
         System.out.println("=== 채널 조회 ===");
@@ -58,6 +66,8 @@ public class JavaApplication {
         for (Channel ch : channelService.getAllChannels()) {
             System.out.println("ID: " + ch.getId() + " | Name: " + ch.getChannelName());
         }
+
+        System.out.println("-----");
 
         channelService.updateChannel(channel1.getId(), "Announcements");
         System.out.println("=== 채널 정보 수정 완료 ===");
@@ -71,5 +81,27 @@ public class JavaApplication {
         for (Channel ch : channelService.getAllChannels()) {
             System.out.println("ID: " + ch.getId() + " | Name: " + ch.getChannelName());
         }
+
+        System.out.println("-----");
+
+        Message message1 = messageService.createMessage(user1.getId(), channel1.getId(), "Hello World");
+        Message message2 = messageService.createMessage(user3.getId(), channel1.getId(), "Hi Kim!");
+        Message message3 = messageService.createMessage(user1.getId(), channel3.getId(), "Java");
+
+        System.out.println("=== 메세지 목록 ===");
+        messageService.getAllMessages().forEach(msg ->
+                System.out.println("[" + msg.getChannelId() + "] " + msg.getContent()));
+
+        messageService.updateMessage(message1.getId(), "Hello CodeIt! (edited)");
+        System.out.println("메세지 변경: " + messageService.getMessage(message1.getId()).getContent());
+
+        System.out.println("=== 메세지 삭제 ===");
+        System.out.println(message2.getId());
+        messageService.deleteMessage(message2.getId());
+
+        System.out.println("=== 메세지 목록 (삭제 후) ===");
+        messageService.getAllMessages().stream()
+                .map(msg -> "]" + msg.getChannelId() + "]" + msg.getUserId() + ": " + msg.getContent())
+                .forEach(System.out::println);
     }
 }

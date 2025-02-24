@@ -24,4 +24,9 @@ public class Message extends BaseEntity {
     public String getContent() {
         return content;
     }
+
+    public void updateContent(String newContent) {
+
+        this.content = newContent;
+    }
 }
