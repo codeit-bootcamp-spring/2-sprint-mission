@@ -72,8 +72,11 @@ public class ChannelMenu {
                         System.out.println("완료되었습니다.\n<모든 채널의 정보 출력>");
                         System.out.print(channelService.getAllChannels());
                     }catch (IllegalArgumentException e){
-                        System.out.println(e.getMessage());
+                        System.out.println("채널 삭제에 실패하였습니다.");
                     }
+                    break;
+                default:
+                    System.out.println("잘못된 입력입니다.");
                     break;
             }
         }
