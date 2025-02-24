@@ -8,10 +8,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JavaApplication {
     public static void main(String[] args) {
@@ -23,16 +20,17 @@ public class JavaApplication {
 
         // 1. JCFUserService 테스트
         // 1.1 등록
-        // 계속 써야하므로 여기에 선언
         User user = new User("성준", "1234", "고기");
-        User user2 = new User("희준", "1234", "생선");
-        User user3 = new User("태환", "1234", "무민");
+        User user2 = new User("태환", "1234", "무민");
+        User user3 = new User("희준", "1234", "생선");
+        User user4 = new User("환주", "1234", "빵쥬");
         try {
             // User user3 = new User("성준","4567", "마늘"); - 중복 username 등록 불가
             // User user4 = new User("재문", "", ""); - 필수 입력 항목이 빠졌으므로 등록 불가
             userService.createUser(user);
             userService.createUser(user2);
             userService.createUser(user3);
+            userService.createUser(user4);
         } catch (IllegalArgumentException e) {
             System.out.println("유저 등록 예외 발생: " + e.getMessage());
         }
@@ -84,7 +82,7 @@ public class JavaApplication {
 
         // 1.5 삭제
         try {
-            userService.deleteUser("희준");
+            userService.deleteUser("환주");
         } catch (IllegalArgumentException e) {
             System.out.println("유저 삭제 예외 발생: " + e.getMessage());
         }
@@ -109,10 +107,13 @@ public class JavaApplication {
             // 채널 주인 (여기선 user Data에서 꺼내와보자)
             User channelOwner1 = userService.getUser("성준");
             User channelOwner2 = userService.getUser("태환");
+            User channelOwner3 = userService.getUser("희준");
             Channel channel1 = new Channel(channelOwner1, "성준의채널");
             Channel channel2 = new Channel(channelOwner2, "태환의채널");
+            Channel channel3 = new Channel(channelOwner3, "희준의채널");
             channelService.createChannel(channel1);
             channelService.createChannel(channel2);
+            channelService.createChannel(channel3);
 
             // 잘 등록됐는지는 조회에서 테스트
         } catch (IllegalArgumentException e) {
@@ -140,7 +141,6 @@ public class JavaApplication {
         String channelName1 = "성준의채널";
         String channelName2 = "태환의채널";
         try {
-            // 권한에 대한 고민 - 채널을 변경하려는 유저에게 관리자 권한이 있어야 채널 수정이 되는게 아닐까?
             channelService.addUsersToChannel(user, newUser, channelName1); // "성준의채널"은 "성준"의 채널이므로 정상적으로 수정
             channelService.addUsersToChannel(user, deleteUser, channelName1);
             // channelService.addUsersToChannel(user, deleteUser, channelName2); // "태환의채널"은 "성준"의 채널이 아니므로 예외 발생
@@ -159,14 +159,13 @@ public class JavaApplication {
         try {
             Channel findChannel = channelService.getChannel("성준의채널");
             System.out.println("채널 수정 조회 : " + findChannel);
-            List<Channel> findChannels = channelService.getAllChannels();
         } catch (IllegalArgumentException e) {
             System.out.println("채널 수정 조회 예외 발생: " + e.getMessage());
         }
 
         // 2.5 삭제
         try {
-            channelService.deleteChannel(user3, "태환의채널"); // 채널 주인이므로 정상적으로 삭제 완료
+            channelService.deleteChannel(user3, "희준의채널"); // 채널 주인이므로 정상적으로 삭제 완료
             // channelService.deleteChannel(user2, "성준의채널"); // 예외 발생
         } catch (IllegalArgumentException e) {
             System.out.println("채널 삭제 예외 발생: " + e.getMessage());
@@ -249,6 +248,44 @@ public class JavaApplication {
         } catch (IllegalArgumentException e) {
             System.out.println("메시지 삭제 조회 예외 발생: " + e.getMessage());
         }
+
+
+        // 4. 임의로 추가한 기능
+        System.out.println();
+        System.out.println("=== 확장 기능 ===");
+        // 4.1 유저 - 채널 동기화 (채널에 유저를 추가/삭제 하면, 유저의 채널 목록에도 해당 채널 추가)
+        try {
+            channelService.addUsersToChannel(user, newUser, channelName1);
+            channelService.addUsersToChannel(user2, newUser, channelName2);
+            System.out.println("유저 - 채널 동기화 확인 ");
+            System.out.print("유저명 '새로운유저'의 가입채널목록 : ");
+            newUser.getChannels().stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
+            System.out.println();
+            channelService.removeUsersFromChannel(user2, newUser, channelName2);
+            System.out.println("태환의채널 탈퇴");
+            System.out.print("유저명 '새로운유저'의 가입채널목록 : ");;
+            newUser.getChannels().stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
+            System.out.println();
+            // 채널 삭제시에 User의 채널 목록에도 삭제돼야함.
+            channelService.deleteChannel(user,channelName1);
+            System.out.println("성준의채널 삭제");
+            System.out.print("유저명 '새로운유저'의 가입채널목록 : ");;
+            newUser.getChannels().stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
+        } catch (IllegalArgumentException e) {
+            System.out.println("유저 - 채널 동기화 예외 발생: " + e.getMessage());
+        }
+
+        // 4.2 유저 - 메시지 동기화 (유저가 메시지를 보내면, 유저의 메시지 목록에도 해당 메시지 추가)
+        try {
+
+
+        } catch(IllegalArgumentException e) {
+            System.out.println("유저 - 메시지 동기화 예외 발생: " + e.getMessage()) ;
+        }
+
+
+
+
 
 
     }

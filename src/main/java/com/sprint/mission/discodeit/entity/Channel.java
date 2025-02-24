@@ -18,6 +18,9 @@ public class Channel extends Common {
     // 중복이어도 예외처리가 필요할 정도로 중요하지 않음 -> 중복만 방지되게끔 Set 사용
     private Set<User> users = new HashSet<>();
 
+    // 해당 채널이 가진 메시지 목록
+    private List<Message> messages = new ArrayList<>();
+
     public Channel(User user, String channelName) {
         // super() 하지 않아도 기본 생성자는 컴파일러가 자동으로 삽입
         this.owner = user;
@@ -34,6 +37,10 @@ public class Channel extends Common {
         return users;
     }
 
+    public List<Message> getMessages() {
+        return messages;
+    }
+
     // 유저 추가 - 유저가 채널에 들어올 경우
     public void addUsers(User user) {
         users.add(user);
@@ -43,6 +50,7 @@ public class Channel extends Common {
     public void removeUsers(User user) {
         users.remove(user);
     }
+
 
     @Override
     public String toString() {

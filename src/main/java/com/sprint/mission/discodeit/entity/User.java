@@ -47,6 +47,14 @@ public class User extends Common{
         return roles;
     }
 
+    public Set<Channel> getChannels() {
+        return channels;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
     // username은 아이디 변경이 불가능하므로 update 필요 X
 
     public void updatePassword(String password) {
@@ -57,12 +65,25 @@ public class User extends Common{
         this.nickname = nickname;
     }
 
+    // 채널 추가
+    public void addChannel(Channel channel) {
+        channels.add(channel);
+    }
+
+    // 채널 삭제
+    public void removeChannel(Channel channel) {
+        channels.remove(channel);
+    }
+
+
+
+
     // 권한 추가
     public void addRole(String role) {
         roles.add(role);
     }
 
-    //권한 삭제
+    // 권한 삭제
     public void removeRole(String role) {
         roles.remove(role);
     }

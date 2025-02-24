@@ -70,6 +70,9 @@ public class JCFChannelService implements ChannelService {
 
         findChannel.updateUpdatedAt(System.currentTimeMillis());
         findChannel.addUsers(user);
+
+        // user의 필드에도 채널 추가
+        user.addChannel(findChannel);
     }
 
     // 유저 삭제
@@ -88,6 +91,9 @@ public class JCFChannelService implements ChannelService {
 
         findChannel.updateUpdatedAt(System.currentTimeMillis());
         findChannel.removeUsers(user);
+
+        // user의 필드에도 채널 삭제
+        user.removeChannel(findChannel);
     }
 
 
@@ -100,6 +106,9 @@ public class JCFChannelService implements ChannelService {
         if (!requestUser.getUsername().equals(findChannel.getOwner().getUsername())) {
             throw new IllegalArgumentException("삭제할 채널의 주인이 아닙니다.");
         }
+
+        // 채널 삭제 시 User의 Channel 목록에서도 삭제
+        findChannel.getUsers().forEach(u -> u.getChannels().remove(findChannel));
 
         data.remove(findChannel);
     }
