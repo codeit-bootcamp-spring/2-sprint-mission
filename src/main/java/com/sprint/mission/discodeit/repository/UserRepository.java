@@ -5,10 +5,16 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.*;
 
 public class UserRepository {
-    private Set<User> users;
+    private final Set<User> users = new HashSet<>();
 
-    public UserRepository() {
-        this.users = new HashSet<User>();
+    private static class SingletonHolder {
+        private static final UserRepository INSTANCE = new UserRepository();
+    }
+
+    private UserRepository() {}
+
+    public static UserRepository getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     public Set<User> getUsers() {
