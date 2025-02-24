@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.entity;
 public class Message extends Common{
     private String message;
 
-    public Message(String s) {
+    public Message(String message) {
         super();
         this.message = message;
     }
