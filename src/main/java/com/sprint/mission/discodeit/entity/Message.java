@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
-
-public class Message extends CommonEntity{
+public class Message extends BaseEntity {
     private User sender;
     private String content;
     private Channel channel;
@@ -18,6 +16,10 @@ public class Message extends CommonEntity{
         return sender;
     }
 
+    public Channel getChannel() {
+        return channel;
+    }
+
     public String getContent() {
         return content;
     }
@@ -27,7 +29,7 @@ public class Message extends CommonEntity{
 
     @Override
     public String toString() {
-        return "[" + channel.getChannelName() + "] " + sender.getName() + " : " + content;
+        return "[" + channel.getChannelName() + "] " + sender.getName() + " : " + content + ", " + getId();
     }
 
 }

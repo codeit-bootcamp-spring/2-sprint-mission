@@ -13,7 +13,6 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void create(Channel channel) {
         channels.put(channel.getId(), channel);
-        System.out.println("[채널 ID] " + channel.getId());
     }
 
     @Override
@@ -27,9 +26,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void update(UUID id, Channel channel) {
-        Channel c = channels.get(id);
-        c.updateChannelName(c.getChannelName());
+    public void update(Channel channel) {
+        channels.put(channel.getId(), channel);
     }
 
     @Override

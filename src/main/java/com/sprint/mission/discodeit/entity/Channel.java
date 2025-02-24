@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends CommonEntity {
+public class Channel extends BaseEntity {
     private String channelName;
 
     public Channel(String channelName) {
@@ -18,8 +18,6 @@ public class Channel extends CommonEntity {
 
     @Override
     public String toString() {
-        return "Channel{" +
-                "channelName='" + channelName + '\'' +
-                '}';
+        return "< 채널 > " + channelName + ", " + getId();
     }
 }

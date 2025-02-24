@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -8,13 +9,30 @@ import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> messages = new HashMap<>();
+    private final JCFUserService userService;
+    private final JCFChannelService channelService;
 
-    public JCFMessageService() {}
+    public JCFMessageService(JCFUserService userService, JCFChannelService channelService) {
+        this.userService = userService;
+        this.channelService = channelService;
+    }
 
     @Override
     public void create(Message message) {
+        User sender = message.getSender();
+        Channel channel = message.getChannel();
+
+        if (userService.find(sender.getId()) == null) {
+            System.out.println("유저가 존재하지 않습니다.");
+            return;
+        }
+
+        if (channelService.find(channel.getId()) == null) {
+            System.out.println("채널이 존재하지 않습니다.");
+            return;
+        }
+
         messages.put(message.getId(), message);
-        System.out.println("[메시지 ID]" + message.getId());
     }
 
     @Override
@@ -28,9 +46,21 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void update(UUID id, Message message) {
-        Message old = messages.get(id);
-        old.updateContent(message.getContent());
+    public void update(Message message) {
+        User sender = message.getSender();
+        Channel channel = message.getChannel();
+
+        if (userService.find(sender.getId()) == null) {
+            System.out.println("유저가 존재하지 않습니다.");
+            return;
+        }
+
+        if (channelService.find(channel.getId()) == null) {
+            System.out.println("채널이 존재하지 않습니다.");
+            return;
+        }
+
+        messages.put(message.getId(), message);
     }
 
     @Override

@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserService implements UserService {
     private final Map<UUID, User> userDb = new HashMap<>();
@@ -15,32 +12,22 @@ public class JCFUserService implements UserService {
 
     @Override
     public void create(User user) {
-        if (userDb.containsKey(user.getId())) {
-            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
-        }
         userDb.put(user.getId(), user);
-        System.out.println("["+ user.getId() + "] 생성이 완료되었습니다.");
     }
 
     @Override
     public User find(UUID id) {
-        if (!userDb.containsKey(id)) {
-            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
-        }
-        return userDb.get(id);
+        return userDb.getOrDefault(id, null);
     }
 
     @Override
     public List<User> findAll() {
-        return userDb.values().stream().toList();
+        return new ArrayList<>(userDb.values());
     }
 
     @Override
-    public void update(UUID id, User updateUser) {
-        if (userDb.containsKey(id)) {
-            User existingUser = userDb.get(id);
-            existingUser.update(updateUser.getName(), updateUser.getAge());
-        }
+    public void update(User updateUser) {
+        userDb.put(updateUser.getId(), updateUser);
     }
 
     @Override
