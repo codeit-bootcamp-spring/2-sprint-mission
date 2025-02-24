@@ -22,7 +22,7 @@ public class JCFChannelService implements ChannelService {
             throw new IllegalArgumentException("생성하려는 채널 정보가 올바르지 않습니다.");
         }
         // 채널명과 채널주인은 필수입력 항목
-        if(channel.getChannelName().isEmpty() || channel.getUser() == null) {
+        if(channel.getChannelName().isEmpty() || channel.getOwner() == null) {
             throw new IllegalArgumentException("필수 입력 항목을 빠뜨리셨습니다.");
         }
         // 중복 채널 방지, 채널 이름으로 채널을 찾거나 수정하기 때문에 겹치면 안됨
@@ -64,7 +64,7 @@ public class JCFChannelService implements ChannelService {
         Channel findChannel = getChannel(channelName);
 
         // 채널 수정 시 요청을 하는 User(requestUser)가 해당 채널의 주인이어야한다.
-        if (!requestUser.equals(findChannel.getUser())) {
+        if (!requestUser.equals(findChannel.getOwner())) {
             throw new IllegalArgumentException("수정할 채널의 주인이 아닙니다.");
         }
 
@@ -82,7 +82,7 @@ public class JCFChannelService implements ChannelService {
         Channel findChannel = getChannel(channelName);
 
         // 채널 수정 시 요청을 하는 User(requestUser)가 해당 채널의 주인이어야한다.
-        if (!requestUser.getUsername().equals(findChannel.getUser().getUsername())) {
+        if (!requestUser.getUsername().equals(findChannel.getOwner().getUsername())) {
             throw new IllegalArgumentException("수정할 채널의 주인이 아닙니다.");
         }
 
@@ -97,7 +97,7 @@ public class JCFChannelService implements ChannelService {
         Channel findChannel = getChannel(channelName);
 
         // 채널 삭제 시 요청을 하는 User(requestUser)가 해당 채널의 주인이어야한다.
-        if (!requestUser.getUsername().equals(findChannel.getUser().getUsername())) {
+        if (!requestUser.getUsername().equals(findChannel.getOwner().getUsername())) {
             throw new IllegalArgumentException("삭제할 채널의 주인이 아닙니다.");
         }
 
