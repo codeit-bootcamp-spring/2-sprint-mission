@@ -11,8 +11,8 @@ import java.util.UUID;
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> data;
 
-    public JCFChannelService(Map<UUID, Channel> channels) {
-        this.data = new HashMap<>(channels);
+    public JCFChannelService() {
+        this.data = new HashMap<>();
     }
 
     @Override

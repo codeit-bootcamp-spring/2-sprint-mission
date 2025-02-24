@@ -11,7 +11,7 @@ import java.util.UUID;
 public class JCFUserService implements UserService {
     private final Map<UUID, User> data;
 
-    public JCFUserService(Map<UUID, User> users) {
+    public JCFUserService() {
         this.data = new HashMap<>();
     }
 

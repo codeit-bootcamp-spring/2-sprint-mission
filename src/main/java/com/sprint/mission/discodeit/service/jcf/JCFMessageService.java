@@ -11,7 +11,7 @@ import java.util.UUID;
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data;
 
-    public JCFMessageService(Map<UUID, Message> data) {
+    public JCFMessageService() {
         this.data = new HashMap<>();
     }
 
