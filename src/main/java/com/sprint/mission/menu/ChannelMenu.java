@@ -2,7 +2,6 @@ package com.sprint.mission.menu;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.jcf.JCFUserService;
 
 import java.util.List;
 import java.util.Scanner;
@@ -10,7 +9,7 @@ import java.util.UUID;
 
 public class ChannelMenu {
     static Scanner sc = new Scanner(System.in);
-    public static void display(JCFChannelService channelService, JCFUserService userService) {
+    public static void display(JCFChannelService channelService) {
         while (true) {
             int choice = crudMenu();
 

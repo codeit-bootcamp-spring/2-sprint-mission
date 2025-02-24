@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 public class JCFMessageService implements MessageService {
      private final Map<UUID, Message> messageData;
      private static JCFMessageService messageInstance;
-     private final JCFChannelService channelService;
-     private final JCFUserService userService;
+     private JCFChannelService channelService;
+     private JCFUserService userService;
 
      public static JCFMessageService getInstance(){
          if(messageInstance == null){
@@ -25,9 +25,13 @@ public class JCFMessageService implements MessageService {
 
      private JCFMessageService() {
          messageData = new HashMap<>();
-         channelService = JCFChannelService.getInstance();
-         userService = JCFUserService.getInstance();
      }
+
+
+    public void initializeServices(JCFChannelService channelService, JCFUserService userService) {
+        this.channelService = channelService;
+        this.userService = userService;
+    }
 
      public void containsMessage(UUID mid) {
         if(!(messageData.containsKey(mid))){
@@ -72,5 +76,13 @@ public class JCFMessageService implements MessageService {
      public void deleteMessage(UUID mid){
          containsMessage(mid);
          this.messageData.remove(mid);
+     }
+
+     public void deleteMessagesByCid(UUID cid){
+         List<UUID> removeId = messageData.values().stream()
+                 .filter(message -> message.getChannel().getCid().equals(cid))
+                 .map(Message::getMid)
+                 .toList();
+         removeId.forEach(messageData::remove);
      }
 }
