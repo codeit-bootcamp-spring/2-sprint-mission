@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
      private final Map<UUID, Message> messageData;
@@ -41,16 +42,35 @@ public class JCFMessageService implements MessageService {
      }
 
      @Override
-     public List<Message> getAllMessages(){
+     public List<Message> getAllMessage(){
          if(messageData.isEmpty()){
              throw new IllegalArgumentException("데이터가 존재하지 않습니다.");
          }
          return new ArrayList<>(messageData.values());
      }
 
+     public List<Message> getUpdatedMessages(){
+         return messageData.values().stream()
+                 .filter(entry-> entry.getMessageUpdateAt() != null)
+                 .collect(Collectors.toList());
+     }
+
      @Override
      public void registerMessage(UUID cid, String userName, String messageContent){
          Message message = new Message(channelService.getChannel(cid), userService.getUser(userName), messageContent);
          this.messageData.put(message.getMid(), message);
+     }
+
+     @Override
+     public void updateMessage(UUID mid, String messageContent){
+         containsMessage(mid);
+         Message message = this.messageData.get(mid);
+         message.messageUpdate(messageContent);
+     }
+
+     @Override
+     public void deleteMessage(UUID mid){
+         containsMessage(mid);
+         this.messageData.remove(mid);
      }
 }

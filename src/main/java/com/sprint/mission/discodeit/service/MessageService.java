@@ -7,6 +7,8 @@ import java.util.UUID;
 
 public interface MessageService {
     Message getMessage(UUID mid);
-    List<Message> getAllMessages();
+    List<Message> getAllMessage();
     void registerMessage(UUID cid, String userName, String messageContent);
+    void updateMessage(UUID mid, String messageContent);
+    void deleteMessage(UUID mid);
 }

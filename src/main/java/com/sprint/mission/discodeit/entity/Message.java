@@ -42,6 +42,11 @@ public class Message {
         return messageContent;
     }
 
+    public void messageUpdate(String messageContent){
+        this.messageUpdateAt = System.currentTimeMillis();
+        this.messageContent = messageContent;
+    }
+
     @Override
     public String toString() {
         return "[mid: " + mid +
@@ -49,9 +54,9 @@ public class Message {
                 ", channelName: " + channel.getChannelName() +
                 ", userName: " + user.getUserName() +
                 ", nickName: " + user.getNickName() +
-                ", messageCreateAt: " + messageCreateAt +
+                "\n\t, messageCreateAt: " + messageCreateAt +
                 ", messageUpdateAt: " + messageUpdateAt +
-                "\n\t, messageContent: " + messageContent + "]\n";
+                ", messageContent: " + messageContent + "]\n";
     }
 
 }
