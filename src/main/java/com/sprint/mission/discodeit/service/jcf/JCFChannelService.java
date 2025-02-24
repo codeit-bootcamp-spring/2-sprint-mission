@@ -63,10 +63,6 @@ public class JCFChannelService implements ChannelService {
 
         Channel findChannel = getChannel(channelName);
 
-        if (findChannel == null) {
-            throw new IllegalArgumentException("수정할 채널이 존재하지 않습니다.");
-        }
-
         // 채널 수정 시 요청을 하는 User(requestUser)가 해당 채널의 주인이어야한다.
         if (!requestUser.equals(findChannel.getUser())) {
             throw new IllegalArgumentException("수정할 채널의 주인이 아닙니다.");
@@ -85,10 +81,6 @@ public class JCFChannelService implements ChannelService {
 
         Channel findChannel = getChannel(channelName);
 
-        if (findChannel == null) {
-            throw new IllegalArgumentException("수정할 채널이 존재하지 않습니다.");
-        }
-
         // 채널 수정 시 요청을 하는 User(requestUser)가 해당 채널의 주인이어야한다.
         if (!requestUser.getUsername().equals(findChannel.getUser().getUsername())) {
             throw new IllegalArgumentException("수정할 채널의 주인이 아닙니다.");
@@ -101,8 +93,14 @@ public class JCFChannelService implements ChannelService {
 
     // 채널 삭제
     @Override
-    public void deleteChannel(User user, String channelName) {
+    public void deleteChannel(User requestUser, String channelName) {
         Channel findChannel = getChannel(channelName);
+
+        // 채널 삭제 시 요청을 하는 User(requestUser)가 해당 채널의 주인이어야한다.
+        if (!requestUser.getUsername().equals(findChannel.getUser().getUsername())) {
+            throw new IllegalArgumentException("삭제할 채널의 주인이 아닙니다.");
+        }
+
         data.remove(findChannel);
     }
 }

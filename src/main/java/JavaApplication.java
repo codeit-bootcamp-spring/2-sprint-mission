@@ -23,10 +23,11 @@ public class JavaApplication {
 
         // 1. JCFUserService 테스트
         // 1.1 등록
-        User user = new User("성준", "1234", "고기"); // 계속 써야하므로 여기에 선언
+        // 계속 써야하므로 여기에 선언
+        User user = new User("성준", "1234", "고기");
+        User user2 = new User("희준", "1234", "생선");
+        User user3 = new User("태환", "1234", "무민");
         try {
-            User user2 = new User("희준", "1234", "생선");
-            User user3 = new User("태환", "1234", "무민");
             // User user3 = new User("성준","4567", "마늘"); - 중복 username 등록 불가
             // User user4 = new User("재문", "", ""); - 필수 입력 항목이 빠졌으므로 등록 불가
             userService.createUser(user);
@@ -132,22 +133,22 @@ public class JavaApplication {
         }
 
         // 2.3 수정
-        User user1 = new User("새로운유저", "1234", "나는야새유저");
-        User user2 = new User("삭제될유저", "1234", "나는야삭제될유저");
+        User newUser = new User("새로운유저", "1234", "나는야새유저");
+        User deleteUser = new User("삭제될유저", "1234", "나는야삭제될유저");
         String channelName1 = "성준의채널";
         String channelName2 = "태환의채널";
         try {
             // 권한에 대한 고민 - 채널을 변경하려는 유저에게 관리자 권한이 있어야 채널 수정이 되는게 아닐까?
-            channelService.addUsersToChannel(user, user1, channelName1); // "성준의채널"은 "성준"의 채널이므로 정상적으로 수정
-            channelService.addUsersToChannel(user, user2, channelName1);
-            channelService.addUsersToChannel(user, user2, channelName2); // "태환의채널"은 "성준"의 채널이 아니므로 예외 발생
+            channelService.addUsersToChannel(user, newUser, channelName1); // "성준의채널"은 "성준"의 채널이므로 정상적으로 수정
+            channelService.addUsersToChannel(user, deleteUser, channelName1);
+            channelService.addUsersToChannel(user, deleteUser, channelName2); // "태환의채널"은 "성준"의 채널이 아니므로 예외 발생
         } catch(IllegalArgumentException e) {
             System.out.println("채널 수정 예외 발생: " + e.getMessage());
         }
 
         try {
             // 유저 삭제
-            channelService.removeUsersFromChannel(user, user2, channelName1);
+            channelService.removeUsersFromChannel(user, deleteUser, channelName1);
         } catch (IllegalArgumentException e) {
             System.out.println("채널 수정 예외 발생: " + e.getMessage());
         }
@@ -165,7 +166,8 @@ public class JavaApplication {
 
         // 2.5 삭제
         try {
-            channelService.deleteChannel(user,"태환의채널");
+            channelService.deleteChannel(user3,"태환의채널"); // 채널 주인이므로 정상적으로 삭제 완료
+            channelService.deleteChannel(user2, "성준의채널"); // 예외 발생
         } catch(IllegalArgumentException e) {
             System.out.println("채널 삭제 예외 발생: " + e.getMessage());
         }
@@ -173,9 +175,9 @@ public class JavaApplication {
         // 2.6 삭제된 데이터 조회
         try {
             List<Channel> findChannels = channelService.getAllChannels();
-            System.out.println("유저 삭제 전체 조회 : " + findChannels);
+            System.out.println("채널 유저 삭제 전체 조회 : " + findChannels);
         } catch (IllegalArgumentException e) {
-            System.out.println("유저 삭제 예외 발생: " + e.getMessage());
+            System.out.println("채널 유저 삭제 예외 발생: " + e.getMessage());
         }
 
 
