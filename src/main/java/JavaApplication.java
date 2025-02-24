@@ -34,7 +34,7 @@ public class JavaApplication {
             userService.createUser(user2);
             userService.createUser(user3);
         } catch (IllegalArgumentException e) {
-            System.out.println("유저 등록 예외 발생: " +e.getMessage());
+            System.out.println("유저 등록 예외 발생: " + e.getMessage());
         }
 
         // 1.2 조회
@@ -46,7 +46,9 @@ public class JavaApplication {
             System.out.println("유저 조회 : " + findUser.getUsername());
             // 1.2.2 다건 조회
             List<User> findUsers = userService.getAllUsers();
-            System.out.println("유저 전체 조회 : " + findUsers);
+            System.out.print("유저 전체 조회 : ");
+            findUsers.stream().forEach(m -> System.out.print(m.getUsername() +  " "));
+            System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println("유저 조회 예외 발생: " + e.getMessage());
         }
@@ -75,9 +77,7 @@ public class JavaApplication {
         // 1.4 수정된 데이터 조회
         try {
             User findUser = userService.getUser("성준");
-            System.out.println("유저 수정 조회 : " + findUser.getUsername());
-            List<User> findUsers = userService.getAllUsers();
-            System.out.println("유저 수정 전체 조회 : " + findUsers);
+            System.out.println("유저 수정 조회 : " + findUser);
         } catch (IllegalArgumentException e) {
             System.out.println("유저 조회 예외 발생: " + e.getMessage());
         }
@@ -85,21 +85,21 @@ public class JavaApplication {
         // 1.5 삭제
         try {
             userService.deleteUser("희준");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println("유저 삭제 예외 발생: " + e.getMessage());
         }
 
         // 1.6 삭제된 데이터 조회
         try {
             List<User> findUsers = userService.getAllUsers();
-            System.out.println("유저 삭제 전체 조회 : " + findUsers);
+            System.out.print("유저 삭제 전체 조회 : ");
+            findUsers.stream().forEach(m -> System.out.print(m.getUsername() + " "));
+            System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println("유저 삭제 예외 발생: " + e.getMessage());
         }
 
         System.out.println();
-
-
 
 
         // 2. JCFChannelService 테스트
@@ -115,7 +115,7 @@ public class JavaApplication {
             channelService.createChannel(channel2);
 
             // 잘 등록됐는지는 조회에서 테스트
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println("채널 생성 예외 발생: " + e.getMessage());
         }
 
@@ -126,9 +126,11 @@ public class JavaApplication {
             System.out.println("채널 조회 : " + findChannel.getChannelName());
             // 2.2.2 다건 조회
             List<Channel> findChannels = channelService.getAllChannels();
-            System.out.println("채널 전체 조회 : " + findChannels);
+            System.out.print("채널 전체 조회 : ");
+            findChannels.stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
+            System.out.println();
 
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println("채널 조회 예외 발생: " + e.getMessage());
         }
 
@@ -141,8 +143,8 @@ public class JavaApplication {
             // 권한에 대한 고민 - 채널을 변경하려는 유저에게 관리자 권한이 있어야 채널 수정이 되는게 아닐까?
             channelService.addUsersToChannel(user, newUser, channelName1); // "성준의채널"은 "성준"의 채널이므로 정상적으로 수정
             channelService.addUsersToChannel(user, deleteUser, channelName1);
-            channelService.addUsersToChannel(user, deleteUser, channelName2); // "태환의채널"은 "성준"의 채널이 아니므로 예외 발생
-        } catch(IllegalArgumentException e) {
+            // channelService.addUsersToChannel(user, deleteUser, channelName2); // "태환의채널"은 "성준"의 채널이 아니므로 예외 발생
+        } catch (IllegalArgumentException e) {
             System.out.println("채널 수정 예외 발생: " + e.getMessage());
         }
 
@@ -156,30 +158,29 @@ public class JavaApplication {
         // 2.4 수정된 데이터 조회
         try {
             Channel findChannel = channelService.getChannel("성준의채널");
-            System.out.println("채널 수정 조회 : " + findChannel.getChannelName());
+            System.out.println("채널 수정 조회 : " + findChannel);
             List<Channel> findChannels = channelService.getAllChannels();
-            System.out.println("채널 수정 전체 조회 : " + findChannels);
-
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println("채널 수정 조회 예외 발생: " + e.getMessage());
         }
 
         // 2.5 삭제
         try {
-            channelService.deleteChannel(user3,"태환의채널"); // 채널 주인이므로 정상적으로 삭제 완료
-            channelService.deleteChannel(user2, "성준의채널"); // 예외 발생
-        } catch(IllegalArgumentException e) {
+            channelService.deleteChannel(user3, "태환의채널"); // 채널 주인이므로 정상적으로 삭제 완료
+            // channelService.deleteChannel(user2, "성준의채널"); // 예외 발생
+        } catch (IllegalArgumentException e) {
             System.out.println("채널 삭제 예외 발생: " + e.getMessage());
         }
 
         // 2.6 삭제된 데이터 조회
         try {
             List<Channel> findChannels = channelService.getAllChannels();
-            System.out.println("채널 유저 삭제 전체 조회 : " + findChannels);
+            System.out.print("채널 삭제 전체 조회 : ");
+            findChannels.stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
+            System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println("채널 유저 삭제 예외 발생: " + e.getMessage());
         }
-
 
 
         System.out.println();
@@ -187,60 +188,68 @@ public class JavaApplication {
         System.out.println("=== 메시지 관련 기능 ===");
         // 3. JCFMessageService 테스트
         Channel channel = channelService.getChannel("성준의채널");
-        Message message1 = new Message("안녕하세요 메시지 테스트1", user, channel);
-        UUID id = message1.getId();
+        Message message1 = new Message("메시지1", user, channel);
+        Message message2 = new Message("메시지2", user, channel);
+        Message message3 = new Message("메시지3", user, channel);
+        UUID id1 = message1.getId();
+        UUID id2 = message2.getId();
         // 3.1 등록
         try {
-            Message message2 = new Message("안녕하세요 메시지 테스트2", user, channel);
             messageService.createMessage(message1);
             messageService.createMessage(message2);
-        } catch(IllegalArgumentException e) {
+            messageService.createMessage(message3);
+        } catch (IllegalArgumentException e) {
             System.out.println("메시지 등록 예외 발생: " + e.getMessage());
         }
 
         // 3.2 조회
         try {
             // 3.2.1 단건 조회
-            Message findMessage = messageService.getMessage(id);
+            Message findMessage = messageService.getMessage(id1);
             System.out.println("메시지 조회 : " + findMessage.getContent());
             // 3.2.2 다건 조회
             List<Message> findMessages = messageService.getAllMessages();
-            System.out.println("메시지 다건 조회 : " + findMessages);
+            System.out.print("메시지 전체 조회 : ");
+            findMessages.stream().forEach(m -> System.out.print(m.getContent() + " "));
+            System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println("메시지 조회 예외 발생: " + e.getMessage());
         }
 
         // 3.3 수정
         try {
-            Message updateMessage = new Message("안녕하세요 메시지 수정됐는지 테스트1", user, channel);
-            messageService.updateMessage(id, updateMessage);
-        } catch(IllegalArgumentException e) {
+            Message updateMessage = new Message("메시지수정1", user, channel);
+            messageService.updateMessage(id1, user, updateMessage);
+            // messageService.updateMessage(id2, user2, updateMessage); // 채널 주인이 아니면서, 메시지 주인이 아닌 사람이 수정하려하면 예외 발생
+        } catch (IllegalArgumentException e) {
             System.out.println("메시지 수정 예외 발생: " + e.getMessage());
         }
 
         // 3.4 수정된 데이터 조회
         try {
-            Message findMessage = messageService.getMessage(id);
+            Message findMessage = messageService.getMessage(id1);
             System.out.println("메시지 수정 조회 : " + findMessage.getContent());
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println("메시지 수정 조회 예외 발생: " + e.getMessage());
         }
 
         // 3.5 삭제
         try {
-            messageService.deleteMessage(id);
-        } catch(IllegalArgumentException e) {
+            messageService.deleteMessage(id1, user);
+            // messageService.deleteMessage(id2, user3);// 채널 주인이 아니면서, 메시지 주인이 아닌 사람이 삭제하려하면 예외 발생
+        } catch (IllegalArgumentException e) {
             System.out.println("메시지 삭제 예외 발생: " + e.getMessage());
         }
 
         // 3.6 삭제된 데이터 조회
         try {
             List<Message> findMessages = messageService.getAllMessages();
-            System.out.println("메시지 삭제 조회 : " + findMessages);
+            System.out.print("메시지 삭제 전체 조회 : ");
+            findMessages.stream().forEach(m -> System.out.print(m.getContent() + " "));
+            System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println("메시지 삭제 조회 예외 발생: " + e.getMessage());
         }
-
 
 
     }
