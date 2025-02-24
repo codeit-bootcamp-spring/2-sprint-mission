@@ -11,8 +11,8 @@ import java.util.UUID;
 public class JCFChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
-    public JCFChannelService() {
-        this.channelRepository = new ChannelRepository();
+    public JCFChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
 
     @Override
