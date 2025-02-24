@@ -19,4 +19,11 @@ public class UserOutput {
             System.out.println(user.getUsername());
         }
     }
+
+    public void gatEmailResponse(String userEmail) {
+        if(userEmail == null || userEmail.isEmpty()) {
+            System.out.println("회원 정보를 찾을 수 없습니다 ");
+        }
+            System.out.println(userEmail + " 님 찾았습니다");
+    }
 }

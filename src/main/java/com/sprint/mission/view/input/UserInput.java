@@ -50,6 +50,12 @@ public class UserInput {
     }
 
 
+    public void getEmailInput() {
+        System.out.print("찾을 이메일을 입력하세요: ");
+        String email = scanner.nextLine().trim();
+
+        userService.getEmailUser(email);
+    }
 
 
 }

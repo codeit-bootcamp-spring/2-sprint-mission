@@ -4,6 +4,7 @@ import com.sprint.mission.model.entity.User;
 import com.sprint.mission.view.output.UserOutput;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class UserServiceImpl implements UserService {
 
@@ -38,5 +39,20 @@ public class UserServiceImpl implements UserService {
         userOutput.AllResponse(users);
     }
 
+    @Override
+    public void getEmailUser(String email) {
+        Optional<User> user = users.stream()
+                .filter(u -> u.getEmail().equals(email))
+                .findFirst();
+
+        if(user.isPresent()) {
+            userOutput.gatEmailResponse(user.toString());
+        }else{
+            userOutput.gatEmailResponse(null);
+        }
+    }
+
+
+}
 
 }
