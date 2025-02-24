@@ -41,4 +41,15 @@ public class UserInput {
         String password = scanner.nextLine().trim();
         userService.updateUser(email, username, password);
     }
+
+    /**
+     *  TODO ID 으로  입력 받기 나중에 구현
+     */
+    public void getAllInput() {
+        userService.getAllUser();
+    }
+
+
+
+
 }

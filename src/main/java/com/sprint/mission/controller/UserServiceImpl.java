@@ -33,6 +33,10 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public void getAllUser() {
+        userOutput.AllResponse(users);
+    }
 
 
 }
