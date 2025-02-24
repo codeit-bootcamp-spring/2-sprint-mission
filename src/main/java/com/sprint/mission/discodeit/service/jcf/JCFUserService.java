@@ -14,27 +14,33 @@ public class JCFUserService implements UserService {
         this.userRepository = new UserRepository();
     }
 
+    @Override
     public void createUser(User newUser) {
         this.userRepository.addUser(newUser);
     }
 
+    @Override
     public User readUser(UUID userId) {
         validateUserId(userId);
         return userRepository.findUserById(userId);
     }
 
+    @Override
     public Set<User> readAllUsers() {
         return userRepository.getUsers();
     }
 
+    @Override
     public void updateUserName(UUID userId, String newUserName) {
         readUser(userId).updateUserName(newUserName);
     }
 
+    @Override
     public void updatePassword(UUID userId, String newPassword) {
         readUser(userId).updateUserPassword(newPassword);
     }
 
+    @Override
     public void deleteUser(UUID userId) {
         validateUserId(userId);
         userRepository.deleteUser(userId);
