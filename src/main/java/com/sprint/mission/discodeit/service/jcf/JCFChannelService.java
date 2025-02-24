@@ -116,9 +116,8 @@ public class JCFChannelService implements ChannelService {
         }
 
         // 채널 삭제 시 User의 Channel 목록에서도 삭제
-        // findChannel.getUsers().forEach(u -> u.getChannels().remove(findChannel)); - Stream 순회 도중 원본 컬렉션이 바뀌면 ConcurrentModificationException 발생
-
-
+        List<User> users = findChannel.getUsers().stream().collect(Collectors.toList());
+        users.stream().forEach(u -> u.removeChannel(findChannel));
         data.remove(findChannel);
     }
 }
