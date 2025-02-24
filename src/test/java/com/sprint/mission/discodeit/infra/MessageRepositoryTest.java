@@ -17,7 +17,7 @@ class MessageRepositoryTest {
     @BeforeEach
     void setUp() {
         messageRepository = new JCFMessageRepository();
-        setUpMessage = messageRepository.create(CONTEXT);
+        setUpMessage = messageRepository.save(CONTEXT);
     }
 
     @Test

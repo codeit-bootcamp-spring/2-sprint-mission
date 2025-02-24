@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserRepository {
-    UserDto register(UserRegisterDto userRegisterDto);
+    UserDto save(UserRegisterDto userRegisterDto);
 
     UserDto findById(UUID id);
 

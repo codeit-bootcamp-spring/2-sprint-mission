@@ -17,7 +17,7 @@ class ChannelRepositoryTest {
     @BeforeEach
     void setUp() {
         channelRepository = new JCFChannelRepository();
-        setUpChannel = channelRepository.create(NAME);
+        setUpChannel = channelRepository.save(NAME);
     }
 
     @Test

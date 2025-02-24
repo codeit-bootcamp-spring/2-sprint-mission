@@ -21,7 +21,7 @@ class UserRepositoryTest {
     void init() {
         userRepository = new JCFUserRepository();
 
-        this.setUpUser = userRepository.register(new UserRegisterDto(NAME, PASSWORD));
+        this.setUpUser = userRepository.save(new UserRegisterDto(NAME, PASSWORD));
     }
 
     @Test
@@ -52,8 +52,8 @@ class UserRepositoryTest {
         UserRegisterDto userOtherHwang = new UserRegisterDto(NAME, PASSWORD + "123");
         UserRegisterDto userKim = new UserRegisterDto("KIM", PASSWORD);
 
-        userRepository.register(userOtherHwang);
-        userRepository.register(userKim);
+        userRepository.save(userOtherHwang);
+        userRepository.save(userKim);
 
         assertThat(userRepository.findByName(NAME)).hasSize(2);
     }

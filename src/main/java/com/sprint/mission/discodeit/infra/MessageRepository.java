@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageRepository {
-    MessageDto create(String context);
+    MessageDto save(String context);
 
     MessageDto findById(UUID id);
 

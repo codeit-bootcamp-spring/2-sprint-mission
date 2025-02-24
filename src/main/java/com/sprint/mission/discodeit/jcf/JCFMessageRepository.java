@@ -12,7 +12,7 @@ public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> messages = new LinkedHashMap<>();
 
     @Override
-    public MessageDto create(String context) {
+    public MessageDto save(String context) {
         Message message = new Message(context);
         messages.put(message.getId(), message);
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelRepository {
-    ChannelDto create(String name);
+    ChannelDto save(String name);
 
     ChannelDto findById(UUID id);
 

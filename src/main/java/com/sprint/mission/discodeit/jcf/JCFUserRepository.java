@@ -38,7 +38,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public UserDto register(UserRegisterDto userRegisterDto) {
+    public UserDto save(UserRegisterDto userRegisterDto) {
         User user = new User(userRegisterDto.name(), userRegisterDto.password());
         users.put(user.getId(), user);
 
