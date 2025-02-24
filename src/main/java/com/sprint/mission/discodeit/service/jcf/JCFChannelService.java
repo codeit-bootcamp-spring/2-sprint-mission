@@ -15,12 +15,15 @@ public class JCFChannelService implements ChannelService {
         this.channelRepository = new ChannelRepository();
     }
 
+    @Override
     public void createChannel(Channel newChannel) {
         if (newChannel == null) {
             throw new IllegalArgumentException("생성할 채널이 null 입니다!!!");
         }
         channelRepository.addChannel(newChannel);
     }
+
+    @Override
     public Channel readChannel(UUID channelId) {
         if (channelId == null) {
             throw new IllegalArgumentException("입력받은 channelId 가 null 입니다!!!");
@@ -28,19 +31,23 @@ public class JCFChannelService implements ChannelService {
         return channelRepository.findChannelById(channelId);
     }
 
+    @Override
     public ArrayDeque<Channel> readAllChannels() {
         return channelRepository.getChannels();
     }
 
+    @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
         readChannel(channelId).updateChannelName(newChannelName);
     }
 
+    @Override
     public void addChannelParticipant(UUID channelId, User newParticipant) {
         //newParticipant 가 userRepository 에 있는 user 인지는 다른데서 확인 필요?
         channelRepository.addParticipant(channelId, newParticipant);
     }
 
+    @Override
     public void deleteChannel(UUID channelId) {
         if (channelId == null) {
             throw new IllegalArgumentException("삭제하려는 channelId 가 null 입니다!!!");
