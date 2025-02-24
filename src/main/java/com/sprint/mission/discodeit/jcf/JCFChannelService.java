@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> channelData;
     private static JCFChannelService channelInstance;
+    private final JCFUserService userService;
 
     public static JCFChannelService getInstance() {
         if (channelInstance == null) {
@@ -23,6 +24,7 @@ public class JCFChannelService implements ChannelService {
 
     private JCFChannelService() {
         this.channelData = new HashMap<>();
+        this.userService = JCFUserService.getInstance();
     }
 
     public void containsChannelData(UUID cid){
@@ -52,8 +54,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void registerChannel(String channelName, UUID userId) {
-        Channel channel = new Channel(channelName, userId);
+    public void registerChannel(String channelName, String userName) {
+        Channel channel = new Channel(channelName, userService.getUser(userName));
         this.channelData.put(channel.getCid(), channel);
     }
 

@@ -35,11 +35,10 @@ public class ChannelMenu {
                     break;
                 case 3:
                     try{
-                        System.out.print("채널을 생성할 사용자 ID 입력: ");
-                        UUID userId = UUID.fromString(sc.nextLine());
-                        userService.uidExists(userId);
+                        System.out.print("채널을 생성할 사용자명 입력: ");
+                        String userName = sc.nextLine();
                         System.out.print("채널명 입력: ");
-                        channelService.registerChannel(sc.nextLine(), userId);
+                        channelService.registerChannel(sc.nextLine(), userName);
                         System.out.println("완료되었습니다.");
                     }catch(IllegalArgumentException e){
                         System.out.println("채널 등록에 실패하였습니다.");

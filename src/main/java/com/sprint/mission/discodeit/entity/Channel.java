@@ -7,13 +7,13 @@ public class Channel {
     private final Long channelCreateAt;
     private Long channelUpdateAt;
     private String channelName;
-    private final UUID channelCreator;
+    private final User user;
 
-    public Channel(String channelName, UUID channelCreator) {
+    public Channel(String channelName, User user) {
         this.cid = UUID.randomUUID();
         this.channelCreateAt = System.currentTimeMillis();
         this.channelName = channelName;
-        this.channelCreator = channelCreator;
+        this.user = user;
     }
 
     public UUID getCid() {
@@ -32,8 +32,8 @@ public class Channel {
         return channelName;
     }
 
-    public UUID getChannelCreator() {
-        return channelCreator;
+    public User getUser() {
+        return user;
     }
 
     public void channelUpdate(String channelName){
@@ -47,7 +47,7 @@ public class Channel {
                 ", channelCreateAt: " + channelCreateAt +
                 ", channelUpdateAt: " + channelUpdateAt +
                 ", channelName: " + channelName +
-                ", channelCreator: " + channelCreator + "]\n";
+                ", userName: " + user.getUserName() + "]\n";
     }
 
 }
