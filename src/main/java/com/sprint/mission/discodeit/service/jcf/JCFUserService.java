@@ -8,17 +8,17 @@ import java.util.List;
 
 
 public class JCFUserService implements UserService {
-    private final List<User> data;
+    private final List<User> usersData;
 
     public JCFUserService() {
-        data = new ArrayList<>();
+        usersData = new ArrayList<>();
     }
 
 
     // 사용자 생성
     @Override
     public void createUser(User user) {
-        data.add(user);
+        usersData.add(user);
         System.out.println("---------------------[사용자 등록]-------------------------");
         System.out.println("이름: " + user.getName() + "\n메일: " + user.getEmail());
         System.out.println("사용자 ID: " + user.getId());
@@ -31,7 +31,7 @@ public class JCFUserService implements UserService {
     // 사용자 조회
     @Override
     public User getUser(String name) {
-        for (User userList : data) {  // foreach 가능?
+        for (User userList : usersData) {  // foreach 가능?
             if (userList.getName().equals(name)) {
                 return userList;
             }
@@ -56,17 +56,17 @@ public class JCFUserService implements UserService {
     @Override
     public List<User> getAllUsers() {
         System.out.println("[사용자 전체 조회]");
-        data.forEach(u -> {
+        usersData.forEach(u -> {
             System.out.printf("이름: %-8s 메일: %s%n", u.getName(), u.getEmail());
         });
-        return data;
+        return usersData;
     }
 
 
     // 사용자 수정
     @Override
     public void updateUser(String name, String changeName, String changeMail) {
-        for (User userList  : data) {
+        for (User userList  : usersData) {
             if (userList.getName().equals(name)) {
                 userList.updateUser(changeName, changeMail);
                 userList.update();
@@ -81,10 +81,11 @@ public class JCFUserService implements UserService {
 
 
     // 사용자 삭제
+    @Override
     public void deleteUser(String name) {
-        for (User userList : data) {
+        for (User userList : usersData) {
             if (userList.getName().equals(name)) {
-                data.remove(userList);
+                usersData.remove(userList);
                 System.out.printf("[사용자 정보 삭제]\n[삭제완료] 삭제 된 이름: %-10s 삭제 된 메일: %s%n", userList.getName(), userList.getEmail());
                 return;
             }

@@ -6,6 +6,11 @@ public class User extends Common {
     private String name;
     private String email;
 
+    public User(){};
+
+    public User(String name){
+        this.name = name;
+    }
 
     public User(String name, String email) {//Common 생성자 호출
         this.name = name;
