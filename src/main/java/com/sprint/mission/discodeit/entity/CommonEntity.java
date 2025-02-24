@@ -2,12 +2,12 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-public class commonness {
-    public UUID id;
-    public Long createdAt;
-    public Long updatedAt;
+public class CommonEntity {
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
 
-    public commonness() {
+    public CommonEntity() {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = this.createdAt;
@@ -25,7 +25,11 @@ public class commonness {
         return updatedAt;
     }
 
-    public void updateUpdateAT(){
-        updatedAt = System.currentTimeMillis();
+    public void updateCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void updateUpdatedAt(Long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
