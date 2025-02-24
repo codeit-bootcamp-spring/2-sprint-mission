@@ -14,24 +14,29 @@ public class JCFMessageService implements MessageService {
         messageRepository = new MessageRepository();
     }
 
+    @Override
     public void createMessage(Message newMessage) {
         messageRepository.addMessage(newMessage);
     }
 
+    @Override
     public Message readMessage(UUID messageId) {
         validateMessageId(messageId);
         return messageRepository.findMessageById(messageId);
     }
 
+    @Override
     public LinkedList<Message> readAllMessages() {
         return messageRepository.getMessages();
     }
 
+    @Override
     public void updateMessageContent(UUID messageId, String content) {
         validateMessageId(messageId);
         messageRepository.findMessageById(messageId).updateContent(content);
     }
 
+    @Override
     public void deleteMessage(UUID messageId) {
         messageRepository.deleteMessage(messageId);
     }
