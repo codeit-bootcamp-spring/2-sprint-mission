@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -35,8 +36,17 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message saveMessage(String text) {
-        Message message = new Message(text);
+    public Message saveMessage(Channel channel, User user, String text) {
+        if(channelService.findById(channel.getId()).isEmpty()){
+            System.out.println("채널이 존재하지 않으므로, 유효하지 않은 요청입니다.");
+            return null;
+        }
+        if(userService.findById(user.getId()).isEmpty()){
+            System.out.println("유저가 존재하지 않으므로, 유효하지 않은 요청입니다.");
+            return null;
+        }
+
+        Message message = new Message(channel.getId(), user.getId(), text);
         messageRepository.put(message.getId(), message);
         return message;
     }

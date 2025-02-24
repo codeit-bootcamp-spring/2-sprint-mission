@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.TimeFormatter;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class JCFUserService implements UserService {
     private volatile static JCFUserService instance = null;
@@ -46,22 +48,18 @@ public class JCFUserService implements UserService {
 
     @Override
     public void findByName(String name) {
-        List<User> userList = userRepository.values().stream()
-                        .filter(user -> user.getName()
-                                .equalsIgnoreCase(name)).toList();
+        userRepository.values().stream()
+                .filter(user -> user.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .ifPresentOrElse(
+                        System.out::println,
+                        () -> System.out.println(name + "으로 등록된 유저가 없습니다.")
+                );
+    }
 
-        if(userList.isEmpty()){
-            System.out.println("이름이 " + name + " 인 유저가 없습니다.");
-        }else {
-            System.out.println("[" + name + "]" + " 유저 검색 결과");
-            for (User user : userList) {
-                System.out.println("유저 ID: " + user.getId());
-                System.out.println("유저 이름: " + user.getName());
-                System.out.println("유저 생성 일자: " + TimeFormatter.format(user.getCreatedAt()));
-                System.out.println("유저 수정 일자: " + TimeFormatter.format(user.getUpdatedAt()));
-                System.out.println("----------------------------------");
-            }
-        }
+    @Override
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(userRepository.get(id));
     }
 
     @Override

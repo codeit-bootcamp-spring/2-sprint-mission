@@ -50,9 +50,14 @@ public class JCFChannelService implements ChannelService {
                 .filter(channel -> channel.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .ifPresentOrElse(
-                        channel -> System.out.println(channel),
+                        System.out::println,
                         () -> System.out.println(name + "으로 등록된 채널이 없습니다.")
                 );
+    }
+
+    @Override
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(channelRepository.get(id));
     }
 
     @Override
