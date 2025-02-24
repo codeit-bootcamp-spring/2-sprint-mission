@@ -41,7 +41,8 @@ public class User extends BaseEntity{
     public String toString() {
         return "User{" +
                 "userId='" + getId() + '\'' +
-                "username='" + username + '\'' +
+                ", username='" + username + '\'' +
+                ", chnnels= " + joinedChannels +
                 '}';
     }
 

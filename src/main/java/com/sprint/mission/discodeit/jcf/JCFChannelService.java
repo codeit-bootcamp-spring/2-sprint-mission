@@ -2,12 +2,19 @@ package com.sprint.mission.discodeit.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
     private final Map<String, Channel> channels = new HashMap<String, Channel>();
+    UserService userService;
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public void createChannel(String channelName) {
@@ -38,8 +45,18 @@ public class JCFChannelService implements ChannelService {
         if(channels.containsKey(newChannelName)) {
             throw new IllegalArgumentException("이미 존재하는 채널명입니다.");
         }
+
         channels.remove(channel.getChannelName());
         channel.updateChannelName(newChannelName);
+
+        String oldChannelName = channel.getChannelName();
+        for (User user : userService.getAllUsers()) {
+            if (user.isJoinedChannel(oldChannelName)) {
+                user.removeJoinedChannel(oldChannelName);
+                user.updateJoinedChannel(newChannelName);
+            }
+        }
+
         channels.put(newChannelName, channel);
     }
 
@@ -49,6 +66,7 @@ public class JCFChannelService implements ChannelService {
             throw new IllegalArgumentException("이미 가입되어 있는 유저입니다.");
         }
         channel.updateMembers(userName);
+        userService.addChannel(userService.getUser(userName), channel.getChannelName());
         channels.put(channel.getChannelName(), channel);
 
     }

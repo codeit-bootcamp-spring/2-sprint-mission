@@ -38,15 +38,11 @@ public class Message extends BaseEntity  {
         this.content = content;
     }
 
-    public UUID getUuid() {
-        return getId();
-    }
-
     @Override
     public String toString() {
         return "Message{" +
                 "sender= " + sender +
-                "sendTime= " + getCreatedAt() +
+                ", sendTime= " + getCreatedAt() +
                 ", channel= " + channel +
                 ", content= '" + content + '\'' +
                 '}';

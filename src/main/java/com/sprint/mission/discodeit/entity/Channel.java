@@ -52,14 +52,14 @@ public class Channel extends BaseEntity {
     }
 
     public boolean isMessageInChannel(Message message){
-        return this.members.contains(message);
+        return this.messages.contains(message);
     }
 
     @Override
     public String toString() {
         return "Channel{" +
-                "channelname ='" + channelName + '\'' +
-                ", members= " + members +
+                "channelName='" + channelName + '\'' +  // 오타 수정
+                ", members=" + members +
                 '}';
     }
 }

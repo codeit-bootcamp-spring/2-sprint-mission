@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> messages = new HashMap<UUID, Message>();
@@ -23,13 +26,14 @@ public class JCFMessageService implements MessageService {
         channelService.validateChannelExists(channelName);
 
         Message message = new Message(userName, channelName, content);
-        messages.put(message.getUuid(), message);
+        channelService.addMessageToChannel(channelService.getChannel(channelName), message);
+        messages.put(message.getId(), message);
     }
 
     @Override
     public Message getMessageById(UUID messageId) {
         if(!messages.containsKey(messageId)){
-            throw new NoSuchElementException("존재하지 않는 메세지ID 입니다.");
+            throw new NoSuchElementException("존재하지 않는 메세지 입니다.");
         }
         return messages.get(messageId);
     }
@@ -52,15 +56,9 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> getChannelMessages(String channelName) {
         channelService.validateChannelExists(channelName);
+        Channel channel = channelService.getChannel(channelName);
 
-        List<Message> messages = new ArrayList<>();
-        for (Message message : this.messages.values()) {
-            if (message.getChannel().equals(channelName)) {
-                messages.add(message);
-            }
-        }
-
-        return messages;
+        return new ArrayList<>(channel.getMessages());
     }
 
     @Override
@@ -84,6 +82,8 @@ public class JCFMessageService implements MessageService {
         }
         Message message = messages.get(messageId);
         message.updateContent(newContent);
+
+        channelService.removeMessageFromChannel(channelService.getChannel(message.getChannel()), message);
         messages.put(messageId, message);
     }
 

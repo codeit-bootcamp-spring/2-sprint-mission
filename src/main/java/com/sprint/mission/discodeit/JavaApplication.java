@@ -16,6 +16,7 @@ public class JavaApplication {
         JCFChannelService channelService = new JCFChannelService();
         JCFUserService userService = new JCFUserService(channelService);
         JCFMessageService messageService = new JCFMessageService(userService, channelService);
+        channelService.setUserService(userService);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -36,7 +37,7 @@ public class JavaApplication {
             scanner.nextLine(); // 개행 문자 제거
 
             switch (choice) {
-                case 1:
+                case 1: //유저 생성
                     try {
                         System.out.print("생성할 유저 이름 입력: ");
                         String username = scanner.nextLine();
@@ -47,7 +48,7 @@ public class JavaApplication {
                     }
                     break;
 
-                case 2:
+                case 2: //채널 생성
                     try {
                         System.out.print("생성할 채널 이름 입력: ");
                         String channelName = scanner.nextLine();
@@ -58,25 +59,23 @@ public class JavaApplication {
                     }
                     break;
 
-                case 3:
+                case 3:// 유저를 채널에 추가
                     try {
                         System.out.print("채널 이름 입력: ");
                         String channelToJoin = scanner.nextLine();
                         System.out.print("추가할 유저 이름 입력: ");
                         String userToJoin = scanner.nextLine();
                         Channel channel = channelService.getChannel(channelToJoin);
-                        if (channel != null) {
-                            channelService.addUserToChannel(channel, userToJoin);
-                            System.out.println(userToJoin + "님이 " + channelToJoin + " 채널에 추가됨.");
-                        } else {
-                            System.out.println("채널이 존재하지 않습니다.");
-                        }
+
+                        channelService.addUserToChannel(channel, userToJoin);
+                        System.out.println(userToJoin + "님이 " + channelToJoin + " 채널에 추가되었습니다.");
+
                     } catch (Exception   e) {
                         System.out.println("오류 발생: " + e.getMessage());
                     }
                     break;
 
-                case 4:
+                case 4: //메세지 보내기
                     try {
                         System.out.print("유저 이름 입력: ");
                         String sender = scanner.nextLine();
@@ -86,6 +85,7 @@ public class JavaApplication {
 
                         System.out.print("메시지 입력: ");
                         String messageContent = scanner.nextLine();
+
                         messageService.createMessage(sender, targetChannel, messageContent);
                         System.out.println("메시지 전송 완료.");
                     } catch (Exception   e) {
@@ -93,7 +93,7 @@ public class JavaApplication {
                     }
                     break;
 
-                case 5:
+                case 5: //특정 채널의 메세지 조회
                     try {
                         System.out.print("메시지를 조회할 채널 이름 입력: ");
                         String channelToView = scanner.nextLine();
@@ -103,7 +103,7 @@ public class JavaApplication {
                         } else {
                             System.out.println("\n===== 채널 메시지 (" + channelToView + ") =====");
                             for (Message msg : messages) {
-                                System.out.println(msg.getSender() + ": " + msg.getContent() + " [" + msg.getUuid() + "]");
+                                System.out.println(msg.getSender() + ": " + msg.getContent() + " [" + msg.getId() + "]");
                             }
                         }
                     } catch (Exception   e) {
@@ -111,7 +111,7 @@ public class JavaApplication {
                     }
                     break;
 
-                case 6:
+                case 6: //특정 메세지 삭제
                     try {
                         System.out.print("삭제할 메시지 ID 입력: ");
                         String messageIdInput = scanner.nextLine();
@@ -129,26 +129,22 @@ public class JavaApplication {
                     }
                     break;
 
-                case 7:
+                case 7: //채널에서 유저 삭제
                     try {
                         System.out.print("채널 이름 입력: ");
                         String channelToRemove = scanner.nextLine();
                         System.out.print("삭제할 유저 이름 입력: ");
                         String userToRemove = scanner.nextLine();
-
                         Channel channelForRemoval = channelService.getChannel(channelToRemove);
-                        if (channelForRemoval != null) {
-                            channelService.removeUserFromChannel(channelForRemoval, userToRemove);
-                            System.out.println(userToRemove + "님이 " + channelToRemove + " 채널에서 삭제됨.");
-                        } else {
-                            System.out.println("해당 채널이 존재하지 않습니다.");
-                        }
+
+                        channelService.removeUserFromChannel(channelForRemoval, userToRemove);
+                        System.out.println(userToRemove + "님이 " + channelToRemove + " 채널에서 삭제됨.");
                     } catch (Exception   e) {
                         System.out.println("오류 발생: " + e.getMessage());
                     }
                     break;
 
-                case 8:
+                case 8: //모든 채널 및 유저 삭제
                     try {
                         System.out.println("\n===== 모든 유저 및 채널 조회 =====");
                         System.out.println("유저 목록: " + userService.getAllUsers());

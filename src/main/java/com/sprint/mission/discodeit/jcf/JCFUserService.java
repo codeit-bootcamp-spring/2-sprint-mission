@@ -13,18 +13,16 @@ public class JCFUserService implements UserService {
     private final Map<String, User> users = new HashMap<String, User>();
     private final ChannelService channelService;
 
-
     public JCFUserService(ChannelService channelService) {
         this.channelService = channelService;
     }
-
-
 
     @Override
     public void createUser(String username) {
         if (users.containsKey(username)) {
             throw new IllegalArgumentException("이미 존재하는 유저입니다.");
         }
+
         users.put(username, new User(username));
     }
 
@@ -57,9 +55,8 @@ public class JCFUserService implements UserService {
     @Override
     public void addChannel(User user, String channel) {
         channelService.validateChannelExists(channel);
-
-        if (!user.isJoinedChannel(channel)) {
-            throw new IllegalArgumentException("가입되어있지 않은 채널입니다. ");
+        if (user.isJoinedChannel(channel)) {
+            throw new IllegalArgumentException("이미 가입되어 있는 채널입니다. ");
         }
         user.updateJoinedChannel(channel);
         users.put(user.getUsername(), user);
