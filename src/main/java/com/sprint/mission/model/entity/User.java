@@ -2,7 +2,7 @@ package com.sprint.mission.model.entity;
 
 import java.util.UUID;
 
-public class User {
+public class User extends BaseTimeEntity{
 
 
     public User(String username, String password, String email) {
@@ -15,8 +15,7 @@ public class User {
     private String username;
     private String password;
     private String email;
-    private Long created;
-    private Long updated;
+
 
     public String getUsername() {
         return username;
@@ -33,15 +32,6 @@ public class User {
     public UUID getId() {
         return id;
     }
-
-    public Long getCreated() {
-        return created;
-    }
-
-    public Long getUpdated() {
-        return updated;
-    }
-
 
     public void update(String password, String username) {
         if (password != null) {
