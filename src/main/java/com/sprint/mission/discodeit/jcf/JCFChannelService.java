@@ -45,7 +45,6 @@ public class JCFChannelService implements ChannelService {
         return new ArrayList<>(channelData.values());
     }
 
-    @Override
     public List<Channel> getUpdatedChannels(){
         return channelData.values().stream()
                 .filter(entry -> entry.getChannelUpdateAt() != null)

@@ -50,7 +50,6 @@ public class JCFUserService implements UserService {
         return new ArrayList<>(userData.values());
     }
 
-    @Override
     public List<User> getUpdatedUsers(){
         return userData.values().stream()
                 .filter(entry -> entry.getUserUpdateAt() != null)
@@ -90,5 +89,10 @@ public class JCFUserService implements UserService {
         if(!(userData.containsKey(userId))) {
             throw new IllegalArgumentException();
         }
+    }
+
+    public User getUserById(UUID userId) {
+        uidExists(userId);
+        return userData.get(userId);
     }
 }
