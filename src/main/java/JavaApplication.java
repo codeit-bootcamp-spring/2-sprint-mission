@@ -218,8 +218,7 @@ public class JavaApplication {
 
         // 3.3 수정
         try {
-            Message updateMessage = new Message("메시지수정1", user, channel);
-            messageService.updateMessage(id1, user, updateMessage);
+            messageService.updateMessage(id1, user, "메시지수정1");
             // messageService.updateMessage(id2, user2, updateMessage); // 채널 주인이 아니면서, 메시지 주인이 아닌 사람이 수정하려하면 예외 발생
         } catch (IllegalArgumentException e) {
             System.out.println("메시지 수정 예외 발생: " + e.getMessage());

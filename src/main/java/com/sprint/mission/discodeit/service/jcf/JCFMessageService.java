@@ -48,16 +48,11 @@ public class JCFMessageService implements MessageService {
 
     // 메시지 수정
     @Override
-    public void updateMessage(UUID id, User owner, Message message) { // 수정정보가 담겨있는 message 객체는 new로 새로 생성되므로 UUID값이 다름 -> 파라미터로 수정하려는 메시지의 UUID도 받자!
-        if (message == null) {
+    public void updateMessage(UUID id, User owner, String content) { // 수정정보가 담겨있는 message 객체는 new로 새로 생성되므로 UUID값이 다름 -> 파라미터로 수정하려는 메시지의 UUID도 받자!
+        if (content == null) {
             throw new IllegalArgumentException("수정 정보가 존재하지 않습니다.");
         }
         Message findMessage = getMessage(id);
-
-        // 필수 입력 항목이 하나라도 빠지면 Exception 발생
-        if (message.getContent() == null) {
-            throw new IllegalArgumentException("필수 입력 항목을 빠뜨리셨습니다.");
-        }
 
         // 메시지의 주인이 아니면 Exception 발생
         if (!owner.equals(findMessage.getSender())) {
@@ -65,7 +60,7 @@ public class JCFMessageService implements MessageService {
         }
 
         findMessage.updateUpdatedAt(System.currentTimeMillis());
-        findMessage.updateContent(message.getContent());
+        findMessage.updateContent(content);
     }
 
     // 메시지 삭제

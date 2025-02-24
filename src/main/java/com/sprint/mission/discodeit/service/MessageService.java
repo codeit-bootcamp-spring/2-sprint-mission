@@ -20,7 +20,8 @@ public interface MessageService {
     List<Message> getAllMessages();
 
     // 메시지 수정
-    void updateMessage(UUID id, User user, Message message);
+    // 내용만 수정하므로 Message 객체를 받기보단 content만 받는게 나을듯
+    void updateMessage(UUID id, User user, String content);
 
     // 메시지 삭제
     void deleteMessage(UUID id, User user);
