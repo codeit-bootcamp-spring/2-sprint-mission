@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     public void createUser(String username, String email, String password) {
 
         User newUser = new User(username, password, email);
-        userOutput.creatResponse(newUser);
+        userOutput.creatOutput(newUser);
     }
 
 
@@ -29,14 +29,14 @@ public class UserServiceImpl implements UserService {
         for(User u : users) {
             if(u.getEmail().equals(email)) {
                 u.update(username, password);
-                userOutput.UpdatedResponse();
+                userOutput.updatedOutput();
             }
         }
     }
 
     @Override
     public void getAllUser() {
-        userOutput.AllResponse(users);
+        userOutput.allOutput(users);
     }
 
     @Override
@@ -46,12 +46,11 @@ public class UserServiceImpl implements UserService {
                 .findFirst();
 
         if(user.isPresent()) {
-            userOutput.gatEmailResponse(user.toString());
+            userOutput.getEmailOutput(user.toString());
         }else{
-            userOutput.gatEmailResponse(null);
+            userOutput.getEmailOutput(null);
         }
     }
-
 
 }
 

@@ -4,23 +4,22 @@ import com.sprint.mission.model.entity.User;
 import java.util.List;
 
 public class UserOutput {
-    public void creatResponse(User user) {
-
+    public void creatOutput(User user) {
         System.out.println(user.getUsername() + " 님 회원가입이 완료 되었습니다 ~ !");
     }
 
-    public void UpdatedResponse() {
+    public void updatedOutput() {
         System.out.println(" 사용자 정보가 업데이트되었습니다.");
     }
 
-    public void AllResponse(List<User> users) {
+    public void allOutput(List<User> users) {
         System.out.println("등록된 사용자 목록: ");
         for (User user : users) {
             System.out.println(user.getUsername());
         }
     }
 
-    public void gatEmailResponse(String userEmail) {
+    public void getEmailOutput(String userEmail) {
         if(userEmail == null || userEmail.isEmpty()) {
             System.out.println("회원 정보를 찾을 수 없습니다 ");
         }

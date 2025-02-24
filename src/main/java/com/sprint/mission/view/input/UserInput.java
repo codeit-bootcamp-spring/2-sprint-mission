@@ -16,7 +16,7 @@ public class UserInput {
         this.scanner = new Scanner(System.in);
     }
 
-    public void creatRequest() {
+    public void creatInput() {
         System.out.println("사용자을 입력해주세요");
         String username = scanner.nextLine().trim();
 
