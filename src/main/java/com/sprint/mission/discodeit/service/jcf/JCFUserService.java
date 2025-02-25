@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
     private final List<User> userList;
@@ -16,13 +15,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User create(User user) {
+    public User creatUser(User user) {
         boolean userExists = userList.stream()
-                .anyMatch(existingUser -> existingUser.getUserId().equals(user.getUserId()));
-        if (userExists) {
-            throw new IllegalArgumentException("사용자 ID가 이미 존재합니다.");
-        }
-        userExists = userList.stream()
                 .anyMatch(existingUser -> existingUser.getUserName().equals(user.getUserName()));
         if (userExists) {
             throw new IllegalArgumentException("사용자 이름이 이미 존재합니다.");
@@ -32,27 +26,27 @@ public class JCFUserService implements UserService {
         if (userExists) {
             throw new IllegalArgumentException("해당 이메일이 이미 존재합니다.");
         }
-        this.userList.add(user);
+        userList.add(user);
         return user;
     }
 
     @Override
-    public User find(UUID id) {
+    public List<User> findAllUser() {
+        return userList;
+    }
+
+    @Override
+    public User findByUserId(UUID userId) {
         return userList.stream()
-                .filter(user -> user.getId().equals(id))
+                .filter(user -> user.getId().equals(userId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("사용자 아이디를 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("사용자 아이디를 찾을 수 없습니다: " + userId));
     }
 
     @Override
-    public List<User> findAll() {
-        return userList.stream().collect(Collectors.toList());
-    }
-
-    @Override
-    public User update(UUID id, User user) {
+    public User updateUser(UUID userId, User user) {
         return userList.stream()
-                .filter(existingUser -> existingUser.getId().equals(id))
+                .filter(existingUser -> existingUser.getId().equals(userId))
                 .findFirst()
                 .map(existingUser -> {
                     if (user.getUserEmail() != null) {
@@ -63,11 +57,11 @@ public class JCFUserService implements UserService {
                     }
                     return existingUser;
                 })
-                .orElseThrow(() -> new IllegalArgumentException("사용자 아이디를 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다: " + userId));
     }
 
     @Override
-    public void delete(UUID id) {
-        userList.removeIf(user -> user.getId().equals(id));
+    public void deleteUser(UUID userId) {
+        userList.removeIf(user -> user.getId().equals(userId));
     }
 }

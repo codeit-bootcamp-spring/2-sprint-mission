@@ -2,53 +2,38 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Channel extends BaseEntity {
     private String channelName;
-    private List<User> users;
-    private int userCount;
+    private List<UUID> channelUser;
+    private List<UUID> channelMessage;
 
     public Channel(String channelName) {
         super();
         this.channelName = channelName;
-        this.users = new ArrayList<>();
-        this.userCount = 0;
+        this.channelUser = new ArrayList<>();
+        this.channelMessage = new ArrayList<>();
     }
 
     public String getChannelName() {
         return channelName;
     }
 
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public int getUserCount() {
-        return userCount;
-    }
-
-    public void addUser(User user) {
-        if (!users.contains(user)) {
-            users.add(user);
-            userCount++;
-            System.out.println("사용자 " + user.getUserName() + "이(가) '" + channelName + "'에 추가되었습니다.");
-        } else {
-            System.out.println("사용자 " + user.getUserName() + "은(는) 이미 '" + channelName + "'에 존재합니다.");
-        }
-    }
-
-    public void removeUser(User user) {
-        if (users.contains(user)) {
-            users.remove(user);
-            userCount--;
-            System.out.println("사용자 " + user.getUserName() + "이(가) '" + channelName + "'에서 삭제되었습니다.");
-        } else {
-            System.out.println("사용자 " + user.getUserName() + "은(는) '" + channelName + "'에 존재하지 않습니다.");
-        }
-    }
-
     public void setChannelName(String channelName) {
         this.channelName = channelName;
         update();
+    }
+
+    public List<UUID> getChannelUser() {
+        return channelUser;
+    }
+
+    public int getChannelUserCount() {
+        return channelUser.size();
+    }
+
+    public List<UUID> getChannelMessage() {
+        return channelMessage;
     }
 }
