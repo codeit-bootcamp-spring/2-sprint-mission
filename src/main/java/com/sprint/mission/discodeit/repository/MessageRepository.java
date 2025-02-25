@@ -2,9 +2,10 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
 
-import java.util.LinkedList;
+import java.util.LinkedList;import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class MessageRepository {
     private final LinkedList<Message> messages = new LinkedList<>();
@@ -31,6 +32,15 @@ public class MessageRepository {
         return messages.stream()
                 .filter((m) -> Objects.equals(messageId, m.getId()))
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("해당 messageId 를 가진 message 를 찾을 수 없습니다!!!"));
+    }
+
+    public List<Message> findMessageListByChannelId(UUID channelId) {
+        if (channelId == null) {
+            throw new IllegalArgumentException("input channelId is null!!!");
+        }
+        return messages.stream()
+                .filter((m) -> Objects.equals(channelId, m.getChannel().getId()))
+                .collect(Collectors.toList());
     }
 
     public LinkedList<Message> getMessages() {
