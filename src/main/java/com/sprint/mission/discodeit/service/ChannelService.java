@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.entity.Message;
+
 public interface ChannelService {
-    public abstract void write(String str);
-    public abstract void print();
-    public abstract void remove();
-    public abstract void update();
+    public abstract Message write(String str);
 }
