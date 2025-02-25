@@ -22,7 +22,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message readMessage(UUID messageId) {
         validateMessageId(messageId);
-        return messageRepository.findMessageById(messageId);
+        return messageRepository.findMessageByMessageId(messageId);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void updateMessageContent(UUID messageId, String content) {
         validateMessageId(messageId);
-        messageRepository.findMessageById(messageId).updateContent(content);
+        messageRepository.findMessageByMessageId(messageId).updateContent(content);
     }
 
     @Override

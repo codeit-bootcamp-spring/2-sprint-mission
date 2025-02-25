@@ -24,7 +24,7 @@ public class MessageRepository {
         messages.addFirst(newMessage);
     }
 
-    public Message findMessageById(UUID messageId) {
+    public Message findMessageByMessageId(UUID messageId) {
         if (messageId == null) {
             throw new IllegalArgumentException("null 값을 가진 messageId가 입력되었습니다!!!");
         }
