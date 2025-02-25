@@ -18,5 +18,8 @@ public interface ChannelService {
     Channel addUserToChannel(UUID channelId, UUID userId);
     void deleteUserFromChannel(UUID channelId, UUID userId);
     void deleteUserFromEveryChannel(UUID userId);
+
+    boolean isChannelMember(UUID channelId, UUID userId);
+
     void validateChannelId(UUID channelId);
 }

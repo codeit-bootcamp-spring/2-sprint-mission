@@ -27,13 +27,6 @@ public class JCFChannelService implements ChannelService {
         return instance;
     }
 
-    private UserService getUserService() {
-        if (userService == null) {
-            userService = JCFUserService.getInstance();
-        }
-        return userService;
-    }
-
     @Override
     public Channel createChannel(UUID ownerId, String title, String description) {
         getUserService().validateUserId(ownerId);
@@ -121,13 +114,8 @@ public class JCFChannelService implements ChannelService {
                 deleteUserFromChannel(channelId, userId));
     }
 
-    private boolean isOwnerOfAnyChannel(UUID userId) {
-        getUserService().validateUserId(userId);
-        return channels.values().stream()
-                .anyMatch(channel -> userId.equals(channel.getOwnerId()));
-    }
-
-    boolean isChannelMember(UUID channelId, UUID userId) {
+    @Override
+    public boolean isChannelMember(UUID channelId, UUID userId) {
         validateChannelId(channelId);
         Set<UUID> channelMembers = memberIdsByChannelId.get(channelId);
 
@@ -143,6 +131,19 @@ public class JCFChannelService implements ChannelService {
         if (!memberIdsByChannelId.containsKey(channelId)) {
             throw new ChannelNotFoundException("해당 채널 없음");
         }
+    }
+
+    private boolean isOwnerOfAnyChannel(UUID userId) {
+        getUserService().validateUserId(userId);
+        return channels.values().stream()
+                .anyMatch(channel -> userId.equals(channel.getOwnerId()));
+    }
+
+    private UserService getUserService() {
+        if (userService == null) {
+            userService = JCFUserService.getInstance();
+        }
+        return userService;
     }
 }
 

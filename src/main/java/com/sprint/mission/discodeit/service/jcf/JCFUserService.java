@@ -26,13 +26,6 @@ public class JCFUserService implements UserService {
         return instance;
     }
 
-    private ChannelService getChannelService() {
-        if (channelService == null) {
-            channelService = JCFChannelService.getInstance();
-        }
-        return channelService;
-    }
-
     @Override
     public User createUser(String nickname, String email, String avatar, String status) {
         if (hasUserByEmail(email)) {
@@ -102,5 +95,12 @@ public class JCFUserService implements UserService {
                 .filter(u -> email.equals(u.getEmail()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private ChannelService getChannelService() {
+        if (channelService == null) {
+            channelService = JCFChannelService.getInstance();
+        }
+        return channelService;
     }
 }
