@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.Factory;
 
-import com.sprint.mission.discodeit.composit.Channel;
-import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.Channel;
 
 public class CreateChannalFactory implements Factory<Channel>{
     private static int count = 0;

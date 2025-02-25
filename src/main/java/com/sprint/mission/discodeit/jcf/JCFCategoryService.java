@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.jcf;
 
-import com.sprint.mission.discodeit.composit.CategoryAndChannel;
+import com.sprint.mission.discodeit.entity.Container;
 import com.sprint.mission.discodeit.service.CategoryService;
 
 import java.util.LinkedList;
@@ -8,7 +8,7 @@ import java.util.List;
 
 public class JCFCategoryService implements CategoryService {
     private static JCFCategoryService instance;
-    public List<CategoryAndChannel> list;
+    public List<Container> list;
 
     private JCFCategoryService() {
     }
@@ -20,7 +20,7 @@ public class JCFCategoryService implements CategoryService {
         return instance;
     }
 
-    public void setList(LinkedList<CategoryAndChannel> list) {
+    public void setList(LinkedList<Container> list) {
         this.list = list;
     }
 

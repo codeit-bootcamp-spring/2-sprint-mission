@@ -1,11 +1,8 @@
-package com.sprint.mission.discodeit.composit;
+package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.Message;
-
-import java.util.LinkedList;
 import java.util.List;
 
-public class Channel extends CategoryAndChannel {
+public class Channel extends Container {
     private List<Message> messageList;
     public Channel(String name) {
         super(name);

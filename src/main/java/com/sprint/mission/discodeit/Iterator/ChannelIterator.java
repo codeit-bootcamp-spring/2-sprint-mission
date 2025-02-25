@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.Iterator;
 
-import com.sprint.mission.discodeit.composit.CategoryAndChannel;
+import com.sprint.mission.discodeit.entity.Container;
 
 public class ChannelIterator implements Iterator {
-    private CategoryAndChannel channel;
-    private CategoryAndChannel category;
+    private Container channel;
+    private Container category;
 
-    public ChannelIterator(CategoryAndChannel category) {
+    public ChannelIterator(Container category) {
         this.category = category;
     }
 

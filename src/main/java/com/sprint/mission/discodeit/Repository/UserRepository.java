@@ -1,10 +1,12 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.Repository;
+
+import com.sprint.mission.discodeit.entity.Server;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class UserRepository {
-    public List<Server> severList;
+    private final List<Server> severList;
 
     public UserRepository() {
         this.severList = new LinkedList<>();
