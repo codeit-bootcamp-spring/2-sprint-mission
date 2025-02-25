@@ -98,7 +98,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message getMessageById(UUID messageId) {
+    public Message getMessageByMessageId(UUID messageId) {
         return messages.get(messageId);
     }
 
