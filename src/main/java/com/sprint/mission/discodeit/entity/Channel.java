@@ -1,26 +1,24 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class Channel extends BaseEntity {
-    private UUID owner;
+    private UUID ownerId;
     private String title;
     private String description;
 
-    public Channel(UUID owner, String title, String description) {
+    public Channel(UUID ownerId, String title, String description) {
         super();
-        setOwner(owner);
+        setOwnerId(ownerId);
         setTitle(title);
         setDescription(description);
     }
 
-    private void setOwner(UUID owner) {
-        if (owner == null) {
+    private void setOwnerId(UUID ownerId) {
+        if (ownerId == null) {
             throw new IllegalArgumentException("유효하지 않은 오너입니다.");
         }
-        this.owner = owner;
+        this.ownerId = ownerId;
     }
 
     private void setTitle(String title) {
@@ -37,8 +35,8 @@ public class Channel extends BaseEntity {
         this.description = description;
     }
 
-    public UUID getOwner() {
-        return owner;
+    public UUID getOwnerId() {
+        return ownerId;
     }
 
     public String getTitle() {
@@ -49,8 +47,8 @@ public class Channel extends BaseEntity {
         return description;
     }
 
-    public void update(UUID owner, String title, String description) {
-        if (owner != null) setOwner(owner);
+    public void update(UUID ownerId, String title, String description) {
+        if (ownerId != null) setOwnerId(ownerId);
         if (title != null) setTitle(title);
         if (description != null) setDescription(description);
 
@@ -62,7 +60,7 @@ public class Channel extends BaseEntity {
         return "Channel{" +
                 "title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", owner=" + owner +
+                ", ownerId=" + ownerId +
                 super.toString() +
                 '}';
     }

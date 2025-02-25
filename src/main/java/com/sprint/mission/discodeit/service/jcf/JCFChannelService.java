@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 public class JCFChannelService implements ChannelService {
     private static JCFChannelService instance;
@@ -44,7 +43,7 @@ public class JCFChannelService implements ChannelService {
         Channel channel = channels.get(channelId);
         if (channel == null) return null;
 
-        return channel.getOwner();
+        return channel.getOwnerId();
     }
 
     @Override
