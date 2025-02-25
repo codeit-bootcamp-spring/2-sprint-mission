@@ -95,24 +95,40 @@ public class JCFMessageService implements MessageService {
     // 해당 채널의 메시지 전체 조회
     @Override
     public List<Message> getAllMessagesByChannel(String channelName) {
+        if(channelName == null) {
+            throw new IllegalArgumentException("검색에 필요한 정보가 충분하지 않습니다. (채널명 필요)");
+        }
         List<Message> findMessages = getAllMessages();
+
         return findMessages.stream().filter(m -> m.getChannel().getChannelName().equals(channelName))
                 .collect(Collectors.toList());
     }
 
     // 해당 채널의 해당 유저의 메시지만 검색
     @Override
-    public List<Message> searchMessageByChannelAndUser(String username, String channelName) {
-        List<Message> messages = getAllMessages();
+    public List<Message> searchMessageByChannelAndUser(String channelName, String username) {
+        if(username == null) {
+            throw new IllegalArgumentException("검색에 필요한 정보가 충분하지 않습니다. (유저이메일 필요)");
+        }
+        List<Message> messages = getAllMessagesByChannel(channelName);
+
         return messages.stream()
-                .filter(m -> m.getChannel().getChannelName().equals(channelName) && m.getSender().getUsername().equals(username))
+                .filter(m -> m.getSender().getUsername().equals(username))
                 .collect(Collectors.toList());
     }
 
     // 해당 채널의 메시지를 포함 내용으로 검색
     @Override
     public List<Message> searchMessagesContaining(String channelName, String content) {
-        List<Message> messages = getAllMessages();
+
+        // 이 메소드에서 channelName에 대한 예외처리를 해주므로, 따로 필요하지 않음
+        List<Message> messages = getAllMessagesByChannel(channelName);
+
+        // content가 null이나 빈칸일 경우 그냥 채널 메시지의 전체 리스트 반환 (검색어가 없으므로)
+        if(content == null || content.isBlank()) {
+            return messages;
+        }
+
         return messages.stream()
                 .filter(m -> m.getContent().contains(content))
                 .collect(Collectors.toList());
