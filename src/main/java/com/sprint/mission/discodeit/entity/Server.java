@@ -40,8 +40,10 @@ public class Server extends BaseEntity{
         for (CategoryAndChannel item : list) {
             if (item.getName() == targetName) {
                 baseCategory.removeChannel(item);
+                return;
             }
         }
+        System.out.println("채널 삭제 실패");
     }
 
 }

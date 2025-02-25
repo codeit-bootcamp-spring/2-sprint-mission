@@ -68,19 +68,37 @@ public class User extends BaseEntity {
         System.out.println(i + " : " + severList.get(i-1).getName());
     }
 
-    public void removeServer(String target) {
+    public void removeServer(String targetName) {
         if (severList.size() < 2) {
             System.out.println("서버는 반드시 1개 이상 필요합니다.");
             return;
         }
         for (Server server : severList) {
-            if (server.getName() == target) {
+            if (server.getName() == targetName) {
                 severList.remove(server);
                 System.out.println("서버 삭제 성공");
                 return;
             }
         }
         System.out.println("서버 삭제에 실패했습니다.");
+    }
+
+    public void removeChannel(String targetName) {
+        head.remove(targetName);
+    }
+
+    public void updateServer(String targetName, String replaceName) {
+        for (Server server : severList) {
+            if (server.getName() == targetName) {
+                server.setName(replaceName);
+                return;
+            }
+        }
+        System.out.println("업데이트할 서버가 존재하지 않습니다.");
+    }
+
+    public void updateChannel(String targetName, String replaceName) {
+        head.update(targetName,replaceName);
     }
 
 }
