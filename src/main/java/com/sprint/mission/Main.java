@@ -1,5 +1,6 @@
 package com.sprint.mission;
 
+import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.service.UserServiceImpl;
 import com.sprint.mission.view.input.UserInput;
@@ -10,8 +11,9 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Hello world!");
 
+        UserRepository userRepository = new UserRepository();
         UserOutput userOutput = new UserOutput();
-        UserService userService = new UserServiceImpl(userOutput);
+        UserService userService = new UserServiceImpl(userRepository, userOutput);
         UserInput userInput = new UserInput(userService);
 
         Scanner scanner = new Scanner(System.in);
