@@ -1,20 +1,30 @@
 package com.sprint.mission.discodeit.entity;
 
 public class Channel extends BaseEntity {
-    private String channelName;
+    private String name;
 
-    public Channel(String channelName) {
-        super();  // BaseEntity 클래스의 생성자 호출 -> id, createdAt 초기화
-        this.channelName = channelName;
+    public Channel(String name) {
+        super();
+        this.name = name;
     }
 
-    public String getChannelName() {
-        return channelName;
+    public String getName() {
+        return name;
     }
 
     // 업데이트 메서드 (채널명 변경)
-    public void update(String channelName) {
-        this.channelName = channelName;
+    public void update(String name) {
+        this.name = name;
         this.updatedAt = System.currentTimeMillis();  // 수정 시간 업데이트
+    }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }

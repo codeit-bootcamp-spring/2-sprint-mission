@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class Message extends BaseEntity {
-    private UUID userId;  // 메시지를 작성한 사용자 ID (어떤 사용자가 작성했는지)
-    private UUID channelId;  // 메세지가 속한 채널 ID (어떤 채널에서 작성되었는지)
+    private final UUID userId;
+    private final UUID channelId;
     private String text;
 
 
@@ -31,5 +31,17 @@ public class Message extends BaseEntity {
     public void updateText(String newText) {
         this.text = newText;
         this.updatedAt = System.currentTimeMillis();  // 수정 시간 업데이트
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "userId=" + userId +
+                ", channelId=" + channelId +
+                ", text='" + text + '\'' +
+                ", id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }

@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public abstract class BaseEntity {
-    protected UUID id;  // 식별 ID
-    protected long createdAt;  // 생성 시간
+    protected final UUID id;  // 식별 ID
+    protected final long createdAt;  // 생성 시간
     protected long updatedAt;  // 수정 시간
 
     // 생성자: id, createdAt, updatedAt 초기화
