@@ -1,66 +1,86 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.Factory.CreateServerFactory;
+import com.sprint.mission.discodeit.Factory.Factory;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
 
-public class User {
-    private static int count;
-    private final SimpleDateFormat dayTime = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
-
-    public final Long createdAt;
-    public  Long updatedAt;
-    private final String id;
-
-    private String name;
+public class User extends BaseEntity {
+    private Server head = null;
     private String password;
-    private UserStatus userStatus;
+    private List<Server> severList;
 
-//    나중에 추가할 기능
-//    private String email;
-//    private String birthday;
-
-    public User(String name, String password) {
-        this.id = "U" + count++;
-        this.name = name;
+    public User(String id, String name, String password) {
+        super(id, name);
         this.password = password;
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-        this.userStatus = UserStatus.ONLINE;
+        severList = new LinkedList<>();
     }
 
-    public String getId() {
-        return id;
+    public void currentHead() {
+        System.out.println(head.getName());
     }
 
-    public String getName() {
-        return name;
+    public void createServer(String name) {
+        Factory serverFactory = CreateServerFactory.getInstance();
+        Server server = serverFactory.create(name);
+        severList.add(server);
+        head = server;
+        System.out.println("서버 생성 성공");
     }
 
-    public Long getCreatedAt() {
-        System.out.println("생성 시각: " + dayTime.format(new Date(createdAt)));
-        return createdAt;
+    public void createChannel(String name) {
+        if (head == null) {
+            System.out.println("서버를 하나 이상 만드세요.");
+        } else {
+            head.addChannel(name);
+            System.out.println("채널 생성 성공");
+        }
     }
 
-    public Long getUpdatedAt() {
-        System.out.println("수정 시각: " + dayTime.format(new Date(updatedAt)));
-        return updatedAt;
+    public void printServer() {
+        System.out.println("=================================================");
+        for (int i = 0; i < severList.size(); i++) {
+            System.out.println(i + 1 + " : " + severList.get(i).getName());
+        }
+        System.out.println("=================================================\n");
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void printChannel() {
+        head.print();
     }
 
-    public void update() {
-        this.updatedAt = System.currentTimeMillis();
+    public void replaceHead() {
+        if (severList.size() < 2) {
+            System.out.println("서버는 반드시 1개 이상 필요합니다.");
+            return;
+        }
+        System.out.println("====서버 목록====");
+        printServer();
+        System.out.print("바라볼 서버의 인덱스를 입력하시오. : ");
+        Scanner sc = new Scanner(System.in);
+        int i = sc.nextInt();
+        sc.nextLine();
+        head = severList.get(i-1);
+        System.out.println(i + " : " + severList.get(i-1).getName());
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "\ncreatedAt=" + dayTime.format(new Date(createdAt)) +
-                ",\nupdatedAt=" + dayTime.format(new Date(updatedAt)) +
-                ",\nid='" + id + '\'' +
-                ",\nname='" + name + '\'' +
-                '}';
+    public void removeServer(String target) {
+        if (severList.size() < 2) {
+            System.out.println("서버는 반드시 1개 이상 필요합니다.");
+            return;
+        }
+        for (Server server : severList) {
+            if (server.getName() == target) {
+                severList.remove(server);
+                System.out.println("서버 삭제 성공");
+                return;
+            }
+        }
+        System.out.println("서버 삭제에 실패했습니다.");
     }
+
 }
