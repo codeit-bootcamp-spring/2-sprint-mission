@@ -23,7 +23,7 @@ public class User extends BaseEntity{
     }
 
     private void setEmail(String email) {
-        if (email == null || email.isEmpty() || !email.contains("@")) {
+        if (email == null || !email.contains("@")) {
             throw new IllegalArgumentException("유효하지 않은 이메일입니다.");
         }
         this.email = email;
