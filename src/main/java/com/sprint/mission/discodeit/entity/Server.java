@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 
-import com.sprint.mission.discodeit.entity.Repository.ServerRepository;
+import com.sprint.mission.discodeit.Repository.ServerRepository;
 
 public class Server extends BaseEntity{
     private ServerRepository serverRepository;

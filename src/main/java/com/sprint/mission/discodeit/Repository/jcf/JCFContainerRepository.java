@@ -1,9 +1,9 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Repository.ServerRepository;
+import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.entity.Container.Container;
 import com.sprint.mission.discodeit.entity.Server;
-import com.sprint.mission.discodeit.service.RepositoryService;
+import com.sprint.mission.discodeit.Repository.RepositoryService;
 
 import java.util.List;
 import java.util.Scanner;

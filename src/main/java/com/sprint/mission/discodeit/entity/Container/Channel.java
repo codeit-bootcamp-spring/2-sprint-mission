@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity.Container;
 
-import com.sprint.mission.discodeit.entity.Repository.ChannelRepository;
+import com.sprint.mission.discodeit.Repository.ChannelRepository;
 
 public class Channel extends Container {
     private final ChannelRepository channelRepository;

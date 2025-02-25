@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.Repository.UserRepository;
+import com.sprint.mission.discodeit.Repository.UserRepository;
 
 
 public class User extends BaseEntity {
