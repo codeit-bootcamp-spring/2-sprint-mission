@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> data;
@@ -28,7 +25,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public List<Channel> readAllChannels() {
-        return List.of();
+        return new ArrayList<>(data.values());
     }
 
     @Override
