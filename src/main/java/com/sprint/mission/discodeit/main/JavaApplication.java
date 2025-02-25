@@ -22,25 +22,27 @@ public class JavaApplication {
         // 유저 등록 테스트
         System.out.println("=========== 유저 생성 및 유저 리스트 조회 테스트 ===========");
         System.out.println("=========== 예상 결과: 유저 7명 나옴 ===========");
-        User user1 = null;
-        User user2 = null;
-        User user3 = null;
-        User user4 = null;
-        User user5 = null;
-        User user6 = null;
-        User user7 = null;
-        User user8 = null; // 실패할 것
+
+
+        User user1 = userService.createUser("Han", "Han@gmail.com", "", "hello I'm sam");
+        User user2 = userService.createUser("Kim", "Kim@gmail.com", "dog pic", "I like dogs");
+        User user3 = userService.createUser("Nick", "Nick@ggg.io", "cat pic", "I love cats");
+        User user4 = userService.createUser("Jack", "Jack@harlow.co", "", "");
+        User user5 = userService.createUser("Jamie", "Jamie@naver.com", "korean flag", "I am Korean");
+        User user6 = userService.createUser("Mr.delete", "delete@naver.com", "XXXXX", "I am gonna be deleted soon");
+        User user7 = userService.createUser("Oreo", "delete2@naver.com", "", "");
+
+        System.out.println("=========== 바로 아래에 중복된 이메일 나와야 함 ===========");
         try {
-            user1 = userService.createUser("Han", "Han@gmail.com", "", "hello I'm sam");
-            user2 = userService.createUser("Kim", "Kim@gmail.com", "dog pic", "I like dogs");
-            user3 = userService.createUser("Nick", "Nick@ggg.io", "cat pic", "I love cats");
-            user4 = userService.createUser("Jack", "Jack@harlow.co", "", "");
-            user5 = userService.createUser("Jamie", "Jamie@naver.com", "korean flag", "I am Korean");
-            user6 = userService.createUser("Mr.delete", "delete@naver.com", "XXXXX", "I am gonna be deleted soon");
-            user7 = userService.createUser("Oreo", "delete2@naver.com", "", "");
-            System.out.println("=========== 바로 아래에 중복된 이메일 떠야 함 ===========");
-            user8 = userService.createUser("나오지 마", "Jamie@naver.com", "korean", "I am Korean"); // 이메일 중복이므로 생성 안 하고 null 반환
-        } catch (DuplicatedUserException | IllegalArgumentException e) {
+            User user8 = userService.createUser("나오지 마", "Jamie@naver.com", "korean", "I am Korean"); // 이메일 중복이므로 생성 안 하고 null 반환
+        } catch (DuplicatedUserException e) {
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println("=========== 바로 아래에 '유효하지 않은 이메일' 나와야 함 ===========");
+        try {
+            User user9 = userService.createUser("나오면 안 됨", "잘못된 이메일","","");
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
 
@@ -54,6 +56,7 @@ public class JavaApplication {
         System.out.println(userService.getUserByEmail(user2.getEmail()));
         System.out.println("=========== id로 조회: 'Han' ===========");
         System.out.println(userService.getUserByUserId(user1.getId()));
+
         System.out.println("=========== 특정 유저 get 테스트 끝 ===========");
         System.out.println();
 
