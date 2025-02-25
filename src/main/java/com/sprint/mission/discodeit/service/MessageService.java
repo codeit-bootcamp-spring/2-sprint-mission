@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.entity.Message;
+
 public interface MessageService {
-    public void add(String str);
-    public void print();
-    public void remove();
-    public void updateMessage();
+    public Message add(String str);
+
 }

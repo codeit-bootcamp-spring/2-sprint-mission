@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 
 public class JCFChannelService extends CategoryAndChannel {
+    JCFMessageService instance = JCFMessageService.getInstance();
     private LinkedList<Message> messageList;
 
     public JCFChannelService(String id, String name) {
@@ -18,7 +19,7 @@ public class JCFChannelService extends CategoryAndChannel {
 
     @Override
     public void add(String str) {
-        Message message = new Message("M" + messageList.size(), "M" + messageList.size(),str);
+        Message message = instance.add(str);
         messageList.add(message);
     }
 

@@ -1,25 +1,26 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 
 public class JCFMessageService implements MessageService {
-    @Override
-    public void add(String str) {
+    private static int count = 0;
+    private static JCFMessageService instance;
 
+    private JCFMessageService() {
+    }
+
+    public static JCFMessageService getInstance() {
+        if (instance == null) {
+            instance = new JCFMessageService();
+        }
+        return instance;
     }
 
     @Override
-    public void print() {
-
-    }
-
-    @Override
-    public void remove() {
-
-    }
-
-    @Override
-    public void updateMessage() {
-
+    public Message add(String str) {
+        Message message = new Message("M" + count, "M" + count, str);
+        count++;
+        return message;
     }
 }
