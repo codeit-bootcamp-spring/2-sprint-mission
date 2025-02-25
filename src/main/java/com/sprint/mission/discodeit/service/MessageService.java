@@ -3,6 +3,6 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.entity.Message;
 
 public interface MessageService {
-    public Message add(String str);
+    public Message write(String str);
 
 }

@@ -1,20 +1,16 @@
 package com.sprint.mission.discodeit.entity.Container;
 
-import com.sprint.mission.discodeit.entity.Message;
-
-import java.util.List;
+import com.sprint.mission.discodeit.entity.Repository.ChannelRepository;
 
 public class Channel extends Container {
-    private List<Message> messageList;
+    private final ChannelRepository channelRepository;
+
     public Channel(String name) {
         super(name);
+        channelRepository = new ChannelRepository();
     }
 
-    public void setMessageList(List<Message> messageList) {
-        this.messageList = messageList;
-    }
-
-    public List<Message> getMessageList() {
-        return messageList;
+    public ChannelRepository getChannelRepository() {
+        return channelRepository;
     }
 }

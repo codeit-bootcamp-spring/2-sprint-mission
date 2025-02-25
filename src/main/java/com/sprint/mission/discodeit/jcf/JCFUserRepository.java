@@ -24,8 +24,7 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
     @Override
     public List<Server> repository(User user) {
         UserRepository userRepository = user.getUserRepository();
-        List<Server> severList = userRepository.getSeverList();
-        return severList;
+        return userRepository.getSeverList();
     }
 
     @Override
@@ -47,14 +46,14 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
         System.out.print("삭제할 서버의 이름을 입력하시오. : ");
         String s = sc.nextLine();
         sc.close();
-        for (Server server : list) {
-            if (server.getName() == s) {
-                list.remove(server);
+        for (Server data : list) {
+            if (data.getName().equals(s)) {
+                list.remove(data);
                 System.out.println("\n서버 삭제 성공");
                 return;
             }
         }
-        System.out.println("삭제할 서버의 이름이 존재하지 않습니다.");
+        System.out.println("해당 서버가 존재하지 않습니다.");
     }
 
     @Override
@@ -64,8 +63,8 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
             return null;
         }
 
-        for (Server server : list) {
-            System.out.println(server.getName());
+        for (Server data : list) {
+            System.out.println(data.getName());
         }
 
         return list;
@@ -78,17 +77,17 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
         Scanner sc = new Scanner(System.in);
         System.out.print("업데이트할 서버의 이름을 입력하시오. : ");
         String s = sc.nextLine();
-        for (Server server : severList) {
-            if (server.getName() == s) {
+        for (Server data : severList) {
+            if (data.getName().equals(s)) {
                 System.out.print("\n바꿀 이름을 입력하시오. : ");
                 String b = sc.nextLine();
-                server.setName(b);
+                data.setName(b);
                 System.out.println("서버 업데이트 성공");
                 return;
             }
         }
         sc.close();
-        System.out.println("해당 서버의 이름이 존재하지 않습니다.");
+        System.out.println("해당 서버가 존재하지 않습니다.");
     }
 
     @Override

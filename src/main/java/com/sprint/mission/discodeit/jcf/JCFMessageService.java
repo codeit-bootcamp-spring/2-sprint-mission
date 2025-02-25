@@ -17,7 +17,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message add(String str) {
+    public Message write(String str) {
         String s = String.valueOf(str.hashCode());
         Message message = new Message(s, str);
         return message;

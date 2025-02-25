@@ -24,8 +24,7 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
     @Override
     public List<Container> repository(Server server) {
         ServerRepository serverRepository = server.getServerRepository();
-        List<Container> containers = serverRepository.getContainers();
-        return containers;
+        return serverRepository.getContainers();
     }
 
     @Override
@@ -47,14 +46,14 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
         System.out.print("삭제할 컨테이너의 이름을 입력하시오. : ");
         String s = sc.nextLine();
         sc.close();
-        for (Container container : list) {
-            if (container.getName() == s) {
-                list.remove(container);
+        for (Container data : list) {
+            if (data.getName().equals(s)) {
+                list.remove(data);
                 System.out.println("\n컨테이너 삭제 성공");
                 return;
             }
         }
-        System.out.println("삭제할 컨테이너의 이름이 존재하지 않습니다.");
+        System.out.println("해당 컨테이너가 존재하지 않습니다.");
     }
 
     @Override
@@ -64,8 +63,8 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
             return null;
         }
 
-        for (Container container : list) {
-            System.out.println(container.getName());
+        for (Container data : list) {
+            System.out.println(data.getName());
         }
 
         return list;
@@ -78,17 +77,17 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
         Scanner sc = new Scanner(System.in);
         System.out.print("업데이트할 컨테이너의 이름을 입력하시오. : ");
         String s = sc.nextLine();
-        for (Container container : list) {
-            if (container.getName() == s) {
+        for (Container data : list) {
+            if (data.getName().equals(s)) {
                 System.out.print("\n바꿀 이름을 입력하시오. : ");
                 String b = sc.nextLine();
-                container.setName(b);
+                data.setName(b);
                 System.out.println("컨테이너 업데이트 성공");
                 return;
             }
         }
         sc.close();
-        System.out.println("해당 서버의 이름이 존재하지 않습니다.");
+        System.out.println("해당 서버가 존재하지 않습니다.");
     }
 
     @Override
