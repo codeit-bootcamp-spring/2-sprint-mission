@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class JCFUserService extends User implements UserService {
-    private Server head = null;
-    private List<Server> severList;
+    private JCFServerService head = null;
+    private List<JCFServerService> severList;
 
     public JCFUserService(String id, String name, String password) {
         super(id, name, password);
@@ -25,7 +25,7 @@ public class JCFUserService extends User implements UserService {
 
     public void createServer(String name) {
         Factory serverFactory = CreateServerFactory.getInstance();
-        Server server = serverFactory.create(name);
+        JCFServerService server = serverFactory.create(name);
         severList.add(server);
         head = server;
         System.out.println("서버 생성 성공");

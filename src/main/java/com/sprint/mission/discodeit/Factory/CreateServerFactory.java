@@ -20,7 +20,7 @@ public class CreateServerFactory implements Factory{
     }
 
     @Override
-    public Server create(String str) {
+    public JCFServerService create(String str) {
         return new JCFServerService("S"+count++,str);
     }
 }

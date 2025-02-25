@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.composit.Category;
-import com.sprint.mission.discodeit.composit.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.ServerService;
 
@@ -9,7 +7,7 @@ import java.util.LinkedList;
 
 public class JCFServerService extends Server implements ServerService {
     private CategoryAndChannel baseCategory;
-    private Channel head;
+    private CategoryAndChannel head;
 
     public JCFServerService(String id, String name) {
         super(id, name);
@@ -25,7 +23,7 @@ public class JCFServerService extends Server implements ServerService {
     public void addChannel(String name) {
         //여긴 추상클래스로 만든 뒤, 구체 클래스에서 static count해서 값을 매긴 뒤 넘길 예정
         String test = "Test";
-        baseCategory.add(new Channel(test, name));
+        baseCategory.add(new JCFChannelService(test, name));
     }
 
     public void update(String targetName, String replaceName) {

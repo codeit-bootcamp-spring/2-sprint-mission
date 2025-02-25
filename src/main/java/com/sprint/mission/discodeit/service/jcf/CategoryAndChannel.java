@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.Iterator.ChannelIterator;
 import com.sprint.mission.discodeit.Iterator.Iterator;
-import com.sprint.mission.discodeit.composit.Category;
 import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.service.CategoryAndChannelService;
 

@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Iterator.Iterator;
 import com.sprint.mission.discodeit.composit.Category;
-import com.sprint.mission.discodeit.composit.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.CategoryAndChannelService;
 
 import java.util.LinkedList;
 import java.util.Scanner;

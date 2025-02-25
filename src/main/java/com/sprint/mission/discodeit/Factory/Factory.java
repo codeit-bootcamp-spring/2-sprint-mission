@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.Factory;
 
 import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.service.jcf.JCFServerService;
 
 public interface Factory {
-    Server create(String str);
+    JCFServerService create(String str);
 }
