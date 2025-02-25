@@ -7,18 +7,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class JCFUserservice implements UserService {
+public class JCFUserService implements UserService {
     private Map<UUID, User> data;
-    private static JCFUserservice instance = null;
+    private static JCFUserService instance = null;
 
-    public static JCFUserservice getInstance() {
+    public static JCFUserService getInstance() {
         if (instance == null) {
-            instance = new JCFUserservice();
+            instance = new JCFUserService();
         }
         return instance;
     }
 
-    private JCFUserservice() {
+    private JCFUserService() {
         this.data = new HashMap<>();
     }
 
@@ -71,5 +71,8 @@ public class JCFUserservice implements UserService {
         data.remove(id);
         System.out.println(id + " 사용자 삭제 완료되었습니다.");
 
+    }
+    public boolean existUser(UUID id){
+        return data.containsKey(id);
     }
 }

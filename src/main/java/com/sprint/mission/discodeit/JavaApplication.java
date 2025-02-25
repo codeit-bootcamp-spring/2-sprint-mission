@@ -2,15 +2,15 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserservice;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        JCFUserservice userservice = JCFUserservice.getInstance();
+        JCFUserService userservice = JCFUserService.getInstance();
         JCFChannelService channelservice = JCFChannelService.getInstance();
-        JCFMessageService messageservice = JCFMessageService.getInstance();
+        JCFMessageService messageservice = JCFMessageService.getInstance(userservice,channelservice);
 
         // user 등록
         UUID user1 = userservice.createUser();
@@ -48,8 +48,8 @@ public class JavaApplication {
 
 
         //Message 등록
-        UUID message1 = messageservice.createMessage();
-        UUID message2 = messageservice.createMessage();
+        UUID message1 = messageservice.createMessage(user2,channel1);
+        UUID message2 = messageservice.createMessage(user2,channel2);
         //message 전체 조회
         messageservice.searchAllMessages();
         //특정 channel 조회

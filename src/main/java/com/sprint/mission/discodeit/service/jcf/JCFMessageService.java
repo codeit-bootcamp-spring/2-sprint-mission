@@ -8,24 +8,37 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
+    private static JCFMessageService instance;
     Map<UUID, Message> data;
-    private static JCFMessageService instance = new JCFMessageService();
 
-    public static JCFMessageService getInstance() {
+    private JCFUserService userservice;
+    private JCFChannelService channelservice;
+
+    public static JCFMessageService getInstance(JCFUserService userService, JCFChannelService channelService) {
         if (instance == null) {
-            instance = new JCFMessageService();
+            instance = new JCFMessageService(userService,channelService);
         }
         return instance;
     }
 
-    private JCFMessageService() {
+    private JCFMessageService(JCFUserService userservice, JCFChannelService channelservice) {
+        this.userservice = userservice;
+        this.channelservice = channelservice;
         data = new HashMap<>();
     }
 
 
     @Override
-    public UUID createMessage() {
-        Message message = new Message();
+    public UUID createMessage(UUID userId, UUID channelId) {
+        if (!userservice.existUser(userId)) {
+            System.out.println("존재하지 않는 사용자 입니다. 메세지를 생성할 수 없습니다.");
+            return null;
+        }
+        if(!channelservice.existChannel(channelId)) {
+            System.out.println("존재하지 않는 채널 입니다. 메세지를 생성할 수 없습니다.");
+            return null;
+        }
+        Message message = new Message(userId,channelId);
         data.put(message.getId(), message);
         System.out.println("메세지가 생성되었습니다: \n" + message);
         return message.getId();

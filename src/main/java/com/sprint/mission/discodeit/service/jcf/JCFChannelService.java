@@ -72,4 +72,7 @@ public class JCFChannelService implements ChannelService {
         System.out.println(id + " 채널 삭제 완료되었습니다.");
 
     }
+    public boolean existChannel(UUID id) {
+        return data.containsKey(id);
+    }
 }
