@@ -27,10 +27,17 @@ public class Main {
         Message retrievedMessage = messageService.readMessage(message.getId());
         System.out.println("Retrieved message: " + retrievedMessage.getMessage());
 
-        message.update("Updated: Hello, Sprint!");
-        messageService.updateMessage(message.getId(), message);
-        retrievedMessage = messageService.readMessage(message.getId());
-        System.out.println("Updated message: " + retrievedMessage.getMessage());
+        message.update("Hello, Sprint!");
+        Message updatedMessage = messageService.updateMessage(message.getId(), message);
+        if (updatedMessage != null) {
+            System.out.println("Message updated successfully: " + updatedMessage.getMessage());
+
+            retrievedMessage = messageService.readMessage(message.getId());
+            System.out.println("Retrieved updated message: " + retrievedMessage.getMessage());
+        } else {
+            System.out.println("Failed to update message. Message not found.");
+        }
+
 
         List<Message> allMessages = messageService.readAllMessages();
         System.out.println("All messages:");
