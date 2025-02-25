@@ -14,11 +14,12 @@ public interface ChannelService {
     List<Channel> getAllChannels(); //모든 채널 조회
 
     void updateChannelName(Channel channel, String newChannelName); //채널 이름 변경
-    void addUserToChannel(Channel channel, String userName); //유저 추가
+    void addUserToChannel(Channel channel, User mamber); //유저 추가
     void addMessageToChannel(Channel channel, Message message);   //메세지 추가
 
 
-    void removeUserFromChannel(Channel channel, String userName); //유저 삭제
+    void removeChannel(Channel channel); //채널 삭제
+    void removeUserFromChannel(Channel channel, User mamber); //유저 삭제
     void removeMessageFromChannel(Channel channel, Message message); //메세지 삭제
 
     void validateChannelExists(String channelName); // 채널 존재 확인
