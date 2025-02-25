@@ -31,7 +31,7 @@ public class UserInput {
 
     public void updateInput() {
 
-        System.out.print("이메일 입력해주세요: ");
+        System.out.print("사용 중이신 이메일을 입력해주세요(이메일은 변경이 불가능 합니다): ");
         String email = scanner.nextLine().trim();
 
         System.out.print("변경 할 이름을 입력해주세요: ");
