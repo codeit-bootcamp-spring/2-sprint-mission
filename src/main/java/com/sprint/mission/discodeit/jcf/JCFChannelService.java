@@ -4,17 +4,11 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
     private final Map<String, Channel> channels = new HashMap<String, Channel>();
-    UserService userService;
-
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
 
     @Override
     public void createChannel(String channelName) {
@@ -46,43 +40,38 @@ public class JCFChannelService implements ChannelService {
             throw new IllegalArgumentException("이미 존재하는 채널명입니다.");
         }
 
-        channels.remove(channel.getChannelName());
-        channel.updateChannelName(newChannelName);
-
         String oldChannelName = channel.getChannelName();
-        for (User user : userService.getAllUsers()) {
-            if (user.isJoinedChannel(oldChannelName)) {
-                user.removeJoinedChannel(oldChannelName);
-                user.updateJoinedChannel(newChannelName);
-            }
-        }
+        channel.updateChannelName(newChannelName);
+        channels.put(newChannelName, channels.remove(oldChannelName));
 
-        channels.put(newChannelName, channel);
+        for (User user : channel.getMembers()) {
+            user.removeJoinedChannel(oldChannelName);
+            user.addJoinedChannel(newChannelName);
+        }
     }
 
     @Override
-    public void addUserToChannel(Channel channel, String userName) {
-        if(channel.isUserInChannel(userName)){
+    public void addUserToChannel(Channel channel, User member) {
+        if(channel.isUserInChannel(member)){
             throw new IllegalArgumentException("이미 가입되어 있는 유저입니다.");
         }
-        channel.updateMembers(userName);
-        userService.addChannel(userService.getUser(userName), channel.getChannelName());
+        channel.addMembers(member);
+        member.addJoinedChannel(channel.getChannelName());
         channels.put(channel.getChannelName(), channel);
-
     }
 
     @Override
     public void addMessageToChannel(Channel channel, Message message) {
-        channel.updateMessages(message);
+        channel.addMessages(message);
         channels.put(channel.getChannelName(), channel);
     }
 
     @Override
-    public void removeUserFromChannel(Channel channel, String userName) {
-        if(!channel.isUserInChannel(userName)){
+    public void removeUserFromChannel(Channel channel, User member) {
+        if(!channel.isUserInChannel(member)){
             throw new IllegalArgumentException("가입되어 있지 않은 유저입니다.");
         }
-        channel.removeMember(userName);
+        channel.removeMember(member);
         channels.put(channel.getChannelName(), channel);
     }
 
