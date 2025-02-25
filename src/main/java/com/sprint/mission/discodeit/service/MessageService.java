@@ -30,7 +30,7 @@ public interface MessageService {
     void deleteMessage(UUID id, User user);
 
     // 해당 채널의 해당 유저의 메시지만 검색
-    List<Message> searchMessageByChannelAndUser(String username, String channelName);
+    List<Message> searchMessageByChannelAndUser(String channelName, String username);
 
     // 해당 채널의 메시지를 포함 내용으로 검색
     List<Message> searchMessagesContaining(String channelName, String content);
