@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Server;
 public class CreateServerFactory implements Factory{
     private static int count = 0;
 
+    // 싱글톤 패턴 적용
     private static CreateServerFactory instance;
 
     private CreateServerFactory() {
