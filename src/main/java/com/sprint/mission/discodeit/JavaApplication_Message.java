@@ -37,7 +37,7 @@ public class JavaApplication_Message {
                 System.out.println("2. 채널 생성");
                 System.out.println("3. 메시지 보내기");
                 System.out.println("4. 모든 메시지 보기");
-                System.out.println("0. 모든 메시지 보기");
+                System.out.println("0. 종료하기");
                 System.out.print("원하시는 메뉴의 숫자를 입력하세요: ");
 
                 int choice = Integer.parseInt(scanner.nextLine());
