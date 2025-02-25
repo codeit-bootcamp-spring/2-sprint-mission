@@ -7,6 +7,4 @@ public class User extends BaseEntity {
         super(id, name);
         this.password = password;
     }
-
-
 }
