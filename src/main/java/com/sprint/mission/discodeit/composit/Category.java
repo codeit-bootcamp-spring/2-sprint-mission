@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.composit;
 
+import com.sprint.mission.discodeit.Iterator.ChannelIterator;
+import com.sprint.mission.discodeit.Iterator.Iterator;
 import com.sprint.mission.discodeit.entity.BaseEntity;
 
 import java.util.ArrayList;
@@ -10,6 +12,10 @@ public class Category extends CategoryAndChannel {
     public Category(String id, String name) {
         super(id, name);
         list = new ArrayList<>();
+    }
+
+    public ArrayList<CategoryAndChannel> getList() {
+        return list;
     }
 
     @Override
@@ -41,10 +47,16 @@ public class Category extends CategoryAndChannel {
     }
 
     @Override
-    public void printChannels() {
-        for (CategoryAndChannel item : list) {
+    public void printCurrentCategoryAndChannel() {
+        System.out.println("==================================");
+        for (CategoryAndChannel item : list){
             System.out.println(item.getName());
         }
+        System.out.println("==================================");
     }
 
+    @Override
+    public Iterator iterator() {
+        return new ChannelIterator(this);
+    }
 }

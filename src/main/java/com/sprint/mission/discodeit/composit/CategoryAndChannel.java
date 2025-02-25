@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.composit;
 
+import com.sprint.mission.discodeit.Iterator.Iterator;
 import com.sprint.mission.discodeit.entity.BaseEntity;
 
 public abstract class CategoryAndChannel extends BaseEntity {
@@ -13,6 +14,8 @@ public abstract class CategoryAndChannel extends BaseEntity {
 
     public abstract void updateChannel(CategoryAndChannel channel);
 
-    public abstract void printChannels();
+    public abstract void printCurrentCategoryAndChannel();
+
+    public abstract Iterator iterator();
 
 }

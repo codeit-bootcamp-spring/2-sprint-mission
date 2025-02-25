@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.composit;
 
+import com.sprint.mission.discodeit.Iterator.Iterator;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.text.SimpleDateFormat;
@@ -29,7 +30,13 @@ public class Channel extends CategoryAndChannel {
     }
 
     @Override
-    public void printChannels() {
+    public void printCurrentCategoryAndChannel() {
+
+    }
+
+    @Override
+    public Iterator iterator() {
+        return null;
     }
 
     @Override
