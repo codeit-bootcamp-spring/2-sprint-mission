@@ -32,7 +32,7 @@ public class JCFMessageService implements MessageService {
     public void updateMessage(UUID messageId, String newText) {
         Message message = data.get(messageId);
         if (message != null) {
-            message.updateText(newText);
+            message.update(newText);
         }
     }
 

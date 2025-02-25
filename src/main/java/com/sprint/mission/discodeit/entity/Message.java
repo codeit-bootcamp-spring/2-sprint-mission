@@ -28,8 +28,8 @@ public class Message extends BaseEntity {
     }
 
     // 업데이트 메서드 (메세지 내용)
-    public void updateText(String newText) {
-        this.text = newText;
+    public void update(String text) {
+        this.text = text;
         this.updatedAt = System.currentTimeMillis();  // 수정 시간 업데이트
     }
 
