@@ -93,7 +93,7 @@ public class JCFMessageService implements MessageService {
         }
 
         return messageIds.stream()
-                .map(messageId -> messages.get(messageId))
+                .map(messages::get)
                 .toList();
     }
 
