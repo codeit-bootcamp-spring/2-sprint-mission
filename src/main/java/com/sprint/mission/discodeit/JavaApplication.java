@@ -242,14 +242,19 @@ public class JavaApplication {
                                 System.out.println("2. 채널 필터");
                                 System.out.println("3. 전부");
                                 System.out.print("입력: ");
-                                switch (sc.nextLine()){
+                                switch (sc.nextLine()){ //이거 수정
                                     case "1":
                                         System.out.print("필터링할 유저 입력: ");
                                         String includesUserName = sc.nextLine();
                                         if(messageService.readUser(includesUserName) == null){
                                             System.out.println("존재하는 유저가 없습니다.");
                                         }
-                                        System.out.println(messageService.readUser(includesUserName));
+                                        messageService.readUser(includesUserName).forEach(message->{
+                                            System.out.printf("(%d)[%s]%s: %s\n",message.getUpdatedAt()
+                                                    ,message.getChannel().getChannelName()
+                                                    ,message.getUser().getUserName()
+                                                    ,message.getMessage());
+                                        });
                                         break;
                                     case "2":
                                         System.out.print("필터링할 채널 입력: ");
@@ -257,7 +262,12 @@ public class JavaApplication {
                                         if(messageService.readUser(includesChannelName) == null){
                                             System.out.println("존재하는 채널이 없습니다.");
                                         }
-                                        System.out.println(messageService.readUser(includesChannelName));
+                                        messageService.readUser(includesChannelName).forEach(message -> {
+                                            System.out.printf("(%d)[%s]%s: %s\n",message.getUpdatedAt()
+                                                                                ,message.getChannel().getChannelName()
+                                                                                ,message.getUser().getUserName()
+                                                                                ,message.getMessage());
+                                        });
                                         break;
                                     case "3":
                                         System.out.println("필터링할 유저, 채널 입력");
@@ -269,7 +279,12 @@ public class JavaApplication {
                                             System.out.println("존재하는 메세지가 없습니다.");
                                             break;
                                         }
-                                        System.out.println(messageService.readFullFilter(userName, channelName));
+                                        messageService.readFullFilter(userName, channelName).forEach(message -> {
+                                            System.out.printf("(%d)[%s]%s: %s\n",message.getUpdatedAt()
+                                                                                ,message.getChannel().getChannelName()
+                                                                                ,message.getUser().getUserName()
+                                                                                ,message.getMessage());
+                                        });
                                         break;
                                     default:
                                         System.out.println("다시 입력해 주세요");
