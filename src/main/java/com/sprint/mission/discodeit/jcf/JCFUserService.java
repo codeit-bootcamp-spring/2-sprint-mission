@@ -12,9 +12,17 @@ import java.util.Map;
 public class JCFUserService implements UserService {
     private final Map<String, User> users = new HashMap<String, User>();
     private final ChannelService channelService;
+    private static JCFUserService INSTANCE;
 
-    public JCFUserService(ChannelService channelService) {
+    private JCFUserService(ChannelService channelService) {
         this.channelService = channelService;
+    }
+
+    public static JCFUserService getInstance(ChannelService channelService) {
+        if (INSTANCE == null) {
+            INSTANCE = new JCFUserService(channelService);
+        }
+        return INSTANCE;
     }
 
     @Override
@@ -22,23 +30,17 @@ public class JCFUserService implements UserService {
         if (users.containsKey(username)) {
             throw new IllegalArgumentException("이미 존재하는 유저입니다.");
         }
-
         users.put(username, new User(username));
     }
 
     @Override
     public User getUser(String username) {
-        if (!users.containsKey(username)) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다. ");
-        }
+        validateUserExists(username);
         return users.get(username);
     }
 
     @Override
     public List<User> getAllUsers() {
-        if (users.isEmpty()) {
-            throw new IllegalArgumentException("현재 유저가 없습니다. ");
-        }
         return new ArrayList<User>(users.values());
     }
 
@@ -47,9 +49,10 @@ public class JCFUserService implements UserService {
         if (users.containsKey(newUsername)) {
             throw new IllegalArgumentException("이미 존재하는 유저명입니다.");
         }
-        users.remove(user.getUsername());
+
+        String oldUserName = user.getUsername();
         user.updateUsername(newUsername);
-        users.put(newUsername, user);
+        users.put(newUsername, users.remove(oldUserName));
     }
 
     @Override
@@ -58,8 +61,7 @@ public class JCFUserService implements UserService {
         if (user.isJoinedChannel(channel)) {
             throw new IllegalArgumentException("이미 가입되어 있는 채널입니다. ");
         }
-        user.updateJoinedChannel(channel);
-        users.put(user.getUsername(), user);
+        user.addJoinedChannel(channel);
     }
 
     @Override
@@ -72,7 +74,6 @@ public class JCFUserService implements UserService {
         channelService.validateChannelExists(channelName);
 
         user.removeJoinedChannel(channelName);
-        users.put(user.getUsername(), user);
     }
 
     public void validateUserExists(String username){

@@ -7,17 +7,23 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> messages = new HashMap<UUID, Message>();
     private final UserService userService;
     private final ChannelService channelService;
+    private static JCFMessageService INSTANCE;
 
-    public JCFMessageService(UserService userService, ChannelService channelService) {
+    private JCFMessageService(UserService userService, ChannelService channelService) {
         this.userService = userService;
         this.channelService = channelService;
+    }
+
+    public static JCFMessageService getInstance(UserService userService, ChannelService channelService){
+        if(INSTANCE == null){
+            INSTANCE = new JCFMessageService(userService, channelService);
+        }
+        return INSTANCE;
     }
 
     @Override
@@ -82,9 +88,6 @@ public class JCFMessageService implements MessageService {
         }
         Message message = messages.get(messageId);
         message.updateContent(newContent);
-
-        channelService.removeMessageFromChannel(channelService.getChannel(message.getChannel()), message);
-        messages.put(messageId, message);
     }
 
     @Override
@@ -92,6 +95,9 @@ public class JCFMessageService implements MessageService {
         if(!messages.containsKey(messageId)){
             throw new NoSuchElementException("존재하지 않는 메세지ID 입니다.");
         }
+
+        Message message = messages.get(messageId);
+        channelService.removeMessageFromChannel(channelService.getChannel(message.getChannel()), message);
         messages.remove(messageId);
     }
 }

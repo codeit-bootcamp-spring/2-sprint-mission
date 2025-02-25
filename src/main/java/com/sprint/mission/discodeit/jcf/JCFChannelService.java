@@ -10,6 +10,14 @@ import java.util.*;
 public class JCFChannelService implements ChannelService {
     private final Map<String, Channel> channels = new HashMap<String, Channel>();
 
+    private static final JCFChannelService INSTANCE = new JCFChannelService();
+
+    private JCFChannelService() { }
+
+    public static JCFChannelService getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public void createChannel(String channelName) {
         if(channels.containsKey(channelName)){
@@ -20,17 +28,12 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel getChannel(String channelName) {
-        if(!channels.containsKey(channelName)){
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
-        }
+        validateChannelExists(channelName);
         return channels.get(channelName);
     }
 
     @Override
     public List<Channel> getAllChannels() {
-        if(channels.isEmpty()){
-            throw new IllegalArgumentException("채널이 존재하지 않습니다.");
-        }
         return new ArrayList<Channel>(channels.values());
     }
 
@@ -57,31 +60,37 @@ public class JCFChannelService implements ChannelService {
         }
         channel.addMembers(member);
         member.addJoinedChannel(channel.getChannelName());
-        channels.put(channel.getChannelName(), channel);
     }
 
     @Override
     public void addMessageToChannel(Channel channel, Message message) {
         channel.addMessages(message);
-        channels.put(channel.getChannelName(), channel);
+    }
+
+    @Override
+    public void removeChannel(Channel channel) {
+        validateChannelExists(channel.getChannelName());
+        for (User user : channel.getMembers()) {
+            user.removeJoinedChannel(channel.getChannelName());
+        }
+        channels.remove(channel.getChannelName());
     }
 
     @Override
     public void removeUserFromChannel(Channel channel, User member) {
         if(!channel.isUserInChannel(member)){
-            throw new IllegalArgumentException("가입되어 있지 않은 유저입니다.");
+            throw new IllegalArgumentException("가입되지 않는 유저입니다.");
         }
+        member.removeJoinedChannel(channel.getChannelName());
         channel.removeMember(member);
-        channels.put(channel.getChannelName(), channel);
     }
 
     @Override
     public void removeMessageFromChannel(Channel channel, Message message) {
         if(!channel.isMessageInChannel(message)){
-            throw new IllegalArgumentException("존재하지 않은 메세지 입니다.");
+            throw new IllegalArgumentException("존재하지 않는 메세지 입니다.");
         }
         channel.removeMessage(message);
-        channels.put(channel.getChannelName(), channel);
     }
 
     public void validateChannelExists(String channelName){

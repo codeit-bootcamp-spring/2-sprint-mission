@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.Scanner;
 
@@ -45,9 +46,9 @@ public class JavaApplication {
 
     public static void main(String[] args) {
         // 서비스 초기화
-        JCFChannelService channelService = new JCFChannelService();
-        JCFUserService userService = new JCFUserService(channelService);
-        JCFMessageService messageService = new JCFMessageService(userService, channelService);
+        JCFChannelService channelService = JCFChannelService.getInstance();
+        JCFUserService userService = JCFUserService.getInstance(channelService);
+        JCFMessageService messageService = JCFMessageService.getInstance(userService, channelService);
 
         Scanner scanner = new Scanner(System.in);
 
