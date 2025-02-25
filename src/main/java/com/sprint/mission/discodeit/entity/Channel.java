@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Channel extends Common {
+public class Channel extends BaseEntity {
 
     // 필드 선언
     private String channelName;
@@ -30,5 +27,12 @@ public class Channel extends Common {
         this.channelName = channelName;
         this.description = description;
         super.update();
+    }
+
+    public boolean equals(Object object){
+        if (object instanceof Channel channel) {
+            return channel.getChannelName().equals(this.getChannelName());
+        }
+        return false;
     }
 }
