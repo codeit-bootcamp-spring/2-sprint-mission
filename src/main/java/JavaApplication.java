@@ -13,9 +13,9 @@ import java.util.*;
 public class JavaApplication {
     public static void main(String[] args) {
 
-        UserService userService = new JCFUserService();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService();
+        UserService userService = JCFUserService.getInstance();
+        ChannelService channelService = JCFChannelService.getInstance();
+        MessageService messageService = JCFMessageService.getInstance();
 
 
         // 1. JCFUserService 테스트

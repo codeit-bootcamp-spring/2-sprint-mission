@@ -16,9 +16,21 @@ public class JCFMessageService implements MessageService {
 
     private final List<Message> data;
 
-    public JCFMessageService() {
+    private JCFMessageService() {
         data = new ArrayList<>();
     }
+
+    // 싱글톤 패턴 적용 - 지금은 javaApplication에서만 사용되는데 굳이 적용할 필요가 있을까? -> 나중을 위해 적용해놓자.
+    // 아직까진 멀티 쓰레드 환경이 아니므로 게으른 초기화 사용
+    private static MessageService messageService;
+
+    public static MessageService getInstance() {
+        if(messageService == null) {
+            messageService = new JCFMessageService();
+        }
+        return messageService;
+    }
+
 
     // 메시지 생성
     @Override

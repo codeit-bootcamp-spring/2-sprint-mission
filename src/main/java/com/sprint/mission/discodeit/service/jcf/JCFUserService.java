@@ -13,9 +13,20 @@ public class JCFUserService implements UserService {
     private final List<User> data;
 
     // 생성자에서 data 필드 초기화
-    // 요구사항엔 이렇게 적혀있는데, 항상 빈 배열로 초기화 할거면 왜 필드가 아니라 생성자에서 초기화하라고 했을까..?
-    public JCFUserService() {
+    // 요구사항엔 이렇게 적혀있는데, 항상 빈 배열로 초기화 할거면 왜 필드가 아니라 생성자에서 초기화하라고 했을까?
+    private JCFUserService() {
         data = new ArrayList<>();
+    } // private으로 객체 생성 방지 -> 싱글톤 패턴
+
+    // 싱글톤 패턴 적용 - 지금은 javaApplication에서만 사용되는데 굳이 적용할 필요가 있을까? -> 나중을 위해 적용해놓자.
+    // 아직까진 멀티 쓰레드 환경이 아니므로 게으른 초기화 사용
+    private static UserService userService;
+
+    public static UserService getInstance() {
+        if(userService == null) {
+            userService = new JCFUserService();
+        }
+        return userService;
     }
 
     // 유저 생성

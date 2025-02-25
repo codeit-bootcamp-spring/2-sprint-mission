@@ -14,9 +14,24 @@ public class JCFChannelService implements ChannelService {
 
     private final List<Channel> data;
 
-    public JCFChannelService() {
+    private JCFChannelService() {
         data = new ArrayList<>();
     }
+
+    // 싱글톤 패턴 적용 - 지금은 javaApplication에서만 사용되는데 굳이 적용할 필요가 있을까? -> 나중을 위해 적용해놓자.
+    // 아직까진 멀티 쓰레드 환경이 아니므로 게으른 초기화 사용
+    private static ChannelService channelService;
+
+    public static ChannelService getInstance() {
+        if(channelService == null) {
+            channelService = new JCFChannelService();
+        }
+        return channelService;
+    }
+
+
+
+
 
     // 채널 생성
     @Override
