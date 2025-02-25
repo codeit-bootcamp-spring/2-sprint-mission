@@ -46,15 +46,18 @@ public class Category extends CategoryAndChannel {
     }
 
     @Override
-    public void printCurrentCategoryAndChannel() {
+    public void printCurrent() {
         for (CategoryAndChannel item : list){
             System.out.println(item.getName());
         }
     }
 
-    @Override
-    public void printAll() {
-
+    public boolean checkCategory(CategoryAndChannel item) {
+        if (item.getClass().isInstance(Category.class)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

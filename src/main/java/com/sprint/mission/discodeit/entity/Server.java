@@ -15,7 +15,7 @@ public class Server extends BaseEntity{
     }
 
     public void print() {
-        baseCategory.printCurrentCategoryAndChannel();
+        baseCategory.printCurrent();
     }
 
     public void addChannel(String name) {

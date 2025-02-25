@@ -28,7 +28,7 @@ public class Channel extends CategoryAndChannel {
     }
 
     @Override
-    public void printCurrentCategoryAndChannel() {
+    public void printCurrent() {
 
     }
 

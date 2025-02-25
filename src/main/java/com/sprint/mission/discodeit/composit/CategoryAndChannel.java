@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.composit;
 import com.sprint.mission.discodeit.Iterator.Iterator;
 import com.sprint.mission.discodeit.entity.BaseEntity;
 
+import java.util.LinkedList;
+
 public abstract class CategoryAndChannel extends BaseEntity {
     public CategoryAndChannel(String id, String name) {
         super(id, name);
@@ -14,9 +16,7 @@ public abstract class CategoryAndChannel extends BaseEntity {
 
     public abstract void updateChannel(CategoryAndChannel channel);
 
-    public abstract void printCurrentCategoryAndChannel();
-
-    public abstract void printAll();
+    public abstract void printCurrent();
 
     public abstract Iterator iterator();
 

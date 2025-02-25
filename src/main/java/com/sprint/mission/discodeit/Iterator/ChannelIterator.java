@@ -23,8 +23,8 @@ public class ChannelIterator implements Iterator {
         }
     }
 
-//    @Override
-//    public Object next() {
-//        return null;
-//    }
+    @Override
+    public Object next() {
+        return null;
+    }
 }
