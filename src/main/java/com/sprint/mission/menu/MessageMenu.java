@@ -73,8 +73,9 @@ public class MessageMenu {
                         System.out.println("완료되었습니다.\n<모든 메시지의 정보 출력>");
                         System.out.print(messageService.getAllMessages());
                     }catch (IllegalArgumentException e){
-                        System.out.println("메시지 삭제를 실패하였습니다.");
+                        System.out.println(e.getMessage());
                     }
+                    break;
                 default:
                     System.out.println("잘못된 입력입니다.");
                     break;
