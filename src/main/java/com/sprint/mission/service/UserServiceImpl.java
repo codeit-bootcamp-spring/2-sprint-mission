@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(String email, String username, String password) {
         Optional<User> byEmail = userRepository.findByEmail(email);
-        if (byEmail.isPresent() || byEmail != null) {
+        if (byEmail.isPresent()) {
             User user = byEmail.get();
             user.update(username, password);
             userOutput.updatedOutput();
@@ -48,13 +48,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void getEmailUser(String email) {
         Optional<User> byEmail = userRepository.findByEmail(email);
-        if(byEmail.isPresent()) {
-            userOutput.getEmailOutput(byEmail);
-        }else{
-            userOutput.getEmailOutput(null);
-        }
+        userOutput.getEmailOutput(Optional.ofNullable(byEmail.orElse(null)));
     }
-
 }
 
 
