@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface ChannelService {
     void create(String channelName);
     void delete(String channelName);
-    void update(String channelName);
+    void update(String oldName, String newName);
     Channel read(String channelName);
     Map<UUID, Channel> readAll();
 }

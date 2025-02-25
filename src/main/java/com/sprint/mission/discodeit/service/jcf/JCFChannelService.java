@@ -36,9 +36,9 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void update(String channelName) {       //채널명 수정
-        Channel channel = read(channelName);
-        channel.updateChannel(channelName);
+    public void update(String oldName, String newName) {       //채널명 수정
+        Channel channel = read(oldName);
+        channel.updateChannel(newName);
     }
 
     @Override

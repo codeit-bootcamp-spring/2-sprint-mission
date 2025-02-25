@@ -26,7 +26,7 @@ public class JCFMessageService implements MessageService {
          List<Message> messages = readUser(userName);
          Message deletedMessage = messages.stream()
                  .filter(m -> m.getMessage().equals(deletingMessage))
-                 .filter(m -> m.getCreatedAt().equals(timestamp))
+                 .filter(m -> m.getUpdatedAt().equals(timestamp))
                  .findFirst()
                  .orElse(null);
          messageData.remove(deletedMessage.getId());
@@ -38,7 +38,7 @@ public class JCFMessageService implements MessageService {
         List<Message> oldMessages = readUser(userName);
         Message changedMessage =  oldMessages.stream()
                 .filter(m -> m.getMessage().equals(oldMessage))
-                .filter(m -> m.getCreatedAt().equals(timestamp))
+                .filter(m -> m.getUpdatedAt().equals(timestamp))
                 .findFirst()
                 .orElse(null);
         changedMessage.updateMessage(newMessage);

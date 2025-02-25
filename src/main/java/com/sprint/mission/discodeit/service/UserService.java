@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface UserService {
     void create(String userName);
     void delete(String userName);
-    void update(String userName);
+    void update(String oldName,String newName);
     User read(String userName);
     Map<UUID,User> readAll();
 }

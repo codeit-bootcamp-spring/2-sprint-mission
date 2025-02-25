@@ -10,6 +10,7 @@ public class MainDomain {
     public MainDomain() {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
+        update();
     }
 
     public Long getCreatedAt() {

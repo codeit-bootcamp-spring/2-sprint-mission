@@ -25,9 +25,9 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void update(String userName) {
-        User user = read(userName);
-        user.updateUser(userName);
+    public void update(String oldName,String newName) {
+        User user = read(oldName);
+        user.updateUser(newName);
     }
 
     @Override
