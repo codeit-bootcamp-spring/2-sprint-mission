@@ -48,7 +48,6 @@ public class JavaApplication {
         JCFChannelService channelService = new JCFChannelService();
         JCFUserService userService = new JCFUserService(channelService);
         JCFMessageService messageService = new JCFMessageService(userService, channelService);
-        channelService.setUserService(userService);
 
         Scanner scanner = new Scanner(System.in);
 
