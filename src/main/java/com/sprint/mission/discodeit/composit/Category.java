@@ -47,11 +47,14 @@ public class Category extends CategoryAndChannel {
 
     @Override
     public void printCurrentCategoryAndChannel() {
-        System.out.println("==================================");
         for (CategoryAndChannel item : list){
             System.out.println(item.getName());
         }
-        System.out.println("==================================");
+    }
+
+    @Override
+    public void printAll() {
+
     }
 
     @Override

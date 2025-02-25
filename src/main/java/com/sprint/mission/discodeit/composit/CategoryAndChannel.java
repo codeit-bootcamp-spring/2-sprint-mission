@@ -16,6 +16,8 @@ public abstract class CategoryAndChannel extends BaseEntity {
 
     public abstract void printCurrentCategoryAndChannel();
 
+    public abstract void printAll();
+
     public abstract Iterator iterator();
 
 }
