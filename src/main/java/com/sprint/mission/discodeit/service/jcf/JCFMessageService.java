@@ -3,12 +3,17 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.ChannelMessage;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.PrivateMessage;
+import com.sprint.mission.discodeit.exception.MessageNotFoundException;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private static JCFMessageService instance;
+    private UserService userService;
+    private ChannelService channelService;
 
     private final Map<UUID, Message> messages;
     private final Map<UUID, List<UUID>> messageIdsBySenderId;
@@ -31,6 +36,8 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public PrivateMessage sendPrivateMessage(UUID senderId, String content, UUID receiverId) {
+        getUserService().validateUserId(senderId);
+        getUserService().validateUserId(receiverId);
         PrivateMessage privateMessage = new PrivateMessage(senderId, content, receiverId);
 
         messages.put(privateMessage.getId(), privateMessage);
@@ -42,7 +49,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public ChannelMessage sendChannelMessage(UUID senderId, String content, UUID channelId) {
-        if (!JCFChannelService.getInstance().isChannelMember(channelId, senderId)) {
+        getChannelService().validateChannelId(channelId);
+        getUserService().validateUserId(senderId);
+        if (!getChannelService().isChannelMember(channelId, senderId)) {
             return null;
         }
         ChannelMessage channelMessage = new ChannelMessage(senderId, content, channelId);
@@ -68,11 +77,13 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> getMessagesBySenderId(UUID senderId) {
+        getUserService().validateUserId(senderId);
         return getMessagesById(messageIdsBySenderId, senderId);
     }
 
     @Override
     public List<ChannelMessage> getChannelMessagesByChannelId(UUID channelId) {
+        getChannelService().validateChannelId(channelId);
         return getMessagesById(channelMessageIdsByChannelId, channelId).stream()
                 .map(message -> (ChannelMessage) message)
                 .toList();
@@ -81,6 +92,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<PrivateMessage> getPrivateMessagesByReceiverId(UUID receiverId) {
+        getUserService().validateUserId(receiverId);
         return getMessagesById(privateMessageIdsByReceiverId, receiverId).stream()
                 .map(message -> (PrivateMessage) message)
                 .toList();
@@ -99,11 +111,13 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message getMessageByMessageId(UUID messageId) {
+        validateMessageId(messageId);
         return messages.get(messageId);
     }
 
     @Override
     public Message updateMessage(UUID messageId, String content) {
+        validateMessageId(messageId);
         Message message = messages.get(messageId);
         if (message == null) {
             return null;
@@ -115,6 +129,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public boolean deleteMessage(UUID messageId) {
+        validateMessageId(messageId);
         Message message = messages.get(messageId);
         if (message == null) {
             return false;
@@ -131,5 +146,25 @@ public class JCFMessageService implements MessageService {
         messages.remove(messageId);
 
         return true;
+    }
+
+    private void validateMessageId(UUID messageId) {
+        if (!messages.containsKey(messageId)) {
+            throw new MessageNotFoundException("해당 메세지 없음");
+        }
+    }
+
+    private ChannelService getChannelService() {
+        if (channelService == null) {
+            channelService = JCFChannelService.getInstance();
+        }
+        return channelService;
+    }
+
+    private UserService getUserService() {
+        if (userService == null) {
+            userService = JCFUserService.getInstance();
+        }
+        return userService;
     }
 }
