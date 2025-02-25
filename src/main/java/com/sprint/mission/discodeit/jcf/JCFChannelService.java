@@ -79,7 +79,7 @@ public class JCFChannelService implements ChannelService {
 
     public void deleteChannelByuid(UUID uid){
         List<UUID> channels = channelData.values().stream()
-                .filter(channel-> channel.getUser().getUid().equals(uid))
+                .filter(channel-> channel.getUser().getId().equals(uid))
                 .map(Channel::getCid)
                 .toList();
         for(UUID cid : channels){

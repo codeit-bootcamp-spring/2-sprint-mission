@@ -54,7 +54,7 @@ public class JCFUserService implements UserService {
 
     public List<User> getUpdatedUsers(){
         return userData.values().stream()
-                .filter(entry -> entry.getUserUpdateAt() != null)
+                .filter(entry -> entry.getUpdateAt() != null)
                 .collect(Collectors.toList());
     }
 
@@ -64,7 +64,7 @@ public class JCFUserService implements UserService {
             throw new IllegalArgumentException("존재하는 사용자명입니다.");
         }
         User user = new User(userName, nickName);
-        UUID uid = user.getUid();
+        UUID uid = user.getId();
         userData.put(uid, user);
         userNameToId.put(userName, uid);
     }
