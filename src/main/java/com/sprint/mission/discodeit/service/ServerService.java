@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.composit.Channel;
 import com.sprint.mission.discodeit.entity.User;
 
 public interface ServerService {

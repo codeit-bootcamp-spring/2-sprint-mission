@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.TextMessage;
 import com.sprint.mission.discodeit.service.MessageService;

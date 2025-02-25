@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.composit.Channel;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -13,7 +15,7 @@ public class Server {
     protected final String id;
     protected String name;
 
-    public final Map<String,Channel> channels;
+    public final Map<String, Channel> channels;
     public final Map<String,User> users;
 
     public Server(String name) {

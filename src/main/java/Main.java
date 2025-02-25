@@ -25,7 +25,7 @@ public class Main {
             User user = userService.randomRegister();
             Message message = messageService.randomWrite();
             server.addUser(user);
-            server.addChannel(channelService.testRegister(message));
+//            server.addChannel(channelService.testRegister(message));
         }
 
         server.printAllChannels();
