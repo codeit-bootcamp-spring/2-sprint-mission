@@ -25,7 +25,7 @@ public class User extends BaseEntity{
         return joinedChannels;
     }
 
-    public void updateJoinedChannel(String newChannel) {
+    public void addJoinedChannel(String newChannel) {
         this.joinedChannels.add(newChannel);
     }
 

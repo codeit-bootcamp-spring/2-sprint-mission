@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class Channel extends BaseEntity {
     private String channelName;
-    private Set<String> members;
+    private Set<User> members;
     private Set<Message> messages;
 
     public Channel(String channelName) {
@@ -23,15 +23,15 @@ public class Channel extends BaseEntity {
         this.channelName = channelName;
     }
 
-    public Set<String> getMembers() {
+    public Set<User> getMembers() {
         return members;
     }
 
-    public void updateMembers(String newMember) {
+    public void addMembers(User newMember) {
         this.members.add(newMember);
     }
 
-    public void removeMember(String member) {
+    public void removeMember(User member) {
         this.members.remove(member);
     }
 
@@ -39,7 +39,7 @@ public class Channel extends BaseEntity {
         return messages;
     }
 
-    public void updateMessages(Message newMessages) {
+    public void addMessages(Message newMessages) {
         this.messages.add(newMessages);
     }
 
@@ -47,8 +47,8 @@ public class Channel extends BaseEntity {
         this.messages.remove(message);
     }
 
-    public boolean isUserInChannel(String userName){
-        return this.members.contains(userName);
+    public boolean isUserInChannel(User member){
+        return this.members.contains(member);
     }
 
     public boolean isMessageInChannel(Message message){
