@@ -27,7 +27,7 @@ public class MessageMenu {
                 case 2:
                     System.out.println("<모든 메시지의 정보 출력>\n");
                     try{
-                        System.out.println(messageService.getAllMessage());
+                        System.out.println(messageService.getAllMessages());
                     }catch(IllegalArgumentException e){
                         System.out.println(e.getMessage());
                     }
@@ -71,7 +71,7 @@ public class MessageMenu {
                         UUID messageId = UUID.fromString(sc.nextLine());
                         messageService.deleteMessage(messageId);
                         System.out.println("완료되었습니다.\n<모든 메시지의 정보 출력>");
-                        System.out.print(messageService.getAllMessage());
+                        System.out.print(messageService.getAllMessages());
                     }catch (IllegalArgumentException e){
                         System.out.println("메시지 삭제를 실패하였습니다.");
                     }

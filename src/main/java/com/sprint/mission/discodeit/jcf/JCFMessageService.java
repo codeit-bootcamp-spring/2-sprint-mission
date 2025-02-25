@@ -46,7 +46,7 @@ public class JCFMessageService implements MessageService {
      }
 
      @Override
-     public List<Message> getAllMessage(){
+     public List<Message> getAllMessages(){
          if(messageData.isEmpty()){
              throw new IllegalArgumentException("데이터가 존재하지 않습니다.");
          }
