@@ -54,14 +54,14 @@ public class JCFChannelService implements ChannelService {
 
     public List<Channel> getUpdatedChannels(){
         return channelData.values().stream()
-                .filter(entry -> entry.getChannelUpdateAt() != null)
+                .filter(entry -> entry.getUpdateAt() != null)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void registerChannel(String channelName, String userName) {
         Channel channel = new Channel(channelName, userService.getUser(userName));
-        this.channelData.put(channel.getCid(), channel);
+        this.channelData.put(channel.getId(), channel);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class JCFChannelService implements ChannelService {
     public void deleteChannelByuid(UUID uid){
         List<UUID> channels = channelData.values().stream()
                 .filter(channel-> channel.getUser().getId().equals(uid))
-                .map(Channel::getCid)
+                .map(Channel::getId)
                 .toList();
         for(UUID cid : channels){
             messageService.deleteMessagesByCid(cid);

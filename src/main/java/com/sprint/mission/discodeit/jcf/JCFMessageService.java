@@ -55,14 +55,14 @@ public class JCFMessageService implements MessageService {
 
      public List<Message> getUpdatedMessages(){
          return messageData.values().stream()
-                 .filter(entry-> entry.getMessageUpdateAt() != null)
+                 .filter(entry-> entry.getUpdateAt() != null)
                  .collect(Collectors.toList());
      }
 
      @Override
      public void registerMessage(UUID cid, String userName, String messageContent){
          Message message = new Message(channelService.getChannel(cid), userService.getUser(userName), messageContent);
-         this.messageData.put(message.getMid(), message);
+         this.messageData.put(message.getId(), message);
      }
 
      @Override
@@ -80,8 +80,8 @@ public class JCFMessageService implements MessageService {
 
      public void deleteMessagesByCid(UUID cid){
          List<UUID> removeId = messageData.values().stream()
-                 .filter(message -> message.getChannel().getCid().equals(cid))
-                 .map(Message::getMid)
+                 .filter(message -> message.getChannel().getId().equals(cid))
+                 .map(Message::getId)
                  .toList();
          removeId.forEach(messageData::remove);
      }
