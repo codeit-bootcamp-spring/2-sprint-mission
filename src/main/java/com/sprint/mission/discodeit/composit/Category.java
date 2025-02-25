@@ -2,19 +2,18 @@ package com.sprint.mission.discodeit.composit;
 
 import com.sprint.mission.discodeit.Iterator.ChannelIterator;
 import com.sprint.mission.discodeit.Iterator.Iterator;
-import com.sprint.mission.discodeit.entity.BaseEntity;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Category extends CategoryAndChannel {
-    private ArrayList<CategoryAndChannel> list;
+    private LinkedList<CategoryAndChannel> list;
 
     public Category(String id, String name) {
         super(id, name);
-        list = new ArrayList<>();
+        list = new LinkedList<>();
     }
 
-    public ArrayList<CategoryAndChannel> getList() {
+    public LinkedList<CategoryAndChannel> getList() {
         return list;
     }
 

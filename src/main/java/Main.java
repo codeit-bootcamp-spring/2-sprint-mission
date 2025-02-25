@@ -17,18 +17,18 @@ public class Main {
 
 
 
-        server.initServer();
-
-
-        for (int i = 0; i < 5; i++) {
-            User user = userService.randomRegister();
-            Message message = messageService.randomWrite();
-            server.addUser(user);
+//        server.initServer();
+//
+//
+//        for (int i = 0; i < 5; i++) {
+//            User user = userService.randomRegister();
+//            Message message = messageService.randomWrite();
+//            server.addUser(user);
 //            server.addChannel(channelService.testRegister(message));
-        }
-
-        server.printAllChannels();
-        server.printAllUsers();
+//        }
+//
+//        server.printAllChannels();
+//        server.printAllUsers();
 
 
     }
