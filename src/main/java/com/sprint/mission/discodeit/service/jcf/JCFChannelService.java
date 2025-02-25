@@ -1,24 +1,34 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.Iterator.Iterator;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
 
-public class JCFChannelService extends CategoryAndChannel {
-    JCFMessageService instance = JCFMessageService.getInstance();
-    private LinkedList<Message> messageList;
+public class JCFChannelService implements ChannelService {
+    JCFMessageService messageinstance = JCFMessageService.getInstance();
+    private static JCFChannelService channelinstance;
+    private List<Message> messageList;
 
-    public JCFChannelService(String id, String name) {
-        super(id, name);
-        messageList = new LinkedList<>();
+    private JCFChannelService(){}
+
+    public JCFChannelService getInstance() {
+        if (channelinstance == null) {
+            channelinstance = new JCFChannelService();
+        }
+        return channelinstance;
+    }
+
+    public void setMessageList(LinkedList<Message> messageList) {
+        this.messageList = messageList;
     }
 
     @Override
     public void add(String str) {
-        Message message = instance.add(str);
+        Message message = messageinstance.add(str);
         messageList.add(message);
     }
 
@@ -70,48 +80,5 @@ public class JCFChannelService extends CategoryAndChannel {
 
         sc.close();
         System.out.println("메시지 수정 성공");
-    }
-
-    @Override
-    public boolean checkCategory(CategoryAndChannel item) {
-        if (item.getClass().isInstance(JCFCategoryService.class)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public LinkedList<CategoryAndChannel> getList() {
-        return null;
-    }
-
-    @Override
-    public void add(CategoryAndChannel channel) {
-
-    }
-
-    @Override
-    public void remove(CategoryAndChannel channel) {
-
-    }
-
-    @Override
-    public void update(CategoryAndChannel channel, String replaceName) {
-
-    }
-    @Override
-    public void printHead() {
-
-    }
-
-    @Override
-    public void printCurrent() {
-
-    }
-
-    @Override
-    public Iterator iterator() {
-        return null;
     }
 }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Iterator;
 
-import com.sprint.mission.discodeit.service.jcf.CategoryAndChannel;
+import com.sprint.mission.discodeit.composit.CategoryAndChannel;
 
 public class ChannelIterator implements Iterator {
     private CategoryAndChannel channel;

@@ -1,29 +1,32 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.Iterator.ChannelIterator;
-import com.sprint.mission.discodeit.Iterator.Iterator;
+import com.sprint.mission.discodeit.composit.CategoryAndChannel;
+import com.sprint.mission.discodeit.service.CategoryService;
 
 import java.util.LinkedList;
+import java.util.List;
 
-public class JCFCategoryService extends CategoryAndChannel {
-    private CategoryAndChannel head;
-    private LinkedList<CategoryAndChannel> list;
+public class JCFCategoryService implements CategoryService {
+    private static JCFCategoryService instance;
+    public List<CategoryAndChannel> list;
 
-    public JCFCategoryService(String id, String name) {
-        super(id, name);
-        list = new LinkedList<>();
-
+    private JCFCategoryService() {
     }
 
-    @Override
-    public LinkedList<CategoryAndChannel> getList() {
-        return list;
+    public static JCFCategoryService getInstance() {
+        if (instance == null) {
+            instance = new JCFCategoryService();
+        }
+        return instance;
+    }
+
+    public void setList(LinkedList<CategoryAndChannel> list) {
+        this.list = list;
     }
 
     @Override
     public void add(CategoryAndChannel channel) {
         list.add(channel);
-        head = channel;
     }
 
     @Override
@@ -37,9 +40,6 @@ public class JCFCategoryService extends CategoryAndChannel {
         channel.setName(replaceName);
     }
 
-
-
-
     @Override
     public void printCurrent() {
         if (list.isEmpty()) {
@@ -49,55 +49,5 @@ public class JCFCategoryService extends CategoryAndChannel {
         for (int i = 0; i < list.size(); i++) {
             System.out.println(i + 1 + " : " + list.get(i).getName());
         }
-    }
-
-    @Override
-    public void print() {
-//        int j = 0;
-//        CategoryAndChannel temp1 = head;
-//        while (j < list.size()) {
-//            CategoryAndChannel temp2 = head;
-//            if (checkCategory(list.get(j))) {
-//                head = list.get(j);
-//            }
-//        }
-    }
-
-    //
-    @Override
-    public void add(String str) {
-        // static필드 이용해서 선언해야함
-//        list.add(new Channel(null, str));
-    }
-
-    @Override
-    public void remove() {
-    }
-
-    @Override
-    public void update() {
-
-    }
-
-
-    @Override
-    public void printHead() {
-        System.out.println(head.getName());
-    }
-
-
-    // 구현해야할 것
-    @Override
-    public boolean checkCategory(CategoryAndChannel item) {
-        if (item.getClass().isInstance(JCFCategoryService.class)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public Iterator iterator() {
-        return new ChannelIterator(this);
     }
 }

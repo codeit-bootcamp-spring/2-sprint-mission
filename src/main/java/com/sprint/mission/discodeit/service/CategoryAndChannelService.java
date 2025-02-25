@@ -1,12 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.Iterator.Iterator;
-import com.sprint.mission.discodeit.service.jcf.CategoryAndChannel;
-
-import java.util.LinkedList;
+import com.sprint.mission.discodeit.composit.CategoryAndChannel;
 
 public interface CategoryAndChannelService {
-    public abstract LinkedList<CategoryAndChannel> getList();
 
     public abstract void add(CategoryAndChannel channel);
 

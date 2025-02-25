@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.composit.CategoryAndChannel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.ServerService;
 

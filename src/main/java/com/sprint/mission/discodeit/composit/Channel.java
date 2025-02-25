@@ -1,10 +1,21 @@
 package com.sprint.mission.discodeit.composit;
 
-import com.sprint.mission.discodeit.entity.BaseEntity;
-import com.sprint.mission.discodeit.service.jcf.CategoryAndChannel;
+import com.sprint.mission.discodeit.entity.Message;
 
-public class Channel extends BaseEntity {
+import java.util.LinkedList;
+import java.util.List;
+
+public class Channel extends CategoryAndChannel {
+    private List<Message> messageList;
     public Channel(String id, String name) {
         super(id, name);
+    }
+
+    public void setMessageList(List<Message> messageList) {
+        this.messageList = messageList;
+    }
+
+    public List<Message> getMessageList() {
+        return messageList;
     }
 }
