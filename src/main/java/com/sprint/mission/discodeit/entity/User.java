@@ -66,6 +66,7 @@ public class User extends BaseEntity {
         sc.nextLine();
         head = severList.get(i-1);
         System.out.println(i + " : " + severList.get(i-1).getName());
+        sc.close();
     }
 
     public void removeServer(String targetName) {

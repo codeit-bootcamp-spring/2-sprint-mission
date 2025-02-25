@@ -9,11 +9,13 @@ import java.util.LinkedList;
 
 public class Server extends BaseEntity{
     private CategoryAndChannel baseCategory;
+    private Channel head;
 
     public Server(String id, String name) {
         super(id, name);
         baseCategory = new Category("B1","BaseCategory");
-        baseCategory.addChannel(new Channel("BC1","BaseChannel"));
+        head = new Channel("BC1","BaseChannel");
+        baseCategory.addChannel(head);
     }
 
     public void print() {
