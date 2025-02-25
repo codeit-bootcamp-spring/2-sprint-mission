@@ -1,37 +1,35 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.application.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.infra.ChannelRepository;
+import com.sprint.mission.discodeit.infra.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
-    private final Map<UUID, Channel> channels = new HashMap<>();
+    private final ChannelRepository channelRepository = new JCFChannelRepository();
 
     @Override
     public ChannelDto create(String name) {
-        Channel channel = new Channel(name);
-        channels.put(channel.getId(), channel);
+        Channel channel = channelRepository.save(
+                new Channel(name)
+        );
 
         return new ChannelDto(channel.getId(), channel.getName());
     }
 
     @Override
     public ChannelDto findById(UUID id) {
-        Channel channel = channels.get(id);
-        if (channel == null) {
-            throw new IllegalArgumentException("[ERROR] 해당 id의 채널이 존재하지 않습니다");
-        }
+        Channel channel = channelRepository.findById(id);
 
         return new ChannelDto(channel.getId(), channel.getName());
     }
 
     @Override
     public List<ChannelDto> findAll() {
-        return channels.values()
+        return channelRepository.findAll()
                 .stream()
                 .map(channel -> new ChannelDto(channel.getId(), channel.getName()))
                 .toList();
@@ -39,12 +37,11 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void updateName(UUID id, String name) {
-        Channel channel = channels.get(id);
-        channel.updateName(name);
+        channelRepository.updateName(id, name);
     }
 
     @Override
     public void delete(UUID id) {
-        channels.remove(id);
+        channelRepository.delete(id);
     }
 }

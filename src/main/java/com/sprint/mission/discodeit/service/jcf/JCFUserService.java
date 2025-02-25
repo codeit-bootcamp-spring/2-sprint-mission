@@ -1,60 +1,56 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.application.UserDto;
 import com.sprint.mission.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.infra.UserRepository;
+import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> users = new HashMap<>();
+    private final UserRepository userRepository = new JCFUserRepository();
 
     @Override
     public UserDto register(UserRegisterDto userRegisterDto) {
-        User user = new User(userRegisterDto.name(), userRegisterDto.password());
-        users.put(user.getId(), user);
+        User savedUser = userRepository.save(
+                new User(userRegisterDto.name(), userRegisterDto.password())
+        );
 
-        return new UserDto(user.getId(), user.getName());
+        return new UserDto(savedUser.getId(), savedUser.getName());
     }
 
     @Override
     public UserDto findById(UUID id) {
-        User user = users.get(id);
-        if (user == null) {
-            throw new IllegalArgumentException("[Error] 해당 아이디의 유저가 없습니다");
-        }
+        User user = userRepository.findById(id);
 
         return new UserDto(user.getId(), user.getName());
     }
 
     @Override
-    public List<UserDto> findAll() {
-        return users.values().stream()
+    public List<UserDto> findByName(String name) {
+        return userRepository.findByName(name)
+                .stream()
                 .map(user -> new UserDto(user.getId(), user.getName()))
                 .toList();
     }
 
     @Override
-    public List<UserDto> findByName(String name) {
-        return users.values().stream()
-                .filter(user -> user.isSameName(name))
+    public List<UserDto> findAll() {
+        return userRepository.findAll()
+                .stream()
                 .map(user -> new UserDto(user.getId(), user.getName()))
                 .toList();
     }
 
     @Override
     public void updateName(UUID id, String name) {
-        UserDto userDto = findById(id);
-        User user = users.get(userDto.id());
-
-        user.updateName(name);
+        userRepository.updateName(id, name);
     }
 
     @Override
     public void delete(UUID id) {
-        users.remove(id);
+        userRepository.delete(id);
     }
 }
