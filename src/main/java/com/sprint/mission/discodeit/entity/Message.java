@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
-public interface Message {
+public class Message extends BaseEntity {
+    public Message(String id, String name) {
+        super(id, name);
+    }
+
+    private String str;
 
 
 }

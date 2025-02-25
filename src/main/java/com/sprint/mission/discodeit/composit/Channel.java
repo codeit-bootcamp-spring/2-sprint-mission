@@ -3,10 +3,8 @@ package com.sprint.mission.discodeit.composit;
 import com.sprint.mission.discodeit.Iterator.Iterator;
 import com.sprint.mission.discodeit.entity.Message;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 
 public class Channel extends CategoryAndChannel {
