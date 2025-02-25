@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class Message extends Common{
-    private UUID userId;
-    private UUID channelId;
+    private final UUID userId;
+    private final UUID channelId;
     private String message;
 
     public Message(UUID userId, UUID channelId, String message) {
