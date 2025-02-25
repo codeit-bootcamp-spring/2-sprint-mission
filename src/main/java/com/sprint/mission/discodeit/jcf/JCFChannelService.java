@@ -2,17 +2,17 @@ package com.sprint.mission.discodeit.jcf;
 
 import com.sprint.mission.application.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.infra.ChannelRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class JCFChannelRepository implements ChannelRepository {
+public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> channels = new HashMap<>();
 
     @Override
-    public ChannelDto save(String name) {
+    public ChannelDto create(String name) {
         Channel channel = new Channel(name);
         channels.put(channel.getId(), channel);
 

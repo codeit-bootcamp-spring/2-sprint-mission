@@ -1,27 +1,27 @@
-package com.sprint.mission.discodeit.infra;
+package com.sprint.mission.discodeit.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sprint.mission.application.UserDto;
 import com.sprint.mission.application.UserRegisterDto;
-import com.sprint.mission.discodeit.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.jcf.JCFUserService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class UserRepositoryTest {
+class UserServiceTest {
     private static final String PASSWORD = "password";
     private static final String NAME = "황지환";
-    private UserRepository userRepository;
+    private UserService userRepository;
     private UserDto setUpUser;
 
     @BeforeEach
     void init() {
-        userRepository = new JCFUserRepository();
+        userRepository = new JCFUserService();
 
-        this.setUpUser = userRepository.save(new UserRegisterDto(NAME, PASSWORD));
+        this.setUpUser = userRepository.register(new UserRegisterDto(NAME, PASSWORD));
     }
 
     @Test
@@ -52,8 +52,8 @@ class UserRepositoryTest {
         UserRegisterDto userOtherHwang = new UserRegisterDto(NAME, PASSWORD + "123");
         UserRegisterDto userKim = new UserRegisterDto("KIM", PASSWORD);
 
-        userRepository.save(userOtherHwang);
-        userRepository.save(userKim);
+        userRepository.register(userOtherHwang);
+        userRepository.register(userKim);
 
         assertThat(userRepository.findByName(NAME)).hasSize(2);
     }

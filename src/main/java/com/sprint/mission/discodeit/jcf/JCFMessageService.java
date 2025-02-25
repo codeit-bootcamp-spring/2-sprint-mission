@@ -2,17 +2,17 @@ package com.sprint.mission.discodeit.jcf;
 
 import com.sprint.mission.application.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.infra.MessageRepository;
+import com.sprint.mission.discodeit.service.MessageService;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class JCFMessageRepository implements MessageRepository {
+public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> messages = new LinkedHashMap<>();
 
     @Override
-    public MessageDto save(String context) {
+    public MessageDto create(String context) {
         Message message = new Message(context);
         messages.put(message.getId(), message);
 

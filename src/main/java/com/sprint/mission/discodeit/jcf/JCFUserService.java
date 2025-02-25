@@ -3,14 +3,22 @@ package com.sprint.mission.discodeit.jcf;
 import com.sprint.mission.application.UserDto;
 import com.sprint.mission.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.infra.UserRepository;
+import com.sprint.mission.discodeit.service.UserService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class JCFUserRepository implements UserRepository {
+public class JCFUserService implements UserService {
     private final Map<UUID, User> users = new HashMap<>();
+
+    @Override
+    public UserDto register(UserRegisterDto userRegisterDto) {
+        User user = new User(userRegisterDto.name(), userRegisterDto.password());
+        users.put(user.getId(), user);
+
+        return new UserDto(user.getId(), user.getName());
+    }
 
     @Override
     public UserDto findById(UUID id) {
@@ -23,14 +31,6 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public List<UserDto> findByName(String name) {
-        return users.values().stream()
-                .filter(user -> user.isSameName(name))
-                .map(user -> new UserDto(user.getId(), user.getName()))
-                .toList();
-    }
-
-    @Override
     public List<UserDto> findAll() {
         return users.values().stream()
                 .map(user -> new UserDto(user.getId(), user.getName()))
@@ -38,11 +38,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public UserDto save(UserRegisterDto userRegisterDto) {
-        User user = new User(userRegisterDto.name(), userRegisterDto.password());
-        users.put(user.getId(), user);
-
-        return new UserDto(user.getId(), user.getName());
+    public List<UserDto> findByName(String name) {
+        return users.values().stream()
+                .filter(user -> user.isSameName(name))
+                .map(user -> new UserDto(user.getId(), user.getName()))
+                .toList();
     }
 
     @Override

@@ -1,23 +1,23 @@
-package com.sprint.mission.discodeit.infra;
+package com.sprint.mission.discodeit.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sprint.mission.application.MessageDto;
-import com.sprint.mission.discodeit.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.jcf.JCFMessageService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class MessageRepositoryTest {
+class MessageServiceTest {
     private static final String CONTEXT = "안녕하세요";
-    private MessageRepository messageRepository;
+    private MessageService messageRepository;
     private MessageDto setUpMessage;
 
     @BeforeEach
     void setUp() {
-        messageRepository = new JCFMessageRepository();
-        setUpMessage = messageRepository.save(CONTEXT);
+        messageRepository = new JCFMessageService();
+        setUpMessage = messageRepository.create(CONTEXT);
     }
 
     @Test
