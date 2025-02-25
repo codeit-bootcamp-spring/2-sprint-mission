@@ -15,7 +15,7 @@ public class Server extends BaseEntity{
         super(id, name);
         baseCategory = new Category("B1","BaseCategory");
         head = new Channel("BC1","BaseChannel");
-        baseCategory.addChannel(head);
+        baseCategory.add(head);
     }
 
     public void print() {
@@ -25,14 +25,14 @@ public class Server extends BaseEntity{
     public void addChannel(String name) {
         //여긴 추상클래스로 만든 뒤, 구체 클래스에서 static count해서 값을 매긴 뒤 넘길 예정
         String test = "Test";
-        baseCategory.addChannel(new Channel(test, name));
+        baseCategory.add(new Channel(test, name));
     }
 
     public void update(String targetName, String replaceName) {
         LinkedList<CategoryAndChannel> list = baseCategory.getList();
         for (CategoryAndChannel item : list) {
             if (item.getName() == targetName) {
-                baseCategory.updateChannel(item,replaceName);
+                baseCategory.update(item,replaceName);
             }
         }
     }
@@ -41,7 +41,7 @@ public class Server extends BaseEntity{
         LinkedList<CategoryAndChannel> list = baseCategory.getList();
         for (CategoryAndChannel item : list) {
             if (item.getName() == targetName) {
-                baseCategory.removeChannel(item);
+                baseCategory.remove(item);
                 return;
             }
         }

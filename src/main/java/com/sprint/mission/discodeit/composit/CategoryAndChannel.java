@@ -11,13 +11,25 @@ public abstract class CategoryAndChannel extends BaseEntity {
     }
 
     public abstract LinkedList<CategoryAndChannel> getList();
-    public abstract void addChannel(CategoryAndChannel channel);
 
-    public abstract void removeChannel(CategoryAndChannel channel);
+    public abstract void add(CategoryAndChannel channel);
 
-    public abstract void updateChannel(CategoryAndChannel channel,String replaceName);
+    public abstract void add(String str);
+
+    public abstract void remove();
+
+    public abstract void remove(CategoryAndChannel channel);
+
+    public abstract void update();
+
+    public abstract void update(CategoryAndChannel channel, String replaceName);
+
+    public abstract void print();
 
     public abstract void printCurrent();
+
+    public abstract void printHead();
+    public abstract boolean checkCategory(CategoryAndChannel item);
 
     public abstract Iterator iterator();
 

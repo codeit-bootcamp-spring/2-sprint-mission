@@ -16,31 +16,31 @@ public class Channel extends CategoryAndChannel {
         messageList = new LinkedList<>();
     }
 
-    public void write(String str) {
+    @Override
+    public void add(String str) {
         Message message = new Message("M" + messageList.size(), "M" + messageList.size(),str);
         messageList.add(message);
     }
 
-    public void showAllMessage() {
+    @Override
+    public void print() {
         if (messageList.isEmpty()) {
             System.out.println("메시지가 없습니다.");
             return;
         }
-        for (Message message : messageList) {
-            System.out.printf(message.getStr() + "\n");
-        }
-    }
-
-    public void removeMessage() {
-        if (messageList.isEmpty()) {
-            System.out.println("메시지가 없습니다.");
-            return;
-        }
-        Scanner sc = new Scanner(System.in);
-        System.out.println("========메시지 목록=========");
         for (int i = 0; i < messageList.size(); i++) {
             System.out.println(i + 1 + " : " + messageList.get(i).getStr());
         }
+    }
+
+    @Override
+    public void remove() {
+        if (messageList.isEmpty()) {
+            System.out.println("메시지가 없습니다.");
+            return;
+        }
+        print();
+        Scanner sc = new Scanner(System.in);
         System.out.println("몇 번째 메시지를 삭제하시겠습니까?");
         int j = sc.nextInt();
         sc.nextLine();
@@ -72,6 +72,14 @@ public class Channel extends CategoryAndChannel {
         System.out.println("메시지 수정 성공");
     }
 
+    @Override
+    public boolean checkCategory(CategoryAndChannel item) {
+        if (item.getClass().isInstance(Category.class)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     @Override
     public LinkedList<CategoryAndChannel> getList() {
@@ -79,15 +87,27 @@ public class Channel extends CategoryAndChannel {
     }
 
     @Override
-    public void addChannel(CategoryAndChannel channel) {
+    public void add(CategoryAndChannel channel) {
+
     }
 
     @Override
-    public void removeChannel(CategoryAndChannel channel) {
+    public void remove(CategoryAndChannel channel) {
+
     }
 
     @Override
-    public void updateChannel(CategoryAndChannel channel, String replaceName) {
+    public void update() {
+
+    }
+
+    @Override
+    public void update(CategoryAndChannel channel, String replaceName) {
+
+    }
+    @Override
+    public void printHead() {
+
     }
 
     @Override
@@ -98,15 +118,5 @@ public class Channel extends CategoryAndChannel {
     @Override
     public Iterator iterator() {
         return null;
-    }
-
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "id='" + id + '\'' +
-                ",\nname='" + name + '\'' +
-                ",\ncreatedAt=" + dayTime.format(new Date(createdAt)) +
-                ",\nupdatedAt=" + dayTime.format(new Date(updatedAt)) +
-                '}';
     }
 }
