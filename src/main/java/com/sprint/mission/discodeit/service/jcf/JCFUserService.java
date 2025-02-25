@@ -14,13 +14,21 @@ public class JCFUserService implements UserService {
 
     @Override
     public void create(String userName) {
-        User user = new User(userName);
-        userData.put(user.getId(), user);
+        if(read(userName)!=null){
+            System.out.println("이미 존재하는 유저입니다.");
+            return;
+        }
+        User newUser = new User(userName);
+        userData.put(newUser.getId(), newUser);
     }
 
     @Override
     public void delete(String userName) {
         User deletedUser = read(userName);
+        if(deletedUser==null){
+            System.out.println("존재하는 유저가 없습니다.");
+            return;
+        }
         userData.remove(deletedUser.getId());
     }
 

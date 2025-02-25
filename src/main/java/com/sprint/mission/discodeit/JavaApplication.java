@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -14,9 +13,7 @@ public class JavaApplication {
     public static void main(String[] args) {
         JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService();
-        JCFMessageService messageService = new JCFMessageService();
-
-
+        JCFMessageService messageService = new JCFMessageService(userService, channelService);
 
 
         Scanner sc = new Scanner(System.in);
@@ -45,10 +42,6 @@ public class JavaApplication {
                             case "1":       //유저 생성
                                 System.out.print("생성할 유저명을 입력해 주세요: ");
                                 String createUserName = sc.nextLine();
-                                if(userService.read(createUserName)!=null){
-                                    System.out.println("이미 존재하는 유저입니다.");
-                                    break;
-                                }
                                 userService.create(createUserName);
                                 break;
 
@@ -62,10 +55,6 @@ public class JavaApplication {
                                 break;
 
                             case "3":       //유저 목록
-                                if(userService.readAll().isEmpty()){
-                                    System.out.println("존재하는 유저가 없습니다.");
-                                    break;
-                                }
                                 userService.readAll().values().forEach(user -> {
                                     System.out.println(user.getUserName());
                                 });
@@ -90,10 +79,6 @@ public class JavaApplication {
                             case "5":       //유저 삭제
                                 System.out.print("삭제할 유저를 입력하세요: ");
                                 String deleteUserName = sc.nextLine();
-                                if(userService.read(deleteUserName)==null){
-                                    System.out.println("존재하지 않는 유저입니다");
-                                    break;
-                                }
                                 userService.delete(deleteUserName);
                                 break;
 
@@ -242,7 +227,7 @@ public class JavaApplication {
                                 System.out.println("2. 채널 필터");
                                 System.out.println("3. 전부");
                                 System.out.print("입력: ");
-                                switch (sc.nextLine()){ //이거 수정
+                                switch (sc.nextLine()){
                                     case "1":
                                         System.out.print("필터링할 유저 입력: ");
                                         String includesUserName = sc.nextLine();
@@ -259,10 +244,10 @@ public class JavaApplication {
                                     case "2":
                                         System.out.print("필터링할 채널 입력: ");
                                         String includesChannelName = sc.nextLine();
-                                        if(messageService.readUser(includesChannelName) == null){
+                                        if(messageService.readChannel(includesChannelName) == null){
                                             System.out.println("존재하는 채널이 없습니다.");
                                         }
-                                        messageService.readUser(includesChannelName).forEach(message -> {
+                                        messageService.readChannel(includesChannelName).forEach(message -> {
                                             System.out.printf("(%d)[%s]%s: %s\n",message.getUpdatedAt()
                                                                                 ,message.getChannel().getChannelName()
                                                                                 ,message.getUser().getUserName()
