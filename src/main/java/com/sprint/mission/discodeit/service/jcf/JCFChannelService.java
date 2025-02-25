@@ -19,6 +19,9 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void create(String channelName) {
         Channel channel = new Channel(channelName);
+        if(read(channelName) != null){
+            System.out.println("이미 존재하는 채널입니다.");
+        }
         channelData.put(channel.getId(), channel);
     }
 
@@ -44,6 +47,9 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void delete(String channelName) {
         Channel channel = read(channelName);
+        if(read(channelName) == null){
+            System.out.println("존재하지 않는 채널입니다.");
+        }
         channelData.remove(channel.getId());
     }
 

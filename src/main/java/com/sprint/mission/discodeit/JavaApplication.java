@@ -55,6 +55,9 @@ public class JavaApplication {
                                 break;
 
                             case "3":       //유저 목록
+                                if(userService.readAll().isEmpty()){
+                                    System.out.println("존재하는 유저가 없습니다.");
+                                }
                                 userService.readAll().values().forEach(user -> {
                                     System.out.println(user.getUserName());
                                 });
@@ -106,10 +109,6 @@ public class JavaApplication {
                             case "1":       //채널 생성
                                 System.out.print("생성할 채널명을 입력해 주세요: ");
                                 String createChannelName = sc.nextLine();
-                                if(channelService.read(createChannelName)!=null){
-                                    System.out.println("이미 존재하는 채널입니다.");
-                                    break;
-                                }
                                 channelService.create(createChannelName);
                                 break;
                             case "2":       //채널 조회
@@ -148,10 +147,6 @@ public class JavaApplication {
                             case "5":       //채널 삭제
                                 System.out.print("삭제할 채널을 입력하세요: ");
                                 String deleteChannelName = sc.nextLine();
-                                if(channelService.read(deleteChannelName)==null){
-                                    System.out.println("존재하지 않는 채널입니다");
-                                    break;
-                                }
                                 channelService.delete(deleteChannelName);
                                 break;
                             case "6":       //뒤로 가기
