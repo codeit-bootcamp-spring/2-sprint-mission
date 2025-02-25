@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.composit.Category;
-import com.sprint.mission.discodeit.composit.CategoryAndChannel;
 import com.sprint.mission.discodeit.composit.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.ServerService;
@@ -14,8 +13,8 @@ public class JCFServerService extends Server implements ServerService {
 
     public JCFServerService(String id, String name) {
         super(id, name);
-        baseCategory = new Category("B1","BaseCategory");
-        head = new Channel("BC1","BaseChannel");
+        baseCategory = new JCFCategoryService("B1","BaseCategory");
+        head = new JCFChannelService("BC1","BaseChannel");
         baseCategory.add(head);
     }
 

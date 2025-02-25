@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.Factory;
 
 import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.service.jcf.JCFServerService;
 
 public class CreateServerFactory implements Factory{
     private static int count = 0;
@@ -20,6 +21,6 @@ public class CreateServerFactory implements Factory{
 
     @Override
     public Server create(String str) {
-        return new Server("S"+count++,str);
+        return new JCFServerService("S"+count++,str);
     }
 }

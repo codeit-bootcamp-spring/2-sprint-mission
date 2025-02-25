@@ -1,15 +1,11 @@
-package com.sprint.mission.discodeit.composit;
+package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.Iterator.Iterator;
-import com.sprint.mission.discodeit.entity.BaseEntity;
+import com.sprint.mission.discodeit.service.jcf.CategoryAndChannel;
 
 import java.util.LinkedList;
 
-public abstract class CategoryAndChannel extends BaseEntity {
-    public CategoryAndChannel(String id, String name) {
-        super(id, name);
-    }
-
+public interface CategoryAndChannelService {
     public abstract LinkedList<CategoryAndChannel> getList();
 
     public abstract void add(CategoryAndChannel channel);
@@ -29,8 +25,10 @@ public abstract class CategoryAndChannel extends BaseEntity {
     public abstract void printCurrent();
 
     public abstract void printHead();
+
     public abstract boolean checkCategory(CategoryAndChannel item);
 
     public abstract Iterator iterator();
+
 
 }
