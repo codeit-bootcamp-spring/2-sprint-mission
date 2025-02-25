@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Iterator;
 
-import com.sprint.mission.discodeit.entity.Container;
+import com.sprint.mission.discodeit.entity.Container.Container;
 
 public class ChannelIterator implements Iterator {
     private Container channel;

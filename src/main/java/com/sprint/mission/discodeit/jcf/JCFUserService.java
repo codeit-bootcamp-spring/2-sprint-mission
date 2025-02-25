@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.jcf;
 import com.sprint.mission.discodeit.Factory.CreateChannalFactory;
 import com.sprint.mission.discodeit.Factory.CreateServerFactory;
 import com.sprint.mission.discodeit.Factory.Factory;
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Container.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.UserService;
 

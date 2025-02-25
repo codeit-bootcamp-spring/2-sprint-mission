@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.jcf;
 
-import com.sprint.mission.discodeit.entity.Container;
+import com.sprint.mission.discodeit.entity.Container.Container;
 import com.sprint.mission.discodeit.service.CategoryService;
 
 import java.util.LinkedList;

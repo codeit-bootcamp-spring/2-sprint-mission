@@ -1,4 +1,6 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.Container;
+
+import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 
