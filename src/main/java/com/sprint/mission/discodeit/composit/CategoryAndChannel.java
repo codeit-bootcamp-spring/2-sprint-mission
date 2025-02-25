@@ -10,11 +10,12 @@ public abstract class CategoryAndChannel extends BaseEntity {
         super(id, name);
     }
 
+    public abstract LinkedList<CategoryAndChannel> getList();
     public abstract void addChannel(CategoryAndChannel channel);
 
     public abstract void removeChannel(CategoryAndChannel channel);
 
-    public abstract void updateChannel(CategoryAndChannel channel);
+    public abstract void updateChannel(CategoryAndChannel channel,String replaceName);
 
     public abstract void printCurrent();
 

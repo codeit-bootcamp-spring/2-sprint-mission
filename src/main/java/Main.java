@@ -8,27 +8,14 @@ import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFServerService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
-        UserService userService = new JCFUserService();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService();
-        ServerService server = new JCFServerService();
-
-
-
-//        server.initServer();
-//
-//
-//        for (int i = 0; i < 5; i++) {
-//            User user = userService.randomRegister();
-//            Message message = messageService.randomWrite();
-//            server.addUser(user);
-//            server.addChannel(channelService.testRegister(message));
-//        }
-//
-//        server.printAllChannels();
-//        server.printAllUsers();
+        Scanner sc = new Scanner(System.in);
+        System.out.print("찾으실 이름을 입력하시오.: ");
+        String targetName = sc.nextLine();
+        System.out.println();
 
 
     }

@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.composit.Category;
 import com.sprint.mission.discodeit.composit.CategoryAndChannel;
 import com.sprint.mission.discodeit.composit.Channel;
 
+import java.util.LinkedList;
+
 public class Server extends BaseEntity{
     private CategoryAndChannel baseCategory;
 
@@ -24,8 +26,22 @@ public class Server extends BaseEntity{
         baseCategory.addChannel(new Channel(test, name));
     }
 
-    public void update() {
+    public void update(String targetName, String replaceName) {
+        LinkedList<CategoryAndChannel> list = baseCategory.getList();
+        for (CategoryAndChannel item : list) {
+            if (item.getName() == targetName) {
+                baseCategory.updateChannel(item,replaceName);
+            }
+        }
+    }
 
+    public void remove(String targetName) {
+        LinkedList<CategoryAndChannel> list = baseCategory.getList();
+        for (CategoryAndChannel item : list) {
+            if (item.getName() == targetName) {
+                baseCategory.removeChannel(item);
+            }
+        }
     }
 
 }

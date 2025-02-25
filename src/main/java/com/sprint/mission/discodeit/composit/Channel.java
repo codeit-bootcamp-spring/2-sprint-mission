@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 
 
 public class Channel extends CategoryAndChannel {
@@ -16,6 +17,11 @@ public class Channel extends CategoryAndChannel {
     }
 
     @Override
+    public LinkedList<CategoryAndChannel> getList() {
+        return null;
+    }
+
+    @Override
     public void addChannel(CategoryAndChannel channel) {
     }
 
@@ -24,7 +30,7 @@ public class Channel extends CategoryAndChannel {
     }
 
     @Override
-    public void updateChannel(CategoryAndChannel channel) {
+    public void updateChannel(CategoryAndChannel channel, String replaceName) {
     }
 
     @Override
