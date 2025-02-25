@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelMessage;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.PrivateMessage;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
@@ -13,15 +11,15 @@ public class JCFMessageService implements MessageService {
     private static JCFMessageService instance;
 
     private Map<UUID, Message> messages;
-    private Map<UUID, List<UUID>> messageIdsBySender;
-    private Map<UUID, List<UUID>> channelMessageIdsByChannel;
-    private Map<UUID, List<UUID>> privateMessageIdsByReceiver;
+    private Map<UUID, List<UUID>> messageIdsBySenderId;
+    private Map<UUID, List<UUID>> channelMessageIdsByChannelId;
+    private Map<UUID, List<UUID>> privateMessageIdsByReceiverId;
 
     private JCFMessageService() {
         messages = new HashMap<>();
-        messageIdsBySender = new HashMap<>();
-        channelMessageIdsByChannel = new HashMap<>();
-        privateMessageIdsByReceiver = new HashMap<>();
+        messageIdsBySenderId = new HashMap<>();
+        channelMessageIdsByChannelId = new HashMap<>();
+        privateMessageIdsByReceiverId = new HashMap<>();
     }
 
     public static JCFMessageService getInstance() {
@@ -36,8 +34,8 @@ public class JCFMessageService implements MessageService {
         PrivateMessage privateMessage = new PrivateMessage(senderId, content, receiverId);
 
         messages.put(privateMessage.getId(), privateMessage);
-        storeMessage(messageIdsBySender, senderId, privateMessage.getId());
-        storeMessage(privateMessageIdsByReceiver, receiverId, privateMessage.getId());
+        storeMessage(messageIdsBySenderId, senderId, privateMessage.getId());
+        storeMessage(privateMessageIdsByReceiverId, receiverId, privateMessage.getId());
 
         return privateMessage;
     }
@@ -50,8 +48,8 @@ public class JCFMessageService implements MessageService {
         ChannelMessage channelMessage = new ChannelMessage(senderId, content, channelId);
 
         messages.put(channelMessage.getId(), channelMessage);
-        storeMessage(messageIdsBySender, senderId, channelMessage.getId());
-        storeMessage(channelMessageIdsByChannel, channelId, channelMessage.getId());
+        storeMessage(messageIdsBySenderId, senderId, channelMessage.getId());
+        storeMessage(channelMessageIdsByChannelId, channelId, channelMessage.getId());
         return channelMessage;
     }
 
@@ -70,12 +68,12 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> getMessagesBySenderId(UUID senderId) {
-        return getMessagesById(messageIdsBySender, senderId);
+        return getMessagesById(messageIdsBySenderId, senderId);
     }
 
     @Override
     public List<ChannelMessage> getChannelMessagesByChannelId(UUID channelId) {
-        return getMessagesById(channelMessageIdsByChannel, channelId).stream()
+        return getMessagesById(channelMessageIdsByChannelId, channelId).stream()
                 .map(message -> (ChannelMessage) message)
                 .toList();
 
@@ -83,7 +81,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<PrivateMessage> getPrivateMessagesByReceiverId(UUID receiverId) {
-        return getMessagesById(privateMessageIdsByReceiver, receiverId).stream()
+        return getMessagesById(privateMessageIdsByReceiverId, receiverId).stream()
                 .map(message -> (PrivateMessage) message)
                 .toList();
     }
@@ -122,12 +120,12 @@ public class JCFMessageService implements MessageService {
             return false;
         }
 
-        messageIdsBySender.get(message.getSenderId()).remove(messageId);
+        messageIdsBySenderId.get(message.getSenderId()).remove(messageId);
 
         if (message instanceof PrivateMessage) {
-            privateMessageIdsByReceiver.get(((PrivateMessage) message).getReceiverId()).remove(messageId);
+            privateMessageIdsByReceiverId.get(((PrivateMessage) message).getReceiverId()).remove(messageId);
         } else if (message instanceof ChannelMessage) {
-            channelMessageIdsByChannel.get(((ChannelMessage) message).getChannelId()).remove(messageId);
+            channelMessageIdsByChannelId.get(((ChannelMessage) message).getChannelId()).remove(messageId);
         }
 
         messages.remove(messageId);

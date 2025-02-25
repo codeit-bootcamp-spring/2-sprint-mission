@@ -9,11 +9,11 @@ public class JCFChannelService implements ChannelService {
     private static JCFChannelService instance;
 
     private final Map<UUID, Channel> channels;
-    private final Map<UUID, Set<UUID>> membersByChannel;
+    private final Map<UUID, Set<UUID>> memberIdsByChannelId;
 
     private JCFChannelService() {
         channels = new HashMap<>();
-        membersByChannel = new HashMap<>();
+        memberIdsByChannelId = new HashMap<>();
     }
 
     public static JCFChannelService getInstance() {
@@ -33,7 +33,7 @@ public class JCFChannelService implements ChannelService {
         Set<UUID> members = new HashSet<>();
         members.add(ownerId);
 
-        membersByChannel.put(channel.getId(), members);
+        memberIdsByChannelId.put(channel.getId(), members);
 
         return channel;
     }
@@ -65,7 +65,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Set<UUID> getChannelMembers(UUID channelId) {
-        return membersByChannel.get(channelId);
+        return memberIdsByChannelId.get(channelId);
     }
 
     @Override
@@ -83,14 +83,14 @@ public class JCFChannelService implements ChannelService {
         }
 
         channels.remove(channelId);
-        membersByChannel.remove(channelId);
+        memberIdsByChannelId.remove(channelId);
 
         return true;
     }
 
     @Override
     public Channel addUserToChannel(UUID channelId, UUID userId) {
-        membersByChannel.get(channelId).add(userId);
+        memberIdsByChannelId.get(channelId).add(userId);
         return getChannelByChannelId(channelId);
     }
 
@@ -100,12 +100,12 @@ public class JCFChannelService implements ChannelService {
             return getChannelByChannelId(channelId);
         }
 
-        membersByChannel.get(channelId).remove(userId);
+        memberIdsByChannelId.get(channelId).remove(userId);
         return getChannelByChannelId(channelId);
     }
 
     protected boolean isChannelMember(UUID channelId, UUID userId) {
-        Set<UUID> channelMembers = membersByChannel.get(channelId);
+        Set<UUID> channelMembers = memberIdsByChannelId.get(channelId);
         if (channelMembers == null) {
             return false;
         }
