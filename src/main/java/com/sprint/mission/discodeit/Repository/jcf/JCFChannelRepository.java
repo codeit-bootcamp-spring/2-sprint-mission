@@ -45,12 +45,12 @@ public class JCFChannelRepository implements RepositoryService<Channel, Message>
 
         Scanner sc = new Scanner(System.in);
         System.out.print("삭제할 메시지의 이름을 입력하시오. : ");
-        String s = sc.nextLine();
+        String s = sc.next();
         sc.close();
         for (Message data : list) {
-            if (data.getName().equals(s)) {
+            if (data.getStr().equals(s)) {
                 list.remove(data);
-                System.out.println("\n메시지 삭제 성공");
+                System.out.println("메시지 삭제 성공");
                 return;
             }
         }
@@ -63,30 +63,34 @@ public class JCFChannelRepository implements RepositoryService<Channel, Message>
         if (list.isEmpty()) {
             return null;
         }
-
+        System.out.println("======================================");
         for (Message data : list) {
             System.out.println(data.getStr());
         }
+        System.out.println("======================================");
 
-        return list;    }
+        return list;
+    }
 
     @Override
     public void update(Channel channel) {
         List<Message> list = print(channel);
 
         Scanner sc = new Scanner(System.in);
-        System.out.print("업데이트할 메시지의 이름을 입력하시오. : ");
-        String s = sc.nextLine();
+        System.out.print("업데이트할 메시지를 입력하시오. : ");
+        String s = sc.next();
+//        s.replaceAll("\n", "");
         for (Message data : list) {
-            if (data.getName().equals(s)) {
-                System.out.print("\n바꿀 이름을 입력하시오. : ");
-                String b = sc.nextLine();
-                data.setName(b);
+            if (data.getStr().equals(s)) {
+                System.out.print("\n바꿀 텍스트를 입력하시오. : ");
+                s = sc.next();
+//                s.replaceAll("\n", "");
+                data.setStr(s);
                 System.out.println("메시지 업데이트 성공");
                 return;
             }
         }
-        sc.close();
+//        sc.close();
         System.out.println("해당 메시지가 존재하지 않습니다.");
     }
 

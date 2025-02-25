@@ -49,7 +49,7 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
         for (Server data : list) {
             if (data.getName().equals(s)) {
                 list.remove(data);
-                System.out.println("\n서버 삭제 성공");
+                System.out.println("서버 삭제 성공");
                 return;
             }
         }
@@ -62,10 +62,12 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
         if (list.isEmpty()) {
             return null;
         }
+        System.out.println("======================================");
 
         for (Server data : list) {
-            System.out.println(data.getName());
+            System.out.println(user.getName() + " : " + data.getName());
         }
+        System.out.println("======================================");
 
         return list;
     }
@@ -79,14 +81,14 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
         String s = sc.nextLine();
         for (Server data : severList) {
             if (data.getName().equals(s)) {
-                System.out.print("\n바꿀 이름을 입력하시오. : ");
-                String b = sc.nextLine();
-                data.setName(b);
+                System.out.print("바꿀 이름을 입력하시오. : ");
+                s = sc.nextLine();
+                data.setName(s);
                 System.out.println("서버 업데이트 성공");
                 return;
             }
         }
-        sc.close();
+//        sc.close();
         System.out.println("해당 서버가 존재하지 않습니다.");
     }
 

@@ -45,14 +45,14 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
         Scanner sc = new Scanner(System.in);
         System.out.print("삭제할 컨테이너의 이름을 입력하시오. : ");
         String s = sc.nextLine();
-        sc.close();
         for (Container data : list) {
             if (data.getName().equals(s)) {
                 list.remove(data);
-                System.out.println("\n컨테이너 삭제 성공");
+                System.out.println("컨테이너 삭제 성공");
                 return;
             }
         }
+        sc.close();
         System.out.println("해당 컨테이너가 존재하지 않습니다.");
     }
 
@@ -62,10 +62,12 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
         if (list.isEmpty()) {
             return null;
         }
+        System.out.println("======================================");
 
         for (Container data : list) {
-            System.out.println(data.getName());
+            System.out.println(server.getName() + " : " + data.getName());
         }
+        System.out.println("======================================");
 
         return list;
     }
@@ -79,15 +81,15 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
         String s = sc.nextLine();
         for (Container data : list) {
             if (data.getName().equals(s)) {
-                System.out.print("\n바꿀 이름을 입력하시오. : ");
-                String b = sc.nextLine();
-                data.setName(b);
+                System.out.print("바꿀 이름을 입력하시오. : ");
+                s = sc.nextLine();
+
                 System.out.println("컨테이너 업데이트 성공");
                 return;
             }
         }
-        sc.close();
-        System.out.println("해당 서버가 존재하지 않습니다.");
+//        sc.close();
+        System.out.println("해당 컨테이너가 존재하지 않습니다.");
     }
 
     @Override

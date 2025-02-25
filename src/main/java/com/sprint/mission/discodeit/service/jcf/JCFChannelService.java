@@ -5,20 +5,20 @@ import com.sprint.mission.discodeit.service.ChannelService;
 
 
 public class JCFChannelService implements ChannelService {
-    JCFMessageService messageinstance = JCFMessageService.getInstance();
-    private static JCFChannelService channelinstance;
+    private static JCFChannelService instance;
 
     private JCFChannelService(){}
 
-    public JCFChannelService getInstance() {
-        if (channelinstance == null) {
-            channelinstance = new JCFChannelService();
+    public static JCFChannelService getInstance() {
+        if (instance == null) {
+            instance = new JCFChannelService();
         }
-        return channelinstance;
+        return instance;
     }
 
     @Override
     public Message write(String str) {
+        JCFMessageService messageinstance = JCFMessageService.getInstance();
         Message message = messageinstance.write(str);
         return message;
     }
