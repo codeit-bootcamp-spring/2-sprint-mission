@@ -5,7 +5,4 @@ public class Server extends BaseEntity{
     public Server(String id, String name) {
         super(id, name);
     }
-
-
-
 }

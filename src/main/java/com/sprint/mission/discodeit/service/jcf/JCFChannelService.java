@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Iterator.Iterator;
-import com.sprint.mission.discodeit.composit.Category;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.LinkedList;
@@ -40,7 +39,6 @@ public class JCFChannelService extends CategoryAndChannel {
             System.out.println("메시지가 없습니다.");
             return;
         }
-        print();
         Scanner sc = new Scanner(System.in);
         System.out.println("몇 번째 메시지를 삭제하시겠습니까?");
         int j = sc.nextInt();
@@ -50,7 +48,8 @@ public class JCFChannelService extends CategoryAndChannel {
         System.out.println("메시지 삭제 성공");
     }
 
-    public void updateMessage() {
+    @Override
+    public void update() {
         if (messageList.isEmpty()) {
             System.out.println("메시지가 없습니다.");
             return;
@@ -75,7 +74,7 @@ public class JCFChannelService extends CategoryAndChannel {
 
     @Override
     public boolean checkCategory(CategoryAndChannel item) {
-        if (item.getClass().isInstance(Category.class)) {
+        if (item.getClass().isInstance(JCFCategoryService.class)) {
             return true;
         } else {
             return false;
@@ -94,11 +93,6 @@ public class JCFChannelService extends CategoryAndChannel {
 
     @Override
     public void remove(CategoryAndChannel channel) {
-
-    }
-
-    @Override
-    public void update() {
 
     }
 

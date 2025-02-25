@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Iterator.ChannelIterator;
 import com.sprint.mission.discodeit.Iterator.Iterator;
-import com.sprint.mission.discodeit.composit.Category;
 
 import java.util.LinkedList;
 
@@ -38,41 +37,8 @@ public class JCFCategoryService extends CategoryAndChannel {
         channel.setName(replaceName);
     }
 
-    @Override
-    public void add(String str) {
-        // static필드 이용해서 선언해야함
-//        list.add(new Channel(null, str));
-    }
 
-    @Override
-    public void remove() {
-        if (list.isEmpty()) {
-            System.out.println("카테고리와 채널이 없습니다.");
-            return;
-        }
-    }
 
-    @Override
-    public void update() {
-
-    }
-
-    @Override
-    public void print() {
-        int j = 0;
-        CategoryAndChannel temp1 = head;
-        while (j < list.size()) {
-            CategoryAndChannel temp2 = head;
-            if (checkCategory(list.get(j))) {
-                head = list.get(j);
-            }
-        }
-    }
-
-    @Override
-    public void printHead() {
-        System.out.println(head.getName());
-    }
 
     @Override
     public void printCurrent() {
@@ -85,10 +51,45 @@ public class JCFCategoryService extends CategoryAndChannel {
         }
     }
 
+    @Override
+    public void print() {
+//        int j = 0;
+//        CategoryAndChannel temp1 = head;
+//        while (j < list.size()) {
+//            CategoryAndChannel temp2 = head;
+//            if (checkCategory(list.get(j))) {
+//                head = list.get(j);
+//            }
+//        }
+    }
+
+    //
+    @Override
+    public void add(String str) {
+        // static필드 이용해서 선언해야함
+//        list.add(new Channel(null, str));
+    }
+
+    @Override
+    public void remove() {
+    }
+
+    @Override
+    public void update() {
+
+    }
+
+
+    @Override
+    public void printHead() {
+        System.out.println(head.getName());
+    }
+
+
     // 구현해야할 것
     @Override
     public boolean checkCategory(CategoryAndChannel item) {
-        if (item.getClass().isInstance(Category.class)) {
+        if (item.getClass().isInstance(JCFCategoryService.class)) {
             return true;
         } else {
             return false;
