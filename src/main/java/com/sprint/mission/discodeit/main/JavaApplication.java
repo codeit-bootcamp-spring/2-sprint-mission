@@ -37,7 +37,7 @@ public class JavaApplication {
             System.out.println(e.getMessage());
         }
 
-        userService.getUsers().stream().forEach(System.out::println);
+        userService.getUsers().forEach(System.out::println);
         System.out.println("=========== 유저 생성 및 전체 조회 테스트 끝 ===========");
         System.out.println();
 
@@ -64,13 +64,13 @@ public class JavaApplication {
         // 유저 삭제
         System.out.println("=========== 유저 삭제 테스트 ===========");
         System.out.println("=========== 삭제 이전: 7명 ===========");
-        userService.getUsers().stream().forEach(System.out::println);
+        userService.getUsers().forEach(System.out::println);
         System.out.println("=========== 유저 'Oreo'를 id로 삭제 ===========");
         System.out.println("'Oreo' 삭제 성공 여부: " + userService.deleteUserById(user7.getId()));
         System.out.println("=========== 유저 'Mr.delete'를 이메일로 삭제 ===========");
         System.out.println("'Mr.delete' 삭제 성공 여부: " + userService.deleteUserByEmail(user6.getEmail()));
         System.out.println("=========== 삭제 이후: 5명이여야 함 ===========");
-        userService.getUsers().stream().forEach(System.out::println);
+        userService.getUsers().forEach(System.out::println);
         System.out.println("=========== 유저 삭제 테스트 끝===========");
         System.out.println();
 
@@ -86,7 +86,7 @@ public class JavaApplication {
         Channel channel3 = channelService.createChannel(user2.getId(), "이거거거거", "아아아아아");
         Channel channel4 = channelService.createChannel(user3.getId(), "스프링 공부방", "다른 방 베낌");
 
-        channelService.getAllChannels().stream().forEach(System.out::println);
+        channelService.getAllChannels().forEach(System.out::println);
         System.out.println("=========== 채널 생성 및 전체 채널 리스트 조회 테스트 끝 ===========");
         System.out.println();
 
@@ -96,7 +96,7 @@ public class JavaApplication {
         UUID ownerId1 = channelService.getChannelOwnerId(channel1.getId());
         System.out.println(userService.getUserById(ownerId1));
         System.out.println("=========== 특정 제목의 채널들 조회: '스프링 공부방' 채널이 2개 나와야 함 ===========");
-        channelService.getChannelsByTitle("스프링 공부방").stream().forEach(System.out::println);
+        channelService.getChannelsByTitle("스프링 공부방").forEach(System.out::println);
         System.out.println("=========== 채널 id로 채널 조회: sb02 방이 나와야 함 ===========");
         System.out.println(channelService.getChannelByChannelId(channel1.getId()));
         System.out.println("=========== 채널 조회 테스트 끝 ===========");
@@ -109,13 +109,13 @@ public class JavaApplication {
         channelService.addUserToChannel(channel1.getId(), user2.getId());
         channelService.addUserToChannel(channel1.getId(), user3.getId());
         System.out.println("=========== Han, Kim, Nice가 나와야 함 ===========");
-        channelService.getChannelMembers(channel1.getId()).stream().forEach((u) -> {
+        channelService.getChannelMembers(channel1.getId()).forEach((u) -> {
             System.out.println(userService.getUserById(u));
         });
         System.out.println("=========== Kim, Han(오너여서 제거 안 됨) 삭제 시도: Han, Nice가 나와야 함 ===========");
         channelService.deleteUserFromChannel(channel1.getId(), user1.getId());
         channelService.deleteUserFromChannel(channel1.getId(), user2.getId());
-        channelService.getChannelMembers(channel1.getId()).stream().forEach((u) -> {
+        channelService.getChannelMembers(channel1.getId()).forEach((u) -> {
             System.out.println(userService.getUserById(u));
         });
         System.out.println("=========== 채널 멤버 추가,삭제 및 조회 테스트 끝 ===========");
@@ -124,11 +124,11 @@ public class JavaApplication {
         //채널 삭제 테스트
         System.out.println("=========== 채널 삭제 테스트 ===========");
         System.out.println("=========== 채널 목록: 4개 ===========");
-        channelService.getAllChannels().stream().forEach(System.out::println);
+        channelService.getAllChannels().forEach(System.out::println);
 
         System.out.println("=========== 채널 하나 삭제: 3개 남아야 함 ===========");
         channelService.deleteChannelByChannelId(channel4.getId());
-        channelService.getAllChannels().stream().forEach(System.out::println);
+        channelService.getAllChannels().forEach(System.out::println);
         System.out.println("=========== 채널 삭제 테스트 끝===========");
         System.out.println();
         System.out.println();
@@ -149,7 +149,7 @@ public class JavaApplication {
         ChannelMessage cm3 = messageService.sendChannelMessage(user2.getId(), "난 보내지면 안됨, 채널에 없거든", channel1.getId());
         ChannelMessage cm4 = messageService.sendChannelMessage(user3.getId(), "하이루", channel1.getId());
 
-        messageService.getAllMessages().stream().forEach(System.out::println);
+        messageService.getAllMessages().forEach(System.out::println);
         System.out.println("=========== 메세지 생성 및 전체 메세지 조회 테스트 끝===========");
         System.out.println();
 
@@ -158,13 +158,13 @@ public class JavaApplication {
         System.out.println(messageService.getMessageById(pm6.getId()));
 
         System.out.println("=========== 송신자 기준 메세지 조회 테스트: Han이 보낸거: 개인 3개, 채널 2개 ===========");
-        messageService.getMessagesBySenderId(user1.getId()).stream().forEach(System.out::println);
+        messageService.getMessagesBySenderId(user1.getId()).forEach(System.out::println);
 
         System.out.println("=========== 수신자 기준 메세지 조회 테스트: Han이 받은거 3개 ===========");
-        messageService.getPrivateMessagesByReceiverId(user1.getId()).stream().forEach(System.out::println);
+        messageService.getPrivateMessagesByReceiverId(user1.getId()).forEach(System.out::println);
 
         System.out.println("=========== 채널 기준 메세지 조회 테스트: 채널 1에 메세지 3개 ===========");
-        messageService.getChannelMessagesByChannelId(channel1.getId()).stream().forEach(System.out::println);
+        messageService.getChannelMessagesByChannelId(channel1.getId()).forEach(System.out::println);
         System.out.println("=========== 채널 메세지 조회 테스트 끝 ===========");
         System.out.println();
 
@@ -179,9 +179,9 @@ public class JavaApplication {
         System.out.println("=========== 메세지 삭제 테스트: Han이 보낸 헬로우 메세지 삭제 ===========");
         messageService.deleteMessage(pm1.getId());
         System.out.println("=========== 송신자 기준 메세지 목록: 4개여야 삭제된거임 ===========");
-        messageService.getMessagesBySenderId(user1.getId()).stream().forEach(System.out::println);
+        messageService.getMessagesBySenderId(user1.getId()).forEach(System.out::println);
         System.out.println("=========== 수신자 기준 메세지 목록: 1개여야 삭제된거임 ===========");
-        messageService.getPrivateMessagesByReceiverId(user2.getId()).stream().forEach(System.out::println);
+        messageService.getPrivateMessagesByReceiverId(user2.getId()).forEach(System.out::println);
 
 
     }
