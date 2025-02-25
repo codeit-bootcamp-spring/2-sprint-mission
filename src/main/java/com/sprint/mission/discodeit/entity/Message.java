@@ -3,20 +3,20 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class Message extends BaseEntity {
-    private UUID senderId;
+    private final UUID senderId;
     private String content;
 
     protected Message(UUID senderId, String content) {
         super();
-        setSenderId(senderId);
+        validateSenderId(senderId);
+        this.senderId = senderId;
         setContent(content);
     }
 
-    private void setSenderId(UUID senderId) {
+    private void validateSenderId(UUID senderId) {
         if (senderId == null) {
             throw new IllegalArgumentException("유효하지 않은 송신자입니다");
         }
-        this.senderId = senderId;
     }
 
     private void setContent(String content) {

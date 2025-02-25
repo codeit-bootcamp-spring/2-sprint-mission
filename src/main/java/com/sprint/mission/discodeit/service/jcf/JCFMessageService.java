@@ -10,10 +10,10 @@ import java.util.*;
 public class JCFMessageService implements MessageService {
     private static JCFMessageService instance;
 
-    private Map<UUID, Message> messages;
-    private Map<UUID, List<UUID>> messageIdsBySenderId;
-    private Map<UUID, List<UUID>> channelMessageIdsByChannelId;
-    private Map<UUID, List<UUID>> privateMessageIdsByReceiverId;
+    private final Map<UUID, Message> messages;
+    private final Map<UUID, List<UUID>> messageIdsBySenderId;
+    private final Map<UUID, List<UUID>> channelMessageIdsByChannelId;
+    private final Map<UUID, List<UUID>> privateMessageIdsByReceiverId;
 
     private JCFMessageService() {
         messages = new HashMap<>();

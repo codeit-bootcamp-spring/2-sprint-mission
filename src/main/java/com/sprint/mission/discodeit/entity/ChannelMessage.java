@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class ChannelMessage extends Message {
-    UUID channelId;
+    private final UUID channelId;
 
     public ChannelMessage(UUID senderId, String content, UUID channelId) {
         super(senderId, content);
