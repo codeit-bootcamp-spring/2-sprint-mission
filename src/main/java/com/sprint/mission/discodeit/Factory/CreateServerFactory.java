@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.Factory;
 
 import com.sprint.mission.discodeit.entity.Server;
-import com.sprint.mission.discodeit.service.jcf.JCFServerService;
 
-public class CreateServerFactory implements Factory{
+public class CreateServerFactory implements Factory<Server>{
     private static int count = 0;
 
     // 싱글톤 패턴 적용
@@ -20,7 +19,9 @@ public class CreateServerFactory implements Factory{
     }
 
     @Override
-    public JCFServerService create(String str) {
-        return new JCFServerService("S"+count++,str);
+    public Server create(String name) {
+        return new Server(name);
     }
+
+
 }

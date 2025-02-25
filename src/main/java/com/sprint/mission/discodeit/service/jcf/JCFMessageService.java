@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 
 public class JCFMessageService implements MessageService {
-    private static int count = 0;
     private static JCFMessageService instance;
 
     private JCFMessageService() {
@@ -19,8 +18,8 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message add(String str) {
-        Message message = new Message("M" + count, "M" + count, str);
-        count++;
+        String s = String.valueOf(str.hashCode());
+        Message message = new Message(s, str);
         return message;
     }
 }

@@ -2,30 +2,27 @@ package com.sprint.mission.discodeit.entity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 public class BaseEntity {
-    protected String id;
+    protected UUID id;
     protected String name;
     public final Long createdAt;
     public Long updatedAt;
     protected final SimpleDateFormat dayTime = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
 
-    public BaseEntity(String id, String name) {
-        this.id = id;
+    public BaseEntity(String name) {
+        this.id = UUID.randomUUID();
         this.name = name;
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = this.createdAt;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 

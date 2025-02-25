@@ -25,19 +25,19 @@ public class JCFCategoryService implements CategoryService {
     }
 
     @Override
-    public void add(CategoryAndChannel channel) {
-        list.add(channel);
+    public void add( ) {
+
     }
 
     @Override
-    public void remove(CategoryAndChannel channel) {
-        list.remove(channel);
+    public void remove( ) {
+
     }
 
     //업데이트 조건, id가 동일해야한다.
     @Override
-    public void update(CategoryAndChannel channel, String replaceName) {
-        channel.setName(replaceName);
+    public void update(String replaceName) {
+
     }
 
     @Override

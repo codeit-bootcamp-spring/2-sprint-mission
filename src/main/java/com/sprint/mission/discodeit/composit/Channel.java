@@ -7,8 +7,8 @@ import java.util.List;
 
 public class Channel extends CategoryAndChannel {
     private List<Message> messageList;
-    public Channel(String id, String name) {
-        super(id, name);
+    public Channel(String name) {
+        super(name);
     }
 
     public void setMessageList(List<Message> messageList) {

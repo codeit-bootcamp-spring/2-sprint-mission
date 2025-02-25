@@ -6,9 +6,8 @@ import java.util.List;
 public class Category extends CategoryAndChannel {
     public List<CategoryAndChannel> list;
 
-    public Category(String id, String name) {
-        super(id, name);
-        list = new LinkedList<>();
+    public Category(String name) {
+        super(name);
     }
 
     public void setList(List<CategoryAndChannel> list) {
