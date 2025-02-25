@@ -1,13 +1,16 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
     private static JCFChannelService instance;
 
+    private UserService userService;
     private final Map<UUID, Channel> channels;
     private final Map<UUID, Set<UUID>> memberIdsByChannelId;
 
@@ -24,9 +27,16 @@ public class JCFChannelService implements ChannelService {
         return instance;
     }
 
+    private UserService getUserService() {
+        if (userService == null) {
+            userService = JCFUserService.getInstance();
+        }
+        return userService;
+    }
 
     @Override
     public Channel createChannel(UUID ownerId, String title, String description) {
+        getUserService().validateUserId(ownerId);
         Channel channel = new Channel(ownerId, title, description);
         channels.put(channel.getId(), channel);
 
@@ -40,14 +50,12 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public UUID getChannelOwnerId(UUID channelId) {
-        Channel channel = channels.get(channelId);
-        if (channel == null) return null;
-
-        return channel.getOwnerId();
+        return getChannelByChannelId(channelId).getOwnerId();
     }
 
     @Override
     public Channel getChannelByChannelId(UUID channelId) {
+        validateChannelId(channelId);
         return channels.get(channelId);
     }
 
@@ -65,52 +73,76 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Set<UUID> getChannelMembers(UUID channelId) {
+        validateChannelId(channelId);
         return memberIdsByChannelId.get(channelId);
     }
 
     @Override
-    public Channel updateChannel(UUID channelId, UUID ownerId, String title, String description) {
-        Channel channel = channels.get(channelId);
+    public Channel updateChannel(UUID channelId, String title, String description) {
+        validateChannelId(channelId);
+        Channel channel = getChannelByChannelId(channelId);
         channel.update(channelId, title, description);
-
         return channel;
     }
 
     @Override
-    public boolean deleteChannelByChannelId(UUID channelId) {
-        if (!channels.containsKey(channelId)) {
-            return false;
-        }
-
+    public void deleteChannelByChannelId(UUID channelId) {
+        validateChannelId(channelId);
         channels.remove(channelId);
         memberIdsByChannelId.remove(channelId);
-
-        return true;
     }
 
     @Override
     public Channel addUserToChannel(UUID channelId, UUID userId) {
+        getUserService().validateUserId(userId);
+        validateChannelId(channelId);
         memberIdsByChannelId.get(channelId).add(userId);
         return getChannelByChannelId(channelId);
     }
 
     @Override
-    public Channel deleteUserFromChannel(UUID channelId, UUID userId) {
+    public void deleteUserFromChannel(UUID channelId, UUID userId) {
+        getUserService().validateUserId(userId);
+        validateChannelId(channelId);
         if (userId.equals(getChannelOwnerId(channelId))) {
-            return getChannelByChannelId(channelId);
+            throw new IllegalArgumentException("채널 소유자 삭제 불가");
         }
 
         memberIdsByChannelId.get(channelId).remove(userId);
-        return getChannelByChannelId(channelId);
     }
 
-    protected boolean isChannelMember(UUID channelId, UUID userId) {
-        Set<UUID> channelMembers = memberIdsByChannelId.get(channelId);
-        if (channelMembers == null) {
-            return false;
+    @Override
+    public void deleteUserFromEveryChannel(UUID userId) {
+        if (isOwnerOfAnyChannel(userId)) {
+            throw new IllegalArgumentException("채널 소유자 삭제 불가");
         }
+
+        channels.keySet().stream().forEach(channelId ->
+                deleteUserFromChannel(channelId, userId));
+    }
+
+    private boolean isOwnerOfAnyChannel(UUID userId) {
+        getUserService().validateUserId(userId);
+        return channels.values().stream()
+                .anyMatch(channel -> userId.equals(channel.getOwnerId()));
+    }
+
+    boolean isChannelMember(UUID channelId, UUID userId) {
+        validateChannelId(channelId);
+        Set<UUID> channelMembers = memberIdsByChannelId.get(channelId);
 
         return channelMembers.stream()
                 .anyMatch(memberId -> memberId.equals(userId));
     }
+
+    @Override
+    public void validateChannelId(UUID channelId) {
+        if (!channels.containsKey(channelId)) {
+            throw new ChannelNotFoundException("해당 채널 없음");
+        }
+        if (!memberIdsByChannelId.containsKey(channelId)) {
+            throw new ChannelNotFoundException("해당 채널 없음");
+        }
+    }
 }
+

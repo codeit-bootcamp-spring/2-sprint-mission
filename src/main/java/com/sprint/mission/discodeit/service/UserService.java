@@ -11,6 +11,7 @@ public interface UserService {
     User getUserByEmail(String email);
     List<User> getAllUsers();
     User updateUser(UUID userId, String nickname, String avatar, String status);
-    boolean deleteUserByEmail(String email);
-    boolean deleteUserById(UUID userId);
+    void deleteUserByEmail(String email);
+    void deleteUserById(UUID userId);
+    void validateUserId(UUID userId);
 }

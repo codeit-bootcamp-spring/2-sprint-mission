@@ -22,8 +22,6 @@ public class JavaApplication {
         // 유저 등록 테스트
         System.out.println("=========== 유저 생성 및 유저 리스트 조회 테스트 ===========");
         System.out.println("=========== 예상 결과: 유저 7명 나옴 ===========");
-
-
         User user1 = userService.createUser("Han", "Han@gmail.com", "", "hello I'm sam");
         User user2 = userService.createUser("Kim", "Kim@gmail.com", "dog pic", "I like dogs");
         User user3 = userService.createUser("Nick", "Nick@ggg.io", "cat pic", "I love cats");
@@ -76,9 +74,9 @@ public class JavaApplication {
         System.out.println("=========== 삭제 이전: 7명 ===========");
         userService.getAllUsers().forEach(System.out::println);
         System.out.println("=========== 유저 'Oreo'를 id로 삭제 ===========");
-        System.out.println("'Oreo' 삭제 성공 여부: " + userService.deleteUserById(user7.getId()));
+        userService.deleteUserById(user7.getId());
         System.out.println("=========== 유저 'Mr.delete'를 이메일로 삭제 ===========");
-        System.out.println("'Mr.delete' 삭제 성공 여부: " + userService.deleteUserByEmail(user6.getEmail()));
+        userService.deleteUserByEmail(user6.getEmail());
         System.out.println("=========== 삭제 이후: 5명이여야 함 ===========");
         userService.getAllUsers().forEach(System.out::println);
         System.out.println("=========== 유저 삭제 테스트 끝===========");
@@ -123,7 +121,11 @@ public class JavaApplication {
             System.out.println(userService.getUserByUserId(u));
         });
         System.out.println("=========== Kim, Han(오너여서 제거 안 됨) 삭제 시도: Han, Nice가 나와야 함 ===========");
-        channelService.deleteUserFromChannel(channel1.getId(), user1.getId());
+        try {
+            channelService.deleteUserFromChannel(channel1.getId(), user1.getId());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
         channelService.deleteUserFromChannel(channel1.getId(), user2.getId());
         channelService.getChannelMembers(channel1.getId()).forEach((u) -> {
             System.out.println(userService.getUserByUserId(u));
@@ -193,6 +195,32 @@ public class JavaApplication {
         System.out.println("=========== 수신자 기준 메세지 목록: 1개여야 삭제된거임 ===========");
         messageService.getPrivateMessagesByReceiverId(user2.getId()).forEach(System.out::println);
 
+
+        System.out.println();
+        System.out.println();
+        System.out.println("=========== 유저 삭제하면 채널에서도 없어지는지 확인:  ===========");
+        System.out.println("=========== 신규유저: David 생성, 채널 1, 2에 가입 ===========");
+        User userToDelete = userService.createUser("David", "David@gmail.com", "Dog", "HIHIHIHIHIHI");
+        channelService.addUserToChannel(channel1.getId(), userToDelete.getId());
+        channelService.addUserToChannel(channel2.getId(), userToDelete.getId());
+        System.out.println("=========== 채널 1 유저 목록 - David 있어야 함===========");
+        channelService.getChannelMembers(channel1.getId()).forEach((u) -> {
+            System.out.println(userService.getUserByUserId(u).getNickname());
+        });
+        System.out.println("=========== 채널 2 유저 목록 - David 있어야 함 ===========");
+        channelService.getChannelMembers(channel2.getId()).forEach((u) -> {
+            System.out.println(userService.getUserByUserId(u).getNickname());
+        });
+        System.out.println("=========== 유저 David 삭제 ===========");
+        userService.deleteUserById(userToDelete.getId());
+        System.out.println("=========== 채널 1 유저 목록 - David 없어야 함===========");
+        channelService.getChannelMembers(channel1.getId()).forEach((u) -> {
+            System.out.println(userService.getUserByUserId(u).getNickname());
+        });
+        System.out.println("=========== 채널 2 유저 목록 - David 없어야 함 ===========");
+        channelService.getChannelMembers(channel2.getId()).forEach((u) -> {
+            System.out.println(userService.getUserByUserId(u).getNickname());
+        });
 
     }
 }

@@ -13,8 +13,10 @@ public interface ChannelService {
     List<Channel> getChannelsByTitle(String title);
     List<Channel> getAllChannels();
     Set<UUID> getChannelMembers(UUID channelId);
-    Channel updateChannel(UUID channelId, UUID ownerId, String title, String description);
-    boolean deleteChannelByChannelId(UUID channelId);
+    Channel updateChannel(UUID channelId, String title, String description);
+    void deleteChannelByChannelId(UUID channelId);
     Channel addUserToChannel(UUID channelId, UUID userId);
-    Channel deleteUserFromChannel(UUID channelId, UUID userId);
+    void deleteUserFromChannel(UUID channelId, UUID userId);
+    void deleteUserFromEveryChannel(UUID userId);
+    void validateChannelId(UUID channelId);
 }
