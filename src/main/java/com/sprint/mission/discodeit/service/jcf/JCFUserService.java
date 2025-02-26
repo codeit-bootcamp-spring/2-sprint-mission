@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.application.UserDto;
-import com.sprint.mission.application.UserRegisterDto;
+import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.infra.UserRepository;
 import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
@@ -15,7 +15,7 @@ public class JCFUserService implements UserService {
     @Override
     public UserDto register(UserRegisterDto userRegisterDto) {
         User savedUser = userRepository.save(
-                new User(userRegisterDto.name(), userRegisterDto.password())
+                new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password())
         );
 
         return new UserDto(savedUser.getId(), savedUser.getName());

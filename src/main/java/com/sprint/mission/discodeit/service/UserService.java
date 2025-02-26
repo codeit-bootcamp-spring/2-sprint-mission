@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.application.UserDto;
-import com.sprint.mission.application.UserRegisterDto;
+import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.application.UserRegisterDto;
 import java.util.List;
 import java.util.UUID;
 

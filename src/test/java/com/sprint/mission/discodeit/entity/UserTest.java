@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class UserTest {
     @Test
     void 업데이트시_수정시간_변경되는지_확인() {
-        User user = new User("황지환", "password");
+        User user = new User("황지환", "h7878@naver.com","password");
         Long createdAt = user.getUpdatedAt();
 
         user.updateName("지환");

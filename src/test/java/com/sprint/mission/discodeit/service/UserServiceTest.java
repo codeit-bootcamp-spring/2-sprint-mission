@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.sprint.mission.application.UserDto;
-import com.sprint.mission.application.UserRegisterDto;
+import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 class UserServiceTest {
     private static final String PASSWORD = "password";
     private static final String NAME = "황지환";
+    private static final String EMAIL = "hwang@naver.com";
     private UserService userService;
     private UserDto setUpUser;
 
@@ -21,7 +22,7 @@ class UserServiceTest {
     void init() {
         userService = new JCFUserService();
 
-        this.setUpUser = userService.register(new UserRegisterDto(NAME, PASSWORD));
+        this.setUpUser = userService.register(new UserRegisterDto(NAME, EMAIL, PASSWORD));
     }
 
     @Test
@@ -49,8 +50,8 @@ class UserServiceTest {
 
     @Test
     void 유저_이름_다수_조회() {
-        UserRegisterDto userOtherHwang = new UserRegisterDto(NAME, PASSWORD + "123");
-        UserRegisterDto userKim = new UserRegisterDto("KIM", PASSWORD);
+        UserRegisterDto userOtherHwang = new UserRegisterDto(NAME, EMAIL, PASSWORD + "123");
+        UserRegisterDto userKim = new UserRegisterDto("KIM", EMAIL, PASSWORD);
 
         userService.register(userOtherHwang);
         userService.register(userKim);

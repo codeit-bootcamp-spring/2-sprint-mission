@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.application.ChannelDto;
+import com.sprint.mission.discodeit.application.ChannelDto;
+import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.infra.ChannelRepository;
 import com.sprint.mission.discodeit.infra.jcf.JCFChannelRepository;
@@ -12,9 +13,9 @@ public class JCFChannelService implements ChannelService {
     private final ChannelRepository channelRepository = new JCFChannelRepository();
 
     @Override
-    public ChannelDto create(String name) {
+    public ChannelDto create(String name, UserDto owner) {
         Channel channel = channelRepository.save(
-                new Channel(name)
+                new Channel(name, owner.id())
         );
 
         return new ChannelDto(channel.getId(), channel.getName());

@@ -8,7 +8,7 @@ import testmethod.ConsoleTestTemplate;
 class ApplicationTest extends ConsoleTestTemplate {
     @Test
     void 초기_채널_생성_테스트() {
-        run();
+        run("7");
         assertThat(output()).contains(
                 "안녕하세요 코드잇2기 서버입니다.",
                 "—---------------------------------------------------------",

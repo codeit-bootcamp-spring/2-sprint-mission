@@ -8,13 +8,15 @@ public class User {
     private final Long createdAt;
     private Long updatedAt;
     private String name;
+    private String email;
     private String password;
 
-    public User(String name, String password) {
+    public User(String name, String email, String password) {
         this.id = UUID.randomUUID(); // TODO: 2/20/25 Id가 UUID에 의존하지 않도록 수정 요망
         this.createdAt = Instant.now().getEpochSecond();
         this.updatedAt = createdAt;
         this.name = name;
+        this.email = email;
         this.password = password;
     }
 

@@ -7,12 +7,16 @@ public class Message {
     private UUID id;
     private final Long createdAt;
     private Long updatedAt;
+    private final UUID userId;
+    private final UUID channelId;
     private String context;
 
-    public Message(String context) {
+    public Message(String context, UUID channelId, UUID userId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
         this.updatedAt = createdAt;
+        this.userId = userId;
+        this.channelId = channelId;
         this.context = context;
     }
 

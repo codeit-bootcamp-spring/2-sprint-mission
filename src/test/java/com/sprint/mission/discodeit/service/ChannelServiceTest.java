@@ -3,7 +3,8 @@ package com.sprint.mission.discodeit.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.sprint.mission.application.ChannelDto;
+import com.sprint.mission.discodeit.application.ChannelDto;
+import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,7 @@ class ChannelServiceTest {
     @BeforeEach
     void setUp() {
         channelService = new JCFChannelService();
-        setUpChannel = channelService.create(NAME);
+        setUpChannel = channelService.create(NAME, new UserDto(UUID.randomUUID(), "황지환"));
     }
 
     @Test

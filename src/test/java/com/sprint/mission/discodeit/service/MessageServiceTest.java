@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.sprint.mission.application.MessageDto;
+import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +17,7 @@ class MessageServiceTest {
     @BeforeEach
     void setUp() {
         messageService = new JCFMessageService();
-        setUpMessage = messageService.create(CONTEXT);
+        setUpMessage = messageService.create(CONTEXT, UUID.randomUUID(), UUID.randomUUID());
     }
 
     @Test
