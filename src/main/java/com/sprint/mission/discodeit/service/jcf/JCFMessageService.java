@@ -164,4 +164,78 @@ public class JCFMessageService implements MessageService {
         System.out.println("존재하지 않습니다.");
         return false;
     }
+
+    @Override
+    public boolean update(UUID myId, UUID targetId) {
+        UserRepository myRepository = getUserRepository(myId);
+        Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
+        Queue<Message> myMessages = getMessages(myMessageList, myId);
+
+        UserRepository yourRepository = getUserRepository(targetId);
+        Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
+        Queue<Message> yourMessages = getMessages(yourMessageList, targetId);
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.printf("바꿀려고 하는 대상의 이름을 입력하시오. : ");
+        String targetName = sc.nextLine();
+        System.out.printf("바꿀 이름을 입력하시오. : ");
+        String replaceName = sc.nextLine();
+
+        return update(myMessages, yourMessages, targetName, replaceName);
+    }
+
+    @Override
+    public boolean update(UUID myId, UUID targetId, String targetName) {
+        UserRepository myRepository = getUserRepository(myId);
+        Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
+        Queue<Message> myMessages = getMessages(myMessageList, myId);
+
+        UserRepository yourRepository = getUserRepository(targetId);
+        Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
+        Queue<Message> yourMessages = getMessages(yourMessageList, targetId);
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.printf("바꿀 이름을 입력하시오. : ");
+        String replaceName = sc.nextLine();
+
+        return update(myMessages, yourMessages, targetName, replaceName);
+    }
+
+    @Override
+    public boolean update(UUID myId, UUID targetId, String targetName, String replaceName) {
+        UserRepository myRepository = getUserRepository(myId);
+        Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
+        Queue<Message> myMessages = getMessages(myMessageList, myId);
+
+        UserRepository yourRepository = getUserRepository(targetId);
+        Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
+        Queue<Message> yourMessages = getMessages(yourMessageList, targetId);
+
+        return update(myMessages, yourMessages, targetName, replaceName);
+    }
+
+    private boolean update(Queue<Message> myMessages, Queue<Message> yourMessages, String targetName, String replaceName) {
+        boolean find = false;
+        Message temp = null;
+        for (Message message : myMessages) {
+            if (message.getName().equals(targetName)) {
+                find = true;
+                temp = message;
+                break;
+            }
+        }
+        if (find) {
+            for (Message message : yourMessages) {
+                if (message.getName().equals(targetName)) {
+                    temp.setName(replaceName);
+                    message.setName(replaceName);
+                    return true;
+                }
+            }
+        }
+        System.out.println("존재하지 않습니다.");
+        return false;
+    }
 }

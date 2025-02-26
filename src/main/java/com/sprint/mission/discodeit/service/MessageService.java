@@ -19,6 +19,10 @@ public interface MessageService {
     public abstract boolean remove(UUID myId, UUID targetId, String str);
 
     public abstract boolean remove(UUID myId, UUID targetId, Message message);
+
     //업데이트
+    public abstract boolean update(UUID myId, UUID targetId);
+    public abstract boolean update(UUID myId, UUID targetId, String targetName);
+    public abstract boolean update(UUID myId, UUID targetId, String targetName, String replaceName);
 
 }
