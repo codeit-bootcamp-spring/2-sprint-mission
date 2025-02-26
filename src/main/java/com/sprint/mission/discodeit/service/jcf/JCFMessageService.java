@@ -36,11 +36,16 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void create(Message message) {
-        if (userService.findById(message.getUserId()) == null) {
+
+        if(message == null) {
+            throw new IllegalArgumentException("message 객체가 null 입니다.");
+        }
+
+        if (userService.findById(message.getUserId()).isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 유저입니다: " + message.getUserId());
         }
 
-        if (channelService.findById(message.getChannelId()) == null) {
+        if (channelService.findById(message.getChannelId()).isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 채널입니다: " + message.getChannelId());
         }
 
@@ -48,8 +53,8 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message findById(UUID id) {
-        return data.get(id);
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override

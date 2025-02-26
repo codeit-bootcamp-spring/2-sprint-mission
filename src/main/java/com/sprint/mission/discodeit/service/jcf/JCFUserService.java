@@ -35,9 +35,9 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User findById(UUID id) {
+    public Optional<User> findById(UUID id) {
 
-        return data.get(id);
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
