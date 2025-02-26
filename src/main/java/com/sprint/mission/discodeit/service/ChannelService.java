@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    void createChannel(Channel newChannel);
+    void createChannel(String channelName);
     Channel readChannel(UUID channelId);
     ArrayDeque<Channel> readAllChannels();
     List<Message> readMessageListByChannelId(UUID channelId);
