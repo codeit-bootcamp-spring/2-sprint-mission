@@ -5,8 +5,20 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.util.UUID;
 
 public interface MessageService {
-    public abstract void send(UUID id, UUID targetId, String str);
+    //전송
+    public abstract void send(UUID myId, UUID targetId, String str);
 
-    public abstract void send(UUID id, UUID targetId, Message message);
+    public abstract void send(UUID myId, UUID targetId, Message message);
+
+    //읽기
+    public abstract void read(UUID myId);
+
+    //삭제
+    public abstract boolean remove(UUID myId, UUID targetId);
+
+    public abstract boolean remove(UUID myId, UUID targetId, String str);
+
+    public abstract boolean remove(UUID myId, UUID targetId, Message message);
+    //업데이트
 
 }

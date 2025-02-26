@@ -46,24 +46,6 @@ public class JCFUserService implements UserService {
         return userRepository;
     }
 
-    @Override
-    public Message write(UUID id, UUID targetId, String str) {
-        UserRepository userRepository = getUserRepository(id);
-        Map<UUID, Queue<Message>> messageList = userRepository.getMessageList();
-        Queue<Message> messages = messageList.get(targetId);
-        Message message = new Message(str);
-        messages.add(message);
-        return message;
-    }
-
-    @Override
-    public Message write(UUID id, UUID targetId, Message message) {
-        UserRepository userRepository = getUserRepository(id);
-        Map<UUID, Queue<Message>> messageList = userRepository.getMessageList();
-        Queue<Message> messages = messageList.get(targetId);
-        messages.add(message);
-        return message;
-    }
 
     public Server createServer(String name) {
         return CreateServerFactory.getInstance().create(name);
