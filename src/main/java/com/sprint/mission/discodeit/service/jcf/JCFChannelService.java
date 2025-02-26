@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,7 +49,6 @@ public class JCFChannelService implements ChannelService {
     private Channel findChannel(String channelName) {
         for (Channel channelList : channelsData) {
             if (channelList.getChannelName().equals(channelName)) {
-                System.out.println(channelList);
                 return channelList;
             }
         }

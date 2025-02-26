@@ -50,7 +50,6 @@ public class JCFUserService implements UserService {
     private User find(String name) {
         for (User userList : usersData) {
             if (userList.getName().equals(name)) {
-                System.out.println(userList);
                 return userList;
             }
         }

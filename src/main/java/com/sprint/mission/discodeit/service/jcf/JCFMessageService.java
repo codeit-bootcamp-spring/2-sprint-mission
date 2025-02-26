@@ -7,7 +7,9 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
     public final List<Message> messagesData;
@@ -21,85 +23,112 @@ public class JCFMessageService implements MessageService {
 
     // 메시지 생성
     @Override
-    public void createMessage(Message message) {
-        User user = userService.getUser(message.getSender());
-        if(user != null && message.getSender().equals(user.getName())) {
-            messagesData.add(message);
-            System.out.println("-------------------[메시지 전달 결과]-----------------------");
-            System.out.println("보내는 사람: " + message.getSender() + "\n내용: " + message.getMessage());
-            System.out.println("업데이트 시간: " + message.getupdatedAttFormatted());
-            System.out.println("---------------------------------------------------------");
-        } else {
-            System.out.println("등록 된 사용자가 없습니다.");
+    public Message create(Message message) {
+        if (!validateMessage(message)) {
+            return null;
         }
+        return createMessage(message);
     }
 
+    private Message createMessage(Message message) {
+        messagesData.add(message);
+        System.out.println(message);
+        return message;
+    }
 
+    private boolean validateMessage(Message message) {
+        User user = userService.getUser(message.getSender());
+        if (user != null && user.getName().equals(message.getSender())) {
+            return true;
+        }
+        System.out.println("등록 된 사용자가 없습니다.");
+        return false;
+    }
 
 
     // 메시지 단일 조회
     @Override
-    public void getMessage(String sender){
-        boolean found = false;
+    public List<Message> getMessage(String sender) {
+        return findMessage(sender);
+    }
+
+    private List<Message> findMessage(String sender) {
+        boolean find = false;
+        List<Message> result = new ArrayList<>();
         for (Message messageList : messagesData) {
             if (messageList.getSender().equals(sender)) {
-                System.out.println("-------------------[메시지 조회 결과]-----------------------");
-                System.out.println("보낸 사람: " + messageList.getSender() + "\n보낸 내용: " + messageList.getMessage());
-                System.out.println("업데이트 시간: " + messageList.getupdatedAttFormatted());
-                System.out.println("---------------------------------------------------------");
-                found = true;
+                result.add(messageList);
+                find = true;
             }
         }
-        if (!found){
-            System.out.println("전달 된 메시지가 없습니다.");
+        if (!find) {
         }
+        return result;
     }
+
+    private Message find(String sender) {
+        for (Message messageList : messagesData) {
+            if (messageList.getSender().equals(sender)) {
+                return messageList;
+            }
+        }
+        return null;
+    }
+
 
     // 메시지 전체 조회
     @Override
-    public void getAllMessage() {
-        System.out.println("-----------------[메시지 전체 조회 결과]---------------------");
-        for (Message messageList : messagesData) {
-            System.out.printf("보낸 사람: %-10s 보낸 내용: %s\n업데이트 시간: %s\n\n",
-                    messageList.getSender(), messageList.getMessage(), messageList.getupdatedAttFormatted());
-            System.out.println("---------------------------------------------------------");
-        }
+    public List<Message> getAllMessage() {
+        return findAllMessage();
     }
+
+    private List<Message> findAllMessage(){
+        if (messagesData.isEmpty()) {
+            System.out.println("전체 조회 결과가 없습니다.");
+            return Collections.emptyList();
+        }
+        for (Message messageList : messagesData) {
+            System.out.println(messageList);
+        }
+        return messagesData;
+    }
+
 
 
     // 메시지 수정
     @Override
-    public void updateMessage(String sender, String changeMessage) {
-        String oldMessage;
-        for (Message messageList : messagesData) {
-            if (messageList.getSender().equals(sender)) {
-                oldMessage = messageList.getMessage();
-                messageList.updateMessage(changeMessage);
-                System.out.println("---------------------[메시지 수정 결과]-------------------------");
-                System.out.printf("보낸 사람: %s\n이전 내용: %s\n수정 내용: %s\n", messageList.getSender(), oldMessage, messageList.getMessage());
-                System.out.println("업데이트 시간: " + messageList.getupdatedAttFormatted());
-                System.out.println("---------------------------------------------------------");
-                return;
-            }
-        }
-        System.out.println("전달 한 메시지가 존재하지 않습니다.");
+    public Message update (String sender, UUID uuid, String changeMessage){
+        return updateMessage(sender, uuid, changeMessage);
     }
+
+    private Message updateMessage(String sender,UUID uuid, String changeMessage){
+        Message senderName = find(sender);
+        if (senderName != null && senderName.getId().equals(uuid)) {
+            senderName.updateMessage(changeMessage);
+            System.out.printf("보낸 내용이 [ %s ] 로 변경되었습니다.", senderName.getSender(), senderName.getMessage());
+            return senderName;
+        }
+        System.out.println("메시지가 존재하지 않습니다.");
+        return null;
+    }
+
+
 
 
     // 메시지 삭제
     @Override
-    public void deleteMessage(String sender) {
-        for (Message messageList : messagesData) {
-            if (messageList.getSender().equals(sender)) {
-                messagesData.remove(messageList);
-                System.out.println("---------------------[메시지 삭제 결과]----------------------");
-                System.out.printf("삭제 된 메시지: %s\n", messageList.getMessage());
-                System.out.println("---------------------------------------------------------");
-                return;
-            }
-        }
-        System.out.println("입력 한 메시지가 존재하지 않습니다");
+    public Message delete (String sender){
+        return deleteMessage(sender);
     }
-
+    private Message deleteMessage(String sender){
+        Message sendName = find(sender);
+        if (sendName != null) {
+            messagesData.remove(sendName);
+            System.out.println("[ " + sendName.getSender() + " ] 이 삭제 되었습니다.");
+            return sendName;
+        }
+        System.out.println("메시지가 존재하지 않습니다");
+        return null;
+    }
 
 }

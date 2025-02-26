@@ -10,13 +10,16 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
         UserService userService = new JCFUserService();
         ChannelService channelService = new JCFChannelService();
         MessageService messageService = new JCFMessageService(userService);
+
 
         Scanner sc = new Scanner(System.in);
 
@@ -25,7 +28,7 @@ public class JavaApplication {
             System.out.println("\n=== 메뉴 ===");
             System.out.println("1. 사용자");
             System.out.println("2. 채널");
-            System.out.println("3. 메시지[구현중]");
+            System.out.println("3. 메시지");
             System.out.println("4. 종료");
             System.out.print("번호 입력: ");
 
@@ -59,6 +62,9 @@ public class JavaApplication {
                             System.out.print("사용자 이름 입력: ");
                             String userName2 = sc.nextLine();
                             userService.getUser(userName2);
+                            User userPrint = userService.getUser(userName2);
+                            System.out.println(userPrint);
+                            System.out.println();
                             break;
 
                         case "3":
@@ -74,7 +80,6 @@ public class JavaApplication {
                             String changename = sc.nextLine();
                             System.out.print("새로운 사용자 이메일 입력: ");
                             String changeemail = sc.nextLine();
-                            User Userinfo =
                             userService.update(username3, changename, changeemail);
                             break;
 
@@ -114,6 +119,8 @@ public class JavaApplication {
                             System.out.print("채널 이름 입력: ");
                             String channelName2  =sc.nextLine();
                             channelService.getChannel(channelName2);
+                            Channel channelPrint = channelService.getChannel(channelName2);
+                            System.out.println(channelPrint);
                             break;
 
                         case "3":
@@ -160,7 +167,7 @@ public class JavaApplication {
                             System.out.print("보낼 메시지 내용 입력: ");
                             String sendMessage = sc.nextLine();
                             Message m1= new Message(sender1, sendMessage);
-                            messageService.createMessage(m1);
+                            messageService.create(m1);
                             break;
 
                         case "2":
@@ -168,6 +175,8 @@ public class JavaApplication {
                             System.out.print("보낸 사람 입력: ");
                             String sender2  =sc.nextLine();
                             messageService.getMessage(sender2);
+                            List<Message> messagePrint = messageService.getMessage(sender2);
+                            System.out.println(messagePrint);
                             break;
 
                         case "3":
@@ -179,16 +188,20 @@ public class JavaApplication {
                             System.out.println("메시지 수정");
                             System.out.print("보낸 사람 입력: ");
                             String sender3  =sc.nextLine();
+                            System.out.print("메시지 UUID 입력: ");
+                            String uuid  =sc.nextLine();
+                            UUID uuid2 = UUID.fromString(uuid);
                             System.out.print("수정 할 메시지 입력: ");
                             String newMessage = sc.nextLine();
-                            messageService.updateMessage(sender3, newMessage);
+                            messageService.update(sender3, uuid2, newMessage);
+                            System.out.println();
                             break;
 
                         case "5":
                             System.out.println("메시지 삭제");
                             System.out.print("보낸 사람 입력: ");
                             String sender4  =sc.nextLine();
-                            messageService.deleteMessage(sender4);
+                            messageService.delete(sender4);
                             break;
                     }
                     continue;
