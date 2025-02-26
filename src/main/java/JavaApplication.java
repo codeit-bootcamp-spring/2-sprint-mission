@@ -11,15 +11,17 @@ public class JavaApplication {
         // 모든 사용자 조회
         printUser();
 
+        // 현재 바라보고 있는 사용자 조회
+        printUserHead();
+
         // 사용자 전환
-        replaeHead();
+        replaeUserHead();
 
         // 특정 데이터 조회
-        search();
+        searchUser();
 
         // 수정
-        update();
-
+        updateUser();
 
         //서버 등록
         createServer();
@@ -28,6 +30,18 @@ public class JavaApplication {
 
         //유저가 가지고 있는 서버 조회
         printServer();
+
+        // 현재 바라보고 있는 사용자 조회
+        printServerHead();
+
+        // 사용자 전환
+        replaeServerHead();
+
+        // 특정 데이터 조회
+        searchServer();
+
+        // 수정
+        updateServer();
 
         //서버 삭제
         removeServer();
@@ -44,22 +58,24 @@ public class JavaApplication {
         // 모든 채널 조회
         printChannel();
 
+        // 현재 바라보고 있는 채널 조회
+        printChannelHead();
+
+        // 사용자 전환
+        replaeChannelHead();
+
+        // 특정 채널 조회
+        searchChannel();
+
+        // 채널명 수정
+        updateChannel();
+
         // 채널 삭제
         removeChannel();
         removeChannel();
 
         // 채널 삭제 후 모든 채널 조회
         printChannel();
-
-        // 특정 채팅방 조회
-
-
-        // 사용자가 속한 채팅방 조회
-
-
-        // 채널명 수정
-        // 수정 시 채널 전부 수정되는 문제 발견
-
 
         // 메시지 생성
         writeMessage();
