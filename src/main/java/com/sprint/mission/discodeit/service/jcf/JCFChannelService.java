@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
-    Map<UUID, Channel> channelsRepository = new HashMap<>();
-    Map<String,UUID> channelNameToIdRepository = new HashMap<>();
+    final Map<UUID, Channel> channelsRepository = new HashMap<>();
+    final Map<String,UUID> channelNameToIdRepository = new HashMap<>();
 
     JCFUserService userRepository = new JCFUserService();
     @Override

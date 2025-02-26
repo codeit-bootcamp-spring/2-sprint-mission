@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
-    Map<UUID,User> userRepository = new HashMap<>();
-    Map<String,UUID> userNameToIdRepository = new HashMap<>();
+    final Map<UUID,User> userRepository = new HashMap<>();
+    final Map<String,UUID> userNameToIdRepository = new HashMap<>();
     @Override
     public void createUser(String userName, Channel channel) {
         if(channel == null) {
