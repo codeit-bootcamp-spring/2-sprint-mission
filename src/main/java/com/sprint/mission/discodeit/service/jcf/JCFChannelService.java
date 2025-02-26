@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
@@ -31,33 +32,33 @@ public class JCFChannelService implements ChannelService {
 
 
 
-
-
     // 채널 생성
     @Override
     public void createChannel(Channel channel) {
         if(channel == null) {
-            throw new IllegalArgumentException("생성하려는 채널 정보가 올바르지 않습니다.");
+            throw new IllegalArgumentException("생성하려는 채널 정보가 존재하지 않습니다.");
         }
         // 채널명과 채널주인은 필수입력 항목
-        if(channel.getChannelName().isEmpty() || channel.getOwner() == null) {
-            throw new IllegalArgumentException("필수 입력 항목을 빠뜨리셨습니다.");
+        if(channel.getChannelName() == null || channel.getChannelName().isBlank() || channel.getOwner() == null) {
+            throw new IllegalArgumentException("필수 입력 항목이 입력되지 않았습니다. (channelName, owner)");
         }
         // 중복 채널 방지, 채널 이름으로 채널을 찾거나 수정하기 때문에 겹치면 안됨
         if(data.stream().anyMatch(ch -> ch.getChannelName().equals(channel.getChannelName()))) {
-            throw new IllegalArgumentException("중복된 채널명 입니다.");
+            throw new IllegalStateException("중복된 channelName 입니다.");
         }
-
         data.add(channel);
     }
 
     // 채널 단건 조회
     @Override
     public Channel getChannel(String channelName) {
+        if(channelName == null || channelName.isBlank()) {
+            throw new IllegalArgumentException("channelName이 입력되지 않았습니다.");
+        }
         Channel findChannel = data.stream()
                 .filter(ch -> ch.getChannelName().equals(channelName))
                 .findFirst() // 리턴타입이 Optional이니까 Optional<Channel>로 받아주거나, orElseThrow로 Optional 벗겨내기
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
+                .orElseThrow(() -> new NoSuchElementException("해당 channelName을 가진 채널은 존재하지 않습니다."));
 
         return findChannel;
     }
@@ -76,14 +77,14 @@ public class JCFChannelService implements ChannelService {
         // 현재는 메소드에서 channel.channelName만 사용하긴하는데, Channel을 쓰는게 확장성이 더 좋을 것 같기도
         // <-> 객체 째로 가져오면 넘 무겁지 않나? (고민)
         if (user == null) {
-            throw new IllegalArgumentException("추가할 유저가 존재하지 않습니다.");
+            throw new IllegalArgumentException("추가하려는 유저 정보가 입력되지 않았습니다.");
         }
 
         Channel findChannel = getChannel(channelName);
 
         // 채널 수정 시 요청을 하는 User(requestUser)가 해당 채널의 주인이어야한다.
         if (!requestUser.equals(findChannel.getOwner())) {
-            throw new IllegalArgumentException("수정할 채널의 주인이 아닙니다.");
+            throw new IllegalStateException("수정할 채널의 주인이 아닙니다.");
         }
 
         findChannel.updateUpdatedAt(System.currentTimeMillis());
@@ -97,14 +98,14 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void removeUsersFromChannel(User requestUser, User user, String channelName) {
         if (user == null) {
-            throw new IllegalArgumentException("삭제할 유저가 존재하지 않습니다.");
+            throw new IllegalArgumentException("삭제하려는 유저 정보가 입력되지 않았습니다.");
         }
 
         Channel findChannel = getChannel(channelName);
 
         // 채널 수정 시 요청을 하는 User(requestUser)가 해당 채널의 주인이어야한다.
         if (!requestUser.getUsername().equals(findChannel.getOwner().getUsername())) {
-            throw new IllegalArgumentException("수정할 채널의 주인이 아닙니다.");
+            throw new IllegalStateException("수정할 채널의 주인이 아닙니다.");
         }
 
         findChannel.updateUpdatedAt(System.currentTimeMillis());
@@ -125,10 +126,9 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void deleteChannel(User requestUser, String channelName) {
         Channel findChannel = getChannel(channelName);
-
         // 채널 삭제 시 요청을 하는 User(requestUser)가 해당 채널의 주인이어야한다.
         if (!requestUser.getUsername().equals(findChannel.getOwner().getUsername())) {
-            throw new IllegalArgumentException("삭제할 채널의 주인이 아닙니다.");
+            throw new IllegalStateException("삭제할 채널의 주인이 아닙니다.");
         }
 
         // 채널 삭제 시 User의 Channel 목록에서도 삭제
@@ -141,4 +141,6 @@ public class JCFChannelService implements ChannelService {
         // 이 부분에 대한 예외 처리는? 예외 처리에 대한 공부가 필요.
         data.remove(findChannel);
     }
+
+
 }
