@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -16,4 +17,10 @@ public interface ChannelService {
     void updateChannelName(UUID channelId, String newChannelName);
     void addChannelParticipant(UUID channelId, User newParticipant);
     void deleteChannel(UUID channelId);
+    static void validateChannelId(UUID channelId, ChannelRepository channelRepository) {
+        if (channelId == null) {
+            throw new IllegalArgumentException("input channelId is null!!!");
+        }
+        channelRepository.findChannelById(channelId);
+    }
 }
