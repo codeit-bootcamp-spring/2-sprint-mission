@@ -21,7 +21,9 @@ public class MessageRepository {
     }
 
     public void addMessage(Message newMessage) {
-        if (newMessage == null) {}
+        if (newMessage == null) {
+            throw new IllegalArgumentException("input newMessage is null!!!");
+        }
         messages.addFirst(newMessage);
     }
 
