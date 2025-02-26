@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
-    private static Map<UUID, Message> messageData;
+    private final Map<UUID, Message> messageData;
     private final UserService userService;
     private final ChannelService channelService;
 
@@ -21,77 +21,83 @@ public class JCFMessageService implements MessageService {
         this.channelService = channelService;
     }
 
+    public UUID getUserId(String userName) {
+         User user = userService.read(userName);
+         if(user == null){
+             throw new IllegalArgumentException("유효하지 않은 사용자명입니다.");
+         }
+         return user.getId();
+    }
+
+    public UUID getChannelId(String channelName) {
+         Channel channel = channelService.read(channelName);
+         if(channel == null){
+             throw new IllegalArgumentException("유효하지 않은 채널명입니다.");
+         }
+         return channel.getId();
+    }
+
+
+
 
     @Override
-    public void create(String writingMessage, User user, Channel channel) {
-        User validUser = userService.read(user.getUserName());
-
-        Message message = new Message(writingMessage, validUser, channel);
-        messageData.put(message.getId(), message);
+    public Message create(String writingMessage, User user, Channel channel) {
+         if(user == null || channel == null){
+             throw new IllegalArgumentException("유저와 채널을 할당해주세요.");
+         }
+         Message message = new Message(writingMessage, user, channel);
+         messageData.put(message.getId(), message);
+         System.out.printf("(%d)[%s]%s: %s%n",message.getUpdatedAt(), user.getUserName()
+                 , user.getUserName(), writingMessage);
+         return message;
     }
 
     @Override
-    public void delete(String userName ,String deletingMessage, Long timestamp) {
-        User validUser = userService.read(userName);
-        if (validUser == null) {
-            throw new IllegalArgumentException("사용자가 존재하지 않습니다.");
-        }
-        List<Message> messages = readUser(userName);
-        Message deletedMessage = messages.stream()
-                .filter(m -> m.getMessage().equals(deletingMessage))
-                .filter(m -> m.getUpdatedAt().equals(timestamp))
-                .findFirst()
-                .orElse(null);
-        if (deletedMessage == null) {
-            throw new IllegalArgumentException("삭제할 메시지를 찾을 수 없습니다.");
-        }
-        messageData.remove(deletedMessage.getId());
+    public void delete(UUID messageId) {
+         Message message = messageData.get(messageId);
+         if (message == null) {
+             throw new IllegalArgumentException("삭제할 메시지를 찾을 수 없습니다.");
+         }
+         messageData.remove(messageId);
     }
 
     @Override
-    public void update(String userName, Long timestamp, String oldMessage, String newMessage) {
-         //메세지 수정
-        User validUser = userService.read(userName);
-        if (validUser == null) {
-            throw new IllegalArgumentException("사용자가 존재하지 않습니다.");
-        }
-        List<Message> oldMessages = readUser(userName);
-        Message changedMessage = oldMessages.stream()
-                .filter(m -> m.getMessage().equals(oldMessage))
-                .filter(m -> m.getUpdatedAt().equals(timestamp))
-                .findFirst()
-                .orElse(null);
-        if (changedMessage == null) {
-            throw new IllegalArgumentException("수정할 메시지를 찾을 수 없습니다.");
-        }
-        changedMessage.updateMessage(newMessage);
-
+    public void update(UUID messageId, String newMessage) {
+         Message message = messageData.get(messageId);
+         if (message == null) {
+             throw  new IllegalArgumentException("수정할 메세지를 찾을 수 없습니다.");
+         }
+         message.updateMessage(newMessage);
     }
 
     @Override
     public List<Message> readUser(String userName) {
+         UUID userId = getUserId(userName);
          return messageData.values().stream()
-                 .filter(message -> message.getUser().getUserName().equals(userName))
+                 .filter(message -> message.getUser().getId().equals(userId))
                  .collect(Collectors.toList());
     }
 
     @Override
     public List<Message> readChannel(String channelName) {
-        return messageData.values().stream()
-                .filter(message -> message.getChannel().getChannelName().equals(channelName))
+        UUID channelId = getChannelId(channelName);
+         return messageData.values().stream()
+                .filter(message -> message.getChannel().getId().equals(channelId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Message> readFullFilter(String userName, String channelName) {
+         UUID userId = getUserId(userName);
+         UUID channelId = getChannelId(channelName);
         return messageData.values().stream()
-                .filter(message -> message.getUser().getUserName().equals(userName))
-                .filter(message -> message.getChannel().getChannelName().equals(channelName))
+                .filter(message -> message.getUser().getId().equals(userId))
+                .filter(message -> message.getChannel().getId().equals(channelId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Message> readAll() {
-        return new ArrayList<>(messageData.values());
+        return messageData.values().stream().toList();
     }
 }
