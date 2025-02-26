@@ -22,9 +22,9 @@ public class MessageEntity extends BaseEntity {
     public ChannelEntity getChannel() { return channel;}
     public Map<String, Integer> getReactions() { return reactions; }
 
-    public long getCreatedTime(){
-        return getCreatedAt();
-    }
+        public long getCreatedTime(){
+            return getCreatedAt();
+        }
 
     public void updateMessage(String newContent) {
         this.content = newContent;

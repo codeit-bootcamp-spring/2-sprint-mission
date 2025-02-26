@@ -8,10 +8,10 @@ public class ChannelEntity extends BaseEntity {
     private String name;
     private String type;
 
-    public ChannelEntity(String name, String type) {
+    public ChannelEntity(String channelName, String channelType) {
         super();
-        this.name = name;
-        this.type = type;
+        this.name = channelName;
+        this.type = channelType;
     }
 
     public String getName() { return name;}
