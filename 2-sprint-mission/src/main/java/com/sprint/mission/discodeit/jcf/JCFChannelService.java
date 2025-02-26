@@ -11,7 +11,7 @@ import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
-    private static JCFChannelService instance;
+    private static volatile JCFChannelService instance;
     private final Map<UUID, Channel> data;
     private final UserService userService;
 
@@ -22,7 +22,11 @@ public class JCFChannelService implements ChannelService {
 
     public static JCFChannelService getInstance(UserService userService) {
         if(instance == null) {
-            instance = new JCFChannelService(userService);
+            synchronized (JCFChannelService.class) {
+                if(instance == null) {
+                    instance = new JCFChannelService(userService);
+                }
+            }
         }
         return instance;
     }

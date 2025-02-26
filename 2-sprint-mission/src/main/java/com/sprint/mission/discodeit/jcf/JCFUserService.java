@@ -9,7 +9,7 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
 
-    private static JCFUserService instance;
+    private static volatile JCFUserService instance;
     private final Map<UUID, User> data;
 
     private JCFUserService() {
@@ -18,7 +18,11 @@ public class JCFUserService implements UserService {
 
     public static JCFUserService getInstance() {
         if (instance == null) {
-            instance = new JCFUserService();
+            synchronized (JCFUserService.class) {
+                if (instance == null) {
+                    instance = new JCFUserService();
+                }
+            }
         }
         return instance;
     }

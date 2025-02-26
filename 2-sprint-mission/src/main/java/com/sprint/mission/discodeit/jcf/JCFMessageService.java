@@ -12,7 +12,7 @@ import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
-    private static JCFMessageService instance;
+    private static volatile JCFMessageService instance;
     private final Map<UUID, Message> data;
     private final ChannelService channelService;
     private final UserService userService;
@@ -25,7 +25,11 @@ public class JCFMessageService implements MessageService {
 
     public static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
         if (instance == null) {
-            instance = new JCFMessageService(userService, channelService);
+            synchronized (JCFMessageService.class) {
+                if (instance == null) {
+                    instance = new JCFMessageService(userService, channelService);
+                }
+            }
         }
         return instance;
     }
