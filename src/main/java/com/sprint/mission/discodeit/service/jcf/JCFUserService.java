@@ -15,13 +15,14 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void createUser(User newUser) {
+    public void createUser(String userName, String userEmail, String password) {
+        User newUser = new User(userName, userEmail, password); //각 요소에 대한 유효성 검증은 User 생성자에게 맡긴다
         this.userRepository.addUser(newUser);
     }
 
     @Override
     public User readUser(UUID userId) {
-        validateUserId(userId);
+        UserService.validateUserId(userId, this.userRepository);        // 아래 코드와 중복되는 코드 존재.
         return userRepository.findUserById(userId);
     }
 
@@ -32,23 +33,19 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUserName(UUID userId, String newUserName) {
+        UserService.validateUserId(userId, this.userRepository);
         readUser(userId).updateUserName(newUserName);
     }
 
     @Override
     public void updatePassword(UUID userId, String newPassword) {
+        UserService.validateUserId(userId, this.userRepository);
         readUser(userId).updateUserPassword(newPassword);
     }
 
     @Override
     public void deleteUser(UUID userId) {
-        validateUserId(userId);
+        UserService.validateUserId(userId, this.userRepository);
         userRepository.deleteUser(userId);
-    }
-
-    public void validateUserId(UUID userId) {
-        if (userId == null) {
-            throw new IllegalArgumentException("null 인 id 값이 들어왔습니다!!!");
-        }
     }
 }
