@@ -28,7 +28,7 @@ public class ChatSystemMenu {
         System.out.println("1. 유저 생성");
         System.out.println("2. 채널 생성");
         System.out.println("3. 채널에 유저 추가");
-        System.out.println("4. 메시지 전송");
+        System.out.println("4. 메세지 전송");
         System.out.print("선택: ");
         int createChoice = scanner.nextInt();
         scanner.nextLine();
@@ -61,15 +61,15 @@ public class ChatSystemMenu {
                 });
                 break;
             case 4:
-                executeSafely("메시지 전송 중 오류 발생", () -> {
+                executeSafely("메세지 전송 중 오류 발생", () -> {
                     System.out.print("유저 ID 입력: ");
                     UUID userId = parseUUID(scanner.nextLine());
                     System.out.print("채널 ID 입력: ");
                     UUID channelId = parseUUID(scanner.nextLine());
-                    System.out.print("메시지 입력: ");
+                    System.out.print("메세지 입력: ");
                     String messageContent = scanner.nextLine();
                     messageService.createMessage(userId, channelId, messageContent);
-                    System.out.println("메시지가 정상적으로 전송되었습니다. 발신자: '" + userService.getUserNameByid(userId) + "', 채널: '" + channelService.getChannelNameById(channelId) + "', 내용: '" + messageContent + "'");                });
+                    System.out.println("메세지가 정상적으로 전송되었습니다. 발신자: '" + userService.getUserNameByid(userId) + "', 채널: '" + channelService.getChannelNameById(channelId) + "', 내용: '" + messageContent + "'");                });
                 break;
             default:
                 System.out.println("잘못된 선택입니다.");
@@ -82,7 +82,7 @@ public class ChatSystemMenu {
         System.out.println("\n--- 단건 정보 조회 메뉴 ---");
         System.out.println("1. 유저 정보 조회");
         System.out.println("2. 채널 정보 조회");
-        System.out.println("3. 메시지 정보 조회");
+        System.out.println("3. 메세지 정보 조회");
         System.out.print("선택: ");
         int lookupChoice = scanner.nextInt();
         scanner.nextLine();
@@ -103,10 +103,10 @@ public class ChatSystemMenu {
                 });
                 break;
             case 3:
-                executeSafely("메시지 조회 중 오류 발생", () -> {
-                    System.out.print("조회할 메시지 ID 입력: ");
+                executeSafely("메세지 조회 중 오류 발생", () -> {
+                    System.out.print("조회할 메세지 ID 입력: ");
                     UUID messageId = UUID.fromString(scanner.nextLine());
-                    System.out.println("메시지 정보: " + messageService.getMessageById(messageId));
+                    System.out.println("메세지 정보: " + messageService.getMessageById(messageId));
                 });
                 break;
             default:
@@ -120,7 +120,7 @@ public class ChatSystemMenu {
             System.out.println("\n--- 다건 정보 조회 메뉴 ---");
             System.out.println("1. 모든 유저 정보 조회");
             System.out.println("2. 모든 채널 정보 조회");
-            System.out.println("3. 특정 채널 메시지 정보 조회");
+            System.out.println("3. 특정 채널 메세지 정보 조회");
             System.out.print("선택: ");
             int lookupChoice = scanner.nextInt();
             scanner.nextLine();
@@ -137,10 +137,10 @@ public class ChatSystemMenu {
                     });
                     break;
                 case 3:
-                    executeSafely("메시지 조회 중 오류 발생", () -> {
+                    executeSafely("메세지 조회 중 오류 발생", () -> {
                         System.out.print("조회할 채널 이름 입력: ");
                         UUID channelId = parseUUID(scanner.nextLine());
-                        System.out.println("메시지 정보: " + messageService.getChannelMessages(channelId));
+                        System.out.println("메세지 정보: " + messageService.getChannelMessages(channelId));
                     });
                     break;
                 default:
@@ -154,7 +154,7 @@ public class ChatSystemMenu {
         System.out.println("\n--- 정보 수정 메뉴 ---");
         System.out.println("1. 유저 이름 수정");
         System.out.println("2. 채널 이름 수정");
-        System.out.println("3. 메시지 내용 수정");
+        System.out.println("3. 메세지 내용 수정");
         System.out.print("선택: ");
         int updateChoice = scanner.nextInt();
         scanner.nextLine();
@@ -181,13 +181,13 @@ public class ChatSystemMenu {
                 });
                 break;
             case 3:
-                executeSafely("메시지 내용 수정 중 오류 발생", () -> {
-                    System.out.print("수정할 메시지 ID 입력: ");
+                executeSafely("메세지 내용 수정 중 오류 발생", () -> {
+                    System.out.print("수정할 메세지 ID 입력: ");
                     UUID messageId = UUID.fromString(scanner.nextLine());
-                    System.out.print("새로운 메시지 내용 입력: ");
+                    System.out.print("새로운 메세지 내용 입력: ");
                     String newMessageContent = scanner.nextLine();
                     messageService.updateMessage(messageId, newMessageContent);
-                    System.out.printf("메시지 내용이 수정되었습니다: %s%n", newMessageContent);
+                    System.out.printf("메세지 내용이 수정되었습니다: %s%n", newMessageContent);
                 });
                 break;
             default:
@@ -201,7 +201,7 @@ public class ChatSystemMenu {
         System.out.println("\n--- 데이터 삭제 메뉴 ---");
         System.out.println("1. 유저 삭제");
         System.out.println("2. 채널 삭제");
-        System.out.println("3. 메시지 삭제");
+        System.out.println("3. 메세지 삭제");
         System.out.println("4. 채널에서 유저 삭제");
         System.out.print("선택: ");
         int deleteChoice = scanner.nextInt();
@@ -230,11 +230,11 @@ public class ChatSystemMenu {
                 break;
             case 3:
                 executeSafely("메세지 삭제중 오류 발생", () ->{
-                    System.out.print("삭제할 메시지 ID 입력: ");
+                    System.out.print("삭제할 메세지 ID 입력: ");
                     String messageIdInput = scanner.nextLine();
                     UUID messageId = UUID.fromString(messageIdInput);
                     messageService.deleteMessage(messageId);
-                    System.out.printf("메시지 [%s]가 삭제되었습니다.%n", messageId);
+                    System.out.printf("메세지 [%s]가 삭제되었습니다.%n", messageId);
                 });
                 break;
             case 4:

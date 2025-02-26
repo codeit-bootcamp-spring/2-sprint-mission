@@ -106,7 +106,7 @@ public class JCFChannelService implements ChannelService {
     public void removeUserFromChannel(UUID channelId, UUID userId) {
         Channel channel = getChannelById(channelId);
         if (!channel.isUserInChannel(userId)) {
-            throw new IllegalArgumentException("가입되지 않는 유저입니다.");
+            throw new IllegalArgumentException("채널에 존재하지 않는 유저입니다.");
         }
 
         User user = userService.getUserById(userId);
@@ -118,7 +118,7 @@ public class JCFChannelService implements ChannelService {
     public void removeMessageFromChannel(UUID channelId, UUID messageId) {
         Channel channel = getChannelById(channelId);
         if (!channel.isMessageInChannel(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메세지 입니다.");
+            throw new IllegalArgumentException("체널에 존재하지 않는 메세지 입니다.");
         }
 
         channel.removeMessage(messageId);

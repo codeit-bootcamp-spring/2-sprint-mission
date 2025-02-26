@@ -39,6 +39,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User getUserById(UUID userId) {
+        validateUserExists(userId);
         return users.get(userId);
     }
 
