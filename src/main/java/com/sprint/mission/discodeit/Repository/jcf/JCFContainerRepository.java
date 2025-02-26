@@ -51,7 +51,7 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
 
         Scanner sc = new Scanner(System.in);
         System.out.print("삭제할 컨테이너의 이름을 입력하시오. : ");
-        String s = sc.nextLine();
+        String s = sc.next();
         for (Container data : list) {
             if (data.getName().equals(s)) {
                 list.remove(data);
@@ -83,11 +83,11 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
 
         Scanner sc = new Scanner(System.in);
         System.out.print("업데이트할 컨테이너의 이름을 입력하시오. : ");
-        String s = sc.nextLine();
+        String s = sc.next();
         for (Container data : list) {
             if (data.getName().equals(s)) {
                 System.out.print("바꿀 이름을 입력하시오. : ");
-                s = sc.nextLine();
+                s = sc.next();
 
                 System.out.println(data.getName() + "컨테이너 업데이트 성공");
                 return;

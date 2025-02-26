@@ -1,11 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class Message extends BaseEntity{
     private String str;
-
 
     public Message(String str) {
         super();

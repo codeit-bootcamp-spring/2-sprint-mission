@@ -66,6 +66,21 @@ public class DiscordRepository {
 
 
     public void update() {
-
+        if (list.isEmpty()) {
+            return;
+        }
+        Scanner sc = new Scanner(System.in);
+        System.out.print("변경할 유저의 이름을 입력하시오. : ");
+        String s = sc.next();
+        for (User data : list) {
+            if (data.getName().equals(s)) {
+                System.out.print("바꿀 이름을 입력하시오. : ");
+                s = sc.next();
+                data.setName(s);
+                System.out.println(data.getName() + "유저 이름 변경 성공");
+                return;
+            }
+        }
+        System.out.println("해당 유저가 존재하지 않습니다.");
     }
 }

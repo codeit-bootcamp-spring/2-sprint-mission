@@ -84,11 +84,11 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
 
         Scanner sc = new Scanner(System.in);
         System.out.print("업데이트할 서버의 이름을 입력하시오. : ");
-        String s = sc.nextLine();
+        String s = sc.next();
         for (Server data : severList) {
             if (data.getName().equals(s)) {
                 System.out.print("바꿀 이름을 입력하시오. : ");
-                s = sc.nextLine();
+                s = sc.next();
                 data.setName(s);
                 System.out.println(data.getName() + "서버 업데이트 성공");
                 return;

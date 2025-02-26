@@ -29,35 +29,10 @@ public class MainEntry {
     private static Server headserver = null;
     private static Container headContainer = null;
 
-    public static boolean isUserNull() {
-        if (headUser == null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static boolean isServerNull() {
-        if (headserver == null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static boolean isContainerNull() {
-        if (headContainer == null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public static void createUser() {
         DiscordRepository discordRepository = DiscordRepository.getInstance();
-
+        List<User> list = discordRepository.repository();
         headUser = new User("U" + USERCOUNT, "U" + USERCOUNT++);
-
         discordRepository.add(headUser);
 
     }
@@ -267,22 +242,53 @@ public class MainEntry {
     }
 
     public static void updateUser() {
-        if (isUserNull())
+        if (isUserNull()) {
             return;
+        }
+        DiscordRepository discordRepository = DiscordRepository.getInstance();
+        discordRepository.update();
 
     }
 
     public static void updateServer() {
-        if (isUserNull())
+        if (isServerNull()) {
             return;
-
+        }
+        JCFUserRepository userRepository = JCFUserRepository.getInstance();
+        userRepository.update(headUser);
     }
 
     public static void updateChannel() {
-        if (isUserNull())
+        if (isContainerNull()) {
             return;
-
+        }
+        JCFContainerRepository containerRepository = JCFContainerRepository.getInstance();
+        containerRepository.update(headserver);
     }
 
+
+    public static boolean isUserNull() {
+        if (headUser == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isServerNull() {
+        if (headserver == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isContainerNull() {
+        if (headContainer == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }
