@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
+    private static final JCFMessageService instance = new JCFMessageService(JCFUserService.getInstance(), JCFChannelService.getInstance());
     private final Map<UUID, Message> data = new HashMap<>();
     private final UserService userService;
     private final ChannelService channelService;
@@ -16,6 +17,9 @@ public class JCFMessageService implements MessageService {
     public JCFMessageService(UserService userService, ChannelService channelService) {
         this.userService = userService;
         this.channelService = channelService;
+    }
+    public static JCFMessageService getInstance() {
+        return instance;
     }
 
     @Override

@@ -14,9 +14,9 @@ public class JavaApplication {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        JCFUserService userService = new JCFUserService();
-        JCFChannelService channelService = new JCFChannelService();
-        JCFMessageService messageService = new JCFMessageService(userService, channelService);
+        JCFUserService userService = JCFUserService.getInstance();
+        JCFChannelService channelService = JCFChannelService.getInstance();
+        JCFMessageService messageService = JCFMessageService.getInstance();
 
         while (true) {
             System.out.println("\n===== 메뉴 선택 =====");

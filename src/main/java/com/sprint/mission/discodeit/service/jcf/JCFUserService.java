@@ -7,7 +7,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
+    private static final JCFUserService instance = new JCFUserService();
     private final Map<UUID, User> data = new HashMap<>();
+
+    private JCFUserService() {}
+
+    public static JCFUserService getInstance() {
+        return instance;
+    }
 
     @Override
     public User createUser(String name) {
