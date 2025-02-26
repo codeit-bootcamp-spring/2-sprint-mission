@@ -3,16 +3,19 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class Message {
-    private final UUID messageId; //메세지 id
-    private final long createdAt;//메세지 생성 시간
-    private long updatedAt;//메세지 수정 업데이트 시간
-    private String content;//메세지 내용
+    private final UUID messageId;
+    private final long createdAt;
+    private long updatedAt;
+    private String content;
 
-    private User user;//발신인
-    private User receiver;//수신인
-    private UUID toChannelId;//채널 id
+    private User user;
+    private User receiver;
+    private UUID toChannelId;
 
     public Message(User user,String content,User receiver,UUID toChannelId) {
+        if(user == null || receiver == null  || toChannelId == null) {
+            throw new IllegalArgumentException("User and Receiver,channel are required");
+        }
         this.user = user;
         this.content=content;
         this.receiver=receiver;
@@ -64,6 +67,14 @@ public class Message {
 
     public void setToChannelId(UUID toChannelId) {
         this.toChannelId = toChannelId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

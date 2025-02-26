@@ -39,4 +39,20 @@ public class User {
         return updatedAt;
     }
 
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", userName='" + userName + '\'' +
+                ", channel=" + channel.getChannelName() + // 혹은 필요한 정보를 출력
+                '}';
+    }
 }

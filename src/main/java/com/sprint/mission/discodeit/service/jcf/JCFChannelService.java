@@ -3,13 +3,16 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
-    Map<UUID, Channel> channelsRepository = new HashMap<UUID, Channel>();
+    Map<UUID, Channel> channelsRepository = new HashMap<>();
     Map<String,UUID> channelNameToIdRepository = new HashMap<>();
+
+    JCFUserService userRepository = new JCFUserService();
     @Override
     public void createChannel(String channelName) {
         Channel newChannel =new Channel(channelName);
@@ -19,7 +22,13 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID channelId) {
-        channelsRepository.remove(channelId);
+        Channel channel = channelsRepository.remove(channelId);
+        if(channel == null){
+            throw new IllegalArgumentException("Channel not found");
+        }
+        userRepository.userRepository.values().stream()
+                .filter(user -> user.getChannel().getId().equals(channelId))
+                .forEach(user -> user.setChannel(null));
     }
 
     @Override

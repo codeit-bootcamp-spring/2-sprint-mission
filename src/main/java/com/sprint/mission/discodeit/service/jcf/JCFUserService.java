@@ -13,6 +13,12 @@ public class JCFUserService implements UserService {
     Map<String,UUID> userNameToIdRepository = new HashMap<>();
     @Override
     public void createUser(String userName, Channel channel) {
+        if(channel == null) {
+            throw new IllegalArgumentException("channel is null");
+        }
+        if(userNameToIdRepository.containsKey(userName)) {
+            throw new IllegalArgumentException("userName " + userName + " already exists");
+        }
         User newUser = new User(userName, channel);
         userRepository.put(newUser.getId(), newUser);
         userNameToIdRepository.put(newUser.getUserName(), newUser.getId());

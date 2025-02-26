@@ -11,10 +11,9 @@ import java.util.UUID;
 public class JavaApplication {
 
     public static void main(String[] args) {
-
-        JCFMessageService messageService = new JCFMessageService();
         JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService();
+        JCFMessageService messageService = new JCFMessageService(userService, channelService);
 
 
         boolean running = true;
@@ -36,8 +35,7 @@ public class JavaApplication {
             scanner.nextLine();
 
             switch (choice){
-                case 1: //메세지 보내기
-                    //User user,String content,User receiver,UUID toChannelId
+                case 1:
                     System.out.println("Sender name: ");
                     String sender = scanner.nextLine();
 
@@ -58,7 +56,6 @@ public class JavaApplication {
                     int c= scanner.nextInt();
                     scanner.nextLine();
                     if(c==1){
-//                        System.out.println(messageService.findAllMessages());
                         System.out.println(messageService.createAllMessageContents());
                     }else if(c==2){
                         System.out.print("Enter Message ID: ");
@@ -87,11 +84,9 @@ public class JavaApplication {
                     }
                     break;
                 case 4:
-                    //변경된 메세지 출력
                     System.out.println(messageService.displayEditmessages());
                     break;
                 case 5:
-                    //메세지 삭제
                     System.out.print("Enter Message ID: ");
                     String messageId3 = scanner.nextLine();
 
@@ -111,7 +106,7 @@ public class JavaApplication {
                         UUID channelChoice= channelService.findChannelIdByName(channelName);
                         userService.createUser(username,channelService.findChannelById(channelChoice));
                     } catch (IllegalArgumentException e) {
-                        System.out.println("Invalid Channel Name");
+                        System.out.print("Invalid Channel Name");
                     }
                     break;
                 case 7:
