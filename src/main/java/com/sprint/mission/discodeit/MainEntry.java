@@ -10,9 +10,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.jcf.*;
 
 public class MainEntry {
-    //카테고리와 채널 관리
-    JCFCategoryService categoryService = JCFCategoryService.getInstance();
-
     //권한 부여
     JCFServerService serverService = JCFServerService.getInstance();
 
