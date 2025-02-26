@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.Factory;
 
 import com.sprint.mission.discodeit.entity.Server;
 
+import java.util.Scanner;
+
 public class CreateServerFactory implements Factory<Server>{
     private static int count = 0;
-
+    private Scanner sc = new Scanner(System.in);
     // 싱글톤 패턴 적용
     private static CreateServerFactory instance;
 
@@ -16,6 +18,13 @@ public class CreateServerFactory implements Factory<Server>{
             instance = new CreateServerFactory();
         }
         return instance;
+    }
+
+    @Override
+    public Server create() {
+        System.out.printf("이름을 입력하세요. : ");
+        String s = sc.nextLine();
+        return create(s);
     }
 
     @Override

@@ -2,11 +2,11 @@ package com.sprint.mission.discodeit.Factory;
 
 import com.sprint.mission.discodeit.entity.Container.Channel;
 
-public class CreateChannalFactory implements Factory<Channel>{
-    private static int count = 0;
+import java.util.Scanner;
 
-    // 싱글톤 패턴 적용
+public class CreateChannalFactory implements Factory<Channel>{
     private static CreateChannalFactory instance;
+    private Scanner sc = new Scanner(System.in);
 
     private CreateChannalFactory() {
     }
@@ -18,6 +18,12 @@ public class CreateChannalFactory implements Factory<Channel>{
         return instance;
     }
 
+    @Override
+    public Channel create() {
+        System.out.printf("이름을 입력하세요. : ");
+        String s = sc.nextLine();
+        return create(s);
+    }
 
     @Override
     public Channel create(String name) {

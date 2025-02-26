@@ -29,7 +29,9 @@ public class JCFMessageService implements MessageService {
     private UserRepository getUserRepository(UUID id) {
         UserRepository userRepository = userTable.get(id);
         if (userRepository == null) {
-            userTable.put(id, new LinkedListUserRepository());
+            LinkedListUserRepository repository = new LinkedListUserRepository();
+            userTable.put(id, repository);
+            userRepository = repository;
         }
         return userRepository;
     }

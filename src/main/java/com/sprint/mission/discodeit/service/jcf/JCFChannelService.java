@@ -30,7 +30,9 @@ public class JCFChannelService implements ChannelService {
     private ChannelRepository getChannelRepository(UUID id) {
         ChannelRepository channelRepository = channelTable.get(id);
         if (channelRepository == null) {
-            channelTable.put(id, new LinkedListChannelRepository());
+            LinkedListChannelRepository repository = new LinkedListChannelRepository();
+            channelTable.put(id, repository);
+            channelRepository = repository;
         }
         return channelRepository;
     }

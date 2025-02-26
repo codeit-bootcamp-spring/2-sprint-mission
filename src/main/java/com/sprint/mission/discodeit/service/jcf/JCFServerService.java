@@ -29,7 +29,9 @@ public class JCFServerService implements ServerService {
     private ServerRepository getServerRepository(UUID id) {
         ServerRepository serverRepository = serverTable.get(id);
         if (serverRepository == null) {
-            serverTable.put(id, new LinkedListServerRepository());
+            LinkedListServerRepository repository = new LinkedListServerRepository();
+            serverTable.put(id, repository);
+            serverRepository = repository;
         }
         return serverRepository;
     }
