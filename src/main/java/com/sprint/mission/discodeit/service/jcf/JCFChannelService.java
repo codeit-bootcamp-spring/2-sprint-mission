@@ -7,10 +7,22 @@ import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
+    private static volatile JCFChannelService instance;
+
     private final Map<UUID, Channel> data;
 
-    public JCFChannelService() {
+    private JCFChannelService() {
         this.data = new HashMap<>();
+    }
+
+    public static JCFChannelService getInstance() {
+        if(instance == null) {
+            synchronized (JCFChannelService.class) {
+                instance = new JCFChannelService();
+            }
+        }
+
+        return instance;
     }
 
     @Override

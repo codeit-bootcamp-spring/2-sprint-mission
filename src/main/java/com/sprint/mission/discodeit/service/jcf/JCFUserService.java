@@ -7,11 +7,26 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
 
+    private static volatile JCFUserService instance;
+
     private final Map<UUID, User> data;
 
 
-    public JCFUserService() {
+    private JCFUserService() {
         this.data = new HashMap<>();
+    }
+
+    public static JCFUserService getInstance() {
+
+        if(instance == null) {
+            synchronized (JCFUserService.class) {
+                if(instance == null) {
+                    instance = new JCFUserService();
+                }
+            }
+        }
+
+        return instance;
     }
 
     @Override

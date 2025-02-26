@@ -12,9 +12,9 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserService userService = new JCFUserService();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService(userService, channelService);
+        UserService userService = JCFUserService.getInstance();
+        ChannelService channelService = JCFChannelService.getInstance();
+        MessageService messageService = JCFMessageService.getInstance(userService, channelService);
 
         System.out.println("========== 유저 등록 ==========");
         User user1 = new User("Alice");

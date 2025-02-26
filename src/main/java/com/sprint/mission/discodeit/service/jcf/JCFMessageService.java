@@ -9,15 +9,30 @@ import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
+    private static volatile JCFMessageService instance;
+
     private final Map<UUID, Message> data = new HashMap<>();
     private final UserService userService;
     private final ChannelService channelService;
 
     //심화 적용
-    public JCFMessageService(UserService userService, ChannelService channelService) {
+    private JCFMessageService(UserService userService, ChannelService channelService) {
         this.userService = userService;
         this.channelService = channelService;
     }
+
+    public static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
+        if(instance == null) {
+            synchronized (JCFMessageService.class) {
+                if(instance == null) {
+                    instance = new JCFMessageService(userService, channelService);
+                }
+            }
+        }
+
+        return instance;
+    }
+
 
     @Override
     public void create(Message message) {
