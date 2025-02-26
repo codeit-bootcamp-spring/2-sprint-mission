@@ -33,7 +33,7 @@ public class JavaApplication {
             userService.createUser(user2);
             userService.createUser(user3);
             userService.createUser(user4);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println("유저 등록 예외 발생: " + e.getMessage());
         }
 
@@ -43,15 +43,16 @@ public class JavaApplication {
             User findUser = userService.getUser("성준");
             // User findUser = userService.getUser("없는유저"); - 없는 유저를 찾으려하면 예외 발생
             System.out.println("=== 유저 관련 기능 ===");
-            System.out.println("유저 조회 : " + findUser.getUsername());
-            // 1.2.2 다건 조회
-            List<User> findUsers = userService.getAllUsers();
-            System.out.print("유저 전체 조회 : ");
-            findUsers.stream().forEach(m -> System.out.print(m.getUsername() + " "));
-            System.out.println();
-        } catch (IllegalArgumentException e) {
-            System.out.println("유저 조회 예외 발생: " + e.getMessage());
+            System.out.println("유저 단건 조회 : " + findUser.getUsername());
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            System.out.println("유저 단건 조회 예외 발생: " + e.getMessage());
         }
+
+        // 1.2.2 다건 조회
+        List<User> findUsers = userService.getAllUsers();
+        System.out.print("유저 전체 조회 : ");
+        findUsers.stream().forEach(m -> System.out.print(m.getUsername() + " "));
+        System.out.println();
 
         // 1.3 수정
         try {
@@ -69,8 +70,7 @@ public class JavaApplication {
             userService.addRole(role2, username);
             // 권한 삭제
             userService.removeRole(role2, username);
-
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             System.out.println("유저 수정 예외 발생: " + e.getMessage());
         }
 
@@ -78,27 +78,21 @@ public class JavaApplication {
         try {
             User findUser = userService.getUser("성준");
             System.out.println("유저 수정 조회 : " + findUser);
-        } catch (IllegalArgumentException e) {
-            System.out.println("유저 조회 예외 발생: " + e.getMessage());
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            System.out.println("유저 수정 조회 예외 발생: " + e.getMessage());
         }
 
         // 1.5 삭제
         try {
             userService.deleteUser("환주");
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             System.out.println("유저 삭제 예외 발생: " + e.getMessage());
         }
 
         // 1.6 삭제된 데이터 조회
-        try {
-            List<User> findUsers = userService.getAllUsers();
-            System.out.print("유저 삭제 전체 조회 : ");
-            findUsers.stream().forEach(m -> System.out.print(m.getUsername() + " "));
-            System.out.println();
-        } catch (IllegalArgumentException e) {
-            System.out.println("유저 삭제 예외 발생: " + e.getMessage());
-        }
-
+        System.out.print("유저 삭제 전체 조회 : ");
+        findUsers.stream().forEach(m -> System.out.print(m.getUsername() + " "));
+        System.out.println();
         System.out.println();
 
 
