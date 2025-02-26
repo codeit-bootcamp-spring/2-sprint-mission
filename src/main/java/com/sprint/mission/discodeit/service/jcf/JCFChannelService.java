@@ -25,9 +25,7 @@ public class JCFChannelService implements ChannelService {
             System.out.println("업데이트 시간: " + channel.getupdatedAttFormatted());
             System.out.println("--------------------------------------------------------");
         } else {
-            System.out.println("---------------------------------------------------------");
             System.out.println("[Info] 생성된 채널이 존재합니다.");
-            System.out.println("---------------------------------------------------------");
         }
     }
 
@@ -44,9 +42,7 @@ public class JCFChannelService implements ChannelService {
                     found = true;
                 }
                 if (!found) {
-                    System.out.println("---------------------------------------------------------");
                     System.out.println("조회 한 채널이 존재하지 않습니다");
-                    System.out.println("---------------------------------------------------------");
                 }
             }
         }
@@ -77,9 +73,7 @@ public class JCFChannelService implements ChannelService {
                 return;
             }
         }
-        System.out.println("---------------------------------------------------------");
         System.out.println("입력 한 채널이 존재하지 않습니다");
-        System.out.println("---------------------------------------------------------");
 
     }
 
@@ -94,10 +88,7 @@ public class JCFChannelService implements ChannelService {
                 return;
             }
         }
-        System.out.println("---------------------------------------------------------");
         System.out.println("입력 한 채널이 존재하지 않습니다");
-        System.out.println("---------------------------------------------------------");
-
     }
 
 }

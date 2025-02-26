@@ -1,30 +1,36 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class JCFMessageService implements MessageService {
-
     public final List<Message> messagesData;
+    public UserService userService;
 
-    public JCFMessageService() {
+    public JCFMessageService(UserService userService) {
         messagesData = new ArrayList<>();
+        this.userService = userService;
     }
-
 
 
     // 메시지 생성
     @Override
     public void createMessage(Message message) {
-        messagesData.add(message);
-        System.out.println("-------------------[메시지 전달 결과]-----------------------");
-        System.out.println("보내는 사람: " + message.getSender() + "\n내용: " + message.getMessage());
-        System.out.println("업데이트 시간: " + message.getupdatedAttFormatted());
-        System.out.println("---------------------------------------------------------");
-
+        User user = userService.getUser(message.getSender());
+        if(user != null && message.getSender().equals(user.getName())) {
+            messagesData.add(message);
+            System.out.println("-------------------[메시지 전달 결과]-----------------------");
+            System.out.println("보내는 사람: " + message.getSender() + "\n내용: " + message.getMessage());
+            System.out.println("업데이트 시간: " + message.getupdatedAttFormatted());
+            System.out.println("---------------------------------------------------------");
+        } else {
+            System.out.println("등록 된 사용자가 없습니다.");
+        }
     }
 
     // 메시지 단일 조회
@@ -41,11 +47,8 @@ public class JCFMessageService implements MessageService {
             }
         }
         if (!found){
-            System.out.println("---------------------------------------------------------");
             System.out.println("전달 된 메시지가 없습니다.");
-            System.out.println("---------------------------------------------------------");
         }
-
     }
 
     // 메시지 전체 조회
@@ -75,9 +78,7 @@ public class JCFMessageService implements MessageService {
                 return;
             }
         }
-        System.out.println("---------------------------------------------------------");
         System.out.println("전달 한 메시지가 존재하지 않습니다.");
-        System.out.println("---------------------------------------------------------");
     }
 
 
@@ -93,9 +94,7 @@ public class JCFMessageService implements MessageService {
                 return;
             }
         }
-        System.out.println("---------------------------------------------------------");
         System.out.println("입력 한 메시지가 존재하지 않습니다");
-        System.out.println("---------------------------------------------------------");
     }
 
 
