@@ -46,8 +46,8 @@ public class JavaApplication {
 
     public static void main(String[] args) {
         // 서비스 초기화
-        JCFChannelService channelService = JCFChannelService.getInstance();
-        JCFUserService userService = JCFUserService.getInstance(channelService);
+        JCFUserService userService = JCFUserService.getInstance();
+        JCFChannelService channelService = JCFChannelService.getInstance(userService);
         JCFMessageService messageService = JCFMessageService.getInstance(userService, channelService);
 
         Scanner scanner = new Scanner(System.in);

@@ -9,16 +9,14 @@ import java.util.*;
 public class JCFUserService implements UserService {
     private final Map<UUID, User> users = new HashMap<>();
     private final Map<String, UUID> userIds = new HashMap<>();
-    private final ChannelService channelService;
     private static JCFUserService INSTANCE;
 
-    private JCFUserService(ChannelService channelService) {
-        this.channelService = channelService;
+    private JCFUserService() {
     }
 
-    public static synchronized JCFUserService getInstance(ChannelService channelService) {
+    public static synchronized JCFUserService getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new JCFUserService(channelService);
+            INSTANCE = new JCFUserService();
         }
         return INSTANCE;
     }
