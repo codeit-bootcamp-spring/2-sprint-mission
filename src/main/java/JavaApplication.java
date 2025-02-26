@@ -134,6 +134,7 @@ public class JavaApplication {
         // 2.3 수정
         User newUser = new User("새로운유저", "1234", "나는야새유저");
         User deleteUser = new User("삭제될유저", "1234", "나는야삭제될유저");
+        // 유저 추가
         try {
             channelService.addUsersToChannel(user, newUser, channel1.getChannelName()); // "성준의채널"은 "성준"의 채널이므로 정상적으로 수정
             channelService.addUsersToChannel(user, deleteUser, channel1.getChannelName());
@@ -141,9 +142,8 @@ public class JavaApplication {
         } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException e) {
             System.out.println("채널 수정 예외 발생: " + e.getMessage());
         }
-
+        // 유저 삭제
         try {
-            // 유저 삭제
             channelService.removeUsersFromChannel(user, deleteUser, channel1.getChannelName());
         } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException e) {
             System.out.println("채널 수정 예외 발생: " + e.getMessage());
