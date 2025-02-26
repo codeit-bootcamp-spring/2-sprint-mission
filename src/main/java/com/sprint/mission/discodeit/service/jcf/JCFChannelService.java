@@ -21,10 +21,9 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void createChannel(Channel newChannel) {
-        if (newChannel == null) {
-            throw new IllegalArgumentException("생성할 채널이 null 입니다!!!");
-        }
+    public void createChannel(String channelName) {
+        validateChannelName(channelName);
+        Channel newChannel = new Channel(channelName);
         channelRepository.addChannel(newChannel);
     }
 
@@ -54,6 +53,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
+        validateChannelName(newChannelName);
         readChannel(channelId).updateChannelName(newChannelName);
     }
 
@@ -69,5 +69,11 @@ public class JCFChannelService implements ChannelService {
             throw new IllegalArgumentException("삭제하려는 channelId 가 null 입니다!!!");
         }
         channelRepository.deleteChannel(channelId);
+    }
+
+    private void validateChannelName(String channelName) {
+        if (channelName == null || channelName.trim().isEmpty()) {
+            throw new IllegalArgumentException("channelName 은 null 이거나 공백일 수 없다!!!");
+        }
     }
 }
