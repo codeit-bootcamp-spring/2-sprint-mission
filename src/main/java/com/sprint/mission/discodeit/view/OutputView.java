@@ -8,12 +8,15 @@ public class OutputView {
     }
 
     public static void printServer(ChannelDto channelDto, UserDto userDto) {
+        int totalWidth = 7;
+        String channelName = String.format("%-" + totalWidth + "s", channelDto.name());
+
         System.out.printf("""
                 —---------------------------------------------------------
                  코드잇 2기  | %s
                 —---------------------------------------------------------
                 # %s |                                      | # %s
                 —---------------------------------------------------------
-                %n""", channelDto.name(), channelDto.name(), userDto.name());
+                %n""", channelDto.name(), channelName, userDto.name());
     }
 }

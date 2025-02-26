@@ -1,5 +1,6 @@
 package com.sprint.mission;
 
+import static com.sprint.mission.discodeit.view.InputView.readChannelName;
 import static com.sprint.mission.discodeit.view.InputView.readUserChoice;
 import static com.sprint.mission.discodeit.view.OutputView.printServer;
 
@@ -21,9 +22,18 @@ public class Application {
         userController.register(
                 new UserRegisterDto("박지환", "park@naver.com", "12345")
         );
-
         ChannelDto initChannel = channelController.create("general", owner);
         printServer(initChannel, owner);
-        readUserChoice();
+
+        while(true){
+            String userChoice = readUserChoice();
+            if(userChoice.equals("3")){
+                String channelName = readChannelName();
+                printServer(channelController.updateName(initChannel, channelName), owner);
+            }
+            if(userChoice.equals("7")){
+                break;
+            }
+        }
     }
 }

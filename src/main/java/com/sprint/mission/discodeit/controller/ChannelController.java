@@ -11,4 +11,10 @@ public class ChannelController {
     public ChannelDto create(String name, UserDto owner){
         return channelService.create(name, owner);
     }
+
+    public ChannelDto updateName(ChannelDto channelDto, String channelName){
+        channelService.updateName(channelDto.id(), channelName);
+
+        return channelService.findById(channelDto.id());
+    }
 }
