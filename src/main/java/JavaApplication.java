@@ -188,7 +188,7 @@ public class JavaApplication {
             messageService.createMessage(message1);
             messageService.createMessage(message2);
             messageService.createMessage(message3);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println("메시지 등록 예외 발생: " + e.getMessage());
         }
 
@@ -197,20 +197,20 @@ public class JavaApplication {
             // 3.2.1 단건 조회
             Message findMessage = messageService.getMessage(id1);
             System.out.println("메시지 조회 : " + findMessage.getContent());
-            // 3.2.2 다건 조회
-            List<Message> findMessages = messageService.getAllMessages();
-            System.out.print("메시지 전체 조회 : ");
-            findMessages.stream().forEach(m -> System.out.print(m.getContent() + " "));
-            System.out.println();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             System.out.println("메시지 조회 예외 발생: " + e.getMessage());
         }
+        // 3.2.2 다건 조회
+        List<Message> findMessages = messageService.getAllMessages();
+        System.out.print("메시지 전체 조회 : ");
+        findMessages.stream().forEach(m -> System.out.print(m.getContent() + " "));
+        System.out.println();
 
         // 3.3 수정
         try {
             messageService.updateMessage(id1, user, "메시지수정1");
             // messageService.updateMessage(id2, user2, updateMessage); // 채널 주인이 아니면서, 메시지 주인이 아닌 사람이 수정하려하면 예외 발생
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NoSuchElementException | IllegalStateException e) {
             System.out.println("메시지 수정 예외 발생: " + e.getMessage());
         }
 
@@ -218,7 +218,7 @@ public class JavaApplication {
         try {
             Message findMessage = messageService.getMessage(id1);
             System.out.println("메시지 수정 조회 : " + findMessage.getContent());
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             System.out.println("메시지 수정 조회 예외 발생: " + e.getMessage());
         }
 
@@ -226,19 +226,15 @@ public class JavaApplication {
         try {
             messageService.deleteMessage(id1, user);
             // messageService.deleteMessage(id2, user3);// 채널 주인이 아니면서, 메시지 주인이 아닌 사람이 삭제하려하면 예외 발생
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException e) {
             System.out.println("메시지 삭제 예외 발생: " + e.getMessage());
         }
 
         // 3.6 삭제된 데이터 조회
-        try {
-            List<Message> findMessages = messageService.getAllMessages();
-            System.out.print("메시지 삭제 전체 조회 : ");
-            findMessages.stream().forEach(m -> System.out.print(m.getContent() + " "));
-            System.out.println();
-        } catch (IllegalArgumentException e) {
-            System.out.println("메시지 삭제 조회 예외 발생: " + e.getMessage());
-        }
+        findMessages = messageService.getAllMessages();
+        System.out.print("메시지 삭제 전체 조회 : ");
+        findMessages.stream().forEach(m -> System.out.print(m.getContent() + " "));
+        System.out.println();
 
 
         // 4. 임의로 추가한 기능 (의존성, 연관관계)
@@ -267,7 +263,7 @@ public class JavaApplication {
             newUser.getChannels().stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
             System.out.println();
             System.out.println();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException e) {
             System.out.println("유저 - 채널 동기화 예외 발생: " + e.getMessage());
         }
 
@@ -297,7 +293,7 @@ public class JavaApplication {
             newUser.getMessages().stream().forEach((m) -> System.out.print(m.getContent() + " "));
             System.out.println();
             System.out.println();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException e) {
             System.out.println("유저 - 메시지 동기화 예외 발생: " + e.getMessage());
         }
 
@@ -322,7 +318,7 @@ public class JavaApplication {
             newUser.getMessages().stream().forEach(m -> System.out.print(m.getContent() + " "));
             System.out.println();
             System.out.println();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException e) {
             System.out.println("채널 - 메시지 동기화 예외 발생: " + e.getMessage());
         }
 
@@ -347,7 +343,7 @@ public class JavaApplication {
             findMessageByChannelAndUser.stream().forEach(m -> System.out.print(m.getContent() + " "));
             System.out.println();
             System.out.println();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException e) {
             System.out.println("채널 - 유저 검색 예외 발생: " + e.getMessage());
         }
 
