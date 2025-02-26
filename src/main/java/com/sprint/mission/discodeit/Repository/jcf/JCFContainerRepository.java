@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 public class JCFContainerRepository implements RepositoryService<Server, Container> {
     private static JCFContainerRepository instance;
+    private Container head;
 
     private JCFContainerRepository() {
     }
@@ -28,9 +29,15 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
     }
 
     @Override
+    public Container getHead() {
+        return head;
+    }
+
+    @Override
     public void add(Server server, Container container) {
         List<Container> list = repository(server);
         list.add(container);
+        head = container;
         System.out.println("컨테이너 추가 성공");
     }
 

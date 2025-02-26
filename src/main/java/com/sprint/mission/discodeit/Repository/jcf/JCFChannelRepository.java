@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 public class JCFChannelRepository implements RepositoryService<Channel, Message> {
     private static JCFChannelRepository instance;
+    private Message headMessage;
 
     private JCFChannelRepository() {
 
@@ -20,6 +21,11 @@ public class JCFChannelRepository implements RepositoryService<Channel, Message>
             instance = new JCFChannelRepository();
         }
         return instance;
+    }
+
+    @Override
+    public Message getHead() {
+        return headMessage;
     }
 
     @Override

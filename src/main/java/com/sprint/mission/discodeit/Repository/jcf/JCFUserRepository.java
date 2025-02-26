@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 public class JCFUserRepository implements RepositoryService<User, Server> {
     private static JCFUserRepository instance;
+    private Server head;
 
     private JCFUserRepository() {
     }
@@ -28,9 +29,15 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
     }
 
     @Override
+    public Server getHead() {
+        return head;
+    }
+
+    @Override
     public void add(User user, Server server) {
         List<Server> severList = repository(user);
         severList.add(server);
+        head = server;
         System.out.println("서버 추가 성공");
     }
 
