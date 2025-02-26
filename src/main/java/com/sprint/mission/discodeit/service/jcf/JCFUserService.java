@@ -164,13 +164,6 @@ public class JCFUserService implements UserService {
         return updateServer(list, targetName);
     }
 
-    @Override
-    public boolean updateServer(List<Server> list, String targetName) {
-        Scanner sc = new Scanner(System.in);
-        System.out.printf("바꿀 이름을 입력하시오. : ");
-        String replaceName = sc.nextLine();
-        return updateServer(list, targetName, replaceName);
-    }
 
     @Override
     public boolean updateServer(UUID id, String targetName) {
@@ -187,6 +180,14 @@ public class JCFUserService implements UserService {
     public boolean updateServer(UUID id, String targetName, String replaceName) {
         UserRepository userRepository = getUserRepository(id);
         List<Server> list = userRepository.getServerList();
+        return updateServer(list, targetName, replaceName);
+    }
+
+    @Override
+    public boolean updateServer(List<Server> list, String targetName) {
+        Scanner sc = new Scanner(System.in);
+        System.out.printf("바꿀 이름을 입력하시오. : ");
+        String replaceName = sc.nextLine();
         return updateServer(list, targetName, replaceName);
     }
 
