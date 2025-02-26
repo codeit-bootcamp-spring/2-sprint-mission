@@ -8,7 +8,15 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> messages = new LinkedHashMap<>();
+    private static final JCFMessageRepository jcfMessageRepository = new JCFMessageRepository();
+    private static final Map<UUID, Message> messages = new LinkedHashMap<>();
+
+    private JCFMessageRepository() {
+    }
+
+    public static JCFMessageRepository getInstance(){
+        return jcfMessageRepository;
+    }
 
     @Override
     public Message save(Message message) {

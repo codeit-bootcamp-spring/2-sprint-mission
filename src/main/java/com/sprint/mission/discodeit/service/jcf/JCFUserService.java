@@ -10,7 +10,15 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
-    private final UserRepository userRepository = new JCFUserRepository();
+    private static final JCFUserService jcfUserService = new JCFUserService();
+    private static final UserRepository userRepository = JCFUserRepository.getInstance();
+
+    private JCFUserService() {
+    }
+
+    public static JCFUserService getInstance() {
+        return jcfUserService;
+    }
 
     @Override
     public UserDto register(UserRegisterDto userRegisterDto) {

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,6 +21,11 @@ public class Channel {
         this.userIds.add(ownerId);
     }
 
+    public void addMember(UUID userId){
+        userIds.add(userId);
+        updatedAt();
+    }
+
     public void updateName(String name) {
         this.name = name;
         updatedAt();
@@ -35,5 +41,9 @@ public class Channel {
 
     public UUID getId() {
         return id;
+    }
+
+    public List<UUID> getUserIds() {
+        return Collections.unmodifiableList(userIds);
     }
 }

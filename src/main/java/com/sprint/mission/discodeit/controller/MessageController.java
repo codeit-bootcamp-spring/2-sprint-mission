@@ -4,5 +4,5 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 
 public class MessageController {
-    private final MessageService messageService = new JCFMessageService();
+    private final MessageService messageService = JCFMessageService.getInstance();
 }

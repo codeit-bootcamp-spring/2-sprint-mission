@@ -1,6 +1,7 @@
 package com.sprint.mission;
 
 import static com.sprint.mission.discodeit.view.InputView.readChannelName;
+import static com.sprint.mission.discodeit.view.InputView.readEmail;
 import static com.sprint.mission.discodeit.view.InputView.readUserChoice;
 import static com.sprint.mission.discodeit.view.OutputView.printServer;
 
@@ -16,22 +17,27 @@ public class Application {
         ChannelController channelController = new ChannelController();
 
         System.out.println("안녕하세요 코드잇2기 서버입니다.");
-        UserDto owner = userController.register(
+        UserDto user = userController.register(
                 new UserRegisterDto("황지환", "hwang@naver.com", "12345")
         );
         userController.register(
                 new UserRegisterDto("박지환", "park@naver.com", "12345")
         );
-        ChannelDto initChannel = channelController.create("general", owner);
-        printServer(initChannel, owner);
+        ChannelDto initChannel = channelController.create("general", user);
+        printServer(channelController.findAll(), user, initChannel);
 
-        while(true){
+        while (true) {
             String userChoice = readUserChoice();
-            if(userChoice.equals("3")){
-                String channelName = readChannelName();
-                printServer(channelController.updateName(initChannel, channelName), owner);
+            if (userChoice.equals("4")) {
+                channelController.addMember(initChannel, readEmail());
+                printServer(channelController.findAll(), user, initChannel);
             }
-            if(userChoice.equals("7")){
+            if (userChoice.equals("3")) {
+                String channelName = readChannelName();
+                ChannelDto channel = channelController.updateName(initChannel, channelName);
+                printServer(channelController.findAll(), user, channel);
+            }
+            if (userChoice.equals("7")) {
                 break;
             }
         }

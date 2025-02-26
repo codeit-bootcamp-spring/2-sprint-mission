@@ -17,7 +17,7 @@ class ChannelServiceTest {
 
     @BeforeEach
     void setUp() {
-        channelService = new JCFChannelService();
+        channelService = JCFChannelService.getInstance(); // TODO: 2/26/25 싱글톤이 테스트 목립적인지 확인 필요
         setUpChannel = channelService.create(NAME, new UserDto(UUID.randomUUID(), "황지환"));
     }
 

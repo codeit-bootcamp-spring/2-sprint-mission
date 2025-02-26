@@ -20,7 +20,7 @@ class UserServiceTest {
 
     @BeforeEach
     void init() {
-        userService = new JCFUserService();
+        userService = JCFUserService.getInstance();
 
         this.setUpUser = userService.register(new UserRegisterDto(NAME, EMAIL, PASSWORD));
     }

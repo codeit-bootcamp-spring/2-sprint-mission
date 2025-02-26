@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
+    ChannelDto addMember(UUID id, String friendEmail);
     ChannelDto create(String name, UserDto owner);
 
     ChannelDto findById(UUID id);

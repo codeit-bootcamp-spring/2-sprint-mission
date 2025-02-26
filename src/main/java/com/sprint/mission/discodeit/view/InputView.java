@@ -29,4 +29,9 @@ public class InputView {
         return scanner.nextLine();
     }
 
+    public static String readEmail(){
+        System.out.println("# 친구 이메일 : ");
+
+        return scanner.nextLine();
+    }
 }

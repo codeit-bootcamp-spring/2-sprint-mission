@@ -13,7 +13,15 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
-    private final MessageRepository messageRepository = new JCFMessageRepository();
+    private static final JCFMessageService jcfMessageService = new JCFMessageService();
+    private static final MessageRepository messageRepository = JCFMessageRepository.getInstance();
+
+    private JCFMessageService() {
+    }
+
+    public static JCFMessageService getInstance(){
+        return jcfMessageService;
+    }
 
     @Override
     public MessageDto create(String context, UUID channelId, UUID userId) {

@@ -11,6 +11,8 @@ public interface UserRepository {
 
     List<User> findByName(String name);
 
+    User findByEmail(String email);
+
     List<User> findAll();
 
     void updateName(UUID id, String name);

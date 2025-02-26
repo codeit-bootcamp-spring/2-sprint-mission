@@ -29,6 +29,9 @@ public class User {
         return this.name.equals(name);
     }
 
+    public boolean isSameEmail(String email){
+        return this.email.equals(email);
+    }
     private void updatedAt() {
         this.updatedAt = Instant.now().getEpochSecond();
     }

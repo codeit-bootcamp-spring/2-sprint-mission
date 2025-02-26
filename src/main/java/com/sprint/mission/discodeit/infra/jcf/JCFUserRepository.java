@@ -8,7 +8,15 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> users = new HashMap<>();
+    private static final JCFUserRepository jcfUserRepository = new JCFUserRepository();
+    private static final Map<UUID, User> users = new HashMap<>();
+
+    private JCFUserRepository() {
+    }
+
+    public static JCFUserRepository getInstance() {
+        return jcfUserRepository;
+    }
 
     @Override
     public User save(User user) {
@@ -32,6 +40,15 @@ public class JCFUserRepository implements UserRepository {
                 .stream()
                 .filter(user -> user.isSameName(name))
                 .toList();
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return users.values()
+                .stream()
+                .filter(user -> user.isSameEmail(email))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("[ERROR] Email과 일치하는 유저가 없습니다."));
     }
 
     @Override

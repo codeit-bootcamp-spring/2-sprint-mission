@@ -16,7 +16,7 @@ class MessageServiceTest {
 
     @BeforeEach
     void setUp() {
-        messageService = new JCFMessageService();
+        messageService = JCFMessageService.getInstance();
         setUpMessage = messageService.create(CONTEXT, UUID.randomUUID(), UUID.randomUUID());
     }
 

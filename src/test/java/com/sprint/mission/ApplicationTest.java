@@ -67,7 +67,8 @@ class ApplicationTest extends ConsoleTestTemplate {
     @Test
     void 채널_유저_초대_테스트() {
         run("4", "park@naver.com", "7");
-        assertThat(output()).contains(
+        assertThat(output().replaceAll("[\\r\\n]+", ""))
+                .containsSequence(
                 "안녕하세요 코드잇2기 서버입니다.",
                 "—---------------------------------------------------------",
                 " 코드잇 2기  | general",
@@ -101,7 +102,7 @@ class ApplicationTest extends ConsoleTestTemplate {
     }
 
     @Test
-    void 채널_메세지_입력_및_바로_조회_테스트() {
+    void 채널_메세지_입력_및_메세지_자동_조회_테스트() {
         run("5번", "안녕하세요 황지환입니다.", "7");
 
         String cleanOutput = output().replaceAll("[^\\S\\n]+", "");
