@@ -106,7 +106,7 @@ public class JavaApplication {
                             System.out.print("채널 설명 입력: ");
                             String channelDesc  =sc.nextLine();
                             Channel c = new Channel(channelName1, channelDesc);
-                            channelService.createChannel(c);
+                            channelService.create(c);
                             break;
 
                         case "2":
@@ -118,7 +118,7 @@ public class JavaApplication {
 
                         case "3":
                             System.out.println("채널 전체 조회");
-                            channelService.getAllChannels();
+                            channelService.getAllChannel();
                             break;
 
                         case "4":
@@ -129,14 +129,14 @@ public class JavaApplication {
                             String newChannelName = sc.nextLine();
                             System.out.print("새로운 채널 설명 입력: ");
                             String newChannelDesc = sc.nextLine();
-                            channelService.updateChannel(oldChannelName, newChannelName, newChannelDesc);
+                            channelService.update(oldChannelName, newChannelName, newChannelDesc);
                             break;
 
                         case "5":
                             System.out.println("채널 삭제");
                             System.out.print("삭제할 채널 이름 입력: ");
                             String deleteChannelName = sc.nextLine();
-                            channelService.deleteChannel(deleteChannelName);
+                            channelService.delete(deleteChannelName);
                             break;
 
                     }

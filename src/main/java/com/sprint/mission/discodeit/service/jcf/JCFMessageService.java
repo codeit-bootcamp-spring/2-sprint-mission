@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -32,6 +33,9 @@ public class JCFMessageService implements MessageService {
             System.out.println("등록 된 사용자가 없습니다.");
         }
     }
+
+
+
 
     // 메시지 단일 조회
     @Override

@@ -11,6 +11,9 @@ public class Channel extends BaseEntity {
         this.channelName = channelName;
         this.description = description;
     }
+    public Channel(String channelName) {
+        this.channelName = channelName;
+    }
 
     // getter
     public String getChannelName() {
@@ -34,5 +37,11 @@ public class Channel extends BaseEntity {
             return channel.getChannelName().equals(this.getChannelName());
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "채널 이름: " + channelName + "\n채널 설명: " + description + "\n사용자 ID: " + this.getId() +
+                "\n생성 시간: " + this.getCreatedAtFormatted() + "\n업데이트 시간: " + this.getupdatedAttFormatted();
     }
 }

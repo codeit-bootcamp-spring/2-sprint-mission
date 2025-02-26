@@ -38,6 +38,6 @@ public class User extends BaseEntity {
     @Override
     public String toString() {
         return "이름: " + name + "\n메일: " + email + "\n사용자 ID: " + this.getId() +
-                "\n생성 시간:" + this.getCreatedAtFormatted() + "\n업데이트 시간: " + this.getupdatedAttFormatted();
+                "\n생성 시간: " + this.getCreatedAtFormatted() + "\n업데이트 시간: " + this.getupdatedAttFormatted();
     }
 }

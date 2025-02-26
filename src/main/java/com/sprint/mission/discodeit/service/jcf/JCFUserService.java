@@ -97,7 +97,7 @@ public class JCFUserService implements UserService {
 
     // 사용자 삭제
     @Override
-    public User delete(String name){
+    public User delete(String name) {
         return deleteUser(name);
     }
 
