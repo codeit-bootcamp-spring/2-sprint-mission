@@ -113,7 +113,7 @@ public class JavaApplication {
             channelService.createChannel(channel3);
 
             // 잘 등록됐는지는 조회에서 테스트
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println("채널 생성 예외 발생: " + e.getMessage());
         }
 
@@ -122,15 +122,14 @@ public class JavaApplication {
             // 2.2.1 단건 조회
             Channel findChannel = channelService.getChannel("성준의채널");
             System.out.println("채널 조회 : " + findChannel.getChannelName());
-            // 2.2.2 다건 조회
-            List<Channel> findChannels = channelService.getAllChannels();
-            System.out.print("채널 전체 조회 : ");
-            findChannels.stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
-            System.out.println();
-
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             System.out.println("채널 조회 예외 발생: " + e.getMessage());
         }
+        // 2.2.2 다건 조회
+        List<Channel> findChannels = channelService.getAllChannels();
+        System.out.print("채널 전체 조회 : ");
+        findChannels.stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
+        System.out.println();
 
         // 2.3 수정
         User newUser = new User("새로운유저", "1234", "나는야새유저");
@@ -139,14 +138,14 @@ public class JavaApplication {
             channelService.addUsersToChannel(user, newUser, channel1.getChannelName()); // "성준의채널"은 "성준"의 채널이므로 정상적으로 수정
             channelService.addUsersToChannel(user, deleteUser, channel1.getChannelName());
             // channelService.addUsersToChannel(user, deleteUser, channel2.getChannelName()); // "태환의채널"은 "성준"의 채널이 아니므로 예외 발생
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException e) {
             System.out.println("채널 수정 예외 발생: " + e.getMessage());
         }
 
         try {
             // 유저 삭제
             channelService.removeUsersFromChannel(user, deleteUser, channel1.getChannelName());
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException e) {
             System.out.println("채널 수정 예외 발생: " + e.getMessage());
         }
 
@@ -154,7 +153,7 @@ public class JavaApplication {
         try {
             Channel findChannel = channelService.getChannel("성준의채널");
             System.out.println("채널 수정 조회 : " + findChannel);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             System.out.println("채널 수정 조회 예외 발생: " + e.getMessage());
         }
 
@@ -162,20 +161,14 @@ public class JavaApplication {
         try {
             channelService.deleteChannel(user3, "희준의채널"); // 채널 주인이므로 정상적으로 삭제 완료
             // channelService.deleteChannel(user2, "성준의채널"); // 예외 발생
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             System.out.println("채널 삭제 예외 발생: " + e.getMessage());
         }
 
         // 2.6 삭제된 데이터 조회
-        try {
-            List<Channel> findChannels = channelService.getAllChannels();
-            System.out.print("채널 삭제 전체 조회 : ");
-            findChannels.stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
-            System.out.println();
-        } catch (IllegalArgumentException e) {
-            System.out.println("채널 유저 삭제 예외 발생: " + e.getMessage());
-        }
-
+        System.out.print("채널 삭제 전체 조회 : ");
+        findChannels.stream().forEach(ch -> System.out.print(ch.getChannelName() + " "));
+        System.out.println();
 
         System.out.println();
 

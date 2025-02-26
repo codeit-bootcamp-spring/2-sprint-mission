@@ -97,9 +97,6 @@ public class JCFUserService implements UserService {
         if (role == null) {
             throw new IllegalArgumentException("추가할 권한이 입력되지 않았습니다.");
         }
-        if (username == null) {
-            throw new IllegalArgumentException("username이 입력되지 않았습니다.");
-        }
 
         User findUser = getUser(username);
         findUser.addRole(role);
@@ -111,9 +108,6 @@ public class JCFUserService implements UserService {
     public void removeRole(String role, String username) {
         if (role == null) { // 입력값 자체에 대한 예외
             throw new IllegalArgumentException("삭제할 권한이 입력되지 않았습니다.");
-        }
-        if (username == null) {
-            throw new IllegalArgumentException("username이 입력되지 않았습니다.");
         }
 
         User findUser = getUser(username);
