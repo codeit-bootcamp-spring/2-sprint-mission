@@ -15,105 +15,132 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 
 public class JavaApplication {
-
     public static void main(String[] args) {
-        System.setProperty("file.encoding", "UTF-8");
-
         UserRepository userRepository = UserRepository.getInstance();
         ChannelRepository channelRepository = ChannelRepository.getInstance();
         MessageRepository messageRepository = MessageRepository.getInstance();
 
         UserService userService = new JCFUserService(userRepository);
-        ChannelService channelService = new JCFChannelService(channelRepository);
-        MessageService messageService = new JCFMessageService(messageRepository);
+        ChannelService channelService = new JCFChannelService(userRepository, channelRepository, messageRepository);
+        MessageService messageService = new JCFMessageService(userRepository, channelRepository, messageRepository);
 
-        // entity 생성자 검증
-        User testUser1 = new User("testUser1", "testUser1@gmail.com", "1111");
-        User testUser2 = new User("testUser2", "testUser2@gmail.com", "2222");
-        User testUser3 = new User("testUser3", "testUser3@gmail.com", "3333");
-        User testUser4 = new User("testUser4", "testUser4@gmail.com", "4444");
-        User testUser5 = new User("testUser5", "testUser5@gmail.com", "5555");
-
-        Channel testChannel1 = new Channel("testChannel1", testUser1);
-        Channel testChannel2 = new Channel("testChannel2", testUser2);
-        Channel testChannel3 = new Channel("testChannel3", testUser3);
-        Channel testChannel4 = new Channel("testChannel4", testUser4);
-        Channel testChannel5 = new Channel("testChannel5", testUser5);
-
-        Message testMessage1 = new Message(testUser1, "testMessage1", testChannel1);
-        Message testMessage2 = new Message(testUser2, "testMessage2", testChannel2);
-        Message testMessage3 = new Message(testUser3, "testMessage3", testChannel3);
-        Message testMessage4 = new Message(testUser4, "testMessage4", testChannel4);
-        Message testMessage5 = new Message(testUser5, "testMessage5", testChannel5);
-
-
-
-        // UserService 검증
-        // UserService 의 createUser 검증
-        userService.createUser(testUser1);
-        userService.createUser(testUser2);
-        userService.createUser(testUser3);
-        userService.createUser(testUser4);
-        userService.createUser(testUser5);
-
-        // UserService 의 readUser 검증
-        System.out.println(userService.readUser(testUser3.getId()));
-
-        // UserService 의 readAllUsers 검증
+        // userService
+        // createUser 검증
+        System.out.println("UserSerivce의 createUser 메서드 검증");
+        userService.createUser("user01", "user01@gmail.com", "1111");
+        userService.createUser("user02", "user02@gmail.com", "2222");
+        userService.createUser("user03", "user03@gmail.com", "3333");
         System.out.println(userService.readAllUsers());
 
-        // UserService 의 updateUserName 검증
-        userService.updateUserName(testUser3.getId(), "testUser3333");
+
+        // read
+        // createUser로 생성할 경우, id 를 가져올 방법이 없어 생성자로 생성 후, repository에 직접 추가
+        System.out.println("UserService의 readUser 메서드 검증");
+        User testUser01 = new User("testUser01", "testUser01@gmail.com", "1111");
+        User testUser02 = new User("testUser02", "testUser02@gmail.com", "2222");
+        User testUser03 = new User("testUser03", "testUser03@gmail.com", "3333");
+        userRepository.addUser(testUser01);
+        userRepository.addUser(testUser02);
+        userRepository.addUser(testUser03);
+        System.out.println(userService.readUser(testUser01.getId()));
+        System.out.println(userService.readUser(testUser02.getId()));
+        System.out.println(userService.readUser(testUser03.getId()));
+
+        // readAll          //userRepository의 정렬순서 확인해볼 것
+        System.out.println("UserService의 readAllUsers 검증");
         System.out.println(userService.readAllUsers());
 
-        // UserService 의 updatePassword 검증
-        userService.updatePassword(testUser3.getId(), "33333333");
+        // update
+        userService.updateUserName(testUser02.getId(), "updateUserName02");
+        userService.updatePassword(testUser03.getId(), "updatePassword03");
         System.out.println(userService.readAllUsers());
 
-        // UserService 의 deleteUser 검증
-        userService.deleteUser(testUser3.getId());
+        // delete
+        userService.deleteUser(testUser01.getId());
         System.out.println(userService.readAllUsers());
 
 
 
-        // ChannelService 검증
-        channelService.createChannel(testChannel1);
-        channelService.createChannel(testChannel2);
-        channelService.createChannel(testChannel3);
-        channelService.createChannel(testChannel4);
-        channelService.createChannel(testChannel5);
 
-        System.out.println(channelService.readChannel(testChannel3.getId()));
 
+        // ChannelService
+        // create
+        System.out.println("ChannelSerivce의 createChannel 메서드 검증");
+        channelService.createChannel("channel01");
+        channelService.createChannel("channel02");
+        channelService.createChannel("channel03");
+
+        // read
+        System.out.println("ChannelService의 readChannel 메서드 검증");
+        Channel testChannel01 = new Channel("testChannel01");
+        Channel testChannel02 = new Channel("testChannel02");
+        Channel testChannel03 = new Channel("testChannel03");
+        channelRepository.addChannel(testChannel01);
+        channelRepository.addChannel(testChannel02);
+        channelRepository.addChannel(testChannel03);
+        System.out.println(channelService.readChannel(testChannel01.getId()));
+        System.out.println(channelService.readChannel(testChannel02.getId()));
+        System.out.println(channelService.readChannel(testChannel03.getId()));
+
+        // readAll
+        System.out.println("ChannelService의 readAllChannels 메서드 검증");
         System.out.println(channelService.readAllChannels());
 
-        channelService.updateChannelName(testChannel3.getId(), "updatedChannel3333");
+        // update
+        System.out.println("ChannelService의 update 메서드 검증");
+        channelService.updateChannelName(testChannel01.getId(), "updateChannelName01");
+        channelService.addChannelParticipant(testChannel03.getId(), testUser03);
         System.out.println(channelService.readAllChannels());
 
-        channelService.addChannelParticipant(testChannel3.getId(), testUser5);
-        channelService.addChannelParticipant(testChannel3.getId(), testUser2);
+        //delete
+        System.out.println("ChannelService의 deleteChannel 메서드 검증");
+        channelService.deleteChannel(testChannel01.getId());
         System.out.println(channelService.readAllChannels());
 
-        channelService.deleteChannel(testChannel3.getId());
-        System.out.println(channelService.readAllChannels());
 
 
 
-        // MessageService 검증
-        messageService.createMessage(testMessage1);
-        messageService.createMessage(testMessage2);
-        messageService.createMessage(testMessage3);
-        messageService.createMessage(testMessage4);
-        messageService.createMessage(testMessage5);
 
-        System.out.println(messageService.readMessage(testMessage3.getId()));
 
+
+        // MessageService
+        //create
+        System.out.println("MessageSerivce의 createMessage 메서드 검증");
+        // messageService.createMessage(testUser01, "test01", testChannel01);   // 위에서 testUser01 삭제함.
+        messageService.createMessage(testUser02, "test02", testChannel02);
+        messageService.createMessage(testUser03, "test03", testChannel03);
+
+        // read
+        System.out.println("MessageSerivce의 readMessage 메서드 검증");
+        // Message testMessage01 = new Message(testUser01, "01test01", testChannel01);   // 위에서 testUser01 삭제함.
+        Message testMessage02 = new Message(testUser02, "02test02", testChannel02);
+        Message testMessage03 = new Message(testUser03, "03test03", testChannel03);
+        messageRepository.addMessage(testMessage02);
+        messageRepository.addMessage(testMessage03);
+        // System.out.println(messageService.readMessage(testMessage01.getId()));
+        System.out.println(messageService.readMessage(testMessage02.getId()));
+        System.out.println(messageService.readMessage(testMessage03.getId()));
+
+        // readAll
+        System.out.println("MessageSerivce의 readAllMessage 메서드 검증");
+        messageService.readAllMessages();
+
+       // update
+        System.out.println("MessageSerivce의 updateMessageContent 메서드 검증");
+        messageService.updateMessageContent(testMessage02.getId(), "updateMessageContent02");
         System.out.println(messageService.readAllMessages());
 
-        messageService.updateMessageContent(testMessage3.getId(), "Hello, this message is updated!!!");
+       // delete
+        System.out.println("MessageSerivce의 deleteMessage 메서드 검증");
+        messageService.deleteMessage(testMessage03.getId());
         System.out.println(messageService.readAllMessages());
 
-        messageService.deleteMessage(testMessage3.getId());
-        System.out.println(messageService.readAllMessages());
+
+
+
+        // ChannelService 의 readMessageList (메세지가 있어야 해서 끝에 두었음)
+        System.out.println("ChannelService의 readMessageListByChannelId 메서드 검증");
+        System.out.println(channelService.readMessageListByChannelId(testChannel02.getId()));
+
     }
 }
