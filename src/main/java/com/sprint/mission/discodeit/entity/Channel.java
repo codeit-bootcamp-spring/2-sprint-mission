@@ -5,17 +5,13 @@ import java.util.stream.Collectors;
 
 public class Channel extends BaseEntity {
     private String channelName;
-    private TreeSet<User> participants;
+    private TreeSet<User> participants;     //중복X && 이름순으로 정렬
 
-    public Channel(String channelName, User... participants) {
+    public Channel(String channelName) {
         validChannelName(channelName);
 
         this.channelName = channelName;
-        if (participants == null || participants.length == 0) {     // 자기자신과의 채팅을 허용하냐 마냐 (허용하면 : == 0 / 허용하지 않으면 : <= 1
-            throw new IllegalArgumentException("최소 1명의 사용자가 입력되어야 합니다!!!");
-        }
-        this.participants = Arrays.stream(participants)
-                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(User::getUserName))));       // Comparator.comparing(User::getUserName) (user1, user2) -> user1.getUserName().compareTo(user2.getUserName())
+        this.participants = new TreeSet<>();
     }
 
     public String getChannelName() {
