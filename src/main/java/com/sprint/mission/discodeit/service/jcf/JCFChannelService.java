@@ -7,7 +7,8 @@ import com.sprint.mission.discodeit.service.ChannelService;
 public class JCFChannelService implements ChannelService {
     private static JCFChannelService instance;
 
-    private JCFChannelService(){}
+    private JCFChannelService(){
+    }
 
     public static JCFChannelService getInstance() {
         if (instance == null) {

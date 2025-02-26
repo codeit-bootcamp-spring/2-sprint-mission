@@ -1,4 +1,4 @@
-import static com.sprint.mission.discodeit.Entry.MainEntry.*;
+import static com.sprint.mission.discodeit.MainEntry.*;
 
 public class JavaApplication {
 

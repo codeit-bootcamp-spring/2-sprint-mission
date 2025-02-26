@@ -1,5 +1,6 @@
-package com.sprint.mission.discodeit.Entry;
+package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.FrontEnd.DiscordRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFContainerRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
@@ -14,7 +15,6 @@ public class MainEntry {
 
     //권한 부여
     JCFServerService serverService = JCFServerService.getInstance();
-
 
     JCFMessageService messageService = JCFMessageService.getInstance();
 
