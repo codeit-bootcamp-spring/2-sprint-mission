@@ -3,12 +3,12 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public abstract class BaseEntity {
-    protected final UUID id;
-    protected final Long createdAt;
-    protected Long updatedAt;
+    private final UUID id;
+    private final Long createdAt;
+    private Long updatedAt;
 
 
-    public BaseEntity() {
+    protected BaseEntity() {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = System.currentTimeMillis();
