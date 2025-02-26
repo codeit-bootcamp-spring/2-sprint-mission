@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.service.TimeFormatter;
+
 public class Channel extends BaseEntity {
     private String name;
 
@@ -23,8 +25,8 @@ public class Channel extends BaseEntity {
         return "Channel{" +
                 "name='" + name + '\'' +
                 ", id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
+                ", createdAt=" + TimeFormatter.formatTimestamp(createdAt) +
+                ", updatedAt=" + TimeFormatter.formatTimestamp(updatedAt) +
                 '}';
     }
 }
