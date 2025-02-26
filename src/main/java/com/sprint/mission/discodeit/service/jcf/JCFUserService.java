@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.Factory.CreateChannalFactory;
 import com.sprint.mission.discodeit.Factory.CreateServerFactory;
-import com.sprint.mission.discodeit.Factory.Factory;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.impl.LinkedListUserRepository;
-import com.sprint.mission.discodeit.entity.Container.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * <h3>유저 서비스 구현체 </h3><p>
@@ -24,6 +24,7 @@ import java.util.*;
  */
 public class JCFUserService implements UserService {
     private static JCFUserService instance;
+    private final Map<UUID, UserRepository> userTable = new HashMap<>();
 
     private JCFUserService() {
     }
@@ -35,7 +36,6 @@ public class JCFUserService implements UserService {
         return instance;
     }
 
-    private final Map<UUID, UserRepository> userTable = new HashMap<>();
 
     //레포지토리 생성
     private UserRepository getUserRepository(UUID id) {
@@ -50,13 +50,9 @@ public class JCFUserService implements UserService {
         return CreateServerFactory.getInstance().create(name);
     }
 
-    public Channel createChannel(String name) {
-        return CreateChannalFactory.getInstance().create(name);
-    }
-
     @Override
-    public void addServer(UUID userId, String name) {
-        UserRepository userRepository = getUserRepository(userId);
+    public void addServer(UUID id, String name) {
+        UserRepository userRepository = getUserRepository(id);
         Server server = createServer(name);
         userRepository.add(server);
 
@@ -65,8 +61,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void addServer(UUID userId, Server server) {
-        UserRepository userRepository = getUserRepository(userId);
+    public void addServer(UUID id, Server server) {
+        UserRepository userRepository = getUserRepository(id);
         userRepository.add(server);
 
         //로그
@@ -74,8 +70,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public Server getServer(UUID userId, String name) {
-        UserRepository userRepository = getUserRepository(userId);
+    public Server getServer(UUID id, String name) {
+        UserRepository userRepository = getUserRepository(id);
         List<Server> list = userRepository.getList();
         for (Server server : list) {
             if (server.getName().equals(name)) {
@@ -90,14 +86,10 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void printServer(UUID userId) {
-        UserRepository userRepository = getUserRepository(userId);
+    public void printServer(UUID id) {
+        UserRepository userRepository = getUserRepository(id);
         List<Server> list = userRepository.getList();
-        System.out.println("=========서버 목록==========");
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(i + 1 + " : " + list.get(i).getName());
-        }
-        System.out.println("=========================");
+        printServer(list);
     }
 
     @Override
@@ -110,8 +102,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean removeServer(UUID userId, String targetName) {
-        UserRepository userRepository = getUserRepository(userId);
+    public boolean removeServer(UUID id, String targetName) {
+        UserRepository userRepository = getUserRepository(id);
         List<Server> list = userRepository.getList();
         for (Server server : list) {
             if (server.getName().equals(targetName)) {
@@ -126,14 +118,14 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean updateServer(UUID userId, String targetName, String replaceName) {
-        UserRepository userRepository = getUserRepository(userId);
+    public boolean updateServer(UUID id, String targetName, String replaceName) {
+        UserRepository userRepository = getUserRepository(id);
         List<Server> list = userRepository.getList();
         for (Server server : list) {
             if (server.getName().equals(targetName)) {
                 server.setName(replaceName);
                 //로그
-                System.out.println(server.getName() + " 이(가) 됩니다.");
+                System.out.println(targetName + " 이름이 " + server.getName() + " 이(가) 됩니다.");
                 return true;
             }
         }
@@ -141,31 +133,5 @@ public class JCFUserService implements UserService {
         return false;
     }
 
-    @Override
-    public void addChannel(UUID userId, Channel Channel) {
-        UserRepository userRepository = getUserRepository(userId);
-        List<Server> list = userRepository.getList();
-        printServer(list);
-        Scanner sc = new Scanner(System.in);
-        System.out.print("추가할 서버의 번호를 입력하시오. : ");
-        int i = sc.nextInt();
-        sc.nextLine();
-        Server server = list.get(i);
 
-    }
-
-    @Override
-    public void printChannel(UUID userId) {
-
-    }
-
-    @Override
-    public boolean removeChannel(String targetName) {
-        return false;
-    }
-
-    @Override
-    public boolean updateChannel(String targetName, String replaceName) {
-        return false;
-    }
 }

@@ -24,13 +24,4 @@ public interface UserService {
 
     public abstract boolean updateServer(UUID userId, String targetName, String replaceName);
 
-    public abstract Channel createChannel(String name);
-
-    public abstract void addChannel(UUID userId, Channel Channel);
-
-    public abstract void printChannel(UUID id);
-
-    public abstract boolean removeChannel(String targetName);
-
-    public abstract boolean updateChannel(String targetName, String replaceName);
 }
