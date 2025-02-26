@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 
 
-public class Main {
+public class JavaApplication {
     public static void main(String[] args) {
         JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService();
