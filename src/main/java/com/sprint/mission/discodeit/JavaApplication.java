@@ -16,7 +16,7 @@ public class JavaApplication {
 
         JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService();
-        JCFMessageService messageService = new JCFMessageService();
+        JCFMessageService messageService = new JCFMessageService(userService, channelService);
 
         while (true) {
             System.out.println("\n===== 메뉴 선택 =====");
