@@ -52,7 +52,6 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
         Scanner sc = new Scanner(System.in);
         System.out.print("삭제할 서버의 이름을 입력하시오. : ");
         String s = sc.nextLine();
-        sc.close();
         for (Server data : list) {
             if (data.getName().equals(s)) {
                 list.remove(data);

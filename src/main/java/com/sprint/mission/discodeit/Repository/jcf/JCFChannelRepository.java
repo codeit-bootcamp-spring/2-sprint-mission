@@ -52,7 +52,6 @@ public class JCFChannelRepository implements RepositoryService<Channel, Message>
         Scanner sc = new Scanner(System.in);
         System.out.print("삭제할 메시지의 이름을 입력하시오. : ");
         String s = sc.next();
-        sc.close();
         for (Message data : list) {
             if (data.getStr().equals(s)) {
                 list.remove(data);
@@ -96,7 +95,6 @@ public class JCFChannelRepository implements RepositoryService<Channel, Message>
                 return;
             }
         }
-//        sc.close();
         System.out.println("해당 메시지가 존재하지 않습니다.");
     }
 

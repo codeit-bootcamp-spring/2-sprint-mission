@@ -59,7 +59,6 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
                 return;
             }
         }
-        sc.close();
         System.out.println("해당 컨테이너가 존재하지 않습니다.");
     }
 

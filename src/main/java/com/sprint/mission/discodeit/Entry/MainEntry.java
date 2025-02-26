@@ -4,35 +4,19 @@ import com.sprint.mission.discodeit.Repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFContainerRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.entity.Container.Channel;
-import com.sprint.mission.discodeit.entity.Container.Container;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.jcf.*;
 
 public class MainEntry {
-    static JCFUserService userService;
-    static JCFServerService serverService;
-    static JCFCategoryService categoryService;
-    static JCFChannelService channelService;
-    static JCFMessageService messageService;
-    static JCFUserRepository userRepository;
-    static JCFContainerRepository containerRepository;
-    static JCFChannelRepository channelRepository;
-    static JCFDiscordRepository discordRepository;
+    //카테고리와 채널 관리
+    JCFCategoryService categoryService = JCFCategoryService.getInstance();
 
-    public MainEntry() {
-        userService = JCFUserService.getInstance();
-        serverService = JCFServerService.getInstance();
-        categoryService = JCFCategoryService.getInstance();
-        channelService = JCFChannelService.getInstance();
-        messageService = JCFMessageService.getInstance();
+    //권한 부여
+    JCFServerService serverService = JCFServerService.getInstance();
 
-        userRepository = JCFUserRepository.getInstance();
-        containerRepository = JCFContainerRepository.getInstance();
-        channelRepository = JCFChannelRepository.getInstance();
-        discordRepository = JCFDiscordRepository.getInstance();
 
-    }
+    JCFMessageService messageService = JCFMessageService.getInstance();
 
     public static int USERCOUNT = 0;
     public static int SERVERCOUNT = 0;
@@ -68,47 +52,64 @@ public class MainEntry {
     }
 
     public static void createUser() {
-
-        User user = new User("U" + USERCOUNT, "U" + USERCOUNT);
+        DiscordRepository discordRepository = DiscordRepository.getInstance();
         USERCOUNT++;
-        headUser = user;
-        discordRepository.add(user);
+        headUser = new User("U" + USERCOUNT, "U" + USERCOUNT);;
+        discordRepository.add(headUser);
 
     }
 
     public static void createServer() {
+        JCFUserService userService = JCFUserService.getInstance();
+        JCFUserRepository userRepository = JCFUserRepository.getInstance();
+
         if (isUserNull())
             return;
-        userRepository.add(headUser, userService.createServer("S" + SERVERCOUNT++));
+        headserver = userService.createServer("S" + SERVERCOUNT++);
+        userRepository.add(headUser, headserver);
     }
 
     public static void createChannel() {
         if (isUserNull())
             return;
-        containerRepository.add(userRepository.getHead(), userService.createChannel("C" + CHANNELCOUNT++));
+        JCFUserService userService = JCFUserService.getInstance();
+        JCFUserRepository userRepository = JCFUserRepository.getInstance();
+        JCFContainerRepository containerRepository = JCFContainerRepository.getInstance();
+
+        headContainer = userService.createChannel("C" + CHANNELCOUNT++);
+        containerRepository.add(userRepository.getHead(), headContainer);
     }
 
     public static void removeUser() {
+
         if (isUserNull())
             return;
+        DiscordRepository discordRepository = DiscordRepository.getInstance();
         discordRepository.remove();
 
     }
 
     public static void removeServer() {
-        if (isUserNull())
+
+        if (isUserNull()) {
             return;
+        }
+        JCFUserRepository userRepository = JCFUserRepository.getInstance();
         userRepository.remove(headUser);
     }
 
     public static void removeChannel() {
         if (isServerNull())
             return;
+        JCFContainerRepository containerRepository = JCFContainerRepository.getInstance();
+
         containerRepository.remove(headserver);
     }
 
 
     public static void printUser() {
+        DiscordRepository discordRepository = DiscordRepository.getInstance();
+
         if (isUserNull())
             return;
         discordRepository.print();
@@ -117,12 +118,15 @@ public class MainEntry {
     public static void printServer() {
         if (isUserNull())
             return;
+        JCFUserRepository userRepository = JCFUserRepository.getInstance();
         userRepository.print(headUser);
     }
 
     public static void printChannel() {
         if (isUserNull())
             return;
+        JCFContainerRepository containerRepository = JCFContainerRepository.getInstance();
+
         containerRepository.print(headserver);
     }
 
@@ -130,6 +134,9 @@ public class MainEntry {
         if (isContainerNull()) {
             return;
         }
+        JCFChannelService channelService = JCFChannelService.getInstance();
+        JCFChannelRepository channelRepository = JCFChannelRepository.getInstance();
+
         channelRepository.add(headContainer, channelService.write("M" + MESSAGECOUNT++));
 
     }
@@ -138,6 +145,8 @@ public class MainEntry {
         if (isContainerNull()) {
             return;
         }
+        JCFChannelRepository channelRepository = JCFChannelRepository.getInstance();
+
         channelRepository.remove(headContainer);
     }
 
@@ -145,6 +154,8 @@ public class MainEntry {
         if (isContainerNull()) {
             return;
         }
+        JCFChannelRepository channelRepository = JCFChannelRepository.getInstance();
+
         channelRepository.print(headContainer);
     }
 

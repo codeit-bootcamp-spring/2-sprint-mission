@@ -36,8 +36,6 @@ public class JavaApplication {
         createChannel();
         createChannel();
 
-
-
         // 모든 채널 조회
         printChannel();
 
