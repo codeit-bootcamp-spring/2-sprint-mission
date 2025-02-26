@@ -19,7 +19,7 @@ public class JCFMessageService implements MessageService {
         this.channelService = channelService;
     }
 
-    public static JCFMessageService getInstance(UserService userService, ChannelService channelService){
+    public static synchronized  JCFMessageService getInstance(UserService userService, ChannelService channelService){
         if(INSTANCE == null){
             INSTANCE = new JCFMessageService(userService, channelService);
         }
@@ -27,12 +27,12 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void createMessage(String userName, String channelName, String content) {
-        userService.validateUserExists(userName);
-        channelService.validateChannelExists(channelName);
+    public void createMessage(UUID userId, UUID channelId, String content) {
+        userService.validateUserExists(userId);
+        channelService.validateChannelExists(channelId);
 
-        Message message = new Message(userName, channelName, content);
-        channelService.addMessageToChannel(channelService.getChannel(channelName), message);
+        Message message = new Message(userId, channelId, content);
+        channelService.addMessageToChannel(channelId, message.getId());
         messages.put(message.getId(), message);
     }
 
@@ -45,13 +45,13 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> getMessagesByUserAndChannel(String userName, String channelName) {
-        userService.validateUserExists(userName);
-        channelService.validateChannelExists(channelName);
+    public List<Message> getMessagesByUserAndChannel(UUID userId, UUID channelId) {
+        userService.validateUserExists(userId);
+        channelService.validateChannelExists(channelId);
 
         List<Message> messages = new ArrayList<>();
         for (Message message : this.messages.values()) {
-            if (message.getSender().equals(userName) && message.getChannel().equals(channelName)) {
+            if (message.getSenderId().equals(userId) && message.getChannelId().equals(channelId)) {
                 messages.add(message);
             }
         }
@@ -60,20 +60,26 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> getChannelMessages(String channelName) {
-        channelService.validateChannelExists(channelName);
-        Channel channel = channelService.getChannel(channelName);
-
-        return new ArrayList<>(channel.getMessages());
-    }
-
-    @Override
-    public List<Message> getUserMessages(String userName) {
-        userService.validateUserExists(userName);
+    public List<Message> getChannelMessages(UUID channelId) {
+        channelService.validateChannelExists(channelId);
 
         List<Message> messages = new ArrayList<>();
         for (Message message : this.messages.values()) {
-            if (message.getSender().equals(userName)) {
+            if (message.getSenderId().equals(channelId)) {
+                messages.add(message);
+            }
+        }
+
+        return messages;
+    }
+
+    @Override
+    public List<Message> getUserMessages(UUID userId) {
+        userService.validateUserExists(userId);
+
+        List<Message> messages = new ArrayList<>();
+        for (Message message : this.messages.values()) {
+            if (message.getSenderId().equals(userId)) {
                 messages.add(message);
             }
         }
@@ -97,7 +103,7 @@ public class JCFMessageService implements MessageService {
         }
 
         Message message = messages.get(messageId);
-        channelService.removeMessageFromChannel(channelService.getChannel(message.getChannel()), message);
+        channelService.removeMessageFromChannel(message.getChannelId(), messageId);
         messages.remove(messageId);
     }
 }

@@ -2,32 +2,32 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-public class Message extends BaseEntity  {
-    private String sender;
-    private String channel;
+public class Message extends BaseEntity {
+    private UUID senderId;  // User의 UUID 저장
+    private UUID channelId; // Channel의 UUID 저장
     private String content;
 
-    public Message(String sender, String channel, String content) {
+    public Message(UUID senderId, UUID channelId, String content) {
         super();
-        this.sender = sender;
-        this.channel = channel;
+        this.senderId = senderId;
+        this.channelId = channelId;
         this.content = content;
     }
 
-    public String getSender() {
-        return sender;
+    public UUID getSenderId() {
+        return senderId;
     }
 
-    public void updateSender(String sender) {
-        this.sender = sender;
+    public void updateSenderId(UUID senderId) {
+        this.senderId = senderId;
     }
 
-    public String getChannel() {
-        return channel;
+    public UUID getChannelId() {
+        return channelId;
     }
 
-    public void updateChannel(String channel) {
-        this.channel = channel;
+    public void updateChannelId(UUID channelId) {
+        this.channelId = channelId;
     }
 
     public String getContent() {
@@ -41,9 +41,9 @@ public class Message extends BaseEntity  {
     @Override
     public String toString() {
         return "Message{" +
-                "sender= " + sender +
+                "senderId= " + senderId +
                 ", sendTime= " + getCreatedAt() +
-                ", channel= " + channel +
+                ", channelId= " + channelId +
                 ", content= '" + content + '\'' +
                 '}';
     }

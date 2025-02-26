@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class User extends BaseEntity{
     private String username;
-    private Set<String> joinedChannels;
+    private Set<UUID> joinedChannels;
 
     public User(String username) {
         super();
@@ -21,28 +20,31 @@ public class User extends BaseEntity{
         this.username = username;
     }
 
-    public Set<String> getJoinedChannels() {
+    public Set<UUID> getJoinedChannels() {
         return joinedChannels;
     }
 
-    public void addJoinedChannel(String newChannel) {
-        this.joinedChannels.add(newChannel);
+    public void addJoinedChannel(UUID channelId) {
+        this.joinedChannels.add(channelId);
     }
 
-    public void removeJoinedChannel(String channelName) {
-        this.joinedChannels.remove(channelName);
+    public void removeJoinedChannel(UUID channelId) {
+        this.joinedChannels.remove(channelId);
     }
 
-    public boolean isJoinedChannel(String channelName) {
-        return this.joinedChannels.contains(channelName);
+    public boolean isJoinedChannel(UUID channelId) {
+        return this.joinedChannels.contains(channelId);
     }
+
+
+
 
     @Override
     public String toString() {
         return "User{" +
-                "userId='" + getId() + '\'' +
+                "userId=" + getId() +
                 ", username='" + username + '\'' +
-                ", chnnels= " + joinedChannels +
+                ", joinedChannels=" + joinedChannels +
                 '}';
     }
 

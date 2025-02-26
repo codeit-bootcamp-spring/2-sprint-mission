@@ -4,13 +4,11 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final Map<String, User> users = new HashMap<String, User>();
+    private final Map<UUID, User> users = new HashMap<>();
+    private final Map<String, UUID> userIds = new HashMap<>();
     private final ChannelService channelService;
     private static JCFUserService INSTANCE;
 
@@ -18,7 +16,7 @@ public class JCFUserService implements UserService {
         this.channelService = channelService;
     }
 
-    public static JCFUserService getInstance(ChannelService channelService) {
+    public static synchronized JCFUserService getInstance(ChannelService channelService) {
         if (INSTANCE == null) {
             INSTANCE = new JCFUserService(channelService);
         }
@@ -27,16 +25,29 @@ public class JCFUserService implements UserService {
 
     @Override
     public void createUser(String username) {
-        if (users.containsKey(username)) {
+        if (userIds.containsKey(username)) {
             throw new IllegalArgumentException("이미 존재하는 유저입니다.");
         }
-        users.put(username, new User(username));
+        User user = new User(username);
+        users.put(user.getId(), user);
+        userIds.put(username, user.getId());
     }
 
     @Override
-    public User getUser(String username) {
+    public User getUserByName(String username) {
         validateUserExists(username);
-        return users.get(username);
+        return users.get(userIds.get(username));
+    }
+
+    @Override
+    public User getUserById(UUID userId) {
+        return users.get(userId);
+    }
+
+    @Override
+    public UUID getUserIdByName(String username) {
+        validateUserExists(username);
+        return userIds.get(username);
     }
 
     @Override
@@ -45,40 +56,59 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void updateUsername(User user, String newUsername) {
-        if (users.containsKey(newUsername)) {
+    public String getUserNameByid(UUID userId) {
+        validateUserExists(userId);
+        return users.get(userId).getUsername();
+    }
+
+    @Override
+    public void updateUsername(UUID userID, String newUsername) {
+        if (userIds.containsKey(newUsername)) {
             throw new IllegalArgumentException("이미 존재하는 유저명입니다.");
         }
-
+        User user = getUserById(userID);
         String oldUserName = user.getUsername();
         user.updateUsername(newUsername);
-        users.put(newUsername, users.remove(oldUserName));
+        userIds.put(newUsername, userIds.remove(oldUserName));
     }
 
     @Override
-    public void addChannel(User user, String channel) {
-        channelService.validateChannelExists(channel);
-        if (user.isJoinedChannel(channel)) {
+    public void addChannel(UUID userID, UUID channelId) {
+        User user = getUserById(userID);
+
+        if (user.isJoinedChannel(channelId)) {
             throw new IllegalArgumentException("이미 가입되어 있는 채널입니다. ");
         }
-        user.addJoinedChannel(channel);
+
+        user.addJoinedChannel(channelId);
     }
 
     @Override
-    public void deleteUser(User user) {
-        users.remove(user.getUsername());
+    public void deleteUser(UUID userID) {
+        User user = getUserById(userID);
+        users.remove(user.getId());
+        userIds.remove(user.getUsername());
     }
 
     @Override
-    public void deleteChannel(User user, String channelName) {
-        channelService.validateChannelExists(channelName);
-
-        user.removeJoinedChannel(channelName);
+    public void deleteChannel(UUID userID, UUID channelId) {
+        User user = getUserById(userID);
+        user.removeJoinedChannel(channelId);
     }
 
-    public void validateUserExists(String username){
-        if (!users.containsKey(username)) {
+    public void validateUserExists(String username) {
+        UUID userId = userIds.get(username);
+        if (userId == null) {
+            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+        }
+        validateUserExists(userId);
+    }
+
+    public void validateUserExists(UUID userId) {
+        if (!users.containsKey(userId)) {
             throw new IllegalArgumentException("존재하지 않는 유저입니다.");
         }
     }
+
+
 }
