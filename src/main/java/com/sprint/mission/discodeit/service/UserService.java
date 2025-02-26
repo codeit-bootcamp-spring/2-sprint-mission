@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.Repository.UserRepository;
-import com.sprint.mission.discodeit.entity.Container.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Server;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
+    public abstract Message write(UUID id, UUID targetId, String str);
+    public abstract Message write(UUID id, UUID targetId, Message message);
+
     public abstract Server createServer(String name);
 
     public abstract void addServer(UUID userId, String name);

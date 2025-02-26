@@ -3,13 +3,11 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.Factory.CreateServerFactory;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.impl.LinkedListUserRepository;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * <h3>유저 서비스 구현체 </h3><p>
@@ -44,6 +42,25 @@ public class JCFUserService implements UserService {
             userTable.put(id, new LinkedListUserRepository());
         }
         return userRepository;
+    }
+
+    @Override
+    public Message write(UUID id, UUID targetId, String str) {
+        UserRepository userRepository = getUserRepository(id);
+        Map<UUID, Queue<Message>> messageList = userRepository.getMessageList();
+        Queue<Message> messages = messageList.get(targetId);
+        Message message = new Message(str);
+        messages.add(message);
+        return message;
+    }
+
+    @Override
+    public Message write(UUID id, UUID targetId, Message message) {
+        UserRepository userRepository = getUserRepository(id);
+        Map<UUID, Queue<Message>> messageList = userRepository.getMessageList();
+        Queue<Message> messages = messageList.get(targetId);
+        messages.add(message);
+        return message;
     }
 
     public Server createServer(String name) {
