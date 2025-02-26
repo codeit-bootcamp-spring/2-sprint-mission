@@ -19,9 +19,6 @@ public interface MessageService {
     // 메시지 모두 읽기
     List<Message> getAllMessages();
 
-    // 해당 채널의 메시지 모두 읽기
-    List<Message> getAllMessagesByChannel(String channelName);
-
     // 메시지 수정
     // 내용만 수정하므로 Message 객체를 받기보단 content만 받는게 나을듯
     void updateMessage(UUID id, User user, String content);

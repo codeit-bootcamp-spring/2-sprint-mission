@@ -15,7 +15,7 @@ public class JavaApplication {
 
         UserService userService = JCFUserService.getInstance();
         ChannelService channelService = JCFChannelService.getInstance();
-        MessageService messageService = JCFMessageService.getInstance();
+        MessageService messageService = JCFMessageService.getInstance(channelService);
 
 
         // 1. JCFUserService 테스트
@@ -334,7 +334,7 @@ public class JavaApplication {
             messageService.createMessage(message5);
             messageService.createMessage(message6);
 
-            List<Message> findMessageByChannel = messageService.getAllMessagesByChannel(channel4.getChannelName());
+            List<Message> findMessageByChannel = channelService.getChannel("검색확인용채널").getMessages();
             System.out.print("'검색확인용채널'의 전체 메시지 : ");
             findMessageByChannel.stream().forEach(m -> System.out.print(m.getContent() + "-" + m.getSender().getUsername() + " "));
             System.out.println();
