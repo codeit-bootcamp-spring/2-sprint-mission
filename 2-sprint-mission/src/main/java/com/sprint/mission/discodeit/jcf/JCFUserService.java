@@ -155,13 +155,13 @@ public class JCFUserService implements UserService {
 
     private void validateId(UUID id){
         if (id == null) {
-            throw new IllegalArgumentException("ID 값이 없습니다.");
+            throw new IllegalArgumentException("사용자 ID 값이 없습니다.");
         }
     }
 
     private User findUserOrThrow(UUID id) {
         return selectUserById(id)
-                .orElseThrow(() -> new RuntimeException("해당 ID의 사용자가 존재하지 않습니다. : " + id));
+                .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다. : " + id));
     }
 
     private void checkUserExists(User user) {
