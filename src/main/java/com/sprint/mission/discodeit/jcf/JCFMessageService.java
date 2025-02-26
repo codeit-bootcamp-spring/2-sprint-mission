@@ -38,9 +38,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message getMessageById(UUID messageId) {
-        if(!messages.containsKey(messageId)){
-            throw new NoSuchElementException("존재하지 않는 메세지 입니다.");
-        }
+        validateMessage(messageId);
         return messages.get(messageId);
     }
 
@@ -62,10 +60,11 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> getChannelMessages(UUID channelId) {
         channelService.validateChannelExists(channelId);
+        Channel channel = channelService.getChannelById(channelId);
 
         List<Message> messages = new ArrayList<>();
         for (Message message : this.messages.values()) {
-            if (message.getSenderId().equals(channelId)) {
+            if (message.getChannelId().equals(channelId)) {
                 messages.add(message);
             }
         }
@@ -89,21 +88,24 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID messageId, String newContent) {
-        if(!messages.containsKey(messageId)){
-            throw new NoSuchElementException("존재하지 않는 메세지ID 입니다.");
-        }
+        validateMessage(messageId);
         Message message = messages.get(messageId);
         message.updateContent(newContent);
     }
 
     @Override
     public void deleteMessage(UUID messageId) {
-        if(!messages.containsKey(messageId)){
-            throw new NoSuchElementException("존재하지 않는 메세지ID 입니다.");
-        }
+        validateMessage(messageId);
 
         Message message = messages.get(messageId);
         channelService.removeMessageFromChannel(message.getChannelId(), messageId);
         messages.remove(messageId);
+    }
+
+    @Override
+    public void validateMessage(UUID messageId) {
+        if(!messages.containsKey(messageId)){
+            throw new NoSuchElementException("존재하지 않는 메세지 입니다.");
+        }
     }
 }

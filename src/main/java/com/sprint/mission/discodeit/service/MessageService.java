@@ -15,4 +15,6 @@ public interface MessageService {
 
     void updateMessage(UUID messageId, String newContent); // 메세지 내용 수정
     void deleteMessage(UUID messageId); // 메세지 삭제
+
+    void validateMessage(UUID messageId); // 메세지 존재 확인
 }
