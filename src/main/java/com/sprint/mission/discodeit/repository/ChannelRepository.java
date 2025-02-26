@@ -28,10 +28,6 @@ public class ChannelRepository {
         this.channels.addFirst(channel);
     }
 
-    public boolean existsById(UUID channelId) {
-        return channels.stream().anyMatch(channel -> Objects.equals(channel.getId(), channelId));
-    }
-
     public Channel findChannelById(UUID channelId) {
         return channels.stream()
                 .filter(channel -> Objects.equals(channel.getId(), channelId))
