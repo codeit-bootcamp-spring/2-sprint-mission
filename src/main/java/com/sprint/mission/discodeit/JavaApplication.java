@@ -11,12 +11,22 @@ import java.util.Scanner;
 import java.util.UUID;
 
 public class JavaApplication {
+    private static JCFUserService getUserService() {
+        return JCFUserService.getInstance();
+    }
+    private static JCFChannelService getChannelService() {
+        return JCFChannelService.getInstance();
+    }
+    private static JCFMessageService getMessageService() {
+        return JCFMessageService.getInstance();
+    }
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        JCFUserService userService = JCFUserService.getInstance();
-        JCFChannelService channelService = JCFChannelService.getInstance();
-        JCFMessageService messageService = JCFMessageService.getInstance();
+        JCFUserService userService = getUserService();
+        JCFChannelService channelService = getChannelService();
+        JCFMessageService messageService = getMessageService();
 
         while (true) {
             System.out.println("\n===== 메뉴 선택 =====");
