@@ -4,16 +4,21 @@ public class JavaApplication {
 
 
     public static void main(String[] args) {
+        //User 관련 기능 모음집
         // 사용자 등록
         createUser();
 
         // 모든 사용자 조회
         printUser();
 
-        // 특정 데이터 조회
+        // 사용자 전환
+        replaeHead();
 
+        // 특정 데이터 조회
+        search();
 
         // 수정
+        update();
 
 
         //서버 등록
