@@ -30,17 +30,9 @@ public class JCFUserService implements UserService {
     @Override
     public void createUser(User user) {
         //데이터 유효성 확인
-        this.userValidationCheck(user);
-        //사용자 확인
-        if (this.selectUserById(user.getId()).isPresent()) {
-            throw new RuntimeException("이미 존재하는 사용자입니다.");
-        }
-        if (this.selectUserByEmail(user.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
-        }
-        if (this.selectUserByNickname(user.getNickname()).isPresent()) {
-            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
-        }
+        userValidationCheck(user);
+        //사용자 중복 확인
+        checkUserExists(user);
         //create
         data.put(user.getId(), user);
     }
@@ -78,32 +70,23 @@ public class JCFUserService implements UserService {
     @Override
     public void updateUser(UUID id, String password, String nickname, UserStatus status, UserRole role) {
         //데이터 유효성 확인
-        if (id == null) {
-            throw new IllegalArgumentException("ID 값이 없습니다.");
-        }
+        validateId(id);
         //사용자 확인
-        User user = this.selectUserById(id)
-                .orElseThrow(() -> new RuntimeException("해당 ID의 사용자가 존재하지 않습니다. : " + id));
+        User user = findUserOrThrow(id);
         //update
-        if (password != null) {
-            if (password.length() < 6) {
-                throw new IllegalArgumentException("비밀번호는 최소 6자 이상이어야 합니다.");
-            }
+        if (password != null && !password.equals(user.getPassword())) {
+            validatePassword(password);
             user.updatePassword(password);
         }
-        if (nickname != null) {
-            if (nickname.length() < 3 || nickname.length() > 20) {
-                throw new IllegalArgumentException("닉네임은 3~20자 사이여야 합니다.");
-            }
-            if (this.selectUserByNickname(nickname).isPresent()) {
-                throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
-            }
+        if (nickname != null && !nickname.equals(user.getNickname())) {
+            validateNickname(nickname);
+            checkUserNicknameExists(nickname);
             user.updateNickname(nickname);
         }
-        if (status != null) {
+        if (status != null && status != user.getStatus()) {
             user.updateStatus(status);
         }
-        if (role != null) {
+        if (role != null && role != user.getRole()) {
             user.updateRole(role);
         }
     }
@@ -111,18 +94,15 @@ public class JCFUserService implements UserService {
     @Override
     public void deleteUser(UUID id) {
         //데이터 유효성 확인
-        if (id == null) {
-            throw new IllegalArgumentException("ID 값이 없습니다.");
-        }
+        validateId(id);
         //사용자 확인
-        User user = this.selectUserById(id)
-                .orElseThrow(() -> new RuntimeException("해당 ID의 사용자가 존재하지 않습니다. : " + id));
+        User user = findUserOrThrow(id);
         //delete
         data.remove(user.getId());
     }
 
     /****************************
-     * User Data Validation check
+     * Validation check
      ****************************/
     private void userValidationCheck(User user){
         // 1. null check
@@ -148,16 +128,63 @@ public class JCFUserService implements UserService {
             throw new IllegalArgumentException("Role 값이 없습니다.");
         }
         //2. 이메일 형식 check
-        if (!user.getEmail().matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+        validateEmail(user.getEmail());
+        //3. 비밀번호 길이 check
+        validatePassword(user.getPassword());
+        //4. 닉네임 길이 check
+        validateNickname(user.getNickname());
+    }
+
+    private void validateEmail(String email){
+        if (!email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
         }
-        //3. 비밀번호 길이 check
-        if (user.getPassword().length() < 6) {
+    }
+
+    private void validatePassword(String password){
+        if (password.length() < 6) {
             throw new IllegalArgumentException("비밀번호는 최소 6자 이상이어야 합니다.");
         }
-        //4. 닉네임 길이 check
-        if (user.getNickname().length() < 3 || user.getNickname().length() > 20) {
+    }
+
+    private void validateNickname(String nickname){
+        if (nickname.length() < 3 || nickname.length() > 20) {
             throw new IllegalArgumentException("닉네임은 3~20자 사이여야 합니다.");
+        }
+    }
+
+    private void validateId(UUID id){
+        if (id == null) {
+            throw new IllegalArgumentException("ID 값이 없습니다.");
+        }
+    }
+
+    private User findUserOrThrow(UUID id) {
+        return selectUserById(id)
+                .orElseThrow(() -> new RuntimeException("해당 ID의 사용자가 존재하지 않습니다. : " + id));
+    }
+
+    private void checkUserExists(User user) {
+        checkUserIdExists(user.getId());
+        checkUserEmailExists(user.getEmail());
+        checkUserNicknameExists(user.getNickname());
+    }
+
+    private void checkUserIdExists(UUID id) {
+        if (selectUserById(id).isPresent()) {
+            throw new RuntimeException("이미 존재하는 사용자입니다.");
+        }
+    }
+
+    private void checkUserEmailExists(String email) {
+        if (selectUserByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
+    }
+
+    private void checkUserNicknameExists(String nickname) {
+        if (selectUserByNickname(nickname).isPresent()) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         }
     }
 
