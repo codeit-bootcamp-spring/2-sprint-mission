@@ -72,7 +72,7 @@ public class JCFUserService implements UserService {
     @Override
     public Server getServer(UUID id, String name) {
         UserRepository userRepository = getUserRepository(id);
-        List<Server> list = userRepository.getList();
+        List<Server> list = userRepository.getServerList();
         for (Server server : list) {
             if (server.getName().equals(name)) {
                 //로그
@@ -88,7 +88,7 @@ public class JCFUserService implements UserService {
     @Override
     public void printServer(UUID id) {
         UserRepository userRepository = getUserRepository(id);
-        List<Server> list = userRepository.getList();
+        List<Server> list = userRepository.getServerList();
         printServer(list);
     }
 
@@ -104,7 +104,7 @@ public class JCFUserService implements UserService {
     @Override
     public boolean removeServer(UUID id, String targetName) {
         UserRepository userRepository = getUserRepository(id);
-        List<Server> list = userRepository.getList();
+        List<Server> list = userRepository.getServerList();
         for (Server server : list) {
             if (server.getName().equals(targetName)) {
                 //로그
@@ -120,7 +120,7 @@ public class JCFUserService implements UserService {
     @Override
     public boolean updateServer(UUID id, String targetName, String replaceName) {
         UserRepository userRepository = getUserRepository(id);
-        List<Server> list = userRepository.getList();
+        List<Server> list = userRepository.getServerList();
         for (Server server : list) {
             if (server.getName().equals(targetName)) {
                 server.setName(replaceName);

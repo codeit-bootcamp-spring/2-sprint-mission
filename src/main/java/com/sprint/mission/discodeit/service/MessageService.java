@@ -2,7 +2,11 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Message;
 
+import java.util.UUID;
+
 public interface MessageService {
-    public Message write(String str);
+    public abstract void send(UUID targetId, String str);
+    public abstract void send(UUID targetId, Message message);
+
 
 }

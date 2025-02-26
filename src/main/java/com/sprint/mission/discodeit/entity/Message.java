@@ -1,19 +1,19 @@
 package com.sprint.mission.discodeit.entity;
 
 public class Message extends BaseEntity{
-    private String str;
+    private String name;
 
     public Message(String str) {
         super();
-        this.str = str;
+        this.name = str;
     }
 
-    public String getStr() {
-        return str;
+    public String getName() {
+        return name;
     }
 
-    public void setStr(String str) {
-        this.str = str;
+    public void setName(String str) {
+        this.name = str;
     }
 
 

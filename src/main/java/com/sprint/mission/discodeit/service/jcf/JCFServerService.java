@@ -67,7 +67,7 @@ public class JCFServerService implements ServerService {
 
     @Override
     public void printChannel(List<Container> list) {
-        System.out.println("=========서버 목록==========");
+        System.out.println("=========채널 목록==========");
         for (int i = 0; i < list.size(); i++) {
             System.out.println(i + 1 + " : " + list.get(i).getName());
         }

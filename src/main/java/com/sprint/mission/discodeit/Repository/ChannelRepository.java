@@ -16,7 +16,7 @@ public class ChannelRepository {
         this.list = list;
     }
 
-    public List<Message> getMessageList() {
+    public List<Message> getList() {
         return list;
     }
 
