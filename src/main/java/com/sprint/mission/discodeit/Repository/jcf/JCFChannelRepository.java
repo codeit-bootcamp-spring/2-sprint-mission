@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Container.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.RepositoryService;
+import com.sprint.mission.discodeit.entity.Container.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 import java.util.Scanner;
@@ -68,11 +68,11 @@ public class JCFChannelRepository implements RepositoryService<Channel, Message>
         if (list.isEmpty()) {
             return null;
         }
-        System.out.println("======================================");
+        System.out.println("=============="+channel.getName()+"채널=================");
         for (Message data : list) {
             System.out.println(data.getStr());
         }
-        System.out.println("======================================");
+        System.out.println("=========================================");
 
         return list;
     }

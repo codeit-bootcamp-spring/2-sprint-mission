@@ -38,7 +38,7 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
         List<Server> severList = repository(user);
         severList.add(server);
         head = server;
-        System.out.println("서버 추가 성공");
+        System.out.println(server.getName() + "서버 추가 성공");
     }
 
     @Override
@@ -55,7 +55,7 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
         for (Server data : list) {
             if (data.getName().equals(s)) {
                 list.remove(data);
-                System.out.println("서버 삭제 성공");
+                System.out.println(data.getName() + "서버 삭제 성공");
                 return;
             }
         }
@@ -68,12 +68,12 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
         if (list.isEmpty()) {
             return null;
         }
-        System.out.println("======================================");
+        System.out.println("=================" + user.getName() + "유저==================");
 
         for (Server data : list) {
             System.out.println(user.getName() + " : " + data.getName());
         }
-        System.out.println("======================================");
+        System.out.println("================================================");
 
         return list;
     }
@@ -90,7 +90,7 @@ public class JCFUserRepository implements RepositoryService<User, Server> {
                 System.out.print("바꿀 이름을 입력하시오. : ");
                 s = sc.nextLine();
                 data.setName(s);
-                System.out.println("서버 업데이트 성공");
+                System.out.println(data.getName() + "서버 업데이트 성공");
                 return;
             }
         }

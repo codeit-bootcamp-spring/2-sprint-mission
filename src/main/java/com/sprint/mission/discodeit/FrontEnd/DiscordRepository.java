@@ -21,8 +21,14 @@ public class DiscordRepository {
         return instance;
     }
 
+    public List<User> repository() {
+        return list;
+    }
+
+
     public void add(User user) {
         list.add(user);
+        System.out.println(user.getName() + "유저 저장 성공");
     }
 
 
@@ -35,11 +41,10 @@ public class DiscordRepository {
         Scanner sc = new Scanner(System.in);
         System.out.print("삭제할 유저의 이름을 입력하시오. : ");
         String s = sc.next();
-        sc.close();
         for (User data : list) {
             if (data.getName().equals(s)) {
                 list.remove(data);
-                System.out.println("유저 삭제 성공");
+                System.out.println(data.getName() + "유저 삭제 성공");
                 return;
             }
         }
@@ -52,7 +57,7 @@ public class DiscordRepository {
         if (list.isEmpty()) {
             return;
         }
-        System.out.println("======================================");
+        System.out.println("==============유저 정보===================");
         for (User data : list) {
             System.out.println(data.getName());
         }

@@ -38,7 +38,7 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
         List<Container> list = repository(server);
         list.add(container);
         head = container;
-        System.out.println("컨테이너 추가 성공");
+        System.out.println(container.getName() + "컨테이너 저장 성공");
     }
 
     @Override
@@ -55,7 +55,7 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
         for (Container data : list) {
             if (data.getName().equals(s)) {
                 list.remove(data);
-                System.out.println("컨테이너 삭제 성공");
+                System.out.println(data.getName() + "컨테이너 삭제 성공");
                 return;
             }
         }
@@ -68,12 +68,11 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
         if (list.isEmpty()) {
             return null;
         }
-        System.out.println("======================================");
-
+        System.out.println("==============" + server.getName() + "서버==================");
         for (Container data : list) {
-            System.out.println(server.getName() + " : " + data.getName());
+            System.out.println(data.getName());
         }
-        System.out.println("======================================");
+        System.out.println("==============================================");
 
         return list;
     }
@@ -90,7 +89,7 @@ public class JCFContainerRepository implements RepositoryService<Server, Contain
                 System.out.print("바꿀 이름을 입력하시오. : ");
                 s = sc.nextLine();
 
-                System.out.println("컨테이너 업데이트 성공");
+                System.out.println(data.getName() + "컨테이너 업데이트 성공");
                 return;
             }
         }

@@ -7,6 +7,8 @@ public class JavaApplication {
         //User 관련 기능 모음집
         // 사용자 등록
         createUser();
+        createUser();
+        createUser();
 
         // 모든 사용자 조회
         printUser();
@@ -15,15 +17,16 @@ public class JavaApplication {
         printUserHead();
 
         // 사용자 전환
-        replaeUserHead();
+        replaceUserHead();
 
         // 특정 데이터 조회
-        searchUser();
+//        searchUser();
 
         // 수정
         updateUser();
 
         //서버 등록
+        createServer();
         createServer();
         createServer();
         createServer();
@@ -35,10 +38,10 @@ public class JavaApplication {
         printServerHead();
 
         // 사용자 전환
-        replaeServerHead();
+        replaceServerHead();
 
         // 특정 데이터 조회
-        searchServer();
+//        searchServer();
 
         // 수정
         updateServer();
@@ -54,6 +57,7 @@ public class JavaApplication {
         createChannel();
         createChannel();
         createChannel();
+        createChannel();
 
         // 모든 채널 조회
         printChannel();
@@ -62,10 +66,10 @@ public class JavaApplication {
         printChannelHead();
 
         // 사용자 전환
-        replaeChannelHead();
+        replaceChannelHead();
 
         // 특정 채널 조회
-        searchChannel();
+//        searchChannel();
 
         // 채널명 수정
         updateChannel();
