@@ -89,15 +89,15 @@ public class JCFChannelService implements ChannelService {
         //채널 확인
         Channel channel = findChannelOrThrow(id);
         //update
-        if (name != null) {
+        if (name != null && !name.equals(channel.getName())) {
             validateName(name);
             channel.updateName(name);
         }
-        if (category != null) {
+        if (category != null && !category.equals(channel.getCategory())) {
             validateCategory(category);
             channel.updateCategory(category);
         }
-        if (type != null) {
+        if (type != null && !type.equals(channel.getType())) {
             channel.updateType(type);
         }
     }
