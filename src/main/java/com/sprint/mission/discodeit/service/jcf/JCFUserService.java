@@ -96,11 +96,11 @@ public class JCFUserService implements UserService {
 
     @Override
     public void printServer(List<Server> list) {
-        System.out.println("=========서버 목록==========");
+        System.out.println("\n=========서버 목록==========");
         for (int i = 0; i < list.size(); i++) {
             System.out.println(i + 1 + " : " + list.get(i).getName());
         }
-        System.out.println("=========================");
+        System.out.println("=========================\n");
     }
 
     @Override
@@ -108,7 +108,7 @@ public class JCFUserService implements UserService {
         UserRepository userRepository = getUserRepository(id);
         List<Server> list = userRepository.getServerList();
         Scanner sc = new Scanner(System.in);
-        System.out.printf("삭제할 이름을 입력하시오. : ");
+        System.out.printf("삭제할 서버 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
 
         return removeServer(list, targetName);
@@ -140,7 +140,7 @@ public class JCFUserService implements UserService {
         UserRepository userRepository = getUserRepository(id);
         List<Server> list = userRepository.getServerList();
         Scanner sc = new Scanner(System.in);
-        System.out.printf("바꿀려고 하는 대상의 이름을 입력하시오. : ");
+        System.out.printf("바꿀려고 하는 서버의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
 
         return updateServer(list, targetName);
@@ -152,7 +152,7 @@ public class JCFUserService implements UserService {
         UserRepository userRepository = getUserRepository(id);
         List<Server> list = userRepository.getServerList();
         Scanner sc = new Scanner(System.in);
-        System.out.printf("바꿀 이름을 입력하시오. : ");
+        System.out.printf("서버 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
 
         return updateServer(list, targetName, replaceName);
@@ -168,7 +168,7 @@ public class JCFUserService implements UserService {
     @Override
     public boolean updateServer(List<Server> list, String targetName) {
         Scanner sc = new Scanner(System.in);
-        System.out.printf("바꿀 이름을 입력하시오. : ");
+        System.out.printf("서버 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
         return updateServer(list, targetName, replaceName);
     }

@@ -26,22 +26,31 @@ public class JavaApplication {
 
         //User 관련 기능 모음집
         // 사용자 등록
-
         // 사용자 이름과 비밀번호 받기
         User user = discordService.create();
 
         // 사용자의 이름만 받기
         User get = discordService.create("get");
 
+        //수동으로 생성 후 등록하기
         User remove = new User("remove", "123");
         User update = new User("update", "123");
 
-        // 모든 사용자 조회
+        discordService.register(remove);
+        discordService.register(update);
+
+        // 사용자 조회
         discordService.print();
 
         // 특정 데이터 조회
+        User getUser = discordService.get("get");
+        System.out.println("getUser.getName() = " + getUser.getName());
 
         // 수정
+        discordService.update(update);
+
+        // 사용자 조회
+        discordService.print();
 
         //서버 생성
         Server s = userService.createServer("server");
@@ -58,6 +67,13 @@ public class JavaApplication {
 
         //유저가 가지고 있는 서버 조회
         userService.printServer(user.getId());
+
+        System.out.println("\n서버 주입하지 않는 get유저는 서버가 없어야 정상");
+        userService.printServer(get.getId());
+
+        //유저 서버 주입 후 조회
+        userService.addServer(get.getId(),removeServer);
+        userService.addServer(get.getId(),updateServer);
         userService.printServer(get.getId());
 
         // 특정 데이터 조회
@@ -68,12 +84,14 @@ public class JavaApplication {
 
         //수정 후 조회
         userService.printServer(user.getId());
+        userService.printServer(get.getId());
 
         //서버 삭제
         userService.removeServer(user.getId(), removeServer.getName());
 
         // 서버 삭제 후 서버 조회
         userService.printServer(user.getId());
+        userService.printServer(get.getId());
 
         // 채널 생성
         Channel c = serverService.createChannel("channel");

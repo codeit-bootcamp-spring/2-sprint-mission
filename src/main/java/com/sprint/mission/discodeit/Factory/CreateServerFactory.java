@@ -22,7 +22,7 @@ public class CreateServerFactory implements Factory<Server>{
 
     @Override
     public Server create() {
-        System.out.printf("이름을 입력하세요. : ");
+        System.out.printf("생성할 서버의 이름을 입력하세요. : ");
         String s = sc.nextLine();
         return create(s);
     }

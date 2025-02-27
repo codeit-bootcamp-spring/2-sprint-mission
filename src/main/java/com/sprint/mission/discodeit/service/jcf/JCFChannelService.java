@@ -84,11 +84,11 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void printChannel(List<Message> list) {
-        System.out.println("=========메시지 목록==========");
+        System.out.println("\n=========메시지 목록==========");
         for (int i = 0; i < list.size(); i++) {
             System.out.println(i + 1 + " : " + list.get(i).getName());
         }
-        System.out.println("=========================");
+        System.out.println("=========================\n");
     }
 
     @Override

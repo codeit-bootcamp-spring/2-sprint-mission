@@ -21,7 +21,7 @@ public class CreateUserFactory implements Factory<User>{
 
     @Override
     public User create() {
-        System.out.printf("이름을 입력하세요. : ");
+        System.out.printf("생성할 유저의 이름을 입력하세요. : ");
         String s = sc.nextLine();
         return create(s);
     }

@@ -93,12 +93,12 @@ public class JCFMessageService implements MessageService {
             return;
         }
 
-        System.out.println("=========메시지 목록==========");
+        System.out.println("\n=========개인 메시지함==========");
         int i = 1;
         for (Message message : myMessages) {
             System.out.println(i++ + " : " + message.getName());
         }
-        System.out.println("=========================");
+        System.out.println("=========================\n");
     }
 
     @Override
@@ -179,7 +179,7 @@ public class JCFMessageService implements MessageService {
 
         System.out.printf("바꿀려고 하는 대상의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
-        System.out.printf("바꿀 이름을 입력하시오. : ");
+        System.out.printf("메시지를 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
 
         return update(myMessages, yourMessages, targetName, replaceName);
@@ -197,7 +197,7 @@ public class JCFMessageService implements MessageService {
 
         Scanner sc = new Scanner(System.in);
 
-        System.out.printf("바꿀 이름을 입력하시오. : ");
+        System.out.printf("메시지를 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
 
         return update(myMessages, yourMessages, targetName, replaceName);
