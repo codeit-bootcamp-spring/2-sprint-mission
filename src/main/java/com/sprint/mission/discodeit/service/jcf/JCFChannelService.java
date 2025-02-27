@@ -36,7 +36,7 @@ public class JCFChannelService implements ChannelService {
     public Message write(UUID channelId) {
         ChannelRepository channelRepository = getChannelRepository(channelId);
         Scanner sc = new Scanner(System.in);
-        System.out.printf("메시지를 작성하시오. : ");
+        System.out.print("메시지를 작성하시오. : ");
         String str = sc.nextLine();
         Message message = new Message(str);
         return write(channelRepository, message);
