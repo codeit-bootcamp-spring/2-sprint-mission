@@ -1,12 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
-import com.sprint.mission.discodeit.Repository.ServerRepository;
-import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.impl.LinkedListChannelRepository;
-import com.sprint.mission.discodeit.entity.Container.Container;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;

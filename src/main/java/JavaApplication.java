@@ -130,6 +130,9 @@ public class JavaApplication {
         Message removeMessage = channelService.write(c.getId(), "remove");
         Message updateMessage = channelService.write(c.getId(), "update");
 
+        //특정 메시지 조회
+        System.out.println("getMessage.getName() = " + channelService.getMessage(c.getId(), getMessage.getName()).getName());
+
         // 채널의 모든 메시지 출력
         channelService.printChannel(c.getId());
 

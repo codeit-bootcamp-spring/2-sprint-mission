@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class CreateChannalFactory implements Factory<Channel>{
     private static CreateChannalFactory instance;
-    private Scanner sc = new Scanner(System.in);
+    private final Scanner sc = new Scanner(System.in);
 
     private CreateChannalFactory() {
     }
@@ -20,7 +20,7 @@ public class CreateChannalFactory implements Factory<Channel>{
 
     @Override
     public Channel create() {
-        System.out.printf("생성할 채널의 이름을 입력하세요. : ");
+        System.out.print("생성할 채널의 이름을 입력하세요. : ");
         String s = sc.nextLine();
         return create(s);
     }

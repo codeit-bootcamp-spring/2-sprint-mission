@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.Factory.CreateServerFactory;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.impl.LinkedListUserRepository;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -18,7 +17,6 @@ import java.util.*;
  * </p>
  *
  * @version 1
- * @JongwonLee
  */
 public class JCFUserService implements UserService {
     private static JCFUserService instance;
@@ -108,7 +106,7 @@ public class JCFUserService implements UserService {
         UserRepository userRepository = getUserRepository(id);
         List<Server> list = userRepository.getServerList();
         Scanner sc = new Scanner(System.in);
-        System.out.printf("삭제할 서버 이름을 입력하시오. : ");
+        System.out.print("삭제할 서버 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
 
         return removeServer(list, targetName);
@@ -140,7 +138,7 @@ public class JCFUserService implements UserService {
         UserRepository userRepository = getUserRepository(id);
         List<Server> list = userRepository.getServerList();
         Scanner sc = new Scanner(System.in);
-        System.out.printf("바꿀려고 하는 서버의 이름을 입력하시오. : ");
+        System.out.print("바꿀려고 하는 서버의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
 
         return updateServer(list, targetName);
@@ -152,7 +150,7 @@ public class JCFUserService implements UserService {
         UserRepository userRepository = getUserRepository(id);
         List<Server> list = userRepository.getServerList();
         Scanner sc = new Scanner(System.in);
-        System.out.printf("서버 이름을 무엇으로 바꾸시겠습니까? : ");
+        System.out.print("서버 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
 
         return updateServer(list, targetName, replaceName);
@@ -168,7 +166,7 @@ public class JCFUserService implements UserService {
     @Override
     public boolean updateServer(List<Server> list, String targetName) {
         Scanner sc = new Scanner(System.in);
-        System.out.printf("서버 이름을 무엇으로 바꾸시겠습니까? : ");
+        System.out.print("서버 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
         return updateServer(list, targetName, replaceName);
     }

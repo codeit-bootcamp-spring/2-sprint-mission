@@ -96,7 +96,7 @@ public class JCFServerService implements ServerService {
         ServerRepository serverRepository = getServerRepository(id);
         List<Container> list = serverRepository.getList();
         Scanner sc = new Scanner(System.in);
-        System.out.printf("삭제할 채널 이름을 입력하시오. : ");
+        System.out.print("삭제할 채널 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
         return removeChannel(list, targetName);
     }
@@ -127,7 +127,7 @@ public class JCFServerService implements ServerService {
         ServerRepository serverRepository = getServerRepository(id);
         List<Container> list = serverRepository.getList();
         Scanner sc = new Scanner(System.in);
-        System.out.printf("바꿀려고 하는 채널의 이름을 입력하시오. : ");
+        System.out.print("바꿀려고 하는 채널의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
         return updateChannel(list,targetName);
     }
@@ -137,7 +137,7 @@ public class JCFServerService implements ServerService {
         ServerRepository serverRepository = getServerRepository(id);
         List<Container> list = serverRepository.getList();
         Scanner sc = new Scanner(System.in);
-        System.out.printf("채널 이름을 무엇으로 바꾸시겠습니까? ");
+        System.out.print("채널 이름을 무엇으로 바꾸시겠습니까? ");
         String replaceName = sc.nextLine();
         return updateChannel(list, targetName, replaceName);
     }
@@ -152,7 +152,7 @@ public class JCFServerService implements ServerService {
     @Override
     public boolean updateChannel(List<Container> list, String targetName) {
         Scanner sc = new Scanner(System.in);
-        System.out.printf("채널 이름을 무엇으로 바꾸시겠습니까? : ");
+        System.out.print("채널 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
         return updateChannel(list, targetName, replaceName);
     }

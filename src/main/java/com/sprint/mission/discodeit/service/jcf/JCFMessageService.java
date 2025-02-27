@@ -9,7 +9,6 @@ import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private static JCFMessageService instance;
-    JCFUserService userService = JCFUserService.getInstance();
     private final Map<UUID, UserRepository> userTable = new HashMap<>();
 
     private JCFMessageService() {
@@ -88,10 +87,6 @@ public class JCFMessageService implements MessageService {
         UserRepository myRepository = getUserRepository(myId);
         Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
         Queue<Message> myMessages = getMessages(myMessageList, myId);
-        if (myMessageList == null) {
-            System.out.println("비어있습니다.");
-            return;
-        }
 
         System.out.println("\n=========개인 메시지함==========");
         int i = 1;
@@ -177,9 +172,9 @@ public class JCFMessageService implements MessageService {
 
         Scanner sc = new Scanner(System.in);
 
-        System.out.printf("바꿀려고 하는 대상의 이름을 입력하시오. : ");
+        System.out.print("바꿀려고 하는 대상의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
-        System.out.printf("메시지를 무엇으로 바꾸시겠습니까? : ");
+        System.out.print("메시지를 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
 
         return update(myMessages, yourMessages, targetName, replaceName);
@@ -197,7 +192,7 @@ public class JCFMessageService implements MessageService {
 
         Scanner sc = new Scanner(System.in);
 
-        System.out.printf("메시지를 무엇으로 바꾸시겠습니까? : ");
+        System.out.print("메시지를 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
 
         return update(myMessages, yourMessages, targetName, replaceName);
