@@ -13,6 +13,9 @@ public abstract class BaseEntity {
         this.updatedAt = System.currentTimeMillis();
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     //추상 메소드 - 구현체 클래스 가 구체적 으로 구현 해야함. (추상 메소드 는 모든 자식 클래스 에 정의 해야 함)
-//    public abstract void printChatInfo();
 }

@@ -19,7 +19,7 @@ public class Channel extends BaseEntity {
 
     @Override
     public String toString() {
-        return "채팅방 정보 : {" +
+        return "{" +
                 "chatRoomName='" + chatRoomName + '\'' +
                 ", id=" + id +
                 ", createdAt=" + createdAt +
