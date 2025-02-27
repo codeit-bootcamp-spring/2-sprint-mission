@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -62,6 +61,7 @@ public class JCFMessageService implements MessageService {
             }
         }
         if (!find) {
+            System.out.println("메시지가 존재하지 않습니다.");
         }
         return result;
     }
@@ -105,7 +105,7 @@ public class JCFMessageService implements MessageService {
         Message senderName = find(sender);
         if (senderName != null && senderName.getId().equals(uuid)) {
             senderName.updateMessage(changeMessage);
-            System.out.printf("보낸 내용이 [ %s ] 로 변경되었습니다.", senderName.getSender(), senderName.getMessage());
+            System.out.printf("보낸 내용이 [ %s ] 로 변경되었습니다.", senderName.getMessage());
             return senderName;
         }
         System.out.println("메시지가 존재하지 않습니다.");

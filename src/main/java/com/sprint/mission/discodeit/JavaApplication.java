@@ -174,9 +174,13 @@ public class JavaApplication {
                             System.out.println("메시지 조회");
                             System.out.print("보낸 사람 입력: ");
                             String sender2  =sc.nextLine();
-                            messageService.getMessage(sender2);
+//                            messageService.getMessage(sender2);
                             List<Message> messagePrint = messageService.getMessage(sender2);
-                            System.out.println(messagePrint);
+                            if (messagePrint.size() < 0) {
+                                break;
+                            } else{
+                                System.out.println(messagePrint);
+                            }
                             break;
 
                         case "3":
