@@ -174,7 +174,6 @@ public class JavaApplication {
                             System.out.println("메시지 조회");
                             System.out.print("보낸 사람 입력: ");
                             String sender2  =sc.nextLine();
-//                            messageService.getMessage(sender2);
                             List<Message> messagePrint = messageService.getMessage(sender2);
                             if (messagePrint.size() < 0) {
                                 break;
