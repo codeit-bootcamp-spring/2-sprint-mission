@@ -31,7 +31,7 @@ public class JCFChannelService implements ChannelService {
         Channel channel = channelRepository.save(
                 new Channel(name, owner.id())
         );
-        // TODO: 2/26/25 개선필요
+
         List<UserDto> users = channel.getUserIds()
                 .stream()
                 .map(userId -> new UserDto(userId, userRepository.findById(userId).getName()))

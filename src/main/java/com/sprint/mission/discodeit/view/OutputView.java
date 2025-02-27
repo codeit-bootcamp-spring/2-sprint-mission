@@ -50,7 +50,7 @@ public class OutputView {
         }
 
         String beforeUserName = "   ";
-        if (owner.id().equals(channelUser.id())) {// TODO: 2/26/25 equals로 수정
+        if (owner.id().equals(channelUser.id())) {
             beforeUserName = " # ";
         }
 

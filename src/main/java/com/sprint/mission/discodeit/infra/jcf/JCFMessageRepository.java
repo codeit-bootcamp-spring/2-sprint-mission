@@ -14,7 +14,7 @@ public class JCFMessageRepository implements MessageRepository {
     private JCFMessageRepository() {
     }
 
-    public static JCFMessageRepository getInstance(){
+    public static JCFMessageRepository getInstance() {
         return jcfMessageRepository;
     }
 

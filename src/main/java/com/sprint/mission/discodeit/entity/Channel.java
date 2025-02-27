@@ -21,7 +21,7 @@ public class Channel {
         this.userIds.add(ownerId);
     }
 
-    public void addMember(UUID userId){
+    public void addMember(UUID userId) {
         userIds.add(userId);
         updatedAt();
     }

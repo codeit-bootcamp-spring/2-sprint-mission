@@ -15,7 +15,7 @@ public class JCFChannelRepository implements ChannelRepository {
     private JCFChannelRepository() {
     }
 
-    public static JCFChannelRepository getInstance(){
+    public static JCFChannelRepository getInstance() {
         return jcfChannelRepository;
     }
 
