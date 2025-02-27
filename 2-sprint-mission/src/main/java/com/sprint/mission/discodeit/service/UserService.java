@@ -10,6 +10,7 @@ public interface UserService {
 
     //읽기
     User getUserById(UUID id);
+    User getUserByName(String username);
 
     //모두읽기
     List<User> getAllUsers();

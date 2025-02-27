@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,14 +17,23 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void createChannel(String channelname) {
-        Channel channel = new Channel(channelname);
+    public void createChannel(String channelname, User creater) {
+        Channel channel = new Channel(channelname, creater);
         data.put(channel.getId(), channel);
     }
 
     @Override
     public Channel getChannelById(UUID id) {
         return data.get(id);
+    }
+
+    public Channel getChannelByChannelName(String channelname){
+        for (Channel channel : data.values()) {
+            if (channel.getChannelname().equals(channelname)) {
+                return channel;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -41,5 +51,9 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void deleteChannel(UUID id) {
         data.remove(id);
+    }
+
+    public boolean isDeleted(UUID id) {
+        return data.containsKey(id);
     }
 }

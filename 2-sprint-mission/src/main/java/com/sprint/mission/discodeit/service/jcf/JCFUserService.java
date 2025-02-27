@@ -16,7 +16,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void createUser(String username){
+    public void createUser(String username) {
         User user = new User(username);
         data.put(user.getId(), user);
     }
@@ -27,25 +27,34 @@ public class JCFUserService implements UserService {
     }
 
     @Override
+    public User getUserByName(String username) {
+        for (User user : data.values()) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public List<User> getAllUsers() {
         return new ArrayList<User>(data.values());
     }
 
     @Override
-    public User updateUserName(UUID id, String username){
+    public User updateUserName(UUID id, String username) {
         User user = data.get(id).updateUsername(username);
         data.put(id, user);
         return user;
     }
 
     @Override
-    public void deleteUser(UUID id){
-            data.remove(id);
+    public void deleteUser(UUID id) {
+        data.remove(id);
 
     }
 
-    @Override
-    public boolean isDeleted(UUID id){
+    public boolean isDeleted(UUID id) {
         return data.containsKey(id);
     }
 }

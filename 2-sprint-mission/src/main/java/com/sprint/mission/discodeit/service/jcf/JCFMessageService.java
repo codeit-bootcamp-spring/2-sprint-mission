@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,13 +18,24 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void createMessage(String messagestring){
-        Message message = new Message(messagestring);
+    public void createMessage(String newmessage, User user, Channel channel){
+        Message message = new Message(newmessage, user, channel);
+
+        data.put(message.getId(), message);
     }
 
     @Override
     public Message getMessageById(UUID id) {
         return data.get(id);
+    }
+
+    public Message getMessageByUser(User user){
+        for (Message message : data.values()) {
+            if (message.getUser().equals(user)) {
+                return message;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -40,5 +53,9 @@ public class JCFMessageService implements MessageService {
     @Override
     public void deleteMessage(UUID id) {
         data.remove(id);
+    }
+
+    public boolean isDeleted(UUID id) {
+        return data.containsKey(id);
     }
 }

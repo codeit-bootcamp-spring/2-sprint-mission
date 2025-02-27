@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
     //생성
-    void createChannel(String channelname);
+    void createChannel(String channelname, User creater);
 
     //읽기
     Channel getChannelById(UUID id);
