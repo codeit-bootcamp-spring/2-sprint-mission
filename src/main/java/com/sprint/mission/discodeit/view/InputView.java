@@ -34,4 +34,10 @@ public class InputView {
 
         return scanner.nextLine();
     }
+
+    public static String readMessage(){
+        System.out.println("# 메세지 입력 : ");
+
+        return scanner.nextLine();
+    }
 }

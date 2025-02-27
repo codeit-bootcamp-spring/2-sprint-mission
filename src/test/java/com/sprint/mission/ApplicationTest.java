@@ -102,11 +102,10 @@ class ApplicationTest extends ConsoleTestTemplate {
     }
 
     @Test
-    void 채널_메세지_입력_및_메세지_자동_조회_테스트() {
-        run("5번", "안녕하세요 황지환입니다.", "7");
-
-        String cleanOutput = output().replaceAll("[^\\S\\n]+", "");
-        assertThat(cleanOutput).contains(
+    void 채널_메세지_입력_테스트() {
+        run("5", "Hello, 7team!!", "7");
+        assertThat(output().replaceAll("[\\r\\n]+", ""))
+                .containsSequence(
                 "안녕하세요 코드잇2기 서버입니다.",
                 "—---------------------------------------------------------",
                 " 코드잇 2기  | general",
@@ -125,7 +124,7 @@ class ApplicationTest extends ConsoleTestTemplate {
                 "—---------------------------------------------------------",
                 " 코드잇 2기  | general",
                 "—---------------------------------------------------------",
-                "# general | 안녕하세요 황지환입니다.                    | # 황지환",
+                "# general | HWANGJIHWAN: Hello, 7team!!          | # 황지환",
                 "—---------------------------------------------------------",
                 "# 하고 싶은 기능 선택",
                 "- 다른 채널 생성 : 1번",
@@ -139,9 +138,10 @@ class ApplicationTest extends ConsoleTestTemplate {
     }
 
     @Test
-    void 채널_생성_테스트() {
+    void 채널_추가_생성_테스트() {
         run("1", "스터디", "7");
-        assertThat(output()).contains(
+        assertThat(output().replaceAll("[\\r\\n]+", ""))
+                .containsSequence(
                 "안녕하세요 코드잇2기 서버입니다.",
                 "—---------------------------------------------------------",
                 " 코드잇 2기  | general",
@@ -177,7 +177,8 @@ class ApplicationTest extends ConsoleTestTemplate {
     @Test
     void 채널_이동_테스트() {
         run("1", "스터디", "6", "1", "7");
-        assertThat(output()).contains(
+        assertThat(output().replaceAll("[\\r\\n]+", ""))
+                .containsSequence(
                 "안녕하세요 코드잇2기 서버입니다.",
                 "—---------------------------------------------------------",
                 " 코드잇 2기  | general",
@@ -229,8 +230,8 @@ class ApplicationTest extends ConsoleTestTemplate {
     @Test
     void 채널_채팅입력_전체_시나리오_테스트() {
         run("3", "7팀", "4", "박지환", "5", "안녕하세요 황지환입니다", "1", "스터디", "6", "7팀", "7");
-        assertThat(output())
-                .contains(
+        assertThat(output().replaceAll("[\\r\\n]+", ""))
+                .containsSequence(
                         "안녕하세요 코드잇2기 서버입니다.",
                         "—---------------------------------------------------------",
                         " 코드잇 2기  | general",

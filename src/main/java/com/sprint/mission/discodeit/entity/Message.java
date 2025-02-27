@@ -7,8 +7,8 @@ public class Message {
     private UUID id;
     private final Long createdAt;
     private Long updatedAt;
-    private final UUID userId;
     private final UUID channelId;
+    private final UUID userId;
     private String context;
 
     public Message(String context, UUID channelId, UUID userId) {
@@ -35,5 +35,13 @@ public class Message {
 
     public String getContext() {
         return context;
+    }
+
+    public UUID getChannelId() {
+        return channelId;
+    }
+
+    public UUID getUserId() {
+        return userId;
     }
 }

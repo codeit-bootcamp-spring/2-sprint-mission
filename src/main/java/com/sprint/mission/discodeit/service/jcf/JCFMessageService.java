@@ -2,12 +2,8 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.infra.ChannelRepository;
 import com.sprint.mission.discodeit.infra.MessageRepository;
-import com.sprint.mission.discodeit.infra.UserRepository;
-import com.sprint.mission.discodeit.infra.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.infra.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.List;
 import java.util.UUID;
@@ -29,21 +25,30 @@ public class JCFMessageService implements MessageService {
                 new Message(context, channelId, userId)
         );
 
-        return new MessageDto(message.getId(), message.getContext());
+        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(), message.getUserId());
     }
 
     @Override
     public MessageDto findById(UUID id) {
         Message message = messageRepository.findById(id);
 
-        return new MessageDto(message.getId(), message.getContext());
+        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(), message.getUserId());
     }
 
     @Override
     public List<MessageDto> findAll() {
         return messageRepository.findAll()
                 .stream()
-                .map(message -> new MessageDto(message.getId(), message.getContext()))
+                .map(message -> new MessageDto(message.getId(), message.getContext(), message.getChannelId(), message.getUserId()))
+                .toList();
+    }
+
+    @Override
+    public List<MessageDto> findByChannelId(UUID channelId) {
+        return messageRepository.findAll()
+                .stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .map(message -> new MessageDto(message.getId(), message.getContext(),message.getChannelId(), message.getUserId()))
                 .toList();
     }
 

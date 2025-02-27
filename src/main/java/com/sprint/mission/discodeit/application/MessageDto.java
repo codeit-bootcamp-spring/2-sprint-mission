@@ -2,5 +2,5 @@ package com.sprint.mission.discodeit.application;
 
 import java.util.UUID;
 
-public record MessageDto(UUID messageId, String context) {
+public record MessageDto(UUID messageId, String context, UUID channelId, UUID userId) {
 }
