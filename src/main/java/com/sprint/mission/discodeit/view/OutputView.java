@@ -31,30 +31,41 @@ public class OutputView {
     private static void createChannelUserFormat(List<ChannelDto> channels, UserDto owner, List<MessageDto> messages,
                                                 List<String> channelUserTexts, ChannelDto channel,
                                                 ChannelDto currentChannel) {
-        List<UserDto> channelUsers = channel.users();
+        List<UserDto> channelUsers = channel.users(); // 채널 유저를 기준으로 작성됩니다.
         for (int i = 0; i < channelUsers.size(); i++) {
             UserDto channelUser = channelUsers.get(i);
-            String beforeUserName = "   ";
-            if (owner.id().equals(channelUser.id())) {// TODO: 2/26/25 equals로 수정
-                beforeUserName = " # ";
-            }
 
-            String userNameFormat = beforeUserName + channelUsers.get(i).name();
-            String channelNameFormat = String.format("%-7s", createChannelName(channels, channel, i, currentChannel));
+            String userNameFormat = createUserName(owner, channelUsers, i, channelUser);
+            String channelNameFormat = createChannelName(channels, channel, i, currentChannel);
             String messageContext = createMessageContext(messages, channel, i);
+
             channelUserTexts.add(
                     String.format("%-10s| %-36s |%-6s", channelNameFormat, messageContext, userNameFormat));
         }
     }
 
-    private static String createChannelName(List<ChannelDto> channels, ChannelDto channel, int i,
-                                            ChannelDto currentChannel) {
-        String channelName = channel.name();
-        if (channel.id().equals(currentChannel.id())) {
-            channelName = "# " + channelName;
+    private static String createUserName(UserDto owner, List<UserDto> channelUsers, int i, UserDto channelUser) {
+        if (i < 0 || i >= channelUsers.size()) {
+            return "";
         }
 
-        channelName = validateChannelEmpty(channels, i, channelName);
+        String beforeUserName = "   ";
+        if (owner.id().equals(channelUser.id())) {// TODO: 2/26/25 equals로 수정
+            beforeUserName = " # ";
+        }
+
+        return beforeUserName + channelUsers.get(i).name();
+    }
+
+    private static String createChannelName(List<ChannelDto> channels, ChannelDto channel, int i, ChannelDto currentChannel) {
+        if (i < 0 || i >= channels.size()) {
+            return "";
+        }
+
+        String channelName = "  " + channel.name();
+        if (channel.id().equals(currentChannel.id())) {
+            channelName = "# " + channelName.trim();
+        }
 
         return channelName;
     }
@@ -69,18 +80,11 @@ public class OutputView {
                 .filter(user -> user.id().equals(messages.get(i).userId()))
                 .findFirst()
                 .map(UserDto::name)
-                .get();
+                .orElse("Unknown User");
 
         Transliterator transliterator = Transliterator.getInstance("Hangul-Latin");
         String englishName = transliterator.transliterate(name).toUpperCase();
 
-        return englishName+ ": " + messages.get(i).context();
-    }
-
-    private static String validateChannelEmpty(List<ChannelDto> channels, int i, String defaultName) {
-        if (i < 0 || i >= channels.size()) {
-            return "";
-        }
-        return defaultName;
+        return englishName + ": " + messages.get(i).context();
     }
 }

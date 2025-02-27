@@ -3,6 +3,7 @@ package com.sprint.mission;
 import static com.sprint.mission.discodeit.view.InputView.readChannelName;
 import static com.sprint.mission.discodeit.view.InputView.readEmail;
 import static com.sprint.mission.discodeit.view.InputView.readMessage;
+import static com.sprint.mission.discodeit.view.InputView.readNewChannelName;
 import static com.sprint.mission.discodeit.view.InputView.readUserChoice;
 import static com.sprint.mission.discodeit.view.OutputView.printServer;
 
@@ -34,6 +35,14 @@ public class Application {
 
         while (true) {
             String userChoice = readUserChoice();
+            if (userChoice.equals("1")) {
+
+            }
+            if (userChoice.equals("1")) {
+                ChannelDto channel = channelController.create(readNewChannelName(), user);
+                List<MessageDto> messages = messageController.findByChannelId(channel.id());
+                printServer(channelController.findAll(), user, messages, channel);
+            }
             if (userChoice.equals("5")) {
                 messageController.createMessage(readMessage(), initChannel.id(), user.id());
                 List<MessageDto> messages = messageController.findByChannelId(initChannel.id());
@@ -42,7 +51,7 @@ public class Application {
             if (userChoice.equals("4")) {
                 channelController.addMember(initChannel, readEmail());
                 List<MessageDto> messages = messageController.findByChannelId(initChannel.id());
-                printServer(channelController.findAll(), user, messages, initChannel); // 현재 채널로 수정
+                printServer(channelController.findAll(), user, messages, initChannel);
             }
             if (userChoice.equals("3")) {
                 String channelName = readChannelName();

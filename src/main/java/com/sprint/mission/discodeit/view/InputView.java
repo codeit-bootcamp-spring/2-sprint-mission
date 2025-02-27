@@ -40,4 +40,10 @@ public class InputView {
 
         return scanner.nextLine();
     }
+
+    public static String readNewChannelName(){
+        System.out.println("# 생성할 채널의 이름을 설정해주세요 : ");
+
+        return scanner.nextLine();
+    }
 }
