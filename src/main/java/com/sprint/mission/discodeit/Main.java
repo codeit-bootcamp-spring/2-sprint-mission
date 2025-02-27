@@ -13,7 +13,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 public class Main {
     public static void main(String[] args) {
 
-        UserService userService = new JCFUserService(); // User 기능 객체 생성
+        UserService userService = JCFUserService.getInstance(); // User 기능 객체 생성
 
         User user1 = userService.createUser("김현호");
 
@@ -30,7 +30,7 @@ public class Main {
 
         System.out.println("------");
 
-        ChannelService channelService = new JCFChannelService();
+        ChannelService channelService = JCFChannelService.getInstance();
 
         Channel channel1 = channelService.createChannel("백엔드 톡방");
         Channel channel2 = channelService.createChannel("자바스프링 톡방");
@@ -48,7 +48,7 @@ public class Main {
 
         System.out.println("------");
 
-        MessageService messageService = new JCFMessageService(channelService, userService);
+        MessageService messageService = JCFMessageService.getInstance(channelService, userService);
 
         Message message1 = messageService.createMessage(user1.getId(), channel1.getId(), "안녕하세요~! 잘부탁드립니다.");
         Message message2 = messageService.createMessage(user2.getId(), channel1.getId(), "네넹넹");

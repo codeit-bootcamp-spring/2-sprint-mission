@@ -12,12 +12,25 @@ public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> messageData;
     private final ChannelService channelService;
     private final UserService userService;
+    // Lazy Initialization 적용
+    private static volatile JCFMessageService INSTANCE;
 
-    public JCFMessageService(ChannelService channelService, UserService userService) {
+    private JCFMessageService(ChannelService channelService, UserService userService) {
         this.messageData = new HashMap<>();
         this.channelService = channelService;
         this.userService = userService;
         // channelService와 userService 객체의 메소드를 접근해서 사용하겠다
+    }
+
+    public static JCFMessageService getInstance(ChannelService channelService, UserService userService) {
+        if (INSTANCE == null) { // 첫 번째 체크 (성능 최적화)
+            synchronized (JCFMessageService.class) {
+                if (INSTANCE == null) { // 두 번째 체크 (스레드 안정성 보장)
+                    INSTANCE = new JCFMessageService(channelService, userService);
+                }
+            }
+        }
+        return INSTANCE;
     }
 
     @Override

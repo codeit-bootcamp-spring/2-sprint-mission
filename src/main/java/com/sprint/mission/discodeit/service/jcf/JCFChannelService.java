@@ -9,10 +9,19 @@ import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> channelData;
+    private static JCFChannelService INSTANCE = new JCFChannelService();
 
     //생성할때 초기화
     public JCFChannelService() {
         this.channelData = new HashMap<>();
+    }
+
+    public static JCFChannelService getInstance() {
+        // instance 가 null 일 때만 생성
+        if (INSTANCE == null) {
+            INSTANCE = new JCFChannelService();
+        }
+        return INSTANCE;
     }
 
     @Override

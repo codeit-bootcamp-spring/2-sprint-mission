@@ -11,9 +11,18 @@ public class JCFUserService implements UserService {
     private final Map<UUID, User> userData; // 타입 선언, 고유 UUID가 키
     // UUID : [id, createdAt, updatedAt, userName]
     //Map<>으로 타입 선언 -> 다형성, 유연성 up
+    private static JCFUserService INSTANCE = new JCFUserService();
 
-    public JCFUserService() {
+    private JCFUserService() {
         this.userData = new HashMap<>(); //구현체 생성, 초기화
+    }
+
+    public static JCFUserService getInstance() {
+        // instance 가 null 일 때만 생성
+        if (INSTANCE == null) {
+            INSTANCE = new JCFUserService();
+        }
+        return INSTANCE;
     }
 
     @Override
