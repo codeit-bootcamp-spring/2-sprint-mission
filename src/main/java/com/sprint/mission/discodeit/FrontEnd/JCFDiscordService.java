@@ -109,11 +109,11 @@ public class JCFDiscordService implements DiscordService {
         if (list.isEmpty()) {
             return;
         }
-        System.out.println("==============유저 정보===================");
+        System.out.println("\n==============유저 정보===================");
         for (User data : list) {
             System.out.println(data.getName());
         }
-        System.out.println("======================================");
+        System.out.println("======================================\n");
     }
 
 
@@ -124,7 +124,7 @@ public class JCFDiscordService implements DiscordService {
         Scanner sc = new Scanner(System.in);
         System.out.print("변경할 유저의 이름을 입력하시오. : ");
         String targetName = sc.next();
-        System.out.print("바꿀 이름을 입력하시오. : ");
+        System.out.print("유저 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.next();
         return update(targetName, replaceName);
     }
@@ -135,7 +135,7 @@ public class JCFDiscordService implements DiscordService {
             return false;
         }
         Scanner sc = new Scanner(System.in);
-        System.out.print("바꿀 이름을 입력하시오. : ");
+        System.out.print("유저 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.next();
         return update(targetName, replaceName);
     }
@@ -146,7 +146,7 @@ public class JCFDiscordService implements DiscordService {
             return false;
         }
         Scanner sc = new Scanner(System.in);
-        System.out.print("바꿀 이름을 입력하시오. : ");
+        System.out.print("유저 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.next();
         return update(user.getName(), replaceName);
     }
