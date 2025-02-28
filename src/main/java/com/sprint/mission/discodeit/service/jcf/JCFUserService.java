@@ -53,6 +53,13 @@ public class JCFUserService implements UserService {
     }
 
     @Override
+    public UserDto findByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+
+        return new UserDto(user.getId(), user.getName());
+    }
+
+    @Override
     public void updateName(UUID id, String name) {
         userRepository.updateName(id, name);
     }

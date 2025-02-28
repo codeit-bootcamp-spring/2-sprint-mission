@@ -3,12 +3,10 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.infra.ChannelRepository;
-import com.sprint.mission.discodeit.infra.UserRepository;
 import com.sprint.mission.discodeit.infra.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +15,7 @@ import java.util.UUID;
 public class JCFChannelService implements ChannelService {
     private static final JCFChannelService jcfChannelService = new JCFChannelService();
     private static final ChannelRepository channelRepository = JCFChannelRepository.getInstance();
-    private static final UserRepository userRepository = JCFUserRepository.getInstance(); // TODO: 2/28/25 유저 서비스로 수정필요
+    private static final UserService userService = JCFUserService.getInstance();
 
     private JCFChannelService() {
     }
@@ -34,7 +32,7 @@ public class JCFChannelService implements ChannelService {
 
         List<UserDto> users = channel.getUserIds()
                 .stream()
-                .map(userId -> new UserDto(userId, userRepository.findById(userId).getName()))
+                .map(userId -> new UserDto(userId, userService.findById(userId).name()))
                 .toList();
 
         return new ChannelDto(channel.getId(), channel.getName(), users);
@@ -46,7 +44,7 @@ public class JCFChannelService implements ChannelService {
 
         List<UserDto> users = channel.getUserIds()
                 .stream()
-                .map(userId -> new UserDto(userId, userRepository.findById(userId).getName()))
+                .map(userId -> new UserDto(userId, userService.findById(userId).name()))
                 .toList();
 
         return new ChannelDto(channel.getId(), channel.getName(), users);
@@ -60,7 +58,7 @@ public class JCFChannelService implements ChannelService {
         for (Channel channel : channels){
             List<UserDto> users = channel.getUserIds()
                     .stream()
-                    .map(id -> new UserDto(id, userRepository.findById(id).getName()))
+                    .map(id -> new UserDto(id, userService.findById(id).name()))
                     .toList();
 
             channelUsers.put(channel.getId(), users);
@@ -83,14 +81,14 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto addMember(UUID id, String friendEmail) {
+    public ChannelDto addMember(UUID id, String email) {
         Channel channel = channelRepository.findById(id);
-        User user = userRepository.findByEmail(friendEmail);
-        channel.addMember(user.getId());
+        UserDto user = userService.findByEmail(email);
+        channel.addMember(user.id());
 
         List<UserDto> users = channel.getUserIds()
                 .stream()
-                .map(userId -> new UserDto(userId, userRepository.findById(userId).getName()))
+                .map(userId -> new UserDto(userId, userService.findById(userId).name()))
                 .toList();
 
         return new ChannelDto(channel.getId(), channel.getName(), users);

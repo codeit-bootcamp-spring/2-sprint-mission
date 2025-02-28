@@ -14,6 +14,8 @@ public interface UserService {
 
     List<UserDto> findAll();
 
+    UserDto findByEmail(String email);
+
     void updateName(UUID id, String name);
 
     void delete(UUID id);
