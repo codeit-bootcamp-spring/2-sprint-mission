@@ -59,7 +59,8 @@ public class JCFChannelService implements ChannelService {
 
         for(Channel channel:data){
             if(channel.getId().equals(uuid)){
-                channel.update(channelName);
+                channel.setChannelName(channelName);
+                channel.setUpdatedAt(System.currentTimeMillis());
                 System.out.println("[성공]채널 변경 완료[채널 아이디: " + channel.getId() +
                         ", 채널명: " +  channel.getChannelName() +
                         ", 변경 시간: " + channel.getUpdatedAt() + "]");

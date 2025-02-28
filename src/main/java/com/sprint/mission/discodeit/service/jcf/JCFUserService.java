@@ -61,7 +61,8 @@ public class JCFUserService implements UserService {
 
         for(User u : data) {
             if(u.getId().equals(uuid)) {
-                u.update(nickname);
+                u.setNickname(nickname);
+                u.setUpdatedAt(System.currentTimeMillis());
                 System.out.println("[성공]사용자 변경 완료[사용자 아이디: " + u.getId() +
                         ", 닉네임: " + u.getNickname() +
                         ", 변경 시간: " + u.getUpdatedAt() +

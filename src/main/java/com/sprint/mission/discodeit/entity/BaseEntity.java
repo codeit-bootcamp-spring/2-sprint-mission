@@ -22,8 +22,4 @@ public abstract class BaseEntity {
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-    public void update() {
-        this.updatedAt = System.currentTimeMillis();
-    }
 }

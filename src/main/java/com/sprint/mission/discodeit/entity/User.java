@@ -9,9 +9,8 @@ public class User extends BaseEntity {
         this.nickname = nickname;
     }
 
-    public void update(String nickname) {
+    public void setNickname(String nickname) {
         this.nickname = nickname;
-        super.update();
     }
 
     public String getNickname() {

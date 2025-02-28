@@ -91,7 +91,8 @@ public class JCFMessageService implements MessageService {
 
         for(Message message : data) {
             if(message.getId().equals(id)) {
-                message.update(content);
+                message.setContent(content);
+                message.setUpdatedAt(System.currentTimeMillis());
                 System.out.println("[성공]메시지 변경 완료[메시지 아이디: " + message.getId() +
                         ", 닉네임: " + message.getUser().getNickname() +
                         ", 변경 시간: " + message.getUpdatedAt() +

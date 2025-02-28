@@ -11,17 +11,15 @@ public class Message extends BaseEntity {
         this.channel = channel;
     }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public User getUser() {
         return user;
     }
-
     public Channel getChannel() {
         return channel;
-    }
-
-    public void update(String content) {
-        super.update();
-        this.content = content;
     }
 
     @Override
