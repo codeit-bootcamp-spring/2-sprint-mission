@@ -17,7 +17,6 @@ public class ChannelController {
         return channelService.findAll();
     }
 
-    // TODO: 2/26/25 계속 채널 Dto를 만드는게 좋은지 고민해봐야됨, 그리고 ChannelDto에 id말고 다른거 반환하는게 좋은지 생각해봐야된다
     public ChannelDto updateName(ChannelDto channelDto, String channelName) {
         channelService.updateName(channelDto.id(), channelName);
 

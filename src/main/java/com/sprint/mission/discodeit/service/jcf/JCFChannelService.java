@@ -17,7 +17,7 @@ import java.util.UUID;
 public class JCFChannelService implements ChannelService {
     private static final JCFChannelService jcfChannelService = new JCFChannelService();
     private static final ChannelRepository channelRepository = JCFChannelRepository.getInstance();
-    private static final UserRepository userRepository = JCFUserRepository.getInstance();
+    private static final UserRepository userRepository = JCFUserRepository.getInstance(); // TODO: 2/28/25 유저 서비스로 수정필요
 
     private JCFChannelService() {
     }
@@ -31,7 +31,7 @@ public class JCFChannelService implements ChannelService {
         Channel channel = channelRepository.save(
                 new Channel(name, owner.id())
         );
-        // TODO: 2/26/25 개선필요
+
         List<UserDto> users = channel.getUserIds()
                 .stream()
                 .map(userId -> new UserDto(userId, userRepository.findById(userId).getName()))
@@ -46,7 +46,7 @@ public class JCFChannelService implements ChannelService {
 
         List<UserDto> users = channel.getUserIds()
                 .stream()
-                .map(userId -> new UserDto(id, userRepository.findById(userId).getName()))
+                .map(userId -> new UserDto(userId, userRepository.findById(userId).getName()))
                 .toList();
 
         return new ChannelDto(channel.getId(), channel.getName(), users);

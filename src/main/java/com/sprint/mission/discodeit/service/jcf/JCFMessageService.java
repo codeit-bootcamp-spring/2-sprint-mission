@@ -3,19 +3,23 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.infra.MessageRepository;
+import com.sprint.mission.discodeit.infra.UserRepository;
 import com.sprint.mission.discodeit.infra.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
     private static final JCFMessageService jcfMessageService = new JCFMessageService();
+    private static final UserService userService = JCFUserService.getInstance();
     private static final MessageRepository messageRepository = JCFMessageRepository.getInstance();
 
     private JCFMessageService() {
     }
 
-    public static JCFMessageService getInstance(){
+    public static JCFMessageService getInstance() {
         return jcfMessageService;
     }
 
@@ -25,21 +29,22 @@ public class JCFMessageService implements MessageService {
                 new Message(context, channelId, userId)
         );
 
-        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(), message.getUserId());
+        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(), userService.findById(userId));
     }
 
     @Override
     public MessageDto findById(UUID id) {
         Message message = messageRepository.findById(id);
 
-        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(), message.getUserId());
+        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(), userService.findById(message.getUserId()));
     }
 
     @Override
     public List<MessageDto> findAll() {
         return messageRepository.findAll()
                 .stream()
-                .map(message -> new MessageDto(message.getId(), message.getContext(), message.getChannelId(), message.getUserId()))
+                .map(message -> new MessageDto(message.getId(), message.getContext(), message.getChannelId(),
+                        userService.findById(message.getUserId())))
                 .toList();
     }
 
@@ -48,7 +53,8 @@ public class JCFMessageService implements MessageService {
         return messageRepository.findAll()
                 .stream()
                 .filter(message -> message.getChannelId().equals(channelId))
-                .map(message -> new MessageDto(message.getId(), message.getContext(),message.getChannelId(), message.getUserId()))
+                .map(message -> new MessageDto(message.getId(), message.getContext(), message.getChannelId(),
+                        userService.findById(message.getUserId())))
                 .toList();
     }
 

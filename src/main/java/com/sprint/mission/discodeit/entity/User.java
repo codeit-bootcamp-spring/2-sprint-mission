@@ -12,7 +12,7 @@ public class User {
     private String password;
 
     public User(String name, String email, String password) {
-        this.id = UUID.randomUUID(); // TODO: 2/20/25 Id가 UUID에 의존하지 않도록 수정 요망
+        this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
         this.updatedAt = createdAt;
         this.name = name;
@@ -29,9 +29,10 @@ public class User {
         return this.name.equals(name);
     }
 
-    public boolean isSameEmail(String email){
+    public boolean isSameEmail(String email) {
         return this.email.equals(email);
     }
+
     private void updatedAt() {
         this.updatedAt = Instant.now().getEpochSecond();
     }

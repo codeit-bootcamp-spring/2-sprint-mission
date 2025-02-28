@@ -3,6 +3,7 @@ package com.sprint.mission;
 import static com.sprint.mission.discodeit.view.InputView.readChannelName;
 import static com.sprint.mission.discodeit.view.InputView.readEmail;
 import static com.sprint.mission.discodeit.view.InputView.readMessage;
+import static com.sprint.mission.discodeit.view.InputView.readNewChannelName;
 import static com.sprint.mission.discodeit.view.InputView.readUserChoice;
 import static com.sprint.mission.discodeit.view.OutputView.printServer;
 
@@ -22,33 +23,37 @@ public class Application {
         MessageController messageController = new MessageController();
 
         System.out.println("안녕하세요 코드잇2기 서버입니다.");
-        UserDto user = userController.register(
+        UserDto loginUser = userController.register(
                 new UserRegisterDto("황지환", "hwang@naver.com", "12345")
         );
         userController.register(
                 new UserRegisterDto("박지환", "park@naver.com", "12345")
         );
-        ChannelDto initChannel = channelController.create("general", user);
+        ChannelDto initChannel = channelController.create("general", loginUser);
         List<MessageDto> initMessages = messageController.findByChannelId(initChannel.id());
-        printServer(channelController.findAll(), user, initMessages, initChannel);
+        printServer(channelController.findAll(), loginUser, initMessages, initChannel);
 
         while (true) {
             String userChoice = readUserChoice();
+            if (userChoice.equals("1")) {
+                ChannelDto currentChannel = channelController.create(readNewChannelName(), loginUser);
+                List<MessageDto> currentChannelMessages = messageController.findByChannelId(currentChannel.id());
+                printServer(channelController.findAll(), loginUser, currentChannelMessages, currentChannel);
+            }
             if (userChoice.equals("5")) {
-                messageController.createMessage(readMessage(), initChannel.id(), user.id());
-                List<MessageDto> messages = messageController.findByChannelId(initChannel.id());
-                printServer(channelController.findAll(), user, messages, initChannel);
+                messageController.createMessage(readMessage(), initChannel.id(), loginUser.id());
+                List<MessageDto> currentChannelMessages = messageController.findByChannelId(initChannel.id());
+                printServer(channelController.findAll(), loginUser, currentChannelMessages, initChannel);
             }
             if (userChoice.equals("4")) {
-                channelController.addMember(initChannel, readEmail());
-                List<MessageDto> messages = messageController.findByChannelId(initChannel.id());
-                printServer(channelController.findAll(), user, messages, initChannel); // 현재 채널로 수정
+                ChannelDto currentChannel = channelController.addMember(initChannel, readEmail());
+                List<MessageDto> currentChannelMessages = messageController.findByChannelId(currentChannel.id());
+                printServer(channelController.findAll(), loginUser, currentChannelMessages, currentChannel);
             }
             if (userChoice.equals("3")) {
-                String channelName = readChannelName();
-                ChannelDto channel = channelController.updateName(initChannel, channelName);
-                List<MessageDto> messages = messageController.findByChannelId(initChannel.id());
-                printServer(channelController.findAll(), user, messages, channel);
+                ChannelDto currentChannel = channelController.updateName(initChannel, readChannelName());
+                List<MessageDto> currentChannelMessages = messageController.findByChannelId(initChannel.id());
+                printServer(channelController.findAll(), loginUser, currentChannelMessages, currentChannel);
             }
             if (userChoice.equals("7")) {
                 break;
