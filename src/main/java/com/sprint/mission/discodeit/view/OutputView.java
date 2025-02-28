@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OutputView {
+    private static final int CHANNEL_FORMAT_SPECIFIER = 10;
+    private static final int MESSAGE_FORMAT_SPECIFIER = 38;
+    private static final int USER_FORMAT_SPECIFIER = 9;
+
     private OutputView() {
     }
 
@@ -17,42 +21,26 @@ public class OutputView {
         String content = formatContent(channels, loginUser, messages, currentChannel);
 
         System.out.printf("""
-                        —---------------------------------------------------------
-                        %s
-                        —---------------------------------------------------------
-                        %s
-                        —---------------------------------------------------------
-                        %n""",
-                title, content);
+                —---------------------------------------------------------
+                %s
+                —---------------------------------------------------------
+                %s
+                —---------------------------------------------------------
+                %n""", title, content);
     }
 
     private static String formatContent(List<ChannelDto> channels, UserDto loginUser,
-                                      List<MessageDto> currentChannelMessages,
-                                      ChannelDto currentChannel) {
+                                        List<MessageDto> currentChannelMessages,
+                                        ChannelDto currentChannel) {
 
         List<String> formattedChannels = formatChannels(channels, currentChannel);
         List<String> formattedMessages = formatMessages(currentChannelMessages);
-        List<String> formattedUsers = formatUsers(loginUser, currentChannel.users()); // 여기서 지금 id가 다르다,
+        List<String> formattedUsers = formatUsers(loginUser, currentChannel.users());
 
-        int channelSize = formattedChannels.size();
-        int messageSize = formattedMessages.size();
-        int usersSize = formattedUsers.size();
-
-        int max = Math.max(channelSize, Math.max(messageSize, usersSize));
-        for (int i = channelSize; i <= max; i++) {
-            formattedChannels.add(" ".repeat(10));
-        }
-
-        for (int i = messageSize; i <= max; i++) {
-            formattedMessages.add(" ".repeat(38));
-        }
-
-        for (int i = usersSize; i <= max; i++) {
-            formattedUsers.add(" ".repeat(9));
-        }
+        addPadding(formattedChannels, formattedMessages, formattedUsers);
 
         List<String> formattedContents = new ArrayList<>();
-        for (int i = 0; i < max; i++) {
+        for (int i = 0; i < formattedChannels.size(); i++) {
             String row = String.join("|", formattedChannels.get(i), formattedMessages.get(i), formattedUsers.get(i));
             formattedContents.add(row);
         }
@@ -60,11 +48,24 @@ public class OutputView {
         return String.join("\n", formattedContents);
     }
 
-    // 마지막 ---- 처리
-//        channelUserTexts.add(
-//                String.format("%-10s| %-36s |%-6s", formattedChannels, formattedMessages, formattedUsers));
+    private static void addPadding(List<String> formattedChannels, List<String> formattedMessages,
+                                   List<String> formattedUsers) {
+        int channelSize = formattedChannels.size();
+        int messageSize = formattedMessages.size();
+        int usersSize = formattedUsers.size();
 
-    // "%-10s|
+        int maxSize = Math.max(channelSize, Math.max(messageSize, usersSize));
+        addEachPadding(channelSize, maxSize, formattedChannels, CHANNEL_FORMAT_SPECIFIER);
+        addEachPadding(messageSize, maxSize, formattedMessages, MESSAGE_FORMAT_SPECIFIER);
+        addEachPadding(usersSize, maxSize, formattedUsers, USER_FORMAT_SPECIFIER);
+    }
+
+    private static void addEachPadding(int usersSize, int max, List<String> formattedUsers, int count) {
+        for (int i = usersSize; i <= max; i++) {
+            formattedUsers.add(" ".repeat(count));
+        }
+    }
+
     private static List<String> formatChannels(List<ChannelDto> channels, ChannelDto currentChannel) {
         List<String> formattedChannels = new ArrayList<>();
 
@@ -78,9 +79,8 @@ public class OutputView {
 
         return formattedChannels;
     }
-    // | %-36s |
+
     private static List<String> formatMessages(List<MessageDto> messages) {
-        // 이거 조정 해줘야됨 36자 이상이면 33자 까지 자르고 ... 해줘야함
         List<String> formattedMessages = new ArrayList<>();
         Transliterator transliterator = Transliterator.getInstance("Hangul-Latin");
 
@@ -92,12 +92,12 @@ public class OutputView {
 
         return formattedMessages;
     }
-    // |%-6s
+
     private static List<String> formatUsers(UserDto loginUser, List<UserDto> channelUsers) {
         List<String> formattedUsers = new ArrayList<>();
 
         for (UserDto user : channelUsers) {
-            String userName = "   " + user.name(); // 이거 위에 채널이랑 통일 시키기
+            String userName = "   " + user.name();
             if (user.id().equals(loginUser.id())) {
                 userName = " # " + userName.trim();
             }
