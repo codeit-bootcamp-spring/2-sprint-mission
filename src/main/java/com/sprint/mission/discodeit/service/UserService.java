@@ -7,11 +7,12 @@ import java.util.UUID;
 
 public interface UserService {
     Optional<UserEntity> getUserByUsername(String username);
-    UserEntity updateUsername(String username, String newUsername);
+    Optional<UserEntity> findById(UUID id);
+    UserEntity updateUsername(UUID userId, String newUsername);//동명이인을 고려해서 userId 사용.
     UserEntity updateNickname(String nickname, String newNickname);
     UserEntity updatePhoneNumber(String phoneNumber, String newPhoneNumber);
-    UserEntity updateEmail(UUID email, String newEmail);
-    UserEntity updatePassword(UUID password, String newPassword);
+    UserEntity updateEmail(String email, String newEmail);
+    UserEntity updatePassword(String password, String newPassword);
     //각각의 변수로 식별하는 게 옳은건지 ?
 
 

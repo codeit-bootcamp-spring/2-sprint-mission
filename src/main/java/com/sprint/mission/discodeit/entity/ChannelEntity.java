@@ -7,6 +7,7 @@ import java.util.List;
 public class ChannelEntity extends BaseEntity {
     private String name;
     private String type;
+    private List<MessageEntity> messages = new ArrayList<>();
 
     public ChannelEntity(String channelName, String channelType) {
         super();
@@ -17,6 +18,13 @@ public class ChannelEntity extends BaseEntity {
     public String getName() { return name;}
     public String getType() { return type;}
 
+    public List<MessageEntity> getMessages() {
+        return messages;
+    }
+
+    public void addMessage(MessageEntity message) {
+        messages.add(message);
+    }
     public void updateChannelName(String newName) {
         this.name = newName;
     }

@@ -10,6 +10,7 @@ public interface BaseService<T> {
     List<T> findAll();
     T update(T entity);
     void delete(T entity);
-    //이 상황에서 delete (UUID id)가 나은지 delete (T entity)가 더 적절한지 .?
+    void deleteById(UUID id);
+    //이 상황에서 findbyId의 UUID id가 적절한지 delete (UUID id)가 나은지 delete (T entity)가 더 적절한지 .?
 }
 
