@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.view;
 
+import static com.sprint.mission.discodeit.view.InputView.readChangeChannelNumber;
 import static com.sprint.mission.discodeit.view.InputView.readChannelName;
 import static com.sprint.mission.discodeit.view.InputView.readEmail;
 import static com.sprint.mission.discodeit.view.InputView.readMessage;
@@ -9,6 +10,8 @@ import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
+import java.util.ArrayList;
+import java.util.List;
 
 public enum ChannelCommand {
     CHANNEL_CREATION("1") {
@@ -44,6 +47,18 @@ public enum ChannelCommand {
             return currentChannel;
         }
     },
+    CHANNEL_CHANGE("5") {
+        @Override
+        public ChannelDto execute(ChannelController channelController, MessageController messageController,
+                                  UserDto loginUser, ChannelDto currentChannel) {
+            List<ChannelDto> channels = channelController.findAll()
+                    .stream()
+                    .filter(channel -> !channel.equals(currentChannel))
+                    .toList();
+
+            return channels.get(readChangeChannelNumber(channels) - 1);
+        }
+    },
     EXIT("6") {
         @Override
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
@@ -57,6 +72,7 @@ public enum ChannelCommand {
 
     public abstract ChannelDto execute(ChannelController channelController, MessageController messageController,
                                        UserDto loginUser, ChannelDto currentChannel);
+
     ChannelCommand(String number) {
         this.number = number;
     }
