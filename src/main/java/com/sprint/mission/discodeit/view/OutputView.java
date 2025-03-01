@@ -15,6 +15,11 @@ public class OutputView {
     private OutputView() {
     }
 
+    public static void printHello() {
+        System.out.println("안녕하세요 코드잇2기 서버입니다.");
+    }
+
+
     public static void printServer(List<ChannelDto> channels, UserDto loginUser, List<MessageDto> messages,
                                    ChannelDto currentChannel) {
         String title = String.format(" 코드잇 2기  | %s", currentChannel.name());
@@ -61,7 +66,7 @@ public class OutputView {
     }
 
     private static void addEachPadding(int usersSize, int max, List<String> formattedUsers, int count) {
-        for (int i = usersSize; i <= max; i++) {
+        for (int i = usersSize; i < max; i++) {
             formattedUsers.add(" ".repeat(count));
         }
     }
