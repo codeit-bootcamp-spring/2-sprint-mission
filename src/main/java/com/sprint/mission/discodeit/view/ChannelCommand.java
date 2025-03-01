@@ -19,6 +19,14 @@ public enum ChannelCommand {
             return channelController.create(readNewChannelName(), loginUser);
         }
     },
+    USER_ADDITION("2") {
+        @Override
+        public ChannelDto execute(ChannelController channelController, MessageController messageController,
+                                  UserDto loginUser,
+                                  ChannelDto currentChannel) {
+            return channelController.addMember(currentChannel, readEmail());
+        }
+    },
     NAME_CHANGE("3") {
         @Override
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
@@ -27,15 +35,7 @@ public enum ChannelCommand {
             return channelController.updateName(currentChannel, readChannelName());
         }
     },
-    USER_ADDITION("4") {
-        @Override
-        public ChannelDto execute(ChannelController channelController, MessageController messageController,
-                                  UserDto loginUser,
-                                  ChannelDto currentChannel) {
-            return channelController.addMember(currentChannel, readEmail());
-        }
-    },
-    MESSAGE_SENT("5") {
+    MESSAGE_SENT("4") {
         @Override
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
                                   UserDto loginUser,
@@ -44,7 +44,7 @@ public enum ChannelCommand {
             return currentChannel;
         }
     },
-    EXIT("7") {
+    EXIT("6") {
         @Override
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
                                   UserDto loginUser,
