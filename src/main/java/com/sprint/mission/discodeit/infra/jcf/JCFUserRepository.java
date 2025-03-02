@@ -2,25 +2,13 @@ package com.sprint.mission.discodeit.infra.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.infra.UserRepository;
-import java.io.BufferedReader;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
-    private static final JCFUserRepository jcfUserRepository = new JCFUserRepository();
     private static final Map<UUID, User> users = new HashMap<>();
-
-    private JCFUserRepository() {
-    }
-
-    public static JCFUserRepository getInstance() {
-        return jcfUserRepository;
-    }
 
     @Override
     public User save(User user) {
@@ -32,7 +20,7 @@ public class JCFUserRepository implements UserRepository {
     public User findById(UUID id) {
         User user = users.get(id);
         if (user == null) {
-            throw new IllegalArgumentException("[Error] 해당 아이디의 유저가 없습니다");
+            throw new IllegalArgumentException("[Error] 해당 유저가 없습니다");
         }
 
         return user;

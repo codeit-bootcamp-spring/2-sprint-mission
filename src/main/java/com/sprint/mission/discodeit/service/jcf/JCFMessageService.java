@@ -3,24 +3,18 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.infra.MessageRepository;
-import com.sprint.mission.discodeit.infra.UserRepository;
-import com.sprint.mission.discodeit.infra.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
-    private static final JCFMessageService jcfMessageService = new JCFMessageService();
-    private static final UserService userService = JCFUserService.getInstance();
-    private static final MessageRepository messageRepository = JCFMessageRepository.getInstance();
+    private final MessageRepository messageRepository;
+    private final UserService userService;
 
-    private JCFMessageService() {
-    }
-
-    public static JCFMessageService getInstance() {
-        return jcfMessageService;
+    public JCFMessageService(MessageRepository messageRepository, UserService userService) {
+        this.messageRepository = messageRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -29,14 +23,16 @@ public class JCFMessageService implements MessageService {
                 new Message(context, channelId, userId)
         );
 
-        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(), userService.findById(userId));
+        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(),
+                userService.findById(userId));
     }
 
     @Override
     public MessageDto findById(UUID id) {
         Message message = messageRepository.findById(id);
 
-        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(), userService.findById(message.getUserId()));
+        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(),
+                userService.findById(message.getUserId()));
     }
 
     @Override

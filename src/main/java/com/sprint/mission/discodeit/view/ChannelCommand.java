@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
-import java.util.ArrayList;
 import java.util.List;
 
 public enum ChannelCommand {

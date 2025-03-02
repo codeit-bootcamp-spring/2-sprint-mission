@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.infra.ChannelRepository;
-import com.sprint.mission.discodeit.infra.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.HashMap;
@@ -13,15 +12,12 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
-    private static final JCFChannelService jcfChannelService = new JCFChannelService();
-    private static final ChannelRepository channelRepository = JCFChannelRepository.getInstance();
-    private static final UserService userService = JCFUserService.getInstance();
+    private final ChannelRepository channelRepository;
+    private final UserService userService;
 
-    private JCFChannelService() {
-    }
-
-    public static JCFChannelService getInstance() {
-        return jcfChannelService;
+    public JCFChannelService(ChannelRepository channelRepository, UserService userService) {
+        this.channelRepository = channelRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -55,7 +51,7 @@ public class JCFChannelService implements ChannelService {
         List<Channel> channels = channelRepository.findAll();
         Map<UUID, List<UserDto>> channelUsers = new HashMap<>();
 
-        for (Channel channel : channels){
+        for (Channel channel : channels) {
             List<UserDto> users = channel.getUserIds()
                     .stream()
                     .map(id -> new UserDto(id, userService.findById(id).name()))

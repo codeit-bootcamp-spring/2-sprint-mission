@@ -3,11 +3,14 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import java.util.*;
+import java.util.List;
 
 public class ChannelController {
-    private final ChannelService channelService = JCFChannelService.getInstance();
+    private final ChannelService channelService;
+
+    public ChannelController(ChannelService channelService) {
+        this.channelService = channelService;
+    }
 
     public ChannelDto create(String name, UserDto owner) {
         return channelService.create(name, owner);

@@ -4,20 +4,15 @@ import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.infra.UserRepository;
-import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
-    private static final JCFUserService jcfUserService = new JCFUserService();
-    private static final UserRepository userRepository = JCFUserRepository.getInstance();
+    private final UserRepository userRepository;
 
-    private JCFUserService() {
-    }
-
-    public static JCFUserService getInstance() {
-        return jcfUserService;
+    public JCFUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override

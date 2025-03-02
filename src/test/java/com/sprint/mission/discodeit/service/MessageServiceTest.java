@@ -4,7 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sprint.mission.discodeit.application.MessageDto;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.infra.UserRepository;
+import com.sprint.mission.discodeit.infra.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +21,10 @@ class MessageServiceTest {
 
     @BeforeEach
     void setUp() {
-        messageService = JCFMessageService.getInstance();
-        setUpMessage = messageService.create(CONTEXT, UUID.randomUUID(), UUID.randomUUID());
+        UserRepository userRepository = new JCFUserRepository();
+        User user = userRepository.save(new User("황지환", "hwang@naver.com", "12345"));
+        messageService = new JCFMessageService(new JCFMessageRepository(), new JCFUserService(userRepository));
+        setUpMessage = messageService.create(CONTEXT, UUID.randomUUID(), user.getId());
     }
 
     @Test

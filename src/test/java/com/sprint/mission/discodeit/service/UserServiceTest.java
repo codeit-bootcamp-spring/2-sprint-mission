@@ -5,9 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
+import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,9 +22,14 @@ class UserServiceTest {
 
     @BeforeEach
     void init() {
-        userService = JCFUserService.getInstance();
+        userService = new JCFUserService(new JCFUserRepository());
 
         this.setUpUser = userService.register(new UserRegisterDto(NAME, EMAIL, PASSWORD));
+    }
+
+    @AfterEach
+    void teardown(){
+        userService.delete(setUpUser.id());
     }
 
     @Test

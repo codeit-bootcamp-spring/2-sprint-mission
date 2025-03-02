@@ -4,6 +4,7 @@ import static com.sprint.mission.discodeit.view.InputView.readUserChoice;
 import static com.sprint.mission.discodeit.view.OutputView.printHello;
 import static com.sprint.mission.discodeit.view.OutputView.printServer;
 
+import com.sprint.mission.discodeit.BeanFactory;
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.application.UserDto;
@@ -16,21 +17,18 @@ import java.util.List;
 
 public class Application {
     public static void main(String[] args) {
-        UserController userController = new UserController();
-        ChannelController channelController = new ChannelController();
-        MessageController messageController = new MessageController();
-
-        UserDto loginUser = registerSetupUser(userController);
-
         printHello();
-        ChannelDto currentChannel = channelController.create("general", loginUser);
+        BeanFactory beanFactory = new BeanFactory();
+        UserDto loginUser = registerSetupUser(beanFactory.findBean(UserController.class));
+
+        ChannelDto currentChannel = (beanFactory.findBean(ChannelController.class)).create("general", loginUser);
         while (true) {
-            List<MessageDto> currentChannelMessages = messageController.findByChannelId(currentChannel.id());
-            printServer(channelController.findAll(), loginUser, currentChannelMessages, currentChannel);
+            List<MessageDto> currentChannelMessages = (beanFactory.findBean(MessageController.class)).findByChannelId(currentChannel.id());
+            printServer((beanFactory.findBean(ChannelController.class)).findAll(), loginUser, currentChannelMessages, currentChannel);
 
             try {
                 currentChannel = ChannelCommand.fromNumber(readUserChoice())
-                        .execute(channelController, messageController, loginUser, currentChannel);
+                        .execute((beanFactory.findBean(ChannelController.class)), (beanFactory.findBean(MessageController.class)), loginUser, currentChannel);
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
