@@ -32,7 +32,7 @@ public class MessageEntity extends BaseEntity {
     }
 
     public void deleteMessage(List<MessageEntity> messages) {
-        messages.remove(this); //Q. 추천하시는 삭제 방법이 있는지
+        messages.remove(this);
     }
 
     public void addReaction(String emoji){

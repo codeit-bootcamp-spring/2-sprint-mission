@@ -32,4 +32,3 @@ public class BaseEntity {
         this.updatedAt = System.currentTimeMillis();
     }
 }
-//수정시간(updatedAt)을 갱신하는 메서드인 update함수를 정의해야하는 건지 ?

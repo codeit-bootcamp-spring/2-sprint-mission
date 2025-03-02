@@ -11,6 +11,5 @@ public interface BaseService<T> {
     T update(T entity);
     void delete(T entity);
     void deleteById(UUID id);
-    //이 상황에서 findbyId의 UUID id가 적절한지 delete (UUID id)가 나은지 delete (T entity)가 더 적절한지 .?
 }
 

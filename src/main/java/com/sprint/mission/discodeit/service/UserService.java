@@ -13,7 +13,6 @@ public interface UserService {
     UserEntity updatePhoneNumber(String phoneNumber, String newPhoneNumber);
     UserEntity updateEmail(String email, String newEmail);
     UserEntity updatePassword(String password, String newPassword);
-    //각각의 변수로 식별하는 게 옳은건지 ?
 
 
 }

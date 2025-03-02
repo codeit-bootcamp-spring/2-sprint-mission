@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.util.Comparator;
 import java.util.UUID;
 import java.util.Optional;
 
@@ -83,20 +84,20 @@ public class JavaApplication {
         System.out.println("======================\n메시지 등록: ");
         messageService.findAll().forEach(message -> System.out.println("- " + message.getContent()));
 
-        Optional <MessageEntity> foundMessage = messageService.getMessageById(message3.getId());
+        Optional <MessageEntity> foundMessage = messageService.getMessageById(message4.getId());
         foundMessage.ifPresent(message -> System.out.println("조회한 메시지: " + message.getContent()));
 
-        messageService.updateMessage(message3.getId(),"저녁");
-        System.out.println("수정할 메시지: " + message3.getContent());
+        messageService.updateMessage(message4.getId(),"보내시길 바랍니다.");
+        System.out.println("수정할 메시지: " + message4.getContent());
 
-        System.out.println("삭제할 메시지: " + message1.getContent());
+        System.out.println("메시지 변경: " + message1.getContent());
         messageService.deleteById(message1.getId());
         System.out.println("메시지 삭제 완료");
 
         System.out.println("현재 메시지 목록: ");
         messageService.findAll()
-            .stream()
-                .sorted((m1,m2) -> m1.getId().toString().compareTo(m2.getId().toString()))
+                .stream()
+                .sorted(Comparator.comparing(MessageEntity::getCreatedTime)) // 생성 시간 기준 정렬
                 .forEach(message -> System.out.println("- " + message.getContent()));
 
 
