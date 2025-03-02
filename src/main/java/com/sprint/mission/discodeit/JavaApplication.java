@@ -16,11 +16,36 @@ public class JavaApplication {
 
         Scanner sc = new Scanner(System.in);
 
+        UUID userToken = null;
+
         boolean run = true;
 
         while (run) {
-            System.out.println(" ======== 메뉴 ========");
-            System.out.println("1. 등록 \n2. 조회(다건, 단건)\n3. 수정 \n4. 삭제 \n5. 나가기");
+            System.out.println(" ======== 메뉴 ======== ");
+            System.out.println("1. 로그인\n2. 회원 가입");
+            System.out.print("입력란: ");
+            int initPage = sc.nextInt();
+            sc.nextLine();
+            switch (initPage) {
+                case 1:
+                    System.out.print("유저 아이디 입력: ");
+                    UUID userUUID = UUID.fromString(sc.nextLine());
+                    System.out.print("비밀번호 입력: ");
+                    String password = sc.nextLine();
+                    userToken = jcfUserService.login(userUUID, password);
+                    break;
+                case 2:
+                    System.out.print("닉네임 입력: ");
+                    String nickname = sc.nextLine();
+                    System.out.print("비밀번호 입력: ");
+                    String savePassword = sc.nextLine();
+                    jcfUserService.save(nickname, savePassword);
+                    break;
+            }
+            if(userToken == null) continue;
+
+            System.out.println(" ======== 메뉴 ======== ");
+            System.out.println("1. 등록 \n2. 조회(다건, 단건)\n3. 수정 \n4. 삭제 \n5. 로그아웃 \n6. 나가기");
             System.out.print("입력란: ");
 
             int num = sc.nextInt();
@@ -29,7 +54,7 @@ public class JavaApplication {
             switch(num){
                 case 1:
                     System.out.println("===등록===");
-                    System.out.println("1. 사용자 등록\n2. 채널 개설\n3. 메세지 보내기\n4. 메뉴로 돌아가기");
+                    System.out.println("1. 회원 가입\n2. 채널 개설\n3. 메세지 보내기\n4. 메뉴로 돌아가기");
                     System.out.print("입력란: ");
                     int createNum = sc.nextInt();
                     sc.nextLine();
@@ -37,7 +62,9 @@ public class JavaApplication {
                         case 1:
                             System.out.print("닉네임 입력: ");
                             String nickname = sc.nextLine();
-                            jcfUserService.save(nickname);
+                            System.out.print("비밀번호 입력: ");
+                            String password = sc.nextLine();
+                            jcfUserService.save(nickname, password);
                             break;
                         case 2:
                             System.out.print("채널명 입력: ");
@@ -184,6 +211,9 @@ public class JavaApplication {
                     }
                     break;
                 case 5:
+                    userToken = null;
+                    break;
+                case 6:
                     run = false;
             }
         }

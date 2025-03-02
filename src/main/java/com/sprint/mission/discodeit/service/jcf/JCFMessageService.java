@@ -4,12 +4,16 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
     private final List<Message> data = new ArrayList<>();
     private final JCFUserService jcfUserService;
     private final JCFChannelService jcfChannelService;
     private static JCFMessageService getInstance;
+
+    private final Map<UUID, List<Message>> messageOfChannel = data.stream()
+            .collect(Collectors.groupingBy(Message::getChannelUUID));
 
     private JCFMessageService(JCFUserService jcfUserService, JCFChannelService jcfChannelService) {
         this.jcfUserService = jcfUserService;
@@ -24,17 +28,17 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void sendMessage(UUID channelId, UUID userId, String content) {
+    public void sendMessage(UUID channelUUID, UUID userUUID, String content) {
 
-        if(jcfChannelService.findChannel(channelId) ==null){
+        if(jcfChannelService.findChannel(channelUUID) ==null){
             return;
         }
 
-        if(jcfUserService.findByUser(userId) == null){
+        if(jcfUserService.findByUser(userUUID) == null){
             return;
         }
 
-        Message message = new Message(jcfChannelService.findChannel(channelId), jcfUserService.findByUser(userId) ,content);
+        Message message = new Message(channelUUID, userUUID,content);
         data.add(message);
         System.out.println("메세지 전송 성공" + message);
     }
@@ -65,21 +69,17 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void findMessageByChannelId(UUID channelId) {
-        if(jcfChannelService.findChannel(channelId) ==null){
+    public void findMessageByChannelId(UUID channelUUID) {
+        if(jcfChannelService.findChannel(channelUUID) ==null){
             return;
         }
 
-        if(data.stream().noneMatch(message -> message.getChannel().getId().equals(channelId))){
+        if(data.stream().noneMatch(message -> message.getChannelUUID().equals(channelUUID))){
             System.out.println("채널에 해당하는 메시지가 존재하지 않습니다.");
             return;
         }
 
-        for(Message message:data){
-            if(message.getChannel() == jcfChannelService.findChannel(channelId)){
-                System.out.println(message);
-            }
-        }
+        messageOfChannel.get(channelUUID).forEach(message -> System.out.println(message.toString()));
     }
 
     @Override
@@ -94,7 +94,6 @@ public class JCFMessageService implements MessageService {
                 message.setContent(content);
                 message.setUpdatedAt(System.currentTimeMillis());
                 System.out.println("[성공]메시지 변경 완료[메시지 아이디: " + message.getId() +
-                        ", 닉네임: " + message.getUser().getNickname() +
                         ", 변경 시간: " + message.getUpdatedAt() +
                         "]");
             }

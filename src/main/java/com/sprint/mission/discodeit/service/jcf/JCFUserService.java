@@ -23,10 +23,9 @@ public class JCFUserService implements UserService {
         return getInstance;
     }
 
-
     @Override
-    public void save(String nickname) {
-        User user = new User(nickname);
+    public void save(String nickname, String password) {
+        User user = new User(nickname, password);
         data.add(user);
         System.out.println("유저 생성 완료" +user);
     }
@@ -80,5 +79,20 @@ public class JCFUserService implements UserService {
         } else {
             System.out.println("[성공]사용자 삭제 완료");
         }
+    }
+
+    public UUID login(UUID userUUID, String password) {
+        User userInfo = findByUser(userUUID);
+        if(userInfo == null){
+            return null;
+        }
+
+        if (!userInfo.getPassword().equals(password)) {
+            System.out.println("[실패]비밀번호가 일치하지 않습니다.");
+            return null;
+        };
+
+        System.out.println("[성공] 로그인 완료");
+        return userInfo.getId();
     }
 }
