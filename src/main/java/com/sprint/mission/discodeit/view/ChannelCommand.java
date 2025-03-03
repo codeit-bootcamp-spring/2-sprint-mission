@@ -18,6 +18,7 @@ public enum ChannelCommand {
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
                                   UserDto loginUser,
                                   ChannelDto currentChannel) {
+
             return channelController.create(readNewChannelName(), loginUser);
         }
     },
@@ -26,6 +27,7 @@ public enum ChannelCommand {
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
                                   UserDto loginUser,
                                   ChannelDto currentChannel) {
+
             return channelController.addMember(currentChannel, readEmail());
         }
     },
@@ -34,6 +36,7 @@ public enum ChannelCommand {
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
                                   UserDto loginUser,
                                   ChannelDto currentChannel) {
+
             return channelController.updateName(currentChannel, readChannelName());
         }
     },
@@ -43,6 +46,7 @@ public enum ChannelCommand {
                                   UserDto loginUser,
                                   ChannelDto currentChannel) {
             messageController.createMessage(readMessage(), currentChannel.id(), loginUser.id());
+
             return currentChannel;
         }
     },
@@ -63,6 +67,7 @@ public enum ChannelCommand {
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
                                   UserDto loginUser,
                                   ChannelDto currentChannel) {
+
             return null;
         }
     };
@@ -82,6 +87,6 @@ public enum ChannelCommand {
                 return command;
             }
         }
-        throw new IllegalArgumentException("[ERROR]" + number + "는 잘못된 명령 번호");
+        throw new IllegalArgumentException("[ERROR] " + number + "는 잘못된 명령 번호");
     }
 }

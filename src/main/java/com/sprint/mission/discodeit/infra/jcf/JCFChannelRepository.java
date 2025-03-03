@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.infra.jcf;
 
+import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
+
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.infra.ChannelRepository;
 import java.util.LinkedHashMap;
@@ -21,7 +23,7 @@ public class JCFChannelRepository implements ChannelRepository {
     public Channel findById(UUID id) {
         Channel channel = channels.get(id);
         if (channel == null) {
-            throw new IllegalArgumentException("[ERROR] 해당 id의 채널이 존재하지 않습니다");
+            throw new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent());
         }
 
         return channel;

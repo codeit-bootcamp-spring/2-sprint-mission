@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.infra.jcf;
 
+import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
+
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.infra.MessageRepository;
 import java.util.LinkedHashMap;
@@ -20,7 +22,7 @@ public class JCFMessageRepository implements MessageRepository {
     public Message findById(UUID id) {
         Message message = messages.get(id);
         if (message == null) {
-            throw new IllegalArgumentException("[ERROR] 해당 메세지가 없습니다");
+            throw new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent());
         }
 
         return message;

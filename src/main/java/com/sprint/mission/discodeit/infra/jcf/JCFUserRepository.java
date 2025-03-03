@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.infra.jcf;
 
+import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND;
+import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
+
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.infra.UserRepository;
 import java.util.HashMap;
@@ -20,7 +23,7 @@ public class JCFUserRepository implements UserRepository {
     public User findById(UUID id) {
         User user = users.get(id);
         if (user == null) {
-            throw new IllegalArgumentException("[Error] 해당 유저가 없습니다");
+            throw new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent());
         }
 
         return user;
@@ -41,7 +44,7 @@ public class JCFUserRepository implements UserRepository {
                 .stream()
                 .filter(user -> user.isSameEmail(email))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("[ERROR] Email과 일치하는 유저가 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
     }
 
     @Override

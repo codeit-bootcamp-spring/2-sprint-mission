@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -14,9 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class UserServiceTest {
-    private static final String PASSWORD = "password";
-    private static final String NAME = "황지환";
-    private static final String EMAIL = "hwang@naver.com";
     private UserService userService;
     private UserDto setUpUser;
 
@@ -24,11 +23,12 @@ class UserServiceTest {
     void init() {
         userService = new JCFUserService(new JCFUserRepository());
 
-        this.setUpUser = userService.register(new UserRegisterDto(NAME, EMAIL, PASSWORD));
+        this.setUpUser = userService.register(
+                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
     }
 
     @AfterEach
-    void teardown(){
+    void teardown() {
         userService.delete(setUpUser.id());
     }
 
@@ -49,21 +49,19 @@ class UserServiceTest {
 
     @Test
     void 유저_이름_단건_조회() {
-        List<UserDto> users = userService.findByName(NAME);
+        List<UserDto> users = userService.findByName(LONGIN_USER.getName());
         UserDto userDto = users.get(0);
 
-        assertThat(userDto.name()).isEqualTo(NAME);
+        assertThat(userDto.name()).isEqualTo(LONGIN_USER.getName());
     }
 
     @Test
     void 유저_이름_다수_조회() {
-        UserRegisterDto userOtherHwang = new UserRegisterDto(NAME, EMAIL, PASSWORD + "123");
-        UserRegisterDto userKim = new UserRegisterDto("KIM", EMAIL, PASSWORD);
+        UserRegisterDto otherUser = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword());
 
-        userService.register(userOtherHwang);
-        userService.register(userKim);
+        userService.register(otherUser);
 
-        assertThat(userService.findByName(NAME)).hasSize(2);
+        assertThat(userService.findByName(LONGIN_USER.getName())).hasSize(2);
     }
 
     @Test

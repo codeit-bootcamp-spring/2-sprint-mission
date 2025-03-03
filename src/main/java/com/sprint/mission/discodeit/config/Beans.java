@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
@@ -18,10 +18,10 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BeanFactory {
-    private final Map<Class<?>, Object> beanFactory = new HashMap<>();
+public class Beans {
+    private final Map<Class<?>, Object> beans = new HashMap<>();
 
-    public BeanFactory() {
+    public Beans() {
         saveBean(UserRepository.class, new JCFUserRepository());
         saveBean(ChannelRepository.class, new JCFChannelRepository());
         saveBean(MessageRepository.class, new JCFMessageRepository());
@@ -38,10 +38,14 @@ public class BeanFactory {
     }
 
     private <T> void saveBean(Class<T> clazz, T instance) {
-        beanFactory.put(clazz, instance);
+        beans.put(clazz, instance);
     }
 
     public <T> T findBean(Class<T> clazz) {
-        return clazz.cast(beanFactory.get(clazz));
+        return clazz.cast(beans.get(clazz));
+    }
+
+    public Map<Class<?>, Object> getBeans() {
+        throw new UnsupportedOperationException("[ERROR] 빈 저장소는 실행도중 꺼낼 수 없습니다.");
     }
 }
