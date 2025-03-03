@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFChannelRepository implements ChannelRepository {
-    private static final Map<UUID, Channel> channels = new LinkedHashMap<>();
+    private final Map<UUID, Channel> channels = new LinkedHashMap<>();
 
     @Override
     public Channel save(Channel channel) {

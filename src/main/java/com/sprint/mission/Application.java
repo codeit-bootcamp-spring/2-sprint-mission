@@ -1,6 +1,6 @@
 package com.sprint.mission;
 
-import static com.sprint.mission.discodeit.view.InputView.readUserChoice;
+import static com.sprint.mission.discodeit.view.InputView.readCommand;
 import static com.sprint.mission.discodeit.view.OutputView.printHello;
 import static com.sprint.mission.discodeit.view.OutputView.printServer;
 
@@ -27,13 +27,13 @@ public class Application {
             printServer((beanFactory.findBean(ChannelController.class)).findAll(), loginUser, currentChannelMessages, currentChannel);
 
             try {
-                currentChannel = ChannelCommand.fromNumber(readUserChoice())
+                currentChannel = ChannelCommand.fromNumber(readCommand())
                         .execute((beanFactory.findBean(ChannelController.class)), (beanFactory.findBean(MessageController.class)), loginUser, currentChannel);
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
             if (currentChannel == null) {
-                break;
+               break;
             }
         }
     }

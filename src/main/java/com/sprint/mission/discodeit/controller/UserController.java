@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.service.UserService;
+import java.util.List;
 
 public class UserController {
     private final UserService userService;
@@ -13,5 +14,9 @@ public class UserController {
 
     public UserDto register(UserRegisterDto userRegisterDto){
         return userService.register(userRegisterDto);
+    }
+
+    public List<UserDto> findAll(){
+        return userService.findAll();
     }
 }

@@ -22,20 +22,22 @@ public class BeanFactory {
     private final Map<Class<?>, Object> beanFactory = new HashMap<>();
 
     public BeanFactory() {
-        put(UserRepository.class, new JCFUserRepository());
-        put(ChannelRepository.class, new JCFChannelRepository());
-        put(MessageRepository.class, new JCFMessageRepository());
+        saveBean(UserRepository.class, new JCFUserRepository());
+        saveBean(ChannelRepository.class, new JCFChannelRepository());
+        saveBean(MessageRepository.class, new JCFMessageRepository());
 
-        put(UserService.class, new JCFUserService(findBean(UserRepository.class)));
-        put(MessageService.class, new JCFMessageService(findBean(MessageRepository.class), findBean(UserService.class)));
-        put(ChannelService.class, new JCFChannelService(findBean(ChannelRepository.class), findBean(UserService.class)));
+        saveBean(UserService.class, new JCFUserService(findBean(UserRepository.class)));
+        saveBean(MessageService.class,
+                new JCFMessageService(findBean(MessageRepository.class), findBean(UserService.class)));
+        saveBean(ChannelService.class,
+                new JCFChannelService(findBean(ChannelRepository.class), findBean(UserService.class)));
 
-        put(UserController.class, new UserController(findBean(UserService.class)));
-        put(MessageController.class, new MessageController(findBean(MessageService.class)));
-        put(ChannelController.class, new ChannelController(findBean(ChannelService.class)));
+        saveBean(UserController.class, new UserController(findBean(UserService.class)));
+        saveBean(MessageController.class, new MessageController(findBean(MessageService.class)));
+        saveBean(ChannelController.class, new ChannelController(findBean(ChannelService.class)));
     }
 
-    private <T> void put(Class<T> clazz, T instance) {
+    private <T> void saveBean(Class<T> clazz, T instance) {
         beanFactory.put(clazz, instance);
     }
 
