@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.application.MessageDto;
+import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.infra.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -23,24 +24,21 @@ public class JCFMessageService implements MessageService {
                 new Message(context, channelId, userId)
         );
 
-        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(),
-                userService.findById(userId));
+        return toDto(message);
     }
 
     @Override
     public MessageDto findById(UUID id) {
         Message message = messageRepository.findById(id);
 
-        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(),
-                userService.findById(message.getUserId()));
+        return toDto(message);
     }
 
     @Override
     public List<MessageDto> findAll() {
         return messageRepository.findAll()
                 .stream()
-                .map(message -> new MessageDto(message.getId(), message.getContext(), message.getChannelId(),
-                        userService.findById(message.getUserId())))
+                .map(this::toDto)
                 .toList();
     }
 
@@ -49,8 +47,7 @@ public class JCFMessageService implements MessageService {
         return messageRepository.findAll()
                 .stream()
                 .filter(message -> message.getChannelId().equals(channelId))
-                .map(message -> new MessageDto(message.getId(), message.getContext(), message.getChannelId(),
-                        userService.findById(message.getUserId())))
+                .map(this::toDto)
                 .toList();
     }
 
@@ -62,5 +59,10 @@ public class JCFMessageService implements MessageService {
     @Override
     public void delete(UUID id) {
         messageRepository.delete(id);
+    }
+
+    private MessageDto toDto(Message message) {
+        UserDto user = userService.findById(message.getUserId());
+        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(), user);
     }
 }

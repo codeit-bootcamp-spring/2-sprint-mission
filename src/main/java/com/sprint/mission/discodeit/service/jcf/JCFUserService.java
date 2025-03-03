@@ -21,21 +21,19 @@ public class JCFUserService implements UserService {
                 new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password())
         );
 
-        return new UserDto(savedUser.getId(), savedUser.getName());
+        return toDto(savedUser);
     }
 
     @Override
     public UserDto findById(UUID id) {
-        User user = userRepository.findById(id);
-
-        return new UserDto(user.getId(), user.getName());
+        return toDto(userRepository.findById(id));
     }
 
     @Override
     public List<UserDto> findByName(String name) {
         return userRepository.findByName(name)
                 .stream()
-                .map(user -> new UserDto(user.getId(), user.getName()))
+                .map(this::toDto)
                 .toList();
     }
 
@@ -43,15 +41,21 @@ public class JCFUserService implements UserService {
     public List<UserDto> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> new UserDto(user.getId(), user.getName()))
+                .map(this::toDto)
                 .toList();
     }
 
     @Override
     public UserDto findByEmail(String email) {
-        User user = userRepository.findByEmail(email);
+        return toDto(userRepository.findByEmail(email));
+    }
 
-        return new UserDto(user.getId(), user.getName());
+    @Override
+    public List<UserDto> findAllByIds(List<UUID> userIds) {
+        return userIds
+                .stream()
+                .map(this::findById)
+                .toList();
     }
 
     @Override
@@ -62,5 +66,9 @@ public class JCFUserService implements UserService {
     @Override
     public void delete(UUID id) {
         userRepository.delete(id);
+    }
+
+    private UserDto toDto(User user) {
+        return new UserDto(user.getId(), user.getName());
     }
 }

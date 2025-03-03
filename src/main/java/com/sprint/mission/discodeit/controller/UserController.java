@@ -12,11 +12,11 @@ public class UserController {
         this.userService = userService;
     }
 
-    public UserDto register(UserRegisterDto userRegisterDto){
+    public UserDto register(UserRegisterDto userRegisterDto) {
         return userService.register(userRegisterDto);
     }
 
-    public List<UserDto> findAll(){
+    public List<UserDto> findAll() {
         return userService.findAll();
     }
 }

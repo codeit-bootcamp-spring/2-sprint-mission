@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
+import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_ACCESS_DENIED_TO_BEAN_STORAGE;
+
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
 import com.sprint.mission.discodeit.controller.UserController;
@@ -46,6 +48,6 @@ public class Beans {
     }
 
     public Map<Class<?>, Object> getBeans() {
-        throw new UnsupportedOperationException("[ERROR] 빈 저장소는 실행도중 꺼낼 수 없습니다.");
+        throw new UnsupportedOperationException(ERROR_ACCESS_DENIED_TO_BEAN_STORAGE.getMessageContent());
     }
 }

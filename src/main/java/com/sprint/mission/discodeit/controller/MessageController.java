@@ -16,7 +16,7 @@ public class MessageController {
         return messageService.create(context, chanelId, userId);
     }
 
-    public List<MessageDto> findByChannelId(UUID channelId){
+    public List<MessageDto> findByChannelId(UUID channelId) {
         return messageService.findByChannelId(channelId);
     }
 }
