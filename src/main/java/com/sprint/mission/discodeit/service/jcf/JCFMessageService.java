@@ -10,57 +10,60 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFMessageService implements MessageService {
-    private final ConcurrentHashMap<UUID, Message> data;
-    private final UserService userService;
+    private final Map<UUID, Message> data;
+    //
     private final ChannelService channelService;
+    private final UserService userService;
 
-    public JCFMessageService(UserService userService, ChannelService channelService) {
-        this.data = new ConcurrentHashMap<>();
-        this.userService = userService;
+    public JCFMessageService(ChannelService channelService, UserService userService) {
+        this.data = new HashMap<>();
         this.channelService = channelService;
+        this.userService = userService;
     }
 
     @Override
-    public Message createMessage(UUID userId, UUID channelId, String message) {
-        if(userService.readUser(userId) == null) {
-            throw new IllegalArgumentException("User not found");
+    public Message create(String content, UUID channelId, UUID authorId) {
+        try {
+            channelService.find(channelId);
+            userService.find(authorId);
+        } catch (NoSuchElementException e) {
+            throw e;
         }
-        if(channelService.readChannel(channelId) == null) {
-            throw new IllegalArgumentException("Channel not found");
+
+        Message message = new Message(content, channelId, authorId);
+        this.data.put(message.getId(), message);
+
+        return message;
+    }
+
+    @Override
+    public Message find(UUID messageId) {
+        Message messageNullable = this.data.get(messageId);
+
+        return Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+    }
+
+    @Override
+    public List<Message> findAll() {
+        return this.data.values().stream().toList();
+    }
+
+    @Override
+    public Message update(UUID messageId, String newContent) {
+        Message messageNullable = this.data.get(messageId);
+        Message message = Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
+
+        return message;
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        if (!this.data.containsKey(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
-        Message newMessage = new Message(userId,channelId,message);
-        data.put(newMessage.getId(), newMessage);
-        return newMessage;
-    }
-
-    @Override
-    public Message readMessage(UUID id) {
-        return data.get(id);
-    }
-
-    @Override
-    public List<Message> readAllMessages() {
-        return new ArrayList<>(data.values());
-    }
-
-    @Override
-    public Message updateMessage(UUID id, Message message) {
-        if(data.containsKey(id)) {
-            Message existingMessage = data.get(id);
-            if(userService.readUser(existingMessage.getUserId()) == null) {
-                throw new IllegalArgumentException("User not found");
-            }
-            if(channelService.readChannel(existingMessage.getChannelId()) == null) {
-                throw new IllegalArgumentException("Channel not found");
-            }
-            existingMessage.update(message.getMessage());
-            return existingMessage;
-        }
-        return null;
-    }
-
-    @Override
-    public void deleteMessage(UUID id) {
-        data.remove(id);
+        this.data.remove(messageId);
     }
 }

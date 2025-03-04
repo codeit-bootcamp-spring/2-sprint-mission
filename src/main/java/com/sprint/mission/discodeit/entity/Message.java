@@ -1,33 +1,60 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.time.Instant;
 import java.util.UUID;
 
-public class Message extends Common{
-    private final UUID userId;
-    private final UUID channelId;
-    private String message;
+public class Message {
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
 
-    public Message(UUID userId, UUID channelId, String message) {
-        super();
-        this.userId = userId;
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.content = content;
         this.channelId = channelId;
-        this.message = message;
+        this.authorId = authorId;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UUID getId() {
+        return id;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getContent() {
+        return content;
     }
 
     public UUID getChannelId() {
         return channelId;
     }
 
-    public String getMessage() {
-        return message;
+    public UUID getAuthorId() {
+        return authorId;
     }
 
-    public void update(String message){
-        this.message = message;
-        updateUpdatedAt();
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }

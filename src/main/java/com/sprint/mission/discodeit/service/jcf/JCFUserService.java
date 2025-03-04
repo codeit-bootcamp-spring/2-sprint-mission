@@ -12,35 +12,42 @@ public class JCFUserService implements UserService {
         this.data = new HashMap<>();
     }
 
-
     @Override
-    public User createUser(User user) {
-        data.put(user.getId(), user);
+    public User create(String username, String email, String password) {
+        User user = new User(username, email, password);
+        this.data.put(user.getId(), user);
+
         return user;
     }
 
     @Override
-    public User readUser(UUID id) {
-        return data.get(id);
+    public User find(UUID userId) {
+        User userNullable = this.data.get(userId);
+
+        return Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
     @Override
-    public List<User> readAllUsers() {
-        return new ArrayList<>(data.values());
+    public List<User> findAll() {
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public User updateUser(UUID id, User user) {
-        if(data.containsKey(id)) {
-            User exisingUser = data.get(id);
-            exisingUser.update(user.getName());
-            return exisingUser;
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User userNullable = this.data.get(userId);
+        User user = Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        user.update(newUsername, newEmail, newPassword);
+
+        return user;
+    }
+
+    @Override
+    public void delete(UUID userId) {
+        if (!this.data.containsKey(userId)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
         }
-        return null;
-    }
-
-    @Override
-    public void deleteUser(UUID id) {
-        data.remove(id);
+        this.data.remove(userId);
     }
 }

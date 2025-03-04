@@ -1,19 +1,67 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User  extends Common{
-    private String name;
+import java.time.Instant;
+import java.util.UUID;
 
-    public User(String name){
-        super();
-        this.name = name;
+public class User {
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String username;
+    private String email;
+    private String password;
+
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
-    public String getName() {
-        return name;
+    public UUID getId() {
+        return id;
     }
 
-    public void update(String name){
-        this.name = name;
-        updateUpdatedAt();
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }
