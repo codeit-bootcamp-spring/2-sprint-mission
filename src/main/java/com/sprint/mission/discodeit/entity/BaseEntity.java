@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public class BaseEntity {
@@ -9,8 +10,7 @@ public class BaseEntity {
 
     public BaseEntity() {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
+        this.createdAt = Instant.now().getEpochSecond();
     }
 
     public UUID getId() {
@@ -25,7 +25,11 @@ public class BaseEntity {
         return updatedAt;
     }
 
+    protected void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public void update() {
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now().getEpochSecond();
     }
 }

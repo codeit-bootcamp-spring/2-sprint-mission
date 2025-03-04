@@ -3,15 +3,20 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class Message extends BaseEntity{
+    private String content;
     private UUID userId;
     private UUID channelId;
-    private String content;
 
-    public Message(UUID userId, UUID channelId, String content) {
+    public Message(String content, UUID userId, UUID channelId) {
         super();
+        this.content = content;
         this.userId = userId;
         this.channelId = channelId;
-        this.content = content;
+
+    }
+
+    public String getContent() {
+        return content;
     }
 
     public UUID getUserId() {
@@ -22,7 +27,14 @@ public class Message extends BaseEntity{
         return channelId;
     }
 
-    public String getContent() {
-        return content;
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.update();
+        }
     }
 }

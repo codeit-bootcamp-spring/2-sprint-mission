@@ -1,39 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 public class Channel extends BaseEntity {
+    private ChannelType type;
     private String channelName;
-    private List<UUID> channelUser;
-    private List<UUID> channelMessage;
+    private String description;
 
-    public Channel(String channelName) {
+    public Channel(ChannelType type, String channelName, String description) {
         super();
+        this.type = type;
         this.channelName = channelName;
-        this.channelUser = new ArrayList<>();
-        this.channelMessage = new ArrayList<>();
+        this.description = description;
+    }
+
+    public ChannelType getType() {
+        return type;
     }
 
     public String getChannelName() {
         return channelName;
     }
 
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
-        update();
+    public String getDescription() {
+        return description;
     }
 
-    public List<UUID> getChannelUser() {
-        return channelUser;
-    }
-
-    public int getChannelUserCount() {
-        return channelUser.size();
-    }
-
-    public List<UUID> getChannelMessage() {
-        return channelMessage;
+    public void update(String newChannelName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newChannelName != null && !newChannelName.equals(this.channelName)) {
+            this.channelName = newChannelName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.update();
+        }
     }
 }

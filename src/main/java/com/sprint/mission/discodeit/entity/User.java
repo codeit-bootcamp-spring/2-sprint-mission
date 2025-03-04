@@ -16,26 +16,30 @@ public class User extends BaseEntity {
         return userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-        update();
-    }
-
     public String getUserEmail() {
         return userEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-        update();
     }
 
     public String getUserPassword() {
         return userPassword;
     }
 
-    public void setUserPassword(String userPassword) {
-        this.userPassword = userPassword;
-        update();
+    public void update(String newUserName, String newUserEmail, String newUserPassword) {
+        boolean anyValueUpdated = false;
+        if (newUserName != null && !newUserName.equals(this.userName)) {
+            this.userName = newUserName;
+            anyValueUpdated = true;
+        }
+        if (newUserEmail != null && !newUserEmail.equals(this.userEmail)) {
+            this.userEmail = newUserEmail;
+            anyValueUpdated = true;
+        }
+        if (newUserPassword != null && !newUserPassword.equals(this.userPassword)) {
+            this.userPassword = newUserPassword;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.update();
+        }
     }
 }
