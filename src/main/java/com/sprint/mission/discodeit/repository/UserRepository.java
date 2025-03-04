@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.*;
 
 public class UserRepository {
-    private final Set<User> users = new HashSet<>();
+    private final Map<UUID, User> users = new HashMap<>();
 
     private static class SingletonHolder {
         private static final UserRepository INSTANCE = new UserRepository();
@@ -17,7 +17,7 @@ public class UserRepository {
         return SingletonHolder.INSTANCE;
     }
 
-    public Set<User> getUsers() {
+    public Map<UUID, User> getUsers() {
         return this.users;
     }
 
@@ -25,23 +25,28 @@ public class UserRepository {
         if (newUser == null) {
             throw new IllegalArgumentException("newUser 는 null 이 될 수 없습니다!!!");
         }
-        this.users.add(newUser);        // Set 은 add 과정에서 중복을 처리한다.이때 내부적으로 equals()와 hashcode()를 활용하기 때문에
-    }                                   // User 클래스에서 equals()와 hashcode()를 오버라이드 하면 중복을 처리하며 add를 수행한다.
+        this.users.put(newUser.getId(), newUser);
+    }
 
-    public User findUserById(UUID userId) {
+    public boolean existUser(UUID userId) {
         if (userId == null) {
             throw new IllegalArgumentException("null값을 가지는 userId가 들어왔습니다!!!");
         }
-        return  this.users.stream()
-                    .filter(user -> Objects.equals(user.getId(), userId))
-                    .findFirst().orElseThrow(() -> new IllegalArgumentException("해당 userId를 가진 User 를 찾을 수 없습니다!!!"));
+        return users.containsKey(userId);
+    }
+
+    public User findUserById(UUID userId) {
+        if (!existUser(userId)) {
+            throw new NoSuchElementException("해당 userId를 가진 사용자를 찾을 수 없습니다 : " + userId);
+        }
+        return this.users.get(userId);
     }
 
     // id가 유효하지 않을 때의 예외처리?
     public void deleteUser(UUID userId) {
-        boolean removed = this.users.removeIf(user -> Objects.equals(user.getId(), userId));
-        if (!removed) {
-            throw new IllegalArgumentException("삭제할 id를 가진 사용자가 존재하지 않습니다!!!");
+        if (!existUser(userId)) {
+            throw new NoSuchElementException("해당 userId를 가진 사용자를 찾을 수 없습니다 : " + userId);
         }
+        this.users.remove(userId);
     }
 }

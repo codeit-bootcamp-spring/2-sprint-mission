@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
@@ -22,30 +22,26 @@ public class JCFUserService implements UserService {
 
     @Override
     public User readUser(UUID userId) {
-        UserService.validateUserId(userId, this.userRepository);        // 아래 코드와 중복되는 코드 존재.
         return userRepository.findUserById(userId);
     }
 
     @Override
-    public Set<User> readAllUsers() {
+    public Map<UUID, User> readAllUsers() {
         return userRepository.getUsers();
     }
 
     @Override
     public void updateUserName(UUID userId, String newUserName) {
-        UserService.validateUserId(userId, this.userRepository);
         readUser(userId).updateUserName(newUserName);
     }
 
     @Override
     public void updatePassword(UUID userId, String newPassword) {
-        UserService.validateUserId(userId, this.userRepository);
         readUser(userId).updateUserPassword(newPassword);
     }
 
     @Override
     public void deleteUser(UUID userId) {
-        UserService.validateUserId(userId, this.userRepository);
         userRepository.deleteUser(userId);
     }
 }
