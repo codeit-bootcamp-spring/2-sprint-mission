@@ -13,7 +13,7 @@ public interface UserService {
     void updatePassword(UUID id, String newPassword);
     void deleteUser(UUID id);
     static void validateUserId(UUID userId, UserRepository userRepository) {
-        if (!userRepository.existUser(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("해당 userId를 가진 사용자를 찾을 수 없습니다 : " + userId);
         }
     }

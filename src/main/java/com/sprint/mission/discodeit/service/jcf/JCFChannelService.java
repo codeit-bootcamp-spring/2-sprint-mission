@@ -28,17 +28,17 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void createChannel(String channelName) {
         Channel newChannel = new Channel(channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
-        channelRepository.addChannel(newChannel);
+        channelRepository.add(newChannel);
     }
 
     @Override
     public Channel readChannel(UUID channelId) {
-        return this.channelRepository.findChannelById(channelId);
+        return this.channelRepository.findById(channelId);
     }
 
     @Override
     public Map<UUID, Channel> readAllChannels() {
-        return channelRepository.getChannels();
+        return channelRepository.getAll();
     }
 
     @Override
@@ -59,6 +59,6 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID channelId) {
-        channelRepository.deleteChannel(channelId);
+        channelRepository.deleteById(channelId);
     }
 }

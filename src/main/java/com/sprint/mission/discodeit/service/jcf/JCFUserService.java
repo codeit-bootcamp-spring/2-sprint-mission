@@ -17,17 +17,17 @@ public class JCFUserService implements UserService {
     @Override
     public void createUser(String userName, String userEmail, String password) {
         User newUser = new User(userName, userEmail, password); //각 요소에 대한 유효성 검증은 User 생성자에게 맡긴다
-        this.userRepository.addUser(newUser);
+        this.userRepository.add(newUser);
     }
 
     @Override
     public User readUser(UUID userId) {
-        return userRepository.findUserById(userId);
+        return userRepository.findById(userId);
     }
 
     @Override
     public Map<UUID, User> readAllUsers() {
-        return userRepository.getUsers();
+        return userRepository.getAll();
     }
 
     @Override
@@ -42,6 +42,6 @@ public class JCFUserService implements UserService {
 
     @Override
     public void deleteUser(UUID userId) {
-        userRepository.deleteUser(userId);
+        userRepository.deleteById(userId);
     }
 }

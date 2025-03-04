@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 
 import java.util.*;
 
-public class ChannelRepository {
+public class ChannelRepository implements Repository<Channel> {
     private final Map<UUID, Channel> channels = new HashMap<>();
 
     private static class SingletonHolder {
@@ -18,36 +18,42 @@ public class ChannelRepository {
         return SingletonHolder.INSTANCE;
     }
 
-    public Map<UUID, Channel> getChannels() {
-        return channels;
-    }
 
-    public void addChannel(Channel channel) {
+    @Override
+    public void add(Channel channel) {
         this.channels.put(channel.getId(), channel);
     }
 
-    public boolean existsChannel(UUID channelId) {
+    @Override
+    public boolean existsById(UUID channelId) {
         if (channelId == null) {
             throw new IllegalArgumentException("null값을 가지는 channelId가 들어왔습니다!!!");
         }
         return channels.containsKey(channelId);
     }
 
-    public Channel findChannelById(UUID channelId) {
-        if (!existsChannel(channelId)) {
+    @Override
+    public Channel findById(UUID channelId) {
+        if (!existsById(channelId)) {
             throw new NoSuchElementException("해당 channelId를 가진 채널이 존재하지 않습니다 : " + channelId);
         }
         return channels.get(channelId);
     }
 
-    public void addParticipant(UUID channelId, User newParticipant) {
-        findChannelById(channelId).addParticipant(newParticipant);
+    @Override
+    public Map<UUID, Channel> getAll() {
+        return channels;
     }
 
-    public void deleteChannel(UUID channelId) {
-        if (!existsChannel(channelId)) {
+    @Override
+    public void deleteById(UUID channelId) {
+        if (!existsById(channelId)) {
             throw new NoSuchElementException("해당 channelId를 가진 채널이 존재하지 않습니다 : " + channelId);
         }
         channels.remove(channelId);
+    }
+
+    public void addParticipant(UUID channelId, User newParticipant) {
+        findById(channelId).addParticipant(newParticipant);
     }
 }

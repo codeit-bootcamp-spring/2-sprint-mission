@@ -16,7 +16,7 @@ public interface ChannelService {
     void addChannelParticipant(UUID channelId, User newParticipant);
     void deleteChannel(UUID channelId);
     static void validateChannelId(UUID channelId, ChannelRepository channelRepository) {
-        if (!channelRepository.existsChannel(channelId)) {
+        if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("해당 channelId를 가진 채널이 존재하지 않습니다 : " + channelId);
         }
     }

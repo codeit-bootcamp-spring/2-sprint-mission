@@ -29,26 +29,26 @@ public class JCFMessageService implements MessageService {
         UserService.validateUserId(sender.getId(), this.userRepository);
         ChannelService.validateChannelId(channel.getId(), this.channelRepository);
         Message newMessage = new Message(sender, content, channel);     //content에 대한 유효성 검증은 Message 생성자에게 맡긴다.
-        messageRepository.addMessage(newMessage);
+        messageRepository.add(newMessage);
     }
 
     @Override
     public Message readMessage(UUID messageId) {
-        return messageRepository.findMessageByMessageId(messageId);
+        return messageRepository.findById(messageId);
     }
 
     @Override
     public Map<UUID, Message> readAllMessages() {
-        return messageRepository.getMessages();
+        return messageRepository.getAll();
     }
 
     @Override
     public void updateMessageContent(UUID messageId, String content) {
-        messageRepository.findMessageByMessageId(messageId).updateContent(content);
+        messageRepository.findById(messageId).updateContent(content);
     }
 
     @Override
     public void deleteMessage(UUID messageId) {
-        messageRepository.deleteMessage(messageId);
+        messageRepository.deleteById(messageId);
     }
 }
