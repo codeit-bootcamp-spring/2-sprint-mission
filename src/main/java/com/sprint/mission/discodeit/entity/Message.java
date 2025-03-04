@@ -25,6 +25,10 @@ public class Message extends BaseEntity {
         return channelUUID;
     }
 
+    public String getContent() {
+        return content;
+    }
+
     @Override
     public String toString() {
         return "Message{" +

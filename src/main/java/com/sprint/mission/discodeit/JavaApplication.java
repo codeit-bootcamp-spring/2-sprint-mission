@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -60,9 +61,9 @@ public class JavaApplication {
                         case 2:
                             channelToken = selectChannel(jcfChannelService);
                             if (channelToken == null) break;
-                            System.out.println("채널 조회 성공");
-                            //showChannelMessages()
-                            break;
+                            jcfMessageService.findMessageByChannelId(channelToken);
+
+                            sendMessageByChannel(jcfMessageService, channelToken, userToken);
                         case 3:
                             break;
                     }
@@ -230,5 +231,14 @@ public class JavaApplication {
         Channel channel = jcfChannelService.findChannel(channelUUID);
         if (channel == null) return null;
         return channel.getId();
+    }
+
+    private static void sendMessageByChannel(JCFMessageService jcfMessageService, UUID channelUUID, UUID userUUID) {
+        while (true) {
+            System.out.println("------ 메세지 보내기 ------");
+            String content = sc.nextLine();
+            if(content.equalsIgnoreCase("EXIT")) return;
+            jcfMessageService.sendMessage(channelUUID, userUUID, content);
+        }
     }
 }

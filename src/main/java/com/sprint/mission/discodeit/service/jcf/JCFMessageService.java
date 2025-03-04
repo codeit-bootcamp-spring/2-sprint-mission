@@ -12,9 +12,6 @@ public class JCFMessageService implements MessageService {
     private final JCFChannelService jcfChannelService;
     private static JCFMessageService getInstance;
 
-    private final Map<UUID, List<Message>> messageOfChannel = data.stream()
-            .collect(Collectors.groupingBy(Message::getChannelUUID));
-
     private JCFMessageService(JCFUserService jcfUserService, JCFChannelService jcfChannelService) {
         this.jcfUserService = jcfUserService;
         this.jcfChannelService = jcfChannelService;
@@ -40,6 +37,7 @@ public class JCFMessageService implements MessageService {
 
         Message message = new Message(channelUUID, userUUID, content);
         data.add(message);
+
         System.out.println("메세지 전송 성공" + message);
     }
 
@@ -79,7 +77,12 @@ public class JCFMessageService implements MessageService {
             return;
         }
 
-        messageOfChannel.get(channelUUID).forEach(message -> System.out.println(message.toString()));
+        data.stream()
+                .filter(message -> message.getChannelUUID().equals(channelUUID))
+                .forEach(message -> {
+                    System.out.println(jcfUserService.findByUser(message.getUserUUID()).getNickname());
+                    System.out.println(message.getContent());
+                });
     }
 
     @Override

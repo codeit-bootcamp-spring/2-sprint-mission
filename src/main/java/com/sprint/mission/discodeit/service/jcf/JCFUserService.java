@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
@@ -91,7 +92,6 @@ public class JCFUserService implements UserService {
             System.out.println("[실패]비밀번호가 일치하지 않습니다.");
             return null;
         }
-        ;
 
         System.out.println("[성공] 로그인 완료");
         return userInfo.getId();
