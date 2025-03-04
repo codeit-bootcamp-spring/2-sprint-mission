@@ -28,24 +28,16 @@ public class JavaApplication {
             sc.nextLine();
             switch (initPage) {
                 case 1:
-                    System.out.print("유저 아이디 입력: ");
-                    UUID userUUID = UUID.fromString(sc.nextLine());
-                    System.out.print("비밀번호 입력: ");
-                    String password = sc.nextLine();
-                    userToken = jcfUserService.login(userUUID, password);
+                    userToken = loginPage(jcfUserService);
                     break;
                 case 2:
-                    System.out.print("닉네임 입력: ");
-                    String nickname = sc.nextLine();
-                    System.out.print("비밀번호 입력: ");
-                    String savePassword = sc.nextLine();
-                    jcfUserService.save(nickname, savePassword);
+                    joinPage(jcfUserService);
                     break;
             }
             if (userToken == null) continue;
 
             System.out.println(" ======== 메뉴 ======== ");
-            System.out.println("1. 등록 \n2. 조회(다건, 단건)\n3. 수정 \n4. 삭제 \n5. 로그아웃 \n6. 나가기");
+            System.out.println("1. 등록\n2. 조회(다건, 단건)\n3. 수정 \n4. 삭제 \n5. 로그아웃 \n6. 나가기");
             System.out.print("입력란: ");
 
             int num = sc.nextInt();
@@ -54,24 +46,17 @@ public class JavaApplication {
             switch (num) {
                 case 1:
                     System.out.println("===등록===");
-                    System.out.println("1. 회원 가입\n2. 채널 개설\n3. 메세지 보내기\n4. 메뉴로 돌아가기");
+                    System.out.println("1. 채널 개설\n2. 메세지 보내기\n3. 메뉴로 돌아가기");
                     System.out.print("입력란: ");
                     int createNum = sc.nextInt();
                     sc.nextLine();
                     switch (createNum) {
                         case 1:
-                            System.out.print("닉네임 입력: ");
-                            String nickname = sc.nextLine();
-                            System.out.print("비밀번호 입력: ");
-                            String password = sc.nextLine();
-                            jcfUserService.save(nickname, password);
-                            break;
-                        case 2:
                             System.out.print("채널명 입력: ");
                             String channelName = sc.nextLine();
                             jcfChannelService.createChannel(channelName);
                             break;
-                        case 3:
+                        case 2:
                             System.out.print("채널 아이디 입력: ");
                             UUID channelUuid = UUID.fromString(sc.nextLine());
 
@@ -83,7 +68,7 @@ public class JavaApplication {
 
                             jcfMessageService.sendMessage(channelUuid, userUuid, message);
                             break;
-                        case 4:
+                        case 3:
                             break;
                     }
                     break;
@@ -217,5 +202,24 @@ public class JavaApplication {
                     run = false;
             }
         }
+    }
+
+    private static UUID loginPage(JCFUserService jcfUserService) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("유저 아이디 입력: ");
+        UUID userUUID = UUID.fromString(sc.nextLine());
+        System.out.print("비밀번호 입력: ");
+        String password = sc.nextLine();
+        UUID userToken = jcfUserService.login(userUUID, password);
+        return userToken;
+    }
+
+    private static void joinPage(JCFUserService jcfUserService) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("닉네임 입력: ");
+        String nickname = sc.nextLine();
+        System.out.print("비밀번호 입력: ");
+        String savePassword = sc.nextLine();
+        jcfUserService.save(nickname, savePassword);
     }
 }
