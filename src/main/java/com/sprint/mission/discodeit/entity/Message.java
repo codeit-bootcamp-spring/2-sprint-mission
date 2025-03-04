@@ -1,42 +1,60 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Message extends MainDomain {
-    private String message;
-    private final User user;
-    private final Channel channel;
+import java.time.Instant;
+import java.util.UUID;
 
+public class Message {
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
 
-
-    public Message(String message,  User user, Channel channel) {
-        super();
-        this.message = message;
-        this.user = user;
-        this.channel = channel;
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    public String getMessage() {
-        return message;
+    public UUID getId() {
+        return id;
     }
 
-    public User getUser() {
-        return user;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    public Channel getChannel() {
-        return channel;
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void updateMessage(String message) {
-        this.message = message;
-        update();
+    public String getContent() {
+        return content;
     }
 
-    @Override
-    public String toString() {
-        return "Message{" +
-                "message='" + message + '\'' +
-                ", user=" + user +
-                ", channel=" + channel +
-                '}';
+    public UUID getChannelId() {
+        return channelId;
+    }
+
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }
