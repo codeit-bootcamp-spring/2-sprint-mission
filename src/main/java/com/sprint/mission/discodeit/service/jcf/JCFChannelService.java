@@ -1,9 +1,14 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
     private volatile static JCFChannelService instance = null;
@@ -16,46 +21,49 @@ public class JCFChannelService implements ChannelService {
     public static JCFChannelService getInstance() {
         if (instance == null) {
             synchronized (JCFChannelService.class) {
-                if (instance == null)
+                if (instance == null) {
                     instance = new JCFChannelService();
+                }
             }
         }
+
         return instance;
     }
 
     @Override
-    public Channel createChannel(String name) {
-        Channel channel = new Channel(name);
+    public Channel create(ChannelType type, String name, String description) {
+        Channel channel = new Channel(type, name, description);
         data.put(channel.getId(), channel);
+
         return channel;
     }
 
     @Override
-    public Optional<Channel> getChannelById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+    public Channel findById(UUID channelId) {
+        return Optional.ofNullable(data.get(channelId))
+                .orElseThrow(() -> new NoSuchElementException(channelId + " 채널을 찾을 수 없습니다."));
     }
 
     @Override
-    public Optional<Channel> getChannelByName(String name) {
-        return data.values().stream()
-                .filter(channel -> channel.getName().equals(name))
-                .findFirst();
-    }
-
-    @Override
-    public List<Channel> getAllChannels() {
+    public List<Channel> findAll() {
         return data.values().stream().toList();
     }
 
     @Override
-    public void updateChannelName(UUID id, String name) {
-        if (data.containsKey(id)) {
-            data.get(id).updateName(name);
-        }
+    public Channel update(UUID channelId, String newName, String newDescription) {
+        Channel channelNullable = data.get(channelId);
+        Channel channel = Optional.ofNullable(channelNullable)
+                .orElseThrow(() -> new NoSuchElementException(channelId + " 채널을 찾을 수 없습니다."));
+        channel.update(newName, newDescription);
+
+        return channel;
     }
 
     @Override
-    public void deleteChannel(UUID id) {
-            data.remove(id);
+    public void delete(UUID channelId) {
+        if (!data.containsKey(channelId)) {
+            throw new NoSuchElementException(channelId + " 채널을 찾을 수 없습니다.");
+        }
+        data.remove(channelId);
     }
 }
