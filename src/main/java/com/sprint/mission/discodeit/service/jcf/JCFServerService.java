@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Factory.CreateChannalFactory;
-import com.sprint.mission.discodeit.Repository.ServerRepository;
-import com.sprint.mission.discodeit.Repository.impl.LinkedListServerRepository;
+import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
+import com.sprint.mission.discodeit.Repository.impl.LinkedListJCFServerRepository;
 import com.sprint.mission.discodeit.entity.Container.Channel;
 import com.sprint.mission.discodeit.entity.Container.Container;
 import com.sprint.mission.discodeit.service.ServerService;
@@ -11,7 +11,7 @@ import java.util.*;
 
 public class JCFServerService implements ServerService {
     private static JCFServerService instance;
-    private final Map<UUID, ServerRepository> serverTable = new HashMap<>();
+    private final Map<UUID, JCFServerRepository> serverTable = new HashMap<>();
 
     private JCFServerService() {
     }
@@ -23,14 +23,14 @@ public class JCFServerService implements ServerService {
         return instance;
     }
 
-    private ServerRepository getServerRepository(UUID id) {
-        ServerRepository serverRepository = serverTable.get(id);
-        if (serverRepository == null) {
-            LinkedListServerRepository repository = new LinkedListServerRepository();
+    private JCFServerRepository getServerRepository(UUID id) {
+        JCFServerRepository JCFServerRepository = serverTable.get(id);
+        if (JCFServerRepository == null) {
+            LinkedListJCFServerRepository repository = new LinkedListJCFServerRepository();
             serverTable.put(id, repository);
-            serverRepository = repository;
+            JCFServerRepository = repository;
         }
-        return serverRepository;
+        return JCFServerRepository;
     }
 
     @Override
@@ -40,9 +40,9 @@ public class JCFServerService implements ServerService {
 
     @Override
     public void addChannel(UUID id, String name) {
-        ServerRepository serverRepository = getServerRepository(id);
+        JCFServerRepository JCFServerRepository = getServerRepository(id);
         Channel channel = createChannel(name);
-        serverRepository.add(channel);
+        JCFServerRepository.add(channel);
 
         //로그
         System.out.println(channel.getName() + " 채널 추가 성공");
@@ -50,8 +50,8 @@ public class JCFServerService implements ServerService {
 
     @Override
     public void addChannel(UUID id, Channel channel) {
-        ServerRepository serverRepository = getServerRepository(id);
-        List<Container> list = serverRepository.getList();
+        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        List<Container> list = JCFServerRepository.getList();
         list.add(channel);
         //로그
         System.out.println(channel.getName() + " 채널 추가 성공");
@@ -59,8 +59,8 @@ public class JCFServerService implements ServerService {
 
     @Override
     public Channel getChannel(UUID id, String name) {
-        ServerRepository serverRepository = getServerRepository(id);
-        List<Container> list = serverRepository.getList();
+        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        List<Container> list = JCFServerRepository.getList();
         for (Container item : list) {
             if (item.getName().equals(name)) {
                 //로그
@@ -77,8 +77,8 @@ public class JCFServerService implements ServerService {
 
     @Override
     public void printChannel(UUID id) {
-        ServerRepository serverRepository = getServerRepository(id);
-        List<Container> list = serverRepository.getList();
+        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        List<Container> list = JCFServerRepository.getList();
         printChannel(list);
     }
 
@@ -93,8 +93,8 @@ public class JCFServerService implements ServerService {
 
     @Override
     public boolean removeChannel(UUID id) {
-        ServerRepository serverRepository = getServerRepository(id);
-        List<Container> list = serverRepository.getList();
+        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        List<Container> list = JCFServerRepository.getList();
         Scanner sc = new Scanner(System.in);
         System.out.print("삭제할 채널 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
@@ -103,8 +103,8 @@ public class JCFServerService implements ServerService {
 
     @Override
     public boolean removeChannel(UUID id, String targetName) {
-        ServerRepository serverRepository = getServerRepository(id);
-        List<Container> list = serverRepository.getList();
+        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        List<Container> list = JCFServerRepository.getList();
         return removeChannel(list, targetName);
     }
 
@@ -124,8 +124,8 @@ public class JCFServerService implements ServerService {
 
     @Override
     public boolean updateChannel(UUID id) {
-        ServerRepository serverRepository = getServerRepository(id);
-        List<Container> list = serverRepository.getList();
+        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        List<Container> list = JCFServerRepository.getList();
         Scanner sc = new Scanner(System.in);
         System.out.print("바꿀려고 하는 채널의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
@@ -134,8 +134,8 @@ public class JCFServerService implements ServerService {
 
     @Override
     public boolean updateChannel(UUID id, String targetName) {
-        ServerRepository serverRepository = getServerRepository(id);
-        List<Container> list = serverRepository.getList();
+        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        List<Container> list = JCFServerRepository.getList();
         Scanner sc = new Scanner(System.in);
         System.out.print("채널 이름을 무엇으로 바꾸시겠습니까? ");
         String replaceName = sc.nextLine();
@@ -144,8 +144,8 @@ public class JCFServerService implements ServerService {
 
     @Override
     public boolean updateChannel(UUID id, String targetName, String replaceName) {
-        ServerRepository serverRepository = getServerRepository(id);
-        List<Container> list = serverRepository.getList();
+        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        List<Container> list = JCFServerRepository.getList();
         return updateChannel(list, targetName, replaceName);
     }
 

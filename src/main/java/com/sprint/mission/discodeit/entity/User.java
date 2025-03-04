@@ -1,10 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.Repository.UserRepository;
-
-import java.util.UUID;
-
-
 public class User extends BaseEntity {
     private String password;
     private String name;
