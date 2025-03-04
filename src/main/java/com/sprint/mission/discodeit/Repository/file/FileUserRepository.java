@@ -43,9 +43,12 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void save(Server server) {
-        Path directory = Paths.get(System.getProperty("user.dir"), "data/person");
+        //디렉토리 체크 및 파일 경로 생성하기
+        Path directory = Paths.get(System.getProperty("user.dir"), "data/server");
         init(directory);
         Path filsPath = directory.resolve(server.getId().toString().concat(".ser"));
+
+        //해당 파일이 이미 만들어졌는지 체크하기
         try (FileOutputStream fos = new FileOutputStream(filsPath.toFile());
              ObjectOutputStream oos = new ObjectOutputStream(fos);) {
             oos.writeObject(server);

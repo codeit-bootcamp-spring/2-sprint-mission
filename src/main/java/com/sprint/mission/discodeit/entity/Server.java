@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
 
-public class Server extends BaseEntity {
+import java.io.Serializable;
+
+public class Server extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String name;
 
     public Server(String name) {

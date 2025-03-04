@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity {
+import java.io.Serializable;
+
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String password;
     private String name;
 
