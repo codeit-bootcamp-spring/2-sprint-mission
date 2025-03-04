@@ -50,19 +50,19 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void addServer(UUID id, String name) {
-        UserRepository JCFUserRepository = getUserRepository(id);
+    public void addServer(UUID userId, String name) {
+        UserRepository userRepository = getUserRepository(userId);
         Server server = createServer(name);
-        JCFUserRepository.save(server);
+        userRepository.save(server);
 
         //로그
         System.out.println(server.getName() + " 서버 추가 성공");
     }
 
     @Override
-    public void addServer(UUID id, Server server) {
-        UserRepository JCFUserRepository = getUserRepository(id);
-        List<Server> serverList = JCFUserRepository.getServerList();
+    public void addServer(UUID userId, Server server) {
+        UserRepository userRepository = getUserRepository(userId);
+        List<Server> serverList = userRepository.getServerList();
         serverList.add(server);
 
         //로그
@@ -70,8 +70,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public Server getServer(UUID id, String name) {
-        UserRepository JCFUserRepository = getUserRepository(id);
+    public Server getServer(UUID userId, String name) {
+        UserRepository JCFUserRepository = getUserRepository(userId);
         List<Server> list = JCFUserRepository.getServerList();
         for (Server server : list) {
             if (server.getName().equals(name)) {
@@ -86,8 +86,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void printServer(UUID id) {
-        UserRepository JCFUserRepository = getUserRepository(id);
+    public void printServer(UUID userId) {
+        UserRepository JCFUserRepository = getUserRepository(userId);
         List<Server> list = JCFUserRepository.getServerList();
         printServer(list);
     }
@@ -102,9 +102,13 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean removeServer(UUID id) {
-        UserRepository JCFUserRepository = getUserRepository(id);
-        List<Server> list = JCFUserRepository.getServerList();
+    public boolean removeServer(UUID userId) {
+        UserRepository userRepository = getUserRepository(userId);
+        List<Server> list = userRepository.getServerList();
+        if (list == null) {
+            System.out.println("서버 삭제 실패 : list null값");
+            return false;
+        }
         Scanner sc = new Scanner(System.in);
         System.out.print("삭제할 서버 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
@@ -113,14 +117,17 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean removeServer(UUID id, String targetName) {
-        UserRepository JCFUserRepository = getUserRepository(id);
+    public boolean removeServer(UUID userId, String targetName) {
+        UserRepository JCFUserRepository = getUserRepository(userId);
         List<Server> list = JCFUserRepository.getServerList();
+        if (list == null) {
+            System.out.println("서버 삭제 실패 : list null값");
+            return false;
+        }
         return removeServer(list, targetName);
     }
 
-    @Override
-    public boolean removeServer(List<Server> list, String targetName) {
+    private boolean removeServer(List<Server> list, String targetName) {
         for (Server server : list) {
             if (server.getName().equals(targetName)) {
                 //로그
@@ -134,9 +141,9 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean updateServer(UUID id) {
-        UserRepository JCFUserRepository = getUserRepository(id);
-        List<Server> list = JCFUserRepository.getServerList();
+    public boolean updateServer(UUID userId) {
+        UserRepository userRepository = getUserRepository(userId);
+        List<Server> list = userRepository.getServerList();
         Scanner sc = new Scanner(System.in);
         System.out.print("바꿀려고 하는 서버의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
@@ -146,8 +153,8 @@ public class JCFUserService implements UserService {
 
 
     @Override
-    public boolean updateServer(UUID id, String targetName) {
-        UserRepository JCFUserRepository = getUserRepository(id);
+    public boolean updateServer(UUID userId, String targetName) {
+        UserRepository JCFUserRepository = getUserRepository(userId);
         List<Server> list = JCFUserRepository.getServerList();
         Scanner sc = new Scanner(System.in);
         System.out.print("서버 이름을 무엇으로 바꾸시겠습니까? : ");
@@ -157,22 +164,21 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean updateServer(UUID id, String targetName, String replaceName) {
-        UserRepository JCFUserRepository = getUserRepository(id);
+    public boolean updateServer(UUID userId, String targetName, String replaceName) {
+        UserRepository JCFUserRepository = getUserRepository(userId);
         List<Server> list = JCFUserRepository.getServerList();
         return updateServer(list, targetName, replaceName);
     }
 
-    @Override
-    public boolean updateServer(List<Server> list, String targetName) {
+
+    private boolean updateServer(List<Server> list, String targetName) {
         Scanner sc = new Scanner(System.in);
         System.out.print("서버 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
         return updateServer(list, targetName, replaceName);
     }
 
-    @Override
-    public boolean updateServer(List<Server> list, String targetName, String replaceName) {
+    private boolean updateServer(List<Server> list, String targetName, String replaceName) {
         for (Server server : list) {
             if (server.getName().equals(targetName)) {
                 server.setName(replaceName);

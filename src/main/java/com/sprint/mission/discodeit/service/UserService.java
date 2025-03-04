@@ -28,16 +28,10 @@ public interface UserService {
 
     public abstract boolean removeServer(UUID userId, String targetName);
 
-    public abstract boolean removeServer(List<Server> list, String targetName);
-
     //업데이트
     public abstract boolean updateServer(UUID userId);
 
     public abstract boolean updateServer(UUID userId, String targetName);
-
-    public abstract boolean updateServer(List<Server> list, String targetName);
-
-    public abstract boolean updateServer(List<Server> list, String targetName, String replaceName);
 
     public abstract boolean updateServer(UUID userId, String targetName, String replaceName);
 

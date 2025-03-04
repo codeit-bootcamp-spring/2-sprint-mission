@@ -4,9 +4,7 @@ import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Server;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,7 +21,27 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<Server> getServerList() {
-        return serverList;
+        Path directory = Paths.get(System.getProperty("user.dir"), "data/server");
+        init(directory);
+
+        try {
+            List<Server> list = Files.list(directory)
+                    .map(path -> {
+                        try (FileInputStream fis = new FileInputStream(path.toFile());
+                             ObjectInputStream ois = new ObjectInputStream(fis)) {
+                            Server server = (Server) ois.readObject();
+                            return server;
+                        } catch (IOException | ClassNotFoundException e) {
+                            System.out.println("서버 찾기 메서드 실패");
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+            return list;
+        }catch (IOException e){
+            System.out.println("서버 찾기 메서드 중 리스트 생성 실패");
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
