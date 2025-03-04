@@ -18,11 +18,20 @@ public class FileUserService implements UserService, FileService<User> {
 
     private static UserService userService;
 
-    public static UserService getInstance() {
+    // UserService<User> 구현 객체 반환
+    public static UserService getInstanceOfUserService() {
         if (userService == null) {
             userService = new FileUserService();
         }
         return userService;
+    }
+
+    // FileService<User> 구현 객체 반환
+    public static FileService<User> getInstanceOfFileService() {
+        if (userService == null) {
+            userService = new FileUserService();
+        }
+        return (FileUserService) userService;
     }
 
     // =================================== 유저 생성 ===================================
@@ -156,6 +165,7 @@ public class FileUserService implements UserService, FileService<User> {
         } catch (IOException e) {
             System.out.println("유저 파일 삭제 실패: " + e.getMessage());
         }
+        data = loadFromFile(); // 데이터를 최신으로 유지
     }
 
     @Override
