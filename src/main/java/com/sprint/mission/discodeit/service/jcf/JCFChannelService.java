@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
@@ -32,18 +33,16 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel readChannel(UUID channelId) {
-        ChannelService.validateChannelId(channelId, this.channelRepository);    //이 부분 위의 코드와 동작이 중복되는 부분이 있다 (validateChannelId() 에서 findChannelById를 실행하므로)
-        return this.channelRepository.findChannelById(channelId);               //성능면에서는 위에서 null 체크만 하면 될 것 같은데, 일관성을 살리는 편이 좋은지??
+        return this.channelRepository.findChannelById(channelId);
     }
 
     @Override
-    public ArrayDeque<Channel> readAllChannels() {
+    public Map<UUID, Channel> readAllChannels() {
         return channelRepository.getChannels();
     }
 
     @Override
     public List<Message> readMessageListByChannelId(UUID channelId) {
-        ChannelService.validateChannelId(channelId, this.channelRepository);        // 아래코드와 중복되서 실행되는 코드
         return messageRepository.findMessageListByChannelId(channelId);
     }
 
@@ -53,15 +52,13 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void addChannelParticipant(UUID channelId, User newParticipant) {
-        ChannelService.validateChannelId(channelId, this.channelRepository);
+    public void addChannelParticipant(UUID channelId, User newParticipant) {        // channelId 검증은 channelRepository 에서 수행
         UserService.validateUserId(newParticipant.getId(), this.userRepository);
         channelRepository.addParticipant(channelId, newParticipant);
     }
 
     @Override
     public void deleteChannel(UUID channelId) {
-        ChannelService.validateChannelId(channelId, this.channelRepository);
         channelRepository.deleteChannel(channelId);
     }
 }
