@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Channel extends Common {
+public class Channel extends Common implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // 해당 채널의 주인
     private final User owner;

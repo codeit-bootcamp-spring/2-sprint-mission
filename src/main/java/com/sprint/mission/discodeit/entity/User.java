@@ -1,9 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
 import javax.management.relation.Role;
+import java.io.Serializable;
 import java.util.*;
 
-public class User extends Common{
+public class User extends Common implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     // 아이디 - 디스코드에서는 이메일 사용
     private final String username;
     // 비밀번호
@@ -85,8 +89,6 @@ public class User extends Common{
         messages.remove(message);
     }
 
-
-
     // 권한 추가
     public void addRole(String role) {
         roles.add(role);
@@ -96,6 +98,7 @@ public class User extends Common{
     public void removeRole(String role) {
         roles.remove(role);
     }
+
 
     @Override
     public String toString() {
