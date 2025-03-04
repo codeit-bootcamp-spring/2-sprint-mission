@@ -6,16 +6,24 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MessageRepository implements Repository<Message> {
-    private final HashMap<UUID, Message> messages = new LinkedHashMap<>();
+    private static volatile MessageRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
+    private final HashMap<UUID, Message> messages;
 
-    private static class SingletonHolder {
-        private static final MessageRepository INSTANCE = new MessageRepository();
+    private MessageRepository() {
+        messages = new LinkedHashMap<>();
     }
 
-    private MessageRepository() {}
-
     public static MessageRepository getInstance() {
-        return SingletonHolder.INSTANCE;
+        // 첫 번째 null 체크 (성능 최적화)
+        if (instance == null) {
+            synchronized (MessageRepository.class) {
+                // 두 번째 null 체크 (동기화 구간 안에서 중복 생성 방지)
+                if (instance == null) {
+                    instance = new MessageRepository();
+                }
+            }
+        }
+        return instance;
     }
 
     @Override

@@ -5,16 +5,24 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.*;
 
 public class UserRepository implements Repository<User> {
-    private final Map<UUID, User> users = new HashMap<>();
+    private static volatile UserRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
+    private final Map<UUID, User> users;
 
-    private static class SingletonHolder {
-        private static final UserRepository INSTANCE = new UserRepository();
+    private UserRepository() {
+        users = new HashMap<>();
     }
 
-    private UserRepository() {}
-
     public static UserRepository getInstance() {
-        return SingletonHolder.INSTANCE;
+        // 첫 번째 null 체크 (성능 최적화)
+        if (instance == null) {
+            synchronized (UserRepository.class) {
+                // 두 번째 null 체크 (동기화 구간 안에서 중복 생성 방지)
+                if (instance == null) {
+                    instance = new UserRepository();
+                }
+            }
+        }
+        return instance;
     }
 
     @Override
