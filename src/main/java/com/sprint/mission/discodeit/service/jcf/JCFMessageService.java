@@ -120,7 +120,7 @@ public class JCFMessageService implements MessageService {
         validateMessageId(messageId);
         Message message = messages.get(messageId);
         if (message == null) {
-            return null;
+            throw new MessageNotFoundException("해당 메세지 없음");
         }
         message.update(content);
 
