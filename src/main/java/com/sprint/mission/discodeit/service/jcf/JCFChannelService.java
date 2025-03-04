@@ -1,53 +1,53 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.ChannelEntity;
-import com.sprint.mission.discodeit.entity.MessageEntity;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
-public class JCFChannelService extends JCFBaseService<ChannelEntity> implements ChannelService{
+public class JCFChannelService implements ChannelService {
+    private final Map<UUID, Channel> data;
 
-    private final MessageService messageService; //채널 삭제 시 메시지도 삭제.
-
-    public JCFChannelService(MessageService messageService){
-        this.messageService = messageService;
+    public JCFChannelService() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public Optional<ChannelEntity> getChannelByName(String channelName){
-        return data.stream()
-                .filter(channel -> channel.getName().equalsIgnoreCase(channelName))
-                .findFirst();
+    public Channel create(ChannelType type, String name, String description) {
+        Channel channel = new Channel(type, name, description);
+        this.data.put(channel.getId(), channel);
 
+        return channel;
     }
 
     @Override
-    public void updateChannelName(String channelName, String newName) {
-        getChannelByName(channelName).ifPresent(channel -> channel.updateChannelName(newName));
+    public Channel find(UUID channelId) {
+        Channel channelNullable = this.data.get(channelId);
+        return Optional.ofNullable(channelNullable)
+                        .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
     }
 
     @Override
-    public void updateChannelType(String channelName, String newType) {
-        getChannelByName(channelName).ifPresent(channel -> channel.updateChannelType(newType));
+    public List<Channel> findAll() {
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public void deleteById(UUID channelId){
-        findById(channelId).ifPresent(channel -> {
-            delete(channel);
-        });
+    public Channel update(UUID channelId, String newName, String newDescription) {
+        Channel channelNullable = this.data.get(channelId);
+        Channel channel = Optional.ofNullable(channelNullable)
+                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+        channel.update(newName, newDescription);
+
+        return channel;
     }
 
     @Override
-    public void delete(ChannelEntity channel) {
-        List<MessageEntity> messagesToDelete = channel.getMessages();
-        messagesToDelete.forEach(messageService::delete);
-        messagesToDelete.clear();
-
-        data.remove(channel);
+    public void delete(UUID channelId) {
+        if (!this.data.containsKey(channelId)) {
+            throw new NoSuchElementException("Channel with id " + channelId + " not found");
+        }
+        this.data.remove(channelId);
     }
 }
