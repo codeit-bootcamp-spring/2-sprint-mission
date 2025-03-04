@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.Repository.impl;
+package com.sprint.mission.discodeit.Repository.jcf.impl;
 
 import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
 import com.sprint.mission.discodeit.entity.Container.Container;

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Factory.CreateServerFactory;
-import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.Repository.impl.LinkedListJCFUserRepository;
+import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -20,7 +20,7 @@ import java.util.*;
  */
 public class JCFUserService implements UserService {
     private static JCFUserService instance;
-    private final Map<UUID, JCFUserRepository> userTable = new HashMap<>();
+    private final Map<UUID, UserRepository> userTable = new HashMap<>();
 
     private JCFUserService() {
     }
@@ -34,14 +34,14 @@ public class JCFUserService implements UserService {
 
 
     //레포지토리 생성
-    private JCFUserRepository getUserRepository(UUID id) {
-        JCFUserRepository JCFUserRepository = userTable.get(id);
-        if (JCFUserRepository == null) {
-            JCFUserRepository repository = new LinkedListJCFUserRepository();
+    private UserRepository getUserRepository(UUID id) {
+        UserRepository userRepository = userTable.get(id);
+        if (userRepository == null) {
+            UserRepository repository = new LinkedListJCFUserRepository();
             userTable.put(id, repository);
-            JCFUserRepository = repository;
+            userRepository = repository;
         }
-        return JCFUserRepository;
+        return userRepository;
     }
 
 
@@ -51,9 +51,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public void addServer(UUID id, String name) {
-        JCFUserRepository JCFUserRepository = getUserRepository(id);
+        UserRepository JCFUserRepository = getUserRepository(id);
         Server server = createServer(name);
-        JCFUserRepository.add(server);
+        JCFUserRepository.save(server);
 
         //로그
         System.out.println(server.getName() + " 서버 추가 성공");
@@ -61,7 +61,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public void addServer(UUID id, Server server) {
-        JCFUserRepository JCFUserRepository = getUserRepository(id);
+        UserRepository JCFUserRepository = getUserRepository(id);
         List<Server> serverList = JCFUserRepository.getServerList();
         serverList.add(server);
 
@@ -71,7 +71,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public Server getServer(UUID id, String name) {
-        JCFUserRepository JCFUserRepository = getUserRepository(id);
+        UserRepository JCFUserRepository = getUserRepository(id);
         List<Server> list = JCFUserRepository.getServerList();
         for (Server server : list) {
             if (server.getName().equals(name)) {
@@ -87,7 +87,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public void printServer(UUID id) {
-        JCFUserRepository JCFUserRepository = getUserRepository(id);
+        UserRepository JCFUserRepository = getUserRepository(id);
         List<Server> list = JCFUserRepository.getServerList();
         printServer(list);
     }
@@ -103,7 +103,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public boolean removeServer(UUID id) {
-        JCFUserRepository JCFUserRepository = getUserRepository(id);
+        UserRepository JCFUserRepository = getUserRepository(id);
         List<Server> list = JCFUserRepository.getServerList();
         Scanner sc = new Scanner(System.in);
         System.out.print("삭제할 서버 이름을 입력하시오. : ");
@@ -114,7 +114,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public boolean removeServer(UUID id, String targetName) {
-        JCFUserRepository JCFUserRepository = getUserRepository(id);
+        UserRepository JCFUserRepository = getUserRepository(id);
         List<Server> list = JCFUserRepository.getServerList();
         return removeServer(list, targetName);
     }
@@ -135,7 +135,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public boolean updateServer(UUID id) {
-        JCFUserRepository JCFUserRepository = getUserRepository(id);
+        UserRepository JCFUserRepository = getUserRepository(id);
         List<Server> list = JCFUserRepository.getServerList();
         Scanner sc = new Scanner(System.in);
         System.out.print("바꿀려고 하는 서버의 이름을 입력하시오. : ");
@@ -147,7 +147,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public boolean updateServer(UUID id, String targetName) {
-        JCFUserRepository JCFUserRepository = getUserRepository(id);
+        UserRepository JCFUserRepository = getUserRepository(id);
         List<Server> list = JCFUserRepository.getServerList();
         Scanner sc = new Scanner(System.in);
         System.out.print("서버 이름을 무엇으로 바꾸시겠습니까? : ");
@@ -158,7 +158,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public boolean updateServer(UUID id, String targetName, String replaceName) {
-        JCFUserRepository JCFUserRepository = getUserRepository(id);
+        UserRepository JCFUserRepository = getUserRepository(id);
         List<Server> list = JCFUserRepository.getServerList();
         return updateServer(list, targetName, replaceName);
     }

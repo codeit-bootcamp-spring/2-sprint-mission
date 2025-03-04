@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.Repository.impl;
+package com.sprint.mission.discodeit.Repository.jcf.impl;
 
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
@@ -13,7 +13,7 @@ public class LinkedListJCFUserRepository extends JCFUserRepository {
     }
 
     @Override
-    public void add(Server server) {
-        super.add(server);
+    public void save(Server server) {
+        super.save(server);
     }
 }

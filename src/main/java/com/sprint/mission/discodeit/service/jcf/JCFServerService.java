@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Factory.CreateChannalFactory;
 import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
-import com.sprint.mission.discodeit.Repository.impl.LinkedListJCFServerRepository;
+import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFServerRepository;
 import com.sprint.mission.discodeit.entity.Container.Channel;
 import com.sprint.mission.discodeit.entity.Container.Container;
 import com.sprint.mission.discodeit.service.ServerService;

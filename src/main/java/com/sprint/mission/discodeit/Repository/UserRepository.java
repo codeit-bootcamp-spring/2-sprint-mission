@@ -17,6 +17,6 @@ public interface UserRepository {
 
     public void setMessageList(Map<UUID, Queue<Message>> messageList);
 
-    public void add(Server server);
+    public void save(Server server);
 
 }

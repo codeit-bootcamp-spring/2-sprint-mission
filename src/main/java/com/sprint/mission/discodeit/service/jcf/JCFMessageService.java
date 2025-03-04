@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.Repository.impl.LinkedListJCFUserRepository;
+import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFUserRepository;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 

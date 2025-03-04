@@ -4,10 +4,7 @@ import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Server;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * <h3>유저 레포지토리 </h3><p>
@@ -16,12 +13,15 @@ import java.util.UUID;
  * </p>
  *
  * @version 1
- * @JongwonLee
  */
 public abstract class JCFUserRepository implements UserRepository {
     private List<Server> serverList;
     private Map<UUID, Queue<Message>> messageList;
 
+    public JCFUserRepository() {
+        serverList = new LinkedList<>();
+        messageList = new HashMap<>();
+    }
 
     public List<Server> getServerList() {
         return serverList;
@@ -39,7 +39,7 @@ public abstract class JCFUserRepository implements UserRepository {
         this.messageList = messageList;
     }
 
-    public void add(Server server) {
+    public void save(Server server) {
         serverList.add(server);
     }
 }
