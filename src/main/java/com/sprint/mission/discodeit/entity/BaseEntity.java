@@ -17,14 +17,6 @@ public class BaseEntity {
         return id;
     }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getModifiedAt() {
-        return modifiedAt;
-    }
-
     public void updateModifiedAt() {
         this.modifiedAt = System.currentTimeMillis();
     }
