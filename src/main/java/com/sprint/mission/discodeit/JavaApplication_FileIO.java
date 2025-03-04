@@ -8,15 +8,12 @@ import java.util.Optional;
 
 public class JavaApplication_FileIO {
     public static void main(String[] args) {
-        try {
-            UserService userService = new FileUserService();
+        UserService userService = new FileUserService(); // File 기반 저장소 사용
 
-            User user = new User("Jaeseok");
-            userService.create(user);
-            Optional<User> check = userService.read(user.getId());
-            System.out.println("Created User: " + check.map(User::getUserName).orElse("User not found"));
-        } catch (Exception e) {
-            e.printStackTrace(); // 오류 메시지를 콘솔에 출력
-        }
+        User user = new User("Jaeseok");
+        userService.create(user);
+
+        Optional<User> check = userService.read(user.getId());
+        System.out.println("Loaded User: " + check.map(User::getUserName).orElse("User not found"));
     }
 }

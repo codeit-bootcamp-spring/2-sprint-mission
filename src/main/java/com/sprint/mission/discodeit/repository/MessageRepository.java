@@ -11,6 +11,6 @@ public interface MessageRepository {
     void save(Message message);
     Optional<Message> findById(UUID id);
     List<Message> findAll();
-    void update(UUID id, User user);
+    void update(UUID id, Message message);
     void delete(UUID id);
 }
