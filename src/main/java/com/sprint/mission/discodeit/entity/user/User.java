@@ -1,6 +1,8 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.user;
 
-public class User extends BaseEntity{
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+
+public class User extends BaseEntity {
     private String nickname;
     private String email;
     private String avatar = "";

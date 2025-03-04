@@ -1,4 +1,6 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.channel;
+
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 
 import java.util.UUID;
 

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;

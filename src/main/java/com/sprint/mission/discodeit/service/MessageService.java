@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.ChannelMessage;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.PrivateMessage;
+import com.sprint.mission.discodeit.entity.message.ChannelMessage;
+import com.sprint.mission.discodeit.entity.message.Message;
+import com.sprint.mission.discodeit.entity.message.PrivateMessage;
 
 import java.util.List;
 import java.util.UUID;

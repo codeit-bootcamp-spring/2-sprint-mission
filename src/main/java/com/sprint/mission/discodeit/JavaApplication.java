@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelMessage;
-import com.sprint.mission.discodeit.entity.PrivateMessage;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.message.ChannelMessage;
+import com.sprint.mission.discodeit.entity.message.PrivateMessage;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicatedUserException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;

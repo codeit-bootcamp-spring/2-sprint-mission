@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicatedUserException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.service.ChannelService;
