@@ -39,9 +39,9 @@ public class JavaApplication {
         User testUser01 = new User("testUser01", "testUser01@gmail.com", "1111");
         User testUser02 = new User("testUser02", "testUser02@gmail.com", "2222");
         User testUser03 = new User("testUser03", "testUser03@gmail.com", "3333");
-        userRepository.addUser(testUser01);
-        userRepository.addUser(testUser02);
-        userRepository.addUser(testUser03);
+        userRepository.add(testUser01);
+        userRepository.add(testUser02);
+        userRepository.add(testUser03);
         System.out.println(userService.readUser(testUser01.getId()));
         System.out.println(userService.readUser(testUser02.getId()));
         System.out.println(userService.readUser(testUser03.getId()));
@@ -56,9 +56,9 @@ public class JavaApplication {
         System.out.println(userService.readAllUsers());
 
         // delete
-        userService.deleteUser(testUser01.getId());
+        /*userService.deleteUser(testUser01.getId());
         System.out.println(userService.readAllUsers());
-
+*/
 
 
 
@@ -75,9 +75,9 @@ public class JavaApplication {
         Channel testChannel01 = new Channel("testChannel01");
         Channel testChannel02 = new Channel("testChannel02");
         Channel testChannel03 = new Channel("testChannel03");
-        channelRepository.addChannel(testChannel01);
-        channelRepository.addChannel(testChannel02);
-        channelRepository.addChannel(testChannel03);
+        channelRepository.add(testChannel01);
+        channelRepository.add(testChannel02);
+        channelRepository.add(testChannel03);
         System.out.println(channelService.readChannel(testChannel01.getId()));
         System.out.println(channelService.readChannel(testChannel02.getId()));
         System.out.println(channelService.readChannel(testChannel03.getId()));
@@ -93,9 +93,9 @@ public class JavaApplication {
         System.out.println(channelService.readAllChannels());
 
         //delete
-        System.out.println("ChannelService의 deleteChannel 메서드 검증");
+        /*System.out.println("ChannelService의 deleteChannel 메서드 검증");
         channelService.deleteChannel(testChannel01.getId());
-        System.out.println(channelService.readAllChannels());
+        System.out.println(channelService.readAllChannels());*/
 
 
 
@@ -115,8 +115,8 @@ public class JavaApplication {
         // Message testMessage01 = new Message(testUser01, "01test01", testChannel01);   // 위에서 testUser01 삭제함.
         Message testMessage02 = new Message(testUser02, "02test02", testChannel02);
         Message testMessage03 = new Message(testUser03, "03test03", testChannel03);
-        messageRepository.addMessage(testMessage02);
-        messageRepository.addMessage(testMessage03);
+        messageRepository.add(testMessage02);
+        messageRepository.add(testMessage03);
         // System.out.println(messageService.readMessage(testMessage01.getId()));
         System.out.println(messageService.readMessage(testMessage02.getId()));
         System.out.println(messageService.readMessage(testMessage03.getId()));
