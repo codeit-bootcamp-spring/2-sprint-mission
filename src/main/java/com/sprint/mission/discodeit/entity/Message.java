@@ -28,6 +28,9 @@ public class Message extends BaseEntity {
     }
 
     public void updateContent(String content) {
+        if (content == null || content.equals(this.content)) {
+            return;
+        }
         this.content = content;
         updateUpdatedAt();
     }

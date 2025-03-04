@@ -13,6 +13,9 @@ public class User extends BaseEntity {
     }
 
     public void updateName(String name) {
+        if(name == null) {
+            return;
+        }
         this.name = name;
         updateUpdatedAt();
     }
