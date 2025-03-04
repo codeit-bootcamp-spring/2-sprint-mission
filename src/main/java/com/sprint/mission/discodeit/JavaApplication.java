@@ -42,7 +42,7 @@ public class JavaApplication {
                     jcfUserService.save(nickname, savePassword);
                     break;
             }
-            if(userToken == null) continue;
+            if (userToken == null) continue;
 
             System.out.println(" ======== 메뉴 ======== ");
             System.out.println("1. 등록 \n2. 조회(다건, 단건)\n3. 수정 \n4. 삭제 \n5. 로그아웃 \n6. 나가기");
@@ -51,14 +51,14 @@ public class JavaApplication {
             int num = sc.nextInt();
             sc.nextLine();
 
-            switch(num){
+            switch (num) {
                 case 1:
                     System.out.println("===등록===");
                     System.out.println("1. 회원 가입\n2. 채널 개설\n3. 메세지 보내기\n4. 메뉴로 돌아가기");
                     System.out.print("입력란: ");
                     int createNum = sc.nextInt();
                     sc.nextLine();
-                    switch (createNum){
+                    switch (createNum) {
                         case 1:
                             System.out.print("닉네임 입력: ");
                             String nickname = sc.nextLine();
@@ -93,14 +93,14 @@ public class JavaApplication {
                     System.out.println("1. 사용자 조회\n2. 채널 조회\n3. 메세지 조회\n4. 메뉴로 돌아가기");
                     System.out.print("입력란: ");
                     int findNum = sc.nextInt();
-                    switch (findNum){
+                    switch (findNum) {
                         case 1:
                             System.out.println("=== 조회 방법 ===");
                             System.out.println("1. 단건 조회\n2. 다건 조회");
                             System.out.print("입력란: ");
                             int findNum1 = sc.nextInt();
                             sc.nextLine();
-                            switch (findNum1){
+                            switch (findNum1) {
                                 case 1:
                                     System.out.print("조회할 사용자 아이디: ");
                                     UUID UserUUID = UUID.fromString(sc.nextLine());
@@ -117,7 +117,7 @@ public class JavaApplication {
                             System.out.print("입력란: ");
                             int findNum2 = sc.nextInt();
                             sc.nextLine();
-                            switch (findNum2){
+                            switch (findNum2) {
                                 case 1:
                                     System.out.print("조회할 채널 아이디: ");
                                     UUID chennelUUID = UUID.fromString(sc.nextLine());
@@ -135,7 +135,7 @@ public class JavaApplication {
                             System.out.print("입력란: ");
                             int findNum3 = sc.nextInt();
                             sc.nextLine();
-                            switch (findNum3){
+                            switch (findNum3) {
                                 case 1:
                                     System.out.print("조회할 메시지 아이디: ");
                                     UUID MessageUUID = UUID.fromString(sc.nextLine());
@@ -158,7 +158,7 @@ public class JavaApplication {
                     System.out.print("입력란: ");
                     int updateNum = sc.nextInt();
                     sc.nextLine();
-                    switch (updateNum){
+                    switch (updateNum) {
                         case 1:
                             System.out.print("변경할 사용자 아이디 입력: ");
                             UUID userUUID = UUID.fromString(sc.nextLine());
@@ -190,7 +190,7 @@ public class JavaApplication {
                     System.out.print("입력란: ");
                     int deleteNum = sc.nextInt();
                     sc.nextLine();
-                    switch (deleteNum){
+                    switch (deleteNum) {
                         case 1:
                             System.out.print("삭제할 사용자 아이디: ");
                             UUID userUUID = UUID.fromString(sc.nextLine());

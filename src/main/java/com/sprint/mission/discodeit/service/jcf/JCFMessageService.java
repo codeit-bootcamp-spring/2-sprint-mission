@@ -20,8 +20,8 @@ public class JCFMessageService implements MessageService {
         this.jcfChannelService = jcfChannelService;
     }
 
-    public static JCFMessageService getInstance(JCFUserService jcfUserService, JCFChannelService jcfChannelService){
-        if(getInstance == null){
+    public static JCFMessageService getInstance(JCFUserService jcfUserService, JCFChannelService jcfChannelService) {
+        if (getInstance == null) {
             getInstance = new JCFMessageService(jcfUserService, jcfChannelService);
         }
         return getInstance;
@@ -30,28 +30,28 @@ public class JCFMessageService implements MessageService {
     @Override
     public void sendMessage(UUID channelUUID, UUID userUUID, String content) {
 
-        if(jcfChannelService.findChannel(channelUUID) ==null){
+        if (jcfChannelService.findChannel(channelUUID) == null) {
             return;
         }
 
-        if(jcfUserService.findByUser(userUUID) == null){
+        if (jcfUserService.findByUser(userUUID) == null) {
             return;
         }
 
-        Message message = new Message(channelUUID, userUUID,content);
+        Message message = new Message(channelUUID, userUUID, content);
         data.add(message);
         System.out.println("메세지 전송 성공" + message);
     }
 
     @Override
     public void findMessageById(UUID id) {
-        if(data.stream().noneMatch(message -> message.getId().equals(id))){
+        if (data.stream().noneMatch(message -> message.getId().equals(id))) {
             System.out.println("[실패]입력 메시지가 존재하지 않습니다.");
             return;
         }
 
-        for(Message message:data){
-            if(message.getId().equals(id)){
+        for (Message message : data) {
+            if (message.getId().equals(id)) {
                 System.out.println(message);
                 return;
             }
@@ -60,7 +60,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void findAllMessages() {
-        if(data.isEmpty()){
+        if (data.isEmpty()) {
             System.out.println("입력 메시지가 존재하지 않습니다.");
             return;
         }
@@ -70,11 +70,11 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void findMessageByChannelId(UUID channelUUID) {
-        if(jcfChannelService.findChannel(channelUUID) ==null){
+        if (jcfChannelService.findChannel(channelUUID) == null) {
             return;
         }
 
-        if(data.stream().noneMatch(message -> message.getChannelUUID().equals(channelUUID))){
+        if (data.stream().noneMatch(message -> message.getChannelUUID().equals(channelUUID))) {
             System.out.println("채널에 해당하는 메시지가 존재하지 않습니다.");
             return;
         }
@@ -84,13 +84,13 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID id, String content) {
-        if(data.stream().noneMatch(data -> data.getId().equals(id))) {
+        if (data.stream().noneMatch(data -> data.getId().equals(id))) {
             System.out.println("[실패]수정하려는 메세지가 존재하지 않습니다.");
             return;
         }
 
-        for(Message message : data) {
-            if(message.getId().equals(id)) {
+        for (Message message : data) {
+            if (message.getId().equals(id)) {
                 message.setContent(content);
                 message.setUpdatedAt(System.currentTimeMillis());
                 System.out.println("[성공]메시지 변경 완료[메시지 아이디: " + message.getId() +
@@ -102,9 +102,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void deleteMessageById(UUID id) {
-        boolean isremove =  data.removeIf(message -> message.getId().equals(id));
+        boolean isremove = data.removeIf(message -> message.getId().equals(id));
 
-        if(!isremove){
+        if (!isremove) {
             System.out.println("[실패]삭제하려는 메시지가 존재하지 않습니다.");
         } else {
             System.out.println("[성공]메세지 삭제 완료");

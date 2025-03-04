@@ -20,6 +20,7 @@ public class Message extends BaseEntity {
     public UUID getUserUUID() {
         return userUUID;
     }
+
     public UUID getChannelUUID() {
         return channelUUID;
     }
