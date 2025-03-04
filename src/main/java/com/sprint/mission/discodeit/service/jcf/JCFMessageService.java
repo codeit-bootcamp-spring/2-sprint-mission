@@ -31,7 +31,7 @@ public class JCFMessageService implements MessageService {
         }
 
         Message message = new Message(content, channelId, authorId);
-        this.data.put(message.getId(), message);
+        this.data.put(message.getId(), message);            //맵에 직접 데이터 저장
 
         return message;
     }
