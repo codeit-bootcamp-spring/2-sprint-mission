@@ -99,6 +99,16 @@ public class User extends Common implements Serializable {
         roles.remove(role);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(username, user.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(username);
+    }
 
     @Override
     public String toString() {

@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Channel extends Common implements Serializable {
 
@@ -65,6 +62,16 @@ public class Channel extends Common implements Serializable {
         messages.remove(message);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Channel channel)) return false;
+        return Objects.equals(channelName, channel.channelName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(channelName);
+    }
 
     @Override
     public String toString() {
