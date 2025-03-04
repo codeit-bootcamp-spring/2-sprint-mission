@@ -4,6 +4,8 @@ import com.sprint.sprint2.discodeit.entity.User;
 import com.sprint.sprint2.discodeit.repository.UserRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository {
@@ -17,7 +19,8 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     @Override
     public User findById(String userId) {
         Map<UUID, User> users = loadAll();
-        return users.getOrDefault(userId, null);
+        return  Optional.ofNullable(users.get(UUID.fromString(userId)))
+                .orElseThrow(() -> new NoSuchElementException(userId + "없는 회원 입니다"));
     }
 
     @Override

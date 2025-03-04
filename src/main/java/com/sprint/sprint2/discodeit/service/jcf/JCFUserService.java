@@ -16,7 +16,6 @@ public class JCFUserService implements UserService {
     public User create(String username, String email, String password) {
         User user = new User(username, email, password);
         this.data.put(user.getId(), user);
-
         return user;
     }
 
@@ -39,7 +38,6 @@ public class JCFUserService implements UserService {
         User user = Optional.ofNullable(userNullable)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
         user.update(newUsername, newEmail, newPassword);
-
         return user;
     }
 
