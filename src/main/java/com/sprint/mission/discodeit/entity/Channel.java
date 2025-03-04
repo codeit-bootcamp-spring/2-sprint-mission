@@ -4,7 +4,6 @@ package com.sprint.mission.discodeit.entity;
 public class Channel extends BaseEntity {
     private String name;
 
-
     public Channel(String name) {
         this.name = name;
     }
@@ -13,9 +12,9 @@ public class Channel extends BaseEntity {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name, Long updateAt) {
         this.name = name;
-        super.updateUpdateAt();
+        super.updateUpdatedAt(updateAt);
     }
 
     @Override

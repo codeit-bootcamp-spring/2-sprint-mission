@@ -12,9 +12,9 @@ public class User extends BaseEntity {
         return nickname;
     }
 
-    public void setNickname(String nickname) {
+    public void setNickname(String nickname, Long updateAt) {
         this.nickname = nickname;
-        super.updateUpdateAt();
+        super.updateUpdatedAt(updateAt);
     }
 
     @Override

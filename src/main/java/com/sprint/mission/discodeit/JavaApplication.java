@@ -6,15 +6,25 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import java.nio.file.Path;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserService userService = JCFUserService.getInstance();
-        ChannelService channelService = JCFChannelService.getInstance();
-        MessageService messageService = JCFMessageService.getInstance(userService, channelService);
+        // 파일 저장 경로 설정
+        Path userDirectory = Path.of("data/users");
+        Path channelDirectory = Path.of("data/channels");
+        Path messageDirectory = Path.of("data/messages");
+
+        // File 기반 서비스 사용
+        UserService userService = FileUserService.getInstance(userDirectory);
+        ChannelService channelService = FileChannelService.getInstance(channelDirectory);
+        MessageService messageService = FileMessageService.getInstance(messageDirectory, userService, channelService);
 
         System.out.println("========== 유저 등록 ==========");
         User user1 = new User("Alice");

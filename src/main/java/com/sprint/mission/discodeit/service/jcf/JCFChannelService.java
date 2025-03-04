@@ -18,7 +18,9 @@ public class JCFChannelService implements ChannelService {
     public static JCFChannelService getInstance() {
         if(instance == null) {
             synchronized (JCFChannelService.class) {
-                instance = new JCFChannelService();
+                if(instance == null) {
+                    instance = new JCFChannelService();
+                }
             }
         }
 
@@ -49,7 +51,7 @@ public class JCFChannelService implements ChannelService {
     public void update(UUID id, String name) {
         if(data.containsKey(id)) {
             Channel channel = data.get(id);
-            channel.setName(name);
+            channel.setName(name, System.currentTimeMillis());
         }
     }
 }

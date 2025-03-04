@@ -36,7 +36,6 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void create(Message message) {
-
         if(message == null) {
             throw new IllegalArgumentException("message 객체가 null 입니다.");
         }
@@ -53,8 +52,8 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Optional<Message> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+    public Optional<Message> findById(UUID messageId) {
+        return Optional.ofNullable(data.get(messageId));
     }
 
     @Override
@@ -71,7 +70,7 @@ public class JCFMessageService implements MessageService {
     public void update(UUID id, String content) {
         if (data.containsKey(id)) {
             Message message = data.get(id);
-            message.setContent(content);
+            message.setContent(content, System.currentTimeMillis());
         }
     }
 }

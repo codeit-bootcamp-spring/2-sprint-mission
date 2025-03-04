@@ -35,9 +35,9 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
+    public Optional<User> findById(UUID userId) {
 
-        return Optional.ofNullable(data.get(id));
+        return Optional.ofNullable(data.get(userId));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class JCFUserService implements UserService {
     public void update(UUID id, String nickname) {
         if (data.containsKey(id)) {
             User user = data.get(id);
-            user.setNickname(nickname);
+            user.setNickname(nickname, System.currentTimeMillis());
         }
     }
 }
