@@ -1,23 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
 public class Channel extends BaseEntity {
+    private ChannelType type;
     private String name;
+    private String description;
 
-    public Channel(String name) {
+    public Channel(ChannelType type, String name, String description) {
         super();
+        this.type = type;
         this.name = name;
+        this.description = description;
+    }
+
+    public ChannelType getType() {
+        return type;
     }
 
     public String getName() {
         return name;
     }
 
-    public void updateName(String name) {
-        if (name == null) {
-            return;
+    public String getDescription() {
+        return description;
+    }
+
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
         }
-        this.name = name;
-        updateUpdatedAt();
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            updateUpdatedAt();
+        }
     }
 
     @Override
