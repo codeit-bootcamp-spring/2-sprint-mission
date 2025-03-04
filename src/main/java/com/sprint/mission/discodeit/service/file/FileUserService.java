@@ -7,9 +7,7 @@ import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFUserReposit
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -58,7 +56,8 @@ public class FileUserService implements UserService {
         userRepository.save(server);
 
         //로그
-        System.out.println(FileUserService.class + " : " + server.getName() + " 서버 추가 성공");
+        System.out.println("저장 시점 name :"+server.getId());
+//        System.out.println(FileUserService.class + " : " + server.getName() + " 서버 추가 성공");
     }
 
     @Override
@@ -67,16 +66,19 @@ public class FileUserService implements UserService {
         userRepository.save(server);
 
         //로그
-        System.out.println(FileUserService.class + " : " + server.getName() + " 서버 추가 성공");
+        System.out.println("저장 시점 server:"+server.getId());
+//        System.out.println(FileUserService.class + " : " + server.getName() + " 서버 추가 성공");
     }
 
     @Override
     public Server getServer(UUID userId, String name) {
         UserRepository userRepository = getUserRepository(userId);
-        List<Server> list = userRepository.getServerList();
-        Server target = list.stream()
-                .filter(server -> server.getName().equals(name))
+        List<Server> serverList = userRepository.getServerList();
+        Server target = serverList.stream().filter(server -> server.getName().equals(name))
                 .findFirst().orElse(null);
+
+        System.out.println("get 시점: " + target.getId());
+
         return target;
     }
 
@@ -156,7 +158,7 @@ public class FileUserService implements UserService {
         System.out.print("바꿀려고 하는 서버의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
 
-        return updateServer(userId,list, targetName);
+        return updateServer(userId, list, targetName);
     }
 
     @Override
@@ -167,7 +169,7 @@ public class FileUserService implements UserService {
         System.out.print("서버 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
 
-        return updateServer(userId,list, targetName, replaceName);
+        return updateServer(userId, list, targetName, replaceName);
     }
 
     @Override
@@ -186,19 +188,33 @@ public class FileUserService implements UserService {
     }
 
     private boolean updateServer(UUID userId, List<Server> list, String targetName, String replaceName) {
+        UserRepository userRepository = getUserRepository(userId);
         Server targetServer = list.stream().filter(server -> server.getName().equals(targetName))
                 .findFirst().orElse(null);
         if (targetServer != null) {
-            Path targetPath = directory.resolve(targetServer.getId().toString().concat(".ser"));
-            if (Files.exists(targetPath)) {
-                targetServer.setName(replaceName);
-                addServer(userId,targetServer);
+            Path oldFilePath = directory.resolve(targetServer.getId().toString().concat(".ser"));
+            try {
+                Files.deleteIfExists(oldFilePath);
+            } catch (IOException e) {
+                System.err.println("기존 서버 파일 삭제 실패: " + e.getMessage());
             }
+
+            targetServer.setName(replaceName);
+            Path filsPath = directory.resolve(targetServer.getId().toString().concat(".ser"));
+
+            try (FileOutputStream fos = new FileOutputStream(filsPath.toFile());
+                 ObjectOutputStream oos = new ObjectOutputStream(fos);) {
+                oos.writeObject(targetServer);
+            } catch (IOException e) {
+                //로그 찍기
+                System.out.println("User Repository 저장 실패");
+                throw new RuntimeException(e);
+            }
+            return true;
         } else {
             System.out.println("업데이트할 서버가 존재하지 않습니다.");
         }
         return false;
-
     }
 
 

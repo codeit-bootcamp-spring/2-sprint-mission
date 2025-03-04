@@ -5,16 +5,20 @@ import java.util.Date;
 import java.util.UUID;
 
 public class BaseEntity {
-    protected UUID id;
+    private final UUID id;
 
     public final Long createdAt;
     public Long updatedAt;
     protected final SimpleDateFormat dayTime = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
 
-    public BaseEntity() {
-        this.id = UUID.randomUUID();
+    public BaseEntity(UUID id) {
+        this.id = id;
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = this.createdAt;
+    }
+
+    public BaseEntity() {
+        this(UUID.randomUUID());
     }
 
 

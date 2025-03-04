@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public class Server extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -9,6 +10,11 @@ public class Server extends BaseEntity implements Serializable {
 
     public Server(String name) {
         super();
+        this.name = name;
+    }
+
+    public Server(UUID id, String name) {
+        super(id);
         this.name = name;
     }
 
@@ -20,4 +26,10 @@ public class Server extends BaseEntity implements Serializable {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return "Server{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }
