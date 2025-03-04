@@ -1,6 +1,12 @@
 package com.sprint.sprint2.discodeit.repository.file;
 
+import static java.lang.System.in;
+
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public abstract class AbstractFileRepository<T> {
     private final String filePath;
@@ -9,7 +15,7 @@ public abstract class AbstractFileRepository<T> {
         this.filePath = filePath;
     }
 
-    public void save(T entity) {
+    protected void writeToFile(Map<UUID, T> entity) {
         try (FileOutputStream fos = new FileOutputStream(filePath, true);
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ){
@@ -20,5 +26,7 @@ public abstract class AbstractFileRepository<T> {
             throw new RuntimeException(e);
         }
     }
+
+
 
 }
