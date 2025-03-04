@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.*;
 
 public class FileUserRepository implements UserRepository {
-    private final String FILE_PATH = "data/files/users.dat";
+    private final String FILE_PATH = "data/files/users.ser";
     private Map<UUID, User> data = new HashMap<>();
 
     public FileUserRepository() {

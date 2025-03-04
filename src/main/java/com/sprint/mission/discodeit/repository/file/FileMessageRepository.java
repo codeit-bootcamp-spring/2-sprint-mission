@@ -8,7 +8,7 @@ import java.io.*;
 import java.util.*;
 
 public class FileMessageRepository implements MessageRepository {
-    private final String FILE_PATH = "data/files/messages.dat";
+    private final String FILE_PATH = "data/files/messages.ser";
     private Map<UUID, Message> data = new HashMap<>();
 
 
