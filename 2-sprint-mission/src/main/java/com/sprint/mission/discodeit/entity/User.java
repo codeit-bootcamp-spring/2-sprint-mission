@@ -1,38 +1,67 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity {
-    private String username;
+import java.time.Instant;
+import java.util.UUID;
 
-    public User(String username) {
-        super();
+public class User {
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String username;
+    private String email;
+    private String password;
+
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
         this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public User updateUsername(String newUsername) {
-        if(this.username.equals(newUsername)){
-            System.out.println("같은 이름으로 변경할 수 없습니다.");
-            return this;
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
         }
 
-        this.username = newUsername;
-        update();
-
-        return this;
-    }
-    @Override
-    public String toString() {
-        return "User{name= '" + username + "', ID= " + getId() +", createdtime= "+getCreatedAt()+", updatedtime= "+getUpdatedAt()+"}";
-    }
-
-    public String toString(boolean bool){
-        if(bool){
-            return "User "+username+"은 삭제되지 않았습니다.";
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
         }
-        return "User "+username+"은 삭제되었습니다.";
     }
-
 }

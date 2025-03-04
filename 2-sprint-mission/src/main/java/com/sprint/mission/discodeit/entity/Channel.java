@@ -1,45 +1,63 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
+import java.util.UUID;
 
-public class Channel extends BaseEntity {
-    private String channelname;
-    private final List<User> users = new ArrayList<>();
+public class Channel {
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private ChannelType type;
+    private String name;
+    private String description;
 
-    public Channel(String channel, User creater) {
-        super();
-        this.channelname = channel;
-        users.add(creater);
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.type = type;
+        this.name = name;
+        this.description = description;
     }
-    public String getChannelname() {
-        return channelname;
+
+    public UUID getId() {
+        return id;
     }
 
-    public Channel updateChannel(String channel) {
-        if(this.channelname.equals(channel)){
-            System.out.println("같은 이름으로 변경할 수 없습니다.");
-            return this;
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public ChannelType getType() {
+        return type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
         }
-        this.channelname = channel;
-        update();
-        return this;
-    }
-
-    public Channel addUser(User user){
-        users.add(user);
-        return this;
-    }
-
-    @Override
-    public String toString() {
-        return "Channel{name= '" + channelname +", creater= "+users.getFirst().getUsername()+ "', ID= " + getId() +", createdtime= "+getCreatedAt()+", updatedtime= "+getUpdatedAt()+"}";
-    }
-
-    public String toString(boolean bool){
-        if(bool){
-            return "Channel "+channelname+"은 삭제되지 않았습니다.";
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
         }
-        return "Channel "+channelname+"은 삭제되었습니다.";
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }

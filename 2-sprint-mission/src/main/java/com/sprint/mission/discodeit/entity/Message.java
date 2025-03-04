@@ -1,49 +1,60 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Message extends BaseEntity {
-    private String message;
-    private final User user;
-    private final Channel channel;
+import java.time.Instant;
+import java.util.UUID;
 
-    public Message(String message, User user, Channel channel) {
-        super();
-        this.message = message;
-        this.user = user;
-        this.channel = channel;
+public class Message {
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
+
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    public String getMessage() {
-        return message;
+    public UUID getId() {
+        return id;
     }
 
-    public User getUser(){
-        return user;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    public Channel getChannel(){
-        return channel;
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    public Message updateMessage(String message) {
-        if(this.message.equals(message)){
-            System.out.println("같은 내용으로 변경할 수 없습니다.");
-            return this;
+    public String getContent() {
+        return content;
+    }
+
+    public UUID getChannelId() {
+        return channelId;
+    }
+
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
         }
-        this.message = message;
-        update();
 
-        return this;
-    }
-
-    @Override
-    public String toString() {
-        return "Message{'" + message +"', creater= "+user.getUsername()+ ", channel= "+channel.getChannelname()+", ID= " + getId() +", createdtime= "+getCreatedAt()+", updatedtime= "+getUpdatedAt()+"}";
-    }
-
-    public String toString(boolean bool){
-        if(bool){
-            return "Message '"+message+"' 은 삭제되지 않았습니다.";
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
         }
-        return "Message '"+message+"' 은 삭제되었습니다.";
     }
 }

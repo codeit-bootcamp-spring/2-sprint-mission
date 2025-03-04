@@ -1,61 +1,53 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data;
 
     public JCFMessageService() {
-        data = new HashMap<UUID, Message>();
+        this.data = new HashMap<>();
     }
 
     @Override
-    public void createMessage(String newmessage, User user, Channel channel){
-        Message message = new Message(newmessage, user, channel);
+    public Message create(String content, UUID channelId, UUID authorId) {
+        Message message = new Message(content, channelId, authorId);
+        this.data.put(message.getId(), message);
 
-        data.put(message.getId(), message);
+        return message;
     }
 
     @Override
-    public Message getMessageById(UUID id) {
-        return data.get(id);
+    public Message find(UUID messageId) {
+        Message messageNullable = this.data.get(messageId);
+
+        return Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
-    public Message getMessageByUser(User user){
-        for (Message message : data.values()) {
-            if (message.getUser().equals(user)) {
-                return message;
-            }
+    @Override
+    public List<Message> findAll() {
+        return this.data.values().stream().toList();
+    }
+
+    @Override
+    public Message update(UUID messageId, String newContent) {
+        Message messageNullable = this.data.get(messageId);
+        Message message = Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
+
+        return message;
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        if (!this.data.containsKey(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
-        return null;
-    }
-
-    @Override
-    public List<Message> getAllMessages(){
-        return new ArrayList<Message>(data.values());
-    }
-
-    @Override
-    public Message updateMessage(UUID id, String message){
-        Message newmessage = data.get(id).updateMessage(message);
-        data.put(id, newmessage);
-        return newmessage;
-    }
-
-    @Override
-    public void deleteMessage(UUID id) {
-        data.remove(id);
-    }
-
-    public boolean isDeleted(UUID id) {
-        return data.containsKey(id);
+        this.data.remove(messageId);
     }
 }
