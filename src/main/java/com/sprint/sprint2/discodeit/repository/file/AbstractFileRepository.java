@@ -1,10 +1,7 @@
 package com.sprint.sprint2.discodeit.repository.file;
 
-import static java.lang.System.in;
-
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,6 +21,19 @@ public abstract class AbstractFileRepository<T> {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    protected Map<UUID, T> loadAll() {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return new HashMap<>(); // 파일이 없으면 빈 Map 반환
+        }
+        try (FileInputStream fis = new FileInputStream(filePath);
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            return (Map<UUID, T>) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return new HashMap<>();
         }
     }
 
