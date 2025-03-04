@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -19,8 +19,8 @@ public class JCFMessageService implements MessageService {
         this.channelService = channelService;
     }
 
-    public static synchronized  JCFMessageService getInstance(UserService userService, ChannelService channelService){
-        if(INSTANCE == null){
+    public static synchronized JCFMessageService getInstance(UserService userService, ChannelService channelService) {
+        if (INSTANCE == null) {
             INSTANCE = new JCFMessageService(userService, channelService);
         }
         return INSTANCE;
@@ -104,7 +104,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void validateMessage(UUID messageId) {
-        if(!messages.containsKey(messageId)){
+        if (!messages.containsKey(messageId)) {
             throw new NoSuchElementException("존재하지 않는 메세지입니다.");
         }
     }

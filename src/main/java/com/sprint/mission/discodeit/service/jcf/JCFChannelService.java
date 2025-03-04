@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -18,8 +17,8 @@ public class JCFChannelService implements ChannelService {
         this.userService = userService;
     }
 
-    public static synchronized JCFChannelService getInstance(UserService userService){
-        if(INSTANCE == null){
+    public static synchronized JCFChannelService getInstance(UserService userService) {
+        if (INSTANCE == null) {
             INSTANCE = new JCFChannelService(userService);
         }
         return INSTANCE;
@@ -27,13 +26,17 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void createChannel(String channelName) {
-        if(channelIds.containsKey(channelName)){
+        if (channelIds.containsKey(channelName)) {
             throw new IllegalArgumentException("이미 존재하는 채널입니다.");
         }
 
         Channel channel = new Channel(channelName);
         channels.put(channel.getId(), channel);
         channelIds.put(channelName, channel.getId());
+    }
+
+    @Override
+    public void updataChannelData() {
     }
 
     @Override

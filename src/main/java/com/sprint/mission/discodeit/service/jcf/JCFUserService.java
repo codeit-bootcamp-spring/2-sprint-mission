@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
@@ -19,6 +18,10 @@ public class JCFUserService implements UserService {
             INSTANCE = new JCFUserService();
         }
         return INSTANCE;
+    }
+
+    @Override
+    public void updataUserData() {
     }
 
     @Override
@@ -108,6 +111,4 @@ public class JCFUserService implements UserService {
             throw new IllegalArgumentException("존재하지 않는 유저입니다.");
         }
     }
-
-
 }

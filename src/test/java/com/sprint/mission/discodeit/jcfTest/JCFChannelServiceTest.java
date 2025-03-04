@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

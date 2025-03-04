@@ -16,6 +16,8 @@ public interface UserService {
     String getUserNameByid(UUID userId); //유저 이름 조회
     List<User> getAllUsers();   //모든 유저 조회
 
+    void updataUserData();
+
     void updateUsername(UUID userId, String newUsername);   //유저 이름 변경 (UUID 기반)
     void addChannel(UUID userID, UUID channelId);  //유저 채널 추가 (UUID 기반)
 
