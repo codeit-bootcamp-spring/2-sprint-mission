@@ -10,7 +10,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.LinkedList;
+import java.util.Map;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
@@ -34,18 +34,16 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message readMessage(UUID messageId) {
-        MessageService.validateMessageId(messageId, this.messageRepository);            //아래ㅐ 코드와 작동 과정 중복, 일관성을 챙길 것인가? 코드 중복을 줄일 것 인가?
         return messageRepository.findMessageByMessageId(messageId);
     }
 
     @Override
-    public LinkedList<Message> readAllMessages() {
+    public Map<UUID, Message> readAllMessages() {
         return messageRepository.getMessages();
     }
 
     @Override
     public void updateMessageContent(UUID messageId, String content) {
-        MessageService.validateMessageId(messageId, this.messageRepository);     //아래 코드와 작동 과정 중복, 일관성을 챙길 것인가? 코드 중복을 줄일 것 인가?
         messageRepository.findMessageByMessageId(messageId).updateContent(content);
     }
 

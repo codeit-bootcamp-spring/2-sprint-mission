@@ -5,19 +5,19 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public interface MessageService {
     void createMessage(User sender, String content, Channel channel);
     Message readMessage(UUID messageId);
-    List<Message> readAllMessages();
+    Map<UUID, Message> readAllMessages();
     void updateMessageContent(UUID messageId, String content);
     void deleteMessage(UUID messageId);
     static void validateMessageId(UUID messageId, MessageRepository messageRepository) {
-        if (messageId == null) {
-            throw new IllegalArgumentException("입력받은 messageId 가 null 입니다!!!");
+        if (!messageRepository.existsMessage(messageId)) {
+            throw new NoSuchElementException("해당 messageId를 가진 사용자를 찾을 수 없습니다 : " + messageId);
         }
-        messageRepository.findMessageByMessageId(messageId);
     }
 }

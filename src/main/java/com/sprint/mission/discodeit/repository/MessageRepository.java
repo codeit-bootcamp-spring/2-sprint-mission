@@ -2,13 +2,11 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
 
-import java.util.LinkedList;import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MessageRepository {
-    private final LinkedList<Message> messages = new LinkedList<>();
+    private final HashMap<UUID, Message> messages = new LinkedHashMap<>();
 
     private static class SingletonHolder {
         private static final MessageRepository INSTANCE = new MessageRepository();
@@ -24,35 +22,40 @@ public class MessageRepository {
         if (newMessage == null) {
             throw new IllegalArgumentException("input newMessage is null!!!");
         }
-        messages.addFirst(newMessage);
+        messages.put(newMessage.getId(), newMessage);
+    }
+
+    public boolean existsMessage(UUID messageId) {
+        if (messageId == null) {
+            throw new IllegalArgumentException("null값을 가지는 messageId가 들어왔습니다!!!");
+        }
+        return messages.containsKey(messageId);
     }
 
     public Message findMessageByMessageId(UUID messageId) {
-        if (messageId == null) {
-            throw new IllegalArgumentException("null 값을 가진 messageId가 입력되었습니다!!!");
+        if (!existsMessage(messageId)) {
+            throw new NoSuchElementException("해당 messageId를 가진 메세지를 찾을 수 없습니다 : " + messageId);
         }
-        return messages.stream()
-                .filter((m) -> Objects.equals(messageId, m.getId()))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("해당 messageId 를 가진 message 를 찾을 수 없습니다!!!"));
+        return messages.get(messageId);
     }
 
-    public List<Message> findMessageListByChannelId(UUID channelId) {
+    public List<Message> findMessageListByChannelId(UUID channelId) {   //해당 channelID를 가진 message가 없을 때, 빈 리스트 반환
         if (channelId == null) {
             throw new IllegalArgumentException("input channelId is null!!!");
         }
-        return messages.stream()
+        return messages.values().stream()
                 .filter((m) -> Objects.equals(channelId, m.getChannel().getId()))
                 .collect(Collectors.toList());
     }
 
-    public LinkedList<Message> getMessages() {
+    public HashMap<UUID, Message> getMessages() {
         return messages;
     }
 
     public void deleteMessage(UUID messageId) {
-        boolean removed = messages.removeIf((m) -> Objects.equals(m.getId(), messageId));
-        if (!removed) {
-            throw new IllegalArgumentException("삭제할 messageId를 가진 message 가 존재하지 않습니다!!!");
+        if (!existsMessage(messageId)) {
+            throw new NoSuchElementException("해당 channelId를 가진 메세지를 찾을 수 없습니다 : " + messageId);
         }
+        messages.remove(messageId);
     }
 }
