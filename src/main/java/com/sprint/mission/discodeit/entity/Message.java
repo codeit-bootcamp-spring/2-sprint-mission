@@ -35,7 +35,7 @@ public class Message extends BaseEntity {
     }
 
     public void update(String content) {
-        if (content != null) setContent(content);
+        setContent(content);
         updateModifiedAt();
     }
 

@@ -64,7 +64,7 @@ public class JavaApplication {
         System.out.println("=========== 'Nick 수정 이전' ===========");
         System.out.println(userService.getUserByUserId(user3.getId()));
         System.out.println("=========== 'Nick 의 닉네임을 Nice로 변경, 상태 메세지 빈칸 만들기 ' ===========");
-        userService.updateUser(user3.getId(), "Nice", null, "");
+        userService.updateUser(user3.getId(), "Nice", user3.getAvatar(), "");
         System.out.println(userService.getUserByUserId(user3.getId()));
         System.out.println("=========== 유저 update 테스트 끝 ===========");
         System.out.println();
