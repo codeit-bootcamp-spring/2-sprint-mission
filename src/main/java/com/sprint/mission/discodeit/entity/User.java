@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
     private UUID id;
     private final Long createdAt;
     private Long updatedAt;
@@ -47,5 +49,9 @@ public class User {
 
     public Long getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

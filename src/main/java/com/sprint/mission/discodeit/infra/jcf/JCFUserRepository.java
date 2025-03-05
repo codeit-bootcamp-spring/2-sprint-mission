@@ -29,7 +29,6 @@ public class JCFUserRepository implements UserRepository {
         return user;
     }
 
-
     @Override
     public List<User> findByName(String name) {
         return users.values()

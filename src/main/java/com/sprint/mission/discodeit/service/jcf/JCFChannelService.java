@@ -60,7 +60,7 @@ public class JCFChannelService implements ChannelService {
     private ChannelDto toDto(Channel channel) {
         List<UserDto> users = userService.findAllByIds(channel.getUserIds())
                 .stream()
-                .map(user -> new UserDto(user.id(), user.name()))
+                .map(user -> new UserDto(user.id(), user.name(), user.email()))
                 .toList();
 
         return new ChannelDto(channel.getId(), channel.getName(), users);

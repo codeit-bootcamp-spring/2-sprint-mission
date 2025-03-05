@@ -25,10 +25,12 @@ class ChannelServiceTest {
     @BeforeEach
     void setUp() {
         UserRepository userRepository = new JCFUserRepository();
-        User user = userRepository.save(new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
+        User user = userRepository.save(
+                new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
 
         channelService = new JCFChannelService(new JCFChannelRepository(), new JCFUserService(userRepository));
-        setUpChannel = channelService.create(NAME, new UserDto(user.getId(), LONGIN_USER.getName()));
+        setUpChannel = channelService.create(NAME,
+                new UserDto(user.getId(), LONGIN_USER.getName(), LONGIN_USER.getEmail()));
     }
 
     @Test

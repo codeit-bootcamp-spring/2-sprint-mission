@@ -20,15 +20,14 @@ class UserServiceTest {
     private UserDto setUpUser;
 
     @BeforeEach
-    void init() {
+    void setUp() {
         userService = new JCFUserService(new JCFUserRepository());
-
-        this.setUpUser = userService.register(
+        setUpUser = userService.register(
                 new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
     }
 
     @AfterEach
-    void teardown() {
+    void tearDown() {
         userService.delete(setUpUser.id());
     }
 
@@ -57,8 +56,8 @@ class UserServiceTest {
 
     @Test
     void 유저_이름_다수_조회() {
-        UserRegisterDto otherUser = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword());
-
+        UserRegisterDto otherUser = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(),
+                OTHER_USER.getPassword());
         userService.register(otherUser);
 
         assertThat(userService.findByName(LONGIN_USER.getName())).hasSize(2);

@@ -9,9 +9,6 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-/* 원본은 camp.nextstep.edu 라이브러리에 있습니다.
-   이해를 위해 주석을 작성했습니다. 추후 보강하겠습니다
-* */
 public abstract class ConsoleTestTemplate {
     private PrintStream standardOut;
     private OutputStream captor;
