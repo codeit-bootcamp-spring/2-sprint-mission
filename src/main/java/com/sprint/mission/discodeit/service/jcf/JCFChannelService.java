@@ -9,7 +9,7 @@ public class JCFChannelService implements ChannelService{
 
     private static JCFChannelService jcfChannel;
 
-    HashMap<UUID, Channel> channels = new HashMap<>();
+    private final HashMap<UUID, Channel> channels = new HashMap<>();
 
     private JCFChannelService(){}
 

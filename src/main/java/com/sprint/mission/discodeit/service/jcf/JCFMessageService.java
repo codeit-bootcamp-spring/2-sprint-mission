@@ -13,7 +13,7 @@ public class JCFMessageService implements MessageService {
     private final ChannelService channelService;
 
 
-    HashMap<UUID, Message> messages = new HashMap<>();
+    private final HashMap<UUID, Message> messages = new HashMap<>();
 
     private JCFMessageService(UserService userService, ChannelService channelService) {
         this.userService = userService;

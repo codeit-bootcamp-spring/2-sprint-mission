@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    HashMap<UUID, User> users = new HashMap<>();
+    private final HashMap<UUID, User> users = new HashMap<>();
 
     private static JCFUserService userService;
 
