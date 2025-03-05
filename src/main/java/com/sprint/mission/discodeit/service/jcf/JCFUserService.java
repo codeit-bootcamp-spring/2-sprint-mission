@@ -3,22 +3,11 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.Factory.CreateServerFactory;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
-/**
- * <h3>유저 서비스 구현체 </h3><p>
- * 서버와 채널을 생성, 삭제, 추가, 업데이트 하는 기능을 수행한다. <br>
- * 유저마다 동일한 기능을 수행해야 한다. <br>
- * 유저마다 유저 레포지토리는 달라야한다.<br>
- * 이를 위해서 Map<유저 ID,유저 레포지토리>를 생성한다.<br>
- * </p>
- *
- * @version 1
- */
 public class JCFUserService implements UserService {
     private static JCFUserService instance;
     private final Map<UUID, UserRepository> userTable = new HashMap<>();

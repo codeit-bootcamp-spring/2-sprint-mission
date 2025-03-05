@@ -1,6 +1,8 @@
-package com.sprint.mission.discodeit.FrontEnd;
+package com.sprint.mission.discodeit.FrontEnd.Service;
 
 import com.sprint.mission.discodeit.Factory.CreateUserFactory;
+import com.sprint.mission.discodeit.FrontEnd.DiscordService;
+import com.sprint.mission.discodeit.FrontEnd.Repository.FileDiscordRepository;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.nio.file.Path;

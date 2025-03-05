@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFChannelRepository;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -24,13 +23,13 @@ public class JCFChannelService implements ChannelService {
     }
 
     private ChannelRepository getChannelRepository(UUID channelId) {
-        ChannelRepository JCFChannelRepository = channelTable.get(channelId);
-        if (JCFChannelRepository == null) {
-            ChannelRepository repository = new LinkedListJCFChannelRepository();
+        ChannelRepository channelRepository = channelTable.get(channelId);
+        if (channelRepository == null) {
+            ChannelRepository repository = new JCFChannelRepository();
             channelTable.put(channelId, repository);
-            JCFChannelRepository = repository;
+            channelRepository = repository;
         }
-        return JCFChannelRepository;
+        return channelRepository;
     }
 
     @Override

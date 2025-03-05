@@ -1,8 +1,7 @@
 import com.sprint.mission.discodeit.FrontEnd.DiscordRepository;
 import com.sprint.mission.discodeit.FrontEnd.DiscordService;
-import com.sprint.mission.discodeit.FrontEnd.FileDiscordRepository;
-import com.sprint.mission.discodeit.FrontEnd.FileDiscordService;
-import com.sprint.mission.discodeit.entity.Container.Channel;
+import com.sprint.mission.discodeit.FrontEnd.Repository.FileDiscordRepository;
+import com.sprint.mission.discodeit.FrontEnd.Service.FileDiscordService;
 import com.sprint.mission.discodeit.entity.Container.Container;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Server;

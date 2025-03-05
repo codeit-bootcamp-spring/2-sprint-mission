@@ -1,5 +1,6 @@
-package com.sprint.mission.discodeit.FrontEnd;
+package com.sprint.mission.discodeit.FrontEnd.Repository;
 
+import com.sprint.mission.discodeit.FrontEnd.DiscordRepository;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.io.*;
@@ -9,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
-public class FileDiscordRepository implements DiscordRepository{
+public class FileDiscordRepository implements DiscordRepository {
     private static FileDiscordRepository instance;
     private final Path path =  Paths.get(System.getProperty("user.dir"), "data", "UserList.ser");
     private List<User> list = new LinkedList<>();

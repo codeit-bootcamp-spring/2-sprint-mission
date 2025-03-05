@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Container.Channel;
 import com.sprint.mission.discodeit.entity.Container.Container;
-import com.sprint.mission.discodeit.entity.Server;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface ServerService {
