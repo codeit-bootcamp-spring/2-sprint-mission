@@ -1,4 +1,4 @@
-package com.sprint.sprint2.discodeit.repository;
+package com.sprint.sprint2.discodeit.repository.util;
 
 import java.io.*;
 import java.util.HashMap;
@@ -26,6 +26,9 @@ public abstract class AbstractFileRepository<T> {
 
     protected Map<UUID, T> loadAll() {
         File file = new File(filePath);
+        if(!file.exists()){
+            return new HashMap<>();
+        }
         try (FileInputStream fis = new FileInputStream(filePath);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             Map<UUID, T> data = (Map<UUID, T>) ois.readObject();
