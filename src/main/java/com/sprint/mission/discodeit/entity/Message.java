@@ -1,23 +1,24 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class Message extends Entity {
+public class Message extends Entity  {
     private String content;
-    private final UUID userId;
+    private final UUID authorId;
     private final UUID channelId;
 
 
-
-    public Message(String content, UUID userId, UUID channelId) {
+    public Message(String content, UUID channelId,UUID authorId) {
         super();
         this.content = content;
-        this.userId = userId;
+        this.authorId = authorId;
         this.channelId = channelId;
     }
 
     public String getContent() { return content; }
-    public UUID getUserId() { return userId; }
+    public UUID getauthorId() { return authorId; }
     public UUID getChannelId() { return channelId; }
 
     public void updateContent(String content) {
