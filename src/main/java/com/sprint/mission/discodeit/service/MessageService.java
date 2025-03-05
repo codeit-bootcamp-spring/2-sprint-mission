@@ -4,12 +4,14 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
     Message saveMessage(Channel channel, User user, String text);
-    void findAll();
-    void findById(UUID id);
+    List<Message> findAll();
+    Optional<Message> findById(UUID id);
     void delete(UUID id);
     void update(UUID id, String message);
 }
