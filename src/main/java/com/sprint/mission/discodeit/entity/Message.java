@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.service.TimeFormatter;
+
 import java.util.UUID;
 
 public class Message extends BaseEntity{
@@ -38,8 +40,8 @@ public class Message extends BaseEntity{
                 ", channelId=" + channelId +
                 ", userId=" + userId +
                 ", text='" + text + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
+                ", createdAt=" + TimeFormatter.format(createdAt, "yyyy-MM-dd HH:mm:ss") +
+                ", updatedAt=" + TimeFormatter.format(updatedAt, "yyyy-MM-dd HH:mm:ss") +
                 '}';
     }
 }

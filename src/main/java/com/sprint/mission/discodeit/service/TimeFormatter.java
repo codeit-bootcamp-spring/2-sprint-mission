@@ -6,10 +6,10 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class TimeFormatter {
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    // 유닉스 타임스탬프를 읽기 좋은 형식으로 변환하는 메서드
-    public static String format(Long timestamp) {
+    // 입력받은 pattern으로 format 타입 설정
+    public static String format(Long timestamp, String pattern) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
         return dateTime.format(formatter);
     }
