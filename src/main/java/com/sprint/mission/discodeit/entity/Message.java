@@ -9,7 +9,6 @@ public class Message extends BaseEntity {
     private final UUID channelId;
     private String text;
 
-
     public Message(UUID userId, UUID channelId, String text) {
         super();
         this.userId = userId;
