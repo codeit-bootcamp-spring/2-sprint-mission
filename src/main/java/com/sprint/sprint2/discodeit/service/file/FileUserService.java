@@ -43,6 +43,6 @@ public class FileUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        fileUserRepository.findById(userId.toString());
+        fileUserRepository.delete(userId);
     }
 }
