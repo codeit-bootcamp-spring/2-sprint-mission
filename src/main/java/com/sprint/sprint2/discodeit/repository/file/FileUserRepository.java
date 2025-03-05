@@ -1,8 +1,9 @@
 package com.sprint.sprint2.discodeit.repository.file;
 
 import com.sprint.sprint2.discodeit.entity.User;
-import com.sprint.sprint2.discodeit.repository.AbstractFileRepository;
+import com.sprint.sprint2.discodeit.repository.util.AbstractFileRepository;
 import com.sprint.sprint2.discodeit.repository.UserRepository;
+import com.sprint.sprint2.discodeit.repository.util.FilePathUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -11,10 +12,9 @@ import java.util.UUID;
 
 public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository {
 
-    private static final String FILE_PATH = "users.ser";
 
     public FileUserRepository() {
-        super(FILE_PATH);
+        super(FilePathUtil.USERS.getPath());
     }
 
     @Override

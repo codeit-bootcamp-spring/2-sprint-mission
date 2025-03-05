@@ -1,10 +1,9 @@
 package com.sprint.sprint2.discodeit.repository.file;
 
-import com.sprint.sprint2.discodeit.entity.Channel;
 import com.sprint.sprint2.discodeit.entity.Message;
-import com.sprint.sprint2.discodeit.entity.User;
-import com.sprint.sprint2.discodeit.repository.AbstractFileRepository;
+import com.sprint.sprint2.discodeit.repository.util.AbstractFileRepository;
 import com.sprint.sprint2.discodeit.repository.MessageRepository;
+import com.sprint.sprint2.discodeit.repository.util.FilePathUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -12,10 +11,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository {
-    private static final String FILE_PATH = "message.ser";
 
     public FileMessageRepository() {
-        super(FILE_PATH);
+        super(FilePathUtil.Message.getPath());
     }
 
     @Override

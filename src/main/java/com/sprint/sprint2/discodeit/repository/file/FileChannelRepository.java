@@ -1,8 +1,9 @@
 package com.sprint.sprint2.discodeit.repository.file;
 
 import com.sprint.sprint2.discodeit.entity.Channel;
-import com.sprint.sprint2.discodeit.repository.AbstractFileRepository;
+import com.sprint.sprint2.discodeit.repository.util.AbstractFileRepository;
 import com.sprint.sprint2.discodeit.repository.ChannelRepository;
+import com.sprint.sprint2.discodeit.repository.util.FilePathUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,10 +12,8 @@ import java.util.UUID;
 
 public class FileChannelRepository extends AbstractFileRepository<Channel> implements ChannelRepository {
 
-    private static final String FILE_PATH = "channel.ser";
-
-    protected FileChannelRepository(String filePath) {
-        super(filePath);
+    protected FileChannelRepository() {
+        super(FilePathUtil.CHANNELS.getPath());
     }
 
     @Override
