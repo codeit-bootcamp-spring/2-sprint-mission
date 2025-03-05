@@ -94,25 +94,7 @@ public class JavaApplication {
                     System.out.print("입력란: ");
                     int deleteNum = sc.nextInt();
                     sc.nextLine();
-                    switch (deleteNum) {
-                        case 1:
-                            System.out.print("삭제할 사용자 아이디: ");
-                            UUID userUUID = UUID.fromString(sc.nextLine());
-                            userService.delete(userUUID);
-                            break;
-                        case 2:
-                            System.out.print("삭제할 채널 아이디: ");
-                            UUID channelUUID = UUID.fromString(sc.nextLine());
-                            channelService.deleteChannel(channelUUID);
-                            break;
-                        case 3:
-                            System.out.print("삭제할 메시지 아이디: ");
-                            UUID messageUUID = UUID.fromString(sc.nextLine());
-                            messageService.deleteMessageById(messageUUID);
-                            break;
-                        case 4:
-                            break;
-                    }
+                    deleteByNum(deleteNum);
                     break;
                 case 5:
                     userToken = null;
@@ -234,23 +216,47 @@ public class JavaApplication {
                 System.out.print("원하는 닉네임 입력: ");
                 String nickname = sc.nextLine();
                 userService.update(userUUID, nickname);
-                break;
+                return;
             case 2:
                 System.out.print("변경할 채널 아이디 입력: ");
                 UUID channelUUID = UUID.fromString(sc.nextLine());
                 System.out.print("원하는 채널명 입력: ");
                 String channelName = sc.nextLine();
                 channelService.updateChannel(channelUUID, channelName);
-                break;
+                return;
             case 3:
                 System.out.print("수정할 메세지 아이디 입력: ");
                 UUID messageUUID = UUID.fromString(sc.nextLine());
                 System.out.print("수정 메시지 입력: ");
                 String message = sc.nextLine();
                 messageService.updateMessage(messageUUID, message);
-                break;
-            case 4:
-                break;
+                return;
+            default:
+                System.out.println("잘못된 입력값");
+                return;
+        }
+    }
+
+    private static void deleteByNum(int deleteNum) {
+        switch (deleteNum) {
+            case 1:
+                System.out.print("삭제할 사용자 아이디: ");
+                UUID userUUID = UUID.fromString(sc.nextLine());
+                userService.delete(userUUID);
+                return;
+            case 2:
+                System.out.print("삭제할 채널 아이디: ");
+                UUID channelUUID = UUID.fromString(sc.nextLine());
+                channelService.deleteChannel(channelUUID);
+                return;
+            case 3:
+                System.out.print("삭제할 메시지 아이디: ");
+                UUID messageUUID = UUID.fromString(sc.nextLine());
+                messageService.deleteMessageById(messageUUID);
+                return;
+            default:
+                System.out.println("잘못된 입력값");
+                return;
         }
     }
 }
