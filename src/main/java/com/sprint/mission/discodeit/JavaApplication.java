@@ -4,9 +4,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.Collections;
 import java.util.Scanner;
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class JavaApplication {
     static Scanner sc = new Scanner(System.in);
-    static UserService userService = JCFUserService.getInstance();
+    static UserService userService = new FileUserService();
     static ChannelService channelService = JCFChannelService.getInstance();
     static MessageService messageService = JCFMessageService.getInstance(userService, channelService);
 

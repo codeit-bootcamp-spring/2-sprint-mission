@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity {
+import java.io.Serializable;
+
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String nickname;
     private String password;
 
@@ -17,13 +20,11 @@ public class User extends BaseEntity {
         return nickname;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getPassword() {
         return password;
     }
+
+    public void update(){}
 
     @Override
     public String toString() {
