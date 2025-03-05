@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 public class LinkedListJCFChannelRepository extends JCFChannelRepository {
     public LinkedListJCFChannelRepository() {
-        super.setList(new LinkedList<>());
+        super.updateMessageList(new LinkedList<>());
     }
 
     @Override

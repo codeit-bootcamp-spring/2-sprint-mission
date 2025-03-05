@@ -19,8 +19,6 @@ public interface ChannelService {
     //출력
     public abstract void printChannel(UUID channelId);
 
-    public abstract void printChannel(List<Message> list);
-
     //삭제
     public abstract boolean removeMessage(UUID channelId, String targetName);
 

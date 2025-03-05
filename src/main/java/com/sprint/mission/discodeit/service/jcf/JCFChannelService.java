@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFChannelRepository;
 import com.sprint.mission.discodeit.entity.Message;
@@ -10,7 +11,7 @@ import java.util.*;
 
 public class JCFChannelService implements ChannelService {
     private static JCFChannelService instance;
-    private final Map<UUID, JCFChannelRepository> channelTable = new HashMap<>();
+    private final Map<UUID, ChannelRepository> channelTable = new HashMap<>();
 
     private JCFChannelService(){
     }
@@ -22,10 +23,10 @@ public class JCFChannelService implements ChannelService {
         return instance;
     }
 
-    private JCFChannelRepository getChannelRepository(UUID channelId) {
-        JCFChannelRepository JCFChannelRepository = channelTable.get(channelId);
+    private ChannelRepository getChannelRepository(UUID channelId) {
+        ChannelRepository JCFChannelRepository = channelTable.get(channelId);
         if (JCFChannelRepository == null) {
-            LinkedListJCFChannelRepository repository = new LinkedListJCFChannelRepository();
+            ChannelRepository repository = new LinkedListJCFChannelRepository();
             channelTable.put(channelId, repository);
             JCFChannelRepository = repository;
         }
@@ -34,31 +35,31 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Message write(UUID channelId) {
-        JCFChannelRepository JCFChannelRepository = getChannelRepository(channelId);
+        ChannelRepository channelRepository = getChannelRepository(channelId);
         Scanner sc = new Scanner(System.in);
         System.out.print("메시지를 작성하시오. : ");
         String str = sc.nextLine();
         Message message = new Message(str);
-        return write(JCFChannelRepository, message);
+        return write(channelRepository, message);
     }
 
     @Override
     public Message write(UUID channelId, String str) {
-        JCFChannelRepository JCFChannelRepository = getChannelRepository(channelId);
+        ChannelRepository channelRepository = getChannelRepository(channelId);
         Message message = new Message(str);
 
-        return write(JCFChannelRepository, message);
+        return write(channelRepository, message);
     }
 
-    private Message write(JCFChannelRepository JCFChannelRepository, Message message) {
-        JCFChannelRepository.add(message);
+    private Message write(ChannelRepository channelRepository, Message message) {
+        channelRepository.save(message);
         return message;
     }
 
     @Override
     public Message getMessage(UUID channelId, String str) {
-        JCFChannelRepository JCFChannelRepository = getChannelRepository(channelId);
-        List<Message> list = JCFChannelRepository.getList();
+        ChannelRepository channelRepository = getChannelRepository(channelId);
+        List<Message> list = channelRepository.getList();
         for (Message message : list) {
             if (message.getStr().equals(str)) {
                 //로그
@@ -73,14 +74,13 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void printChannel(UUID channelId) {
-        JCFChannelRepository JCFChannelRepository = getChannelRepository(channelId);
-        List<Message> list = JCFChannelRepository.getList();
+        ChannelRepository channelRepository = getChannelRepository(channelId);
+        List<Message> list = channelRepository.getList();
         printChannel(list);
     }
 
-    @Override
-    public void printChannel(List<Message> list) {
-        System.out.println("\n=========메시지 목록==========");
+    private void printChannel(List<Message> list) {
+        System.out.println("\n=========채널 메시지 목록==========");
         for (int i = 0; i < list.size(); i++) {
             System.out.println(i + 1 + " : " + list.get(i).getStr());
         }
@@ -89,8 +89,8 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public boolean removeMessage(UUID channelId, String targetName) {
-        JCFChannelRepository JCFChannelRepository = getChannelRepository(channelId);
-        List<Message> list = JCFChannelRepository.getList();
+        ChannelRepository channelRepository = getChannelRepository(channelId);
+        List<Message> list = channelRepository.getList();
         for (Message item : list) {
             if (item.getStr().equals(targetName)) {
                 //로그
@@ -104,9 +104,9 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public boolean updateMessage(UUID id, String targetName, String replaceName) {
-        JCFChannelRepository JCFChannelRepository = getChannelRepository(id);
-        List<Message> list = JCFChannelRepository.getList();
+    public boolean updateMessage(UUID channelId, String targetName, String replaceName) {
+        ChannelRepository channelRepository = getChannelRepository(channelId);
+        List<Message> list = channelRepository.getList();
         for (Message item : list) {
             if (item.getStr().equals(targetName)) {
                 item.setStr(replaceName);

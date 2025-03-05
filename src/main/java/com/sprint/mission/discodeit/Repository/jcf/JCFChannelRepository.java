@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 
-public class JCFChannelRepository implements ChannelRepository {
+public class JCFChannelRepository implements com.sprint.mission.discodeit.Repository.ChannelRepository {
     private List<Message> list;
 
     public void save(Message message) {
