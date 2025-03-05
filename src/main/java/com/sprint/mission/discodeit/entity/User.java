@@ -25,8 +25,8 @@ public class User extends BaseEntity {
         return "User{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", createdAt=" + TimeFormatter.format(createdAt) +
-                ", updatedAt=" + TimeFormatter.format(updatedAt) +
+                ", createdAt=" + TimeFormatter.format(createdAt, "yyyy-MM-dd HH:mm:ss") +
+                ", updatedAt=" + TimeFormatter.format(updatedAt, "yyyy-MM-dd HH:mm:ss") +
                 '}';
     }
 }

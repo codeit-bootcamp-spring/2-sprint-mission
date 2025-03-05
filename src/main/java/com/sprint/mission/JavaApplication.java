@@ -3,6 +3,9 @@ package com.sprint.mission;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -11,9 +14,9 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        JCFUserService userService = JCFUserService.getInstance();
-        JCFChannelService channelService = JCFChannelService.getInstance();
-        JCFMessageService messageService = JCFMessageService.getInstance(userService, channelService);
+        UserService userService = JCFUserService.getInstance();
+        ChannelService channelService = JCFChannelService.getInstance();
+        MessageService messageService = JCFMessageService.getInstance(userService, channelService);
 
         // 유저 등록
         User user1 = userService.saveUser("user1");
