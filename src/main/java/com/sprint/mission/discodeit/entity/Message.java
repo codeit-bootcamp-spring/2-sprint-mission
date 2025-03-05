@@ -22,7 +22,9 @@ public class Message extends Entity  {
     public UUID getChannelId() { return channelId; }
 
     public void updateContent(String content) {
-        this.content = content;
-        this.updatedAt = System.currentTimeMillis();
+        if(content != null) {
+            this.content = content;
+            this.updatedAt = System.currentTimeMillis();
+        } else return;;
     }
 }

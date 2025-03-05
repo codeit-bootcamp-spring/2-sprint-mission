@@ -16,11 +16,22 @@ public class Channel extends Entity {
 
     public String getName() { return name; }
     public void updateName(String name) {
-        this.name = name;
-        this.updatedAt = System.currentTimeMillis();
+        if(name!=null) {
+            this.name = name;
+            this.updatedAt = System.currentTimeMillis();
+        }else return;;
+
     }
     public ChannelType getType() { return type; }
     public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public void setType(ChannelType type) { this.type = type; }
+    public void setDescription(String description) {
+        if(description!=null) {
+            this.description = description;
+        }else return;;
+    }
+    public void setType(ChannelType type) {
+        if(type!=null) {
+            this.type = type;
+        }else return;;
+    }
 }

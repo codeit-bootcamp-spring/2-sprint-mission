@@ -18,17 +18,24 @@ public class User extends Entity {
 
     public String getUsername() { return username; }
     public void updateUsername(String username) {
-        this.username = username;
-        this.updatedAt = System.currentTimeMillis();
+        if(username != null){
+            this.username = username;
+            this.updatedAt = System.currentTimeMillis();
+        }else return;
     }
     public void setPassword(String password) {
-        this.password = password;
-        this.updatedAt = System.currentTimeMillis();
+        if(password != null){
+            this.password = password;
+            this.updatedAt = System.currentTimeMillis();
+        }else return;;
+
     }
     public String getPassword() { return password; }
     public String getEmail() { return email; }
     public void setEmail(String email) {
-        this.email = email;
-        this.updatedAt = System.currentTimeMillis();
+        if(email != null){
+            this.email = email;
+            this.updatedAt = System.currentTimeMillis();
+        }else return;;
     }
 }
