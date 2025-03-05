@@ -12,8 +12,4 @@ public interface MessageService {
     List<Message> findAll();
     Message update(UUID messageId, String newContent);
     void delete(UUID messageId);
-    void saveToFile(Message message);
-    Message loadOneFromFile(UUID messageId);
-    List<Message> loadAllFromFile();
-    void deleteFile(UUID messageId);
 }

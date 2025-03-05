@@ -12,8 +12,4 @@ public interface ChannelService {
     List<Channel> findAll();
     Channel update(UUID channelId, String newName, String newDescription);
     void delete(UUID channelId);
-    void saveToFile(Channel channel);
-    Channel loadOneFromFile(UUID channelId);
-    List<Channel> loadAllFromFile();
-    void deleteFile(UUID channelId);
 }

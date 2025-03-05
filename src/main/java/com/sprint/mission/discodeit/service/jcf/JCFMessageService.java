@@ -65,23 +65,5 @@ public class JCFMessageService implements MessageService {
         this.data.remove(messageId);
     }
 
-    @Override
-    public void saveToFile(Message message) {
 
-    }
-
-    @Override
-    public Message loadOneFromFile(UUID messageId) {
-        return null;
-    }
-
-    @Override
-    public List<Message> loadAllFromFile() {
-        return List.of();
-    }
-
-    @Override
-    public void deleteFile(UUID messageId) {
-
-    }
 }

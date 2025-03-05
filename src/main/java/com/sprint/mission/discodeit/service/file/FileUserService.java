@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.FileService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.SerializationUtil;
 
@@ -10,7 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class FileUserService implements UserService {
+public class FileUserService implements UserService, FileService<User> {
 
     @Override
     public User create(String username, String email, String password) {

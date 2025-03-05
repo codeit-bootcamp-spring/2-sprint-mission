@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.FileService;
 import com.sprint.mission.discodeit.util.SerializationUtil;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class FileChannelService implements ChannelService {
+public class FileChannelService implements ChannelService, FileService<Channel> {
 
     @Override
     public Channel create(ChannelType type, String name, String description) {

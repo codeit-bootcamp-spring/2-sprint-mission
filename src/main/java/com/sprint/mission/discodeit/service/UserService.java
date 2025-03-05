@@ -11,9 +11,5 @@ public interface UserService {
     User find(UUID userId);
     List<User> findAll();
     User update(UUID userId, String newUsername, String newEmail, String newPassword);
-    void delete(UUID userId);
-    void saveToFile(User user);
-    User loadOneFromFile(UUID userId);
-    List<User> loadAllFromFile();
-    void deleteFile(UUID userId);
+    void delete(UUID userId);;
 }
