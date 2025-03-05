@@ -15,9 +15,15 @@ public class User extends BaseEntity {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-        setUpdatedAt();
+    public void setName(String newName) {
+        boolean anyValueUpdated = false;
+        if(newName != null && !newName.equals(this.name)){
+            anyValueUpdated = true;
+        }
+        if(anyValueUpdated){
+            this.name = newName;
+            setUpdatedAt();
+        }
     }
 
     @Override
