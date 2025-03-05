@@ -1,12 +1,9 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -22,8 +19,8 @@ public class ChatSystemMenu {
     }
 
     // 1번 메뉴: 생성 서브 메뉴
-    public static void processCreateMenu(Scanner scanner, JCFUserService userService,
-                                         JCFChannelService channelService, JCFMessageService messageService) {
+    public static void processCreateMenu(Scanner scanner, UserService userService,
+                                         ChannelService channelService, MessageService messageService) {
         System.out.println("\n--- 생성 메뉴 ---");
         System.out.println("1. 유저 생성");
         System.out.println("2. 채널 생성");
@@ -77,8 +74,8 @@ public class ChatSystemMenu {
     }
 
     // 2번 메뉴: 단건 정보 조회
-    public static void processSingleLookupMenu(Scanner scanner, JCFUserService userService,
-                                               JCFChannelService channelService, JCFMessageService messageService) {
+    public static void processSingleLookupMenu(Scanner scanner, UserService userService,
+                                               ChannelService channelService, MessageService messageService) {
         System.out.println("\n--- 단건 정보 조회 메뉴 ---");
         System.out.println("1. 유저 정보 조회");
         System.out.println("2. 채널 정보 조회");
@@ -115,8 +112,8 @@ public class ChatSystemMenu {
     }
 
     // 3번 메뉴: 다건 정보 조회
-    public static void processMultipleLookupMenu(Scanner scanner, JCFUserService userService,
-                                                 JCFChannelService channelService, JCFMessageService messageService) {
+    public static void processMultipleLookupMenu(Scanner scanner, UserService userService,
+                                                 ChannelService channelService, MessageService messageService) {
             System.out.println("\n--- 다건 정보 조회 메뉴 ---");
             System.out.println("1. 모든 유저 정보 조회");
             System.out.println("2. 모든 채널 정보 조회");
@@ -149,8 +146,8 @@ public class ChatSystemMenu {
         }
 
         // 4번 메뉴: 정보 수정
-    public static void processUpdateMenu(Scanner scanner, JCFUserService userService,
-                                         JCFChannelService channelService, JCFMessageService messageService) {
+    public static void processUpdateMenu(Scanner scanner, UserService userService,
+                                         ChannelService channelService, MessageService messageService) {
         System.out.println("\n--- 정보 수정 메뉴 ---");
         System.out.println("1. 유저 이름 수정");
         System.out.println("2. 채널 이름 수정");
@@ -196,8 +193,8 @@ public class ChatSystemMenu {
     }
 
     // 5번 메뉴: 데이터 삭제 서브 메뉴
-    public static void processDeleteMenu(Scanner scanner, JCFUserService userService,
-                                         JCFChannelService channelService, JCFMessageService messageService) {
+    public static void processDeleteMenu(Scanner scanner, UserService userService,
+                                         ChannelService channelService, MessageService messageService) {
         System.out.println("\n--- 데이터 삭제 메뉴 ---");
         System.out.println("1. 유저 삭제");
         System.out.println("2. 채널 삭제");
@@ -253,8 +250,8 @@ public class ChatSystemMenu {
     }
 
     // 6번 메뉴: 모든 유저 및 채널 조회
-    public static void processAllLookup(Scanner scanner, JCFUserService userService,
-                                        JCFChannelService channelService, JCFMessageService messageService) {
+    public static void processAllLookup(Scanner scanner, UserService userService,
+                                        ChannelService channelService, MessageService messageService) {
         executeSafely("모든 유저 및 채널 조회 중 오류 발생", () -> {
             System.out.println("\n===== 모든 유저 및 채널 조회 =====");
             System.out.println("유저 목록: " + userService.getAllUsers());

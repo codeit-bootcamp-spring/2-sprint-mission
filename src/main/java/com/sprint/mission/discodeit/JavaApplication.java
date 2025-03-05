@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.jcf.JCFUserService;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 
 import java.util.Scanner;
 
@@ -46,9 +48,14 @@ public class JavaApplication {
 
     public static void main(String[] args) {
         // 서비스 초기화
-        JCFUserService userService = JCFUserService.getInstance();
-        JCFChannelService channelService = JCFChannelService.getInstance(userService);
-        JCFMessageService messageService = JCFMessageService.getInstance(userService, channelService);
+//        UserService userService = JCFUserService.getInstance();
+//        ChannelService channelService = JCFChannelService.getInstance(userService);
+//        MessageService  messageService = JCFMessageService.getInstance(userService, channelService);
+
+        UserService userService = FileUserService.getInstance();
+        ChannelService channelService = FileChannelService.getInstance(userService);
+        MessageService messageService = FileMessageService.getInstance(userService, channelService);
+
 
         Scanner scanner = new Scanner(System.in);
 
