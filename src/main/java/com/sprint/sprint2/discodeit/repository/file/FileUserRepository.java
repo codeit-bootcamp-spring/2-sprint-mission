@@ -1,6 +1,7 @@
 package com.sprint.sprint2.discodeit.repository.file;
 
 import com.sprint.sprint2.discodeit.entity.User;
+import com.sprint.sprint2.discodeit.repository.AbstractFileRepository;
 import com.sprint.sprint2.discodeit.repository.UserRepository;
 import java.util.List;
 import java.util.Map;

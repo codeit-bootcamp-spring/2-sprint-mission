@@ -1,6 +1,7 @@
 package com.sprint.sprint2.discodeit.repository.file;
 
 import com.sprint.sprint2.discodeit.entity.Channel;
+import com.sprint.sprint2.discodeit.repository.AbstractFileRepository;
 import com.sprint.sprint2.discodeit.repository.ChannelRepository;
 import java.util.List;
 import java.util.Map;
