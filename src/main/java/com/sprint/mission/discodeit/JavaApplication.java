@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.channel.Channel;
-import com.sprint.mission.discodeit.entity.message.ChannelMessage;
-import com.sprint.mission.discodeit.entity.message.PrivateMessage;
+import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicatedUserException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -151,78 +150,39 @@ public class JavaApplication {
 
         // 메시지 서비스 테스트
         System.out.println("=========== 메세지 생성 및 전체 메세지 조회 테스트 ===========");
-        System.out.println("=========== 예상 결과: 메세지 9개 (개인 6개, 채널 3개) ===========");
-        PrivateMessage pm1 = messageService.sendPrivateMessage(user1.getId(), "안녕하세요", user2.getId());
-        PrivateMessage pm2 = messageService.sendPrivateMessage(user2.getId(), "반가워요", user1.getId());
-        PrivateMessage pm3 = messageService.sendPrivateMessage(user1.getId(), "뭐하세요", user2.getId());
-        PrivateMessage pm4 = messageService.sendPrivateMessage(user2.getId(), "밥 먹는 중", user1.getId());
-        PrivateMessage pm5 = messageService.sendPrivateMessage(user1.getId(), "안녕하세요 Jack", user4.getId());
-        PrivateMessage pm6 = messageService.sendPrivateMessage(user4.getId(), "방가방가", user1.getId());
-        ChannelMessage cm1 = messageService.sendChannelMessage(user1.getId(), "단체 메일 보냄", channel1.getId());
-        ChannelMessage cm2 = messageService.sendChannelMessage(user1.getId(), "하이하이", channel1.getId());
-        ChannelMessage cm3 = messageService.sendChannelMessage(user2.getId(), "난 보내지면 안됨, 채널에 없거든", channel1.getId());
-        ChannelMessage cm4 = messageService.sendChannelMessage(user3.getId(), "하이루", channel1.getId());
+        System.out.println("=========== 예상 결과: 메세지 4개 ===========");
+        Message cm1 = messageService.sendMessage(user1.getId(), "단체 메일 보냄", channel1.getId());
+        Message cm2 = messageService.sendMessage(user1.getId(), "하이하이", channel1.getId());
+        Message cm3 = messageService.sendMessage(user2.getId(), "난 보내지면 안됨, 채널에 없거든", channel1.getId());
+        Message cm4 = messageService.sendMessage(user3.getId(), "하이루", channel1.getId());
 
         messageService.getAllMessages().forEach(System.out::println);
         System.out.println("=========== 메세지 생성 및 전체 메세지 조회 테스트 끝===========");
         System.out.println();
 
         System.out.println("=========== 메세지 테스트===========");
-        System.out.println("=========== 메세지 id로 메세지 조회 테스트: 내용이 '방가방가' ===========");
-        System.out.println(messageService.getMessageByMessageId(pm6.getId()));
-
-        System.out.println("=========== 송신자 기준 메세지 조회 테스트: Han이 보낸거: 개인 3개, 채널 2개 ===========");
-        messageService.getMessagesBySenderId(user1.getId()).forEach(System.out::println);
-
-        System.out.println("=========== 수신자 기준 메세지 조회 테스트: Han이 받은거 3개 ===========");
-        messageService.getPrivateMessagesByReceiverId(user1.getId()).forEach(System.out::println);
-
-        System.out.println("=========== 채널 기준 메세지 조회 테스트: 채널 1에 메세지 3개 ===========");
-        messageService.getChannelMessagesByChannelId(channel1.getId()).forEach(System.out::println);
+        System.out.println("=========== 메세지 id로 메세지 조회 테스트: 내용이 '하이하이' ===========");
+        System.out.println(messageService.getMessageByMessageId(cm2.getId()));
         System.out.println("=========== 채널 메세지 조회 테스트 끝 ===========");
         System.out.println();
 
-        System.out.println("=========== 메세지 변경 테스트: 변경 이전 내용:안녕하세요 ===========");
-        System.out.println(messageService.getMessageByMessageId(pm1.getId()));
+        System.out.println("=========== 메세지 변경 테스트: 변경 이전 내용:'하이하이' ===========");
+        System.out.println(messageService.getMessageByMessageId(cm2.getId()));
         System.out.println("=========== 메세지 변경 테스트: 변경 이후 내용:헬로우 ===========");
-        messageService.updateMessage(pm1.getId(), "헬로우");
-        System.out.println(messageService.getMessageByMessageId(pm1.getId()));
+        messageService.updateMessage(cm2.getId(), "헬로우");
+        System.out.println(messageService.getMessageByMessageId(cm2.getId()));
         System.out.println("=========== 메세지 수정 테스트 끝 ===========");
         System.out.println();
 
         System.out.println("=========== 메세지 삭제 테스트: Han이 보낸 헬로우 메세지 삭제 ===========");
-        messageService.deleteMessage(pm1.getId());
-        System.out.println("=========== 송신자 기준 메세지 목록: 4개여야 삭제된거임 ===========");
-        messageService.getMessagesBySenderId(user1.getId()).forEach(System.out::println);
-        System.out.println("=========== 수신자 기준 메세지 목록: 1개여야 삭제된거임 ===========");
-        messageService.getPrivateMessagesByReceiverId(user2.getId()).forEach(System.out::println);
+        messageService.deleteMessage(cm2.getId());
+        System.out.println("=========== 총 메세지 2개여야 함 ===========");
+        messageService.getAllMessages().forEach(System.out::println);
 
 
         System.out.println();
         System.out.println();
-//        System.out.println("=========== 유저 삭제하면 채널에서도 없어지는지 확인:  ===========");
-//        System.out.println("=========== 신규유저: David 생성, 채널 1, 2에 가입 ===========");
-//        User userToDelete = userService.createUser("David", "David@gmail.com", "Dog", "HIHIHIHIHIHI");
-//        channelService.addUserToChannel(channel1.getId(), userToDelete.getId());
-//        channelService.addUserToChannel(channel2.getId(), userToDelete.getId());
-//        System.out.println("=========== 채널 1 유저 목록 - David 있어야 함===========");
-//        channelService.getChannelMembers(channel1.getId()).forEach((u) -> {
-//            System.out.println(userService.getUserByUserId(u).getNickname());
-//        });
-//        System.out.println("=========== 채널 2 유저 목록 - David 있어야 함 ===========");
-//        channelService.getChannelMembers(channel2.getId()).forEach((u) -> {
-//            System.out.println(userService.getUserByUserId(u).getNickname());
-//        });
-//        System.out.println("=========== 유저 David 삭제 ===========");
-//        userService.deleteUserById(userToDelete.getId());
-//        System.out.println("=========== 채널 1 유저 목록 - David 없어야 함===========");
-//        channelService.getChannelMembers(channel1.getId()).forEach((u) -> {
-//            System.out.println(userService.getUserByUserId(u).getNickname());
-//        });
-//        System.out.println("=========== 채널 2 유저 목록 - David 없어야 함 ===========");
-//        channelService.getChannelMembers(channel2.getId()).forEach((u) -> {
-//            System.out.println(userService.getUserByUserId(u).getNickname());
-//        });
+
 
     }
 }
