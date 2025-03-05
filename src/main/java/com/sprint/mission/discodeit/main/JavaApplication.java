@@ -6,15 +6,19 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserService userService = new JCFUserService();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService(userService, channelService);
+//        UserService userService = new FileUserService();
+//        ChannelService channelService = new FileChannelService();
+//        MessageService messageService = new FileMessageService();
+
+        UserService userService = new FileUserService();
+        ChannelService channelService = new FileChannelService();
+        MessageService messageService = new FileMessageService();
 
         User user1 = userService.createUser("Kim");
         User user2 = userService.createUser("Lee");
@@ -84,9 +88,9 @@ public class JavaApplication {
 
         System.out.println("-----");
 
-        Message message1 = messageService.createMessage(user1.getId(), channel1.getId(), "Hello World");
-        Message message2 = messageService.createMessage(user3.getId(), channel1.getId(), "Hi Kim!");
-        Message message3 = messageService.createMessage(user1.getId(), channel3.getId(), "Java");
+        Message message1 = messageService.createMessage(channel1.getId(), user1.getId(), "Hello World");
+        Message message2 = messageService.createMessage(channel1.getId(), user3.getId(), "Hi Kim!");
+        Message message3 = messageService.createMessage(channel3.getId(), user1.getId(), "Java");
 
         System.out.println("=== 메세지 목록 ===");
         messageService.getAllMessages().forEach(msg ->
@@ -101,7 +105,7 @@ public class JavaApplication {
 
         System.out.println("=== 메세지 목록 (삭제 후) ===");
         messageService.getAllMessages().stream()
-                .map(msg -> "]" + msg.getChannelId() + "]" + msg.getUserId() + ": " + msg.getContent())
+                .map(msg -> "[" + msg.getChannelId() + "] " + msg.getUserId() + ": " + msg.getContent())
                 .forEach(System.out::println);
     }
 }
