@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileUserRepository implements FileRepository<User>, UserRepository {
@@ -22,8 +23,8 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
     }
 
     @Override
-    public User findById(UUID userId) {
-        return loadOneFromFileById(userId);
+    public Optional<User> findById(UUID userId) {
+        return Optional.ofNullable(loadOneFromFileById(userId));
     }
 
     @Override
