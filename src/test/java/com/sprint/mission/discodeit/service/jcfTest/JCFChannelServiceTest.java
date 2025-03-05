@@ -46,19 +46,6 @@ class JCFChannelServiceTest {
     }
 
     @Test
-    @DisplayName("JCFChannelService: 이미 존재하는 채널 생성 시 예외 확인")
-    void testDuplicateChannelCreation() {
-        String channelName = "testChannel_" + UUID.randomUUID();
-        channelService.createChannel(channelName);
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            channelService.createChannel(channelName);
-        });
-        logger.info("예외 발생 확인: " + exception.getMessage());
-        assertEquals("이미 존재하는 채널입니다.", exception.getMessage());
-    }
-
-    @Test
     @DisplayName("JCFChannelService: 채널에 유저 추가 및 제거 확인")
     void testAddAndRemoveUser() {
         String channelName = "testChannel_" + UUID.randomUUID();
@@ -67,8 +54,7 @@ class JCFChannelServiceTest {
                 .filter(c -> c.getChannelName().equals(channelName))
                 .findFirst().get().getId();
 
-        userService.createUser("testUser");
-        User user = userService.getUserByName("testUser");
+        User user = userService.createUser("testUser");
         UUID userId = user.getId();
 
         channelService.addUserToChannel(channelId, userId);

@@ -15,11 +15,11 @@ import java.util.UUID;
 import java.util.List;
 import java.util.logging.Logger;
 
-class JCFMessageServiceTest {
+class JCFMessageRepositoryTest {
     private JCFMessageService messageService;
     private JCFUserService userService;
     private JCFChannelService channelService;
-    private static final Logger logger = Logger.getLogger(JCFMessageServiceTest.class.getName());
+    private static final Logger logger = Logger.getLogger(JCFMessageRepositoryTest.class.getName());
 
     @BeforeEach
     void setUp() {
@@ -31,8 +31,7 @@ class JCFMessageServiceTest {
     @Test
     @DisplayName("JCFMessageService: 여러 개의 메세지 추가 확인")
     void testMultipleMessagesOrder() {
-        userService.createUser("testUser_" + UUID.randomUUID());
-        User user = userService.getUserByName(userService.getAllUsers().get(0).getUsername());
+        User user = userService.createUser("testUser_" + UUID.randomUUID());
         UUID userId = user.getId();
 
         String channelName = "testChannel_" + UUID.randomUUID();
@@ -70,8 +69,8 @@ class JCFMessageServiceTest {
     @Test
     @DisplayName("JCFMessageService: 존재하지 않는 채널에 메세지 전송 시 예외 발생")
     void testMessageToNonExistentChannel() {
-        userService.createUser("testUser_" + UUID.randomUUID());
-        User user = userService.getUserByName(userService.getAllUsers().get(0).getUsername());
+
+        User user = userService.createUser("testUser_" + UUID.randomUUID());
         UUID userId = user.getId();
         UUID fakeChannelId = UUID.randomUUID();
 
@@ -85,8 +84,7 @@ class JCFMessageServiceTest {
     @Test
     @DisplayName("JCFMessageService: 메세지 수정 확인")
     void testUpdateMessage() {
-        userService.createUser("testUser_" + UUID.randomUUID());
-        User user = userService.getUserByName(userService.getAllUsers().get(0).getUsername());
+        User user = userService.createUser("testUser_" + UUID.randomUUID());
         UUID userId = user.getId();
 
         String channelName = "testChannel_" + UUID.randomUUID();

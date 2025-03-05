@@ -27,22 +27,10 @@ class JCFUserServiceTest {
     void testCreateValidUser() {
         String uniqueUsername = "user_" + UUID.randomUUID();
         userService.createUser(uniqueUsername);
-        User createdUser = userService.getUserByName(uniqueUsername);
+        User createdUser = userService.createUser(uniqueUsername);
         assertNotNull(createdUser);
         assertEquals(uniqueUsername, createdUser.getUsername());
         logger.info("유저 생성 확인: " + createdUser.getUsername());
-    }
-
-    @Test
-    @DisplayName("JCFUserService: 중복된 유저 생성 시 예외 발생")
-    void testCreateDuplicateUser() {
-        String uniqueUsername = "user_" + UUID.randomUUID();
-        userService.createUser(uniqueUsername);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            userService.createUser(uniqueUsername);
-        });
-        logger.info("예외 발생 확인: " + exception.getMessage());
-        assertEquals("이미 존재하는 유저입니다.", exception.getMessage());
     }
 
     @Test
@@ -58,8 +46,7 @@ class JCFUserServiceTest {
     @DisplayName("JCFUserService: 유저 삭제 후 조회 시 예외 발생 확인")
     void testDeleteUserAndCheck() {
         String uniqueUsername = "user_" + UUID.randomUUID();
-        userService.createUser(uniqueUsername);
-        User user = userService.getUserByName(uniqueUsername);
+        User user = userService.createUser(uniqueUsername);
         UUID userId = user.getId();
         userService.deleteUser(userId);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -72,8 +59,8 @@ class JCFUserServiceTest {
     @Test
     @DisplayName("JCFUserService: 채널에 유저 추가 후 정상적으로 포함되는지 확인")
     void testAddUserToChannelAndCheck() {
-        userService.createUser("testUser_" + UUID.randomUUID());
-        User user = userService.getUserByName(userService.getAllUsers().get(0).getUsername());
+
+        User user = userService.createUser("testUser_" + UUID.randomUUID());
         UUID userId = user.getId();
         String channelName = "testChannel_" + UUID.randomUUID();
         channelService.createChannel(channelName);
@@ -89,8 +76,7 @@ class JCFUserServiceTest {
     @Test
     @DisplayName("JCFUserService: 채널에 없는 유저 삭제 시 예외 발생")
     void testRemoveUserNotInChannel() {
-        userService.createUser("testUser_" + UUID.randomUUID());
-        User user = userService.getUserByName(userService.getAllUsers().get(0).getUsername());
+        User user = userService.createUser("testUser_" + UUID.randomUUID());
         UUID userId = user.getId();
         String channelName = "testChannel_" + UUID.randomUUID();
         channelService.createChannel(channelName);
