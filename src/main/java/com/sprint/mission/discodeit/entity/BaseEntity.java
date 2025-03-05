@@ -6,19 +6,18 @@ import java.util.UUID;
 
 public class BaseEntity {
     private final UUID id;
-
     public final Long createdAt;
     public Long updatedAt;
     protected final SimpleDateFormat dayTime = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
 
-    public BaseEntity(UUID id) {
+    public BaseEntity(UUID id, Long createdAt) {
         this.id = id;
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = createdAt;
         this.updatedAt = this.createdAt;
     }
 
     public BaseEntity() {
-        this(UUID.randomUUID());
+        this(UUID.randomUUID(), System.currentTimeMillis());
     }
 
 

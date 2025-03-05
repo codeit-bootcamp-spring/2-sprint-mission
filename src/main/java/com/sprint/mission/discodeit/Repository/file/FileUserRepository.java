@@ -14,23 +14,46 @@ public class FileUserRepository implements UserRepository {
     private List<Server> serverList;
     private Map<UUID, Queue<Message>> messageList;
 
-    private final Path serverListFile;
+    private final Path serverListFilePath;
 
     public FileUserRepository() {
-        this.serverListFile = Paths.get(System.getProperty("user.dir"), "data", "serverList.ser");
+        this.serverListFilePath = Paths.get(System.getProperty("user.dir"), "data", "serverList.ser");
         this.serverList = new LinkedList<>();
         this.messageList = new HashMap<>();
+        //이미 저장된 데이터 불러오기
         loadServerList();
     }
 
+    // 서버 리스트를 저장할 디렉토리가 있는지 확인
     private void init() {
-        Path directory = serverListFile.getParent();
+        Path directory = serverListFilePath.getParent();
         if (!Files.exists(directory)) {
             try {
                 Files.createDirectories(directory);
                 System.out.println("디렉토리 생성 완료: " + directory);
             } catch (IOException e) {
                 System.out.println("디렉토리 생성 실패");
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void loadServerList() {
+        if (Files.exists(serverListFilePath)) {
+            try (FileInputStream fis = new FileInputStream(serverListFilePath.toFile());
+                 ObjectInputStream ois = new ObjectInputStream(fis)) {
+
+                List<Server> list = (List<Server>) ois.readObject();
+                for (Server server : list) {
+                    Server s = new Server(server.getId(), server.getCreatedAt(), server.getName());
+                    System.out.println("s.getId() = " + s.getId());
+                    this.serverList.add(s);
+                    System.out.println("서버 로드 완료 - ID 유지: " + s.getId());
+                }
+
+                System.out.println("서버 리스트 로드 완료: " + serverListFilePath);
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("서버 리스트 로드 실패");
                 throw new RuntimeException(e);
             }
         }
@@ -43,29 +66,15 @@ public class FileUserRepository implements UserRepository {
         // 중복 서버 체크
         if (serverList.stream().noneMatch(s -> s.getId().equals(server.getId()))) {
             serverList.add(server);
+            //현재 리스트에 저장과 동시에 디스크에 기록
             saveServerList();
-        }
-    }
-
-    private void loadServerList() {
-        if (Files.exists(serverListFile)) {
-            try (FileInputStream fis = new FileInputStream(serverListFile.toFile());
-                 ObjectInputStream ois = new ObjectInputStream(fis)) {
-
-                this.serverList = (List<Server>) ois.readObject();
-
-                System.out.println("서버 리스트 로드 완료: " + serverListFile);
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println("서버 리스트 로드 실패");
-                throw new RuntimeException(e);
-            }
         }
     }
 
     private void saveServerList() {
         init();
 
-        try (FileOutputStream fos = new FileOutputStream(serverListFile.toFile());
+        try (FileOutputStream fos = new FileOutputStream(serverListFilePath.toFile());
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
             oos.writeObject(serverList);
@@ -76,14 +85,14 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
+
     @Override
     public List<Server> getServerList() {
-        loadServerList();
         return serverList;
     }
 
     @Override
-    public void setServerList(List<Server> serverList) {
+    public void updateServerList(List<Server> serverList) {
         this.serverList = serverList;
         saveServerList();
     }
@@ -94,7 +103,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void setMessageList(Map<UUID, Queue<Message>> messageList) {
+    public void updateMessageList(Map<UUID, Queue<Message>> messageList) {
         this.messageList = messageList;
     }
 

@@ -71,12 +71,12 @@ public class FileUserService implements UserService {
     public Server getServer(UUID userId, String name) {
         UserRepository userRepository = getUserRepository(userId);
         List<Server> serverList = userRepository.getServerList();
-        Server target = serverList.stream().filter(server -> server.getName().equals(name))
-                .findFirst().orElse(null);
-
-        System.out.println("get 시점: " + target.getId());
-
-        return target;
+        for (Server server : serverList) {
+            if (server.getName().equals(name)) {
+                return server;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -90,7 +90,8 @@ public class FileUserService implements UserService {
     public void printServer(List<Server> list) {
         System.out.println("\n=========서버 목록==========");
         for (int i = 0; i < list.size(); i++) {
-            System.out.println(i + 1 + " : " + list.get(i).getName());
+            System.out.println(i + 1 + " id : " + list.get(i).getId());
+            System.out.println(i + 1 + " name : " + list.get(i).getName());
         }
         System.out.println("=========================\n");
     }
@@ -108,42 +109,35 @@ public class FileUserService implements UserService {
         System.out.print("삭제할 서버 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
 
-        return removeServer(list, targetName, directory);
+        return removeServer(list, targetName, userRepository);
     }
 
     @Override
     public boolean removeServer(UUID userId, String targetName) {
-        UserRepository JCFUserRepository = getUserRepository(userId);
-        List<Server> list = JCFUserRepository.getServerList();
+        UserRepository userRepository = getUserRepository(userId);
+        List<Server> list = userRepository.getServerList();
 
         if (list == null) {
             System.out.println("서버 삭제 실패 : list null값");
             return false;
         }
-        return removeServer(list, targetName, directory);
+        return removeServer(list, targetName,userRepository);
 
     }
 
-    private boolean removeServer(List<Server> list, String targetName, Path directory) {
+    private boolean removeServer(List<Server> list, String targetName, UserRepository userRepository) {
         Server targetServer = list.stream().filter(server -> server.getName().equals(targetName))
                 .findFirst().orElse(null);
-        if (targetServer != null) {
-            Path targetPath = directory.resolve(targetServer.getId().toString().concat(".ser"));
-            try {
-                if (Files.deleteIfExists(targetPath)) {
-                    //로그 찍기
-                    System.out.println("파일 삭제 성공");
-                    return true;
-                } else {
-                    System.out.println("파일이 존재하지 않습니다.");
-                }
-            } catch (IOException e) {
-                System.out.println("파일 삭제 중 오류 발생");
-            }
-        } else {
+        if (targetServer == null) {
             System.out.println("삭제할 서버가 존재하지 않습니다.");
+            return false;
+        } else {
+            //서버 리스트를 가져와서 목표한 서버를 삭제한 뒤
+            list.remove(targetServer);
+            //서버를 다시 저장한다.
+            userRepository.updateServerList(list);
         }
-        return false;
+        return true;
     }
 
 
@@ -151,6 +145,7 @@ public class FileUserService implements UserService {
     public boolean updateServer(UUID userId) {
         UserRepository userRepository = getUserRepository(userId);
         List<Server> list = userRepository.getServerList();
+
         Scanner sc = new Scanner(System.in);
         System.out.print("바꿀려고 하는 서버의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
@@ -189,41 +184,15 @@ public class FileUserService implements UserService {
         Server targetServer = list.stream().filter(server -> server.getName().equals(targetName))
                 .findFirst().orElse(null);
         if (targetServer != null) {
-            Path oldFilePath = directory.resolve(targetServer.getId().toString().concat(".ser"));
-            try {
-                Files.deleteIfExists(oldFilePath);
-            } catch (IOException e) {
-                System.err.println("기존 서버 파일 삭제 실패: " + e.getMessage());
+            for (Server server : list) {
+                if (server.getId().equals(targetServer.getId())) {
+                    server.setName(replaceName);
+                    userRepository.updateServerList(list);
+                }
             }
-
-            targetServer.setName(replaceName);
-            Path filsPath = directory.resolve(targetServer.getId().toString().concat(".ser"));
-
-            try (FileOutputStream fos = new FileOutputStream(filsPath.toFile());
-                 ObjectOutputStream oos = new ObjectOutputStream(fos);) {
-                oos.writeObject(targetServer);
-            } catch (IOException e) {
-                //로그 찍기
-                System.out.println("User Repository 저장 실패");
-                throw new RuntimeException(e);
-            }
-            return true;
         } else {
             System.out.println("업데이트할 서버가 존재하지 않습니다.");
         }
         return false;
     }
-
-
-    private void init(Path directory) {
-        if (!Files.exists(directory)) {
-            try {
-                Files.createDirectories(directory);
-            } catch (IOException e) {
-                System.out.println("디렉토리 저장 실패");
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
 }

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFUserRepository;
 import com.sprint.mission.discodeit.entity.Message;
@@ -9,7 +11,7 @@ import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private static JCFMessageService instance;
-    private final Map<UUID, JCFUserRepository> userTable = new HashMap<>();
+    private final Map<UUID, UserRepository> userTable = new HashMap<>();
 
     private JCFMessageService() {
     }
@@ -22,15 +24,19 @@ public class JCFMessageService implements MessageService {
     }
 
     //레포지토리 생성
-    private JCFUserRepository getUserRepository(UUID id) {
-        JCFUserRepository JCFUserRepository = userTable.get(id);
-        if (JCFUserRepository == null) {
-            LinkedListJCFUserRepository repository = new LinkedListJCFUserRepository();
+    private UserRepository getUserRepository(UUID id) {
+        UserRepository userRepository = userTable.get(id);
+        if (userRepository == null) {
+
+            UserRepository repository = new JCFUserRepository();
+
             userTable.put(id, repository);
-            JCFUserRepository = repository;
+
+            userRepository = repository;
         }
-        return JCFUserRepository;
+        return userRepository;
     }
+
 
     private Queue<Message> getMessages(Map<UUID, Queue<Message>> messageList, UUID id) {
         Queue<Message> messages = messageList.get(id);
@@ -48,8 +54,8 @@ public class JCFMessageService implements MessageService {
         //메시지 전송 과정 시작
         System.out.println("전송중");
         //두 아이디의 유저 레포지토리 열기
-        JCFUserRepository myRepository = getUserRepository(myId);
-        JCFUserRepository yourRepository = getUserRepository(targetId);
+        UserRepository myRepository = getUserRepository(myId);
+        UserRepository yourRepository = getUserRepository(targetId);
         //유저 레포지토리 내 메시지함 가져오기
         Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
         Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
@@ -67,8 +73,8 @@ public class JCFMessageService implements MessageService {
         //메시지 전송 과정 시작
         System.out.println("전송중");
         //두 아이디의 유저 레포지토리 열기
-        JCFUserRepository myRepository = getUserRepository(myId);
-        JCFUserRepository yourRepository = getUserRepository(targetId);
+        UserRepository myRepository = getUserRepository(myId);
+        UserRepository yourRepository = getUserRepository(targetId);
         //유저 레포지토리 내 메시지함 가져오기
         Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
         Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
@@ -84,7 +90,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void read(UUID myId) {
-        JCFUserRepository myRepository = getUserRepository(myId);
+        UserRepository myRepository = getUserRepository(myId);
         Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
         Queue<Message> myMessages = getMessages(myMessageList, myId);
 
@@ -98,11 +104,11 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public boolean remove(UUID myId, UUID targetId) {
-        JCFUserRepository myRepository = getUserRepository(myId);
+        UserRepository myRepository = getUserRepository(myId);
         Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
         Queue<Message> myMessages = getMessages(myMessageList, myId);
 
-        JCFUserRepository yourRepository = getUserRepository(targetId);
+        UserRepository yourRepository = getUserRepository(targetId);
         Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
         Queue<Message> yourMessages = getMessages(yourMessageList, targetId);
 
@@ -114,11 +120,11 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public boolean remove(UUID myId, UUID targetId, Message message) {
-        JCFUserRepository myRepository = getUserRepository(myId);
+        UserRepository myRepository = getUserRepository(myId);
         Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
         Queue<Message> myMessages = getMessages(myMessageList, myId);
 
-        JCFUserRepository yourRepository = getUserRepository(targetId);
+        UserRepository yourRepository = getUserRepository(targetId);
         Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
         Queue<Message> yourMessages = getMessages(yourMessageList, targetId);
 
@@ -127,11 +133,11 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public boolean remove(UUID myId, UUID targetId, String str) {
-        JCFUserRepository myRepository = getUserRepository(myId);
+        UserRepository myRepository = getUserRepository(myId);
         Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
         Queue<Message> myMessages = getMessages(myMessageList, myId);
 
-        JCFUserRepository yourRepository = getUserRepository(targetId);
+        UserRepository yourRepository = getUserRepository(targetId);
         Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
         Queue<Message> yourMessages = getMessages(yourMessageList, targetId);
 
@@ -162,11 +168,11 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public boolean update(UUID myId, UUID targetId) {
-        JCFUserRepository myRepository = getUserRepository(myId);
+        UserRepository myRepository = getUserRepository(myId);
         Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
         Queue<Message> myMessages = getMessages(myMessageList, myId);
 
-        JCFUserRepository yourRepository = getUserRepository(targetId);
+        UserRepository yourRepository = getUserRepository(targetId);
         Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
         Queue<Message> yourMessages = getMessages(yourMessageList, targetId);
 
@@ -182,11 +188,11 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public boolean update(UUID myId, UUID targetId, String targetName) {
-        JCFUserRepository myRepository = getUserRepository(myId);
+        UserRepository myRepository = getUserRepository(myId);
         Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
         Queue<Message> myMessages = getMessages(myMessageList, myId);
 
-        JCFUserRepository yourRepository = getUserRepository(targetId);
+        UserRepository yourRepository = getUserRepository(targetId);
         Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
         Queue<Message> yourMessages = getMessages(yourMessageList, targetId);
 
@@ -200,11 +206,11 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public boolean update(UUID myId, UUID targetId, String targetName, String replaceName) {
-        JCFUserRepository myRepository = getUserRepository(myId);
+        UserRepository myRepository = getUserRepository(myId);
         Map<UUID, Queue<Message>> myMessageList = myRepository.getMessageList();
         Queue<Message> myMessages = getMessages(myMessageList, myId);
 
-        JCFUserRepository yourRepository = getUserRepository(targetId);
+        UserRepository yourRepository = getUserRepository(targetId);
         Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
         Queue<Message> yourMessages = getMessages(yourMessageList, targetId);
 

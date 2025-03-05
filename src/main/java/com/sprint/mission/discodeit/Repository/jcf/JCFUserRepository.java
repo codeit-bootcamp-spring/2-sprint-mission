@@ -14,7 +14,7 @@ import java.util.*;
  *
  * @version 1
  */
-public abstract class JCFUserRepository implements UserRepository {
+public class JCFUserRepository implements UserRepository {
     private List<Server> serverList;
     private Map<UUID, Queue<Message>> messageList;
 
@@ -27,7 +27,7 @@ public abstract class JCFUserRepository implements UserRepository {
         return serverList;
     }
 
-    public void setServerList(List<Server> serverList) {
+    public void updateServerList(List<Server> serverList) {
         this.serverList = serverList;
     }
 
@@ -35,7 +35,7 @@ public abstract class JCFUserRepository implements UserRepository {
         return messageList;
     }
 
-    public void setMessageList(Map<UUID, Queue<Message>> messageList) {
+    public void updateMessageList(Map<UUID, Queue<Message>> messageList) {
         this.messageList = messageList;
     }
 

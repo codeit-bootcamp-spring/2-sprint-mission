@@ -8,8 +8,8 @@ import java.util.LinkedList;
 
 public class LinkedListJCFUserRepository extends JCFUserRepository {
     public LinkedListJCFUserRepository() {
-        super.setServerList(new LinkedList<>());
-        super.setMessageList(new HashMap<>());
+        super.updateServerList(new LinkedList<>());
+        super.updateMessageList(new HashMap<>());
     }
 
     @Override

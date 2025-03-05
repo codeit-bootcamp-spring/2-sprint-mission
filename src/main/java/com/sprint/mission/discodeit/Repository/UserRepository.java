@@ -13,11 +13,11 @@ public interface UserRepository {
 
     public List<Server> getServerList();
 
-    public void setServerList(List<Server> serverList);
+    public void updateServerList(List<Server> serverList);
 
     public Map<UUID, Queue<Message>> getMessageList();
 
-    public void setMessageList(Map<UUID, Queue<Message>> messageList);
+    public void updateMessageList(Map<UUID, Queue<Message>> messageList);
 
 
 }
