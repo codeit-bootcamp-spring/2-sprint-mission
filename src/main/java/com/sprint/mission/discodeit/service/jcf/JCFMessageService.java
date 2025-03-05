@@ -18,16 +18,23 @@ public class JCFMessageService implements MessageService {
         this.userService = userService;
         this.channelService = channelService;
     }
+
     public static JCFMessageService getInstance() {
         return instance;
     }
 
     @Override
     public Message createMessage(UUID userId, UUID channelId, String text) {
+        if (userId == null) {
+            throw new IllegalArgumentException("사용자 ID는 null일 수 없습니다.");
+        }
+        if (channelId == null) {
+            throw new IllegalArgumentException("채널 ID는 null일 수 없습니다.");
+        }
         if (!userService.getUserById(userId).isPresent()) {
             throw new IllegalArgumentException("존재하지 않는 사용자입니다: " + userId);
         }
-        if(!channelService.getChannelById(channelId).isPresent()) {
+        if (!channelService.getChannelById(channelId).isPresent()) {
             throw new IllegalArgumentException("존재하지 않는 채널입니다: " + channelId);
         }
         Message message = new Message(userId, channelId, text);
