@@ -56,6 +56,11 @@ public class FileChannelService implements ChannelService {
         saveChannels(channels);
     }
 
+    @Override
+    public boolean exists(UUID channelId) {
+        return false;
+    }
+
     private Map<UUID, Channel> loadChannels() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {

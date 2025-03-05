@@ -55,6 +55,11 @@ public class FileUserService implements UserService {
         saveUsers(users);
     }
 
+    @Override
+    public boolean exists(UUID authorId) {
+        return false;
+    }
+
     private Map<UUID, User> loadUsers() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {

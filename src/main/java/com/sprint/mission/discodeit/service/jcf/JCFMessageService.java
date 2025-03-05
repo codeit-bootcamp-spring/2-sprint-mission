@@ -23,11 +23,12 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {
-        try {
-            channelService.find(channelId);
-            userService.find(authorId);
-        } catch (NoSuchElementException e) {
-            throw e;
+        if (!channelService.exists(channelId)){
+            throw new NoSuchElementException("Channel not found");
+        }
+
+        if(!userService.exists(authorId)){
+            throw new NoSuchElementException("Author not found");
         }
 
         Message message = new Message(content, channelId, authorId);

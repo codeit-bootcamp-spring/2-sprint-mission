@@ -18,7 +18,7 @@ import java.util.UUID;
 public class JavaApplication {
     static void userCRUDTest(UserService userService) {
         // 생성
-        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        User user = userService.create("user1", "user1@codeit.com", "user1234");
         System.out.println("유저 생성: " + user.getId());
         // 조회
         User foundUser = userService.find(user.getId());
@@ -26,8 +26,8 @@ public class JavaApplication {
         List<User> foundUsers = userService.findAll();
         System.out.println("유저 조회(다건): " + foundUsers.size());
         // 수정
-        User updatedUser = userService.update(user.getId(), null, null, "woody5678");
-        System.out.println("유저 수정: " + String.join("/", updatedUser.getUsername(), updatedUser.getEmail(), updatedUser.getPassword()));
+        User updatedUser = userService.update(user.getId(), null, "updateUser1@codeit.com", null);
+        System.out.println("유저 수정: " + String.join("/", updatedUser.getUsername(), updatedUser.getEmail()));
         // 삭제
         userService.delete(user.getId());
         List<User> foundUsersAfterDelete = userService.findAll();
@@ -73,7 +73,7 @@ public class JavaApplication {
     }
 
     static User setupUser(UserService userService) {
-        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        User user = userService.create("user1", "user1@codeit.com", "user1234");
         return user;
     }
 
@@ -98,10 +98,10 @@ public class JavaApplication {
         ChannelService channelService = new FileChannelService();
         MessageService messageService = new FileMessageService(channelService, userService);
 
-        // 테스트
-//        userCRUDTest(userService);
-//        channelCRUDTest(channelService);
-//        messageCRUDTest(messageService);
+        //테스트
+        userCRUDTest(userService);
+        channelCRUDTest(channelService);
+        messageCRUDTest(messageService);
 
         // 셋업
         User user = setupUser(userService);

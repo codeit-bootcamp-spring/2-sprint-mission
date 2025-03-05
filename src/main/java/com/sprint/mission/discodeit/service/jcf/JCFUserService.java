@@ -50,4 +50,9 @@ public class JCFUserService implements UserService {
         }
         this.data.remove(userId);
     }
+
+    @Override
+    public boolean exists(UUID authorId) {
+        return false;
+    }
 }

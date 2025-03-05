@@ -50,4 +50,9 @@ public class JCFChannelService implements ChannelService {
         }
         this.data.remove(channelId);
     }
+
+    @Override
+    public boolean exists(UUID channelId) {
+        return false;
+    }
 }
