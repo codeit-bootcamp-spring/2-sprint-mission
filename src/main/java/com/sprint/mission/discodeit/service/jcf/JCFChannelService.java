@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFChannelService implements ChannelService {
     private volatile static JCFChannelService instance = null;
@@ -35,24 +32,23 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void findAll() {
-        channelRepository.values().stream()
-                .findFirst()
-                .ifPresentOrElse(
-                        channel -> channelRepository.values().forEach(System.out::println),
-                        () -> System.out.println("등록된 채널이 없습니다.")
-                );
+    public List<Channel> findAll() {
+        if(channelRepository.isEmpty()){
+            throw new NoSuchElementException("채널이 없습니다.");
+        }
+        return channelRepository.values().stream().toList();
     }
 
     @Override
-    public void findByName(String name) {
-        channelRepository.values().stream()
+    public List<Channel> findByName(String name) {
+        List<Channel> channels = channelRepository.values().stream()
                 .filter(channel -> channel.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .ifPresentOrElse(
-                        System.out::println,
-                        () -> System.out.println(name + "으로 등록된 채널이 없습니다.")
-                );
+                .toList();
+
+        if(channels.isEmpty()){
+            throw new NoSuchElementException("해당 이름의 채널이 없습니다.");
+        }
+        return channels;
     }
 
     @Override
@@ -62,12 +58,14 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void update(UUID id, String name) {
-        Optional<Channel> channel = Optional.ofNullable(channelRepository.get(id));
+        if(!channelRepository.containsKey(id)){
+            throw new NoSuchElementException("채널이 없습니다.");
+        }
+        if(name == null){
+            throw new IllegalArgumentException("수정할 이름은 null일 수 없습니다.");
+        }
 
-        channel.ifPresentOrElse(
-                ch -> ch.setName(name),
-                () -> System.out.println("해당 id로 등록된 채널이 없습니다.")
-        );
+        channelRepository.get(id).setName(name);
     }
 
     @Override
