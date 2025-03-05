@@ -24,7 +24,7 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
 
     @Override
     public Optional<User> findById(UUID userId) {
-        return Optional.ofNullable(loadOneFromFileById(userId));
+        return loadOneFromFileById(userId);
     }
 
     @Override
@@ -45,8 +45,8 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
     }
 
     @Override
-    public User loadOneFromFileById(UUID userId) {
-        return SerializationUtil.reverseOneSerialization(directory,userId);
+    public Optional<User> loadOneFromFileById(UUID userId) {
+        return Optional.ofNullable(SerializationUtil.reverseOneSerialization(directory,userId));
     }
 
     @Override

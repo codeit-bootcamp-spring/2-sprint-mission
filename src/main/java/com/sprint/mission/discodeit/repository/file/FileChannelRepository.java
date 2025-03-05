@@ -24,7 +24,7 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
 
     @Override
     public Optional<Channel> findById(UUID channelId) {
-        return Optional.ofNullable(loadOneFromFileById(channelId));
+        return loadOneFromFileById(channelId);
     }
 
     @Override
@@ -45,8 +45,8 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
     }
 
     @Override
-    public Channel loadOneFromFileById(UUID channelId) {
-        return SerializationUtil.reverseOneSerialization(directory,channelId);
+    public Optional<Channel> loadOneFromFileById(UUID channelId) {
+        return Optional.ofNullable(SerializationUtil.reverseOneSerialization(directory,channelId));
     }
 
     @Override

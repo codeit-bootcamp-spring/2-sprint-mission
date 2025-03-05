@@ -25,7 +25,7 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
 
     @Override
     public Optional<Message> findById(UUID messageId) {
-        return Optional.ofNullable(loadOneFromFileById(messageId));
+        return loadOneFromFileById(messageId);
     }
 
     @Override
@@ -46,8 +46,8 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
     }
 
     @Override
-    public Message loadOneFromFileById(UUID messageId) {
-        return SerializationUtil.reverseOneSerialization(directory,messageId);
+    public Optional<Message> loadOneFromFileById(UUID messageId) {
+        return Optional.ofNullable(SerializationUtil.reverseOneSerialization(directory,messageId));
     }
 
     @Override
