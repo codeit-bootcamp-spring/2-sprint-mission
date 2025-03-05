@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    void create(String userId, String username, String userPwd, String userEmail, String userPhone);
+    UUID create(String userId, String username, String userPwd, String userEmail, String userPhone);
     User read(String userId);
-    String getUserName(UUID uuid);
-    String getUserId(UUID uuid);
+    String getUserName(UUID userKey);
+    String getUserId(UUID userKey);
     List<User> readAll(List<String> userIdList);
-    UUID login(String userId, String userPwd);
-
-    User update(UUID loginUserUuid, String userId, String userPwd, String userEmail, String userPhone);
-    void delete(UUID loginUserUuid);
+    UUID login(String userId, String userPwd, UUID loginUserKey);
+    void logOut(UUID userKey);
+    UUID update(UUID userKey, String userId, String userPwd, String userEmail, String userPhone);
+    void delete(UUID userKey);
 }

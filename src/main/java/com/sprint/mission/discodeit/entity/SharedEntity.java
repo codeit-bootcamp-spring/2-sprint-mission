@@ -22,10 +22,6 @@ public abstract class SharedEntity {
         return createdAt;
     }
 
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public long getUpdatedAt() {
         return updatedAt;
     }

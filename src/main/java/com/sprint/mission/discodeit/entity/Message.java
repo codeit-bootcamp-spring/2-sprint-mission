@@ -1,36 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
 public class Message extends SharedEntity {
-    private static int totalMessageNum = 0;
-    private int messageNum;
     private String content;
     private final String userName;
     private final String channelName;
+    private final int messageId;
 
-    public Message(String content, String userName, String channelName) {
+    public Message(int messageId, String content, String userName, String channelName) {
         super();
-        this.messageNum = totalMessageNum++;
+        this.messageId = messageId;
         this.content = content;
         this.userName = userName;
         this.channelName = channelName;
-
-    }
-
-    public int getMessageNum() {
-        return messageNum;
-    }
-
-    public void setMessageNum(int messageNum) {
-        this.messageNum = messageNum;
-    }
-
-    public int getTotalMessageNum() {
-        return totalMessageNum;
-    }
-
-
-    public String getContent() {
-        return content;
     }
 
     public void updateContent(String content) {
@@ -38,8 +19,8 @@ public class Message extends SharedEntity {
         setUpdatedAt(System.currentTimeMillis());
     }
 
-    public String getUserName() {
-        return userName;
+    public int getMessageId() {
+        return messageId;
     }
 
     public String getChannelName() {
@@ -48,7 +29,7 @@ public class Message extends SharedEntity {
 
     @Override
     public String toString() {
-        return String.format("\n uuid= %s\n messageNum= %s\n content= %s\n userName= %s\n channelName= %s\n createdAt= %s\n updatedAt= %s\n",
-                uuid, messageNum, content, userName, channelName, createdAt, updatedAt);
+        return String.format("\n uuid= %s\n messageId= %s\n content= %s\n userName= %s\n channelName= %s\n createdAt= %s\n updatedAt= %s\n",
+                uuid, messageId, content, userName, channelName, createdAt, updatedAt);
     }
 }

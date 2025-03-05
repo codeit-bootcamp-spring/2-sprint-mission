@@ -2,194 +2,155 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    private static final JCFChannelService INSTANCE = new JCFChannelService(JCFUserService.getInstance());
-    public JCFUserService ui;
-    final Map<UUID, Channel> data;
+    final Map<UUID, Channel> data = new HashMap<>();
+    private final UserService userService;
 
-    private JCFChannelService(JCFUserService ui) {
-        data = new HashMap<>();
-        this.ui = ui;
-    }
-
-    public static JCFChannelService getInstance() {
-        return INSTANCE;
+    public JCFChannelService(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
-    public void signUp(String name, UUID userUuid) {
-        Channel entity = findChannelEntity(name);
-        if (entity == null) {
-            System.out.println("[Error] 가입하려는 채널이 존재하지 않습니다.");
-            return;
+    public UUID signUp(String name, UUID userUuid) {
+        UUID channelKey = getChannelKey(name,userUuid);
+        Channel channel = data.get(channelKey);
+
+        if (channel == null) {
+            throw new IllegalArgumentException("[Error] 가입하려는 채널이 존재하지 않습니다.");
         }
         if (isSignUp(name, userUuid)) {
-            System.out.println("[Error] 이미 가입된 채널입니다.");
-            return;
+            throw new IllegalStateException("[Error] 이미 가입된 채널입니다.");
         }
-        entity.updateMemberName(getMemberName(userUuid));
+        channel.updateMemberName(userService.getUserName(userUuid));
+        return channel.getUuid();
     }
 
     @Override
     public UUID create(String category, String name, String introduction, UUID memberUuid, UUID ownerUuid) {
+        String memberName = userService.getUserName(memberUuid);
+        String ownerName = userService.getUserName(ownerUuid);
         if (isChannelCheck(name)) {
-            System.out.println("[Error] 동일한 채널명이 존재합니다.");
-            return null;
+            throw new IllegalArgumentException("[Error] 동일한 채널명이 존재합니다.");
         }
-        Channel channel = new Channel(category, name, introduction, getMemberName(memberUuid), getOwnerName(ownerUuid));
+        if (memberName == null || ownerName == null) {
+            throw new IllegalStateException("[Error] 존재하지 않는 유저 입니다.");
+        }
+        Channel channel = new Channel(category, name, introduction, memberName, ownerName);
         data.put(channel.getUuid(), channel);
-        System.out.println("[Info] 채널 생성이 완료 되었습니다.");
         return channel.getUuid();
     }
+
     @Override
     public Channel read(String name) {
-        if (!isChannelCheck(name)) {
-            System.out.println("[Error] 채널이 존재 하지 않습니다.");
+        UUID channelKey = convertToKey(name);
+        Channel channel = data.get(channelKey);
+        if (channel == null) {
+            throw new IllegalArgumentException("[Error] 조회할 채널이 존재하지 않습니다.");
         }
-        return findChannelEntity(name);
+        return data.get(channelKey);
     }
 
     @Override
     public List<Channel> readAll(List<String> nameList) {
-        if (!isChannelCheck(nameList)) {
-            System.out.println("[Error] 채널이 존재 하지 않습니다");
+        List<UUID> channelsKey = convertToKey(nameList);
+        List<Channel> channels = channelsKey.stream().map(data::get).toList();
+        if (channels.isEmpty()) {
+            throw new IllegalArgumentException("[Error] 조회할 채널이 존재하지 않습니다.");
         }
-        return findChannelEntity(nameList);
-    }
-
-    public List<Channel> readAll() {
-        return findChannelEntity();
+        return channels;
     }
 
     @Override
-    public void update(String origin, String category, String name, String introduction) {
+    public List<Channel> readAll() {
+        List<Channel> info = data.values().stream().toList();
+        if (info.isEmpty()) {
+            throw new IllegalStateException("[Error] 조회할 채널이 존재하지 않습니다.");
+        }
+        return info;
+    }
 
-        Channel originChannel = data.get(findChannelUuid(origin));
+    @Override
+    public Channel update(String inputNameToModify, String category, String name, String introduction) {
+        UUID channelKey = convertToKey(inputNameToModify);
+        Channel currentChannel = data.get(channelKey);
 
-        if (!isChannelCheck(origin)) {
-            System.out.println("[Error] 채널이 존재 하지 않습니다");
-            return;
+        if (currentChannel == null) {
+            throw new IllegalArgumentException("[Error] 존재하지 않는 채널입니다.");
         }
         if (!category.isEmpty()) {
-            originChannel.updateCategory(category);
+            currentChannel.updateCategory(category);
         }
         if (!name.isEmpty()) {
-            originChannel.updateName(name);
+            currentChannel.updateName(name);
         }
         if (!name.isEmpty()) {
-            originChannel.updateIntroduction(introduction);
+            currentChannel.updateIntroduction(introduction);
         }
+        return currentChannel;
     }
 
     @Override
     public void delete(String name, UUID userUuid) {
-        if (!isChannelCheck(name)) {
-            System.out.println("[Error] 채널이 존재 하지 않습니다");
-            return;
-        } else if (!isChannelOwner(userUuid)) {
-            System.out.println("[Error] 삭제가 불가능 합니다 (권한부족)");
-            return;
+        UUID channelUuid = convertToKey(name, userUuid);
+        Channel channel = data.get(channelUuid);
+        if (channel == null) {
+            throw new IllegalArgumentException("[Error] 존재하지 않는 채널입니다.");
         }
-        data.remove(findChannelUuid(name));
-        System.out.println("[Info] 정상적으로 삭제 되었습니다.");
+        data.remove(channelUuid);
     }
 
     @Override
-    public List<String> getOwnerChannelName(UUID userUuid) {
-        List<String> cn = findOwnerChannelName(userUuid);
-        if (cn.isEmpty()) {
-            return null;
+    public UUID getChannelKey(String inputName, UUID userKey) {
+        UUID channelKey = convertToKey(inputName, userKey);
+        if (channelKey == null) {
+            throw new IllegalArgumentException("[Error] 올바르지 않은 Key");
         }
-        return cn;
+        return channelKey;
     }
 
-    public String getMemberName(UUID memberUuid) {
-        return JCFUserService.getInstance().getUserName(memberUuid);
+    @Override
+    public String getChannelName(UUID channelKey) {
+        if (channelKey == null) {
+            throw new IllegalStateException("[Error] 올바르지 않은 Key");
+        }
+        return data.get(channelKey).getName();
     }
 
-    public String getChannelName(UUID channelUuid) {
-        return findChannelName(channelUuid);
-    }
-
-    public UUID getChannelUuid(String channelName) {
-        return findChannelUuid(channelName);
-    }
-
-    public List<String> getUserChannels(UUID userUuid) {
-        return findMemberChannelName(userUuid);
-    }
-
-    public String getOwnerName(UUID ownerUuid) {
-        return JCFUserService.getInstance().getUserName(ownerUuid);
-    }
 
     private boolean isChannelCheck(String name) {
         return data.values().stream()
                 .anyMatch(c -> c.getName().equals(name));
     }
 
-    private boolean isChannelCheck(List<String> name) {
+    private boolean isSignUp(String name, UUID userUuid) {
         return data.values().stream()
-                .anyMatch(cl -> name.contains(cl.getName()));
+                .anyMatch(c -> c.getName().equals(name) && c.getMemberName().contains(userService.getUserId(userUuid)));
     }
 
-    private Channel findChannelEntity(String name) {
+    private UUID convertToKey(String inputName, UUID userKey) {
         return data.values().stream()
-                .filter(c -> c.getName().equals(name))
-                .findFirst()
-                .orElse(null);
-    }
-    private List<Channel> findChannelEntity(List<String> name) {
-        return data.values().stream()
-                .filter(cl -> name.contains(cl.getName()))
-                .toList();
-    }
-    private List<Channel> findChannelEntity() {
-        List<Channel> info = data.values().stream().toList();
-        if (info.isEmpty()) {
-            System.out.println("생성된 채널이 없습니다");
-            return null;
-        }
-        return info;
-    }
-
-    private UUID findChannelUuid(String name) {
-        return data.values().stream()
-                .filter(c -> c.getName().equals(name))
+                .filter(c -> c.getName().equals(inputName) && c.getMemberName().contains(userService.getUserName(userKey)))
                 .map(Channel::getUuid)
                 .findFirst()
                 .orElse(null);
     }
 
-    private List<String> findOwnerChannelName(UUID userUuid) {
+    private UUID convertToKey(String inputName) {
         return data.values().stream()
-                .filter(c -> c.getOwnerName().equals(getOwnerName(userUuid)))
-                .map(Channel::getName)
+                .filter(c -> c.getName().equals(inputName))
+                .map(Channel::getUuid)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private List<UUID> convertToKey(List<String> inputNameList) {
+        return data.values().stream()
+                .filter(c -> inputNameList.contains(c.getName()))
+                .map(Channel::getUuid)
                 .toList();
-    }
-
-    private List<String> findMemberChannelName(UUID userUuid) {
-        String userName = getMemberName(userUuid);
-        return data.values().stream()
-                .filter(c -> c.getMemberName().contains(userName))
-                .map(Channel::getName)
-                .toList();
-    }
-
-    private String findChannelName(UUID channelUuid) {
-        return data.get(channelUuid).getName();
-    }
-
-    private boolean isChannelOwner(UUID userUuid) {
-        return data.values().stream()
-                .anyMatch(c -> c.getOwnerName().equals(getOwnerName(userUuid)));
-    }
-
-    private boolean isSignUp(String name, UUID userUuid) {
-        return data.values().stream()
-                .anyMatch(c -> c.getName().equals(name) && c.getMemberName().contains(getMemberName(userUuid)));
     }
 }

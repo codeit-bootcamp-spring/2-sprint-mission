@@ -27,16 +27,8 @@ public class Channel extends SharedEntity {
         this.name = name;
     }
 
-    public String getIntroduction() {
-        return introduction;
-    }
-
     public void updateIntroduction(String introduction) {
         this.introduction = introduction;
-    }
-
-    public String getCategory() {
-        return category;
     }
 
     public void updateCategory(String category) {

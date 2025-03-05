@@ -4,100 +4,105 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
-    private static final JCFUserService INSTANCE = new JCFUserService();
-    protected final Map<UUID, User> data;
+    protected final Map<UUID, User> data = new HashMap<>();
 
-    private JCFUserService() {
-        data = new HashMap<>();
-    }
-
-    public static JCFUserService getInstance() {
-        return INSTANCE;
-    }
+    public JCFUserService() {}
 
     @Override
-    public UUID login(String id, String pwd) {
-        if (findUserUuid(id, pwd) == null) {
-            System.out.println("[Error] 일치하는 사용자가 없습니다");
+    public UUID login(String id, String pwd, UUID loginUserKey) {
+        UUID userKey = getUserKeyBy(id, pwd);
+        if (userKey == null) {
+            throw new IllegalArgumentException("[Error] 잘못된 ID 또는 비밀번호 입니다.");
         }
-        return findUserUuid(id,pwd);
+        if (isLoginCheck(loginUserKey)) {
+            throw new IllegalStateException("[Error] 이미 로그인 되어 있습니다.");
+        }
+        return userKey;
+    }
+
+
+    @Override
+    public void logOut(UUID userKey) {
+        if (!isLoginCheck(userKey)) {
+            throw new IllegalStateException("[Error] 로그인을 먼저 해주세요.");
+        }
     }
 
     @Override
-    public void create(String id, String name, String pwd, String email, String phone) {
+    public UUID create(String id, String name, String pwd, String email, String phone) {
         if (isUserCheck(id)) {
-            System.out.println("[Error] 동일한 사용자 정보가 존재합니다");
-            return;
+            throw new IllegalArgumentException("[Error] 동일한 사용자가 존재합니다.");
         }
         User user = new User(id, name, pwd, email, phone);
         data.put(user.getUuid(), user);
-        System.out.println("[Info] 사용자가 생성 되었습니다.");
+        return user.getUuid();
     }
 
     @Override
     public User read(String id) {
-        if (!isUserCheck(id)) {
-            System.out.println("[Error] 조회할 사용자가 존재하지 않습니다");
-        }
-        return findUserEntity(id);
-    }
-
-    public User read(UUID uuid) {
-        return findUserEntity(uuid);
+        return data.values().stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("[Error] 조회할 사용자가 존재하지 않습니다."));
     }
 
     @Override
     public List<User> readAll(List<String> id) {
-        if (!isUserCheck(id)) {
-            System.out.println("[Error] 조회할 사용자가 존재하지 않습니다");
+        List<User> users = data.values().stream()
+                .filter(u -> id.contains(u.getId()))
+                .toList();
+        if (users.isEmpty()) {
+            throw new IllegalArgumentException("[Error] 조회할 사용자가 존재하지 않습니다.");
         }
-        return findUserEntity(id);
+        return users;
     }
 
     @Override
-    public User update(UUID uuid, String id, String pwd, String email, String phone) {
+    public UUID update(UUID uuid, String id, String pwd, String email, String phone) {
         User currentData = data.get(uuid);
-
+        if (currentData == null) {
+            throw new IllegalStateException("[Error] 수정이 불가능합니다");
+        }
         if (!id.isEmpty()) {
             currentData.updateId(id);
         }
         if (!pwd.isEmpty()) {
             currentData.updatePwd(pwd);
         }
-
         if (!email.isEmpty()) {
             currentData.updateEmail(email);
         }
         if (!phone.isEmpty()) {
             currentData.updatePhone(phone);
         }
-        System.out.println("[Info] 정상 업데이트 되었습니다 ");
-        return currentData;
+        return currentData.getUuid();
     }
 
     @Override
     public void delete(UUID uuid) {
+        User currentData = data.get(uuid);
+        if (currentData == null) {
+            throw new IllegalStateException("[Error] 삭제가 불가능합니다");
+        }
         data.remove(uuid);
-        System.out.println("[Info] 사용자가 삭제 되었습니다.");
     }
 
     @Override
     public String getUserName(UUID uuid) {
         if (uuid == null) {
-            return "";
+            throw new IllegalArgumentException("[Error] 이름을 찾을 수 없습니다.");
         }
-        return findUserName(uuid);
+        return data.get(uuid).getName();
     }
 
     @Override
     public String getUserId(UUID uuid) {
         if (uuid == null) {
-            return "";
+            throw new IllegalArgumentException("[Error] ID를 찾을 수 없습니다.");
         }
-        return findUserId(uuid);
+        return data.get(uuid).getId();
     }
 
     private boolean isUserCheck(String id) {
@@ -105,39 +110,15 @@ public class JCFUserService implements UserService {
                 .anyMatch(i -> i.getId().equals(id));
     }
 
-    private boolean isUserCheck(List<String> id) {
-        return data.values().stream()
-                .anyMatch(i -> id.contains(i.getId()));
+    private boolean isLoginCheck(UUID userKey) {
+        return userKey != null;
     }
 
-    private UUID findUserUuid(String id, String pwd) {
-        return data.entrySet().stream()
-                .filter(e -> e.getValue().getId().equals(id) && e.getValue().getId().equals(pwd))
-                .map(Map.Entry::getKey)
+    private UUID getUserKeyBy(String id, String pwd) {
+        return data.values().stream()
+                .filter(e -> e.getId().equals(id) && e.getPwd().equals(pwd))
+                .map(User::getUuid)
                 .findFirst()
                 .orElse(null);
-    }
-
-    private User findUserEntity(String id) {
-        return data.values().stream()
-                .filter(u -> u.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private List<User> findUserEntity(List<String> id) {
-        return data.values().stream()
-                .filter(u -> id.contains(u.getId()))
-                .collect(Collectors.toList());
-    }
-
-    private User findUserEntity(UUID uuid) {
-        return data.get(uuid);
-    }
-    private String findUserId(UUID uuid) {
-        return data.get(uuid).getId();
-    }
-    private String findUserName(UUID uuid) {
-        return data.get(uuid).getName();
     }
 }
