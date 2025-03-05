@@ -1,5 +1,6 @@
 package com.sprint.sprint2.discodeit.repository.file;
 
+import com.sprint.sprint2.discodeit.entity.User;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ public abstract class AbstractFileRepository<T> {
     }
 
     protected void writeToFile(Map<UUID, T> entity) {
-        try (FileOutputStream fos = new FileOutputStream(filePath, true);
+        try (FileOutputStream fos = new FileOutputStream(filePath);
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ){
             oos.writeObject(entity);
@@ -26,17 +27,13 @@ public abstract class AbstractFileRepository<T> {
 
     protected Map<UUID, T> loadAll() {
         File file = new File(filePath);
-        if (!file.exists()) {
-            return new HashMap<>(); // 파일이 없으면 빈 Map 반환
-        }
         try (FileInputStream fis = new FileInputStream(filePath);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
-            return (Map<UUID, T>) ois.readObject();
+            Map<UUID, T> data = (Map<UUID, T>) ois.readObject();
+            return data;
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
             return new HashMap<>();
         }
     }
-
-
-
 }
