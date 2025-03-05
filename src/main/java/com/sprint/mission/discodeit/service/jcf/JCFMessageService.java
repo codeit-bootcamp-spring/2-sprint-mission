@@ -7,10 +7,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private volatile static JCFMessageService instance = null;
@@ -38,12 +35,10 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message saveMessage(Channel channel, User user, String text) {
         if(channelService.findById(channel.getId()).isEmpty()){
-            System.out.println("채널이 존재하지 않으므로, 유효하지 않은 요청입니다.");
-            return null;
+            throw new NoSuchElementException("not found channel");
         }
         if(userService.findById(user.getId()).isEmpty()){
-            System.out.println("유저가 존재하지 않으므로, 유효하지 않은 요청입니다.");
-            return null;
+            throw new NoSuchElementException("not found user");
         }
 
         Message message = new Message(channel.getId(), user.getId(), text);
@@ -52,33 +47,29 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void findAll() {
-        messageRepository.values().stream()
-                .findFirst()
-                .ifPresentOrElse(
-                        message -> messageRepository.values().forEach(System.out::println),
-                        () -> System.out.println("등록된 메세지가 없습니다.")
-                );
+    public List<Message> findAll() {
+        if(messageRepository.isEmpty()){
+            throw new NoSuchElementException("메시지가 없습니다.");
+        }
+
+        return messageRepository.values().stream().toList();
     }
 
     @Override
-    public void findById(UUID id) {
-        Optional<Message> message = Optional.ofNullable(messageRepository.get(id));
-
-        message.ifPresentOrElse(
-                System.out::println,
-                () -> System.out.println("해당 id의 메세지가 없습니다.")
-        );
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(messageRepository.get(id));
     }
 
     @Override
     public void update(UUID id, String text) {
-        Optional<Message> message = Optional.ofNullable(messageRepository.get(id));
+        if(!messageRepository.containsKey(id)){
+            throw new NoSuchElementException("메시지가 없습니다.");
+        }
+        if(text == null){
+            throw new IllegalArgumentException("수정할 내용은 null일 수 없습니다.");
+        }
 
-        message.ifPresentOrElse(
-                msg -> msg.setText(text),
-                () -> System.out.println("해당 id의 메세지가 없습니다.")
-        );
+        messageRepository.get(id).setText(text);
     }
 
     @Override
