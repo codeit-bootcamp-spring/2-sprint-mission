@@ -8,26 +8,26 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
-    private final UserRepository userRepository;
+    private final UserRepository jcfUserRepository;
 
-    public JCFUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public JCFUserService(UserRepository jcfUserRepository) {
+        this.jcfUserRepository = jcfUserRepository;
     }
 
     @Override
     public void createUser(String userName, String userEmail, String password) {
         User newUser = new User(userName, userEmail, password); //각 요소에 대한 유효성 검증은 User 생성자에게 맡긴다
-        this.userRepository.add(newUser);
+        this.jcfUserRepository.add(newUser);
     }
 
     @Override
     public User readUser(UUID userId) {
-        return userRepository.findById(userId);
+        return jcfUserRepository.findById(userId);
     }
 
     @Override
     public Map<UUID, User> readAllUsers() {
-        return userRepository.getAll();
+        return jcfUserRepository.getAll();
     }
 
     @Override
@@ -42,6 +42,6 @@ public class JCFUserService implements UserService {
 
     @Override
     public void deleteUser(UUID userId) {
-        userRepository.deleteById(userId);
+        jcfUserRepository.deleteById(userId);
     }
 }

@@ -14,41 +14,41 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
-    private final MessageRepository messageRepository;
+    private final UserRepository jcfUserRepository;
+    private final ChannelRepository jcfChannelRepository;
+    private final MessageRepository jcfMessageRepository;
 
-    public JCFMessageService(UserRepository userRepository, ChannelRepository channelRepository ,MessageRepository messageRepository) {
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
-        this.messageRepository = messageRepository;
+    public JCFMessageService(UserRepository jcfUserRepository, ChannelRepository jcfChannelRepository, MessageRepository jcfMessageRepository) {
+        this.jcfUserRepository = jcfUserRepository;
+        this.jcfChannelRepository = jcfChannelRepository;
+        this.jcfMessageRepository = jcfMessageRepository;
     }
 
     @Override
     public void createMessage(User sender, String content, Channel channel) {
-        UserService.validateUserId(sender.getId(), this.userRepository);
-        ChannelService.validateChannelId(channel.getId(), this.channelRepository);
+        UserService.validateUserId(sender.getId(), this.jcfUserRepository);
+        ChannelService.validateChannelId(channel.getId(), this.jcfChannelRepository);
         Message newMessage = new Message(sender, content, channel);     //content에 대한 유효성 검증은 Message 생성자에게 맡긴다.
-        messageRepository.add(newMessage);
+        jcfMessageRepository.add(newMessage);
     }
 
     @Override
     public Message readMessage(UUID messageId) {
-        return messageRepository.findById(messageId);
+        return jcfMessageRepository.findById(messageId);
     }
 
     @Override
     public Map<UUID, Message> readAllMessages() {
-        return messageRepository.getAll();
+        return jcfMessageRepository.getAll();
     }
 
     @Override
     public void updateMessageContent(UUID messageId, String content) {
-        messageRepository.findById(messageId).updateContent(content);
+        jcfMessageRepository.findById(messageId).updateContent(content);
     }
 
     @Override
     public void deleteMessage(UUID messageId) {
-        messageRepository.deleteById(messageId);
+        jcfMessageRepository.deleteById(messageId);
     }
 }

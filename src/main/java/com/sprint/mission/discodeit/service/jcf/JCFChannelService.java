@@ -9,41 +9,40 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
-    private final ChannelRepository channelRepository;
-    private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
+    private final ChannelRepository jcfChannelRepository;
+    private final MessageRepository jcfMessageRepository;
+    private final UserRepository jcfUserRepository;
 
-    public JCFChannelService(UserRepository userRepository, ChannelRepository channelRepository, MessageRepository messageRepository) {
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
-        this.messageRepository = messageRepository;
+    public JCFChannelService(UserRepository jcfUserRepository, ChannelRepository jcfChannelRepository, MessageRepository jcfMessageRepository) {
+        this.jcfUserRepository = jcfUserRepository;
+        this.jcfChannelRepository = jcfChannelRepository;
+        this.jcfMessageRepository = jcfMessageRepository;
     }
 
     @Override
     public void createChannel(String channelName) {
         Channel newChannel = new Channel(channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
-        channelRepository.add(newChannel);
+        jcfChannelRepository.add(newChannel);
     }
 
     @Override
     public Channel readChannel(UUID channelId) {
-        return this.channelRepository.findById(channelId);
+        return this.jcfChannelRepository.findById(channelId);
     }
 
     @Override
     public Map<UUID, Channel> readAllChannels() {
-        return channelRepository.getAll();
+        return jcfChannelRepository.getAll();
     }
 
     @Override
     public List<Message> readMessageListByChannelId(UUID channelId) {
-        return messageRepository.findMessageListByChannelId(channelId);
+        return jcfMessageRepository.findMessageListByChannelId(channelId);
     }
 
     @Override
@@ -53,12 +52,12 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void addChannelParticipant(UUID channelId, User newParticipant) {        // channelId 검증은 channelRepository 에서 수행
-        UserService.validateUserId(newParticipant.getId(), this.userRepository);
-        channelRepository.addParticipant(channelId, newParticipant);
+        UserService.validateUserId(newParticipant.getId(), this.jcfUserRepository);
+        jcfChannelRepository.addParticipant(channelId, newParticipant);
     }
 
     @Override
     public void deleteChannel(UUID channelId) {
-        channelRepository.deleteById(channelId);
+        jcfChannelRepository.deleteById(channelId);
     }
 }

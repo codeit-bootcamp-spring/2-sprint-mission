@@ -6,6 +6,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -16,13 +19,13 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserRepository userRepository = UserRepository.getInstance();
-        ChannelRepository channelRepository = ChannelRepository.getInstance();
-        MessageRepository messageRepository = MessageRepository.getInstance();
+        UserRepository jcfUserRepository = JCFUserRepository.getInstance();
+        ChannelRepository jcfChannelRepository = JCFChannelRepository.getInstance();
+        MessageRepository jcfMessageRepository = JCFMessageRepository.getInstance();
 
-        UserService userService = new JCFUserService(userRepository);
-        ChannelService channelService = new JCFChannelService(userRepository, channelRepository, messageRepository);
-        MessageService messageService = new JCFMessageService(userRepository, channelRepository, messageRepository);
+        UserService userService = new JCFUserService(jcfUserRepository);
+        ChannelService channelService = new JCFChannelService(jcfUserRepository, jcfChannelRepository, jcfMessageRepository);
+        MessageService messageService = new JCFMessageService(jcfUserRepository, jcfChannelRepository, jcfMessageRepository);
 
         // userService
         // createUser 검증
@@ -39,9 +42,9 @@ public class JavaApplication {
         User testUser01 = new User("testUser01", "testUser01@gmail.com", "1111");
         User testUser02 = new User("testUser02", "testUser02@gmail.com", "2222");
         User testUser03 = new User("testUser03", "testUser03@gmail.com", "3333");
-        userRepository.add(testUser01);
-        userRepository.add(testUser02);
-        userRepository.add(testUser03);
+        jcfUserRepository.add(testUser01);
+        jcfUserRepository.add(testUser02);
+        jcfUserRepository.add(testUser03);
         System.out.println(userService.readUser(testUser01.getId()));
         System.out.println(userService.readUser(testUser02.getId()));
         System.out.println(userService.readUser(testUser03.getId()));
@@ -75,9 +78,9 @@ public class JavaApplication {
         Channel testChannel01 = new Channel("testChannel01");
         Channel testChannel02 = new Channel("testChannel02");
         Channel testChannel03 = new Channel("testChannel03");
-        channelRepository.add(testChannel01);
-        channelRepository.add(testChannel02);
-        channelRepository.add(testChannel03);
+        jcfChannelRepository.add(testChannel01);
+        jcfChannelRepository.add(testChannel02);
+        jcfChannelRepository.add(testChannel03);
         System.out.println(channelService.readChannel(testChannel01.getId()));
         System.out.println(channelService.readChannel(testChannel02.getId()));
         System.out.println(channelService.readChannel(testChannel03.getId()));
@@ -115,8 +118,8 @@ public class JavaApplication {
         // Message testMessage01 = new Message(testUser01, "01test01", testChannel01);   // 위에서 testUser01 삭제함.
         Message testMessage02 = new Message(testUser02, "02test02", testChannel02);
         Message testMessage03 = new Message(testUser03, "03test03", testChannel03);
-        messageRepository.add(testMessage02);
-        messageRepository.add(testMessage03);
+        jcfMessageRepository.add(testMessage02);
+        jcfMessageRepository.add(testMessage03);
         // System.out.println(messageService.readMessage(testMessage01.getId()));
         System.out.println(messageService.readMessage(testMessage02.getId()));
         System.out.println(messageService.readMessage(testMessage03.getId()));
