@@ -5,10 +5,8 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import javax.swing.text.html.Option;
+import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data;
@@ -24,8 +22,8 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findById(UUID messageId) {
-        return data.get(messageId);
+    public Optional<Message> findById(UUID messageId) {
+        return Optional.ofNullable(data.get(messageId));
     }
 
     @Override

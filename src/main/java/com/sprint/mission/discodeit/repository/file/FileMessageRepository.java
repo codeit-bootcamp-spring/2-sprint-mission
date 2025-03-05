@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository, FileRepository<Message> {
@@ -23,8 +24,8 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
     }
 
     @Override
-    public Message findById(UUID messageId) {
-        return loadOneFromFileById(messageId);
+    public Optional<Message> findById(UUID messageId) {
+        return Optional.ofNullable(loadOneFromFileById(messageId));
     }
 
     @Override
