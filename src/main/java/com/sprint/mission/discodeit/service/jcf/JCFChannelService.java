@@ -59,10 +59,6 @@ public class JCFChannelService implements ChannelService {
     // 채널 전체 조회
     @Override
     public List<Channel> getAllChannel() {
-        return findAllChannel();
-    }
-
-    private List<Channel> findAllChannel() {
         if (channelsData.isEmpty()) {
             System.out.println("전체 조회 결과가 없습니다.");
             return Collections.emptyList();

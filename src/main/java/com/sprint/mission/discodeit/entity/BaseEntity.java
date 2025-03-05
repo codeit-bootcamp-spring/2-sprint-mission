@@ -1,22 +1,26 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-public class BaseEntity {
+public class BaseEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     // 필드 선언
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    protected final UUID id;
+    protected final Long createdAt;
+    protected Long updatedAt;
 
     // Common 생성자 선언
     public BaseEntity(){
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis() / 1000;
+        this.createdAt = Instant.now().getEpochSecond();
         this.updatedAt = createdAt; // 첫 업데이트 시간은 생성시간과 동일
     }
 
@@ -44,7 +48,7 @@ public class BaseEntity {
 
     // 업데이트 메소드
     public void update(){
-        this.updatedAt = System.currentTimeMillis() / 1000; // 수정 시에 현재 시간으로 업데이트
+        this.updatedAt = Instant.now().getEpochSecond(); // 수정 시에 현재 시간으로 업데이트
     }
 
 

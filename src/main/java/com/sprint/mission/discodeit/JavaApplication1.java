@@ -6,17 +6,18 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class JavaApplication {
+public class JavaApplication1 {
     public static void main(String[] args) {
-        UserService userService = new JCFUserService();
+        UserService userService = new FileUserService();
         ChannelService channelService = new JCFChannelService();
         MessageService messageService = new JCFMessageService(userService);
 
@@ -32,10 +33,10 @@ public class JavaApplication {
             System.out.println("4. 종료");
             System.out.print("번호 입력: ");
 
-            String choice_1 = sc.nextLine();
+            String choice1 = sc.nextLine();
 
 
-            switch (choice_1) {
+            switch (choice1) {
                 case "1":
                     System.out.println("\n===사용자 메뉴 ===");
                     System.out.println("1. 사용자 등록");
@@ -44,9 +45,9 @@ public class JavaApplication {
                     System.out.println("4. 사용자 수정");
                     System.out.println("5. 사용자 삭제");
                     System.out.print("번호 입력: ");
-                    String choice_1_1 = sc.nextLine();
+                    String choice11 = sc.nextLine();
 
-                    switch (choice_1_1) {
+                    switch (choice11) {
                         case "1":
                             System.out.println("\n===사용자 등록 ===");
                             System.out.print("사용자 이름 입력: ");
@@ -55,6 +56,7 @@ public class JavaApplication {
                             String userMail1 = sc.nextLine();
                             User user = new User(userName1, userMail1);
                             userService.create(user);
+                            System.out.println(user);
                             break;
 
                         case "2":
@@ -64,12 +66,13 @@ public class JavaApplication {
                             userService.getUser(userName2);
                             User userPrint = userService.getUser(userName2);
                             System.out.println(userPrint);
-                            System.out.println();
                             break;
 
                         case "3":
                             System.out.println("\n===사용자 전체 조회 ===");
-                            userService.getAllUser();
+                            List<User> printUser1 = userService.getAllUser();
+                            System.out.println(printUser1);
+                            System.out.println();
                             break;
 
                         case "4":
@@ -101,9 +104,9 @@ public class JavaApplication {
                     System.out.println("4. 채널 수정");
                     System.out.println("5. 채널 삭제");
                     System.out.print("번호 입력: ");
-                    String choice_1_2 = sc.nextLine();
+                    String choice12 = sc.nextLine();
 
-                    switch (choice_1_2) {
+                    switch (choice12) {
                         case "1":
                             System.out.println("채널 생성");
                             System.out.print("채널 이름 입력: ");
@@ -125,7 +128,8 @@ public class JavaApplication {
 
                         case "3":
                             System.out.println("채널 전체 조회");
-                            channelService.getAllChannel();
+                            List<Channel> channelPrint2 = channelService.getAllChannel();
+                            System.out.println(channelPrint2);
                             break;
 
                         case "4":
@@ -157,9 +161,9 @@ public class JavaApplication {
                     System.out.println("4. 메시지 수정");
                     System.out.println("5. 메시지 삭제");
                     System.out.print("번호 입력: ");
-                    String choice_1_3 = sc.nextLine();
+                    String choice13 = sc.nextLine();
 
-                    switch (choice_1_3) {
+                    switch (choice13) {
                         case "1":
                             System.out.println("메시지 생성");
                             System.out.print("보내는 사람 입력: ");

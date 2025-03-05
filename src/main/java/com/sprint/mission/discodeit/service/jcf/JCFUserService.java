@@ -69,7 +69,6 @@ public class JCFUserService implements UserService {
             return Collections.emptyList();
         }
         for (User userList : usersData) {
-            System.out.println(userList);
         }
         return usersData;
     }
@@ -96,19 +95,13 @@ public class JCFUserService implements UserService {
 
     // 사용자 삭제
     @Override
-    public User delete(String name) {
-        return deleteUser(name);
-    }
-
-    private User deleteUser(String name) {
+    public void delete(String name) {
         for (User userList : usersData) {
             if (userList.getName().equals(name)) {
                 usersData.remove(userList);
                 System.out.println("[ " + userList.getName() + " ] 이 삭제 되었습니다.");
-                return userList;
             }
         }
         System.out.println("삭제 할 사용자가 존재하지 않습니다.");
-        return null;
     }
 }
