@@ -50,8 +50,6 @@ public class JavaApplication {
 
         // 유저 읽기
         System.out.println("=========== 특정 유저 get 테스트 ===========");
-        System.out.println("=========== 이메일로 조회: 'Kim' ===========");
-        System.out.println(userService.getUserByEmail(user2.getEmail()));
         System.out.println("=========== id로 조회: 'Han' ===========");
         System.out.println(userService.getUserByUserId(user1.getId()));
 
@@ -75,8 +73,8 @@ public class JavaApplication {
         userService.getAllUsers().forEach(System.out::println);
         System.out.println("=========== 유저 'Oreo'를 id로 삭제 ===========");
         userService.deleteUserById(user7.getId());
-        System.out.println("=========== 유저 'Mr.delete'를 이메일로 삭제 ===========");
-        userService.deleteUserByEmail(user6.getEmail());
+        System.out.println("=========== 유저 'Mr.delete'를 id로 삭제 ===========");
+        userService.deleteUserById(user6.getId());
         System.out.println("=========== 삭제 이후: 5명이여야 함 ===========");
         userService.getAllUsers().forEach(System.out::println);
         System.out.println("=========== 유저 삭제 테스트 끝===========");
@@ -103,8 +101,6 @@ public class JavaApplication {
         System.out.println("=========== 채널 주인 조회: Han이 나와야 함 ===========");
         UUID ownerId1 = channelService.getChannelOwnerId(channel1.getId());
         System.out.println(userService.getUserByUserId(ownerId1));
-        System.out.println("=========== 특정 제목의 채널들 조회: '스프링 공부방' 채널이 2개 나와야 함 ===========");
-        channelService.getChannelsByTitle("스프링 공부방").forEach(System.out::println);
         System.out.println("=========== 채널 id로 채널 조회: sb02 방이 나와야 함 ===========");
         System.out.println(channelService.getChannelByChannelId(channel1.getId()));
         System.out.println("=========== 채널 조회 테스트 끝 ===========");

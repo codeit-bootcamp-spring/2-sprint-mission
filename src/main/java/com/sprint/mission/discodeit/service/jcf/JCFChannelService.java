@@ -53,13 +53,6 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> getChannelsByTitle(String title) {
-        return channels.values().stream()
-                .filter(c -> title.equals(c.getTitle()))
-                .toList();
-    }
-
-    @Override
     public List<Channel> getAllChannels() {
         return channels.values().stream().toList();
     }

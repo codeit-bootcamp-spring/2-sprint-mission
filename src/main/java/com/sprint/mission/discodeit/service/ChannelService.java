@@ -10,7 +10,6 @@ public interface ChannelService {
     Channel createChannel(UUID ownerId, String title, String description);
     UUID getChannelOwnerId(UUID channelId);
     Channel getChannelByChannelId(UUID channelId);
-    List<Channel> getChannelsByTitle(String title);
     List<Channel> getAllChannels();
     Set<UUID> getChannelMembers(UUID channelId);
     Channel updateChannel(UUID channelId, String title, String description);

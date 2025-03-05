@@ -43,14 +43,6 @@ public class JCFUserService implements UserService {
         return user;
     }
 
-    @Override
-    public User getUserByEmail(String email) {
-        User user = findUserByEmail(email);
-        if (user == null) {
-            throw new UserNotFoundException("해당 유저가 없습니다.");
-        }
-        return user;
-    }
 
     @Override
     public List<User> getAllUsers() {
@@ -65,12 +57,6 @@ public class JCFUserService implements UserService {
         return user;
     }
 
-    @Override
-    public void deleteUserByEmail(String email) {
-        UUID userId = getUserByEmail(email).getId();
-        getChannelService().deleteUserFromEveryChannel(userId);
-        users.remove(userId);
-    }
 
     @Override
     public void deleteUserById(UUID userId) {
