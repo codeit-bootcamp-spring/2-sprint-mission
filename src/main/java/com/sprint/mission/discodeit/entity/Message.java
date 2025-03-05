@@ -35,7 +35,7 @@ public class Message extends BaseEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "[" + channel.getChannelName() + "] " + sender.getName() + " : " + content + ", " + getId();
+        return "[" + channel.getChannelName() + "] " + sender.getName() + " : " + content;
     }
 
 }

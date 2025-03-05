@@ -4,15 +4,13 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class FileUserRepository implements UserRepository {
-    private final Map<UUID, User> users = new HashMap<>();
+    private final Map<UUID, User> users;
 
     public FileUserRepository() {
-        loadFromFile("Users.csv");
+        users = loadFromFile("Users.csv");
     }
 
     @Override
@@ -33,6 +31,15 @@ public class FileUserRepository implements UserRepository {
     public void delete(UUID id) {
         users.remove(id);
         saveInFile(users, "Users.csv");
+    }
+
+    public User find(UUID id) {
+        return users.getOrDefault(id, null);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return new ArrayList<>(users.values());
     }
 
     public static void saveInFile(Map<UUID, User> users, String fileName) {

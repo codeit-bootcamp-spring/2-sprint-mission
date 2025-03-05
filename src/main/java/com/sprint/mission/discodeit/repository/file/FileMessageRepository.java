@@ -1,62 +1,26 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class FileMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> messages = new HashMap<>();
-    private final FileUserService fileUserService;
-    private final FileChannelService fileChannelService;
+    private final Map<UUID, Message> messages;
 
-    public FileMessageRepository(FileUserService fileUserService, FileChannelService fileChannelService) {
-        this.fileUserService = fileUserService;
-        this.fileChannelService = fileChannelService;
-        loadFromFile("messages.ser");
+    public FileMessageRepository() {
+        messages = loadFromFile("messages.ser");
     }
 
     @Override
     public void create(Message message) {
-        User sender = message.getSender();
-        Channel channel = message.getChannel();
-
-        if (fileUserService.find(sender.getId()) == null) {
-            System.out.println("유저가 존재하지 않습니다.");
-            return;
-        }
-
-        if (fileChannelService.find(channel.getId()) == null) {
-            System.out.println("채널이 존재하지 않습니다.");
-            return;
-        }
-
         messages.put(message.getId(), message);
         saveInFile(messages, "messages.ser");
     }
 
     @Override
     public void update(Message message) {
-        User sender = message.getSender();
-        Channel channel = message.getChannel();
-
-        if (fileUserService.find(sender.getId()) == null) {
-            System.out.println("유저가 존재하지 않습니다.");
-            return;
-        }
-
-        if (fileChannelService.find(channel.getId()) == null) {
-            System.out.println("채널이 존재하지 않습니다.");
-            return;
-        }
-
         messages.put(message.getId(), message);
         saveInFile(messages, "messages.ser");
     }
@@ -65,6 +29,16 @@ public class FileMessageRepository implements MessageRepository {
     public void delete(UUID id) {
         messages.remove(id);
         saveInFile(messages, "messages.ser");
+    }
+
+    @Override
+    public Message find(UUID id) {
+        return messages.getOrDefault(id, null);
+    }
+
+    @Override
+    public List<Message> findAll() {
+        return new ArrayList<>(messages.values());
     }
 
     public static void saveInFile(Map<UUID, Message> messages, String fileName){

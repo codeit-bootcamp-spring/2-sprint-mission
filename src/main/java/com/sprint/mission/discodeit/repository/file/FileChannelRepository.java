@@ -4,15 +4,13 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class FileChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channels = new HashMap<>();
+    private final Map<UUID, Channel> channels;
 
     public FileChannelRepository() {
-        loadFromFile("Channels.csv");
+        channels = loadFromFile("Channels.csv");
     }
 
     @Override
@@ -31,6 +29,16 @@ public class FileChannelRepository implements ChannelRepository {
     public void delete(UUID id) {
         channels.remove(id);
         saveInFile(channels, "Channels.csv");
+    }
+
+    @Override
+    public List<Channel> findAll() {
+        return new ArrayList<>(channels.values());
+    }
+
+    @Override
+    public Channel find(UUID id) {
+        return channels.getOrDefault(id, null);
     }
 
     public static void saveInFile(Map<UUID, Channel> channels, String fileName) {

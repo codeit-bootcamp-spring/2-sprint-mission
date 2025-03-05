@@ -24,6 +24,6 @@ public class User extends BaseEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "< 유저 > " + name + ", " + getId();
+        return name;
     }
 }

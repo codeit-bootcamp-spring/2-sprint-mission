@@ -3,9 +3,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> users = new HashMap<>();
@@ -25,5 +23,15 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public void delete(UUID id) {
         users.remove(id);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return new ArrayList<>(users.values());
+    }
+
+    @Override
+    public User find(UUID id) {
+        return users.getOrDefault(id, null);
     }
 }
