@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 
 import java.util.Collections;
@@ -15,7 +15,7 @@ import java.util.UUID;
 public class JavaApplication {
     static Scanner sc = new Scanner(System.in);
     static UserService userService = new FileUserService();
-    static ChannelService channelService = JCFChannelService.getInstance();
+    static ChannelService channelService = new FileChannelService();
     static MessageService messageService = JCFMessageService.getInstance(userService, channelService);
 
     public static void main(String[] args) {
@@ -73,7 +73,9 @@ public class JavaApplication {
                             channelToken = null;
                             break;
                         case 3:
-                            channelService.findAllChannel();
+                            channelService.findAllChannel()
+                                    .orElse(Collections.emptyList())
+                                    .forEach(System.out::println);
                         case 4:
                             break;
                     }

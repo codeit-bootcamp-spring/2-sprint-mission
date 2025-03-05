@@ -85,10 +85,10 @@ public class FileUserService implements UserService {
                 .findAny()
                 .ifPresentOrElse(
                     user -> {
-                        user.setNickname(nickname);
+                        user.updateNickname(nickname);
                         System.out.println("[성공]닉네임 변경 완료" + user);
                     },
-                    () -> System.out.println("[실패]수정하려는 메세지가 존재하지 않습니다"));
+                    () -> System.out.println("[실패]수정하려는 아이디가 존재하지 않습니다"));
 
         try (FileOutputStream fos = new FileOutputStream("user.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
