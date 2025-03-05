@@ -12,7 +12,7 @@ import java.util.List;
 
 public class FileServerRepository implements ServerRepository {
     private List<Container> containerList;
-    private final Path containerListFilePath =  Paths.get(System.getProperty("user.dir"), "data", "ContainerList.ser");
+    private final Path path =  Paths.get(System.getProperty("user.dir"), "data", "ContainerList.ser");
 
     public FileServerRepository() {
         containerList = new LinkedList<>();
@@ -21,7 +21,7 @@ public class FileServerRepository implements ServerRepository {
 
     // 채널 리스트를 저장할 디렉토리가 있는지 확인
     private void init() {
-        Path directory = containerListFilePath.getParent();
+        Path directory = path.getParent();
         if (!Files.exists(directory)) {
             try {
                 Files.createDirectories(directory);
@@ -34,8 +34,8 @@ public class FileServerRepository implements ServerRepository {
     }
 
     private void loadContainerList() {
-        if (Files.exists(containerListFilePath)) {
-            try (FileInputStream fis = new FileInputStream(containerListFilePath.toFile());
+        if (Files.exists(path)) {
+            try (FileInputStream fis = new FileInputStream(path.toFile());
                  ObjectInputStream ois = new ObjectInputStream(fis)) {
 
                 List<Container> list = (List<Container>) ois.readObject();
@@ -45,7 +45,7 @@ public class FileServerRepository implements ServerRepository {
                     System.out.println("채널 로드 완료 - ID 유지: " + c.getId());
                 }
 
-                System.out.println("채널 리스트 로드 완료: " + containerListFilePath);
+                System.out.println("채널 리스트 로드 완료: " + path);
             } catch (IOException | ClassNotFoundException e) {
                 System.out.println("채널 리스트 로드 실패");
                 throw new RuntimeException(e);
@@ -61,7 +61,7 @@ public class FileServerRepository implements ServerRepository {
     private void saveChannelList() {
         init();
 
-        try (FileOutputStream fos = new FileOutputStream(containerListFilePath.toFile());
+        try (FileOutputStream fos = new FileOutputStream(path.toFile());
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
             oos.writeObject(containerList);
@@ -72,13 +72,13 @@ public class FileServerRepository implements ServerRepository {
         }
     }
 
-    public List<Container> getContainerList() {
-        return containerList;
-    }
-
     public void updateContainerList(List<Container> containerList) {
         this.containerList = containerList;
         saveChannelList();
+    }
+
+    public List<Container> getContainerList() {
+        return containerList;
     }
 
 

@@ -11,7 +11,7 @@ public class LinkedListJCFChannelRepository extends JCFChannelRepository {
     }
 
     @Override
-    public void add(Message message) {
-        super.add(message);
+    public void save(Message message) {
+        super.save(message);
     }
 }
