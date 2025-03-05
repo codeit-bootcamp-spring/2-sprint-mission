@@ -2,27 +2,27 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.io.*;
 import java.util.*;
 
 public class FileChannelService implements ChannelService {
-    private static final String FILE_PATH = "channels.ser";
+    private ChannelRepository channelRepository;
+
+    public FileChannelService(ChannelRepository channelRepository){
+        this.channelRepository = channelRepository;
+    }
 
     @Override
     public Channel create(ChannelType type, String name, String description) {
         Channel channel = new Channel(type, name, description);
-        Map<UUID, Channel> channels = loadChannels();
-        channels.put(channel.getId(), channel);
-        saveChannels(channels);
-        return channel;
+        return channelRepository.save(channel);
     }
 
     @Override
     public Channel find(UUID channelId) {
-        Map<UUID, Channel> channels = loadChannels();
-        Channel channel = channels.get(channelId);
+        Channel channel = channelRepository.findById(channelId);
         if (channel == null) {
             throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
@@ -31,55 +31,29 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(loadChannels().values());
+        return channelRepository.findAll();
     }
 
     @Override
     public Channel update(UUID channelId, String newName, String newDescription) {
-        Map<UUID, Channel> channels = loadChannels();
-        Channel channel = channels.get(channelId);
+        Channel channel = channelRepository.findById(channelId);
         if (channel == null) {
             throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
         channel.update(newName, newDescription);
-        saveChannels(channels);
-        return channel;
+        return channelRepository.save(channel);
     }
 
     @Override
     public void delete(UUID channelId) {
-        Map<UUID, Channel> channels = loadChannels();
-        if (!channels.containsKey(channelId)) {
+        if(!channelRepository.exists(channelId)) {
             throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
-        channels.remove(channelId);
-        saveChannels(channels);
+        channelRepository.delete(channelId);
     }
 
     @Override
     public boolean exists(UUID channelId) {
-        return false;
-    }
-
-    private Map<UUID, Channel> loadChannels() {
-        File file = new File(FILE_PATH);
-        if (!file.exists()) {
-            return new HashMap<>();
-        }
-
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            return (Map<UUID, Channel>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return new HashMap<>();
-        }
-    }
-
-    private void saveChannels(Map<UUID, Channel> channels) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(channels);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return channelRepository.exists(channelId);
     }
 }

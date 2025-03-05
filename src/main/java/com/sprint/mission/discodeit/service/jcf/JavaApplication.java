@@ -4,6 +4,15 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelrepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -12,6 +21,7 @@ import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 
@@ -52,24 +62,47 @@ public class JavaApplication {
         System.out.println("채널 삭제: " + foundChannelsAfterDelete.size());
     }
 
-    static void messageCRUDTest(MessageService messageService) {
-        // 생성
-        UUID channelId = UUID.randomUUID();
-        UUID authorId = UUID.randomUUID();
-        Message message = messageService.create("안녕하세요.", channelId, authorId);
-        System.out.println("메시지 생성: " + message.getId());
-        // 조회
-        Message foundMessage = messageService.find(message.getId());
-        System.out.println("메시지 조회(단건): " + foundMessage.getId());
-        List<Message> foundMessages = messageService.findAll();
-        System.out.println("메시지 조회(다건): " + foundMessages.size());
-        // 수정
-        Message updatedMessage = messageService.update(message.getId(), "반갑습니다.");
-        System.out.println("메시지 수정: " + updatedMessage.getContent());
-        // 삭재
-        messageService.delete(message.getId());
-        List<Message> foundMessagesAfterDelete = messageService.findAll();
-        System.out.println("메시지 삭제: " + foundMessagesAfterDelete.size());
+    static void messageCRUDTest(MessageService messageService, ChannelService channelService, UserService userService) {
+        try{
+            // 생성
+            Channel channel = channelService.create(ChannelType.PUBLIC, "테스트용 채널", "테스트용 채널입니다");
+            User user = userService.create("user1", "user1@codeit.com", "user1234");
+            Message message = messageService.create("안녕하세요.", channel.getId(), user.getId());
+            System.out.println("메시지 생성: " + message.getId());
+            // 조회
+            try {
+                Message foundMessage = messageService.find(message.getId());
+                System.out.println("메시지 조회(단건): " + foundMessage.getId());
+            } catch (NoSuchElementException e) {
+                System.out.println("메시지 조회 실패: " + e.getMessage());
+            }
+            List<Message> foundMessages = messageService.findAll();
+            System.out.println("메시지 조회(다건): " + foundMessages.size());
+            // 수정
+            try{
+                Message updatedMessage = messageService.update(message.getId(), "반갑습니다.");
+                System.out.println("메시지 수정: " + updatedMessage.getContent());
+            } catch (NoSuchElementException e) {
+                System.out.println("메시지 수정 실패: " + e.getMessage());
+            }
+            //삭제
+            try {
+                messageService.delete(message.getId());
+                System.out.println("메시지 삭제 성공");
+            } catch (NoSuchElementException e) {
+                System.out.println("메시지 삭제 실패: " + e.getMessage());
+            }
+
+            List<Message> foundMessagesAfterDelete = messageService.findAll();
+            System.out.println("메시지 삭제 후 조회: " + foundMessagesAfterDelete.size());
+            //테스트 후 삭제
+            channelService.delete(channel.getId());
+            userService.delete(user.getId());
+        } catch (NoSuchElementException e) {
+            System.out.println("메시지 CRUD 테스트 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
+
     }
 
     static User setupUser(UserService userService) {
@@ -89,24 +122,35 @@ public class JavaApplication {
 
     public static void main(String[] args) {
         // 서비스 초기화 JCF
-//        UserService userService = new JCFUserService();
-//        ChannelService channelService = new JCFChannelService();
-//        MessageService messageService = new JCFMessageService(channelService, userService);
+//        UserRepository userRepository = new JCFUserRepository();
+//        ChannelRepository channelRepository = new JCFChannelRepository();
+//        MessageRepository messageRepository = new JCFMessageRepository();
+//
+//        UserService userService = new JCFUserService(userRepository);
+//        ChannelService channelService = new JCFChannelService(channelRepository);
+//        MessageService messageService = new JCFMessageService(messageRepository, channelService, userService);
 
         //서비스 초기화 FileI/O
-        UserService userService = new FileUserService();
-        ChannelService channelService = new FileChannelService();
-        MessageService messageService = new FileMessageService(channelService, userService);
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelrepository();
+        MessageRepository messageRepository = new FileMessageRepository();
+
+        UserService userService = new FileUserService(userRepository);
+        ChannelService channelService = new FileChannelService(channelRepository);
+        MessageService messageService = new FileMessageService(messageRepository, channelService, userService);
 
         //테스트
         userCRUDTest(userService);
         channelCRUDTest(channelService);
-        messageCRUDTest(messageService);
+        messageCRUDTest(messageService, channelService, userService);
 
         // 셋업
         User user = setupUser(userService);
         Channel channel = setupChannel(channelService);
+
         // 테스트
         messageCreateTest(messageService, channel, user);
+        userService.delete(user.getId());
+        channelService.delete(channel.getId());
     }
 }
