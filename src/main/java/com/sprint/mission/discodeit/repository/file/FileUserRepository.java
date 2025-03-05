@@ -1,16 +1,16 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
 import java.util.*;
 
-public class FileUserService implements UserService {
+public class FileUserRepository implements UserRepository {
     private final String fileName = "users.ser";
     private final Map<UUID, User> userMap;
 
-    public FileUserService() {
+    public FileUserRepository() {
         this.userMap = loadUserList();
     }
 
@@ -36,8 +36,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User create(String userName, String userEmail, String userPassword) {
-        User user = new User(userName, userEmail, userPassword);
+    public User save(User user) {
         this.userMap.put(user.getId(), user);
         saveUserList();
         return user;
@@ -49,29 +48,23 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User findById(UUID userId) {
-        User userNullable = this.userMap.get(userId);
-        return Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자를 찾을 수 없습니다: " + userId));
+    public Optional<User> findById(UUID userId) {
+        return Optional.ofNullable(userMap.get(userId));
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User userNullable = this.userMap.get(userId);
-        User user = Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자를 찾을 수 없습니다: " + userId));
-        user.update(newUsername, newEmail, newPassword);
+    public User update(User user) {
+        this.userMap.put(user.getId(), user);
         saveUserList();
         return user;
     }
 
-
     @Override
-    public void delete(UUID userId) {
-        User removedUser = this.userMap.remove(userId);
-        if (removedUser == null) {
-            throw new NoSuchElementException("해당 사용자를 찾을 수 없습니다 : " + userId);
+    public boolean delete(UUID userId) {
+        boolean removed = userMap.remove(userId) != null;
+        if (removed) {
+            saveUserList();
         }
-        saveUserList();
+        return removed;
     }
 }

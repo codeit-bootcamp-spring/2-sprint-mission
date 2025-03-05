@@ -21,8 +21,8 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message create(String content, UUID channelId, UUID userId) {
         try {
-            channelService.findByChannelId(channelId);
-            userService.findByUserId(userId);
+            channelService.findById(channelId);
+            userService.findById(userId);
         } catch (NoSuchElementException e) {
             throw e;
         }
@@ -38,7 +38,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message findByMessageId(UUID messageId) {
+    public Message findById(UUID messageId) {
         Message message = this.messageList.get(messageId);
         return Optional.ofNullable(message)
                 .orElseThrow(() -> new NoSuchElementException("해당 메시지를 찾을 수 없습니다 : " + messageId));

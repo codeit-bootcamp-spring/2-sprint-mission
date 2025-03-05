@@ -1,17 +1,16 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
 import java.util.*;
 
-public class FileChannelService implements ChannelService {
-    private final String fileName = "channel.ser";
+public class FileChannelRepository implements ChannelRepository {
+    private final String fileName = "channels.ser";
     private final Map<UUID, Channel> channelMap;
 
-    public FileChannelService() {
+    public FileChannelRepository() {
         this.channelMap = loadChannelList();
     }
 
@@ -36,10 +35,8 @@ public class FileChannelService implements ChannelService {
         }
     }
 
-
     @Override
-    public Channel create(ChannelType type, String channelName, String description) {
-        Channel channel = new Channel(type, channelName, description);
+    public Channel save(Channel channel) {
         this.channelMap.put(channel.getId(), channel);
         saveChannelList();
         return channel;
@@ -51,27 +48,23 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-        Channel channelNullable = this.channelMap.get(channelId);
-        return Optional.ofNullable(channelNullable)
-                .orElseThrow(() -> new NoSuchElementException("해당 채널을 찾을 수 없습니다 : " + channelId));
+    public Optional<Channel> findById(UUID channelId) {
+        return Optional.ofNullable(channelMap.get(channelId));
     }
 
     @Override
-    public Channel update(UUID channelId, String newChannelName, String newDescription) {
-        Channel channelNullable = this.channelMap.get(channelId);
-        Channel channel = Optional.ofNullable(channelNullable)
-                .orElseThrow(() -> new NoSuchElementException("해당 채널을 찾을 수 없습니다 : " + channelId));
-        channel.update(newChannelName, newDescription);
+    public Channel update(Channel channel) {
+        this.channelMap.put(channel.getId(), channel);
         saveChannelList();
         return channel;
     }
 
     @Override
-    public void delete(UUID channelId) {
-        Channel removedChannel = this.channelMap.remove(channelId);
-        if (removedChannel == null) {
-            throw new NoSuchElementException("해당 채널을 찾을 수 없습니다 : " + channelId);
+    public boolean delete(UUID channelId) {
+        boolean removed = channelMap.remove(channelId) != null;
+        if (removed) {
+            saveChannelList();
         }
+        return removed;
     }
 }
