@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class BaseEntity {
-    protected final UUID id;
+    protected UUID id;
     protected Long createAt;
     protected Long updateAt;
 
