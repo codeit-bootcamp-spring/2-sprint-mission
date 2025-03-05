@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class SerializationUtil {
@@ -54,6 +55,29 @@ public class SerializationUtil {
             }
         } else {
             return new ArrayList<>();
+        }
+    }
+
+    // 파일 하나만 역직렬화
+    public static <T> T reverseOneSerialization(Path directory, UUID id) {
+        if (!Files.exists(directory)) {
+            return null;
+        }
+        try {
+            // ID와 일치하는 파일 찾기
+            Path filePath = Files.list(directory)
+                    .filter(path -> path.getFileName().toString().equals(id + ".ser")) //
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("UUID값에 해당하는 데이터가 존재하지 않습니다.")); //
+
+            // 파일이 존재하면 역직렬화 수행
+            try (FileInputStream fis = new FileInputStream(filePath.toFile());
+                 ObjectInputStream ois = new ObjectInputStream(fis)) {
+
+                return (T) ois.readObject();
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("파일 역직렬화 실패: " + e.getMessage(), e);
         }
     }
 
