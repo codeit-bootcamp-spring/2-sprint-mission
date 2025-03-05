@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository, FileRepository<Channel> {
@@ -22,8 +23,8 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-        return loadOneFromFileById(channelId);
+    public Optional<Channel> findById(UUID channelId) {
+        return Optional.ofNullable(loadOneFromFileById(channelId));
     }
 
     @Override
