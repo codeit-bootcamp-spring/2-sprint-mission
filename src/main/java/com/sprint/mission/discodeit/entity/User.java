@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import static com.sprint.mission.discodeit.entity.Util.formatTime;
+
 public class User extends BaseEntity {
     private String userName;
     private String nickName;
@@ -19,17 +21,17 @@ public class User extends BaseEntity {
         return nickName;
     }
 
-    public void userUpdate(String userName, String nickName){
+    public void userUpdate(String userName, String nickName) {
         updateTime();
         this.userName = userName;
         this.nickName = nickName;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "[uid: " + id +
-                ", userCreateAt: " + formatTime(getCreateAt()) +
-                ", userUpdateAt: " + (getUpdateAt() == null ? "null" : formatTime(getUpdateAt())) +
+                ", userCreateAt: " + formatTime(getCreatedAt()) +
+                ", userUpdateAt: " + (getUpdatedAt() == null ? "null" : formatTime(getUpdatedAt())) +
                 ", userName: " + userName +
                 ", nickName: " + nickName + "]\n";
     }

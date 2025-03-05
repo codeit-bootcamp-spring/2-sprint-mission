@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import static com.sprint.mission.discodeit.entity.Util.formatTime;
+
 public class Message extends BaseEntity {
     private final Channel channel;
     private final User user;
     private String messageContent;
 
-    public Message(Channel channel, User user, String messageContent){
+    public Message(Channel channel, User user, String messageContent) {
         super();
         this.channel = channel;
         this.user = user;
@@ -24,7 +26,7 @@ public class Message extends BaseEntity {
         return messageContent;
     }
 
-    public void messageUpdate(String messageContent){
+    public void messageUpdate(String messageContent) {
         updateTime();
         this.messageContent = messageContent;
     }
@@ -36,8 +38,8 @@ public class Message extends BaseEntity {
                 ", channelName: " + channel.getChannelName() +
                 ", userName: " + user.getUserName() +
                 ", nickName: " + user.getNickName() +
-                "\n\t, messageCreateAt: " + formatTime(getCreateAt()) +
-                ", messageUpdateAt: " + (getUpdateAt() == null ? "null" : formatTime(getUpdateAt())) +
+                "\n\t, messageCreateAt: " + formatTime(getCreatedAt()) +
+                ", messageUpdateAt: " + (getUpdatedAt() == null ? "null" : formatTime(getUpdatedAt())) +
                 ", messageContent: " + messageContent + "]\n";
     }
 
