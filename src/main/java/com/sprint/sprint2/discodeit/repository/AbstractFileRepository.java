@@ -1,6 +1,5 @@
-package com.sprint.sprint2.discodeit.repository.file;
+package com.sprint.sprint2.discodeit.repository;
 
-import com.sprint.sprint2.discodeit.entity.User;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +13,7 @@ public abstract class AbstractFileRepository<T> {
     }
 
     protected void writeToFile(Map<UUID, T> entity) {
-        try (FileOutputStream fos = new FileOutputStream(filePath);
+        try (FileOutputStream fos = new FileOutputStream(filePath, false);
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ){
             oos.writeObject(entity);
