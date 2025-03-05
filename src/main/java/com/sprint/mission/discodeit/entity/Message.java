@@ -28,9 +28,15 @@ public class Message extends BaseEntity{
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
-        setUpdatedAt();
+    public void setText(String newText) {
+        boolean anyValueUpdated = false;
+        if(newText != null && !newText.equals(this.text)){
+            anyValueUpdated = true;
+        }
+        if(anyValueUpdated){
+            this.text = newText;
+            setUpdatedAt();
+        }
     }
 
     @Override
