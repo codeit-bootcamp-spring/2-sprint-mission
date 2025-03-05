@@ -20,7 +20,7 @@ public abstract class BaseEntity implements Serializable {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
+    public void updateTime() {
+        this.updatedAt = System.currentTimeMillis();
     }
 }

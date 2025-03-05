@@ -13,10 +13,6 @@ public class Message extends BaseEntity {
         this.content = content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public UUID getUserUUID() {
         return userUUID;
     }
@@ -27,6 +23,11 @@ public class Message extends BaseEntity {
 
     public String getContent() {
         return content;
+    }
+
+    public void updateContent(String content) {
+        super.updateTime();
+        this.content = content;
     }
 
     @Override

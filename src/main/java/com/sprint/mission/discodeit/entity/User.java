@@ -12,10 +12,6 @@ public class User extends BaseEntity implements Serializable {
         this.password = password;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
     public String getNickname() {
         return nickname;
     }
@@ -24,7 +20,11 @@ public class User extends BaseEntity implements Serializable {
         return password;
     }
 
-    public void update(){}
+    public void updateNickname(String nickname) {
+        super.updateTime();
+        this.nickname = nickname;
+    }
+    public void updatePassword(String password) {}
 
     @Override
     public String toString() {
