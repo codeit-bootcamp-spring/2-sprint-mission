@@ -18,5 +18,12 @@ public abstract class Entity implements Serializable {
     public UUID getId() { return id; }
     public long getCreatedAt() { return createdAt; }
     public long getUpdatedAt() { return updatedAt; }
+
+    public String toString() {
+        return "BaseEntity{" +
+                "createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }
 
