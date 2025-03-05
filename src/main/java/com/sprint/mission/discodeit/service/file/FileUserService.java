@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.Factory.CreateServerFactory;
 import com.sprint.mission.discodeit.Repository.UserRepository;
-import com.sprint.mission.discodeit.Repository.file.impl.LinkedListFileUserRepository;
-import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFUserRepository;
+import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -17,7 +16,7 @@ public class FileUserService implements UserService {
     private static FileUserService instance;
     private final Map<UUID, UserRepository> userTable = new HashMap<>();
 
-    Path directory = Paths.get(System.getProperty("user.dir"), "data/server");
+    Path directory = Paths.get(System.getProperty("user.dir"), "data","serverList.ser");
 
     private FileUserService() {
 
@@ -35,7 +34,7 @@ public class FileUserService implements UserService {
         UserRepository userRepository = userTable.get(id);
         if (userRepository == null) {
 
-            UserRepository repository = new LinkedListFileUserRepository();
+            UserRepository repository = new FileUserRepository();
 
             userTable.put(id, repository);
 
@@ -57,7 +56,6 @@ public class FileUserService implements UserService {
 
         //로그
         System.out.println("저장 시점 name :"+server.getId());
-//        System.out.println(FileUserService.class + " : " + server.getName() + " 서버 추가 성공");
     }
 
     @Override
@@ -67,7 +65,6 @@ public class FileUserService implements UserService {
 
         //로그
         System.out.println("저장 시점 server:"+server.getId());
-//        System.out.println(FileUserService.class + " : " + server.getName() + " 서버 추가 성공");
     }
 
     @Override

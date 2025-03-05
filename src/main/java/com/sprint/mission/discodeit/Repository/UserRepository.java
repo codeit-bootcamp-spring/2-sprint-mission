@@ -9,6 +9,8 @@ import java.util.Queue;
 import java.util.UUID;
 
 public interface UserRepository {
+    public void save(Server server);
+
     public List<Server> getServerList();
 
     public void setServerList(List<Server> serverList);
@@ -17,6 +19,5 @@ public interface UserRepository {
 
     public void setMessageList(Map<UUID, Queue<Message>> messageList);
 
-    public void save(Server server);
 
 }

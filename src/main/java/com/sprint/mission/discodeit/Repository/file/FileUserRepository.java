@@ -13,49 +13,79 @@ import java.util.*;
 public class FileUserRepository implements UserRepository {
     private List<Server> serverList;
     private Map<UUID, Queue<Message>> messageList;
-    private final Path directory;
+
+    private final Path serverListFile;
 
     public FileUserRepository() {
-        this.directory = Paths.get(System.getProperty("user.dir"), "data/server");
-        serverList = new LinkedList<>();
-        messageList = new HashMap<>();
+        this.serverListFile = Paths.get(System.getProperty("user.dir"), "data", "serverList.ser");
+        this.serverList = new LinkedList<>();
+        this.messageList = new HashMap<>();
+        loadServerList();
+    }
+
+    private void init() {
+        Path directory = serverListFile.getParent();
+        if (!Files.exists(directory)) {
+            try {
+                Files.createDirectories(directory);
+                System.out.println("디렉토리 생성 완료: " + directory);
+            } catch (IOException e) {
+                System.out.println("디렉토리 생성 실패");
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
-    public List<Server> getServerList() {
-        init(directory);
+    public void save(Server server) {
+        System.out.println("FileUserRepository 저장 시점: " + server.getId());
 
-        try {
-            this.serverList = Files.list(directory)
-                    .map(path -> {
-                        try (FileInputStream fis = new FileInputStream(path.toFile());
-                             ObjectInputStream ois = new ObjectInputStream(fis)) {
-                            String fileName = path.getFileName().toString();
-                            String serverId = fileName.replace(".ser", "");
-                            UUID uuid = UUID.fromString(serverId);
-                            Server temp = (Server) ois.readObject();
-                            Server server = new Server(uuid, temp.getName());
+        // 중복 서버 체크
+        if (serverList.stream().noneMatch(s -> s.getId().equals(server.getId()))) {
+            serverList.add(server);
+            saveServerList();
+        }
+    }
 
-                            System.out.println("서버 리스트 호출 시점:" + server.getId());
+    private void loadServerList() {
+        if (Files.exists(serverListFile)) {
+            try (FileInputStream fis = new FileInputStream(serverListFile.toFile());
+                 ObjectInputStream ois = new ObjectInputStream(fis)) {
 
-                            return server;
-                        } catch (IOException | ClassNotFoundException e) {
-                            System.out.println("서버 찾기 메서드 실패");
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
+                this.serverList = (List<Server>) ois.readObject();
 
-            return serverList;
+                System.out.println("서버 리스트 로드 완료: " + serverListFile);
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("서버 리스트 로드 실패");
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void saveServerList() {
+        init();
+
+        try (FileOutputStream fos = new FileOutputStream(serverListFile.toFile());
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+
+            oos.writeObject(serverList);
+
         } catch (IOException e) {
-            System.out.println("서버 찾기 메서드 중 리스트 생성 실패");
+            System.out.println("서버 리스트 저장 실패");
             throw new RuntimeException(e);
         }
     }
 
     @Override
+    public List<Server> getServerList() {
+        loadServerList();
+        return serverList;
+    }
+
+    @Override
     public void setServerList(List<Server> serverList) {
         this.serverList = serverList;
+        saveServerList();
     }
 
     @Override
@@ -68,32 +98,5 @@ public class FileUserRepository implements UserRepository {
         this.messageList = messageList;
     }
 
-    @Override
-    public void save(Server server) {
-        System.out.println("FileUserRepository 저장 시점 :" + server.getId());
-        //디렉토리 체크 및 파일 경로 생성하기
-        Path directory = Paths.get(System.getProperty("user.dir"), "data/server");
-        init(directory);
-        Path filsPath = directory.resolve(server.getId().toString().concat(".ser"));
-
-        try (FileOutputStream fos = new FileOutputStream(filsPath.toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos);) {
-            oos.writeObject(server);
-        } catch (IOException e) {
-            //로그 찍기
-            System.out.println("User Repository 저장 실패");
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void init(Path directory) {
-        if (!Files.exists(directory)) {
-            try {
-                Files.createDirectories(directory);
-            } catch (IOException e) {
-                System.out.println("디렉토리 저장 실패");
-                throw new RuntimeException(e);
-            }
-        }
-    }
 }
+
