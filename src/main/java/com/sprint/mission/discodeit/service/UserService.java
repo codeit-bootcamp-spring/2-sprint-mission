@@ -12,19 +12,19 @@ import java.util.UUID;
 // CRUD(생성, 읽기, 수정, 삭제)
 public interface UserService {
     // Create - 생성
-    void CreateUser(String name);
+    void createUser(String name);
 
     // Read - 읽기, 조회
     // user들을 list형태로 관리한다
     // 모든 user 조회(다건)
-    Map<UUID, User> getAllUser();
+    List<User> getAllUser();
     // 특정 user 조회(단건)
     // optional은 null값 반환 시 오류가 나지 않도록 해준다.
-    Optional<User> getoneUser(UUID id);
+    Optional<User> getOneUser(UUID id);
 
     // Update - 수정
-    void UpdateUser(String newName, UUID id);
+    void updateUser(String newName, UUID id);
 
     // Delete - 삭제
-    void DeleteUser(UUID id);
+    void deleteUser(UUID id);
 }

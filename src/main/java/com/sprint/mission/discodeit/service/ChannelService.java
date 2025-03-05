@@ -11,12 +11,12 @@ import java.util.UUID;
 // CRUD(생성, 읽기, 수정, 삭제)
 public interface ChannelService {
     // Create - 생성
-    public void CreateChannel(String name, String topic);
+    void createChannel(String name, String topic);
     // Read - 읽기, 조회
-    public Optional<Channel> getOneChannel(UUID id);
-    public Map<UUID, Channel> getAllChannel();
+    Optional<Channel> getOneChannel(UUID id);
+    List<Channel> getAllChannel();
     // Update - 수정
-    public void UpdateChannel(String newname, String newtopic, UUID id);
+    void updateChannel(String newname, String newtopic, UUID id);
     // Delete - 삭제
-    public void DeleteChannel(UUID id);
+    void deleteChannel(UUID id);
 }

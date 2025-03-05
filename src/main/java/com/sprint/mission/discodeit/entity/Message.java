@@ -10,6 +10,7 @@ public class Message extends BaseEntity {
     // 메시지 작성 채널 id
     private UUID channelid;
 
+    // id를 받는 간접 참조
     public Message(String content, UUID userid, UUID channelid){
         super();
         this.content = content;

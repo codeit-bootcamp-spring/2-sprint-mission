@@ -21,7 +21,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public boolean CreateMessage(String message, String username, String channelname){
+    public boolean createMessage(String message, String username, String channelname){
         UUID userid = null;
         UUID channelid = null;
         Map<UUID, User> temp = userservice.getAllUser();
@@ -53,17 +53,17 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Map<UUID, Message> getAllMessage(){
+    public List<Message> getAllMessage(){
         return messagemap;
     }
 
     @Override
-    public void UpdateMessage(String message, UUID id){
+    public void updateMessage(String message, UUID id){
         messagemap.get(id).updateMessage(message);
     }
 
     @Override
-    public void DeleteMessage(UUID id){
+    public void deleteMessage(UUID id){
         messagemap.remove(id);
     }
 }
