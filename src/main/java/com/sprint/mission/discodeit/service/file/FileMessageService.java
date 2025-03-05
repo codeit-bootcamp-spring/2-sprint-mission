@@ -9,7 +9,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class FileMessageService implements MessageService {
-    private MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
     private final ChannelService channelService;
     private final UserService userService;
 

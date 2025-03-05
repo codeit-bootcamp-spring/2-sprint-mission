@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class FileUserService implements UserService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public FileUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
