@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
@@ -31,4 +32,10 @@ public interface MessageService {
 
     // 해당 채널의 메시지를 포함 내용으로 검색
     List<Message> searchMessagesContaining(String channelName, String content);
+
+    void saveToFile(Message message);
+
+    List<Message> loadFromFile();
+
+    void deleteFile(Message message);
 }

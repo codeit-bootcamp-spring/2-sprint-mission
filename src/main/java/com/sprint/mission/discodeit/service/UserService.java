@@ -29,4 +29,11 @@ public interface UserService {
     // 유저 삭제
     void deleteUser(String username);
 
+    void saveToFile(User user);
+
+    List<User> loadFromFile();
+
+    void deleteFile(User user);
+
+
 }

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.FileService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.SerializationUtil;
 
@@ -12,27 +11,19 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class FileUserService implements UserService, FileService<User> {
+public class FileUserService implements UserService {
     // 파일에서 역직렬화해 객체 불러오기
     private List<User> data = loadFromFile();
 
-    private static UserService userService;
+    private static FileUserService userService;
 
-    // UserService<User> 구현 객체 반환
-    public static UserService getInstanceOfUserService() {
+    public static UserService getInstance() {
         if (userService == null) {
             userService = new FileUserService();
         }
         return userService;
     }
 
-    // FileService<User> 구현 객체 반환
-    public static FileService<User> getInstanceOfFileService() {
-        if (userService == null) {
-            userService = new FileUserService();
-        }
-        return (FileUserService) userService;
-    }
 
     // =================================== 유저 생성 ===================================
 
@@ -148,7 +139,7 @@ public class FileUserService implements UserService, FileService<User> {
 
     // =================================== 직렬화 관련 메소드 ===================================
     @Override
-    public  void saveToFile(User user) {
+    public void saveToFile(User user) {
         Path directory = Paths.get(System.getProperty("user.dir"), "data", "user");
         SerializationUtil.init(directory); // 디렉토리가 존재하지 않으면 생성
         Path filePath = directory.resolve(user.getUsername().concat(".ser"));

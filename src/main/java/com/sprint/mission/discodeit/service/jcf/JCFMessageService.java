@@ -169,4 +169,18 @@ public class JCFMessageService implements MessageService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void saveToFile(Message message) {
+
+    }
+
+    @Override
+    public List<Message> loadFromFile() {
+        return List.of();
+    }
+
+    @Override
+    public void deleteFile(Message message) {
+
+    }
 }

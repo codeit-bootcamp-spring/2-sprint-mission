@@ -28,5 +28,11 @@ public interface ChannelService {
     // 채널 삭제
     void deleteChannel(User requestUser, String channelName);
 
+    void saveToFile(Channel channel);
+
+    List<Channel> loadFromFile();
+
+    void deleteFile(Channel channel);
+
 
 }

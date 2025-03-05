@@ -1,7 +1,7 @@
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.FileService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
@@ -10,9 +10,9 @@ import java.util.List;
 
 public class FileApplication {
     public static void main(String[] args) {
-        UserService userService = FileUserService.getInstanceOfUserService();
-        FileService<User> userFileService =  FileUserService.getInstanceOfFileService(); // channelService 주입용
-        ChannelService channelService = FileChannelService.getInstance(userFileService);
+        UserService userService = FileUserService.getInstance();
+        ChannelService channelService = FileChannelService.getInstance(userService);
+
 
         // 1. 유저
         // 1.1 유저 생성
@@ -70,11 +70,19 @@ public class FileApplication {
         channelService.removeUsersFromChannel(user1, user3, channel1.getChannelName());
         System.out.println(channelService.getChannel(channel1.getChannelName()).getUsers());
 
-
         // 2.4 채널 삭제
         // 채널 삭제 후 유저 확인
         // channelService.deleteChannel(user1, channel1.getChannelName());
         System.out.println(user3.getChannels());
+
+        // 3. 메시지
+        // 3.1 메시지 생성
+        Message message1 = new Message("메시지1", user1, channel1);
+        Message message2 = new Message("메시지2", user2, channel2);
+
+
+
+
 
 
 

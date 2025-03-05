@@ -167,5 +167,18 @@ public class JCFChannelService implements ChannelService {
         // 이 부분에 대한 예외 처리는? 예외 처리에 대한 공부가 필요.
     }
 
+    @Override
+    public void saveToFile(Channel channel) {
 
+    }
+
+    @Override
+    public List<Channel> loadFromFile() {
+        return List.of();
+    }
+
+    @Override
+    public void deleteFile(Channel channel) {
+
+    }
 }

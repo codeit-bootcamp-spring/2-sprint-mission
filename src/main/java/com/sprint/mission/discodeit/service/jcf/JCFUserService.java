@@ -148,4 +148,19 @@ public class JCFUserService implements UserService {
         User findUser = getUser(username);
         data.remove(findUser);
     }
+
+    @Override
+    public void saveToFile(User user) {
+
+    }
+
+    @Override
+    public List<User> loadFromFile() {
+        return List.of();
+    }
+
+    @Override
+    public void deleteFile(User user) {
+
+    }
 }

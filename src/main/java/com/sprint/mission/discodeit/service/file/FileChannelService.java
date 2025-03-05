@@ -4,37 +4,35 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.FileService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.util.SerializationUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-public class FileChannelService implements ChannelService, FileService<Channel> {
+public class FileChannelService implements ChannelService {
     private List<Channel> data = loadFromFile();
-    private final FileService<User> fileUserService; // FileUserService의 메소드를 써야하므로..
+    private final UserService userService; // FileUserService의 메소드를 써야하므로..
 
-    // 다형성을 위한 인터페이스 생성자 주입
-    public FileChannelService(FileService<User> fileService) {
-        this.fileUserService = fileService;
+
+    public FileChannelService(UserService userService) {
+        this.userService = userService;
     }
 
     private static ChannelService channelService;
 
-    public static ChannelService getInstance(FileService<User> fileUserService) {
+    public static ChannelService getInstance(UserService userService) {
         if (channelService == null) {
-            channelService = new FileChannelService(fileUserService);
+            channelService = new FileChannelService(userService);
         }
         return channelService;
     }
+
 
 
     // =================================== 채널 생성 ===================================
@@ -92,7 +90,7 @@ public class FileChannelService implements ChannelService, FileService<Channel> 
         user.addChannel(findChannel);
 
         saveToFile(findChannel);
-        fileUserService.saveToFile(user); // 연관관계에 따라 유저 파일도 수정
+        userService.saveToFile(user); // 연관관계에 따라 유저 파일도 수정
     }
 
     @Override
@@ -105,7 +103,7 @@ public class FileChannelService implements ChannelService, FileService<Channel> 
 
         user.removeChannel(findChannel);
         deleteUserMessagesFromChannel(findChannel, user);
-        fileUserService.saveToFile(user); // 연관관계에 따라 유저 파일도 수정
+        userService.saveToFile(user); // 연관관계에 따라 유저 파일도 수정
     }
 
     private void validateUpdateChannelAndUser(User requestUser, User user, Channel channel) {
@@ -153,7 +151,7 @@ public class FileChannelService implements ChannelService, FileService<Channel> 
         users.stream().forEach(u -> messages.stream().forEach(m -> u.deleteMessage(m)));  // 해당 유저에서 메시지를 삭제
 
         // User 리스트를 순회하면서 파일 수정
-        users.stream().forEach(u -> fileUserService.saveToFile(u));
+        users.stream().forEach(u -> userService.saveToFile(u));
     }
 
 
