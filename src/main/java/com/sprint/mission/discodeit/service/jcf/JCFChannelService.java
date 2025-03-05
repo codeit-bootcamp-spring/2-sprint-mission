@@ -40,13 +40,12 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void findChannelAll() {
+    public Optional<List<Channel>> findAllChannel() {
         if (data.isEmpty()) {
             System.out.println("개설된 채널이 없습니다.");
-            return;
+            return Optional.empty();
         }
-
-        data.forEach(System.out::println);
+        return Optional.of(data);
     }
 
     @Override

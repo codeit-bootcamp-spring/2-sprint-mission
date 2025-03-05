@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserService implements UserService {
 
@@ -43,13 +40,12 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void findAll() {
+    public Optional<List<User>> findAllUser() {
         if (data.isEmpty()) {
             System.out.println("아이디가 존재하지 않습니다");
-            return;
+            return Optional.empty();
         }
-
-        data.forEach(System.out::println);
+        return Optional.of(data);
     }
 
     @Override

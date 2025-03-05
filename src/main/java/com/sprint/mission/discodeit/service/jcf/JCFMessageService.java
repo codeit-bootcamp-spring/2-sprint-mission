@@ -44,47 +44,32 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void findMessageById(UUID id) {
-        if (data.stream().noneMatch(message -> message.getId().equals(id))) {
-            System.out.println("[실패]입력 메시지가 존재하지 않습니다.");
-            return;
-        }
-
-        for (Message message : data) {
-            if (message.getId().equals(id)) {
-                System.out.println(message);
-                return;
-            }
-        }
+    public Message findMessageById(UUID messageUUID) {
+        return data.stream().filter(message -> message.getId().equals(messageUUID)).findAny().orElse(null);
     }
 
     @Override
-    public void findAllMessages() {
+    public Optional<List<Message>> findAllMessages() {
         if (data.isEmpty()) {
             System.out.println("입력 메시지가 존재하지 않습니다.");
-            return;
+            return  Optional.empty();
         }
 
-        data.forEach(message -> System.out.println(message.toString()));
+        return Optional.of(data);
     }
 
     @Override
-    public void findMessageByChannelId(UUID channelUUID) {
+    public Optional<List<Message>> findMessageByChannelId(UUID channelUUID) {
         if (channelService.findChannel(channelUUID) == null) {
-            return;
+            return  Optional.empty();
         }
 
         if (data.stream().noneMatch(message -> message.getChannelUUID().equals(channelUUID))) {
             System.out.println("채널에 해당하는 메시지가 존재하지 않습니다.");
-            return;
+            return Optional.empty();
         }
 
-        data.stream()
-                .filter(message -> message.getChannelUUID().equals(channelUUID))
-                .forEach(message -> {
-                    System.out.println(userService.findByUser(message.getUserUUID()).getNickname());
-                    System.out.println(message.getContent());
-                });
+        return Optional.of(data);
     }
 
     @Override
