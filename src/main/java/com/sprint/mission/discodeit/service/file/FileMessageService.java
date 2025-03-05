@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -18,7 +19,7 @@ public class FileMessageService implements MessageService {
     private static FileMessageService INSTANCE;
 
     private FileMessageService(UserService userService, ChannelService channelService) {
-        loadMessagesFromFile();
+        loadMessage();
         this.userService = userService;
         this.channelService = channelService;
     }
@@ -30,26 +31,26 @@ public class FileMessageService implements MessageService {
         return INSTANCE;
     }
 
-    private void saveMessagesToFiel() {
+    private void saveMessage(){
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(messages);
         } catch (IOException e) {
-            throw new RuntimeException("메세지 저장 중 오류 발생", e);
+            throw new RuntimeException("메시지 저장 중 오류 발생", e);
         }
     }
-
-    private void loadMessagesFromFile() {
+    
+    private void loadMessage(){
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
             messages = (Map<UUID, Message>) ois.readObject();
-        }catch (EOFException e) {
+        } catch (EOFException e) {
             System.out.println("⚠ messages.dat 파일이 비어 있습니다. 빈 데이터로 유지합니다.");
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("메세지 로드 중 오류 발생", e);
+            throw new RuntimeException("메시지 로드 중 오류 발생", e);
         }
     }
 
     @Override
-    public void createMessage(UUID userId, UUID channelId, String content) {
+    public Message createMessage(UUID userId, UUID channelId, String content) {
         userService.validateUserExists(userId);
         channelService.validateChannelExists(channelId);
 
@@ -57,7 +58,9 @@ public class FileMessageService implements MessageService {
         channelService.addMessageToChannel(channelId, message.getId());
         channelService.updataChannelData();
         messages.put(message.getId(), message);
-        saveMessagesToFiel();
+        saveMessage();
+
+        return message;
     }
 
     @Override
@@ -68,9 +71,6 @@ public class FileMessageService implements MessageService {
 
     @Override
     public List<Message> getMessagesByUserAndChannel(UUID userId, UUID channelId) {
-        userService.validateUserExists(userId);
-        channelService.validateChannelExists(channelId);
-
         List<Message> messages = new ArrayList<>();
         for (Message message : this.messages.values()) {
             if (message.getSenderId().equals(userId) && message.getChannelId().equals(channelId)) {
@@ -83,9 +83,6 @@ public class FileMessageService implements MessageService {
 
     @Override
     public List<Message> getChannelMessages(UUID channelId) {
-        channelService.validateChannelExists(channelId);
-        Channel channel = channelService.getChannelById(channelId);
-
         List<Message> messages = new ArrayList<>();
         for (Message message : this.messages.values()) {
             if (message.getChannelId().equals(channelId)) {
@@ -98,8 +95,6 @@ public class FileMessageService implements MessageService {
 
     @Override
     public List<Message> getUserMessages(UUID userId) {
-        userService.validateUserExists(userId);
-
         List<Message> messages = new ArrayList<>();
         for (Message message : this.messages.values()) {
             if (message.getSenderId().equals(userId)) {
@@ -115,7 +110,7 @@ public class FileMessageService implements MessageService {
         validateMessage(messageId);
         Message message = messages.get(messageId);
         message.updateContent(newContent);
-        saveMessagesToFiel();
+        saveMessage();
     }
 
     @Override
@@ -126,7 +121,7 @@ public class FileMessageService implements MessageService {
         channelService.removeMessageFromChannel(message.getChannelId(), messageId);
         channelService.updataChannelData();
         messages.remove(messageId);
-        saveMessagesToFiel();
+        saveMessage();
     }
 
     @Override

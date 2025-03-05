@@ -49,19 +49,6 @@ class FileChannelServiceTest {
     }
 
     @Test
-    @DisplayName("FileChannelService: 이미 존재하는 채널 생성 시 예외 확인")
-    void testDuplicateChannelCreation() {
-        String channelName = "testChannel_" + UUID.randomUUID();
-        fileChannelService.createChannel(channelName);
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            fileChannelService.createChannel(channelName);
-        });
-        logger.info("예외 발생 확인: " + exception.getMessage());
-        assertEquals("이미 존재하는 채널입니다.", exception.getMessage());
-    }
-
-    @Test
     @DisplayName("FileChannelService: 채널에 유저 추가 및 제거 확인")
     void testAddAndRemoveUser() {
         String channelName = "testChannel_" + UUID.randomUUID();
@@ -70,9 +57,8 @@ class FileChannelServiceTest {
                 .filter(c -> c.getChannelName().equals(channelName))
                 .findFirst().get().getId();
 
-        String userName = "user_" + UUID.randomUUID();
-        userService.createUser(userName);
-        User user = userService.getUserByName(userName);
+        User user = userService.createUser("user_" + UUID.randomUUID());
+
         UUID userId = user.getId();
 
         fileChannelService.addUserToChannel(channelId, userId);

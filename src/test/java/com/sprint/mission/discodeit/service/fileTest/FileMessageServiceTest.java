@@ -35,9 +35,7 @@ class FileMessageServiceTest {
     @Test
     @DisplayName("FileMessageService: 여러 개의 메세지 추가 확인")
     void testMultipleMessagesOrder() {
-        String userName = "user_" + UUID.randomUUID();
-        userService.createUser(userName);
-        User user = userService.getUserByName(userName);
+        User user = userService.createUser("user_" + UUID.randomUUID());
         UUID userId = user.getId();
 
         String channelName = "testChannel_" + UUID.randomUUID();
@@ -73,9 +71,8 @@ class FileMessageServiceTest {
     @Test
     @DisplayName("FileMessageService: 존재하지 않는 채널에 메세지 전송 시 예외 발생")
     void testMessageToNonExistentChannel() {
-        String userName = "user_" + UUID.randomUUID();
-        userService.createUser(userName);
-        User user = userService.getUserByName(userName);
+
+        User user = userService.createUser("user_" + UUID.randomUUID());
         UUID userId = user.getId();
         UUID fakeChannelId = UUID.randomUUID();
 
@@ -89,9 +86,7 @@ class FileMessageServiceTest {
     @Test
     @DisplayName("FileMessageService: 메세지 수정 확인")
     void testUpdateMessage() {
-        String userName = "user_" + UUID.randomUUID();
-        userService.createUser(userName);
-        User user = userService.getUserByName(userName);
+        User user = userService.createUser("user_" + UUID.randomUUID());
         UUID userId = user.getId();
 
         String channelName = "testChannel_" + UUID.randomUUID();
