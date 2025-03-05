@@ -4,6 +4,7 @@ import com.sprint.sprint2.discodeit.entity.Channel;
 import com.sprint.sprint2.discodeit.repository.ChannelRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -17,12 +18,14 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
 
     @Override
     public Channel findById(String uuId) {
-        return null;
+        Map<UUID, Channel> channelMap = loadAll();
+        return Optional.ofNullable(channelMap.get(UUID.fromString(uuId))).orElseThrow(() -> new NullPointerException(uuId.toString() + " 는  없는 채널 입니다"));
     }
 
     @Override
     public List<Channel> findByAll() {
-        return List.of();
+        Map<UUID, Channel> channelMap = loadAll();
+        return channelMap.values().stream().toList();
     }
 
     @Override
