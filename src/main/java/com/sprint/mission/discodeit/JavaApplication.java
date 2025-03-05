@@ -5,6 +5,10 @@ import com.sprint.mission.discodeit.entity.message.ChannelMessage;
 import com.sprint.mission.discodeit.entity.message.PrivateMessage;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicatedUserException;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -16,9 +20,13 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        // User Service 테스트
-        UserService userService = JCFUserService.getInstance();
+        UserRepository userRepository = JCFUserRepository.getInstance();
+        ChannelRepository channelRepository = JCFChannelRepository.getInstance();
+        UserService userService = new JCFUserService(userRepository);
+        ChannelService channelService = new JCFChannelService(userService, channelRepository);
+        MessageService messageService = new JCFMessageService(userService, channelService);
 
+        // User Service 테스트
         // 유저 등록 테스트
         System.out.println("=========== 유저 생성 및 유저 리스트 조회 테스트 ===========");
         System.out.println("=========== 예상 결과: 유저 7명 나옴 ===========");
@@ -84,7 +92,6 @@ public class JavaApplication {
 
         //////////////////////
         //체널 등록 테스트
-        ChannelService channelService = JCFChannelService.getInstance();
         System.out.println("=========== 채널 생성 및 전체 채널 리스트 조회 테스트 ===========");
         System.out.println("=========== 예상 결과: 채널 4개 나옴 ===========");
         Channel channel1 = channelService.createChannel(user1.getId(), "sb02", "코드잇 스프린트 2기");
@@ -142,7 +149,6 @@ public class JavaApplication {
         System.out.println();
 
 
-        MessageService messageService = JCFMessageService.getInstance();
         // 메시지 서비스 테스트
         System.out.println("=========== 메세지 생성 및 전체 메세지 조회 테스트 ===========");
         System.out.println("=========== 예상 결과: 메세지 9개 (개인 6개, 채널 3개) ===========");
@@ -194,29 +200,29 @@ public class JavaApplication {
 
         System.out.println();
         System.out.println();
-        System.out.println("=========== 유저 삭제하면 채널에서도 없어지는지 확인:  ===========");
-        System.out.println("=========== 신규유저: David 생성, 채널 1, 2에 가입 ===========");
-        User userToDelete = userService.createUser("David", "David@gmail.com", "Dog", "HIHIHIHIHIHI");
-        channelService.addUserToChannel(channel1.getId(), userToDelete.getId());
-        channelService.addUserToChannel(channel2.getId(), userToDelete.getId());
-        System.out.println("=========== 채널 1 유저 목록 - David 있어야 함===========");
-        channelService.getChannelMembers(channel1.getId()).forEach((u) -> {
-            System.out.println(userService.getUserByUserId(u).getNickname());
-        });
-        System.out.println("=========== 채널 2 유저 목록 - David 있어야 함 ===========");
-        channelService.getChannelMembers(channel2.getId()).forEach((u) -> {
-            System.out.println(userService.getUserByUserId(u).getNickname());
-        });
-        System.out.println("=========== 유저 David 삭제 ===========");
-        userService.deleteUserById(userToDelete.getId());
-        System.out.println("=========== 채널 1 유저 목록 - David 없어야 함===========");
-        channelService.getChannelMembers(channel1.getId()).forEach((u) -> {
-            System.out.println(userService.getUserByUserId(u).getNickname());
-        });
-        System.out.println("=========== 채널 2 유저 목록 - David 없어야 함 ===========");
-        channelService.getChannelMembers(channel2.getId()).forEach((u) -> {
-            System.out.println(userService.getUserByUserId(u).getNickname());
-        });
+//        System.out.println("=========== 유저 삭제하면 채널에서도 없어지는지 확인:  ===========");
+//        System.out.println("=========== 신규유저: David 생성, 채널 1, 2에 가입 ===========");
+//        User userToDelete = userService.createUser("David", "David@gmail.com", "Dog", "HIHIHIHIHIHI");
+//        channelService.addUserToChannel(channel1.getId(), userToDelete.getId());
+//        channelService.addUserToChannel(channel2.getId(), userToDelete.getId());
+//        System.out.println("=========== 채널 1 유저 목록 - David 있어야 함===========");
+//        channelService.getChannelMembers(channel1.getId()).forEach((u) -> {
+//            System.out.println(userService.getUserByUserId(u).getNickname());
+//        });
+//        System.out.println("=========== 채널 2 유저 목록 - David 있어야 함 ===========");
+//        channelService.getChannelMembers(channel2.getId()).forEach((u) -> {
+//            System.out.println(userService.getUserByUserId(u).getNickname());
+//        });
+//        System.out.println("=========== 유저 David 삭제 ===========");
+//        userService.deleteUserById(userToDelete.getId());
+//        System.out.println("=========== 채널 1 유저 목록 - David 없어야 함===========");
+//        channelService.getChannelMembers(channel1.getId()).forEach((u) -> {
+//            System.out.println(userService.getUserByUserId(u).getNickname());
+//        });
+//        System.out.println("=========== 채널 2 유저 목록 - David 없어야 함 ===========");
+//        channelService.getChannelMembers(channel2.getId()).forEach((u) -> {
+//            System.out.println(userService.getUserByUserId(u).getNickname());
+//        });
 
     }
 }

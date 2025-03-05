@@ -3,56 +3,39 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicatedUserException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private static JCFUserService instance;
+    private UserRepository userRepository;
 
-    private ChannelService channelService;
-    private final Map<UUID, User> users;
-
-    private JCFUserService() {
-        users = new HashMap<>();
-        channelService = JCFChannelService.getInstance();
-    }
-
-    public static JCFUserService getInstance() {
-        if (instance == null) {
-            instance = new JCFUserService();
-        }
-        return instance;
+    public JCFUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public User createUser(String nickname, String email, String avatar, String status) {
-        if (hasUserByEmail(email)) {
-            throw new DuplicatedUserException("이메일 중복입니다.");
-        }
-        User user = new User(nickname, email, avatar, status);
-        users.put(user.getId(), user);
-        return user;
+        validateUniqueEmail(email);
+        return userRepository.save(new User(nickname, email, avatar, status));
     }
 
     @Override
     public User getUserByUserId(UUID userId) {
         validateUserId(userId);
-        User user = users.get(userId);
-        return user;
+        return userRepository.findByUserId(userId);
     }
 
 
     @Override
     public List<User> getAllUsers() {
-        return new ArrayList<>(users.values());
+        return userRepository.findAll();
     }
 
     @Override
     public User updateUser(UUID userId, String nickname, String avatar, String status) {
         User user = getUserByUserId(userId);
-
         user.update(nickname, avatar, status);
         return user;
     }
@@ -61,32 +44,24 @@ public class JCFUserService implements UserService {
     @Override
     public void deleteUserById(UUID userId) {
         validateUserId(userId);
-        getChannelService().deleteUserFromEveryChannel(userId);
-        users.remove(userId);
+        userRepository.delete(userId);
     }
 
     @Override
     public void validateUserId(UUID userId) {
-        if (!users.containsKey(userId)) {
+        if (!userRepository.exists(userId)) {
             throw new UserNotFoundException("해당 유저가 없습니다.");
         }
     }
 
-    private boolean hasUserByEmail(String email) {
-        return findUserByEmail(email) != null;
-    }
-
-    private User findUserByEmail(String email) {
-        return users.values().stream()
-                .filter(u -> email.equals(u.getEmail()))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private ChannelService getChannelService() {
-        if (channelService == null) {
-            channelService = JCFChannelService.getInstance();
+    private void validateUniqueEmail(String email) {
+        if (hasUserByEmail(email)) {
+            throw new DuplicatedUserException("이메일 중복입니다.");
         }
-        return channelService;
     }
+
+    private boolean hasUserByEmail(String email) {
+        return userRepository.findByEmail(email) != null;
+    }
+
 }
