@@ -3,7 +3,9 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -11,17 +13,22 @@ import java.util.UUID;
 
 public class BasicMessageService implements MessageService {
     private static volatile BasicMessageService instance;
-    private final MessageRepository messageRepository;
 
-    private BasicMessageService(MessageRepository messageRepository) {
+    private final MessageRepository messageRepository;
+    private final UserService userService;
+    private final ChannelService channelService;
+
+    private BasicMessageService(MessageRepository messageRepository, UserService userService, ChannelService channelService) {
         this.messageRepository = messageRepository;
+        this.userService = userService;
+        this.channelService = channelService;
     }
 
-    public static BasicMessageService getInstance(MessageRepository messageRepository) {
+    public static BasicMessageService getInstance(MessageRepository messageRepository, UserService userService, ChannelService channelService) {
         if (instance == null) {
             synchronized (BasicMessageService.class) {
                 if (instance == null) {
-                    instance = new BasicMessageService(messageRepository);
+                    instance = new BasicMessageService(messageRepository, userService, channelService);
                 }
             }
         }
@@ -33,6 +40,14 @@ public class BasicMessageService implements MessageService {
         if (message == null) {
             throw new IllegalArgumentException("message 객체가 null 입니다.");
         }
+
+        try {
+            userService.findById(message.getUserId());
+            channelService.findById(message.getChannelId());
+        }catch (NoSuchElementException e) {
+            throw new IllegalArgumentException("연관된 user 또는 channel이 없습니다.");
+        }
+
         messageRepository.save(message);
     }
 

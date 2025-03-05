@@ -51,7 +51,7 @@ public class JavaApplication {
 
         UserService userService = BasicUserService.getInstance(fileUserRepository);
         ChannelService channelService = BasicChannelService.getInstance(fileChannelRepository);
-        MessageService messageService = BasicMessageService.getInstance(fileMessageRepository);
+        MessageService messageService = BasicMessageService.getInstance(fileMessageRepository, userService, channelService);
 
         System.out.println("========== 유저 등록 ==========");
         User user1 = new User("Alice", "alice@gmail.com", "12345");
@@ -85,8 +85,11 @@ public class JavaApplication {
         System.out.println("========== 채널 조회 ==========");
         System.out.println("단건 조회: " + channelService.findById(channel1.getId()));
 
+        System.out.println("다건 조회:");
+        channelService.findAll().forEach(System.out::println);
+
         System.out.println("========== 채널 수정 ==========");
-        channelService.update(channel2.getId(), "코드잇 스프린트 Spring 백엔드 2기", "스프린트 1기입니다.");
+        channelService.update(channel2.getId(), "코드잇 스프린트 Spring 백엔드 2기", "스프린트 2기입니다.");
         System.out.println("수정된 데이터 조회: " + channelService.findById(channel2.getId()));
 
         System.out.println("========== 채널 삭제 ==========");

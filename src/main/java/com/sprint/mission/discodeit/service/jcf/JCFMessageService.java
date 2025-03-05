@@ -40,7 +40,7 @@ public class JCFMessageService implements MessageService {
             userService.findById(message.getUserId());
             channelService.findById(message.getChannelId());
         }catch (NoSuchElementException e) {
-            throw e;
+            throw new IllegalArgumentException("연관된 user 또는 channel이 없습니다.");
         }
 
         data.put(message.getId(), message);

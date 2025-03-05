@@ -70,8 +70,8 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        Path filePath = getFilePath(id);
+    public void delete(UUID userId) {
+        Path filePath = getFilePath(userId);
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
@@ -80,15 +80,11 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(UUID id, String nickname, String email, String password) {
-        Optional<User> userOptional = findById(id);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
+    public void update(UUID userId, String nickname, String email, String password) {
+        findById(userId).ifPresent(user -> {
             user.update(nickname, email, password, System.currentTimeMillis());
             save(user);
-        } else {
-            throw new NoSuchElementException("User not found with id: " + id);
-        }
+        });
     }
 
     private static <T> List<T> load(Path directory) {
@@ -114,7 +110,7 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
-    private Path getFilePath(UUID id) {
-        return directory.resolve(id.toString().concat(".ser"));
+    private Path getFilePath(UUID userId) {
+        return directory.resolve(userId.toString().concat(".ser"));
     }
 }

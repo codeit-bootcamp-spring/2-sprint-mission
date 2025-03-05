@@ -72,8 +72,8 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        Path filePath = getFilePath(id);
+    public void delete(UUID channelId) {
+        Path filePath = getFilePath(channelId);
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
@@ -82,9 +82,8 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void update(UUID id, String name, String description) {
-        Optional<Channel> channelOptional = findById(id);
-        channelOptional.ifPresent(channel -> {
+    public void update(UUID channelId, String name, String description) {
+        findById(channelId).ifPresent(channel -> {
             channel.update(name, description, System.currentTimeMillis());
             save(channel);
         });
@@ -113,7 +112,7 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
-    private Path getFilePath(UUID id) {
-        return directory.resolve(id.toString().concat(".ser"));
+    private Path getFilePath(UUID channelId) {
+        return directory.resolve(channelId.toString().concat(".ser"));
     }
 }

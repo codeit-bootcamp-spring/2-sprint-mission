@@ -118,7 +118,7 @@ public class FileChannelService implements ChannelService {
         }
     }
 
-    private Path getFilePath(UUID id) {
-        return directory.resolve(id.toString().concat(".ser"));
+    private Path getFilePath(UUID channelId) {
+        return directory.resolve(channelId.toString().concat(".ser"));
     }
 }

@@ -69,8 +69,8 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        Path filePath = getFilePath(id);
+    public void delete(UUID messageId) {
+        Path filePath = getFilePath(messageId);
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
@@ -79,8 +79,8 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void update(UUID id, String content) {
-        findById(id).ifPresent(message -> {
+    public void update(UUID messageId, String content) {
+        findById(messageId).ifPresent(message -> {
             message.update(content, System.currentTimeMillis());
             save(message);
         });
@@ -109,7 +109,7 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
 
-    private Path getFilePath(UUID id) {
-        return directory.resolve(id.toString().concat(".ser"));
+    private Path getFilePath(UUID messageId) {
+        return directory.resolve(messageId.toString().concat(".ser"));
     }
 }
