@@ -16,7 +16,7 @@ public class JCFMessageService implements MessageService {
 
     public static JCFMessageService getInstance(JCFUserService userService, JCFChannelService channelService) {
         if (instance == null) {
-            instance = new JCFMessageService(userService,channelService);
+            instance = new JCFMessageService(userService, channelService);
         }
         return instance;
     }
@@ -31,14 +31,13 @@ public class JCFMessageService implements MessageService {
     @Override
     public UUID createMessage(UUID userId, UUID channelId) {
         if (!userservice.existUser(userId)) {
-            System.out.println("존재하지 않는 사용자 입니다. 메세지를 생성할 수 없습니다.");
-            return null;
+            throw new IllegalArgumentException("존재하지 않는 사용자 입니다. 메세지를 생성할 수 없습니다.");
+
         }
-        if(!channelservice.existChannel(channelId)) {
-            System.out.println("존재하지 않는 채널 입니다. 메세지를 생성할 수 없습니다.");
-            return null;
+        if (!channelservice.existChannel(channelId)) {
+            throw new IllegalArgumentException("존재하지 않는 채널 입니다. 메세지를 생성할 수 없습니다.");
         }
-        Message message = new Message(userId,channelId);
+        Message message = new Message(userId, channelId);
         data.put(message.getId(), message);
         System.out.println("메세지가 생성되었습니다: \n" + message);
         return message.getId();

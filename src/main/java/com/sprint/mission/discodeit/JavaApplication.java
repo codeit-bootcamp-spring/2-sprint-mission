@@ -10,7 +10,7 @@ public class JavaApplication {
     public static void main(String[] args) {
         JCFUserService userservice = JCFUserService.getInstance();
         JCFChannelService channelservice = JCFChannelService.getInstance();
-        JCFMessageService messageservice = JCFMessageService.getInstance(userservice,channelservice);
+        JCFMessageService messageservice = JCFMessageService.getInstance(userservice, channelservice);
 
         // user 등록
         UUID user1 = userservice.createUser("김이름");
@@ -48,8 +48,18 @@ public class JavaApplication {
 
 
         //Message 등록
-        UUID message1 = messageservice.createMessage(user2,channel1);
-        UUID message2 = messageservice.createMessage(user2,channel2);
+        UUID message1 = null;
+        try {
+            message1 = messageservice.createMessage(user2, channel1);
+        } catch (IllegalArgumentException e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+        UUID message2 = null;
+        try {
+            message2 = messageservice.createMessage(user2, channel2);
+        } catch (IllegalArgumentException e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
         //message 전체 조회
         messageservice.searchAllMessages();
         //특정 channel 조회
