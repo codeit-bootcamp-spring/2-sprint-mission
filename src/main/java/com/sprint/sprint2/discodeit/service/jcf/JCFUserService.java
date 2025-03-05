@@ -1,51 +1,45 @@
 package com.sprint.sprint2.discodeit.service.jcf;
 
 import com.sprint.sprint2.discodeit.entity.User;
+import com.sprint.sprint2.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.sprint2.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> data;
+    private final JCFUserRepository jcfUserRepository;
 
-    public JCFUserService() {
-        this.data = new HashMap<>();
+    public JCFUserService(JCFUserRepository jcfUserRepository) {
+        this.jcfUserRepository = jcfUserRepository;
     }
+
 
     @Override
     public User create(String username, String email, String password) {
         User user = new User(username, email, password);
-        this.data.put(user.getId(), user);
+        jcfUserRepository.save(user);
         return user;
     }
 
     @Override
     public User find(UUID userId) {
-        User userNullable = this.data.get(userId);
-
-        return Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+      return jcfUserRepository.findById(userId.toString());
     }
 
     @Override
     public List<User> findAll() {
-        return this.data.values().stream().toList();
+        return jcfUserRepository.findByAll();
     }
 
     @Override
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User userNullable = this.data.get(userId);
-        User user = Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        User user = jcfUserRepository.findById(userId.toString());
         user.update(newUsername, newEmail, newPassword);
         return user;
     }
 
     @Override
     public void delete(UUID userId) {
-        if (!this.data.containsKey(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " not found");
-        }
-        this.data.remove(userId);
+        jcfUserRepository.delete(userId);
     }
 }
