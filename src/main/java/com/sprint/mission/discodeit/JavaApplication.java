@@ -41,6 +41,7 @@ public class JavaApplication {
                         System.out.println("\n[사용자 관리]");
                         System.out.println("1. 사용자 등록");
                         System.out.println("2. 사용자 조회");
+                        System.out.println("0. 이전 메뉴로");
                         System.out.print("선택: ");
 
                         UserMenu userChoice;
@@ -52,7 +53,11 @@ public class JavaApplication {
                         }
                         sc.nextLine();
 
-                        switch(userChoice) {
+                        if (userChoice == UserMenu.BACK) {
+                            break;
+                        }
+
+                        switch (userChoice) {
                             case CREATE_USER:
                                 System.out.print("사용자 이름 입력: ");
                                 String userName = sc.nextLine();
@@ -69,14 +74,16 @@ public class JavaApplication {
                         }
                         break;
                     }
+                    break;
 
                 case CHANNEL_MANAGEMENT:
-                    while(true) {
+                    while (true) {
                         System.out.println("\n[채널 관리]");
                         System.out.println("1. 채널 등록");
                         System.out.println("2. 채널 조회");
                         System.out.println("3. 채널 수정");
                         System.out.println("4. 채널 삭제");
+                        System.out.println("0. 이전 메뉴로");
                         System.out.print("선택: ");
 
                         ChannelMenu channelChoice;
@@ -88,7 +95,11 @@ public class JavaApplication {
                         }
                         sc.nextLine();
 
-                        switch(channelChoice) {
+                        if (channelChoice == ChannelMenu.BACK) {
+                            break;
+                        }
+
+                        switch (channelChoice) {
                             case CREATE_CHANNEL:
                                 System.out.println("채널 이름 입력: ");
                                 String channelName = sc.nextLine();
@@ -121,14 +132,16 @@ public class JavaApplication {
                         }
                         break;
                     }
+                    break;
 
                 case MESSAGE_MANAGEMENT:
-                    while(true) {
+                    while (true) {
                         System.out.println("\n[메시지 관리]");
                         System.out.println("1. 메시지 등록");
                         System.out.println("2. 메시지 조회");
                         System.out.println("3. 메시지 수정");
                         System.out.println("4. 메시지 삭제");
+                        System.out.println("0. 이전 메뉴로");
                         System.out.print("선택: ");
 
                         MessageMenu messageChoice;
@@ -140,13 +153,17 @@ public class JavaApplication {
                         }
                         sc.nextLine();
 
+                        if (messageChoice == MessageMenu.BACK) {
+                            break;
+                        }
+
                         switch (messageChoice) {
                             case CREATE_MESSAGE:
                                 System.out.print("사용자 ID 입력: ");
                                 String userIdInput = sc.nextLine().trim();
                                 UUID userId = UUID.fromString(userIdInput);
 
-                                System.out.print("채널 ID 입력: " );
+                                System.out.print("채널 ID 입력: ");
                                 String channelIdInput = sc.nextLine().trim();
                                 UUID channelId = UUID.fromString(channelIdInput);
 
@@ -171,6 +188,7 @@ public class JavaApplication {
                                 String newMessageText = sc.nextLine();
                                 messageService.updateMessage(messageIdToUpdate, newMessageText);
                                 System.out.println("메시지 수정 완료");
+                                break;
 
                             case DELETE_MESSAGE:
                                 System.out.print("삭제할 메시지 ID 입력: ");
@@ -181,6 +199,7 @@ public class JavaApplication {
                         }
                         break;
                     }
+                    break;
 
                 case EXIT:
                     System.out.println("프로그램 종료");

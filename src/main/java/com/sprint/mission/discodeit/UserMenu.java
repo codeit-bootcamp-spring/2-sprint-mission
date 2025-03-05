@@ -2,7 +2,8 @@ package com.sprint.mission.discodeit;
 
 public enum UserMenu {
     CREATE_USER(1),
-    GET_USER(2);
+    GET_USER(2),
+    BACK(0);
 
     private final int value;
 

@@ -4,7 +4,8 @@ public enum ChannelMenu {
     CREATE_CHANNEL(1),
     GET_CHANNEL(2),
     UPDATE_CHANNEL(3),
-    DELETE_CHANNEL(4);
+    DELETE_CHANNEL(4),
+    BACK(0);
 
     private final int value;
 

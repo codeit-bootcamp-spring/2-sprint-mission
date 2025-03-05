@@ -4,7 +4,8 @@ public enum MessageMenu {
     CREATE_MESSAGE(1),
     GET_MESSAGE(2),
     UPDATE_MESSAGE(3),
-    DELETE_MESSAGE(4);
+    DELETE_MESSAGE(4),
+    BACK(0);
 
     private final int value;
 
