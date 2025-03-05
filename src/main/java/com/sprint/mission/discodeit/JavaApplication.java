@@ -41,7 +41,7 @@ public class JavaApplication {
             if (userToken == null) continue;
 
             System.out.println(" ======== 메뉴 ======== ");
-            System.out.println("1. 채널\n2. 사용자 조회\n3. 수정\n4. 삭제\n5. 로그아웃\n6. 나가기");
+            System.out.println("1. 채널\n2. 조회\n3. 수정\n4. 삭제\n5. 로그아웃\n6. 나가기");
             System.out.print("입력란: ");
 
             int num = sc.nextInt();
@@ -63,7 +63,6 @@ public class JavaApplication {
                             if (channelToken == null) break;
                             messageService.findMessageByChannelId(channelToken);
 
-
                             sendMessageByChannel(messageService, channelToken, userToken);
                             channelToken = null;
                         case 3:
@@ -77,65 +76,8 @@ public class JavaApplication {
                     System.out.println("=== 조회 ===");
                     System.out.println("1. 사용자 조회\n2. 채널 조회\n3. 메세지 조회\n4. 메뉴로 돌아가기");
                     System.out.print("입력란: ");
-                    int findNum = sc.nextInt();
-                    switch (findNum) {
-                        case 1:
-                            System.out.println("=== 조회 방법 ===");
-                            System.out.println("1. 단건 조회\n2. 다건 조회");
-                            System.out.print("입력란: ");
-                            int findNum1 = sc.nextInt();
-                            sc.nextLine();
-                            switch (findNum1) {
-                                case 1:
-                                    System.out.print("조회할 사용자 아이디: ");
-                                    UUID UserUUID = UUID.fromString(sc.nextLine());
-                                    System.out.println(userService.findByUser(UserUUID));
-                                    break;
-                                case 2:
-                                    userService.findAll();
-                                    break;
-                            }
-                            break;
-                        case 2:
-                            System.out.println("=== 조회 방법 ===");
-                            System.out.println("1. 단건 조회\n2. 다건 조회\n3. 채널별 조회");
-                            System.out.print("입력란: ");
-                            int findNum2 = sc.nextInt();
-                            sc.nextLine();
-                            switch (findNum2) {
-                                case 1:
-                                    System.out.print("조회할 채널 아이디: ");
-                                    UUID chennelUUID = UUID.fromString(sc.nextLine());
-
-                                    System.out.println(channelService.findChannel(chennelUUID));
-
-                                    break;
-                                case 2:
-                                    channelService.findChannelAll();
-                            }
-                            break;
-                        case 3:
-                            System.out.println("=== 조회 방법 ===");
-                            System.out.println("1. 단건 조회\n2. 다건 조회\n3. 채널별 조회");
-                            System.out.print("입력란: ");
-                            int findNum3 = sc.nextInt();
-                            sc.nextLine();
-                            switch (findNum3) {
-                                case 1:
-                                    System.out.print("조회할 메시지 아이디: ");
-                                    UUID MessageUUID = UUID.fromString(sc.nextLine());
-                                    messageService.findMessageById(MessageUUID);
-                                    break;
-                                case 2:
-                                    messageService.findAllMessages();
-                                    break;
-                                case 3:
-                                    System.out.print("조회할 채널 아이디: ");
-                                    UUID channelUUID = UUID.fromString(sc.nextLine());
-                                    messageService.findMessageByChannelId(channelUUID);
-                            }
-                            break;
-                    }
+                    int searchNum = sc.nextInt();
+                    serchByNum(searchNum, userService, channelService,messageService);
                     break;
                 case 3:
                     System.out.println("=== 수정 ===");
@@ -241,8 +183,69 @@ public class JavaApplication {
         while (true) {
             System.out.println("------ 메세지 보내기 ------");
             String content = sc.nextLine();
-            if(content.equalsIgnoreCase("EXIT")) return;
+            if (content.equalsIgnoreCase("EXIT")) return;
             messageService.sendMessage(channelUUID, userUUID, content);
+        }
+    }
+
+    private static void serchByNum(int serchdNum, UserService userService, ChannelService channelService,MessageService messageService) {
+        switch (serchdNum) {
+            case 1:
+                System.out.println("=== 조회 방법 ===");
+                System.out.println("1. 단건 조회\n2. 다건 조회");
+                System.out.print("입력란: ");
+                int findNum1 = sc.nextInt();
+                sc.nextLine();
+                switch (findNum1) {
+                    case 1:
+                        System.out.print("조회할 사용자 아이디: ");
+                        UUID UserUUID = UUID.fromString(sc.nextLine());
+                        System.out.println(userService.findByUser(UserUUID));
+                        break;
+                    case 2:
+                        userService.findAll();
+                        break;
+                }
+                break;
+            case 2:
+                System.out.println("=== 조회 방법 ===");
+                System.out.println("1. 단건 조회\n2. 다건 조회");
+                System.out.print("입력란: ");
+                int findNum2 = sc.nextInt();
+                sc.nextLine();
+                switch (findNum2) {
+                    case 1:
+                        System.out.print("조회할 채널 아이디: ");
+                        UUID chennelUUID = UUID.fromString(sc.nextLine());
+
+                        System.out.println(channelService.findChannel(chennelUUID));
+
+                        break;
+                    case 2:
+                        channelService.findChannelAll();
+                }
+                break;
+            case 3:
+                System.out.println("=== 조회 방법 ===");
+                System.out.println("1. 단건 조회\n2. 다건 조회\n3. 채널별 조회");
+                System.out.print("입력란: ");
+                int findNum3 = sc.nextInt();
+                sc.nextLine();
+                switch (findNum3) {
+                    case 1:
+                        System.out.print("조회할 메시지 아이디: ");
+                        UUID MessageUUID = UUID.fromString(sc.nextLine());
+                        messageService.findMessageById(MessageUUID);
+                        break;
+                    case 2:
+                        messageService.findAllMessages();
+                        break;
+                    case 3:
+                        System.out.print("조회할 채널 아이디: ");
+                        UUID channelUUID = UUID.fromString(sc.nextLine());
+                        messageService.findMessageByChannelId(channelUUID);
+                }
+                break;
         }
     }
 }
