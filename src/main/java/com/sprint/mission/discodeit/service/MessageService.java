@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
@@ -11,4 +12,8 @@ public interface MessageService {
     List<Message> findAll();
     Message update(UUID messageId, String newContent);
     void delete(UUID messageId);
+    void saveToFile(Message message);
+    Message loadOneFromFile(UUID messageId);
+    List<Message> loadAllFromFile();
+    void deleteFile(UUID messageId);
 }
