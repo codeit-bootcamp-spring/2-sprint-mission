@@ -7,9 +7,9 @@ public class CommonEntity {
     private Long createdAt;
     private Long updatedAt;
 
-    public CommonEntity() {
+    public CommonEntity(Long currentTime) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = currentTime;
         this.updatedAt = createdAt;
     }
 
@@ -25,7 +25,7 @@ public class CommonEntity {
         return updatedAt;
     }
 
-    public void update() {
-        this.updatedAt = System.currentTimeMillis();
+    public void updateTime(Long currentTime) {
+        this.updatedAt = currentTime;
     }
 }

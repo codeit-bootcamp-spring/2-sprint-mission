@@ -70,7 +70,7 @@ public class JCFMessageService implements MessageService {
             System.out.println("업데이트할 메세지가 존재하지 않습니다.");
             return;
         }
-        data.get(id).update();
+        data.get(id).updateTime(System.currentTimeMillis());
         System.out.println(id + " 메세지 업데이트 완료되었습니다.");
     }
 

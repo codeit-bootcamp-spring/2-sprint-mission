@@ -57,7 +57,7 @@ public class JCFUserService implements UserService {
             System.out.println("업데이트할 사용자가 존재하지 않습니다.");
             return;
         }
-        data.get(id).update();
+        data.get(id).updateTime(System.currentTimeMillis());
         System.out.println(id + " 사용자 업데이트 완료되었습니다.");
 
     }

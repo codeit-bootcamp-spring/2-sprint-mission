@@ -57,7 +57,7 @@ public class JCFChannelService implements ChannelService {
             System.out.println("업데이트할 채널이 존재하지 않습니다.");
             return;
         }
-        data.get(id).update();
+        data.get(id).updateTime(System.currentTimeMillis());
         System.out.println(id + " 채널 업데이트 완료되었습니다.");
 
     }
