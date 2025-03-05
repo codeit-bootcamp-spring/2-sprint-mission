@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface MessageService {
     // CRUD(생성, 읽기, 모두 읽기, 수정, 삭제)
-    void createMessage(UUID userId, UUID channelId, String content); // 메세지 생성 (UUID 기반)
+    Message createMessage(UUID userId, UUID channelId, String content); // 메세지 생성 (UUID 기반)
 
     Message getMessageById(UUID messageId); // 메세지 조회
     List<Message> getMessagesByUserAndChannel(UUID userId, UUID channelId); // 특정 유저가 특정 채널에서 작성한 메세지 확인

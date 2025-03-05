@@ -24,9 +24,15 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void createChannel(String channelName) {
+    public void updataChannelData() {
+
+    }
+
+    @Override
+    public Channel createChannel(String channelName) {
         Channel channel = new Channel(channelName);
         channels.put(channel.getId(), channel);
+        return channel;
     }
 
     @Override
@@ -55,20 +61,18 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void addUserToChannel(UUID channelId, UUID userId) {
         Channel channel = getChannelById(channelId);
-        User user = userService.getUserById(userId);
 
         if (channel.isUserInChannel(userId)) {
             throw new IllegalArgumentException("이미 가입되어 있는 유저입니다.");
         }
 
+        userService.addChannel(userId, channelId);
         channel.addMembers(userId);
-        user.addJoinedChannel(channelId);
     }
 
     @Override
     public void addMessageToChannel(UUID channelId, UUID messageId) {
         Channel channel = getChannelById(channelId);
-
         channel.addMessages(messageId);
     }
 
@@ -77,10 +81,7 @@ public class JCFChannelService implements ChannelService {
         Channel channel = getChannelById(channelId);
 
         for (UUID userId : channel.getMembers()) {
-            User user = userService.getUserById(userId);
-            if (user != null) {
-                user.removeJoinedChannel(channelId);
-            }
+            userService.deleteChannel(userId, channelId);
         }
 
         channels.remove(channelId);
@@ -93,8 +94,7 @@ public class JCFChannelService implements ChannelService {
             throw new IllegalArgumentException("채널에 존재하지 않는 유저입니다.");
         }
 
-        User user = userService.getUserById(userId);
-        user.removeJoinedChannel(channelId);
+        userService.deleteChannel(userId, channelId);
         channel.removeMember(userId);
     }
 
