@@ -2,51 +2,45 @@ package com.sprint.sprint2.discodeit.service.jcf;
 
 import com.sprint.sprint2.discodeit.entity.Channel;
 import com.sprint.sprint2.discodeit.entity.ChannelType;
+import com.sprint.sprint2.discodeit.repository.ChannelRepository;
 import com.sprint.sprint2.discodeit.service.ChannelService;
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    private final Map<UUID, Channel> data;
 
-    public JCFChannelService() {
-        this.data = new HashMap<>();
+    private final ChannelRepository channelRepository;
+
+    public JCFChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
+
 
     @Override
     public Channel create(ChannelType type, String name, String description) {
         Channel channel = new Channel(type, name, description);
-        this.data.put(channel.getId(), channel);
-
+        channelRepository.save(channel);
         return channel;
     }
 
     @Override
     public Channel find(UUID channelId) {
-        Channel channelNullable = this.data.get(channelId);
-        return Optional.ofNullable(channelNullable)
-                        .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+        return  channelRepository.findById(channelId.toString());
     }
 
     @Override
     public List<Channel> findAll() {
-        return this.data.values().stream().toList();
+        return channelRepository.findByAll();
     }
 
     @Override
     public Channel update(UUID channelId, String newName, String newDescription) {
-        Channel channelNullable = this.data.get(channelId);
-        Channel channel = Optional.ofNullable(channelNullable)
-                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+        Channel channel = channelRepository.findById(channelId.toString());
         channel.update(newName, newDescription);
-
         return channel;
     }
 
     @Override
     public void delete(UUID channelId) {
-        if (!this.data.containsKey(channelId)) {
-            throw new NoSuchElementException("Channel with id " + channelId + " not found");
-        }
-        this.data.remove(channelId);
+      channelRepository.delete(channelId);
     }
 }
