@@ -3,13 +3,13 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class CommonEntity {
-    private UUID id;
-    private Long createdAt;
+    private final UUID id;
+    private final Long createdAt;
     private Long updatedAt;
 
-    public CommonEntity(Long currentTime) {
+    public CommonEntity() {
         this.id = UUID.randomUUID();
-        this.createdAt = currentTime;
+        this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
     }
 
@@ -27,5 +27,9 @@ public class CommonEntity {
 
     public void updateTime(Long currentTime) {
         this.updatedAt = currentTime;
+    }
+    @Override
+    public String toString() {
+        return "ID: " + getId() + "\tCreated At: " + getCreatedAt() + "\tUpdated At: " + getUpdatedAt() + "]";
     }
 }

@@ -7,7 +7,7 @@ public class Channel extends CommonEntity {
 
     @Override
     public String toString() {
-        return "[CHANNEL ID: " + getId() + "\tCreated At: " + getCreatedAt() + "\tUpdated At: " + getUpdatedAt() + "]";
+        return "[CHANNEL " +super.toString();
 
     }
 }

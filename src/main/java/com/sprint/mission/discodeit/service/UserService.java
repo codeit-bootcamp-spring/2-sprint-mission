@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service;
 import java.util.UUID;
 
 public interface UserService {
-    UUID createUser();
+    UUID createUser(String username);
 
     void searchUser(UUID id);
 

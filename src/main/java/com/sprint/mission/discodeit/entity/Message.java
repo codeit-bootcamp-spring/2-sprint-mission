@@ -14,6 +14,6 @@ public class Message extends CommonEntity {
 
     @Override
     public String toString() {
-        return "[Message ID: " + getId() + "\tCreated At: " + getCreatedAt() + "\tUpdated At: " + getUpdatedAt() + "]";
+        return "[Message " +super.toString();
     }
 }

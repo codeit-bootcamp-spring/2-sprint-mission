@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
-    private Map<UUID, Channel> data;
+    private final Map<UUID, Channel> data;
     private static JCFChannelService instance = null;
 
     public static JCFChannelService getInstance() {

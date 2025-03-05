@@ -13,9 +13,9 @@ public class JavaApplication {
         JCFMessageService messageservice = JCFMessageService.getInstance(userservice,channelservice);
 
         // user 등록
-        UUID user1 = userservice.createUser();
-        UUID user2 = userservice.createUser();
-        UUID user3 = userservice.createUser();
+        UUID user1 = userservice.createUser("김이름");
+        UUID user2 = userservice.createUser("김연두");
+        UUID user3 = userservice.createUser("이비누");
         //user 전체 조회
         userservice.searchAllUsers();
         //특정 user 조회

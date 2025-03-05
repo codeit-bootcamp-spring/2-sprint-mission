@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
-    private Map<UUID, User> data;
+    private final Map<UUID, User> data;
     private static JCFUserService instance = null;
 
     public static JCFUserService getInstance() {
@@ -23,8 +23,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public UUID createUser() {
-        User user = new User();
+    public UUID createUser(String username) {
+        User user = new User(username);
         data.put(user.getId(), user);
         System.out.println("사용자가 생성되었습니다: \n" + user);
         return user.getId();

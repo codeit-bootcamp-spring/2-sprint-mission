@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
     private static JCFMessageService instance;
-    Map<UUID, Message> data;
+    private final Map<UUID, Message> data;
 
     private JCFUserService userservice;
     private JCFChannelService channelservice;
