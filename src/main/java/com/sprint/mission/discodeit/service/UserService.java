@@ -12,7 +12,7 @@ public interface UserService {
 
     void registerUser(String userName, String nickName);
 
-    void updateName(String oldUserName, String userName, String newName);
+    void updateName(String oldUserName, String newUserName, String newNickName);
 
     void deleteUser(String userName);
 }
