@@ -28,32 +28,28 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Message save(Message message) {
-        return null;
+        messages.put(message.getId(), message);
+        return message;
     }
 
     @Override
     public Message findById(UUID messageId) {
-        return null;
+        return messages.get(messageId);
     }
 
     @Override
     public List<Message> findAll() {
-        return List.of();
-    }
-
-    @Override
-    public List<Message> findBySenderId(UUID senderId) {
-        return List.of();
+        return new ArrayList<>(messages.values());
     }
 
 
     @Override
-    public Message update(UUID messageId, String content) {
-        return null;
+    public void delete(UUID messageId) {
+        messages.remove(messageId);
     }
 
     @Override
-    public boolean delete(UUID messageId) {
-        return false;
+    public boolean exists(UUID messageId) {
+        return messages.containsKey(messageId);
     }
 }

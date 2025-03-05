@@ -32,7 +32,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findByUserId(UUID userId) {
+    public User findById(UUID userId) {
         return users.get(userId);
     }
 

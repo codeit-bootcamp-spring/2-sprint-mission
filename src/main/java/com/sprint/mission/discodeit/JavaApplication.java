@@ -5,8 +5,10 @@ import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicatedUserException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -21,9 +23,10 @@ public class JavaApplication {
     public static void main(String[] args) {
         UserRepository userRepository = JCFUserRepository.getInstance();
         ChannelRepository channelRepository = JCFChannelRepository.getInstance();
+        MessageRepository messageRepository = JCFMessageRepository.getInstance();
         UserService userService = new JCFUserService(userRepository);
         ChannelService channelService = new JCFChannelService(userService, channelRepository);
-        MessageService messageService = new JCFMessageService(userService, channelService);
+        MessageService messageService = new JCFMessageService(userService, channelService, messageRepository);
 
         // User Service 테스트
         // 유저 등록 테스트
@@ -162,15 +165,15 @@ public class JavaApplication {
 
         System.out.println("=========== 메세지 테스트===========");
         System.out.println("=========== 메세지 id로 메세지 조회 테스트: 내용이 '하이하이' ===========");
-        System.out.println(messageService.getMessageByMessageId(cm2.getId()));
+        System.out.println(messageService.getMessageById(cm2.getId()));
         System.out.println("=========== 채널 메세지 조회 테스트 끝 ===========");
         System.out.println();
 
         System.out.println("=========== 메세지 변경 테스트: 변경 이전 내용:'하이하이' ===========");
-        System.out.println(messageService.getMessageByMessageId(cm2.getId()));
+        System.out.println(messageService.getMessageById(cm2.getId()));
         System.out.println("=========== 메세지 변경 테스트: 변경 이후 내용:헬로우 ===========");
         messageService.updateMessage(cm2.getId(), "헬로우");
-        System.out.println(messageService.getMessageByMessageId(cm2.getId()));
+        System.out.println(messageService.getMessageById(cm2.getId()));
         System.out.println("=========== 메세지 수정 테스트 끝 ===========");
         System.out.println();
 

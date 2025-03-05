@@ -24,7 +24,7 @@ public class JCFUserService implements UserService {
     @Override
     public User getUserByUserId(UUID userId) {
         validateUserId(userId);
-        return userRepository.findByUserId(userId);
+        return userRepository.findById(userId);
     }
 
 

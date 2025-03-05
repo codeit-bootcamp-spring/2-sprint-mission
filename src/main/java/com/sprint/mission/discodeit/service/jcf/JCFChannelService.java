@@ -31,7 +31,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel getChannelByChannelId(UUID channelId) {
         validateChannelId(channelId);
-        return channelRepository.find(channelId);
+        return channelRepository.findById(channelId);
     }
 
     @Override
