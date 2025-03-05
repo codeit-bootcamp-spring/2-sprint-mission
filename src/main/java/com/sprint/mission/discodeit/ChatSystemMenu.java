@@ -66,7 +66,7 @@ public class ChatSystemMenu {
                     System.out.print("메세지 입력: ");
                     String messageContent = scanner.nextLine();
                     messageService.createMessage(userId, channelId, messageContent);
-                    System.out.println("메세지가 정상적으로 전송되었습니다. 발신자: '" + userService.getUserNameByid(userId) + "', 채널: '" + channelService.getChannelNameById(channelId) + "', 내용: '" + messageContent + "'");                });
+                    System.out.println("메세지가 정상적으로 전송되었습니다. 발신자: '" + userService.getUserNameById(userId) + "', 채널: '" + channelService.getChannelNameById(channelId) + "', 내용: '" + messageContent + "'");                });
                 break;
             default:
                 System.out.println("잘못된 선택입니다.");
@@ -209,7 +209,7 @@ public class ChatSystemMenu {
                 executeSafely("유저 삭제중 오류 발생", () ->{
                     System.out.print("삭제할 유저 ID 입력: ");
                     UUID userId = parseUUID(scanner.nextLine());
-                    String userName = userService.getUserNameByid(userId);
+                    String userName = userService.getUserNameById(userId);
                     userService.deleteUser(userId);
 
                     System.out.printf("유저 '%s'가 삭제되었습니다.%n", userName);
@@ -241,7 +241,7 @@ public class ChatSystemMenu {
                     System.out.print("삭제할 유저 ID 입력: ");
                     UUID userId = parseUUID(scanner.nextLine());
                     channelService.removeUserFromChannel(channelId, userId);
-                    System.out.printf("유저 '%s'가 채널 '%s'에서 삭제되었습니다.%n", userService.getUserNameByid(userId), channelService.getChannelNameById(channelId));
+                    System.out.printf("유저 '%s'가 채널 '%s'에서 삭제되었습니다.%n", userService.getUserNameById(userId), channelService.getChannelNameById(channelId));
                 });
                 break;
             default:

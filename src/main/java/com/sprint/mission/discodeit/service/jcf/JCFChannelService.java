@@ -9,7 +9,6 @@ import java.util.*;
 
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> channels = new HashMap<>();
-    private final Map<String, UUID> channelIds = new HashMap<>();
     private final UserService userService;
     private static JCFChannelService INSTANCE;
 
@@ -26,17 +25,8 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void createChannel(String channelName) {
-        if (channelIds.containsKey(channelName)) {
-            throw new IllegalArgumentException("이미 존재하는 채널입니다.");
-        }
-
         Channel channel = new Channel(channelName);
         channels.put(channel.getId(), channel);
-        channelIds.put(channelName, channel.getId());
-    }
-
-    @Override
-    public void updataChannelData() {
     }
 
     @Override
@@ -59,15 +49,6 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
         Channel channel = getChannelById(channelId);
-
-        // 채널명이 이미 존재하는지 확인
-        for (Channel existingChannel : channels.values()) {
-            if (existingChannel.getChannelName().equals(newChannelName)) {
-                throw new IllegalArgumentException("이미 존재하는 채널명입니다.");
-            }
-        }
-
-        String oldChannelName = channel.getChannelName();
         channel.updateChannelName(newChannelName);
     }
 
