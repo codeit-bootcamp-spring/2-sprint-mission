@@ -40,6 +40,8 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
 
     @Override
     public void delete(UUID uuId) {
-
+        Map<UUID, Channel> channelMap = loadAll();
+        channelMap.remove(uuId);
+        writeToFile(channelMap);
     }
 }
