@@ -46,6 +46,10 @@ public class User implements Serializable {
         return id;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public Long getCreatedAt() {
         System.out.println("생성 시각: " + dayTime.format(new Date(createdAt)));
         return createdAt;

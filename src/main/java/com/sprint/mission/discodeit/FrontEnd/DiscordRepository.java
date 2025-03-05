@@ -2,25 +2,12 @@ package com.sprint.mission.discodeit.FrontEnd;
 
 import com.sprint.mission.discodeit.entity.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class DiscordRepository {
-    private static DiscordRepository instance;
-    List<User> list;
+public interface DiscordRepository {
+    public abstract void register(User user);
 
-    private DiscordRepository( ) {
-        list = new ArrayList<>();
-    }
+    public abstract List<User> getUserList();
 
-    public static DiscordRepository getInstance() {
-        if (instance == null) {
-            instance = new DiscordRepository();
-        }
-        return instance;
-    }
-
-    public List<User> getList() {
-        return list;
-    }
+    public abstract void updateUserList(List<User> userList);
 }

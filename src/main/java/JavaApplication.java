@@ -36,8 +36,8 @@ public class JavaApplication {
         User remove = new User("remove", "123");
         User update = new User("update", "123");
 
-        discordService.register(remove);
-        discordService.register(update);
+//        discordService.register(remove);
+//        discordService.register(update);
 
         // 사용자 조회
         discordService.print();

@@ -14,7 +14,7 @@ public class FileUserRepository implements UserRepository {
     private List<Server> serverList;
     private Map<UUID, Queue<Message>> messageList;
 
-    private final Path serverListFilePath =  Paths.get(System.getProperty("user.dir"), "data", "serverList.ser");
+    private final Path path =  Paths.get(System.getProperty("user.dir"), "data", "serverList.ser");
 
     public FileUserRepository() {
         this.serverList = new LinkedList<>();
@@ -25,7 +25,7 @@ public class FileUserRepository implements UserRepository {
 
     // 서버 리스트를 저장할 디렉토리가 있는지 확인
     private void init() {
-        Path directory = serverListFilePath.getParent();
+        Path directory = path.getParent();
         if (!Files.exists(directory)) {
             try {
                 Files.createDirectories(directory);
@@ -38,8 +38,8 @@ public class FileUserRepository implements UserRepository {
     }
 
     private void loadServerList() {
-        if (Files.exists(serverListFilePath)) {
-            try (FileInputStream fis = new FileInputStream(serverListFilePath.toFile());
+        if (Files.exists(path)) {
+            try (FileInputStream fis = new FileInputStream(path.toFile());
                  ObjectInputStream ois = new ObjectInputStream(fis)) {
 
                 List<Server> list = (List<Server>) ois.readObject();
@@ -50,7 +50,7 @@ public class FileUserRepository implements UserRepository {
                     System.out.println("서버 로드 완료 - ID 유지: " + s.getId());
                 }
 
-                System.out.println("서버 리스트 로드 완료: " + serverListFilePath);
+                System.out.println("서버 리스트 로드 완료: " + path);
             } catch (IOException | ClassNotFoundException e) {
                 System.out.println("서버 리스트 로드 실패");
                 throw new RuntimeException(e);
@@ -71,7 +71,7 @@ public class FileUserRepository implements UserRepository {
     private void saveServerList() {
         init();
 
-        try (FileOutputStream fos = new FileOutputStream(serverListFilePath.toFile());
+        try (FileOutputStream fos = new FileOutputStream(path.toFile());
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
             oos.writeObject(serverList);

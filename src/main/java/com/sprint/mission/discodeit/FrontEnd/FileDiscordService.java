@@ -3,21 +3,24 @@ package com.sprint.mission.discodeit.FrontEnd;
 import com.sprint.mission.discodeit.Factory.CreateUserFactory;
 import com.sprint.mission.discodeit.entity.User;
 
-import java.util.LinkedList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 
-public class JCFDiscordService implements DiscordService {
-    private static JCFDiscordService instance;
-    DiscordRepository discordRepository = JCFDiscordRepository.getInstance();
-
+public class FileDiscordService implements DiscordService {
+    private static FileDiscordService instance;
+    FileDiscordRepository discordRepository = FileDiscordRepository.getInstance();
     List<User> list = discordRepository.getUserList();
-    private JCFDiscordService() {
+
+    private final Path path = Paths.get(System.getProperty("user.dir"), "data", "UserList.ser");
+
+    private FileDiscordService() {
     }
 
-    public static JCFDiscordService getInstance() {
+    public static FileDiscordService getInstance() {
         if (instance == null) {
-            instance = new JCFDiscordService();
+            instance = new FileDiscordService();
         }
         return instance;
     }
@@ -25,20 +28,15 @@ public class JCFDiscordService implements DiscordService {
     @Override
     public User create() {
         User user = CreateUserFactory.getInstance().create();
-        register(user);
+        discordRepository.register(user);
         return user;
     }
 
     @Override
     public User create(String name) {
         User user = CreateUserFactory.getInstance().create(name);
-        register(user);
+        discordRepository.register(user);
         return user;
-    }
-
-    public void register(User user) {
-        list.add(user);
-        System.out.println(user.getName() + "유저 저장 성공");
     }
 
     @Override
@@ -62,7 +60,7 @@ public class JCFDiscordService implements DiscordService {
     public User get(String targetName) {
         for (User data : list) {
             if (data.getName().equals(targetName)) {
-                System.out.println(data.getName() + "유저 조회 성공");
+                System.out.println(data.getName() + " 유저 조회 성공");
                 return data;
             }
         }
@@ -70,6 +68,7 @@ public class JCFDiscordService implements DiscordService {
         return null;
     }
 
+    @Override
     public boolean remove() {
         if (list == null) {
             System.out.println("아무것도 저장되어있지 않습니다.");
@@ -107,6 +106,7 @@ public class JCFDiscordService implements DiscordService {
         return false;
     }
 
+    @Override
     public void print() {
         if (list.isEmpty()) {
             return;
@@ -116,9 +116,10 @@ public class JCFDiscordService implements DiscordService {
             System.out.println(data.getName());
         }
         System.out.println("======================================\n");
+
     }
 
-
+    @Override
     public boolean update() {
         if (list.isEmpty()) {
             return false;
@@ -166,6 +167,7 @@ public class JCFDiscordService implements DiscordService {
         for (User data : list) {
             if (data.getName().equals(targetName)) {
                 data.setName(replaceName);
+                discordRepository.updateUserList(list);
                 System.out.println(data.getName() + "유저 이름 변경 성공");
                 return true;
             }
