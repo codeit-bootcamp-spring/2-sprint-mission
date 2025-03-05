@@ -11,4 +11,5 @@ public interface UserService {
     void findAll();
     void update(UUID uuid, String nickname);
     void delete(UUID uuid);
+    UUID login(UUID userUUID, String password);
 }

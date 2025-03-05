@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
-import java.util.Locale;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -13,9 +15,9 @@ public class JavaApplication {
     static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        JCFUserService jcfUserService = JCFUserService.getInstance();
-        JCFChannelService jcfChannelService = JCFChannelService.getInstance();
-        JCFMessageService jcfMessageService = JCFMessageService.getInstance(jcfUserService, jcfChannelService);
+        UserService userService = JCFUserService.getInstance();
+        ChannelService channelService = JCFChannelService.getInstance();
+        MessageService messageService = JCFMessageService.getInstance(userService, channelService);
 
         UUID userToken = null;
         UUID channelToken = null;
@@ -31,17 +33,17 @@ public class JavaApplication {
                 sc.nextLine();
                 switch (initPage) {
                     case 1:
-                        userToken = loginPage(jcfUserService);
+                        userToken = loginPage(userService);
                         break;
                     case 2:
-                        joinPage(jcfUserService);
+                        joinPage(userService);
                         break;
                 }
             }
             if (userToken == null) continue;
 
             System.out.println(" ======== 메뉴 ======== ");
-            System.out.println("1. 채널\n2. 조회(다건, 단건)\n3. 수정 \n4. 삭제 \n5. 로그아웃\n6. 나가기");
+            System.out.println("1. 채널\n2. 사용자 조회\n3. 수정\n4. 삭제\n5. 로그아웃\n6. 나가기");
             System.out.print("입력란: ");
 
             int num = sc.nextInt();
@@ -50,21 +52,25 @@ public class JavaApplication {
             switch (num) {
                 case 1:
                     System.out.println("===등록===");
-                    System.out.println("1. 채널 개설\n2. 채널 선택\n3. 메뉴로 돌아가기");
+                    System.out.println("1. 채널 개설\n2. 채널 선택\n3. 개설된 채널 조회\n4. 메뉴로 돌아가기");
                     System.out.print("입력란: ");
                     int createNum = sc.nextInt();
                     sc.nextLine();
                     switch (createNum) {
                         case 1:
-                            createChannelPage(jcfChannelService);
+                            createChannelPage(channelService);
                             break;
                         case 2:
-                            channelToken = selectChannel(jcfChannelService);
+                            channelToken = selectChannel(channelService);
                             if (channelToken == null) break;
-                            jcfMessageService.findMessageByChannelId(channelToken);
+                            messageService.findMessageByChannelId(channelToken);
 
-                            sendMessageByChannel(jcfMessageService, channelToken, userToken);
+
+                            sendMessageByChannel(messageService, channelToken, userToken);
+                            channelToken = null;
                         case 3:
+                            channelService.findChannelAll();
+                        case 4:
                             break;
                     }
                     break;
@@ -85,10 +91,10 @@ public class JavaApplication {
                                 case 1:
                                     System.out.print("조회할 사용자 아이디: ");
                                     UUID UserUUID = UUID.fromString(sc.nextLine());
-                                    System.out.println(jcfUserService.findByUser(UserUUID));
+                                    System.out.println(userService.findByUser(UserUUID));
                                     break;
                                 case 2:
-                                    jcfUserService.findAll();
+                                    userService.findAll();
                                     break;
                             }
                             break;
@@ -103,11 +109,11 @@ public class JavaApplication {
                                     System.out.print("조회할 채널 아이디: ");
                                     UUID chennelUUID = UUID.fromString(sc.nextLine());
 
-                                    System.out.println(jcfChannelService.findChannel(chennelUUID));
+                                    System.out.println(channelService.findChannel(chennelUUID));
 
                                     break;
                                 case 2:
-                                    jcfChannelService.findChannelAll();
+                                    channelService.findChannelAll();
                             }
                             break;
                         case 3:
@@ -120,15 +126,15 @@ public class JavaApplication {
                                 case 1:
                                     System.out.print("조회할 메시지 아이디: ");
                                     UUID MessageUUID = UUID.fromString(sc.nextLine());
-                                    jcfMessageService.findMessageById(MessageUUID);
+                                    messageService.findMessageById(MessageUUID);
                                     break;
                                 case 2:
-                                    jcfMessageService.findAllMessages();
+                                    messageService.findAllMessages();
                                     break;
                                 case 3:
                                     System.out.print("조회할 채널 아이디: ");
                                     UUID channelUUID = UUID.fromString(sc.nextLine());
-                                    jcfMessageService.findMessageByChannelId(channelUUID);
+                                    messageService.findMessageByChannelId(channelUUID);
                             }
                             break;
                     }
@@ -145,21 +151,21 @@ public class JavaApplication {
                             UUID userUUID = UUID.fromString(sc.nextLine());
                             System.out.print("원하는 닉네임 입력: ");
                             String nickname = sc.nextLine();
-                            jcfUserService.update(userUUID, nickname);
+                            userService.update(userUUID, nickname);
                             break;
                         case 2:
                             System.out.print("변경할 채널 아이디 입력: ");
                             UUID channelUUID = UUID.fromString(sc.nextLine());
                             System.out.print("원하는 채널명 입력: ");
                             String channelName = sc.nextLine();
-                            jcfChannelService.updateChannel(channelUUID, channelName);
+                            channelService.updateChannel(channelUUID, channelName);
                             break;
                         case 3:
                             System.out.print("수정할 메세지 아이디 입력: ");
                             UUID messageUUID = UUID.fromString(sc.nextLine());
                             System.out.print("수정 메시지 입력: ");
                             String message = sc.nextLine();
-                            jcfMessageService.updateMessage(messageUUID, message);
+                            messageService.updateMessage(messageUUID, message);
                             break;
                         case 4:
                             break;
@@ -175,17 +181,17 @@ public class JavaApplication {
                         case 1:
                             System.out.print("삭제할 사용자 아이디: ");
                             UUID userUUID = UUID.fromString(sc.nextLine());
-                            jcfUserService.delete(userUUID);
+                            userService.delete(userUUID);
                             break;
                         case 2:
                             System.out.print("삭제할 채널 아이디: ");
                             UUID channelUUID = UUID.fromString(sc.nextLine());
-                            jcfChannelService.deleteChannel(channelUUID);
+                            channelService.deleteChannel(channelUUID);
                             break;
                         case 3:
                             System.out.print("삭제할 메시지 아이디: ");
                             UUID messageUUID = UUID.fromString(sc.nextLine());
-                            jcfMessageService.deleteMessageById(messageUUID);
+                            messageService.deleteMessageById(messageUUID);
                             break;
                         case 4:
                             break;
@@ -200,45 +206,45 @@ public class JavaApplication {
         }
     }
 
-    private static UUID loginPage(JCFUserService jcfUserService) {
+    private static UUID loginPage(UserService userService) {
         Scanner sc = new Scanner(System.in);
         System.out.print("유저 아이디 입력: ");
         UUID userUUID = UUID.fromString(sc.nextLine());
         System.out.print("비밀번호 입력: ");
         String password = sc.nextLine();
-        UUID userToken = jcfUserService.login(userUUID, password);
+        UUID userToken = userService.login(userUUID, password);
         return userToken;
     }
 
-    private static void joinPage(JCFUserService jcfUserService) {
+    private static void joinPage(UserService userService) {
         System.out.print("닉네임 입력: ");
         String nickname = sc.nextLine();
         System.out.print("비밀번호 입력: ");
         String savePassword = sc.nextLine();
-        jcfUserService.save(nickname, savePassword);
+        userService.save(nickname, savePassword);
     }
 
-    private static void createChannelPage(JCFChannelService jcfChannelService) {
+    private static void createChannelPage(ChannelService channelService) {
         System.out.print("채널명 입력: ");
         String channelName = sc.nextLine();
-        jcfChannelService.createChannel(channelName);
+        channelService.createChannel(channelName);
     }
 
-    private static UUID selectChannel(JCFChannelService jcfChannelService) {
+    private static UUID selectChannel(ChannelService channelService) {
         System.out.print("채널 아이디 입력: ");
         UUID channelUUID = UUID.fromString(sc.nextLine());
 
-        Channel channel = jcfChannelService.findChannel(channelUUID);
+        Channel channel = channelService.findChannel(channelUUID);
         if (channel == null) return null;
         return channel.getId();
     }
 
-    private static void sendMessageByChannel(JCFMessageService jcfMessageService, UUID channelUUID, UUID userUUID) {
+    private static void sendMessageByChannel(MessageService messageService, UUID channelUUID, UUID userUUID) {
         while (true) {
             System.out.println("------ 메세지 보내기 ------");
             String content = sc.nextLine();
             if(content.equalsIgnoreCase("EXIT")) return;
-            jcfMessageService.sendMessage(channelUUID, userUUID, content);
+            messageService.sendMessage(channelUUID, userUUID, content);
         }
     }
 }

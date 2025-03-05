@@ -82,6 +82,7 @@ public class JCFUserService implements UserService {
         }
     }
 
+    @Override
     public UUID login(UUID userUUID, String password) {
         User userInfo = findByUser(userUUID);
         if (userInfo == null) {

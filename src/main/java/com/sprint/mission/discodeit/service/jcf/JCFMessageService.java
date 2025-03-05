@@ -1,25 +1,27 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
     private final List<Message> data = new ArrayList<>();
-    private final JCFUserService jcfUserService;
-    private final JCFChannelService jcfChannelService;
+    private final UserService userService;
+    private final ChannelService channelService;
     private static JCFMessageService getInstance;
 
-    private JCFMessageService(JCFUserService jcfUserService, JCFChannelService jcfChannelService) {
-        this.jcfUserService = jcfUserService;
-        this.jcfChannelService = jcfChannelService;
+    private JCFMessageService(UserService userService, ChannelService channelService) {
+        this.userService = userService;
+        this.channelService = channelService;
     }
 
-    public static JCFMessageService getInstance(JCFUserService jcfUserService, JCFChannelService jcfChannelService) {
+    public static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
         if (getInstance == null) {
-            getInstance = new JCFMessageService(jcfUserService, jcfChannelService);
+            getInstance = new JCFMessageService(userService, channelService);
         }
         return getInstance;
     }
@@ -27,11 +29,11 @@ public class JCFMessageService implements MessageService {
     @Override
     public void sendMessage(UUID channelUUID, UUID userUUID, String content) {
 
-        if (jcfChannelService.findChannel(channelUUID) == null) {
+        if (channelService.findChannel(channelUUID) == null) {
             return;
         }
 
-        if (jcfUserService.findByUser(userUUID) == null) {
+        if (userService.findByUser(userUUID) == null) {
             return;
         }
 
@@ -68,7 +70,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void findMessageByChannelId(UUID channelUUID) {
-        if (jcfChannelService.findChannel(channelUUID) == null) {
+        if (channelService.findChannel(channelUUID) == null) {
             return;
         }
 
@@ -80,7 +82,7 @@ public class JCFMessageService implements MessageService {
         data.stream()
                 .filter(message -> message.getChannelUUID().equals(channelUUID))
                 .forEach(message -> {
-                    System.out.println(jcfUserService.findByUser(message.getUserUUID()).getNickname());
+                    System.out.println(userService.findByUser(message.getUserUUID()).getNickname());
                     System.out.println(message.getContent());
                 });
     }
