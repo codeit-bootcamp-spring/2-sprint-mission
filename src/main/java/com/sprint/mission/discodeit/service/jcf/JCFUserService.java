@@ -9,10 +9,23 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
+    private static volatile JCFUserService instance;
+
     private UserRepository userRepository;
 
-    public JCFUserService(UserRepository userRepository) {
+    private JCFUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public static JCFUserService getInstance(UserRepository userRepository) {
+        if (instance == null) {
+            synchronized (JCFUserService.class) {
+                if (instance == null) {
+                    instance = new JCFUserService(userRepository);
+                }
+            }
+        }
+        return instance;
     }
 
     @Override

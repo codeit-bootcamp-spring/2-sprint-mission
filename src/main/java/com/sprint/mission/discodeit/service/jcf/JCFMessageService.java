@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -10,10 +11,11 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
+    private static volatile JCFMessageService instance;
+
     private UserService userService;
     private ChannelService channelService;
     private MessageRepository messageRepository;
-
 
     public JCFMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         this.userService = userService;
@@ -21,6 +23,16 @@ public class JCFMessageService implements MessageService {
         this.messageRepository = messageRepository;
     }
 
+    public static JCFMessageService getInstance(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
+        if (instance == null) {
+            synchronized (JCFMessageService.class) {
+                if (instance == null) {
+                    instance = new JCFMessageService(userService, channelService, messageRepository);
+                }
+            }
+        }
+        return instance;
+    }
 
     @Override
     public Message sendMessage(UUID senderId, String content, UUID channelId) {

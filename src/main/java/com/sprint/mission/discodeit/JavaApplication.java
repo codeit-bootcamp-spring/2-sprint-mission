@@ -24,9 +24,9 @@ public class JavaApplication {
         UserRepository userRepository = JCFUserRepository.getInstance();
         ChannelRepository channelRepository = JCFChannelRepository.getInstance();
         MessageRepository messageRepository = JCFMessageRepository.getInstance();
-        UserService userService = new JCFUserService(userRepository);
-        ChannelService channelService = new JCFChannelService(userService, channelRepository);
-        MessageService messageService = new JCFMessageService(userService, channelService, messageRepository);
+        UserService userService = JCFUserService.getInstance(userRepository);
+        ChannelService channelService = JCFChannelService.getInstance(userService, channelRepository);
+        MessageService messageService = JCFMessageService.getInstance(userService, channelService, messageRepository);
 
         // User Service 테스트
         // 유저 등록 테스트
@@ -137,6 +137,12 @@ public class JavaApplication {
         });
         System.out.println("=========== 채널 멤버 추가,삭제 및 조회 테스트 끝 ===========");
         System.out.println();
+
+        //채널 업데이트
+        System.out.println("=========== 채널 업데이트 테스트: 제목은 '바꿨으' ===========");
+        channelService.updateChannel(channel1.getId(), "바꿨으", channel1.getDescription());
+        System.out.println(channelService.getChannelByChannelId(channel1.getId()));
+
 
         //채널 삭제 테스트
         System.out.println("=========== 채널 삭제 테스트 ===========");
