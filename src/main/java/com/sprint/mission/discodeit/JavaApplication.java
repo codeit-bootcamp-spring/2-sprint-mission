@@ -13,11 +13,11 @@ import java.util.UUID;
 
 public class JavaApplication {
     static Scanner sc = new Scanner(System.in);
+    static UserService userService = JCFUserService.getInstance();
+    static ChannelService channelService = JCFChannelService.getInstance();
+    static MessageService messageService = JCFMessageService.getInstance(userService, channelService);
 
     public static void main(String[] args) {
-        UserService userService = JCFUserService.getInstance();
-        ChannelService channelService = JCFChannelService.getInstance();
-        MessageService messageService = JCFMessageService.getInstance(userService, channelService);
 
         UUID userToken = null;
         UUID channelToken = null;
@@ -31,10 +31,10 @@ public class JavaApplication {
                 sc.nextLine();
                 switch (initPage) {
                     case 1:
-                        userToken = loginPage(userService);
+                        userToken = loginPage();
                         break;
                     case 2:
-                        joinPage(userService);
+                        joinPage();
                         break;
                 }
             }
@@ -56,15 +56,16 @@ public class JavaApplication {
                     sc.nextLine();
                     switch (createNum) {
                         case 1:
-                            createChannelPage(channelService);
+                            createChannelPage();
                             break;
                         case 2:
-                            channelToken = selectChannel(channelService);
+                            channelToken = selectChannel();
                             if (channelToken == null) break;
                             messageService.findMessageByChannelId(channelToken);
 
-                            sendMessageByChannel(messageService, channelToken, userToken);
+                            sendMessageByChannel(channelToken, userToken);
                             channelToken = null;
+                            break;
                         case 3:
                             channelService.findChannelAll();
                         case 4:
@@ -77,7 +78,7 @@ public class JavaApplication {
                     System.out.println("1. 사용자 조회\n2. 채널 조회\n3. 메세지 조회\n4. 메뉴로 돌아가기");
                     System.out.print("입력란: ");
                     int searchNum = sc.nextInt();
-                    serchByNum(searchNum, userService, channelService,messageService);
+                    serchByNum(searchNum);
                     break;
                 case 3:
                     System.out.println("=== 수정 ===");
@@ -85,31 +86,7 @@ public class JavaApplication {
                     System.out.print("입력란: ");
                     int updateNum = sc.nextInt();
                     sc.nextLine();
-                    switch (updateNum) {
-                        case 1:
-                            System.out.print("변경할 사용자 아이디 입력: ");
-                            UUID userUUID = UUID.fromString(sc.nextLine());
-                            System.out.print("원하는 닉네임 입력: ");
-                            String nickname = sc.nextLine();
-                            userService.update(userUUID, nickname);
-                            break;
-                        case 2:
-                            System.out.print("변경할 채널 아이디 입력: ");
-                            UUID channelUUID = UUID.fromString(sc.nextLine());
-                            System.out.print("원하는 채널명 입력: ");
-                            String channelName = sc.nextLine();
-                            channelService.updateChannel(channelUUID, channelName);
-                            break;
-                        case 3:
-                            System.out.print("수정할 메세지 아이디 입력: ");
-                            UUID messageUUID = UUID.fromString(sc.nextLine());
-                            System.out.print("수정 메시지 입력: ");
-                            String message = sc.nextLine();
-                            messageService.updateMessage(messageUUID, message);
-                            break;
-                        case 4:
-                            break;
-                    }
+                    updateByNum(updateNum);
                     break;
                 case 4:
                     System.out.println("=== 삭제 ===");
@@ -146,7 +123,7 @@ public class JavaApplication {
         }
     }
 
-    private static UUID loginPage(UserService userService) {
+    private static UUID loginPage() {
         Scanner sc = new Scanner(System.in);
         System.out.print("유저 아이디 입력: ");
         UUID userUUID = UUID.fromString(sc.nextLine());
@@ -156,7 +133,7 @@ public class JavaApplication {
         return userToken;
     }
 
-    private static void joinPage(UserService userService) {
+    private static void joinPage() {
         System.out.print("닉네임 입력: ");
         String nickname = sc.nextLine();
         System.out.print("비밀번호 입력: ");
@@ -164,13 +141,13 @@ public class JavaApplication {
         userService.save(nickname, savePassword);
     }
 
-    private static void createChannelPage(ChannelService channelService) {
+    private static void createChannelPage() {
         System.out.print("채널명 입력: ");
         String channelName = sc.nextLine();
         channelService.createChannel(channelName);
     }
 
-    private static UUID selectChannel(ChannelService channelService) {
+    private static UUID selectChannel() {
         System.out.print("채널 아이디 입력: ");
         UUID channelUUID = UUID.fromString(sc.nextLine());
 
@@ -179,7 +156,7 @@ public class JavaApplication {
         return channel.getId();
     }
 
-    private static void sendMessageByChannel(MessageService messageService, UUID channelUUID, UUID userUUID) {
+    private static void sendMessageByChannel(UUID channelUUID, UUID userUUID) {
         while (true) {
             System.out.println("------ 메세지 보내기 ------");
             String content = sc.nextLine();
@@ -188,7 +165,7 @@ public class JavaApplication {
         }
     }
 
-    private static void serchByNum(int serchdNum, UserService userService, ChannelService channelService,MessageService messageService) {
+    private static void serchByNum(int serchdNum) {
         switch (serchdNum) {
             case 1:
                 System.out.println("=== 조회 방법 ===");
@@ -245,6 +222,34 @@ public class JavaApplication {
                         UUID channelUUID = UUID.fromString(sc.nextLine());
                         messageService.findMessageByChannelId(channelUUID);
                 }
+                break;
+        }
+    }
+
+    private static void updateByNum(int updateNum) {
+        switch (updateNum) {
+            case 1:
+                System.out.print("변경할 사용자 아이디 입력: ");
+                UUID userUUID = UUID.fromString(sc.nextLine());
+                System.out.print("원하는 닉네임 입력: ");
+                String nickname = sc.nextLine();
+                userService.update(userUUID, nickname);
+                break;
+            case 2:
+                System.out.print("변경할 채널 아이디 입력: ");
+                UUID channelUUID = UUID.fromString(sc.nextLine());
+                System.out.print("원하는 채널명 입력: ");
+                String channelName = sc.nextLine();
+                channelService.updateChannel(channelUUID, channelName);
+                break;
+            case 3:
+                System.out.print("수정할 메세지 아이디 입력: ");
+                UUID messageUUID = UUID.fromString(sc.nextLine());
+                System.out.print("수정 메시지 입력: ");
+                String message = sc.nextLine();
+                messageService.updateMessage(messageUUID, message);
+                break;
+            case 4:
                 break;
         }
     }
