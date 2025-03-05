@@ -1,18 +1,21 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> data = new HashMap<>();
+    private final MessageRepository messageRepository;
     private final UserService userService;
     private final ChannelService channelService;
 
-    public JCFMessageService(UserService userService, ChannelService channelService) {
+    public JCFMessageService(MessageRepository messageRepository, UserService userService, ChannelService channelService) {
+        this.messageRepository = messageRepository;
         this.userService = userService;
         this.channelService = channelService;
     }
@@ -27,30 +30,31 @@ public class JCFMessageService implements MessageService {
         }
 
         Message message = new Message(userId, channelId, content);
-        data.put(message.getId(), message);
+        messageRepository.save(message);
         return message;
     }
 
     @Override
     public Message getMessage(UUID id) {
-        return data.get(id);
+        return messageRepository.findById(id);
     }
 
     @Override
     public List<Message> getAllMessages() {
-        return new ArrayList<>(data.values());
+        return messageRepository.findAll();
     }
 
     @Override
     public void deleteMessage(UUID id) {
-        data.remove(id);
+        messageRepository.delete(id);
     }
 
     @Override
     public void updateMessage(UUID id, String newContent) {
-        Message message = data.get(id);
+        Message message = messageRepository.findById(id);
         if (message != null) {
-            message.updateContent(newContent); //
+            message.updateContent(newContent);
+            messageRepository.save(message);
         }
     }
 }
