@@ -188,6 +188,7 @@ public class FileUserService implements UserService {
                 if (server.getId().equals(targetServer.getId())) {
                     server.setName(replaceName);
                     userRepository.updateServerList(list);
+                    return true;
                 }
             }
         } else {

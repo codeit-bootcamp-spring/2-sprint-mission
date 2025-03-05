@@ -9,6 +9,6 @@ public interface ServerRepository {
 
     List<Container> getContainerList();
 
-    void setContainerList(List<Container> containerList);
+    void updateContainerList(List<Container> containerList);
 
 }

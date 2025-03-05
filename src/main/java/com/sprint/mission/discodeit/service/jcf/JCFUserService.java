@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Factory.CreateServerFactory;
 import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.UserService;
@@ -37,7 +38,7 @@ public class JCFUserService implements UserService {
     private UserRepository getUserRepository(UUID id) {
         UserRepository userRepository = userTable.get(id);
         if (userRepository == null) {
-            UserRepository repository = new LinkedListJCFUserRepository();
+            UserRepository repository = new JCFUserRepository();
             userTable.put(id, repository);
             userRepository = repository;
         }

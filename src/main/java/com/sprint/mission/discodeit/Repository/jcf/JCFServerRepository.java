@@ -16,7 +16,8 @@ public class JCFServerRepository implements ServerRepository  {
         return list;
     }
 
-    public void setContainerList(List<Container> containerList) {
+    @Override
+    public void updateContainerList(List<Container> containerList) {
         this.list = containerList;
     }
 }

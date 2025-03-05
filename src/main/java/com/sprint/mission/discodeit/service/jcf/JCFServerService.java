@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Factory.CreateChannalFactory;
+import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
 import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFServerRepository;
 import com.sprint.mission.discodeit.entity.Container.Channel;
@@ -11,7 +12,7 @@ import java.util.*;
 
 public class JCFServerService implements ServerService {
     private static JCFServerService instance;
-    private final Map<UUID, JCFServerRepository> serverTable = new HashMap<>();
+    private final Map<UUID, ServerRepository> serverTable = new HashMap<>();
 
     private JCFServerService() {
     }
@@ -23,10 +24,10 @@ public class JCFServerService implements ServerService {
         return instance;
     }
 
-    private JCFServerRepository getServerRepository(UUID id) {
-        JCFServerRepository JCFServerRepository = serverTable.get(id);
+    private ServerRepository getServerRepository(UUID id) {
+        ServerRepository JCFServerRepository = serverTable.get(id);
         if (JCFServerRepository == null) {
-            LinkedListJCFServerRepository repository = new LinkedListJCFServerRepository();
+            ServerRepository repository = new JCFServerRepository();
             serverTable.put(id, repository);
             JCFServerRepository = repository;
         }
@@ -40,17 +41,17 @@ public class JCFServerService implements ServerService {
 
     @Override
     public void addChannel(UUID id, String name) {
-        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        ServerRepository serverRepository = getServerRepository(id);
         Channel channel = createChannel(name);
-        JCFServerRepository.add(channel);
+        serverRepository.save(channel);
 
         //로그
         System.out.println(channel.getName() + " 채널 추가 성공");
     }
 
     @Override
-    public void addChannel(UUID id, Channel channel) {
-        JCFServerRepository JCFServerRepository = getServerRepository(id);
+    public void addChannel(UUID id, Container channel) {
+        ServerRepository JCFServerRepository = getServerRepository(id);
         List<Container> list = JCFServerRepository.getContainerList();
         list.add(channel);
         //로그
@@ -58,8 +59,8 @@ public class JCFServerService implements ServerService {
     }
 
     @Override
-    public Channel getChannel(UUID id, String name) {
-        JCFServerRepository JCFServerRepository = getServerRepository(id);
+    public Container getChannel(UUID id, String name) {
+        ServerRepository JCFServerRepository = getServerRepository(id);
         List<Container> list = JCFServerRepository.getContainerList();
         for (Container item : list) {
             if (item.getName().equals(name)) {
@@ -77,13 +78,13 @@ public class JCFServerService implements ServerService {
 
     @Override
     public void printChannel(UUID id) {
-        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        ServerRepository JCFServerRepository = getServerRepository(id);
         List<Container> list = JCFServerRepository.getContainerList();
         printChannel(list);
     }
 
-    @Override
-    public void printChannel(List<Container> list) {
+
+    private void printChannel(List<Container> list) {
         System.out.println("\n=========채널 목록==========");
         for (int i = 0; i < list.size(); i++) {
             System.out.println(i + 1 + " : " + list.get(i).getName());
@@ -93,7 +94,7 @@ public class JCFServerService implements ServerService {
 
     @Override
     public boolean removeChannel(UUID id) {
-        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        ServerRepository JCFServerRepository = getServerRepository(id);
         List<Container> list = JCFServerRepository.getContainerList();
         Scanner sc = new Scanner(System.in);
         System.out.print("삭제할 채널 이름을 입력하시오. : ");
@@ -103,13 +104,13 @@ public class JCFServerService implements ServerService {
 
     @Override
     public boolean removeChannel(UUID id, String targetName) {
-        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        ServerRepository JCFServerRepository = getServerRepository(id);
         List<Container> list = JCFServerRepository.getContainerList();
         return removeChannel(list, targetName);
     }
 
-    @Override
-    public boolean removeChannel(List<Container> list, String targetName) {
+
+    private boolean removeChannel(List<Container> list, String targetName) {
         for (Container item : list) {
             if (item.getName().equals(targetName)) {
                 //로그
@@ -124,7 +125,7 @@ public class JCFServerService implements ServerService {
 
     @Override
     public boolean updateChannel(UUID id) {
-        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        ServerRepository JCFServerRepository = getServerRepository(id);
         List<Container> list = JCFServerRepository.getContainerList();
         Scanner sc = new Scanner(System.in);
         System.out.print("바꿀려고 하는 채널의 이름을 입력하시오. : ");
@@ -134,7 +135,7 @@ public class JCFServerService implements ServerService {
 
     @Override
     public boolean updateChannel(UUID id, String targetName) {
-        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        ServerRepository JCFServerRepository = getServerRepository(id);
         List<Container> list = JCFServerRepository.getContainerList();
         Scanner sc = new Scanner(System.in);
         System.out.print("채널 이름을 무엇으로 바꾸시겠습니까? ");
@@ -144,21 +145,21 @@ public class JCFServerService implements ServerService {
 
     @Override
     public boolean updateChannel(UUID id, String targetName, String replaceName) {
-        JCFServerRepository JCFServerRepository = getServerRepository(id);
+        ServerRepository JCFServerRepository = getServerRepository(id);
         List<Container> list = JCFServerRepository.getContainerList();
         return updateChannel(list, targetName, replaceName);
     }
 
-    @Override
-    public boolean updateChannel(List<Container> list, String targetName) {
+
+    private boolean updateChannel(List<Container> list, String targetName) {
         Scanner sc = new Scanner(System.in);
         System.out.print("채널 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
         return updateChannel(list, targetName, replaceName);
     }
 
-    @Override
-    public boolean updateChannel(List<Container> list, String targetName, String replaceName) {
+
+    private boolean updateChannel(List<Container> list, String targetName, String replaceName) {
         for (Container item : list) {
             if (item.getName().equals(targetName)) {
                 item.setName(replaceName);

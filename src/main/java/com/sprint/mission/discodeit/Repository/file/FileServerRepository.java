@@ -76,7 +76,7 @@ public class FileServerRepository implements ServerRepository {
         return containerList;
     }
 
-    public void setContainerList(List<Container> containerList) {
+    public void updateContainerList(List<Container> containerList) {
         this.containerList = containerList;
         saveChannelList();
     }
