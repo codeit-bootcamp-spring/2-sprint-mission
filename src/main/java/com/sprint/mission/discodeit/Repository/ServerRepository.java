@@ -5,9 +5,10 @@ import com.sprint.mission.discodeit.entity.Container.Container;
 import java.util.List;
 
 public interface ServerRepository {
-    List<Container> getList();
+    void save(Container container);
 
-    void setList(List<Container> list);
+    List<Container> getContainerList();
 
-    void add(Container container);
+    void setContainerList(List<Container> containerList);
+
 }

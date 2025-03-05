@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Repository.UserRepository;
-import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.Repository.jcf.impl.LinkedListJCFUserRepository;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 
@@ -97,7 +95,7 @@ public class JCFMessageService implements MessageService {
         System.out.println("\n=========개인 메시지함==========");
         int i = 1;
         for (Message message : myMessages) {
-            System.out.println(i++ + " : " + message.getName());
+            System.out.println(i++ + " : " + message.getStr());
         }
         System.out.println("=========================\n");
     }
@@ -128,7 +126,7 @@ public class JCFMessageService implements MessageService {
         Map<UUID, Queue<Message>> yourMessageList = yourRepository.getMessageList();
         Queue<Message> yourMessages = getMessages(yourMessageList, targetId);
 
-        return remove(myMessages, yourMessages, message.getName());
+        return remove(myMessages, yourMessages, message.getStr());
     }
 
     @Override
@@ -147,14 +145,14 @@ public class JCFMessageService implements MessageService {
     private boolean remove(Queue<Message> myMessages, Queue<Message> yourMessages, String str) {
         boolean find = false;
         for (Message message : myMessages) {
-            if (message.getName().equals(str)) {
+            if (message.getStr().equals(str)) {
                 find = true;
                 break;
             }
         }
         if (find) {
             for (Message message : yourMessages) {
-                if (message.getName().equals(str)) {
+                if (message.getStr().equals(str)) {
                     myMessages.remove(message);
                     yourMessages.remove(message);
                     return true;
@@ -221,7 +219,7 @@ public class JCFMessageService implements MessageService {
         boolean find = false;
         Message temp = null;
         for (Message message : myMessages) {
-            if (message.getName().equals(targetName)) {
+            if (message.getStr().equals(targetName)) {
                 find = true;
                 temp = message;
                 break;
@@ -229,9 +227,9 @@ public class JCFMessageService implements MessageService {
         }
         if (find) {
             for (Message message : yourMessages) {
-                if (message.getName().equals(targetName)) {
-                    temp.setName(replaceName);
-                    message.setName(replaceName);
+                if (message.getStr().equals(targetName)) {
+                    temp.setStr(replaceName);
+                    message.setStr(replaceName);
                     return true;
                 }
             }

@@ -14,10 +14,9 @@ public class FileUserRepository implements UserRepository {
     private List<Server> serverList;
     private Map<UUID, Queue<Message>> messageList;
 
-    private final Path serverListFilePath;
+    private final Path serverListFilePath =  Paths.get(System.getProperty("user.dir"), "data", "serverList.ser");
 
     public FileUserRepository() {
-        this.serverListFilePath = Paths.get(System.getProperty("user.dir"), "data", "serverList.ser");
         this.serverList = new LinkedList<>();
         this.messageList = new HashMap<>();
         //이미 저장된 데이터 불러오기
@@ -46,7 +45,7 @@ public class FileUserRepository implements UserRepository {
                 List<Server> list = (List<Server>) ois.readObject();
                 for (Server server : list) {
                     Server s = new Server(server.getId(), server.getCreatedAt(), server.getName());
-                    System.out.println("s.getId() = " + s.getId());
+
                     this.serverList.add(s);
                     System.out.println("서버 로드 완료 - ID 유지: " + s.getId());
                 }
@@ -61,8 +60,6 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void save(Server server) {
-        System.out.println("FileUserRepository 저장 시점: " + server.getId());
-
         // 중복 서버 체크
         if (serverList.stream().noneMatch(s -> s.getId().equals(server.getId()))) {
             serverList.add(server);

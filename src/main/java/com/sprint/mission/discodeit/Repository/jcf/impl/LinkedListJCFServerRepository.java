@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 public class LinkedListJCFServerRepository extends JCFServerRepository {
     public LinkedListJCFServerRepository() {
-        super.setList(new LinkedList<>());
+        super.setContainerList(new LinkedList<>());
     }
 
     @Override

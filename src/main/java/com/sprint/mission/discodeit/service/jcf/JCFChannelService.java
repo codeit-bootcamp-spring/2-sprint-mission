@@ -60,9 +60,9 @@ public class JCFChannelService implements ChannelService {
         JCFChannelRepository JCFChannelRepository = getChannelRepository(channelId);
         List<Message> list = JCFChannelRepository.getList();
         for (Message message : list) {
-            if (message.getName().equals(str)) {
+            if (message.getStr().equals(str)) {
                 //로그
-                System.out.println(message.getName() + " 이(가) 반환됩니다.");
+                System.out.println(message.getStr() + " 이(가) 반환됩니다.");
                 return message;
             }
         }
@@ -82,7 +82,7 @@ public class JCFChannelService implements ChannelService {
     public void printChannel(List<Message> list) {
         System.out.println("\n=========메시지 목록==========");
         for (int i = 0; i < list.size(); i++) {
-            System.out.println(i + 1 + " : " + list.get(i).getName());
+            System.out.println(i + 1 + " : " + list.get(i).getStr());
         }
         System.out.println("=========================\n");
     }
@@ -92,9 +92,9 @@ public class JCFChannelService implements ChannelService {
         JCFChannelRepository JCFChannelRepository = getChannelRepository(channelId);
         List<Message> list = JCFChannelRepository.getList();
         for (Message item : list) {
-            if (item.getName().equals(targetName)) {
+            if (item.getStr().equals(targetName)) {
                 //로그
-                System.out.println(item.getName() + " 이(가) 삭제됩니다.");
+                System.out.println(item.getStr() + " 이(가) 삭제됩니다.");
                 list.remove(item);
                 return true;
             }
@@ -108,10 +108,10 @@ public class JCFChannelService implements ChannelService {
         JCFChannelRepository JCFChannelRepository = getChannelRepository(id);
         List<Message> list = JCFChannelRepository.getList();
         for (Message item : list) {
-            if (item.getName().equals(targetName)) {
-                item.setName(replaceName);
+            if (item.getStr().equals(targetName)) {
+                item.setStr(replaceName);
                 //로그
-                System.out.println(targetName+" 이(가) " + item.getName() + " 이(가) 됩니다.");
+                System.out.println(targetName+" 이(가) " + item.getStr() + " 이(가) 됩니다.");
                 return true;
             }
         }

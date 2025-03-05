@@ -131,19 +131,19 @@ public class JavaApplication {
         Message updateMessage = channelService.write(c.getId(), "update");
 
         //특정 메시지 조회
-        System.out.println("getMessage.getName() = " + channelService.getMessage(c.getId(), getMessage.getName()).getName());
+        System.out.println("getMessage.getName() = " + channelService.getMessage(c.getId(), getMessage.getStr()).getStr());
 
         // 채널의 모든 메시지 출력
         channelService.printChannel(c.getId());
 
         // 특정 메시지 삭제
-        channelService.removeMessage(c.getId(), removeMessage.getName());
+        channelService.removeMessage(c.getId(), removeMessage.getStr());
 
         // 메시지 삭제 후 채널의 모든 메시지 출력
         channelService.printChannel(c.getId());
 
         // 메시지 수정
-        channelService.updateMessage(c.getId(), updateMessage.getName(), "replaceChannelMessage");
+        channelService.updateMessage(c.getId(), updateMessage.getStr(), "replaceChannelMessage");
 
         // 메시지 수정 후 채널 메시지 출력
         channelService.printChannel(c.getId());

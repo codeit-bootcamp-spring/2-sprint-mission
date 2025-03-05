@@ -6,14 +6,6 @@ import com.sprint.mission.discodeit.entity.Server;
 
 import java.util.*;
 
-/**
- * <h3>유저 레포지토리 </h3><p>
- * 유저마다 서버 리스트를 갖는다. <br>
- * 유저는 개인 메시지함을 받는다.<br>
- * </p>
- *
- * @version 1
- */
 public class JCFUserRepository implements UserRepository {
     private List<Server> serverList;
     private Map<UUID, Queue<Message>> messageList;
