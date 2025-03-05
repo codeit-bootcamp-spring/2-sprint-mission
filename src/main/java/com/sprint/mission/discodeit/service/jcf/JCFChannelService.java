@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -37,18 +37,19 @@ public class JCFChannelService implements ChannelService{
     }
 
     @Override
-    public void update(UUID id) {
-        Optional<Channel> channel = this.findById(id);
+    public void update(UUID id, String name, String description) {
+        Channel channel = this.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
 
-        if (channel.isEmpty()) {
-            throw new RuntimeException("id가 존재하지 않습니다.");
-        }
-
-        channel.ifPresent(ch -> ch.setUpdatedAt(System.currentTimeMillis()));
+        channel.setUpdatedAt(System.currentTimeMillis());
+        channel.setName(name);
+        channel.setDescription(description);
     }
 
     @Override
     public void delete(UUID id) {
+        if(!channels.containsKey(id)){
+            throw new RuntimeException("id가 존재하지 않습니다.");
+        }
         channels.remove(id);
     }
 }

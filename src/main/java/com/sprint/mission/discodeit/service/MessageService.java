@@ -7,9 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    void create(Message message);
+    void create(Message message, UUID channelId, UUID authorId);
     Optional<Message> findById(UUID id);
     List<Message> findAll();
-    void update(UUID id);
+    void update(UUID id, String content, UUID channelId, UUID authorId);
     void delete(UUID id);
 }

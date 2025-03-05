@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -29,13 +29,13 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void create(Message message) {
+    public void create(Message message, UUID channelId, UUID authorId) {
         userService
-                .findById(message.getId())
+                .findById(authorId)
                 .orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
 
         channelService
-                .findById(message.getId())
+                .findById(channelId)
                 .orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
 
         messages.put(message.getId(), message);
@@ -52,19 +52,19 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void update(UUID id) {
+    public void update(UUID id, String content, UUID channelId, UUID authorId) {
+        Message message = this.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
 
-        Optional<Message> message = this.findById(id);
-
-        if (message.isEmpty()) {
-            throw new RuntimeException("id가 존재하지 않습니다.");
-        }
-
-        message.ifPresent(ch -> ch.setUpdatedAt(System.currentTimeMillis()));
+        message.setContent(content);
+        message.setChannelId(channelId);
+        message.setAuthorId(authorId);
     }
 
     @Override
     public void delete(UUID id) {
+        if (!messages.containsKey(id)) {
+            throw new RuntimeException("id가 존재하지 않습니다.");
+        }
         messages.remove(id);
     }
 }
