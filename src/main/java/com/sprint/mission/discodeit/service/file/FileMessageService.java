@@ -14,7 +14,7 @@ public class FileMessageService implements MessageService {
     private final String FILE_PATH = "src/main/resources/messages.dat";
     private final UserService userService;
     private final ChannelService channelService;
-    private Map<UUID, Message> messages = new HashMap<UUID, Message>();
+    private Map<UUID, Message> messages = new HashMap<>();
 
     private FileMessageService(UserService userService, ChannelService channelService) {
         loadMessage();

@@ -9,7 +9,7 @@ import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private static JCFMessageService INSTANCE;
-    private final Map<UUID, Message> messages = new HashMap<UUID, Message>();
+    private final Map<UUID, Message> messages = new HashMap<>();
     private final UserService userService;
     private final ChannelService channelService;
 
