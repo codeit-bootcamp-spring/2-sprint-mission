@@ -17,7 +17,7 @@ public class Message extends BaseEntity {
     public UUID getChannelId() { return channelId; }
     public String getContent() { return content; }
 
-    public void setContent(String content, Long updateAt) {
+    public void update(String content, Long updateAt) {
         this.content = content;
         super.updateUpdatedAt(updateAt);
     }

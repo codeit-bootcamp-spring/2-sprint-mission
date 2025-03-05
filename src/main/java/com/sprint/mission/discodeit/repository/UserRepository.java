@@ -10,6 +10,6 @@ public interface UserRepository {
     void save(User user);
     Optional<User> findById(UUID userId);
     List<User> findAll();
-    void delete(UUID id);
-    void update(UUID id, String nickname);
+    void delete(UUID userId);
+    void update(UUID userId, String nickname, String email, String password);
 }

@@ -82,10 +82,10 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void update(UUID id, String name) {
+    public void update(UUID id, String name, String description) {
         Optional<Channel> channelOptional = findById(id);
         channelOptional.ifPresent(channel -> {
-            channel.setName(name, System.currentTimeMillis());
+            channel.update(name, description, System.currentTimeMillis());
             save(channel);
         });
     }

@@ -80,11 +80,11 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(UUID id, String nickname) {
+    public void update(UUID id, String nickname, String email, String password) {
         Optional<User> userOptional = findById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            user.setNickname(nickname, System.currentTimeMillis());
+            user.update(nickname, email, password, System.currentTimeMillis());
             save(user);
         } else {
             throw new NoSuchElementException("User not found with id: " + id);

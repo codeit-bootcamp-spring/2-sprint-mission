@@ -8,14 +8,12 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-
     private static volatile JCFMessageService instance;
 
     private final Map<UUID, Message> data = new HashMap<>();
     private final UserService userService;
     private final ChannelService channelService;
 
-    //심화 적용
     private JCFMessageService(UserService userService, ChannelService channelService) {
         this.userService = userService;
         this.channelService = channelService;
@@ -29,10 +27,8 @@ public class JCFMessageService implements MessageService {
                 }
             }
         }
-
         return instance;
     }
-
 
     @Override
     public void create(Message message) {
@@ -40,20 +36,20 @@ public class JCFMessageService implements MessageService {
             throw new IllegalArgumentException("message 객체가 null 입니다.");
         }
 
-        if (userService.findById(message.getUserId()).isEmpty()) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다: " + message.getUserId());
-        }
-
-        if (channelService.findById(message.getChannelId()).isEmpty()) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다: " + message.getChannelId());
+        try {
+            userService.findById(message.getUserId());
+            channelService.findById(message.getChannelId());
+        }catch (NoSuchElementException e) {
+            throw e;
         }
 
         data.put(message.getId(), message);
     }
 
     @Override
-    public Optional<Message> findById(UUID messageId) {
-        return Optional.ofNullable(data.get(messageId));
+    public Message findById(UUID messageId) {
+        return Optional.ofNullable(data.get(messageId))
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
     @Override
@@ -62,15 +58,14 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void delete(UUID id) {
-        data.remove(id);
+    public void delete(UUID messageId) {
+        Message message = findById(messageId);
+        data.remove(message.getId());
     }
 
     @Override
-    public void update(UUID id, String content) {
-        if (data.containsKey(id)) {
-            Message message = data.get(id);
-            message.setContent(content, System.currentTimeMillis());
-        }
+    public void update(UUID messageId, String content) {
+        Message message = findById(messageId);
+        message.update(content, System.currentTimeMillis());
     }
 }

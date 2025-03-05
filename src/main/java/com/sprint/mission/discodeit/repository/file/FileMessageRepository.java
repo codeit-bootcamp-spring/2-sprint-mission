@@ -81,7 +81,7 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void update(UUID id, String content) {
         findById(id).ifPresent(message -> {
-            message.setContent(content, System.currentTimeMillis());
+            message.update(content, System.currentTimeMillis());
             save(message);
         });
     }

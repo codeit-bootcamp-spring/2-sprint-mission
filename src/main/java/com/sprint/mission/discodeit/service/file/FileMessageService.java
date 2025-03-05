@@ -8,10 +8,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileMessageService implements MessageService {
@@ -54,31 +51,24 @@ public class FileMessageService implements MessageService {
             throw new IllegalArgumentException("message 객체가 null 입니다.");
         }
 
-        if (userService.findById(message.getUserId()).isEmpty()) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다: " + message.getUserId());
-        }
-
-        if (channelService.findById(message.getChannelId()).isEmpty()) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다: " + message.getChannelId());
-        }
+        userService.findById(message.getUserId());
+        channelService.findById(message.getChannelId());
 
         save(getFilePath(message.getId()), message);
     }
 
     @Override
-    public Optional<Message> findById(UUID id) {
-        Path filePath = getFilePath(id);
+    public Message findById(UUID messageId) {
+        Path filePath = getFilePath(messageId);
         if (Files.exists(filePath)) {
-            try (
-                    FileInputStream fis = new FileInputStream(filePath.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                return Optional.of((Message) ois.readObject());
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
+                return (Message) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to read message data", e);
             }
+        }else {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
-        return Optional.empty();
     }
 
     @Override
@@ -87,8 +77,8 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void delete(UUID id) {
-        Path filePath = getFilePath(id);
+    public void delete(UUID messageId) {
+        Path filePath = getFilePath(messageId);
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
@@ -97,11 +87,10 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void update(UUID id, String content) {
-        findById(id).ifPresent(message -> {
-            message.setContent(content, System.currentTimeMillis());
-            save(getFilePath(id), message);
-        });
+    public void update(UUID messageId, String content) {
+        Message message = findById(messageId);
+        message.update(content, System.currentTimeMillis());
+        save(getFilePath(messageId), message);
     }
 
     private <T> void save(Path filePath, T data) {

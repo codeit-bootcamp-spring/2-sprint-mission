@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
-
     private static volatile JCFUserRepository instance;
     private final Map<UUID, User> data;
 
@@ -41,15 +40,15 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        data.remove(id);
+    public void delete(UUID userId) {
+        data.remove(userId);
     }
 
     @Override
-    public void update(UUID id, String nickname) {
-        if (data.containsKey(id)) {
-            User user = data.get(id);
-            user.setNickname(nickname, System.currentTimeMillis());
-        }
+    public void update(UUID userId, String nickname, String email, String password) {
+        findById(userId).ifPresent(user -> {
+            user.update(nickname, email, password, System.currentTimeMillis());
+            save(user);
+        });
     }
 }

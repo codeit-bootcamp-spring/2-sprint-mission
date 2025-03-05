@@ -2,18 +2,13 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class FileChannelService implements ChannelService {
-
     private static volatile FileChannelService instance;
 
     private final Path directory;
@@ -47,23 +42,24 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public void create(Channel channel) {
+        if (channel == null) {
+            throw new IllegalArgumentException("channel 객체가 null 입니다.");
+        }
         save(getFilePath(channel.getId()), channel);
     }
 
     @Override
-    public Optional<Channel> findById(UUID channelId) {
+    public Channel findById(UUID channelId) {
         Path filePath = getFilePath(channelId);
         if (Files.exists(filePath)) {
-            try (
-                    FileInputStream fis = new FileInputStream(filePath.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                return Optional.of((Channel) ois.readObject());
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
+                return (Channel) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to read channel data", e);
             }
+        }else {
+            throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
-        return Optional.empty();
     }
 
     @Override
@@ -72,8 +68,8 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void delete(UUID id) {
-        Path filePath = getFilePath(id);
+    public void delete(UUID channelId) {
+        Path filePath = getFilePath(channelId);
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
@@ -82,11 +78,10 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void update(UUID id, String name) {
-        findById(id).ifPresent(channel -> {
-            channel.setName(name, System.currentTimeMillis());
-            save(getFilePath(id), channel);
-        });
+    public void update(UUID channelId, String name, String description) {
+        Channel channel = findById(channelId);
+        channel.update(name, description, System.currentTimeMillis());
+        save(getFilePath(channelId), channel);
     }
 
     private <T> void save(Path filePath, T data) {

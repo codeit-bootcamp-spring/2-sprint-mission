@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.util.*;
 
 public class JCFChannelRepository implements ChannelRepository {
-
     private static volatile JCFChannelRepository instance;
     private final Map<UUID, Channel> data;
 
@@ -46,10 +45,10 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void update(UUID id, String name) {
-        if(data.containsKey(id)) {
-            Channel channel = data.get(id);
-            channel.setName(name, System.currentTimeMillis());
-        }
+    public void update(UUID channelId, String name, String description) {
+        findById(channelId).ifPresent(channel -> {
+            channel.update(name, description, System.currentTimeMillis());
+            save(channel);
+        });
     }
 }

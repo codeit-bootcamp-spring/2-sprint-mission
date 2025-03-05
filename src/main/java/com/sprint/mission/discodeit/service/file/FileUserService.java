@@ -6,10 +6,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileUserService implements UserService {
@@ -44,23 +41,26 @@ public class FileUserService implements UserService {
 
     @Override
     public void create(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("user 객체가 null 입니다.");
+        }
         save(getFilePath(user.getId()), user);
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
-        Path filePath = getFilePath(id);
+    public User findById(UUID userId) {
+        Path filePath = getFilePath(userId);
         if (Files.exists(filePath)) {
             try (
                     FileInputStream fis = new FileInputStream(filePath.toFile());
                     ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-                return Optional.of((User) ois.readObject());
+                return (User) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to read user data", e);
             }
         }
-        return Optional.empty();
+        throw new NoSuchElementException("User with id " + userId + " not found");
     }
 
     @Override
@@ -69,8 +69,8 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void delete(UUID id) {
-        Path filePath = getFilePath(id);
+    public void delete(UUID userId) {
+        Path filePath = getFilePath(userId);
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
@@ -79,11 +79,10 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void update(UUID id, String nickname) {
-        findById(id).ifPresent(user -> {
-            user.setNickname(nickname, System.currentTimeMillis());
-            save(getFilePath(id), user);
-        });
+    public void update(UUID userId, String nickname, String email, String password) {
+        User user = findById(userId);
+        user.update(nickname, email, password, System.currentTimeMillis());
+        save(getFilePath(userId), user);
     }
 
     private <T> void save(Path filePath, T data) {

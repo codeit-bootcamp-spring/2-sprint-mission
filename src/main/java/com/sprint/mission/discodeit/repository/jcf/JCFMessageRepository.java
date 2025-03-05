@@ -9,9 +9,7 @@ public class JCFMessageRepository implements MessageRepository {
     private static volatile JCFMessageRepository instance;
     private final Map<UUID, Message> data = new HashMap<>();
 
-    private JCFMessageRepository() {
-        // 초기화 코드가 필요하다면 여기에 추가
-    }
+    private JCFMessageRepository() {}
 
     public static JCFMessageRepository getInstance() {
         if (instance == null) {
@@ -40,14 +38,15 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        data.remove(id);
+    public void delete(UUID messageId) {
+        data.remove(messageId);
     }
 
     @Override
-    public void update(UUID id, String content) {
-        findById(id).ifPresent(message -> {
-            message.setContent(content, System.currentTimeMillis());
+    public void update(UUID messageId, String content) {
+        findById(messageId).ifPresent(message -> {
+            message.update(content, System.currentTimeMillis());
+            save(message);
         });
     }
 }
