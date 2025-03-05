@@ -22,9 +22,7 @@ public class JavaApplication {
         UUID userToken = null;
         UUID channelToken = null;
 
-        boolean run = true;
-
-        while (run) {
+        while (true) {
             if (userToken == null) {
                 System.out.println("\n ======== 메뉴 ======== ");
                 System.out.println("1. 로그인\n2. 회원 가입");
@@ -200,8 +198,8 @@ public class JavaApplication {
                 case 5:
                     userToken = null;
                     break;
-                case 6:
-                    run = false;
+                default:
+                    return;
             }
         }
     }
