@@ -50,4 +50,24 @@ public class JCFUserService implements UserService {
         }
         this.data.remove(userId);
     }
+
+    @Override
+    public void saveToFile(User user) {
+
+    }
+
+    @Override
+    public User loadOneFromFile(UUID userId) {
+        return null;
+    }
+
+    @Override
+    public List<User> loadAllFromFile() {
+        return List.of();
+    }
+
+    @Override
+    public void deleteFile(UUID userId) {
+
+    }
 }

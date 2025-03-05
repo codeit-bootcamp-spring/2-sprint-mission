@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -28,7 +29,7 @@ public class JavaApplication {
         User updatedUser = userService.update(user.getId(), null, null, "woody5678");
         System.out.println("유저 수정: " + String.join("/", updatedUser.getUsername(), updatedUser.getEmail(), updatedUser.getPassword()));
         // 삭제
-        // userService.delete(user.getId());
+        userService.delete(user.getId());
         List<User> foundUsersAfterDelete = userService.findAll();
         System.out.println("유저 삭제: " + foundUsersAfterDelete.size());
     }
@@ -51,11 +52,11 @@ public class JavaApplication {
         System.out.println("채널 삭제: " + foundChannelsAfterDelete.size());
     }
 
-    static void messageCRUDTest(MessageService messageService) {
+    static void messageCRUDTest(UserService userService, ChannelService channelService, MessageService messageService) {
         // 생성
-        UUID channelId = UUID.randomUUID();
-        UUID authorId = UUID.randomUUID();
-        Message message = messageService.create("안녕하세요.", channelId, authorId);
+        User user = userService.create("woody","woody@codeit.com", "woody1234");
+        Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+        Message message = messageService.create("안녕하세요.", channel.getId(), user.getId());
         System.out.println("메시지 생성: " + message.getId());
         // 조회
         Message foundMessage = messageService.find(message.getId());
@@ -88,14 +89,14 @@ public class JavaApplication {
 
     public static void main(String[] args) {
         // 서비스 초기화
-        UserService userService = new JCFUserService();
+        UserService userService = new FileUserService();
         ChannelService channelService = new JCFChannelService();
         MessageService messageService = new JCFMessageService(channelService, userService);
 
         // 테스트
         userCRUDTest(userService);
         channelCRUDTest(channelService);
-        messageCRUDTest(messageService);
+        messageCRUDTest(userService,channelService,messageService);
 
         // 셋업
         User user = setupUser(userService);
