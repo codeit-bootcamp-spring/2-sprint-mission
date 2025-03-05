@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -11,10 +9,10 @@ import java.util.*;
 
 public class FileChannelService implements ChannelService {
 
-    private final String FILE_PATH = "src/main/resources/channels.dat";
-    private  Map<UUID, Channel> channels = new HashMap<>();
-    private final UserService userService;
     private static FileChannelService INSTANCE;
+    private final String FILE_PATH = "src/main/resources/channels.dat";
+    private final UserService userService;
+    private  Map<UUID, Channel> channels = new HashMap<>();
 
     private FileChannelService(UserService userService) {
         loadChannel();

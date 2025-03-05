@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
@@ -9,9 +8,9 @@ import java.util.*;
 
 public class FileUserService implements UserService {
 
+    private static FileUserService INSTANCE;
     private final String FILE_PATH = "src/main/resources/users.dat";
     private Map<UUID, User> users = new HashMap<>();
-    private static FileUserService INSTANCE;
 
     private FileUserService() {
         loadUser();

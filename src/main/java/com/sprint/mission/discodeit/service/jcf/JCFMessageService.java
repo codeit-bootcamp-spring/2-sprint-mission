@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -9,10 +8,10 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
+    private static JCFMessageService INSTANCE;
     private final Map<UUID, Message> messages = new HashMap<UUID, Message>();
     private final UserService userService;
     private final ChannelService channelService;
-    private static JCFMessageService INSTANCE;
 
     private JCFMessageService(UserService userService, ChannelService channelService) {
         this.userService = userService;

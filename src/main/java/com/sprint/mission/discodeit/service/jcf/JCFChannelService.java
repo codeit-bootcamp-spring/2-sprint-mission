@@ -1,16 +1,15 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
+    private static JCFChannelService INSTANCE;
     private final Map<UUID, Channel> channels = new HashMap<>();
     private final UserService userService;
-    private static JCFChannelService INSTANCE;
 
     private JCFChannelService(UserService userService) {
         this.userService = userService;
