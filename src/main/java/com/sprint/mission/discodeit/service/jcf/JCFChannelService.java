@@ -50,4 +50,24 @@ public class JCFChannelService implements ChannelService {
         }
         this.data.remove(channelId);
     }
+
+    @Override
+    public void saveToFile(Channel channel) {
+
+    }
+
+    @Override
+    public Channel loadOneFromFile(UUID channelId) {
+        return null;
+    }
+
+    @Override
+    public List<Channel> loadAllFromFile() {
+        return List.of();
+    }
+
+    @Override
+    public void deleteFile(UUID channelId) {
+
+    }
 }
