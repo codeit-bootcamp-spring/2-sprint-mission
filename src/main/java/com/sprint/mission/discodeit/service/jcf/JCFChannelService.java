@@ -45,7 +45,8 @@ public class JCFChannelService implements ChannelService {
     public void updateChannel(UUID channelId, String newName) {
         Channel channel = data.get(channelId);
         if (channel != null) {
-            channel.update(newName);
+            long currentTime = System.currentTimeMillis();
+            channel.update(newName, currentTime);
         }
     }
 

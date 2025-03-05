@@ -51,7 +51,8 @@ public class JCFMessageService implements MessageService {
     public void updateMessage(UUID messageId, String newText) {
         Message message = data.get(messageId);
         if (message != null) {
-            message.update(newText);
+            long currentTime = System.currentTimeMillis();
+            message.update(newText, currentTime);
         }
     }
 

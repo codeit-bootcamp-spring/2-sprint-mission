@@ -14,10 +14,9 @@ public class User extends BaseEntity {
         return name;
     }
 
-    // 업데이트 메서드
-    public void update(String name) {
+    public void update(String name, long updatedAt) {
         this.name = name;
-        this.updatedAt = System.currentTimeMillis();  // 수정 시간 업데이트
+        this.updatedAt = updatedAt;
     }
 
     @Override

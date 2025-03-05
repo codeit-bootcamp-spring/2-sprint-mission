@@ -19,7 +19,7 @@ public class JCFUserService implements UserService {
     @Override
     public User createUser(String name) {
         User user = new User(name);
-        data.put(user.getId(), user);  // id를 키로, User 객체를 맵에 저장
+        data.put(user.getId(), user);
         return user;
     }
 
@@ -31,7 +31,7 @@ public class JCFUserService implements UserService {
     @Override
     public List<User> getUsersByName(String name) {
         return data.values().stream()
-                .filter(user -> user.getName().equals(name))  // 이름이 같은 사용자 필터링
+                .filter(user -> user.getName().equals(name))
                 .collect(Collectors.toList());
     }
 
@@ -42,9 +42,10 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUser(UUID userId, String newName) {
-        User user = data.get(userId);  // 해당 Id의 User 객체 가져오기
+        User user = data.get(userId);
         if (user != null) {
-            user.update(newName);
+            long updatedTime = System.currentTimeMillis();
+            user.update(newName, updatedTime);
         }
     }
 
