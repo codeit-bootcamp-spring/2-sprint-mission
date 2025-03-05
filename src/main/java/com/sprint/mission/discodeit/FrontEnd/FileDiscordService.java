@@ -82,7 +82,7 @@ public class FileDiscordService implements DiscordService {
 
     @Override
     public boolean remove(User user) {
-        if (list == null) {
+        if (list == null || user == null) {
             System.out.println("아무것도 저장되어있지 않습니다.");
             return false;
         }
@@ -97,7 +97,10 @@ public class FileDiscordService implements DiscordService {
         }
         for (User data : list) {
             if (data.getName().equals(targetName)) {
+
                 list.remove(data);
+                discordRepository.updateUserList(list);
+
                 System.out.println(data.getName() + "유저 삭제 성공");
                 return true;
             }

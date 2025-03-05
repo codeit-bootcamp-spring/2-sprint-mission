@@ -88,5 +88,6 @@ public class FileDiscordRepository implements DiscordRepository{
     @Override
     public void updateUserList(List<User> userList) {
         this.list = userList;
+        saveUserList();
     }
 }
