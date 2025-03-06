@@ -9,13 +9,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileUserRepository implements FileRepository<User>, UserRepository {
     private static volatile FileUserRepository instance;
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "users");
+    private final Map<UUID, User> userMap;
 
     public static FileUserRepository getInstance() {
         if (instance == null) {
@@ -30,26 +30,30 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
 
     private FileUserRepository() {
         SerializationUtil.init(directory);
+        userMap = new ConcurrentHashMap<>();
+        loadCacheFromFile();
     }
 
     @Override
     public User save(User user) {
+        userMap.put(user.getId(), user);
         saveToFile(user);
         return user;
     }
 
     @Override
     public Optional<User> findById(UUID userId) {
-        return loadOneFromFileById(userId);
+        return Optional.ofNullable(userMap.get(userId));
     }
 
     @Override
     public List<User> findAll() {
-        return loadAllFromFile();
+        return new ArrayList<>(userMap.values());
     }
 
     @Override
     public void deleteById(UUID userId) {
+        userMap.remove(userId);
         deleteFileById(userId);
     }
 
@@ -60,10 +64,6 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
         SerializationUtil.serialization(filePath, user);
     }
 
-    @Override
-    public Optional<User> loadOneFromFileById(UUID userId) {
-        return Optional.ofNullable(SerializationUtil.reverseOneSerialization(directory,userId));
-    }
 
     @Override
     public List<User> loadAllFromFile() {
@@ -77,6 +77,13 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
             System.out.println("유저 파일 삭제 예외 발생 : " + e.getMessage());
+        }
+    }
+
+    private void loadCacheFromFile() {
+        List<User> users = SerializationUtil.reverseSerialization(directory);
+        for (User user : users) {
+            userMap.put(user.getId(), user);
         }
     }
 }
