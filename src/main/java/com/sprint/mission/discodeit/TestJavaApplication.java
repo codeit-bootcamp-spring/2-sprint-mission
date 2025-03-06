@@ -40,9 +40,9 @@ public class TestJavaApplication {
         MessageRepository messageRepository = new FileMessageRepository();
 
 
-        UserService userService = new BasicUserService(userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository, userRepository);
-        MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
+        UserService userService = BasicUserService.getInstance(userRepository);
+        ChannelService channelService = BasicChannelService.getInstance(channelRepository, userService);
+        MessageService messageService = BasicMessageService.getInstance(messageRepository, channelService, userService);
 
         // 셋업
         User user = setupUser(userService);
