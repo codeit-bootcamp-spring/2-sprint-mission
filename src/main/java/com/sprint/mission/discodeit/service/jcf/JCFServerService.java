@@ -10,7 +10,7 @@ import com.sprint.mission.discodeit.service.ServerService;
 import java.util.*;
 
 public class JCFServerService implements ServerService {
-    private static JCFServerService instance;
+    private static volatile JCFServerService instance;
     private final Map<UUID, ServerRepository> serverTable = new HashMap<>();
 
     private JCFServerService() {
@@ -18,7 +18,11 @@ public class JCFServerService implements ServerService {
 
     public static JCFServerService getInstance() {
         if (instance == null) {
-            instance = new JCFServerService();
+            synchronized (JCFServerService.class) {
+                if (instance == null) {
+                    instance = new JCFServerService();
+                }
+            }
         }
         return instance;
     }
@@ -129,7 +133,7 @@ public class JCFServerService implements ServerService {
         Scanner sc = new Scanner(System.in);
         System.out.print("바꿀려고 하는 채널의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
-        return updateChannel(list,targetName);
+        return updateChannel(list, targetName);
     }
 
     @Override
@@ -163,7 +167,7 @@ public class JCFServerService implements ServerService {
             if (item.getName().equals(targetName)) {
                 item.setName(replaceName);
                 //로그
-                System.out.println(targetName+" 이름이 " + item.getName() + " 이(가) 됩니다.");
+                System.out.println(targetName + " 이름이 " + item.getName() + " 이(가) 됩니다.");
                 return true;
             }
         }

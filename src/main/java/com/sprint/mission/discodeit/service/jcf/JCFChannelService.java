@@ -9,15 +9,19 @@ import java.util.*;
 
 
 public class JCFChannelService implements ChannelService {
-    private static JCFChannelService instance;
+    private static volatile JCFChannelService instance;
     private final Map<UUID, ChannelRepository> channelTable = new HashMap<>();
 
-    private JCFChannelService(){
+    private JCFChannelService() {
     }
 
     public static JCFChannelService getInstance() {
         if (instance == null) {
-            instance = new JCFChannelService();
+            synchronized (JCFChannelService.class) {
+                if (instance == null) {
+                    instance = new JCFChannelService();
+                }
+            }
         }
         return instance;
     }
@@ -110,7 +114,7 @@ public class JCFChannelService implements ChannelService {
             if (item.getStr().equals(targetName)) {
                 item.setStr(replaceName);
                 //로그
-                System.out.println(targetName+" 이(가) " + item.getStr() + " 이(가) 됩니다.");
+                System.out.println(targetName + " 이(가) " + item.getStr() + " 이(가) 됩니다.");
                 return true;
             }
         }

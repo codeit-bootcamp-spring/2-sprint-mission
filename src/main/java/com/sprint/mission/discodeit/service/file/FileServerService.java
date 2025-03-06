@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class FileServerService implements ServerService {
-    private static FileServerService instance;
+    private static volatile FileServerService instance;
     private final Map<UUID, ServerRepository> serverTable = new HashMap<>();
 
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "ContainerList.ser");
@@ -22,7 +22,11 @@ public class FileServerService implements ServerService {
 
     public static FileServerService getInstance() {
         if (instance == null) {
-            instance = new FileServerService();
+            synchronized (FileServerService.class){
+                if (instance == null) {
+                    instance = new FileServerService();
+                }
+            }
         }
         return instance;
     }

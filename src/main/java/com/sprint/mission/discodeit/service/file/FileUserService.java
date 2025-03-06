@@ -11,9 +11,8 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class FileUserService implements UserService {
-    private static FileUserService instance;
+    private static volatile FileUserService instance;
     private final Map<UUID, UserRepository> userTable = new HashMap<>();
-
     Path directory = Paths.get(System.getProperty("user.dir"), "data","serverList.ser");
 
     private FileUserService() {
@@ -22,7 +21,11 @@ public class FileUserService implements UserService {
 
     public static FileUserService getInstance() {
         if (instance == null) {
-            instance = new FileUserService();
+            synchronized (FileUserService.class){
+                if (instance == null) {
+                    instance = new FileUserService();
+                }
+            }
         }
         return instance;
     }

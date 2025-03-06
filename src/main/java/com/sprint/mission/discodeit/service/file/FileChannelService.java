@@ -10,17 +10,21 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class FileChannelService implements ChannelService {
-    private static FileChannelService instance;
+    private static volatile FileChannelService instance;
     private final Map<UUID, ChannelRepository> channelTable = new HashMap<>();
 
-    private final Path directory =  Paths.get(System.getProperty("user.dir"), "data", "MessageList.ser");
+    private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "MessageList.ser");
 
     private FileChannelService() {
     }
 
     public static FileChannelService getInstance() {
         if (instance == null) {
-            instance = new FileChannelService();
+            synchronized (FileChannelService.class) {
+                if (instance == null) {
+                    instance = new FileChannelService();
+                }
+            }
         }
         return instance;
     }
