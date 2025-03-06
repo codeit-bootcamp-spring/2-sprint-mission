@@ -6,28 +6,28 @@ import com.sprint.mission.discodeit.menu.UserMenu;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import java.util.Scanner;
 
 public class JavaApplication {
     static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        UserRepository userRepository = new JCFUserRepository();
-        ChannelRepository channelRepository = new JCFChannelRepository();
-        MessageRepository messageRepository = new JCFMessageRepository();
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
 
-        UserService userService = new JCFUserService(userRepository, channelRepository, messageRepository);
-        ChannelService channelService = new JCFChannelService(userRepository, channelRepository, messageRepository);
-        MessageService messageService = new JCFMessageService(userRepository, channelRepository, messageRepository);
+        UserService userService = new BasicUserService(userRepository, channelRepository, messageRepository);
+        ChannelService channelService = new BasicChannelService(userRepository, channelRepository, messageRepository);
+        MessageService messageService = new BasicMessageService(userRepository, channelRepository, messageRepository);
 
         while (true) {
             System.out.println("=============================");
