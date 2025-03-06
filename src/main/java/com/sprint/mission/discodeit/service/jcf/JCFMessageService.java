@@ -26,12 +26,10 @@ public class JCFMessageService implements MessageService {
         boolean channelExists = channelService.read(message.getChannelId()).isPresent();
 
         if (!userExists) {
-            System.out.println("❌User " + message.getUserId() + " does not exist❌");
-            return;
+            throw new IllegalArgumentException("❌User " + message.getUserId() + " does not exist❌");
         }
         if (!channelExists) {
-            System.out.println("❌Channel " + message.getChannelId() + " does not exist❌");
-            return;
+            throw new IllegalArgumentException("❌Channel " + message.getChannelId() + " does not exist❌");
         }
 
         data.put(message.getId(), message);
