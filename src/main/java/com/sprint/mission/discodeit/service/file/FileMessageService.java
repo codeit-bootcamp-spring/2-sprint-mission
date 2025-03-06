@@ -19,8 +19,8 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void sendMessage(UUID channelId, UUID UserId, String content) {
-        Message message = new Message(channelId, UserId, content);
+    public void sendMessage(UUID channelUUID, UUID userUUID, String content) {
+        Message message = new Message(channelUUID, userUUID, content);
 
         try {
             String fileName = "message.ser";
