@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.Scanner;
 
 public class CreateUserFactory implements Factory<User>{
-    private static CreateUserFactory instance;
+    private static volatile CreateUserFactory instance;
     private final Scanner sc = new Scanner(System.in);
 
     private CreateUserFactory() {
@@ -13,7 +13,11 @@ public class CreateUserFactory implements Factory<User>{
 
     public static CreateUserFactory getInstance() {
         if (instance == null) {
-            instance = new CreateUserFactory();
+            synchronized (CreateUserFactory.class){
+                if (instance == null) {
+                    instance = new CreateUserFactory();
+                }
+            }
         }
         return instance;
     }

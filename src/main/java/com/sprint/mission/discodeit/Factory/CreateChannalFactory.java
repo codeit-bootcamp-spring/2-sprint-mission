@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.entity.Container.Channel;
 
 import java.util.Scanner;
 
-public class CreateChannalFactory implements Factory<Channel>{
-    private static CreateChannalFactory instance;
+public class CreateChannalFactory implements Factory<Channel> {
+    private static volatile CreateChannalFactory instance;
     private final Scanner sc = new Scanner(System.in);
 
     private CreateChannalFactory() {
@@ -13,7 +13,11 @@ public class CreateChannalFactory implements Factory<Channel>{
 
     public static CreateChannalFactory getInstance() {
         if (instance == null) {
-            instance = new CreateChannalFactory();
+            synchronized (CreateChannalFactory.class) {
+                if (instance == null) {
+                    instance = new CreateChannalFactory();
+                }
+            }
         }
         return instance;
     }
