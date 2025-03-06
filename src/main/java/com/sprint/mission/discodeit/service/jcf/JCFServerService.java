@@ -63,8 +63,9 @@ public class JCFServerService implements ServerService {
     @Override
     public Channel getChannel(UUID id, String name) {
         ServerRepository serverRepository = getServerRepository(id);
-        List<Channel> list = serverRepository.getContainerList();
-        Channel channel = list.stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+        List<Channel> channelList = serverRepository.getContainerList();
+        Channel channel = channelList.stream().filter(c -> c.getName().equals(name))
+                .findFirst().orElse(null);
         if (channel != null) {
             //로그
             System.out.println(channel.getName() + " 이(가) 반환됩니다.");
@@ -78,54 +79,66 @@ public class JCFServerService implements ServerService {
     @Override
     public void printChannel(UUID id) {
         ServerRepository serverRepository = getServerRepository(id);
-        List<Channel> list = serverRepository.getContainerList();
-        printChannel(list);
+        List<Channel> channelList = serverRepository.getContainerList();
+        printChannel(channelList);
     }
 
 
     private void printChannel(List<Channel> list) {
         System.out.println("\n=========채널 목록==========");
-        list.forEach(c-> System.out.println(c.getId() + " : " + c.getName()));
+        list.forEach(c -> System.out.println(c.getId() + " : " + c.getName()));
         System.out.println("=========================\n");
     }
 
     @Override
-    public boolean removeChannel(UUID id) {
-        ServerRepository serverRepository = getServerRepository(id);
-        List<Channel> list = serverRepository.getContainerList();
+    public boolean removeChannel(UUID serverId) {
+        ServerRepository serverRepository = getServerRepository(serverId);
+        List<Channel> channelList = serverRepository.getContainerList();
+        if (channelList == null) {
+            System.out.println("채널 삭제 실패 : list null값");
+            return false;
+        }
         Scanner sc = new Scanner(System.in);
         System.out.print("삭제할 채널 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
-        return removeChannel(list, targetName);
+        return removeChannel(channelList, targetName);
     }
 
     @Override
-    public boolean removeChannel(UUID id, String targetName) {
-        ServerRepository serverRepository = getServerRepository(id);
-        List<Channel> list = serverRepository.getContainerList();
-        return removeChannel(list, targetName);
+    public boolean removeChannel(UUID serverId, String targetName) {
+        ServerRepository serverRepository = getServerRepository(serverId);
+        List<Channel> channelList = serverRepository.getContainerList();
+        if (channelList == null) {
+            System.out.println("채널 삭제 실패 : list null값");
+            return false;
+        }
+        return removeChannel(channelList, targetName);
     }
 
 
     private boolean removeChannel(List<Channel> list, String targetName) {
-        Channel channel = list.stream().filter(c -> c.getName().equals(targetName)).findFirst().orElse(null);
-        if (channel != null) {
+        Channel targetChannel = list.stream().filter(c -> c.getName().equals(targetName))
+                .findFirst().orElse(null);
+        if (targetChannel == null) {
             //로그
-            System.out.println(channel.getName() + " 이(가) 삭제됩니다.");
-            list.remove(channel);
-            return true;
+            System.out.println("삭제할 채널이 존재하지 않습니다.");
+            return false;
         }
-        System.out.println("해당 채널이 존재하지 않습니다.");
-        return false;
+        System.out.println(targetChannel.getName() + " 이(가) 삭제됩니다.");
+        list.remove(targetChannel);
+        return true;
+
     }
 
     @Override
     public boolean updateChannel(UUID id) {
         ServerRepository JCFServerRepository = getServerRepository(id);
         List<Channel> list = JCFServerRepository.getContainerList();
+
         Scanner sc = new Scanner(System.in);
         System.out.print("바꿀려고 하는 채널의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
+
         return updateChannel(list, targetName);
     }
 
@@ -156,14 +169,15 @@ public class JCFServerService implements ServerService {
 
 
     private boolean updateChannel(List<Channel> list, String targetName, String replaceName) {
-        Channel channel = list.stream().filter(c -> c.getName().equals(targetName)).findFirst().orElse(null);
-        if (channel != null) {
-            channel.setName(replaceName);
+        Channel targetChannel = list.stream().filter(c -> c.getName().equals(targetName))
+                .findFirst().orElse(null);
+        if (targetChannel != null) {
+            targetChannel.setName(replaceName);
             //로그
-            System.out.println(targetName + " 이름이 " + channel.getName() + " 이(가) 됩니다.");
+            System.out.println(targetName + " 이름이 " + targetChannel.getName() + " 이(가) 됩니다.");
             return true;
         }
-        System.out.println("존재하지 않습니다.");
+        System.out.println("업데이트할 채널이 존재하지 않습니다.");
         return false;
     }
 }

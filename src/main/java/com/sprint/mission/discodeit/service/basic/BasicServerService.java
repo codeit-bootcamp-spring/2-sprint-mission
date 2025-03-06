@@ -1,35 +1,25 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.Factory.CreateChannalFactory;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
-import com.sprint.mission.discodeit.Repository.file.FileServerRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ServerService;
 
 import java.util.*;
 
-public class FileServerService implements ServerService {
-    private static volatile FileServerService instance;
+public class BasicServerService implements ServerService {
     private final Map<UUID, ServerRepository> serverTable = new HashMap<>();
+    ServerRepository repository;
 
-    private FileServerService() {
+    //생성될 때 어떤 repository 를 쓸 지 결정함
+    public BasicServerService(ServerRepository repository) {
+        this.repository = repository;
     }
 
-    public static FileServerService getInstance() {
-        if (instance == null) {
-            synchronized (FileServerService.class) {
-                if (instance == null) {
-                    instance = new FileServerService();
-                }
-            }
-        }
-        return instance;
-    }
 
     private ServerRepository getServerRepository(UUID id) {
         ServerRepository serverRepository = serverTable.get(id);
         if (serverRepository == null) {
-            ServerRepository repository = new FileServerRepository();
             serverTable.put(id, repository);
             serverRepository = repository;
         }
@@ -47,12 +37,18 @@ public class FileServerService implements ServerService {
         ServerRepository serverRepository = getServerRepository(serverId);
         Channel channel = CreateChannalFactory.getInstance().create(name);
         serverRepository.save(channel);
+
+        //로그
+        System.out.println(channel.getName() + " 채널 추가 성공");
     }
 
     @Override
     public void addChannel(UUID serverId, Channel channel) {
         ServerRepository serverRepository = getServerRepository(serverId);
         serverRepository.save(channel);
+
+        //로그
+        System.out.println(channel.getName() + " 채널 추가 성공");
     }
 
     @Override
@@ -81,7 +77,7 @@ public class FileServerService implements ServerService {
 
     private void printChannel(List<Channel> list) {
         System.out.println("\n=========채널 목록==========");
-        list.forEach(c-> System.out.println(c.getId() + " : " + c.getName()));
+        list.forEach(c -> System.out.println(c.getId() + " : " + c.getName()));
         System.out.println("=========================\n");
     }
 
@@ -119,10 +115,13 @@ public class FileServerService implements ServerService {
         if (targetChannel == null) {
             System.out.println("삭제할 채널이 존재하지 않습니다.");
             return false;
-        } else {
-            list.remove(targetChannel);
-            serverRepository.updateContainerList(list);
         }
+        System.out.println(targetChannel.getName() + " 이(가) 삭제됩니다.");
+        list.remove(targetChannel);
+
+        //삭제한 내용 적용
+        serverRepository.updateContainerList(list);
+
         return true;
     }
 
@@ -176,6 +175,7 @@ public class FileServerService implements ServerService {
         if (targetChannel != null) {
             targetChannel.setName(replaceName);
             serverRepository.updateContainerList(list);
+            System.out.println(targetName + " 이름이 " + targetChannel.getName() + " 이(가) 됩니다.");
             return true;
         }
         System.out.println("업데이트할 채널이 존재하지 않습니다.");

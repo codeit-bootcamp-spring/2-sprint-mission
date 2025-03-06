@@ -1,43 +1,26 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.Factory.CreateServerFactory;
 import com.sprint.mission.discodeit.Repository.UserRepository;
-import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
-public class FileUserService implements UserService {
-    private static volatile FileUserService instance;
+public class BasicUserService implements UserService {
     private final Map<UUID, UserRepository> userTable = new HashMap<>();
+    UserRepository repository;
 
-    private FileUserService() {
-        System.out.println("File User Service 가동");
-    }
-
-    public static FileUserService getInstance() {
-        if (instance == null) {
-            synchronized (FileUserService.class) {
-                if (instance == null) {
-                    instance = new FileUserService();
-                }
-            }
-        }
-        return instance;
+    //생성될 때 어떤 repository 를 쓸 지 결정함
+    public BasicUserService(UserRepository repository) {
+        this.repository = repository;
     }
 
     //레포지토리 생성
     private UserRepository getUserRepository(UUID id) {
         UserRepository userRepository = userTable.get(id);
         if (userRepository == null) {
-
-            UserRepository repository = new FileUserRepository();
-
             userTable.put(id, repository);
-
             userRepository = repository;
         }
         return userRepository;
@@ -122,12 +105,15 @@ public class FileUserService implements UserService {
         if (targetServer == null) {
             System.out.println("삭제할 서버가 존재하지 않습니다.");
             return false;
-        } else {
-            //서버 리스트를 가져와서 목표한 서버를 삭제한 뒤
-            list.remove(targetServer);
-            //서버를 다시 저장한다.
-            userRepository.updateServerList(list);
         }
+        //서버 리스트를 가져와서 목표한 서버를 삭제한 뒤
+        list.remove(targetServer);
+
+        //서버를 다시 저장한다.
+        userRepository.updateServerList(list);
+
+        //로그
+        System.out.println(targetServer.getName() + " 이(가) 삭제됩니다.");
         return true;
     }
 
@@ -177,6 +163,10 @@ public class FileUserService implements UserService {
         if (targetServer != null) {
             targetServer.setName(replaceName);
             userRepository.updateServerList(list);
+
+            //로그
+            System.out.println(targetName + " 이름이 " + targetServer.getName() + " 이(가) 됩니다.");
+
             return true;
         }
         System.out.println("업데이트할 서버가 존재하지 않습니다.");

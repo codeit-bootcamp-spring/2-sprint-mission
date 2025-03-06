@@ -13,6 +13,7 @@ public class JCFUserService implements UserService {
     private final Map<UUID, UserRepository> userTable = new HashMap<>();
 
     private JCFUserService() {
+        System.out.println("JCF User Service 가동");
     }
 
     public static JCFUserService getInstance() {
@@ -31,6 +32,7 @@ public class JCFUserService implements UserService {
     private UserRepository getUserRepository(UUID id) {
         UserRepository userRepository = userTable.get(id);
         if (userRepository == null) {
+            //주입 시점
             UserRepository repository = new JCFUserRepository();
             userTable.put(id, repository);
             userRepository = repository;
@@ -65,18 +67,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public Server getServer(UUID userId, String name) {
-        UserRepository JCFUserRepository = getUserRepository(userId);
-        List<Server> list = JCFUserRepository.getServerList();
-        for (Server server : list) {
-            if (server.getName().equals(name)) {
-                //로그
-                System.out.println(server.getName() + " 이(가) 반환됩니다.");
-                return server;
-            }
-        }
-        //로그
-        System.out.println("존재하지 않습니다.");
-        return null;
+        UserRepository userRepository = getUserRepository(userId);
+        List<Server> serverList = userRepository.getServerList();
+        return serverList.stream().filter(s -> s.getName().equals(name)).findFirst().orElse(null);
     }
 
     @Override
@@ -120,22 +113,24 @@ public class JCFUserService implements UserService {
     }
 
     private boolean removeServer(List<Server> list, String targetName) {
-        Server target = list.stream().filter(s -> s.getName().equals(targetName)).findFirst().orElse(null);
-        if (target != null) {
-            //로그
-            System.out.println(target.getName() + " 이(가) 삭제됩니다.");
-
-            list.remove(target);
-            return true;
+        Server targetServer = list.stream().filter(s -> s.getName().equals(targetName)).findFirst().orElse(null);
+        if (targetServer == null) {
+            System.out.println("삭제할 서버가 존재하지 않습니다.");
+            return false;
         }
-        System.out.println("존재하지 않습니다.");
-        return false;
+        list.remove(targetServer);
+
+        //로그
+        System.out.println(targetServer.getName() + " 이(가) 삭제됩니다.");
+
+        return true;
     }
 
     @Override
     public boolean updateServer(UUID userId) {
         UserRepository userRepository = getUserRepository(userId);
         List<Server> list = userRepository.getServerList();
+
         Scanner sc = new Scanner(System.in);
         System.out.print("바꿀려고 하는 서버의 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
@@ -146,8 +141,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public boolean updateServer(UUID userId, String targetName) {
-        UserRepository JCFUserRepository = getUserRepository(userId);
-        List<Server> list = JCFUserRepository.getServerList();
+        UserRepository userRepository = getUserRepository(userId);
+        List<Server> list = userRepository.getServerList();
         Scanner sc = new Scanner(System.in);
         System.out.print("서버 이름을 무엇으로 바꾸시겠습니까? : ");
         String replaceName = sc.nextLine();
@@ -157,8 +152,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public boolean updateServer(UUID userId, String targetName, String replaceName) {
-        UserRepository JCFUserRepository = getUserRepository(userId);
-        List<Server> list = JCFUserRepository.getServerList();
+        UserRepository userRepository = getUserRepository(userId);
+        List<Server> list = userRepository.getServerList();
         return updateServer(list, targetName, replaceName);
     }
 
@@ -171,14 +166,15 @@ public class JCFUserService implements UserService {
     }
 
     private boolean updateServer(List<Server> list, String targetName, String replaceName) {
-        Server target = list.stream().filter(s -> s.getName().equals(targetName)).findFirst().orElse(null);
-        if (target != null) {
-            target.setName(replaceName);
+        Server targetServer = list.stream().filter(s -> s.getName().equals(targetName))
+                .findFirst().orElse(null);
+        if (targetServer != null) {
+            targetServer.setName(replaceName);
             //로그
-            System.out.println(targetName + " 이름이 " + target.getName() + " 이(가) 됩니다.");
+            System.out.println(targetName + " 이름이 " + targetServer.getName() + " 이(가) 됩니다.");
             return true;
         }
-        System.out.println("존재하지 않습니다.");
+        System.out.println("업데이트할 서버가 존재하지 않습니다.");
         return false;
     }
 }

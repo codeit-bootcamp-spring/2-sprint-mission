@@ -69,7 +69,7 @@ public class FileChannelService implements ChannelService {
             return message;
         }
         //로그
-        System.out.println("존재하지 않습니다.");
+        System.out.println("해당 메시지가 존재하지 않습니다.");
         return null;
     }
 
@@ -113,6 +113,7 @@ public class FileChannelService implements ChannelService {
         }
         targetMessage.setStr(replaceName);
         channelRepository.updateMessageList(list);
+        System.out.println(targetName + " 이(가) " + targetMessage.getStr() + " 이(가) 됩니다.");
         return true;
     }
 }

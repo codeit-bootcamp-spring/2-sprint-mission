@@ -1,33 +1,20 @@
-package com.sprint.mission.discodeit.FrontEnd.Service;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.Factory.CreateUserFactory;
 import com.sprint.mission.discodeit.FrontEnd.DiscordRepository;
 import com.sprint.mission.discodeit.FrontEnd.DiscordService;
-import com.sprint.mission.discodeit.FrontEnd.Repository.FileDiscordRepository;
 import com.sprint.mission.discodeit.entity.User;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 
-public class FileDiscordService implements DiscordService {
-    private static volatile FileDiscordService instance;
-    DiscordRepository discordRepository = FileDiscordRepository.getInstance();
-    List<User> list = discordRepository.getUserList();
+public class BasicDiscordService implements DiscordService {
+    DiscordRepository discordRepository;
+    List<User> list;
 
-    private FileDiscordService() {
-    }
-
-    public static FileDiscordService getInstance() {
-        if (instance == null) {
-            synchronized (FileDiscordService.class) {
-                if (instance == null) {
-                    instance = new FileDiscordService();
-                }
-            }
-        }
-        return instance;
+    public BasicDiscordService(DiscordRepository discordRepository) {
+        this.discordRepository = discordRepository;
+        this.list = discordRepository.getUserList();
     }
 
     @Override
@@ -63,11 +50,11 @@ public class FileDiscordService implements DiscordService {
 
     @Override
     public User get(String targetName) {
-        for (User data : list) {
-            if (data.getName().equals(targetName)) {
-                System.out.println(data.getName() + " 유저 조회 성공");
-                return data;
-            }
+        User user = list.stream().filter(u -> u.getName().equals(targetName))
+                .findFirst().orElse(null);
+        if (user != null) {
+            System.out.println(user.getName() + " 유저 조회 성공");
+            return user;
         }
         System.out.println("해당 유저가 존재하지 않습니다.");
         return null;
@@ -100,15 +87,13 @@ public class FileDiscordService implements DiscordService {
             System.out.println("아무것도 저장되어있지 않습니다.");
             return false;
         }
-        for (User data : list) {
-            if (data.getName().equals(targetName)) {
-
-                list.remove(data);
-                discordRepository.updateUserList(list);
-
-                System.out.println(data.getName() + "유저 삭제 성공");
-                return true;
-            }
+        User user = list.stream().filter(u -> u.getName().equals(targetName))
+                .findFirst().orElse(null);
+        if (user != null) {
+            list.remove(user);
+            discordRepository.updateUserList(list);
+            System.out.println(user.getName() + "유저 삭제 성공");
+            return true;
         }
         System.out.println("해당 유저가 존재하지 않습니다.");
         return false;
@@ -120,11 +105,8 @@ public class FileDiscordService implements DiscordService {
             return;
         }
         System.out.println("\n==============유저 정보===================");
-        for (User data : list) {
-            System.out.println(data.getName());
-        }
+        list.forEach(u-> System.out.println(u.getName()));
         System.out.println("======================================\n");
-
     }
 
     @Override
@@ -172,13 +154,13 @@ public class FileDiscordService implements DiscordService {
 
     @Override
     public boolean update(String targetName, String replaceName) {
-        for (User data : list) {
-            if (data.getName().equals(targetName)) {
-                data.setName(replaceName);
-                discordRepository.updateUserList(list);
-                System.out.println(data.getName() + "유저 이름 변경 성공");
-                return true;
-            }
+        User user = list.stream().filter(u -> u.getName().equals(targetName))
+                .findFirst().orElse(null);
+        if (user != null) {
+            user.setName(replaceName);
+            discordRepository.updateUserList(list);
+            System.out.println(user.getName() + "유저 이름 변경 성공");
+            return true;
         }
         System.out.println("해당 유저가 존재하지 않습니다.");
         return false;
