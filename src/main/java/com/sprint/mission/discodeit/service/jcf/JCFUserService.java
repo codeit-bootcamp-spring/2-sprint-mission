@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
-
 public class JCFUserService implements UserService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;

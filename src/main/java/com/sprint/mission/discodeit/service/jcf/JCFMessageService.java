@@ -33,6 +33,7 @@ public class JCFMessageService implements MessageService {
         return messageRepository.findAll();
     }
 
+    @Override
     public List<Message> getUpdatedMessages() {
         return messageRepository.findUpdatedMessages();
     }
