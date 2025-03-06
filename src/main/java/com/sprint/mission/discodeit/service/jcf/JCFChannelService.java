@@ -46,7 +46,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
-        readChannel(channelId).updateChannelName(newChannelName);       //유효한 channelName인지에 대한 검증을 Channel entity의 updateChannelName()에 맡김.
+        jcfChannelRepository.updateChannelName(channelId, newChannelName);
     }
 
     @Override

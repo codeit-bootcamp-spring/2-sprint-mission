@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -47,7 +46,7 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
-        readChannel(channelId).updateChannelName(newChannelName);       //유효한 channelName인지에 대한 검증을 Channel entity의 updateChannelName()에 맡김.
+        fileChannelRepository.updateChannelName(channelId, newChannelName);
     }
 
     @Override
@@ -60,5 +59,4 @@ public class FileChannelService implements ChannelService {
     public void deleteChannel(UUID channelId) {
         fileChannelRepository.deleteById(channelId);
     }
-
 }
