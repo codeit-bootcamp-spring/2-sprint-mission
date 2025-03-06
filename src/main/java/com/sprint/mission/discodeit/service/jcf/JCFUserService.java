@@ -24,8 +24,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public Optional<User> getUserById(UUID userid) {
-        return Optional.ofNullable(data.get(userid));
+    public Optional<User> getUserById(UUID userId) {
+        return Optional.ofNullable(data.get(userId));
     }
 
     @Override

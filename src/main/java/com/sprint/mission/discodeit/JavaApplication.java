@@ -3,6 +3,12 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -14,9 +20,13 @@ public class JavaApplication {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        JCFUserService userService = JCFUserService.getInstance();
-        JCFChannelService channelService = JCFChannelService.getInstance();
-        JCFMessageService messageService = JCFMessageService.getInstance();
+//        JCFUserService userService = JCFUserService.getInstance();
+//        JCFChannelService channelService = JCFChannelService.getInstance();
+//        JCFMessageService messageService = JCFMessageService.getInstance();
+
+        UserService userService = FileUserService.getInstance();
+        ChannelService channelService = FileChannelService.getInstance();
+        MessageService messageService = FileMessageService.getInstance();
 
         while (true) {
             System.out.println("\n===== 메뉴 선택 =====");
