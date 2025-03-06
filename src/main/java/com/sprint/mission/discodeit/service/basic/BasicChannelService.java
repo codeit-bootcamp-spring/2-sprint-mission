@@ -43,6 +43,7 @@ public class BasicChannelService implements ChannelService {
 
     private Message write(ChannelRepository channelRepository, Message message) {
         channelRepository.save(message);
+        System.out.println("메시지 생성 : " + message.getStr());
         return message;
     }
 

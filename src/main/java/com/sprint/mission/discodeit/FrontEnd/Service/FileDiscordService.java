@@ -120,9 +120,7 @@ public class FileDiscordService implements DiscordService {
             return;
         }
         System.out.println("\n==============유저 정보===================");
-        for (User data : list) {
-            System.out.println(data.getName());
-        }
+        list.forEach(u-> System.out.println(u.getId() + " : " + u.getName()));
         System.out.println("======================================\n");
 
     }
@@ -172,13 +170,13 @@ public class FileDiscordService implements DiscordService {
 
     @Override
     public boolean update(String targetName, String replaceName) {
-        for (User data : list) {
-            if (data.getName().equals(targetName)) {
-                data.setName(replaceName);
-                discordRepository.updateUserList(list);
-                System.out.println(data.getName() + "유저 이름 변경 성공");
-                return true;
-            }
+        User user = list.stream().filter(u -> u.getName().equals(targetName))
+                .findFirst().orElse(null);
+        if (user != null) {
+            user.setName(replaceName);
+            discordRepository.updateUserList(list);
+            System.out.println(targetName +" 이(가) "+ user.getName() + " 으로 이름 변경 성공");
+            return true;
         }
         System.out.println("해당 유저가 존재하지 않습니다.");
         return false;

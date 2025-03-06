@@ -92,7 +92,7 @@ public class BasicDiscordService implements DiscordService {
         if (user != null) {
             list.remove(user);
             discordRepository.updateUserList(list);
-            System.out.println(user.getName() + "유저 삭제 성공");
+            System.out.println(user.getName() + " 유저 삭제 성공");
             return true;
         }
         System.out.println("해당 유저가 존재하지 않습니다.");
@@ -105,7 +105,7 @@ public class BasicDiscordService implements DiscordService {
             return;
         }
         System.out.println("\n==============유저 정보===================");
-        list.forEach(u-> System.out.println(u.getName()));
+        list.forEach(u-> System.out.println(u.getId() + " : " + u.getName()));
         System.out.println("======================================\n");
     }
 
@@ -159,7 +159,7 @@ public class BasicDiscordService implements DiscordService {
         if (user != null) {
             user.setName(replaceName);
             discordRepository.updateUserList(list);
-            System.out.println(user.getName() + "유저 이름 변경 성공");
+            System.out.println(targetName +" 이(가) "+ user.getName() + " 으로 이름 변경 성공");
             return true;
         }
         System.out.println("해당 유저가 존재하지 않습니다.");

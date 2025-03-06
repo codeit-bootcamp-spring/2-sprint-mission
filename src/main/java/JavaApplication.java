@@ -1,8 +1,6 @@
-import com.sprint.mission.discodeit.FrontEnd.DiscordRepository;
 import com.sprint.mission.discodeit.FrontEnd.DiscordService;
 import com.sprint.mission.discodeit.FrontEnd.Repository.FileDiscordRepository;
 import com.sprint.mission.discodeit.FrontEnd.Repository.JCFDiscordRepository;
-import com.sprint.mission.discodeit.FrontEnd.Service.FileDiscordService;
 import com.sprint.mission.discodeit.Repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.Repository.file.FileServerRepository;
 import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
@@ -20,10 +18,9 @@ import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicDiscordService;
 import com.sprint.mission.discodeit.service.basic.BasicServerService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileServerService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class JavaApplication {
@@ -33,10 +30,13 @@ public class JavaApplication {
         Server server2 = userService.createServer("server2");
         Server server3 = userService.createServer("server3");
 
+
         //서버 등록
-        userService.addServer(user.getId(), server1);
-        userService.addServer(user.getId(), server2);
-        userService.addServer(user.getId(), server3);
+        if (isJCF || !saveServerData) {
+            userService.addServer(user.getId(), server1);
+            userService.addServer(user.getId(), server2);
+            userService.addServer(user.getId(), server3);
+        }
 
         //서버 불러오기
         server1 = userService.getServer(user.getId(), "server1");
@@ -60,7 +60,11 @@ public class JavaApplication {
         userService.printServer(user.getId());
 
         //서버 삭제
-        userService.removeServer(user.getId(), "server3");
+        Server remove = userService.createServer("remove");
+        userService.addServer(user.getId(), remove);
+        userService.printServer(user.getId());
+
+        userService.removeServer(user.getId(), "remove");
         userService.printServer(user.getId());
 
         return server1;
@@ -73,15 +77,17 @@ public class JavaApplication {
         Channel channel2 = serverService.createChannel("channel2");
         Channel channel3 = serverService.createChannel("channel3");
 
-        //채널 등록
-        serverService.addChannel(server1.getId(),channel1);
-        serverService.addChannel(server1.getId(),channel2);
-        serverService.addChannel(server1.getId(),channel3);
 
+        //채널 등록
+        if (isJCF || !saveContainerData) {
+            serverService.addChannel(server1.getId(), channel1);
+            serverService.addChannel(server1.getId(), channel2);
+            serverService.addChannel(server1.getId(), channel3);
+        }
         //채널 불러오기
         channel1 = serverService.getChannel(server1.getId(), "channel1");
         channel2 = serverService.getChannel(server1.getId(), "channel2");
-       channel3 = serverService.getChannel(server1.getId(), "channel3");
+        channel3 = serverService.getChannel(server1.getId(), "channel3");
 
         // 모든 채널 조회
         serverService.printChannel(server1.getId());
@@ -98,7 +104,11 @@ public class JavaApplication {
         serverService.printChannel(server1.getId());
 
         // 채널 삭제
-        serverService.removeChannel(server1.getId(), "channel3");
+        Channel remove = serverService.createChannel("remove");
+        serverService.addChannel(server1.getId(), remove);
+        serverService.printChannel(server1.getId());
+
+        serverService.removeChannel(server1.getId(), "remove");
         serverService.printChannel(server1.getId());
 
         return channel1;
@@ -106,9 +116,11 @@ public class JavaApplication {
 
     public static void messageEngine(ChannelService channelService, Channel channel1) {
         // 채널 내 메시지 생성 및 저장
-        channelService.write(channel1.getId(), "hello");
-        channelService.write(channel1.getId(), "world");
-        channelService.write(channel1.getId(), "nice");
+        if (isJCF || ! saveMessageData) {
+            channelService.write(channel1.getId(), "hello");
+            channelService.write(channel1.getId(), "world");
+            channelService.write(channel1.getId(), "nice");
+        }
 
         //저장된 특정 메시지 조회하기
         Message getMessage = channelService.getMessage(channel1.getId(), "hello");
@@ -125,19 +137,26 @@ public class JavaApplication {
         channelService.printChannel(channel1.getId());
 
         // 특정 메시지 삭제
-        channelService.removeMessage(channel1.getId(), "nice");
+        channelService.write(channel1.getId(), "remove");
+        channelService.printChannel(channel1.getId());
+
+        channelService.removeMessage(channel1.getId(), "remove");
         channelService.printChannel(channel1.getId());
     }
 
     public static User userEngine(DiscordService discordService) {
-        //User 관련 기능 모음집
-        // 사용자 등록
-        // 사용자 이름과 비밀번호 받기
-        User user1 = discordService.create();
-        // 사용자의 이름만 받기
-        User user2 = discordService.create("user2");
-        User user3 = discordService.create("user3");
+        User user1;
+        User user2;
+        User user3;
 
+        // 사용자 등록
+        if (isJCF || !saveUserData) {
+            // 사용자 이름과 비밀번호 받기
+            user1 = discordService.create();
+            // 사용자의 이름만 받기
+            user2 = discordService.create("user2");
+            user3 = discordService.create("user3");
+        }
 
         //유저 불러오기
         user1 = discordService.get("user1");
@@ -159,15 +178,28 @@ public class JavaApplication {
         discordService.print();
 
         //삭제
-        discordService.remove(user3);
+        User remove = discordService.create("remove");
+        discordService.print();
+
+        discordService.remove(remove);
         discordService.print();
 
         return user1;
     }
 
-    static boolean isAuto = true;
+    //저장된 값 존재여부 확인
+    static boolean saveUserData;
+    static boolean saveMessageData;
+    static boolean saveContainerData;
+    static boolean saveServerData;
+
+    static boolean isJCF = false;
 
     public static void main(String[] args) {
+        saveUserData = Files.exists(Paths.get(System.getProperty("user.dir"), "data", "UserList.ser"));
+        saveServerData = Files.exists(Paths.get(System.getProperty("user.dir"), "data", "serverList.ser"));
+        saveContainerData = Files.exists(Paths.get(System.getProperty("user.dir"), "data", "ContainerList.ser"));
+        saveMessageData = Files.exists(Paths.get(System.getProperty("user.dir"), "data", "MessageList.ser"));
         //초기 설정
         DiscordService discordService;
         UserService userService;
@@ -179,10 +211,10 @@ public class JavaApplication {
         System.out.print("1: JCF // 2: File : ");
         int i = sc.nextInt();
         sc.nextLine();
-
         switch (i) {
             case 1:
                 System.out.println("JCF 작동");
+                isJCF = true;
                 discordService = new BasicDiscordService(JCFDiscordRepository.getInstance());
                 userService = new BasicUserService(new JCFUserRepository());
                 serverService = new BasicServerService(new JCFServerRepository());
@@ -203,22 +235,6 @@ public class JavaApplication {
                 serverService = new BasicServerService(new FileServerRepository());
                 channelService = new BasicChannelService(new FileChannelRepository());
         }
-        /*
-                System.out.println("테스트를 위한 자동모드로 설정하시겠습니까?");
-        System.out.print("1: Auto // 2: Manual : ");
-        int j = sc.nextInt();
-        sc.nextLine();
-
-        if (j == 1) {
-            isAuto = true;
-        } else if (j == 2) {
-            isAuto = false;
-        } else {
-            System.out.println("잘못된 값을 입력하셨습니다.");
-            System.out.println("기본 셋팅인 Auto를 실행하겠습니다.");
-        }
-         */
-
         User user = userEngine(discordService);
         Server server = serverEngine(userService, user);
         Channel channel = channelEngine(serverService, server);

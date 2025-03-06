@@ -166,7 +166,7 @@ public class JCFDiscordService implements DiscordService {
                 .findFirst().orElse(null);
         if (user != null) {
             user.setName(replaceName);
-            System.out.println(user.getName() + "유저 이름 변경 성공");
+            System.out.println(targetName +" 이(가) "+ user.getName() + " 으로 이름 변경 성공");
             return true;
         }
         System.out.println("해당 유저가 존재하지 않습니다.");
