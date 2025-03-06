@@ -12,7 +12,7 @@ import java.io.ObjectOutputStream;
 public class FileChannelRepository implements ChannelRepository {
 
     @Override
-    public void channelSave(String channelName) {
+    public Channel channelSave(String channelName) {
         Channel channel = new Channel(channelName);
         try {
             String fileName = "channel.ser";
@@ -30,5 +30,6 @@ public class FileChannelRepository implements ChannelRepository {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return channel;
     }
 }

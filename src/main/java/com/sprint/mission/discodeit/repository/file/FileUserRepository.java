@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class FileUserRepository implements UserRepository {
     @Override
@@ -28,5 +31,25 @@ public class FileUserRepository implements UserRepository {
             e.printStackTrace();
         }
         return user;
+    }
+
+    @Override
+    public Optional<User> findUserById(UUID userUUID) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<User> findAllUser() {
+        return List.of();
+    }
+
+    @Override
+    public User updateUserNickname(UUID userUUID, String nickname) {
+        return null;
+    }
+
+    @Override
+    public boolean deleteUserById(UUID userUUID) {
+        return false;
     }
 }

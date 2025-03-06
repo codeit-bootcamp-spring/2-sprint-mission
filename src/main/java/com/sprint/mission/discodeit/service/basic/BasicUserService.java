@@ -4,14 +4,12 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class BasicUserService implements UserService {
 
-    private final List<User> userList = new ArrayList<>();
     private final UserRepository userRepository;
 
     public BasicUserService(UserRepository userRepository) {
@@ -27,16 +25,12 @@ public class BasicUserService implements UserService {
             return;
         }
 
-        userList.add(user);
-
         System.out.println("[성공]" + user);
     }
 
     @Override
     public User findByUser(UUID userUUID) {
-        return userList.stream()
-                .filter(user -> user.getId().equals(userUUID))
-                .findAny()
+        return userRepository.findUserById(userUUID)
                 .orElseGet(() -> {
                     System.out.println("[실패] 사용자가 존재하지 않습니다.");
                     return null;
@@ -45,8 +39,10 @@ public class BasicUserService implements UserService {
 
     @Override
     public Optional<List<User>> findAllUser() {
+        List<User> userList = userRepository.findAllUser();
+
         if (userList.isEmpty()) {
-            System.out.println("아이디가 존재하지 않습니다");
+            System.out.println("회원이 존재하지 않습니다");
             return Optional.empty();
         }
         return Optional.of(userList);
@@ -54,28 +50,24 @@ public class BasicUserService implements UserService {
 
     @Override
     public void update(UUID userUUID, String nickname) {
-        userList.stream()
-                .filter(user -> user.getId().equals(userUUID))
-                .findAny()
-                .ifPresentOrElse(
-                        (user) -> {
-                            user.updateNickname(nickname);
-                            System.out.println("[성공] 사용자 변경 완료");
-                        },
-                        () -> {
-                            System.out.println("[실패] 수정에 실패하였습니다.");
-                        }
-                );
+        User user = userRepository.updateUserNickname(userUUID, nickname);
+        if (user == null) {
+            System.out.println("[실패] 닉네임 변경을 실패하였습니다.");
+            return;
+        }
+
+        System.out.println("[성공]" + user);
+
     }
 
     @Override
     public void delete(UUID uuid) {
-        boolean removed = userList.removeIf(user -> user.getId().equals(uuid));
-        if (!removed) {
-            System.out.println("[실패]존재하지 않는 사용자");
-        } else {
-            System.out.println("[성공]사용자 삭제 완료");
+        boolean isDeleted = userRepository.deleteUserById(uuid);
+        if (!isDeleted) {
+            System.out.println("삭제 실패");
+            return;
         }
+        System.out.println("[성공]");
     }
 
     @Override
