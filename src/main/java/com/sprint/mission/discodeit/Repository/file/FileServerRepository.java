@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.Repository.ServerRepository;
-import com.sprint.mission.discodeit.entity.Container.Container;
+import com.sprint.mission.discodeit.entity.Channel;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -11,11 +11,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FileServerRepository implements ServerRepository {
-    private List<Container> containerList;
+    private List<Channel> channelList;
     private final Path path =  Paths.get(System.getProperty("user.dir"), "data", "ContainerList.ser");
 
     public FileServerRepository() {
-        containerList = new LinkedList<>();
+        channelList = new LinkedList<>();
         loadContainerList();
     }
 
@@ -38,10 +38,10 @@ public class FileServerRepository implements ServerRepository {
             try (FileInputStream fis = new FileInputStream(path.toFile());
                  ObjectInputStream ois = new ObjectInputStream(fis)) {
 
-                List<Container> list = (List<Container>) ois.readObject();
-                for (Container data : list) {
-                    Container c = new Container(data.getId(), data.getCreatedAt(), data.getName());
-                    this.containerList.add(c);
+                List<Channel> list = (List<Channel>) ois.readObject();
+                for (Channel data : list) {
+                    Channel c = new Channel(data.getId(), data.getCreatedAt(), data.getName());
+                    this.channelList.add(c);
                     System.out.println("채널 로드 완료 - ID 유지: " + c.getId());
                 }
 
@@ -53,8 +53,8 @@ public class FileServerRepository implements ServerRepository {
         }
     }
 
-    public void save(Container container) {
-        containerList.add(container);
+    public void save(Channel channel) {
+        channelList.add(channel);
         saveChannelList();
     }
 
@@ -64,7 +64,7 @@ public class FileServerRepository implements ServerRepository {
         try (FileOutputStream fos = new FileOutputStream(path.toFile());
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
-            oos.writeObject(containerList);
+            oos.writeObject(channelList);
 
         } catch (IOException e) {
             System.out.println("채널 리스트 저장 실패");
@@ -72,13 +72,13 @@ public class FileServerRepository implements ServerRepository {
         }
     }
 
-    public void updateContainerList(List<Container> containerList) {
-        this.containerList = containerList;
+    public void updateContainerList(List<Channel> channelList) {
+        this.channelList = channelList;
         saveChannelList();
     }
 
-    public List<Container> getContainerList() {
-        return containerList;
+    public List<Channel> getContainerList() {
+        return channelList;
     }
 
 

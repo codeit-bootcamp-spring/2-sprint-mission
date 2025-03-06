@@ -1,11 +1,11 @@
-package com.sprint.mission.discodeit.entity.Container;
+package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-public class Container implements Serializable {
+public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
@@ -16,11 +16,11 @@ public class Container implements Serializable {
     private String name;
 
 
-    public Container(String name) {
+    public Channel(String name) {
         this(UUID.randomUUID(), System.currentTimeMillis(), name);
     }
 
-    public Container(UUID id, Long createdAt, String name) {
+    public Channel(UUID id, Long createdAt, String name) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;

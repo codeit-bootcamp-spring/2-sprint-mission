@@ -1,23 +1,23 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.Repository.ServerRepository;
-import com.sprint.mission.discodeit.entity.Container.Container;
+import com.sprint.mission.discodeit.entity.Channel;
 
 import java.util.List;
 
 public class JCFServerRepository implements ServerRepository  {
-    private List<Container> list;
+    private List<Channel> list;
 
-    public void save(Container container) {
-        list.add(container);
+    public void save(Channel channel) {
+        list.add(channel);
     }
 
-    public List<Container> getContainerList() {
+    public List<Channel> getContainerList() {
         return list;
     }
 
     @Override
-    public void updateContainerList(List<Container> containerList) {
-        this.list = containerList;
+    public void updateContainerList(List<Channel> channelList) {
+        this.list = channelList;
     }
 }

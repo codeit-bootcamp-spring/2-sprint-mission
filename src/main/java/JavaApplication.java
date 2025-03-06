@@ -2,7 +2,7 @@ import com.sprint.mission.discodeit.FrontEnd.DiscordRepository;
 import com.sprint.mission.discodeit.FrontEnd.DiscordService;
 import com.sprint.mission.discodeit.FrontEnd.Repository.FileDiscordRepository;
 import com.sprint.mission.discodeit.FrontEnd.Service.FileDiscordService;
-import com.sprint.mission.discodeit.entity.Container.Container;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -53,7 +53,7 @@ public class JavaApplication {
         return server1;
     }
 
-    public static Container channelEngine(ServerService serverService, Server server1) {
+    public static Channel channelEngine(ServerService serverService, Server server1) {
         // 채널 생성
 //        Channel channel1 = serverService.createChannel("Channel1");
 //        Channel channel2 = serverService.createChannel("Channel2");
@@ -65,15 +65,15 @@ public class JavaApplication {
 //        serverService.addChannel(server1.getId(),channel3);
 
         //채널 불러오기
-        Container channel1 = serverService.getChannel(server1.getId(), "Channel1");
-        Container channel2 = serverService.getChannel(server1.getId(), "Channel2");
-        Container channel3 = serverService.getChannel(server1.getId(), "Channel3");
+        Channel channel1 = serverService.getChannel(server1.getId(), "Channel1");
+        Channel channel2 = serverService.getChannel(server1.getId(), "Channel2");
+        Channel channel3 = serverService.getChannel(server1.getId(), "Channel3");
 
         // 모든 채널 조회
         serverService.printChannel(server1.getId());
 
         // 특정 채널 조회
-        Container getChannel = serverService.getChannel(server1.getId(), "Channel1");
+        Channel getChannel = serverService.getChannel(server1.getId(), "Channel1");
         System.out.println("getChannel = \n" + getChannel);
 
         // 채널명 수정
@@ -90,7 +90,7 @@ public class JavaApplication {
         return channel1;
     }
 
-    public static void messageEngine(ChannelService channelService, Container channel1) {
+    public static void messageEngine(ChannelService channelService, Channel channel1) {
         // 채널 내 메시지 생성 및 저장
 //        channelService.write(channel1.getId(), "hello");
 //        channelService.write(channel1.getId(), "world");
@@ -163,7 +163,7 @@ public class JavaApplication {
         //        MessageService messageService = JCFMessageService.getInstance();
         User user = userEngine(discordService, discordRepository);
         Server server = serverEngine(userService, user);
-        Container channel = channelEngine(serverService, server);
+        Channel channel = channelEngine(serverService, server);
         messageEngine(channelService, channel);
     }
 }
