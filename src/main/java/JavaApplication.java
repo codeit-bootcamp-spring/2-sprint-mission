@@ -29,9 +29,9 @@ import java.util.Scanner;
 public class JavaApplication {
     public static Server serverEngine(UserService userService, User user) {
         //서버 생성
-        Server server1 = userService.createServer("Server1");
-        Server server2 = userService.createServer("Server2");
-        Server server3 = userService.createServer("Server3");
+        Server server1 = userService.createServer("server1");
+        Server server2 = userService.createServer("server2");
+        Server server3 = userService.createServer("server3");
 
         //서버 등록
         userService.addServer(user.getId(), server1);
@@ -39,28 +39,28 @@ public class JavaApplication {
         userService.addServer(user.getId(), server3);
 
         //서버 불러오기
-        server1 = userService.getServer(user.getId(), "Server1");
-        server2 = userService.getServer(user.getId(), "Server2");
-        server3 = userService.getServer(user.getId(), "Server3");
+        server1 = userService.getServer(user.getId(), "server1");
+        server2 = userService.getServer(user.getId(), "server2");
+        server3 = userService.getServer(user.getId(), "server3");
 
         //유저가 가지고 있는 서버 조회
         userService.printServer(user.getId());
 
 
         // 특정 데이터 조회
-        Server getServer = userService.getServer(user.getId(), "Server1");
+        Server getServer = userService.getServer(user.getId(), "server1");
         System.out.println("getServer = \n" + getServer);
 
         // 서버 수정
-        userService.updateServer(user.getId(), "Server3", "replaceServer");
+        userService.updateServer(user.getId(), "server3", "replaceServer");
         userService.printServer(user.getId());
 
         //서버명 복원
-        userService.updateServer(user.getId(), "replaceServer", "Server3");
+        userService.updateServer(user.getId(), "replaceServer", "server3");
         userService.printServer(user.getId());
 
         //서버 삭제
-        userService.removeServer(user.getId(), "Server3");
+        userService.removeServer(user.getId(), "server3");
         userService.printServer(user.getId());
 
         return server1;
@@ -69,9 +69,9 @@ public class JavaApplication {
 
     public static Channel channelEngine(ServerService serverService, Server server1) {
         // 채널 생성
-        Channel channel1 = serverService.createChannel("Channel1");
-        Channel channel2 = serverService.createChannel("Channel2");
-        Channel channel3 = serverService.createChannel("Channel3");
+        Channel channel1 = serverService.createChannel("channel1");
+        Channel channel2 = serverService.createChannel("channel2");
+        Channel channel3 = serverService.createChannel("channel3");
 
         //채널 등록
         serverService.addChannel(server1.getId(),channel1);
@@ -79,26 +79,26 @@ public class JavaApplication {
         serverService.addChannel(server1.getId(),channel3);
 
         //채널 불러오기
-        channel1 = serverService.getChannel(server1.getId(), "Channel1");
-        channel2 = serverService.getChannel(server1.getId(), "Channel2");
-       channel3 = serverService.getChannel(server1.getId(), "Channel3");
+        channel1 = serverService.getChannel(server1.getId(), "channel1");
+        channel2 = serverService.getChannel(server1.getId(), "channel2");
+       channel3 = serverService.getChannel(server1.getId(), "channel3");
 
         // 모든 채널 조회
         serverService.printChannel(server1.getId());
 
         // 특정 채널 조회
-        Channel getChannel = serverService.getChannel(server1.getId(), "Channel1");
+        Channel getChannel = serverService.getChannel(server1.getId(), "channel1");
         System.out.println("getChannel = \n" + getChannel);
 
         // 채널명 수정
-        serverService.updateChannel(server1.getId(), "Channel3", "replaceChannel");
+        serverService.updateChannel(server1.getId(), "channel3", "replaceChannel");
         serverService.printChannel(server1.getId());
 
-        serverService.updateChannel(server1.getId(), "replaceChannel", "Channel3");
+        serverService.updateChannel(server1.getId(), "replaceChannel", "channel3");
         serverService.printChannel(server1.getId());
 
         // 채널 삭제
-        serverService.removeChannel(server1.getId(), "Channel3");
+        serverService.removeChannel(server1.getId(), "channel3");
         serverService.printChannel(server1.getId());
 
         return channel1;
@@ -135,27 +135,27 @@ public class JavaApplication {
         // 사용자 이름과 비밀번호 받기
         User user1 = discordService.create();
         // 사용자의 이름만 받기
-        User user2 = discordService.create("User2");
-        User user3 = discordService.create("User3");
+        User user2 = discordService.create("user2");
+        User user3 = discordService.create("user3");
 
 
         //유저 불러오기
-        user1 = discordService.get("User1");
-        user2 = discordService.get("User2");
-        user3 = discordService.get("User3");
+        user1 = discordService.get("user1");
+        user2 = discordService.get("user2");
+        user3 = discordService.get("user3");
 
         // 사용자 조회
         discordService.print();
 
         // 특정 데이터 조회
-        User getUser = discordService.get("User3");
+        User getUser = discordService.get("user3");
         System.out.println("get = \n" + getUser);
 
         // 수정
-        discordService.update("User3", "replaceUser");
+        discordService.update("user3", "replaceUser");
         discordService.print();
 
-        discordService.update("replaceUser", "User3");
+        discordService.update("replaceUser", "user3");
         discordService.print();
 
         //삭제
@@ -203,6 +203,21 @@ public class JavaApplication {
                 serverService = new BasicServerService(new FileServerRepository());
                 channelService = new BasicChannelService(new FileChannelRepository());
         }
+        /*
+                System.out.println("테스트를 위한 자동모드로 설정하시겠습니까?");
+        System.out.print("1: Auto // 2: Manual : ");
+        int j = sc.nextInt();
+        sc.nextLine();
+
+        if (j == 1) {
+            isAuto = true;
+        } else if (j == 2) {
+            isAuto = false;
+        } else {
+            System.out.println("잘못된 값을 입력하셨습니다.");
+            System.out.println("기본 셋팅인 Auto를 실행하겠습니다.");
+        }
+         */
 
         User user = userEngine(discordService);
         Server server = serverEngine(userService, user);
