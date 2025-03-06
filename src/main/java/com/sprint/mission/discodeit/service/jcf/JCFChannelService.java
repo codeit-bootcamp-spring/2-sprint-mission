@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -51,9 +50,9 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void addChannelParticipant(UUID channelId, User newParticipant) {        // channelId 검증은 channelRepository 에서 수행
-        UserService.validateUserId(newParticipant.getId(), this.jcfUserRepository);
-        jcfChannelRepository.addParticipant(channelId, newParticipant);
+    public void addChannelParticipant(UUID channelId, UUID newParticipantId) {        // channelId 검증은 channelRepository 에서 수행
+        UserService.validateUserId(newParticipantId, this.jcfUserRepository);
+        jcfChannelRepository.addParticipant(channelId, newParticipantId);
     }
 
     @Override

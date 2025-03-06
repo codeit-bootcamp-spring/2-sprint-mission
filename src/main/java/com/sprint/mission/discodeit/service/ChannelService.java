@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
@@ -13,7 +12,7 @@ public interface ChannelService {
     Map<UUID, Channel> readAllChannels();
     List<Message> readMessageListByChannelId(UUID channelId);
     void updateChannelName(UUID channelId, String newChannelName);
-    void addChannelParticipant(UUID channelId, User newParticipant);
+    void addChannelParticipant(UUID channelId, UUID newParticipantId);
     void deleteChannel(UUID channelId);
     static void validateChannelId(UUID channelId, ChannelRepository jcfChannelRepository) {
         if (!jcfChannelRepository.existsById(channelId)) {
