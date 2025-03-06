@@ -50,8 +50,8 @@ public class JCFChannelService implements ChannelService {
     @Override
     public ChannelDto addMember(UUID id, String email) {
         Channel channel = channelRepository.findById(id);
-        UserDto user = userService.findByEmail(email);
-        channel.addMember(user.id());
+        UserDto friend = userService.findByEmail(email);
+        channel.addMember(friend.id());
         channelRepository.save(channel);
 
         return toDto(channel);

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
+import static com.sprint.mission.discodeit.config.ChannelInfo.CHANNEL_NAME;
+import static com.sprint.mission.discodeit.config.ChannelInfo.UPDATED_CHANNEL_NAME;
 import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,8 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ChannelServiceTest {
-    private static final String NAME = "7팀";
-    private static final String UPDATED_CHANNEL_NAME = "7팀 스터디";
     private ChannelService channelService;
     private ChannelDto setUpChannel;
 
@@ -29,13 +29,13 @@ class ChannelServiceTest {
                 new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
 
         channelService = new JCFChannelService(new JCFChannelRepository(), new JCFUserService(userRepository));
-        setUpChannel = channelService.create(NAME,
+        setUpChannel = channelService.create(CHANNEL_NAME,
                 new UserDto(user.getId(), LONGIN_USER.getName(), LONGIN_USER.getEmail()));
     }
 
     @Test
     void 채널_생성() {
-        assertThat(setUpChannel.name()).isEqualTo(NAME);
+        assertThat(setUpChannel.name()).isEqualTo(CHANNEL_NAME);
     }
 
     @Test
