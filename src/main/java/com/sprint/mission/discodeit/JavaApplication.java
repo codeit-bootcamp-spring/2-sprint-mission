@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -11,8 +13,8 @@ import java.util.UUID;
 public class JavaApplication {
 
     public static void main(String[] args) {
-        JCFUserService userService = new JCFUserService();
-        JCFChannelService channelService = new JCFChannelService();
+        UserService userService = JCFUserService.getInstance();
+        JCFChannelService channelService = JCFChannelService.getInstance();
         JCFMessageService messageService = new JCFMessageService(userService, channelService);
 
 
@@ -48,7 +50,10 @@ public class JavaApplication {
                     System.out.print("Enter Channel: ");
                     String channel = scanner.nextLine();
 
-                    Message message = new Message(userService.findByUserId(userService.findByUsername(sender)),content,userService.findByUserId(userService.findByUsername(receiver)),channelService.findChannelIdByName(channel));
+                    User senderEntity = userService.userfindByName(sender);
+                    User receiverEntity = userService.userfindByName(receiver);
+
+                    Message message = new Message(senderEntity,content,receiverEntity,channelService.findChannelIdByName(channel));
                     messageService.sendMessage(message);
                     break;
                 case 2:
@@ -113,7 +118,12 @@ public class JavaApplication {
                     System.out.print("Enter Channel name: ");
                     String channelName2 = scanner.nextLine();
 
-                    channelService.createChannel(channelName2);
+                    JCFChannelService channelService1 = JCFChannelService.getInstance();
+                    if (channelService1 == null) {
+                        System.out.println("Failed to get channelService instance.");
+                    } else {
+                        channelService1.createChannel(channelName2);
+                    }
                     break;
                 case 0:
                     running = false;

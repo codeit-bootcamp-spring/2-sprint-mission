@@ -9,12 +9,30 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
+    private static volatile JCFChannelService instance;
     final Map<UUID, Channel> channelsRepository = new HashMap<>();
     final Map<String,UUID> channelNameToIdRepository = new HashMap<>();
 
-    JCFUserService userRepository = new JCFUserService();
+    private final JCFUserService userRepository = JCFUserService.getInstance();
+    private JCFChannelService() {}
+    public static JCFChannelService getInstance() {
+        if (instance == null) {
+            synchronized (JCFChannelService.class) {
+                if (instance == null) {
+                    instance = new JCFChannelService();
+                }
+            }
+        }
+        return instance;
+    }
+
     @Override
     public void createChannel(String channelName) {
+        if (channelNameToIdRepository.containsKey(channelName)) {
+            System.out.println("A channel with this name already exists.");
+            return; 
+        }
+
         Channel newChannel =new Channel(channelName);
         channelsRepository.put(newChannel.getId(), newChannel);
         channelNameToIdRepository.put(newChannel.getChannelName(), newChannel.getId());

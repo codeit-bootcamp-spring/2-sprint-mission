@@ -9,8 +9,23 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
+    private static volatile JCFUserService instance;
     final Map<UUID,User> userRepository = new HashMap<>();
     final Map<String,UUID> userNameToIdRepository = new HashMap<>();
+
+    private JCFUserService() {}
+
+    public static JCFUserService getInstance() {
+        if (instance == null) {
+            synchronized (JCFUserService.class) {
+                if (instance == null) {
+                    instance = new JCFUserService();
+                }
+            }
+        }
+        return instance;
+    }
+
     @Override
     public void createUser(String userName, Channel channel) {
         if(channel == null) {
@@ -32,5 +47,10 @@ public class JCFUserService implements UserService {
     @Override
     public UUID findByUsername(String username) {
         return userNameToIdRepository.get(username);
+    }
+
+    @Override
+    public User userfindByName(String username) {
+        return userRepository.get(userNameToIdRepository.get(username));
     }
 }

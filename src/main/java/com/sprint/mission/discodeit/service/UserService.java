@@ -9,4 +9,5 @@ public interface UserService {
     void createUser(String username, Channel channel);
     User findByUserId(UUID userId);
     UUID findByUsername(String username);
+    User userfindByName(String username);
 }

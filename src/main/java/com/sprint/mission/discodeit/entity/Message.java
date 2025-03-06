@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-public class Message {
-    private final UUID messageId;
-    private final long createdAt;
+public class Message extends BaseEntity {
     private long updatedAt;
     private String content;
 
@@ -12,8 +10,17 @@ public class Message {
     private User receiver;
     private UUID toChannelId;
 
+    private static final boolean SOME_VALUE_IS_NULL = Boolean.TRUE;
+    private static final boolean ALL_PARAMS_HAS_VALUE = Boolean.FALSE;
+
+    public Message() {
+        super(UUID.randomUUID(),System.currentTimeMillis());
+        this.updatedAt = System.currentTimeMillis();
+    }
+
     public Message(User user,String content,User receiver,UUID toChannelId) {
-        if(user == null || receiver == null  || toChannelId == null) {
+        this();
+        if(checkRequiredField(user,receiver,toChannelId)==SOME_VALUE_IS_NULL) {
             throw new IllegalArgumentException("User and Receiver,channel are required");
         }
         this.user = user;
@@ -21,19 +28,12 @@ public class Message {
         this.receiver=receiver;
         this.toChannelId=toChannelId;
 
-        this.createdAt = System.currentTimeMillis();
         this.updatedAt = System.currentTimeMillis();
-        this.messageId=UUID.randomUUID();
     }
 
-    public UUID getMessageId() {
-        return messageId;
+    private boolean checkRequiredField(User user,User receiver,UUID toChannelId) {
+        return (user==null || receiver==null || toChannelId==null)? SOME_VALUE_IS_NULL :ALL_PARAMS_HAS_VALUE;
     }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
 
     public long getUpdatedAt() {
         return updatedAt;
@@ -80,8 +80,8 @@ public class Message {
     @Override
     public String toString() {
         return "Message{" +
-                "messageId=" + messageId +
-                ", createdAt=" + createdAt +
+                "messageId=" + getId() +
+                ", createdAt=" + getCreatedAt() +
                 ", updatedAt=" + updatedAt +
                 ", content='" + content + '\'' +
                 ", user=" + user +

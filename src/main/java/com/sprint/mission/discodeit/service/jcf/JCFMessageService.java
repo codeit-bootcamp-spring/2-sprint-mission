@@ -1,27 +1,36 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    private final JCFUserService userService;
-    private  final JCFChannelService channelService;
+    private final UserService userService;
+    private  final ChannelService channelService;
     Map<UUID, Message> messagesRepository = new HashMap<>();
 
-    public JCFMessageService(JCFUserService userService, JCFChannelService channelService) {
+    public JCFMessageService(UserService userService, ChannelService channelService) {
         this.userService= userService;
         this.channelService = channelService;
     }
 
     @Override
     public boolean sendMessage(Message message) {
-        if(message.getUser().getChannel().getId().equals(message.getReceiver().getChannel().getId())){
+        UUID channelId = Optional.ofNullable(message)
+                .map(Message::getUser)
+                .map(User::getChannel)
+                .map(Channel::getId)
+                .orElseThrow(()-> new IllegalArgumentException("Invaild user or channel"));
+        if(channelId.equals(message.getReceiver().getChannel().getId())) {
             if(message.getContent()==null) {
                 return false;
             }
-            messagesRepository.put(message.getMessageId(),message);
+            messagesRepository.put(message.getId(),message);
             return true;
         }
         System.out.println("not same server");
@@ -48,7 +57,7 @@ public class JCFMessageService implements MessageService {
     public String createAllMessageContents() {
         StringBuilder result = new StringBuilder();
         for (Message message : findAllMessages()) {
-            result.append(message.getContent()).append(" id=(").append(message.getMessageId()).append(")").append("\n");
+            result.append(message.getContent()).append(" id=(").append(message.getId()).append(")").append("\n");
         }
         return result.toString();
     }
@@ -57,7 +66,7 @@ public class JCFMessageService implements MessageService {
     public String findOneMessage(UUID messageId) {
         String result = "";
         Message oneMessage =messagesRepository.get(messageId);
-        result += oneMessage.getContent() + " id=(" + oneMessage.getMessageId() + ")" + "\n";
+        result += oneMessage.getContent() + " id=(" + oneMessage.getId() + ")" + "\n";
         return result;
     }
 
@@ -72,7 +81,7 @@ public class JCFMessageService implements MessageService {
     public String displayEditmessages() {//출력 안됨
         StringBuilder result = new StringBuilder();
         for (Message message : findEditedMessages()) {
-            result.append(message.getContent()).append(" id=(").append(message.getMessageId()).append(")").append("\n");
+            result.append(message.getContent()).append(" id=(").append(message.getId()).append(")").append("\n");
         }
         return result.toString();
     }
