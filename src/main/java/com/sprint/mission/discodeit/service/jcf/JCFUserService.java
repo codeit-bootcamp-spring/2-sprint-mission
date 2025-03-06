@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND;
+
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.infra.UserRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +28,12 @@ public class JCFUserService implements UserService {
 
     @Override
     public UserDto findById(UUID id) {
-        return toDto(userRepository.findById(id));
+        User user = userRepository.findById(id);
+        if (user == null) {
+            throw new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent());
+        }
+
+        return toDto(user);
     }
 
     @Override

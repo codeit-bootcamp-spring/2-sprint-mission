@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.file;
 
+import static com.sprint.mission.config.FilePath.MESSAGE_FILE;
+import static com.sprint.mission.config.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
-import static com.sprint.mission.discodeit.constants.FilePath.MESSAGE_FILE;
-import static com.sprint.mission.discodeit.constants.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 

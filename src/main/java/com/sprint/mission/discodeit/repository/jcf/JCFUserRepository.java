@@ -1,10 +1,10 @@
-package com.sprint.mission.discodeit.infra.jcf;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND;
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.infra.UserRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

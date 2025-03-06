@@ -1,8 +1,8 @@
 package com.sprint.mission;
 
-import static com.sprint.mission.discodeit.constants.FilePath.CHANNEL_FILE;
-import static com.sprint.mission.discodeit.constants.FilePath.MESSAGE_FILE;
-import static com.sprint.mission.discodeit.constants.FilePath.USER_FILE;
+import static com.sprint.mission.config.FilePath.CHANNEL_FILE;
+import static com.sprint.mission.config.FilePath.MESSAGE_FILE;
+import static com.sprint.mission.config.FilePath.USER_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -18,7 +18,6 @@ class ApplicationTest extends ConsoleTestTemplate {
         Files.deleteIfExists(MESSAGE_FILE.getPath());
         Files.deleteIfExists(USER_FILE.getPath());
     }
-
 
     @Test
     void 초기_채널_생성_테스트() {

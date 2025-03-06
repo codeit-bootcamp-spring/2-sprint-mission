@@ -7,9 +7,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.infra.UserRepository;
-import com.sprint.mission.discodeit.infra.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.UUID;

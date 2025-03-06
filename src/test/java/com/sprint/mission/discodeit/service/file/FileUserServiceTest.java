@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.file;
 
+import static com.sprint.mission.config.FilePath.USER_FILE;
 import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
 import static com.sprint.mission.config.SetUpUserInfo.OTHER_USER;
-import static com.sprint.mission.discodeit.constants.FilePath.USER_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

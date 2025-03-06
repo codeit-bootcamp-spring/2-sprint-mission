@@ -1,9 +1,9 @@
-package com.sprint.mission.discodeit.infra.jcf;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.infra.MessageRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

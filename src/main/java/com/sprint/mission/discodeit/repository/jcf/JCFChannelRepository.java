@@ -1,9 +1,9 @@
-package com.sprint.mission.discodeit.infra.jcf;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.infra.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
