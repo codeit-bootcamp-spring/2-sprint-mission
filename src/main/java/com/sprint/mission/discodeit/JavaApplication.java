@@ -49,10 +49,9 @@ public class JavaApplication {
     }
 
     public static void main(String[] args) {
-        UserService userService = new BasicUserService(new FileUserRepository());
-        ChannelService channelService = new BasicChannelService(new FileChannelRepository());
-        MessageRepository messageRepository = new FileMessageRepository();
-        MessageService messageService = new BasicMessageService(messageRepository, channelService, userService);
+        UserService userService = new FileUserService(new FileUserRepository());
+        ChannelService channelService = new FileChannelService(new FileChannelRepository());
+        MessageService messageService = new FileMessageService(new FileMessageRepository(), channelService, userService);
 
         // 셋업
         User user = setupUser(userService);

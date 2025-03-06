@@ -8,7 +8,9 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
@@ -30,12 +32,15 @@ public class BasicMessageService implements MessageService {
             throw new IllegalArgumentException("유효하지 않은 채널 ID 또는 유저 ID입니다.", e);
         }
         Message message = new Message(content, channelId, userId);
-        return messageRepository.save(message);
+        messageRepository.save(message);
+        return message;
     }
 
     @Override
     public List<Message> findAll() {
-        return messageRepository.findAll();
+        return messageRepository.findAll().stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -46,10 +51,11 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message update(UUID messageId, String newContent) {
-        Message message = messageRepository.findById(messageId)
+        Message existingMessage = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("해당 메시지를 찾을 수 없습니다 : " + messageId));
-        message.update(newContent);
-        return messageRepository.update(message);
+        existingMessage.update(newContent);
+        messageRepository.save(existingMessage);
+        return existingMessage;
     }
 
     @Override

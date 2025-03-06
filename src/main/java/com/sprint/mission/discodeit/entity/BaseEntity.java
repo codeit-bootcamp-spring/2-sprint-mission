@@ -7,8 +7,8 @@ import java.util.UUID;
 public class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private UUID id;
-    private long createdAt;
+    private final UUID id;
+    private final long createdAt;
     private long updatedAt;
 
     public BaseEntity() {
