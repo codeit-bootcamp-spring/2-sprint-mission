@@ -29,13 +29,13 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) throws IOException {
-        testWithJCFRepo();
-//        testWithFileRepo();
+//        testWithJCFRepo();
+        testWithFileRepo();
     }
 
     private static void testWithJCFRepo() {
         System.out.println("=========== =========== =========== ===========");
-        System.out.println("=========== 인 메모리 테스트 ===========");
+        System.out.println("=========== JCF 테스트 ===========");
         System.out.println("=========== =========== =========== ===========");
         UserRepository jcfUserRepository = JCFUserRepository.getInstance();
         ChannelRepository jcfChannelRepository = JCFChannelRepository.getInstance();
