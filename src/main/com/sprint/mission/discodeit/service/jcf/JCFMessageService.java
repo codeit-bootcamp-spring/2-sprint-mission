@@ -21,40 +21,20 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void createMessage(String message, String username, String channelname){
-        UUID userid = null;
-        UUID channelid = null;
-        Map<UUID, User> temp = userservice.getAllUser();
-        for(User eachuser : temp.values()){
-            if(eachuser.getUsername().equals(username)){
-                userid = eachuser.getId();
-                break;
-            }
-        }
-        Map<UUID, Channel> temp2 = channelservice.getAllChannel();
-        for(Channel eachchannel : temp2.values()){
-            if(eachchannel.getName().equals(channelname)){
-                channelid = eachchannel.getId();
-                break;
-            }
-        }
-        if(userid == null || channelid == null){
-            System.out.println("user or channel name is error");
-            return false;
-        }
+    public void createMessage(String message, UUID userid, UUID channelid){
         Message newmessage = new Message(message, userid, channelid);
         messagemap.put(newmessage.getId(), newmessage);
-        return true;
     }
 
     @Override
-    public Optional<Message> getMessage(UUID id){
+    public Optional<Message> getOneMessage(UUID id){
         return Optional.ofNullable(messagemap.get(id));
     }
 
     @Override
     public List<Message> getAllMessage(){
-        return messagemap;
+        List<Message> messageList = new ArrayList<>(messagemap.values());
+        return messageList;
     }
 
     @Override

@@ -3,10 +3,7 @@ package main.com.sprint.mission.discodeit.service.jcf;
 import main.com.sprint.mission.discodeit.entity.Channel;
 import main.com.sprint.mission.discodeit.service.ChannelService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 // ChannelService interface를 참조하여 기능구현한다.
 public class JCFChannelService implements ChannelService {
@@ -21,8 +18,8 @@ public class JCFChannelService implements ChannelService {
         return Optional.ofNullable(channelmap.get(id));
     }
     public List<Channel> getAllChannel(){
-
-        return channelmap;
+        List<Channel> channelList = new ArrayList<Channel>(channelmap.values());
+        return channelList;
     }
     public void updateChannel(String newname, String newtopic, UUID id){
         channelmap.get(id).updateChannel(newname, newtopic);

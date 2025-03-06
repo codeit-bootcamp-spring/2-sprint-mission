@@ -21,11 +21,8 @@ public class JCFUserService implements UserService {
     // Read - 읽기, 조회
     @Override
     public List<User> getAllUser(){
-        List<User> userList = null;
-        for(Map.Entry<UUID, User> entry : usermap.entrySet()){
-            userList.add(entry.getValue());
-        }
-        return userList;
+        List<User> userList = new ArrayList<>(usermap.values());
+        return Optional.ofNullable(userList).orElse(Collections.emptyList());
     }
     @Override
     public Optional<User> getOneUser(UUID id){

@@ -2,6 +2,7 @@ package main.com.sprint.mission.discodeit.service;
 
 import main.com.sprint.mission.discodeit.entity.Message;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 // message도 id가 있다.
 public interface MessageService {
     // Create - 생성
-    createMessage(String message, String username, String channelname);
+    void createMessage(String message, UUID userid, UUID channelid);
     // Read - 읽기, 조회
     Optional<Message> getOneMessage(UUID id);
     List<Message> getAllMessage();
