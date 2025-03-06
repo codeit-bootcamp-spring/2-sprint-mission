@@ -5,8 +5,8 @@ import java.util.UUID;
 
 public class Message extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    private UUID senderId;  // User의 UUID 저장
-    private UUID channelId; // Channel의 UUID 저장
+    private final UUID senderId;  // User의 UUID 저장
+    private final UUID channelId; // Channel의 UUID 저장
     private String content;
 
     public Message(UUID senderId, UUID channelId, String content) {
@@ -20,16 +20,8 @@ public class Message extends BaseEntity implements Serializable {
         return senderId;
     }
 
-    public void updateSenderId(UUID senderId) {
-        this.senderId = senderId;
-    }
-
     public UUID getChannelId() {
         return channelId;
-    }
-
-    public void updateChannelId(UUID channelId) {
-        this.channelId = channelId;
     }
 
     public String getContent() {
@@ -38,6 +30,7 @@ public class Message extends BaseEntity implements Serializable {
 
     public void updateContent(String content) {
         this.content = content;
+        updateTimestamp();
     }
 
     @Override

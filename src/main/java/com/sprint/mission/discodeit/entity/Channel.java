@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class Channel extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+    private final Set<UUID> members;
+    private final Set<UUID> messages;
     private String channelName;
-    private Set<UUID> members;
-    private Set<UUID> messages;
 
     public Channel(String channelName) {
         super();
@@ -22,6 +24,7 @@ public class Channel extends BaseEntity implements Serializable {
 
     public void updateChannelName(String channelName) {
         this.channelName = channelName;
+        updateTimestamp();
     }
 
     public Set<UUID> getMembers() {
@@ -52,8 +55,8 @@ public class Channel extends BaseEntity implements Serializable {
         return this.members.contains(userId);
     }
 
-    public boolean isMessageInChannel(UUID MessageId) {
-        return this.messages.contains(MessageId);
+    public boolean isMessageInChannel(UUID messageId) {
+        return this.messages.contains(messageId);
     }
 
     @Override
