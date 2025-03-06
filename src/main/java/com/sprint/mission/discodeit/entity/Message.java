@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message extends BaseEntity {
+public class Message extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final UUID authorId;
     private final UUID channelId;
     private String content;
@@ -41,11 +43,11 @@ public class Message extends BaseEntity {
     @Override
     public String toString() {
         return "Message{" +
-                "id=" + id +
-                ", userId=" + authorId +
-                ", channelId=" + channelId +
+                "id=" + id + '\'' +
+                ", authorId=" + authorId + '\'' +
+                ", channelId=" + channelId + '\'' +
                 ", content='" + content + '\'' +
-                ", createdAt=" + createdAt +
+                ", createdAt=" + createdAt + '\'' +
                 ", updatedAt=" + updatedAt +
                 '}';
     }

@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends BaseEntity {
+import java.io.Serializable;
+
+public class Channel extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private ChannelType type;
     private String name;
     private String description;
@@ -43,9 +46,11 @@ public class Channel extends BaseEntity {
     @Override
     public String toString() {
         return "Channel{" +
-                "id=" + id +
+                "id=" + id + '\'' +
+                ", type=" + type + '\'' +
                 ", name='" + name + '\'' +
-                ", createdAt=" + createdAt +
+                ", description='" + description + '\'' +
+                ", createdAt=" + createdAt + '\'' +
                 ", updatedAt=" + updatedAt +
                 '}';
     }
