@@ -35,16 +35,16 @@ public class JavaApplication {
             System.out.println("ID: " + u.getId() + " | Name: " + u.getUsername());
         }
 
-        userService.updateUser(user1.getId(), "Park");
+        userService.updateUser(user3.getId(), "Ha");
         System.out.println("=== 유저 정보 수정 완료 ===");
-        System.out.println("Updated User 1: " + userService.getUser(user1.getId()).getUsername());
+        System.out.println("Updated User 3: " + userService.getUser(user3.getId()).getUsername());
 
 
         System.out.println("=== 유저 삭제 완료 ===");
 
         try {
-            userService.deleteUser(user1.getId());
-            System.out.println("유저 삭제 완료: " + user1.getId());
+            userService.deleteUser(user2.getId());
+            System.out.println("유저 삭제 완료: " + user2.getId());
         } catch (IllegalArgumentException e) {
             System.err.println("에러 발생: " + e.getMessage());
         }
