@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -14,20 +15,16 @@ public class JCFMessageService implements MessageService {
     private final UserService userService;
     private final ChannelService channelService;
 
-    public JCFMessageService(MessageRepository messageRepository, UserService userService, ChannelService channelService) {
-        this.messageRepository = messageRepository;
+    public JCFMessageService(UserService userService, ChannelService channelService) {
+        this.messageRepository = new JCFMessageRepository();
         this.userService = userService;
         this.channelService = channelService;
     }
 
     @Override
     public Message createMessage(UUID userId, UUID channelId, String content) {
-        if (userService.getUser(userId) == null) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
-        }
-        if (channelService.getChannel(channelId) == null) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
-        }
+        userService.getUser(userId);
+        channelService.getChannel(channelId);
 
         Message message = new Message(userId, channelId, content);
         messageRepository.save(message);
@@ -36,7 +33,11 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message getMessage(UUID id) {
-        return messageRepository.findById(id);
+        Message message = messageRepository.findById(id);
+        if (message == null) {
+            throw new IllegalArgumentException("존재하지 않는 메시지입니다.");
+        }
+        return message;
     }
 
     @Override
@@ -45,16 +46,15 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void deleteMessage(UUID id) {
-        messageRepository.delete(id);
+    public void updateMessage(UUID id, String newContent) {
+        Message message = getMessage(id);
+        message.updateContent(newContent);
+        messageRepository.save(message);
     }
 
     @Override
-    public void updateMessage(UUID id, String newContent) {
-        Message message = messageRepository.findById(id);
-        if (message != null) {
-            message.updateContent(newContent);
-            messageRepository.save(message);
-        }
+    public void deleteMessage(UUID id) {
+        getMessage(id);
+        messageRepository.delete(id);
     }
 }
