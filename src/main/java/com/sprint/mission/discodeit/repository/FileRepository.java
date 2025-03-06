@@ -8,7 +8,6 @@ import java.util.UUID;
 
 public interface FileRepository<T> {
     void saveToFile(T t);
-    Optional<T> loadOneFromFileById(UUID id);
     List<T> loadAllFromFile();
     void deleteFileById(UUID id);
 }

@@ -9,13 +9,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class FileChannelRepository implements ChannelRepository, FileRepository<Channel> {
     private static volatile FileChannelRepository instance;
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "channels");
+
+    // 조회할 떄 마다 파일 I/O를 이용해 로드하기 vs Map을 이용해 메모리에 저장해놓고 꺼내쓰기
+    private final Map<UUID, Channel> channelMap;
 
     public static FileChannelRepository getInstance() {
         if (instance == null) {
@@ -30,30 +33,31 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
 
     private FileChannelRepository() {
         SerializationUtil.init(directory);
+        channelMap = new ConcurrentHashMap<>(); // 멀티쓰레드 환경 고려
+        loadCacheFromFile(); // 서버 메모리와 파일 동기화
     }
 
 
-    // 조회할 떄 마다 파일 I/O를 이용해 로드하기 vs Map을 이용해 메모리에 저장해놓고 꺼내쓰기
-    // private final Map<UUID, Channel> channels = new HashMap<>();;
-
     @Override
     public Channel save(Channel channel) {
+        channelMap.put(channel.getId(), channel); // 메모리에 업데이트
         saveToFile(channel);
         return channel;
     }
 
     @Override
     public Optional<Channel> findById(UUID channelId) {
-        return loadOneFromFileById(channelId);
+        return Optional.ofNullable(channelMap.get(channelId));
     }
 
     @Override
     public List<Channel> findAll() {
-        return loadAllFromFile();
+        return new ArrayList<>(channelMap.values());
     }
 
     @Override
     public void deleteById(UUID channelId) {
+        channelMap.remove(channelId);
         deleteFileById(channelId);
     }
 
@@ -64,10 +68,6 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
         SerializationUtil.serialization(filePath, channel);
     }
 
-    @Override
-    public Optional<Channel> loadOneFromFileById(UUID channelId) {
-        return Optional.ofNullable(SerializationUtil.reverseOneSerialization(directory,channelId));
-    }
 
     @Override
     public List<Channel> loadAllFromFile() {
@@ -81,6 +81,14 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
             System.out.println("채널 파일 삭제 예외 발생 : " + e.getMessage());
+        }
+    }
+
+    // 서버 시작 시 기존 저장된 데이터 메모리에 캐싱
+    private void loadCacheFromFile() {
+        List<Channel> channels = SerializationUtil.reverseSerialization(directory);
+        for (Channel channel : channels) {
+            channelMap.put(channel.getId(), channel);
         }
     }
 }
