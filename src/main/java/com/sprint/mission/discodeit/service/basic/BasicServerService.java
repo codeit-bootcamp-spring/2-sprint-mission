@@ -9,7 +9,7 @@ import java.util.*;
 
 public class BasicServerService implements ServerService {
     private final Map<UUID, ServerRepository> serverTable = new HashMap<>();
-    ServerRepository repository;
+    private final ServerRepository repository;
 
     //생성될 때 어떤 repository 를 쓸 지 결정함
     public BasicServerService(ServerRepository repository) {

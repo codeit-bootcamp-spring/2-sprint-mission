@@ -9,7 +9,7 @@ import java.util.*;
 
 public class BasicUserService implements UserService {
     private final Map<UUID, UserRepository> userTable = new HashMap<>();
-    UserRepository repository;
+    private final UserRepository repository;
 
     //생성될 때 어떤 repository 를 쓸 지 결정함
     public BasicUserService(UserRepository repository) {

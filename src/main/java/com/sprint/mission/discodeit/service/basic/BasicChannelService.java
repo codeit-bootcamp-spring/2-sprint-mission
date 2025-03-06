@@ -8,7 +8,7 @@ import java.util.*;
 
 public class BasicChannelService implements ChannelService {
     private final Map<UUID, ChannelRepository> channelTable = new HashMap<>();
-    ChannelRepository repository;
+    private final ChannelRepository repository;
 
     public BasicChannelService(ChannelRepository repository) {
         this.repository = repository;

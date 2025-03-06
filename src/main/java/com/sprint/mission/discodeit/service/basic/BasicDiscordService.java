@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class BasicDiscordService implements DiscordService {
-    DiscordRepository discordRepository;
+    private final DiscordRepository discordRepository;
     List<User> list;
 
     public BasicDiscordService(DiscordRepository discordRepository) {
