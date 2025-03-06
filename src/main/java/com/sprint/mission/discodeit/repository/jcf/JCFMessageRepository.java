@@ -14,15 +14,13 @@ import java.util.stream.Collectors;
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> messageData = new HashMap<>();
 
-    private void checkById(UUID messageId) {
-        if (!(messageData.containsKey(messageId))) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
-        }
+
+    public boolean messageExists(UUID messageId) {
+        return !messageData.containsKey(messageId);
     }
 
     @Override
     public Message findById(UUID messageId) {
-        checkById(messageId);
         return messageData.get(messageId);
     }
 
@@ -49,14 +47,12 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public void updateMessage(UUID messageId, String messageContent) {
-        checkById(messageId);
         Message message = this.messageData.get(messageId);
         message.messageUpdate(messageContent);
     }
 
     @Override
     public void deleteMessage(UUID messageId) {
-        checkById(messageId);
         this.messageData.remove(messageId);
     }
 

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelRepository {
+    boolean channelExists(UUID channelId);
+
     Channel findById(UUID channelId);
 
     List<Channel> findAll();

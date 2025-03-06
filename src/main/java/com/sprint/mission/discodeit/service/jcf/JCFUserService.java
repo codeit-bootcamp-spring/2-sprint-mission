@@ -23,6 +23,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public User getUser(String userName) {
+        if (userRepository.userExists(userName)) {
+            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+        }
         return userRepository.findByName(userName);
     }
 
@@ -38,25 +41,30 @@ public class JCFUserService implements UserService {
 
     @Override
     public void registerUser(String userName, String nickName) {
+        if (!userRepository.userExists(userName)) {
+            throw new IllegalArgumentException("존재하는 사용자명입니다.");
+        }
         userRepository.createUser(userName, nickName);
     }
 
     @Override
     public void updateName(String oldUserName, String newUserName, String newNickName) {
+        if (userRepository.userExists(oldUserName)) {
+            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+        }
         userRepository.updateUser(oldUserName, newUserName, newNickName);
     }
 
     @Override
     public void deleteUser(String userName) {
-        // 1. userId를 가지는 Channel 리스트 가져오기
+        if (userRepository.userExists(userName)) {
+            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+        }
         List<UUID> channels = channelRepository.channelListByuserId(userRepository.findByName(userName).getId());
-        // 2. userId가지는 유저 삭제
         userRepository.deleteUser(userName);
-        // 3. 각 channelId를 가지는 message들 삭제
         for (UUID channelId : channels) {
             messageRepository.deleteMessagesByChannelId(channelId);
         }
-        // 4. channels 리스트 삭제 gk...
         channelRepository.deleteChannelList(channels);
     }
 }

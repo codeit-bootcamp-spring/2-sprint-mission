@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 
 public interface UserRepository {
+    boolean userExists(String userName);
+
     User findByName(String userName);
 
     List<User> findAll();

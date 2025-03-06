@@ -13,15 +13,13 @@ public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> userData = new HashMap<>();
     private final Map<String, UUID> userNameToId = new HashMap<>();
 
-    private void checkUserNameToId(String userName) {
-        if (!(userNameToId.containsKey(userName))) {
-            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
-        }
+    @Override
+    public boolean userExists(String userName) {
+        return !userNameToId.containsKey(userName);
     }
 
     @Override
     public User findByName(String userName) {
-        checkUserNameToId(userName);
         return userData.get(userNameToId.get(userName));
     }
 
@@ -42,9 +40,6 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void createUser(String userName, String nickName) {
-        if (userNameToId.containsKey(userName)) {
-            throw new IllegalArgumentException("존재하는 사용자명입니다.");
-        }
         User user = new User(userName, nickName);
         UUID uid = user.getId();
         userData.put(uid, user);
@@ -53,7 +48,6 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void updateUser(String oldUserName, String newUserName, String newNickName) {
-        checkUserNameToId(oldUserName);
         UUID uid = userNameToId.get(oldUserName);
         User user = userData.get(uid);
         user.userUpdate(newUserName, newNickName);
@@ -63,7 +57,6 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void deleteUser(String userName) {
-        checkUserNameToId(userName);
         UUID uid = userNameToId.get(userName);
         userData.remove(uid);
         userNameToId.remove(userName);

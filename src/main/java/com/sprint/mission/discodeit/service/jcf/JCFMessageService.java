@@ -22,6 +22,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message getMessage(UUID messageId) {
+        if (messageRepository.messageExists(messageId)) {
+            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
+        }
         return messageRepository.findById(messageId);
     }
 
@@ -36,17 +39,26 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void registerMessage(UUID channelId, String userName, String messageContent) {
+        if (channelRepository.channelExists(channelId)) {
+            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
+        }
         messageRepository.createMessage(channelRepository.findById(channelId), userRepository.findByName(userName),
                 messageContent);
     }
 
     @Override
     public void updateMessage(UUID messageId, String messageContent) {
+        if (messageRepository.messageExists(messageId)) {
+            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
+        }
         messageRepository.updateMessage(messageId, messageContent);
     }
 
     @Override
     public void deleteMessage(UUID messageId) {
+        if (messageRepository.messageExists(messageId)) {
+            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
+        }
         messageRepository.deleteMessage(messageId);
     }
 

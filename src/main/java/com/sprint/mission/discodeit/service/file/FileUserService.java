@@ -39,6 +39,9 @@ public class FileUserService implements UserService {
 
     @Override
     public User getUser(String userName) {
+        if (userRepository.userExists(userName)) {
+            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+        }
         return userRepository.findByName(userName);
     }
 
@@ -54,16 +57,25 @@ public class FileUserService implements UserService {
 
     @Override
     public void registerUser(String userName, String nickName) {
+        if (!userRepository.userExists(userName)) {
+            throw new IllegalArgumentException("존재하는 사용자명입니다.");
+        }
         userRepository.createUser(userName, nickName);
     }
 
     @Override
     public void updateName(String oldUserName, String newUserName, String newNickName) {
+        if (userRepository.userExists(oldUserName)) {
+            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+        }
         userRepository.updateUser(oldUserName, newUserName, newNickName);
     }
 
     @Override
     public void deleteUser(String userName) {
+        if (userRepository.userExists(userName)) {
+            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+        }
         List<UUID> channels = channelRepository.channelListByuserId(userRepository.findByName(userName).getId());
         userRepository.deleteUser(userName);
         for (UUID channelId : channels) {

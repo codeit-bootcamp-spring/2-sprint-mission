@@ -21,7 +21,8 @@ public class FileChannelRepository implements ChannelRepository {
     Path directory = Paths.get(System.getProperty("user.dir"),
             "src/main/java/com/sprint/mission/discodeit/data/Channel");
 
-    private boolean fileExists(UUID channelId) {
+    @Override
+    public boolean channelExists(UUID channelId) {
         return !Files.exists(directory.resolve(channelId + ".ser"));
     }
 
@@ -70,9 +71,6 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel findById(UUID channelId) {
-        if (fileExists(channelId)) {
-            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
-        }
         Path filePath = directory.resolve(channelId + ".ser");
         try (
                 FileInputStream fis = new FileInputStream(filePath.toFile());
@@ -106,9 +104,6 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void updateChannel(UUID channelId, String channelName) {
-        if (fileExists(channelId)) {
-            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
-        }
         Channel channel = findById(channelId);
         deleteChannelFile(channel.getId());
         channel.updateChannel(channelName);
@@ -117,9 +112,6 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteChannel(UUID channelId) {
-        if (fileExists(channelId)) {
-            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
-        }
         deleteChannelFile(channelId);
     }
 

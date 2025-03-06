@@ -19,8 +19,9 @@ public class FileUserRepository implements UserRepository {
     private final Path directory = Paths.get(System.getProperty("user.dir"),
             "src/main/java/com/sprint/mission/discodeit/data/User");
 
-    private boolean fileExists(String filename) {
-        return Files.exists(directory.resolve(filename + ".ser"));
+    @Override
+    public boolean userExists(String userName) {
+        return !Files.exists(directory.resolve(userName + ".ser"));
     }
 
     private void save(String userName, User user) {
@@ -68,10 +69,6 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User findByName(String userName) {
-        if (!fileExists(userName)) {
-            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
-        }
-
         Path filePath = directory.resolve(userName + ".ser");
         try (
                 FileInputStream fis = new FileInputStream(filePath.toFile());
@@ -99,18 +96,12 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void createUser(String userName, String nickName) {
-        if (fileExists(userName)) {
-            throw new IllegalArgumentException("존재하는 사용자명입니다.");
-        }
         User user = new User(userName, nickName);
         save(userName, user);
     }
 
     @Override
     public void updateUser(String oldUserName, String newUserName, String newNickName) {
-        if (!fileExists(oldUserName)) {
-            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
-        }
         User user = findByName(oldUserName);
         deleteUserFile(oldUserName);
         user.userUpdate(newUserName, newNickName);
@@ -119,9 +110,6 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void deleteUser(String userName) {
-        if (!fileExists(userName)) {
-            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
-        }
         deleteUserFile(userName);
     }
 

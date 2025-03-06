@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageRepository {
+    boolean messageExists(UUID messageId);
+
     Message findById(UUID messageId);
 
     List<Message> findAll();

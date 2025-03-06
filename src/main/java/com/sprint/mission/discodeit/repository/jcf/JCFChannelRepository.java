@@ -13,15 +13,13 @@ import java.util.stream.Collectors;
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> channelData = new HashMap<>();
 
-    private void checkById(UUID cid) {
-        if (!(channelData.containsKey(cid))) {
-            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
-        }
+    @Override
+    public boolean channelExists(UUID channelId) {
+        return !channelData.containsKey(channelId);
     }
 
     @Override
     public Channel findById(UUID channelId) {
-        checkById(channelId);
         return channelData.get(channelId);
     }
 
@@ -48,13 +46,11 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void updateChannel(UUID channelId, String channelName) {
-        checkById(channelId);
         channelData.get(channelId).updateChannel(channelName);
     }
 
     @Override
     public void deleteChannel(UUID channelId) {
-        checkById(channelId);
         channelData.remove(channelId);
     }
 

@@ -22,7 +22,8 @@ public class FileMessageRepository implements MessageRepository {
     Path directory = Paths.get(System.getProperty("user.dir"),
             "src/main/java/com/sprint/mission/discodeit/data/Message");
 
-    private boolean fileExists(UUID messageId) {
+    @Override
+    public boolean messageExists(UUID messageId) {
         return !Files.exists(directory.resolve(messageId + ".ser"));
     }
 
@@ -71,9 +72,6 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message findById(UUID messageId) {
-        if (fileExists(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
-        }
         Path filePath = directory.resolve(messageId + ".ser");
         try (
                 FileInputStream fis = new FileInputStream(filePath.toFile());
@@ -107,9 +105,6 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void updateMessage(UUID messageId, String messageContent) {
-        if (fileExists(messageId)) {
-            throw new IllegalArgumentException();
-        }
         Message message = findById(messageId);
         deleteMessageFile(message.getId());
         message.messageUpdate(messageContent);
@@ -118,9 +113,6 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void deleteMessage(UUID messageId) {
-        if (fileExists(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
-        }
         deleteMessageFile(messageId);
     }
 

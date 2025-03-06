@@ -39,6 +39,9 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public Channel getChannel(UUID channelId) {
+        if (channelRepository.channelExists(channelId)) {
+            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
+        }
         return channelRepository.findById(channelId);
     }
 
@@ -54,16 +57,25 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public void registerChannel(String channelName, String userName) {
+        if (userRepository.userExists(userName)) {
+            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+        }
         channelRepository.createChannel(channelName, userRepository.findByName(userName));
     }
 
     @Override
     public void updateChannel(UUID channelId, String channelName) {
+        if (channelRepository.channelExists(channelId)) {
+            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
+        }
         channelRepository.updateChannel(channelId, channelName);
     }
 
     @Override
     public void deleteChannel(UUID channelId) {
+        if (channelRepository.channelExists(channelId)) {
+            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
+        }
         channelRepository.deleteChannel(channelId);
         messageRepository.deleteMessagesByChannelId(channelId);
     }
