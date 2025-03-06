@@ -25,4 +25,14 @@ public class Message extends BaseEntity {
     public void setAuthorId(UUID authorId) {
         this.authorId = authorId;
     }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                super.toString() +
+                "content='" + content + '\'' +
+                ", channelId=" + channelId +
+                ", authorId=" + authorId +
+                '}';
+    }
 }

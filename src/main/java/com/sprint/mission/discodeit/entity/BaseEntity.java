@@ -33,10 +33,9 @@ public class BaseEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "BaseEntity{" +
+        return
                 "id=" + id +
                 ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+                ", updatedAt=" + updatedAt;
     }
 }
