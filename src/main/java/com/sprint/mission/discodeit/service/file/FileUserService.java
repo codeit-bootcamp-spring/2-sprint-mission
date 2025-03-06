@@ -42,7 +42,7 @@ public class FileUserService implements UserService {
         }
     }
 
-    public void updataUserData() {
+    public void updateUserData() {
         saveUser();
     }
 
@@ -99,7 +99,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void deleteChannel(UUID userID, UUID channelId) {
+    public void removeChannel(UUID userID, UUID channelId) {
         User user = getUserById(userID);
         user.removeJoinedChannel(channelId);
         saveUser();

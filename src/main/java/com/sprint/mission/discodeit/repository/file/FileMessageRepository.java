@@ -40,23 +40,23 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findById(UUID messageId) {
+    public Message findMessageById(UUID messageId) {
         return messages.get(messageId);
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<Message> findMessageAll() {
         return new ArrayList<>(messages.values());
     }
 
     @Override
-    public void delete(UUID messageId) {
+    public void deleteMessageById(UUID messageId) {
         messages.remove(messageId);
         saveFile();
     }
 
     @Override
-    public boolean exists(UUID messageId) {
+    public boolean existsById(UUID messageId) {
         return messages.containsKey(messageId);
     }
 }

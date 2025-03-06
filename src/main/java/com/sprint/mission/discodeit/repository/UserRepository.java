@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public interface UserRepository {
     void save(User user);
-    User findById(UUID userId);
-    List<User> findAll();
-    void deleteById(UUID userId);
-    boolean exists(UUID userId);
+    User findUserById(UUID userId);
+    List<User> findUserAll();
+    void deleteUserById(UUID userId);
+    boolean existsById(UUID userId);
 }

@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public interface MessageRepository {
     void save(Message message); // 메시지 저장
-    Message findById(UUID messageId); // 메시지 조회
-    List<Message> findAll(); // 모든 메시지 조회
-    void delete(UUID messageId); // 메시지 삭제
-    boolean exists(UUID messageId);
+    Message findMessageById(UUID messageId); // 메시지 조회
+    List<Message> findMessageAll(); // 모든 메시지 조회
+    void deleteMessageById(UUID messageId); // 메시지 삭제
+    boolean existsById(UUID messageId);
 }

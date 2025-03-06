@@ -6,8 +6,8 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> users = new HashMap<>();
     private static JCFUserService INSTANCE;
+    private final Map<UUID, User> users = new HashMap<>();
 
     private JCFUserService() {
     }
@@ -20,7 +20,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void updataUserData() {
+    public void updateUserData() {
 
     }
 
@@ -72,7 +72,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void deleteChannel(UUID userID, UUID channelId) {
+    public void removeChannel(UUID userID, UUID channelId) {
         User user = getUserById(userID);
         user.removeJoinedChannel(channelId);
     }

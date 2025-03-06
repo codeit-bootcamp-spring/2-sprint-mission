@@ -49,11 +49,15 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(UUID userId, UUID channelId, String content) {
-        userService.validateUserExists(userId);
+    public Message createMessage(UUID senderId, UUID channelId, String content) {
+        userService.validateUserExists(senderId);
         channelService.validateChannelExists(channelId);
 
-        Message message = new Message(userId, channelId, content);
+        if(!channelService.findChannelById(channelId).getMembers().contains(senderId)){
+            throw new IllegalStateException("유저가 채널에 속해있지 않음.");
+        }
+
+        Message message = new Message(senderId, channelId, content);
         channelService.addMessage(channelId, message.getId());
         channelService.updateChannelData();
         messages.put(message.getId(), message);

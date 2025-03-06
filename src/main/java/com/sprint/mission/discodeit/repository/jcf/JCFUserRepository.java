@@ -15,22 +15,22 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID userId) {
+    public User findUserById(UUID userId) {
         return users.get(userId);
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findUserAll() {
         return new ArrayList<>(users.values());
     }
 
     @Override
-    public void deleteById(UUID userId) {
+    public void deleteUserById(UUID userId) {
         users.remove(userId);
     }
 
     @Override
-    public boolean exists(UUID userId) {
+    public boolean existsById(UUID userId) {
         return users.containsKey(userId);
     }
 }

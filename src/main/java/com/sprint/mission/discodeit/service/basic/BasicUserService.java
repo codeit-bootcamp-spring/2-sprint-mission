@@ -23,53 +23,53 @@ public class BasicUserService implements UserService {
 
     @Override
     public User getUserById(UUID userId) {
-        return userRepository.findById(userId);
+        return userRepository.findUserById(userId);
     }
 
     @Override
     public String getUserNameById(UUID userId) {
-        return userRepository.findById(userId).getUsername();
+        return userRepository.findUserById(userId).getUsername();
     }
 
     @Override
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository.findUserAll();
     }
 
     @Override
-    public void updataUserData() {
+    public void updateUserData() {
 
     }
 
     @Override
     public void updateUsername(UUID userId, String newUsername) {
-        User user = userRepository.findById(userId);
+        User user = userRepository.findUserById(userId);
         user.updateUsername(newUsername);
         userRepository.save(user);
     }
 
     @Override
     public void addChannel(UUID userID, UUID channelId) {
-        User user = userRepository.findById(userID);
+        User user = userRepository.findUserById(userID);
         user.addJoinedChannel(channelId);
         userRepository.save(user);
     }
 
     @Override
     public void deleteUser(UUID userId) {
-        userRepository.deleteById(userId);
+        userRepository.deleteUserById(userId);
     }
 
     @Override
-    public void deleteChannel(UUID userId, UUID channelId) {
-    User user = userRepository.findById(userId);
+    public void removeChannel(UUID userId, UUID channelId) {
+    User user = userRepository.findUserById(userId);
         user.removeJoinedChannel(channelId);
     userRepository.save(user);
     }
 
     @Override
     public void validateUserExists(UUID userId) {
-        if(!userRepository.exists(userId)){
+        if(!userRepository.existsById(userId)){
             throw new RuntimeException("존재하지 않는 유저입니다.");
         }
     }

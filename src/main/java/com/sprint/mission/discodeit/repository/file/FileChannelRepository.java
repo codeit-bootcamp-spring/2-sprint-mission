@@ -40,23 +40,23 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID channelId) {
+    public Channel findChannelById(UUID channelId) {
         return channels.get(channelId);
     }
 
     @Override
-    public List<Channel> findAll() {
+    public List<Channel> findAllChannels() {
         return new ArrayList<>(channels.values());
     }
 
     @Override
-    public void deleteById(UUID channelId) {
+    public void deleteChannelById(UUID channelId) {
         channels.remove(channelId);
         saveFile();
     }
 
     @Override
-    public boolean exists(UUID channelId) {
+    public boolean existsById(UUID channelId) {
         return channels.containsKey(channelId);
     }
 }

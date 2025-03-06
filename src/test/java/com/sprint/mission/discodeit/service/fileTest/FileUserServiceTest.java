@@ -15,9 +15,9 @@ import java.util.logging.Logger;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FileUserServiceTest {
+    private static final Logger logger = Logger.getLogger(FileUserServiceTest.class.getName());
     private FileUserService userService;
     private FileChannelService channelService;
-    private static final Logger logger = Logger.getLogger(FileUserServiceTest.class.getName());
 
     @BeforeEach
     void setUp(@TempDir Path tempDir) {
@@ -68,8 +68,8 @@ class FileUserServiceTest {
                 .filter(c -> c.getChannelName().equals(channelName))
                 .findFirst().orElseThrow(() -> new IllegalStateException("채널을 찾을 수 없습니다."))
                 .getId();
-        channelService.addUserToChannel(channelId, userId);
-        assertTrue(channelService.getChannelById(channelId).getMembers().contains(userId));
+        channelService.addUser(channelId, userId);
+        assertTrue(channelService.findChannelById(channelId).getMembers().contains(userId));
         logger.info("채널 내 유저 추가 확인: " + userId);
     }
 
@@ -85,7 +85,7 @@ class FileUserServiceTest {
                 .findFirst().orElseThrow(() -> new IllegalStateException("채널을 찾을 수 없습니다."))
                 .getId();
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            channelService.removeUserFromChannel(channelId, userId);
+            channelService.removeUser(channelId, userId);
         });
         logger.info("채널에 없는 유저 삭제 예외 확인: " + exception.getMessage());
         assertEquals("채널에 존재하지 않는 유저입니다.", exception.getMessage());

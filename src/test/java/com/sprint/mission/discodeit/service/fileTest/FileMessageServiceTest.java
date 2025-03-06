@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.fileTest;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
@@ -17,13 +16,14 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FileMessageServiceTest {
+    private static final Logger logger = Logger.getLogger(FileMessageServiceTest.class.getName());
     private FileMessageService messageService;
     private FileUserService userService;
     private FileChannelService channelService;
-    private static final Logger logger = Logger.getLogger(FileMessageServiceTest.class.getName());
 
     @BeforeEach
     void setUp(@TempDir Path tempDir) {
@@ -47,7 +47,7 @@ class FileMessageServiceTest {
         messageService.createMessage(userId, channelId, "첫 번째 메세지");
         messageService.createMessage(userId, channelId, "두 번째 메세지");
 
-        List<Message> messages = messageService.getChannelMessages(channelId);
+        List<Message> messages = messageService.findChannelMessages(channelId);
         assertEquals(2, messages.size());
     }
 
@@ -96,7 +96,7 @@ class FileMessageServiceTest {
                 .findFirst().get().getId();
 
         messageService.createMessage(userId, channelId, "원본 메세지");
-        Message message = messageService.getChannelMessages(channelId).stream()
+        Message message = messageService.findChannelMessages(channelId).stream()
                 .filter(m -> m.getContent().equals("원본 메세지"))
                 .findFirst().get();
         UUID messageId = message.getId();

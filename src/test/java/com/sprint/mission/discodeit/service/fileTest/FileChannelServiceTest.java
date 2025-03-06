@@ -15,9 +15,9 @@ import java.util.logging.Logger;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FileChannelServiceTest {
+    private static final Logger logger = Logger.getLogger(FileChannelServiceTest.class.getName());
     private FileChannelService fileChannelService;
     private FileUserService userService;
-    private static final Logger logger = Logger.getLogger(FileChannelServiceTest.class.getName());
 
     @BeforeEach
     void setUp(@TempDir Path tempDir) {
@@ -42,7 +42,7 @@ class FileChannelServiceTest {
     void testChannelNotFound() {
         UUID randomId = UUID.randomUUID();
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            fileChannelService.getChannelById(randomId);
+            fileChannelService.findChannelById(randomId);
         });
         logger.info("예외 발생 확인: " + exception.getMessage());
         assertEquals("존재하지 않는 채널입니다.", exception.getMessage());
@@ -61,26 +61,26 @@ class FileChannelServiceTest {
 
         UUID userId = user.getId();
 
-        fileChannelService.addUserToChannel(channelId, userId);
-        assertTrue(fileChannelService.getChannelById(channelId).getMembers().contains(userId));
+        fileChannelService.addUser(channelId, userId);
+        assertTrue(fileChannelService.findChannelById(channelId).getMembers().contains(userId));
 
-        fileChannelService.removeUserFromChannel(channelId, userId);
-        assertFalse(fileChannelService.getChannelById(channelId).getMembers().contains(userId));
+        fileChannelService.removeUser(channelId, userId);
+        assertFalse(fileChannelService.findChannelById(channelId).getMembers().contains(userId));
     }
 
     @Test
     @DisplayName("FileChannelService: 채널 삭제 확인")
-    void testRemoveChannel() {
+    void testDeleteChannel() {
         String channelName = "testChannel_" + UUID.randomUUID();
         fileChannelService.createChannel(channelName);
         UUID channelId = fileChannelService.getAllChannels().stream()
                 .filter(c -> c.getChannelName().equals(channelName))
                 .findFirst().get().getId();
 
-        fileChannelService.removeChannel(channelId);
+        fileChannelService.deleteChannel(channelId);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            fileChannelService.getChannelById(channelId);
+            fileChannelService.findChannelById(channelId);
         });
         logger.info("예외 발생 확인: " + exception.getMessage());
         assertEquals("존재하지 않는 채널입니다.", exception.getMessage());

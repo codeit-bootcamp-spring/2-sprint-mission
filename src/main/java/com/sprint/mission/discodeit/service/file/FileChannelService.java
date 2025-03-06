@@ -45,7 +45,7 @@ public class FileChannelService implements ChannelService {
         }
     }
 
-    public void updataChannelData() {
+    public void updateChannelData() {
         saveChannel();
     }
 
@@ -58,13 +58,13 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel getChannelById(UUID channelId) {
+    public Channel findChannelById(UUID channelId) {
         validateChannelExists(channelId);
         return channels.get(channelId);
     }
 
     @Override
-    public String getChannelNameById(UUID channelId) {
+    public String findChannelNameById(UUID channelId) {
         validateChannelExists(channelId);
         return channels.get(channelId).getChannelName();
     }
@@ -76,61 +76,61 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
-        Channel channel = getChannelById(channelId);
+        Channel channel = findChannelById(channelId);
         channel.updateChannelName(newChannelName);
         saveChannel();
     }
 
     @Override
-    public void addUserToChannel(UUID channelId, UUID userId) {
-        Channel channel = getChannelById(channelId);
+    public void addUser(UUID channelId, UUID userId) {
+        Channel channel = findChannelById(channelId);
 
         if (channel.isUserInChannel(userId)) {
             throw new IllegalArgumentException("이미 가입되어 있는 유저입니다.");
         }
 
         userService.addChannel(userId, channelId);
-        userService.updataUserData();
+        userService.updateUserData();
         saveChannel();
     }
 
     @Override
-    public void addMessageToChannel(UUID channelId, UUID messageId) {
-        Channel channel = getChannelById(channelId);
+    public void addMessage(UUID channelId, UUID messageId) {
+        Channel channel = findChannelById(channelId);
 
         channel.addMessages(messageId);
         saveChannel();
     }
 
     @Override
-    public void removeChannel(UUID channelId) {
-        Channel channel = getChannelById(channelId);
+    public void deleteChannel(UUID channelId) {
+        Channel channel = findChannelById(channelId);
 
         for (UUID userId : channel.getMembers()) {
-            userService.deleteChannel(userId, channelId);
+            userService.removeChannel(userId, channelId);
         }
 
         channels.remove(channelId);
-        userService.updataUserData();
+        userService.updateUserData();
         saveChannel();
     }
 
     @Override
-    public void removeUserFromChannel(UUID channelId, UUID userId) {
-        Channel channel = getChannelById(channelId);
+    public void removeUser(UUID channelId, UUID userId) {
+        Channel channel = findChannelById(channelId);
         if (!channel.isUserInChannel(userId)) {
             throw new IllegalArgumentException("채널에 존재하지 않는 유저입니다.");
         }
 
-        userService.deleteChannel(userId, channelId);
-        userService.updataUserData();
+        userService.removeChannel(userId, channelId);
+        userService.updateUserData();
         channel.removeMember(userId);
         saveChannel();
     }
 
     @Override
-    public void removeMessageFromChannel(UUID channelId, UUID messageId) {
-        Channel channel = getChannelById(channelId);
+    public void removeMessage(UUID channelId, UUID messageId) {
+        Channel channel = findChannelById(channelId);
         if (!channel.isMessageInChannel(messageId)) {
             throw new IllegalArgumentException("체널에 존재하지 않는 메세지 입니다.");
         }

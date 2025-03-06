@@ -25,9 +25,9 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(UUID userId, UUID channelId, String content) {
-        Message message = new Message(userId, channelId, content);
-        Channel channel = channelRepository.findById(channelId);
+    public Message createMessage(UUID senderId, UUID channelId, String content) {
+        Message message = new Message(senderId, channelId, content);
+        Channel channel = channelRepository.findChannelById(channelId);
 
         channel.addMessages(message.getId());
 
@@ -38,53 +38,53 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message getMessageById(UUID messageId) {
-        return messageRepository.findById(messageId);
+        return messageRepository.findMessageById(messageId);
     }
 
     @Override
-    public List<Message> getMessagesByUserAndChannel(UUID userId, UUID channelId) {
-        return messageRepository.findAll().stream()
+    public List<Message> findMessagesByUserAndChannel(UUID senderId, UUID channelId) {
+        return messageRepository.findMessageAll().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
-                .filter(message -> message.getSenderId().equals(userId))
+                .filter(message -> message.getSenderId().equals(senderId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Message> getChannelMessages(UUID channelId) {
-        return messageRepository.findAll().stream()
+    public List<Message> findChannelMessages(UUID channelId) {
+        return messageRepository.findMessageAll().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Message> getUserMessages(UUID userId) {
-        return messageRepository.findAll().stream()
-                .filter(message -> message.getSenderId().equals(userId))
+    public List<Message> findUserMessages(UUID senderId) {
+        return messageRepository.findMessageAll().stream()
+                .filter(message -> message.getSenderId().equals(senderId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public void updateMessage(UUID messageId, String newContent) {
-        Message message = messageRepository.findById(messageId);
+        Message message = messageRepository.findMessageById(messageId);
         message.updateContent(newContent);
         messageRepository.save(message);
     }
 
     @Override
     public void deleteMessage(UUID messageId) {
-        Message message = messageRepository.findById(messageId);
-        Channel channel = channelRepository.findById(message.getChannelId());
+        Message message = messageRepository.findMessageById(messageId);
+        Channel channel = channelRepository.findChannelById(message.getChannelId());
 
         channel.removeMessage(messageId);
 
         channelRepository.save(channel);
-        messageRepository.delete(messageId);
+        messageRepository.deleteMessageById(messageId);
 
     }
 
     @Override
     public void validateMessage(UUID messageId) {
-        if(!messageRepository.exists(messageId)){
+        if(!messageRepository.existsById(messageId)){
             throw new IllegalArgumentException("존재하지 않는 메세지입니다.");
         }
     }

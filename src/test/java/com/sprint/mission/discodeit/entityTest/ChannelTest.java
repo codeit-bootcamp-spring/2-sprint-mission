@@ -4,9 +4,10 @@ import com.sprint.mission.discodeit.entity.Channel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ChannelTest {
     private Channel channel;

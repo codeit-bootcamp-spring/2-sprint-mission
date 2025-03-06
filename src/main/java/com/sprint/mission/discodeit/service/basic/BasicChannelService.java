@@ -28,36 +28,36 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel getChannelById(UUID channelId) {
-        return channelRepository.findById(channelId);
+    public Channel findChannelById(UUID channelId) {
+        return channelRepository.findChannelById(channelId);
     }
 
     @Override
-    public String getChannelNameById(UUID channelId) {
-        return channelRepository.findById(channelId).getChannelName();
+    public String findChannelNameById(UUID channelId) {
+        return channelRepository.findChannelById(channelId).getChannelName();
     }
 
     @Override
     public List<Channel> getAllChannels() {
-        return channelRepository.findAll();
+        return channelRepository.findAllChannels();
     }
 
     @Override
-    public void updataChannelData() {
+    public void updateChannelData() {
 
     }
 
     @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
-        Channel channel = channelRepository.findById(channelId);
+        Channel channel = channelRepository.findChannelById(channelId);
         channel.updateChannelName(newChannelName);
         channelRepository.save(channel);
     }
 
     @Override
-    public void addUserToChannel(UUID channelId, UUID userId) {
-        Channel channel = channelRepository.findById(channelId);
-        User user = userRepository.findById(userId);
+    public void addUser(UUID channelId, UUID userId) {
+        Channel channel = channelRepository.findChannelById(channelId);
+        User user = userRepository.findUserById(userId);
 
         channel.addMembers(userId);
         user.addJoinedChannel(channelId);
@@ -67,42 +67,42 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void addMessageToChannel(UUID channelId, UUID messageId) {
-        Channel channel = channelRepository.findById(channelId);
+    public void addMessage(UUID channelId, UUID messageId) {
+        Channel channel = channelRepository.findChannelById(channelId);
         channel.addMessages(messageId);
         channelRepository.save(channel);
     }
 
     @Override
-    public void removeChannel(UUID channelId) {
-        Channel channel = channelRepository.findById(channelId);
+    public void deleteChannel(UUID channelId) {
+        Channel channel = channelRepository.findChannelById(channelId);
         Set<UUID> userIds = channel.getMembers();
         for(UUID id : userIds){
-            User user = userRepository.findById(id);
+            User user = userRepository.findUserById(id);
             user.removeJoinedChannel(channelId);
             userRepository.save(user);
         }
 
-        channelRepository.deleteById(channelId);
+        channelRepository.deleteChannelById(channelId);
     }
 
     @Override
-    public void removeUserFromChannel(UUID channelId, UUID userId) {
-        Channel channel = channelRepository.findById(channelId);
-        channel.deleteMember(userId);
+    public void removeUser(UUID channelId, UUID userId) {
+        Channel channel = channelRepository.findChannelById(channelId);
+        channel.removeMember(userId);
         channelRepository.save(channel);
     }
 
     @Override
-    public void removeMessageFromChannel(UUID channelId, UUID messageId) {
-        Channel channel = channelRepository.findById(channelId);
+    public void removeMessage(UUID channelId, UUID messageId) {
+        Channel channel = channelRepository.findChannelById(channelId);
         channel.removeMessage(messageId);
         channelRepository.save(channel);
     }
 
     @Override
     public void validateChannelExists(UUID channelId) {
-        if(!channelRepository.exists(channelId)){
+        if(!channelRepository.existsById(channelId)){
             throw new IllegalArgumentException("존재하지 않는 채널입니다.");
         }
     }
