@@ -9,11 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JCFChannelService implements ChannelService {
     // 싱글톤 패턴 적용
     private static volatile JCFChannelService instance;
-    private final Map<UUID, Channel> data;
+    private final Map<UUID, Channel> data = new ConcurrentHashMap<>();
 
-    public JCFChannelService() {
-        this.data = new ConcurrentHashMap<>();
-    }
+    public JCFChannelService(){}
 
     public static JCFChannelService getInstance() {
         if (instance == null) {
