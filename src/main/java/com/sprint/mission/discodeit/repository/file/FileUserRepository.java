@@ -11,11 +11,9 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void save(User user) {
         if (user.getId() == null) {
-            throw new IllegalArgumentException("User ID cannot be null!");
+            throw new IllegalArgumentException("ID가 공백입니다.");
         }
-
         List<User> users = readFromFile();
-
         users.removeIf(u -> u.getId().equals(user.getId()));
         users.add(user);
         writeToFile(users);
