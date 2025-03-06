@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.Factory;
 
-import com.sprint.mission.discodeit.entity.Container.Channel;
+import com.sprint.mission.discodeit.entity.Container.Container;
 
 import java.util.Scanner;
 
-public class CreateChannalFactory implements Factory<Channel> {
+public class CreateChannalFactory implements Factory<Container> {
     private static volatile CreateChannalFactory instance;
     private final Scanner sc = new Scanner(System.in);
 
@@ -23,16 +23,15 @@ public class CreateChannalFactory implements Factory<Channel> {
     }
 
     @Override
-    public Channel create() {
+    public Container create() {
         System.out.print("생성할 채널의 이름을 입력하세요. : ");
         String s = sc.nextLine();
         return create(s);
     }
 
     @Override
-    public Channel create(String name) {
-        return new Channel(name);
+    public Container create(String name) {
+        return new Container(name);
     }
-
 
 }

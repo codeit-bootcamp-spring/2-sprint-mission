@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Container.Channel;
 import com.sprint.mission.discodeit.entity.Container.Container;
 
 import java.util.UUID;
 
 public interface ServerService {
-    public abstract Channel createChannel(String name);
+    public abstract Container createChannel(String name);
 
     //주입
     public abstract void addChannel(UUID serverId, String name);

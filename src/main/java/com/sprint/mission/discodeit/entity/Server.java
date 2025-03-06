@@ -6,18 +6,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-public class Server  implements Serializable {
+public class Server implements Serializable {
     private static final long serialVersionUID = 1L;
-
     private final UUID id;
     public final Long createdAt;
     public Long updatedAt;
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
+
     private String name;
 
-    private final SimpleDateFormat dayTime;
-
     public Server(String name) {
-        this(UUID.randomUUID(),System.currentTimeMillis(),name);
+        this(UUID.randomUUID(), System.currentTimeMillis(), name);
     }
 
     public Server(UUID id, Long createdAt, String name) {
@@ -25,7 +24,6 @@ public class Server  implements Serializable {
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
         this.name = name;
-        this.dayTime = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
     }
 
     public void setName(String name) {
@@ -41,7 +39,7 @@ public class Server  implements Serializable {
         return "Server{" +
                 "id='" + this.getId() + '\'' +
                 "name='" + name + '\'' +
-                "creadAt='" + dayTime.format(new Date(createdAt)) + '\'' +
+                "creadAt='" + format.format(new Date(createdAt)) + '\'' +
                 '}';
     }
 
@@ -51,12 +49,12 @@ public class Server  implements Serializable {
 
 
     public Long getCreatedAt() {
-        System.out.println("생성 시각: " + dayTime.format(new Date(createdAt)));
+        System.out.println("생성 시각: " + format.format(new Date(createdAt)));
         return createdAt;
     }
 
     public Long getUpdatedAt() {
-        System.out.println("수정 시각: " + dayTime.format(new Date(updatedAt)));
+        System.out.println("수정 시각: " + format.format(new Date(updatedAt)));
         return updatedAt;
     }
 }

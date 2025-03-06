@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.Factory.CreateChannalFactory;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Repository.file.FileServerRepository;
-import com.sprint.mission.discodeit.entity.Container.Channel;
 import com.sprint.mission.discodeit.entity.Container.Container;
 import com.sprint.mission.discodeit.service.ServerService;
 
@@ -43,14 +42,14 @@ public class FileServerService implements ServerService {
 
 
     @Override
-    public Channel createChannel(String name) {
+    public Container createChannel(String name) {
         return CreateChannalFactory.getInstance().create(name);
     }
 
     @Override
     public void addChannel(UUID serverId, String name) {
         ServerRepository serverRepository = getServerRepository(serverId);
-        Channel channel = CreateChannalFactory.getInstance().create(name);
+        Container channel = CreateChannalFactory.getInstance().create(name);
         serverRepository.save(channel);
     }
 

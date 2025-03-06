@@ -11,10 +11,10 @@ public class Message implements Serializable {
     private final UUID id;
     public final Long createdAt;
     public Long updatedAt;
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
 
     private String str;
 
-    private final SimpleDateFormat dayTime;
 
     public Message(String str) {
         this(UUID.randomUUID(), System.currentTimeMillis(), str);
@@ -25,7 +25,6 @@ public class Message implements Serializable {
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
         this.str = str;
-        this.dayTime = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
     }
 
     public String getStr() {
@@ -41,7 +40,7 @@ public class Message implements Serializable {
         return "Message{" +
                 "id='" + this.getId() + '\'' +
                 "str='" + str + '\'' +
-                "creadAt='" + dayTime.format(new Date(createdAt)) + '\'' +
+                "creadAt='" + format.format(new Date(createdAt)) + '\'' +
                 '}';
     }
 
@@ -51,12 +50,12 @@ public class Message implements Serializable {
 
 
     public Long getCreatedAt() {
-        System.out.println("생성 시각: " + dayTime.format(new Date(createdAt)));
+        System.out.println("생성 시각: " + format.format(new Date(createdAt)));
         return createdAt;
     }
 
     public Long getUpdatedAt() {
-        System.out.println("수정 시각: " + dayTime.format(new Date(updatedAt)));
+        System.out.println("수정 시각: " + format.format(new Date(updatedAt)));
         return updatedAt;
     }
 

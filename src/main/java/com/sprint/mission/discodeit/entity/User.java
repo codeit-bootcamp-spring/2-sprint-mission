@@ -10,7 +10,7 @@ public class User implements Serializable {
     private final UUID id;
     public final Long createdAt;
     public Long updatedAt;
-    protected final SimpleDateFormat dayTime = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
+    protected final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
 
     private String name;
     private String password;
@@ -38,7 +38,7 @@ public class User implements Serializable {
         return "User{" +
                 "id='" + this.getId() + '\'' +
                 "name='" + name + '\'' +
-                "creadAt='" + dayTime.format(new Date(createdAt)) + '\'' +
+                "creadAt='" + format.format(new Date(createdAt)) + '\'' +
                 '}';
     }
 
@@ -51,13 +51,12 @@ public class User implements Serializable {
     }
 
     public Long getCreatedAt() {
-        System.out.println("생성 시각: " + dayTime.format(new Date(createdAt)));
+        System.out.println("생성 시각: " + format.format(new Date(createdAt)));
         return createdAt;
     }
 
     public Long getUpdatedAt() {
-        System.out.println("수정 시각: " + dayTime.format(new Date(updatedAt)));
+        System.out.println("수정 시각: " + format.format(new Date(updatedAt)));
         return updatedAt;
     }
-
 }

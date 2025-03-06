@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.Factory.CreateChannalFactory;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
-import com.sprint.mission.discodeit.entity.Container.Channel;
 import com.sprint.mission.discodeit.entity.Container.Container;
 import com.sprint.mission.discodeit.service.ServerService;
 
@@ -38,14 +37,14 @@ public class JCFServerService implements ServerService {
     }
 
     @Override
-    public Channel createChannel(String name) {
+    public Container createChannel(String name) {
         return CreateChannalFactory.getInstance().create(name);
     }
 
     @Override
     public void addChannel(UUID id, String name) {
         ServerRepository serverRepository = getServerRepository(id);
-        Channel channel = createChannel(name);
+        Container channel = createChannel(name);
         serverRepository.save(channel);
 
         //로그
@@ -69,8 +68,8 @@ public class JCFServerService implements ServerService {
             if (item.getName().equals(name)) {
                 //로그
                 System.out.println(item.getName() + " 이(가) 반환됩니다.");
-                if (item.getClass() == Channel.class) {
-                    return (Channel) item;
+                if (item.getClass() == Container.class) {
+                    return item;
                 }
             }
         }
