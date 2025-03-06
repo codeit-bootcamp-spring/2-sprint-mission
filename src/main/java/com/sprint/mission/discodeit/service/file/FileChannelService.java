@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
+// JCFChannelService와 동일하며, 추후 BasicChannelService도 동일할 예정입니다. (스프린트 요구 사항으로 남겨두었습니다.)
 public class FileChannelService implements ChannelService {
     private static volatile FileChannelService instance;
 

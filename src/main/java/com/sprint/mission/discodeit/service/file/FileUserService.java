@@ -48,6 +48,7 @@ public class FileUserService implements UserService {
 
     @Override
     public User updateUser(UUID userId, String nickname, String avatar, String status) {
+        validateUserId(userId);
         User user = getUserByUserId(userId);
         user.update(nickname, avatar, status);
         return userRepository.save(user);
