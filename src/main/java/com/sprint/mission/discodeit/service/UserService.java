@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface UserService {
@@ -11,6 +12,7 @@ public interface UserService {
 
     User getUserById(UUID userId); //유저 조회(UUID)
     String getUserNameById(UUID userId); //유저 이름 조회
+    List<User> findUsersByIds(Set<UUID> userIds);
     List<User> getAllUsers();   //모든 유저 조회
 
     void updateUserData();

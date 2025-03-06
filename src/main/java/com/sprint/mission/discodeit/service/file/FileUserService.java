@@ -61,6 +61,11 @@ public class FileUserService implements UserService {
     }
 
     @Override
+    public List<User> findUsersByIds(Set<UUID> userIds) {
+        return List.of();
+    }
+
+    @Override
     public List<User> getAllUsers() {
         return new ArrayList<User>(users.values());
     }

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class BasicUserService implements UserService {
@@ -26,7 +27,7 @@ public class BasicUserService implements UserService {
     @Override
     public User createUser(String username) {
         User user = new User(username);
-        userRepository.save(user);
+        userRepository.addUser(user);
         return user;
     }
 
@@ -41,27 +42,32 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    public List<User> findUsersByIds(Set<UUID> userIds) {
+        return userRepository.findUsersByIds(userIds);
+    }
+
+    @Override
     public List<User> getAllUsers() {
         return userRepository.findUserAll();
     }
 
     @Override
     public void updateUserData() {
-
+        userRepository.save();
     }
 
     @Override
     public void updateUsername(UUID userId, String newUsername) {
         User user = userRepository.findUserById(userId);
         user.updateUsername(newUsername);
-        userRepository.save(user);
+        userRepository.addUser(user);
     }
 
     @Override
     public void addChannel(UUID userID, UUID channelId) {
         User user = userRepository.findUserById(userID);
         user.addJoinedChannel(channelId);
-        userRepository.save(user);
+        userRepository.addUser(user);
     }
 
     @Override
@@ -73,7 +79,7 @@ public class BasicUserService implements UserService {
     public void removeChannel(UUID userId, UUID channelId) {
     User user = userRepository.findUserById(userId);
         user.removeJoinedChannel(channelId);
-    userRepository.save(user);
+    userRepository.addUser(user);
     }
 
     @Override
