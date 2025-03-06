@@ -3,27 +3,29 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+;
+
 public class BasicChannelService implements ChannelService {
 
     private static ChannelRepository channelRepository;
-    private static UserRepository userRepository;
+    private static UserService userService;
     private static BasicChannelService INSTANCE;
 
-    public BasicChannelService(ChannelRepository channelRepository, UserRepository userRepository) {
+    public BasicChannelService(ChannelRepository channelRepository, UserService userService) {
         this.channelRepository = channelRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
-    public static synchronized BasicChannelService getInstance(ChannelRepository channelRepository, UserRepository userRepository) {
+    public static synchronized BasicChannelService getInstance(ChannelRepository channelRepository, UserService userService) {
         if (INSTANCE == null) {
-            INSTANCE = new BasicChannelService(channelRepository, userRepository);
+            INSTANCE = new BasicChannelService(channelRepository, userService);
         }
         return INSTANCE;
     }
@@ -31,17 +33,19 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel createChannel(String channelName) {
         Channel channel = new Channel(channelName);
-        channelRepository.save(channel);
+        channelRepository.addChannel(channel);
         return channel;
     }
 
     @Override
     public Channel findChannelById(UUID channelId) {
+        validateChannelExists(channelId);
         return channelRepository.findChannelById(channelId);
     }
 
     @Override
     public String findChannelNameById(UUID channelId) {
+        validateChannelExists(channelId);
         return channelRepository.findChannelById(channelId).getChannelName();
     }
 
@@ -52,45 +56,45 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void updateChannelData() {
-
+        channelRepository.save();
     }
 
     @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
+        validateChannelExists(channelId);
         Channel channel = channelRepository.findChannelById(channelId);
         channel.updateChannelName(newChannelName);
-        channelRepository.save(channel);
+        channelRepository.addChannel(channel);
     }
 
     @Override
     public void addUser(UUID channelId, UUID userId) {
+        userService.validateUserExists(userId);
+
         Channel channel = channelRepository.findChannelById(channelId);
-        User user = userRepository.findUserById(userId);
+        userService.addChannel(userId, channelId);
 
-        channel.addMembers(userId);
-        user.addJoinedChannel(channelId);
-
-        userRepository.save(user);
-        channelRepository.save(channel);
+        userService.updateUserData();
+        channelRepository.addChannel(channel);
     }
 
     @Override
     public void addMessage(UUID channelId, UUID messageId) {
         Channel channel = channelRepository.findChannelById(channelId);
         channel.addMessages(messageId);
-        channelRepository.save(channel);
+        channelRepository.addChannel(channel);
     }
 
     @Override
     public void deleteChannel(UUID channelId) {
         Channel channel = channelRepository.findChannelById(channelId);
-        Set<UUID> userIds = channel.getMembers();
-        for(UUID id : userIds){
-            User user = userRepository.findUserById(id);
-            user.removeJoinedChannel(channelId);
-            userRepository.save(user);
-        }
 
+        Set<UUID> userIds = channel.getMembers();
+        List<User> users = userService.findUsersByIds(userIds);
+
+        users.forEach(user -> user.removeJoinedChannel(channelId));
+
+        userService.updateUserData();
         channelRepository.deleteChannelById(channelId);
     }
 
@@ -98,14 +102,14 @@ public class BasicChannelService implements ChannelService {
     public void removeUser(UUID channelId, UUID userId) {
         Channel channel = channelRepository.findChannelById(channelId);
         channel.removeMember(userId);
-        channelRepository.save(channel);
+        channelRepository.addChannel(channel);
     }
 
     @Override
     public void removeMessage(UUID channelId, UUID messageId) {
         Channel channel = channelRepository.findChannelById(channelId);
         channel.removeMessage(messageId);
-        channelRepository.save(channel);
+        channelRepository.addChannel(channel);
     }
 
     @Override
