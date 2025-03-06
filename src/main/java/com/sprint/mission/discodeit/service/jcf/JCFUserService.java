@@ -24,7 +24,6 @@ public class JCFUserService implements UserService {
         return instance;
     }
 
-
     @Override
     public User saveUser(String name) {
         User user = new User(name);

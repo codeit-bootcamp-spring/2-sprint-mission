@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface UserService {
     User saveUser(String name);
-    List<User> findByName(String Name);
+    List<User> findByName(String name);
     Optional<User> findById(UUID id);
     List<User> findAll();
     void update(UUID id, String name);
