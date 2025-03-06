@@ -80,7 +80,7 @@ public class FileMessageService implements MessageService {
     @Override
     public Message findById(UUID messageId) {
         return findAll().stream()
-                .filter(u -> u.getId().equals(messageId))
+                .filter(message -> message.getId().equals(messageId))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException(messageId + " 메세지를 찾을 수 없습니다."));
     }
@@ -88,14 +88,14 @@ public class FileMessageService implements MessageService {
     @Override
     public List<Message> findByChannelId(UUID channelId) {
         return findAll().stream()
-                .filter(u -> u.getId().equals(channelId))
+                .filter(message -> message.getChannelId().equals(channelId))
                 .toList();
     }
 
     @Override
     public List<Message> findByAuthorId(UUID authorId) {
         return findAll().stream()
-                .filter(u -> u.getId().equals(authorId))
+                .filter(message -> message.getAuthorId().equals(authorId))
                 .toList();
     }
 

@@ -77,7 +77,7 @@ public class FileUserService implements UserService {
     @Override
     public User findById(UUID userId) {
         return findAll().stream()
-                .filter(u -> u.getId().equals(userId))
+                .filter(user -> user.getId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException(userId + " 유저를 찾을 수 없습니다."));
     }

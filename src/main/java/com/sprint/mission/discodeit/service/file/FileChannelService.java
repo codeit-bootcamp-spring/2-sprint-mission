@@ -68,7 +68,7 @@ public class FileChannelService implements ChannelService {
     @Override
     public Channel findById(UUID channelId) {
         return findAll().stream()
-                .filter(u -> u.getId().equals(channelId))
+                .filter(channel -> channel.getId().equals(channelId))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException(channelId + " 채널을 찾을 수 없습니다."));
     }
