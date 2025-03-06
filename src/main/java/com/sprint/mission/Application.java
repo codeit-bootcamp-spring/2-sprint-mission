@@ -27,9 +27,8 @@ public class Application {
         MessageController messageController = beans.findBean(MessageController.class);
 
         printHello();
-        UserDto loginUser = registerSetupUser(userController);
-
-        ChannelDto currentChannel = channelController.create(SETUP_CHANNEL_NAME, loginUser);
+        UserDto loginUser = setupUser(userController);
+        ChannelDto currentChannel = setupChannel(channelController, loginUser);
         while (true) {
             List<MessageDto> currentChannelMessages = messageController.findByChannelId(currentChannel.id());
             printServer(channelController.findAll(), loginUser, currentChannelMessages, currentChannel);
@@ -46,7 +45,11 @@ public class Application {
         }
     }
 
-    private static UserDto registerSetupUser(UserController userController) {
+    private static ChannelDto setupChannel(ChannelController channelController, UserDto loginUser) {
+        return channelController.create(SETUP_CHANNEL_NAME, loginUser);
+    }
+
+    private static UserDto setupUser(UserController userController) {
         UserDto loginUser = userController.register(
                 new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword())
         );

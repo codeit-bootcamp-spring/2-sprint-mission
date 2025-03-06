@@ -47,8 +47,8 @@
 - [x] 필요한 Repository 인터페이스를 필드로 선언하고 생성자를 통해 초기화하세요.
 - [x] "저장 로직"은 Repository 인터페이스 필드를 활용하세요. (직접 구현하지 마세요.)
 - [ ] Basic*Service 구현체를 활용하여 테스트해보세요.
-- [ ] JCF*Repository 구현체를 활용하여 테스트해보세요.
-- [ ] File*Repository 구현체를 활용하여 테스트해보세요.
+  - [x] JCF*Repository 구현체를 활용하여 테스트해보세요.
+  - [ ] File*Repository 구현체를 활용하여 테스트해보세요.
 - [ ] 이전에 작성했던 코드(JCF*Service 또는 File*Service)와 비교해 어떤 차이가 있는지 정리해보세요
 ~~~java
 // 참고 하겠습니다.
