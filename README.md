@@ -41,15 +41,48 @@
 관심사 분리를 통한 레이어 간 의존성 주입
 
 - 다음의 조건을 만족하는 서비스 인터페이스의 구현체를 작성하세요.
-- [ ] 클래스 패키지명: com.sprint.mission.discodeit.service.basic
-- [ ] 클래스 네이밍 규칙: Basic[인터페이스 이름]
-- [ ] 기존에 구현한 서비스 구현체의 "비즈니스 로직"과 관련된 코드를 참고하여 구현하세요.
-- [ ] 필요한 Repository 인터페이스를 필드로 선언하고 생성자를 통해 초기화하세요.
-- [ ] "저장 로직"은 Repository 인터페이스 필드를 활용하세요. (직접 구현하지 마세요.)
+- [x] 클래스 패키지명: com.sprint.mission.discodeit.service.basic
+- [x] 클래스 네이밍 규칙: Basic[인터페이스 이름]
+- [x] 기존에 구현한 서비스 구현체의 "비즈니스 로직"과 관련된 코드를 참고하여 구현하세요.
+- [x] 필요한 Repository 인터페이스를 필드로 선언하고 생성자를 통해 초기화하세요.
+- [x] "저장 로직"은 Repository 인터페이스 필드를 활용하세요. (직접 구현하지 마세요.)
 - [ ] Basic*Service 구현체를 활용하여 테스트해보세요.
 - [ ] JCF*Repository 구현체를 활용하여 테스트해보세요.
 - [ ] File*Repository 구현체를 활용하여 테스트해보세요.
 - [ ] 이전에 작성했던 코드(JCF*Service 또는 File*Service)와 비교해 어떤 차이가 있는지 정리해보세요
+~~~java
+// 참고 하겠습니다.
+public class JavaApplication {
+    static User setupUser(UserService userService) {
+        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        return user;
+    }
+
+    static Channel setupChannel(ChannelService channelService) {
+        Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+        return channel;
+    }
+
+    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+        Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
+        System.out.println("메시지 생성: " + message.getId());
+    }
+
+    public static void main(String[] args) {
+        // 서비스 초기화
+        // TODO Basic*Service 구현체를 초기화하세요.
+        UserService userService;
+        ChannelService channelService;
+        MessageService messageService;
+
+        // 셋업
+        User user = setupUser(userService);
+        Channel channel = setupChannel(channelService);
+        // 테스트
+        messageCreateTest(messageService, channel, user);
+    }
+}
+~~~
 
 # 미완성 및 개선해야할 부분
 

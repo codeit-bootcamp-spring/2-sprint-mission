@@ -16,6 +16,7 @@ public class FileChannelRepository implements ChannelRepository {
     public Channel save(Channel channel) {
         Map<UUID, Channel> channels = loadObjectsFromFile(CHANNEL_FILE.getPath());
         channels.put(channel.getId(), channel);
+
         saveObjectsToFile(STORAGE_DIRECTORY.getPath(), CHANNEL_FILE.getPath(), channels);
 
         return channel;
@@ -48,7 +49,6 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void delete(UUID id) {
         Map<UUID, Channel> channels = loadObjectsFromFile(CHANNEL_FILE.getPath());
-
         channels.remove(id);
 
         saveObjectsToFile(STORAGE_DIRECTORY.getPath(), CHANNEL_FILE.getPath(), channels);

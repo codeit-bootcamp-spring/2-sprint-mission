@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
 
@@ -6,19 +6,29 @@ import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-public class FileChannelService implements ChannelService {
-    private final ChannelRepository channelRepository = new FileChannelRepository();
+public class BasicChannelService implements ChannelService {
+    private final ChannelRepository channelRepository;
     private final UserService userService;
 
-    public FileChannelService(UserService userService) {
+    public BasicChannelService(ChannelRepository channelRepository, UserService userService) {
+        this.channelRepository = channelRepository;
         this.userService = userService;
+    }
+
+    @Override
+    public ChannelDto addMember(UUID id, String friendEmail) {
+        Channel channel = channelRepository.findById(id);
+        UserDto friend = userService.findByEmail(friendEmail);
+        channel.addMember(friend.id());
+        channelRepository.save(channel);
+
+        return toDto(channel);
     }
 
     @Override
@@ -56,16 +66,6 @@ public class FileChannelService implements ChannelService {
     @Override
     public void delete(UUID id) {
         channelRepository.delete(id);
-    }
-
-    @Override
-    public ChannelDto addMember(UUID chanelId, String friendEmail) {
-        Channel channel = channelRepository.findById(chanelId);
-        UserDto friend = userService.findByEmail(friendEmail);
-        channel.addMember(friend.id());
-        channelRepository.save(channel);
-
-        return toDto(channel);
     }
 
     private ChannelDto toDto(Channel channel) {
