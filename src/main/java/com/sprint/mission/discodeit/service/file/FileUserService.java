@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class FileUserService implements UserService {
-    private UserRepository userRepository = new FileUserRepository();
+    private final UserRepository userRepository = new FileUserRepository();
 
     @Override
     public UserDto register(UserRegisterDto userRegisterDto) {
