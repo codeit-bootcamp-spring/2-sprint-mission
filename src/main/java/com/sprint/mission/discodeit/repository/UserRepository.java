@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
 
+import java.util.UUID;
+
 public interface UserRepository extends Repository<User> {
-    // 미션 요구에 따른 작성
-    // 추후 추가 할 것
+    void updateUserName(UUID userId, String newUserName);
+    void updatePassword(UUID userId, String newPassword);
 }

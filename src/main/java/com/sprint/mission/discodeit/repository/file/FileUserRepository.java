@@ -39,4 +39,20 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
         super.deleteById(userId);                 //users에서 삭제
         super.deleteFile(userId);                 //file 삭제
     }
+
+    @Override
+    public void updateUserName(UUID userId, String userName) {
+        if (existsById(userId)) {
+            super.storage.get(userId).updateUserName(userName);
+        }
+        saveToFile(directory.resolve(userId.toString() + ".ser"), super.storage.get(userId));
+    }
+
+    @Override
+    public void updatePassword(UUID userId, String newPassword) {
+        if (existsById(userId)) {
+            super.storage.get(userId).updateUserPassword(newPassword);
+        }
+        saveToFile(directory.resolve(userId.toString() + ".ser"), super.storage.get(userId));
+    }
 }
