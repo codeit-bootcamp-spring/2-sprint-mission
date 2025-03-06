@@ -1,48 +1,60 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Message extends BaseEntity{
-    private String messageContent;
+public class Message {
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String content;
+    //
     private UUID channelId;
-    private UUID userId;
+    private UUID authorId;
 
-    public Message(UUID channelId, UUID userId, String messageContent) {
-        super();
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.content = content;
         this.channelId = channelId;
-        this.userId = userId;
-        this.messageContent = messageContent;
+        this.authorId = authorId;
     }
 
-    public String getMessageContent() {
-        return messageContent;
+    public UUID getId() {
+        return id;
     }
 
-    public void setMessageContent(String messageContent) {
-        this.messageContent = messageContent;
-        this.updatedAt = System.currentTimeMillis();
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getContent() {
+        return content;
     }
 
     public UUID getChannelId() {
         return channelId;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UUID getAuthorId() {
+        return authorId;
     }
 
-    @Override
-    public String toString() {
-        return "{" +
-                "messageContent='" + messageContent + '\'' +
-                ", channelId=" + channelId +
-                ", userId=" + userId +
-                ", id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }

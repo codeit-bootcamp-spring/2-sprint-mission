@@ -1,32 +1,67 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity {
-    private String userName;
+import java.time.Instant;
+import java.util.UUID;
 
-    public User(String userName) {
-        super(); //id, createdAt, updatedAt
-        this.userName = userName;
+public class User {
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String username;
+    private String email;
+    private String password;
+
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
-    public String getUserName() {
-        return userName;
+    public UUID getId() {
+        return id;
     }
 
-    public void setUserName(String userName) {
-        // 데이터 필드를 조작하기 위한 기본 규칙 (예: 10살은 가입 못한다.)
-        // -> 업데이트 방향 getter setter 캡슐화
-        this.userName = userName;
-        this.updatedAt = System.currentTimeMillis();
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    //유저 객체 생성하면 toString() 메소드 자동 반영돼서 출력함.
-    @Override
-    public String toString() {
-        return "{" +
-                "userName='" + userName + '\'' +
-                ", id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }
