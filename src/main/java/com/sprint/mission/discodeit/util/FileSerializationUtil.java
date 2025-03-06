@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.util;
 
 import com.sprint.mission.discodeit.entity.BaseEntity;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.io.*;
 import java.nio.file.Files;

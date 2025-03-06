@@ -1,24 +1,25 @@
+import com.sprint.mission.discodeit.ChannelService;
+import com.sprint.mission.discodeit.MessageService;
+import com.sprint.mission.discodeit.UserService;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.util.FileSerializationUtil;
 
 import java.io.IOException;
 import java.util.*;
 
 public class JavaApplication {
-    static UserService userService = FileUserService.getInstance(FileSerializationUtil.getInstance());
-    static ChannelService channelService = FileChannelService.getInstance(FileSerializationUtil.getInstance());
-    static MessageService messageService = FileMessageService.getInstance(FileSerializationUtil.getInstance(), userService, channelService);;
+
+    static UserService userService = BasicUserService.getInstance(FileUserRepository.getInstance(FileSerializationUtil.getInstance()));
+    static ChannelService channelService = BasicChannelService.getInstance(FileChannelRepository.getInstance(FileSerializationUtil.getInstance()));
+    static MessageService messageService = BasicMessageService.getInstance(userService, channelService, FileMessageRepository.getInstance(FileSerializationUtil.getInstance()));;
 
     public static void main(String[] args) {
         try {
