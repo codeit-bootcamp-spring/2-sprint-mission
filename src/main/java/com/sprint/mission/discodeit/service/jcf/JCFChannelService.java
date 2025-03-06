@@ -1,13 +1,30 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFChannelService implements ChannelService {
-    private final Map<UUID, Channel> data = new HashMap<>();
+    // 싱글톤 패턴 적용
+    private static volatile JCFChannelService instance;
+    private final Map<UUID, Channel> data;
+
+    public JCFChannelService() {
+        this.data = new ConcurrentHashMap<>();
+    }
+
+    public static JCFChannelService getInstance() {
+        if (instance == null) {
+            synchronized (JCFChannelService.class) {
+                if (instance == null) {
+                    instance = new JCFChannelService();
+                }
+            }
+        }
+        return instance;
+    }
 
     @Override
     public void create(Channel channel) {
