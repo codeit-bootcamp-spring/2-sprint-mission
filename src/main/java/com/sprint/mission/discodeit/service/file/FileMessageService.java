@@ -26,7 +26,7 @@ public class FileMessageService implements MessageService {
     public Message getMessage(UUID id) {
         Message message = messageRepository.findById(id);
         if (message == null) {
-            throw new IllegalArgumentException("Message not found!");
+            throw new IllegalArgumentException("존재하지 않는 메세지입니다.");
         }
         return message;
     }
@@ -38,14 +38,14 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID id, String newContent) {
-        Message message = getMessage(id); // 예외 처리된 메서드 활용
+        Message message = getMessage(id);
         message.updateContent(newContent);
         messageRepository.save(message);
     }
 
     @Override
     public void deleteMessage(UUID id) {
-        getMessage(id); // 존재 여부 체크
+        getMessage(id);
         messageRepository.delete(id);
     }
 }
