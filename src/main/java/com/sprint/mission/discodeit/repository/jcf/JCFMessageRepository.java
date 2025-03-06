@@ -5,13 +5,14 @@ import com.sprint.mission.discodeit.repository.AbstractRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class JCFMessageRepository extends AbstractRepository<Message> implements MessageRepository {
     private static volatile JCFMessageRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
 
     private JCFMessageRepository() {
-        super(Message.class, new LinkedHashMap<UUID, Message>());
+        super(Message.class, new ConcurrentHashMap<>());
     }
 
     public static JCFMessageRepository getInstance() {
@@ -35,5 +36,12 @@ public class JCFMessageRepository extends AbstractRepository<Message> implements
         return super.storage.values().stream()
                 .filter((m) -> Objects.equals(channelId, m.getChannelId()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateMessageContent(UUID messageId, String newContent) {
+        if (existsById(messageId)) {
+            super.storage.get(messageId).updateContent(newContent);
+        }
     }
 }

@@ -49,4 +49,11 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
                 .filter((m) -> Objects.equals(channelId, m.getChannelId()))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void updateMessageContent(UUID messageId, String newContent) {
+        if (existsById(messageId)) {
+            super.storage.get(messageId).updateContent(newContent);
+        }
+    }
 }
