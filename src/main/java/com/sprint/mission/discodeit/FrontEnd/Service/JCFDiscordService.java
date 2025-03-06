@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class JCFDiscordService implements DiscordService {
-    private static JCFDiscordService instance;
+    private static volatile JCFDiscordService instance;
     DiscordRepository discordRepository = JCFDiscordRepository.getInstance();
 
     List<User> list = discordRepository.getUserList();
@@ -19,7 +19,11 @@ public class JCFDiscordService implements DiscordService {
 
     public static JCFDiscordService getInstance() {
         if (instance == null) {
-            instance = new JCFDiscordService();
+            synchronized (JCFDiscordService.class){
+                if (instance == null) {
+                    instance = new JCFDiscordService();
+                }
+            }
         }
         return instance;
     }

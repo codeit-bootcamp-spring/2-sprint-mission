@@ -7,16 +7,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JCFDiscordRepository implements DiscordRepository {
-    private static JCFDiscordRepository instance;
+    private static volatile JCFDiscordRepository instance;
     List<User> list;
 
-    private JCFDiscordRepository( ) {
+    private JCFDiscordRepository() {
         list = new ArrayList<>();
     }
 
     public static JCFDiscordRepository getInstance() {
         if (instance == null) {
-            instance = new JCFDiscordRepository();
+            synchronized (JCFDiscordRepository.class) {
+                if (instance == null) {
+                    instance = new JCFDiscordRepository();
+                }
+            }
         }
         return instance;
     }

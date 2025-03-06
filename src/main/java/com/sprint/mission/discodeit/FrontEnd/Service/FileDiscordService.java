@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class FileDiscordService implements DiscordService {
-    private static FileDiscordService instance;
+    private static volatile FileDiscordService instance;
     FileDiscordRepository discordRepository = FileDiscordRepository.getInstance();
     List<User> list = discordRepository.getUserList();
 
@@ -22,7 +22,11 @@ public class FileDiscordService implements DiscordService {
 
     public static FileDiscordService getInstance() {
         if (instance == null) {
-            instance = new FileDiscordService();
+            synchronized (FileDiscordService.class) {
+                if (instance == null) {
+                    instance = new FileDiscordService();
+                }
+            }
         }
         return instance;
     }
