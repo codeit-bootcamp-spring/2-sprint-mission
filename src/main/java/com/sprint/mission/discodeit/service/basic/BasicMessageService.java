@@ -41,8 +41,8 @@ public class BasicMessageService implements MessageService {
 
         channel.addMessages(message.getId());
 
-        messageRepository.save(message);
-        channelRepository.save(channel);
+        messageRepository.addMessage(message);
+        channelRepository.addChannel(channel);
         return message;
     }
 
@@ -77,7 +77,7 @@ public class BasicMessageService implements MessageService {
     public void updateMessage(UUID messageId, String newContent) {
         Message message = messageRepository.findMessageById(messageId);
         message.updateContent(newContent);
-        messageRepository.save(message);
+        messageRepository.addMessage(message);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class BasicMessageService implements MessageService {
 
         channel.removeMessage(messageId);
 
-        channelRepository.save(channel);
+        channelRepository.addChannel(channel);
         messageRepository.deleteMessageById(messageId);
 
     }
