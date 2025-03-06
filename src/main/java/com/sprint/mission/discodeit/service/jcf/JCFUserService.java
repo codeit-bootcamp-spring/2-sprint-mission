@@ -17,7 +17,7 @@ public class JCFUserService implements UserService {
 
     public static JCFUserService getInstance() {
         if (instance == null) {
-            synchronized (JCFUserService.class){
+            synchronized (JCFUserService.class) {
                 if (instance == null) {
                     instance = new JCFUserService();
                 }
@@ -89,9 +89,7 @@ public class JCFUserService implements UserService {
     @Override
     public void printServer(List<Server> list) {
         System.out.println("\n=========서버 목록==========");
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(i + 1 + " : " + list.get(i).getName());
-        }
+        list.forEach(s -> System.out.println(s.getId() + " : " + s.getName()));
         System.out.println("=========================\n");
     }
 
@@ -122,13 +120,13 @@ public class JCFUserService implements UserService {
     }
 
     private boolean removeServer(List<Server> list, String targetName) {
-        for (Server server : list) {
-            if (server.getName().equals(targetName)) {
-                //로그
-                System.out.println(server.getName() + " 이(가) 삭제됩니다.");
-                list.remove(server);
-                return true;
-            }
+        Server target = list.stream().filter(s -> s.getName().equals(targetName)).findFirst().orElse(null);
+        if (target != null) {
+            //로그
+            System.out.println(target.getName() + " 이(가) 삭제됩니다.");
+
+            list.remove(target);
+            return true;
         }
         System.out.println("존재하지 않습니다.");
         return false;
@@ -173,13 +171,12 @@ public class JCFUserService implements UserService {
     }
 
     private boolean updateServer(List<Server> list, String targetName, String replaceName) {
-        for (Server server : list) {
-            if (server.getName().equals(targetName)) {
-                server.setName(replaceName);
-                //로그
-                System.out.println(targetName + " 이름이 " + server.getName() + " 이(가) 됩니다.");
-                return true;
-            }
+        Server target = list.stream().filter(s -> s.getName().equals(targetName)).findFirst().orElse(null);
+        if (target != null) {
+            target.setName(replaceName);
+            //로그
+            System.out.println(targetName + " 이름이 " + target.getName() + " 이(가) 됩니다.");
+            return true;
         }
         System.out.println("존재하지 않습니다.");
         return false;

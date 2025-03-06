@@ -13,7 +13,6 @@ import java.util.*;
 public class FileUserService implements UserService {
     private static volatile FileUserService instance;
     private final Map<UUID, UserRepository> userTable = new HashMap<>();
-    Path directory = Paths.get(System.getProperty("user.dir"), "data","serverList.ser");
 
     private FileUserService() {
 
@@ -21,7 +20,7 @@ public class FileUserService implements UserService {
 
     public static FileUserService getInstance() {
         if (instance == null) {
-            synchronized (FileUserService.class){
+            synchronized (FileUserService.class) {
                 if (instance == null) {
                     instance = new FileUserService();
                 }
@@ -56,7 +55,7 @@ public class FileUserService implements UserService {
         userRepository.save(server);
 
         //로그
-        System.out.println("저장 시점 name :"+server.getId());
+        System.out.println("저장 시점 name :" + server.getId());
     }
 
     @Override
@@ -65,19 +64,14 @@ public class FileUserService implements UserService {
         userRepository.save(server);
 
         //로그
-        System.out.println("저장 시점 server:"+server.getId());
+        System.out.println("저장 시점 server:" + server.getId());
     }
 
     @Override
     public Server getServer(UUID userId, String name) {
         UserRepository userRepository = getUserRepository(userId);
         List<Server> serverList = userRepository.getServerList();
-        for (Server server : serverList) {
-            if (server.getName().equals(name)) {
-                return server;
-            }
-        }
-        return null;
+        return serverList.stream().filter(s -> s.getName().equals(name)).findFirst().orElse(null);
     }
 
     @Override
@@ -90,10 +84,7 @@ public class FileUserService implements UserService {
     @Override
     public void printServer(List<Server> list) {
         System.out.println("\n=========서버 목록==========");
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(i + 1 + " id : " + list.get(i).getId());
-            System.out.println(i + 1 + " name : " + list.get(i).getName());
-        }
+        list.forEach(s -> System.out.println(s.getId() + " : " + s.getName()));
         System.out.println("=========================\n");
     }
 
@@ -117,12 +108,11 @@ public class FileUserService implements UserService {
     public boolean removeServer(UUID userId, String targetName) {
         UserRepository userRepository = getUserRepository(userId);
         List<Server> list = userRepository.getServerList();
-
         if (list == null) {
             System.out.println("서버 삭제 실패 : list null값");
             return false;
         }
-        return removeServer(list, targetName,userRepository);
+        return removeServer(list, targetName, userRepository);
 
     }
 
@@ -185,16 +175,11 @@ public class FileUserService implements UserService {
         Server targetServer = list.stream().filter(server -> server.getName().equals(targetName))
                 .findFirst().orElse(null);
         if (targetServer != null) {
-            for (Server server : list) {
-                if (server.getId().equals(targetServer.getId())) {
-                    server.setName(replaceName);
-                    userRepository.updateServerList(list);
-                    return true;
-                }
-            }
-        } else {
-            System.out.println("업데이트할 서버가 존재하지 않습니다.");
+            targetServer.setName(replaceName);
+            userRepository.updateServerList(list);
+            return true;
         }
+        System.out.println("업데이트할 서버가 존재하지 않습니다.");
         return false;
     }
 }

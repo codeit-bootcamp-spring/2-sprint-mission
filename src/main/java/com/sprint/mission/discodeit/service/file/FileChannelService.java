@@ -5,15 +5,11 @@ import com.sprint.mission.discodeit.Repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class FileChannelService implements ChannelService {
     private static volatile FileChannelService instance;
     private final Map<UUID, ChannelRepository> channelTable = new HashMap<>();
-
-    private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "MessageList.ser");
 
     private FileChannelService() {
     }
@@ -66,12 +62,11 @@ public class FileChannelService implements ChannelService {
     public Message getMessage(UUID channelId, String str) {
         ChannelRepository channelRepository = getChannelRepository(channelId);
         List<Message> list = channelRepository.getList();
-        for (Message message : list) {
-            if (message.getStr().equals(str)) {
-                //로그
-                System.out.println(message.getStr() + " 이(가) 반환됩니다.");
-                return message;
-            }
+        Message message = list.stream().filter(m -> m.getStr().equals(str)).findFirst().orElse(null);
+        if (message != null) {
+            //로그
+            System.out.println(message.getStr() + " 이(가) 반환됩니다.");
+            return message;
         }
         //로그
         System.out.println("존재하지 않습니다.");
@@ -87,9 +82,7 @@ public class FileChannelService implements ChannelService {
 
     private void printChannel(List<Message> list) {
         System.out.println("\n=========채널 메시지 목록==========");
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(i + 1 + " : " + list.get(i).getStr());
-        }
+        list.forEach(m -> System.out.println(m.getStr()));
         System.out.println("=========================\n");
     }
 
@@ -97,16 +90,14 @@ public class FileChannelService implements ChannelService {
     public boolean removeMessage(UUID channelId, String targetName) {
         ChannelRepository channelRepository = getChannelRepository(channelId);
         List<Message> list = channelRepository.getList();
-        for (Message item : list) {
-            if (item.getStr().equals(targetName)) {
-                //로그
-                System.out.println(item.getStr() + " 이(가) 삭제됩니다.");
-                list.remove(item);
-                channelRepository.updateMessageList(list);
-                return true;
-            }
+        Message message = list.stream().filter(m -> m.getStr().equals(targetName)).findFirst().orElse(null);
+        if (message != null) {
+            System.out.println(message.getStr() + " 이(가) 삭제됩니다.");
+            list.remove(message);
+            channelRepository.updateMessageList(list);
+            return true;
         }
-        System.out.println("존재하지 않습니다.");
+        System.out.println("해당 메시지가 존재하지 않습니다.");
         return false;
     }
 
@@ -119,14 +110,9 @@ public class FileChannelService implements ChannelService {
         if (targetMessage == null) {
             System.out.println("업데이트할 메시지가 존재하지 않습니다.");
             return false;
-        } else {
-            for (Message message : list) {
-                if (message.getId().equals(targetMessage.getId())) {
-                    message.setStr(replaceName);
-                    channelRepository.updateMessageList(list);
-                }
-            }
         }
+        targetMessage.setStr(replaceName);
+        channelRepository.updateMessageList(list);
         return true;
     }
 }

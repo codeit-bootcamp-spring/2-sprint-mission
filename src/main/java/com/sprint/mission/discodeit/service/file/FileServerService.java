@@ -6,22 +6,18 @@ import com.sprint.mission.discodeit.Repository.file.FileServerRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ServerService;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class FileServerService implements ServerService {
     private static volatile FileServerService instance;
     private final Map<UUID, ServerRepository> serverTable = new HashMap<>();
 
-    private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "ContainerList.ser");
-
     private FileServerService() {
     }
 
     public static FileServerService getInstance() {
         if (instance == null) {
-            synchronized (FileServerService.class){
+            synchronized (FileServerService.class) {
                 if (instance == null) {
                     instance = new FileServerService();
                 }
@@ -81,9 +77,7 @@ public class FileServerService implements ServerService {
 
     private void printChannel(List<Channel> list) {
         System.out.println("\n=========채널 목록==========");
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(i + 1 + " : " + list.get(i).getName());
-        }
+        list.forEach(c-> System.out.println(c.getId() + " : " + c.getName()));
         System.out.println("=========================\n");
     }
 
@@ -99,7 +93,7 @@ public class FileServerService implements ServerService {
         System.out.print("삭제할 채널 이름을 입력하시오. : ");
         String targetName = sc.nextLine();
 
-        return removeChannel(channelList,targetName,serverRepository);
+        return removeChannel(channelList, targetName, serverRepository);
     }
 
     @Override
@@ -111,7 +105,7 @@ public class FileServerService implements ServerService {
             return false;
         }
 
-        return removeChannel(channelList,targetName,serverRepository);
+        return removeChannel(channelList, targetName, serverRepository);
     }
 
 
@@ -176,16 +170,11 @@ public class FileServerService implements ServerService {
         Channel targetChannel = list.stream().filter(c -> c.getName().equals(targetName))
                 .findFirst().orElse(null);
         if (targetChannel != null) {
-            for (Channel channel : list) {
-                if (channel.getId().equals(targetChannel.getId())) {
-                    channel.setName(replaceName);
-                    serverRepository.updateContainerList(list);
-                    return true;
-                }
-            }
-        } else {
-            System.out.println("업데이트할 채널이 존재하지 않습니다.");
+            targetChannel.setName(replaceName);
+            serverRepository.updateContainerList(list);
+            return true;
         }
+        System.out.println("업데이트할 채널이 존재하지 않습니다.");
         return false;
     }
 
