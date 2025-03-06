@@ -9,10 +9,18 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
+    private static JCFChannelService instance;
     private final ChannelRepository channelRepository;
 
-    public JCFChannelService() {
+    private JCFChannelService() {
         this.channelRepository = new JCFChannelRepository();
+    }
+
+    public static synchronized JCFChannelService getInstance() {
+        if (instance == null) {
+            instance = new JCFChannelService();
+        }
+        return instance;
     }
 
     @Override
