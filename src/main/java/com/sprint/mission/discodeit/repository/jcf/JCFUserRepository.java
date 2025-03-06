@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.AbstractRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
 
-public class JCFUserRepository implements UserRepository {
+public class JCFUserRepository extends AbstractRepository<User> implements UserRepository {
     private static volatile JCFUserRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
-    private final Map<UUID, User> users;
 
     private JCFUserRepository() {
-        users = new HashMap<>();
+        super(User.class, new HashMap<>());
     }
 
     public static JCFUserRepository getInstance() {
@@ -24,42 +24,5 @@ public class JCFUserRepository implements UserRepository {
             }
         }
         return instance;
-    }
-
-    @Override
-    public void add(User newUser) {
-        if (newUser == null) {
-            throw new IllegalArgumentException("newUser 는 null 이 될 수 없습니다!!!");
-        }
-        this.users.put(newUser.getId(), newUser);
-    }
-
-    @Override
-    public boolean existsById(UUID userId) {
-        if (userId == null) {
-            throw new IllegalArgumentException("null값을 가지는 userId가 들어왔습니다!!!");
-        }
-        return users.containsKey(userId);
-    }
-
-    @Override
-    public User findById(UUID userId) {
-        if (!existsById(userId)) {
-            throw new NoSuchElementException("해당 userId를 가진 사용자를 찾을 수 없습니다 : " + userId);
-        }
-        return this.users.get(userId);
-    }
-
-    @Override
-    public Map<UUID, User> getAll() {
-        return this.users;
-    }
-
-    @Override
-    public void deleteById(UUID userId) {
-        if (!existsById(userId)) {
-            throw new NoSuchElementException("해당 userId를 가진 사용자를 찾을 수 없습니다 : " + userId);
-        }
-        this.users.remove(userId);
     }
 }
