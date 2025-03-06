@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.*;
 
 public class FileMessageRepository implements MessageRepository {
-    private final String fileName = "messages.ser";
+    private final String fileName = "message.ser";
     private final Map<UUID, Message> messageMap;
 
     public FileMessageRepository() {

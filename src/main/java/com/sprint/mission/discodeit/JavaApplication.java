@@ -63,4 +63,3 @@ public class JavaApplication {
         messageCreateTest(fileMessageService, fileChannel, fileUser);
     }
 }
-

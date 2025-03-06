@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.*;
 
 public class FileUserRepository implements UserRepository {
-    private final String fileName = "users.ser";
+    private final String fileName = "user.ser";
     private final Map<UUID, User> userMap;
 
     public FileUserRepository() {
