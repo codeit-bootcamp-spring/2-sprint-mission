@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -25,10 +23,10 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void createMessage(User sender, String content, Channel channel) {
-        UserService.validateUserId(sender.getId(), this.jcfUserRepository);
-        ChannelService.validateChannelId(channel.getId(), this.jcfChannelRepository);
-        Message newMessage = new Message(sender, content, channel);     //content에 대한 유효성 검증은 Message 생성자에게 맡긴다.
+    public void createMessage(UUID senderId, String content, UUID channelId) {
+        UserService.validateUserId(senderId, this.jcfUserRepository);
+        ChannelService.validateChannelId(channelId, this.jcfChannelRepository);
+        Message newMessage = new Message(senderId, content, channelId);     //content에 대한 유효성 검증은 Message 생성자에게 맡긴다.
         jcfMessageRepository.add(newMessage);
     }
 

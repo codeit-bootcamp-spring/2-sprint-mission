@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.Map;
@@ -10,7 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public interface MessageService {
-    void createMessage(User sender, String content, Channel channel);
+    void createMessage(UUID senderId, String content, UUID channelId);
     Message readMessage(UUID messageId);
     Map<UUID, Message> readAllMessages();
     void updateMessageContent(UUID messageId, String content);
