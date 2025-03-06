@@ -7,21 +7,22 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import java.util.List;
 
 public class JavaApplication {
     static void userCRUDTest(UserService userService) {
         // 생성
-        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        User user = userService.create("sang", "sang@codeit.com", "sang1234");
         System.out.println("유저 생성: " + user.getId());
         // 조회
-        User foundUser = userService.findById(user.getId());
-        System.out.println("유저 조회(단건): " + foundUser.getId());
         List<User> foundUsers = userService.findAll();
         System.out.println("유저 조회(다건): " + foundUsers.size());
+        User foundUser = userService.findById(user.getId());
+        System.out.println("유저 조회(단건): " + foundUser.getId());
+
         // 수정
         User updatedUser = userService.update(user.getId(), null, null, "woody5678");
         System.out.println("유저 수정: " + String.join("/", updatedUser.getUsername(), updatedUser.getEmail(),
@@ -72,9 +73,9 @@ public class JavaApplication {
 
     public static void main(String[] args) {
         // 서비스 초기화
-        UserService userService = JCFUserService.getInstance();
-        ChannelService channelService = JCFChannelService.getInstance();
-        MessageService messageService = JCFMessageService.getInstance(userService, channelService);
+        UserService userService = FileUserService.getInstance();
+        ChannelService channelService = FileChannelService.getInstance();
+        MessageService messageService = FileMessageService.getInstance(userService, channelService);
 
         // 테스트
         userCRUDTest(userService);
