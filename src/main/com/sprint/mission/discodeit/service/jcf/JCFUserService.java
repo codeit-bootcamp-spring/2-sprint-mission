@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.service.jcf;
+package main.com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
+import main.com.sprint.mission.discodeit.entity.User;
+import main.com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
@@ -21,11 +21,11 @@ public class JCFUserService implements UserService {
     // Read - 읽기, 조회
     @Override
     public List<User> getAllUser(){
-        List<User> userList;
-        for(Map<UUID, User> entry : usermap.entrySet()){
-            userList.append(entry.getValue())
+        List<User> userList = null;
+        for(Map.Entry<UUID, User> entry : usermap.entrySet()){
+            userList.add(entry.getValue());
         }
-        return userlist;
+        return userList;
     }
     @Override
     public Optional<User> getOneUser(UUID id){

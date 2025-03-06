@@ -1,17 +1,17 @@
-package com.sprint.mission.discodeit.service.jcf;
+package main.com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import main.com.sprint.mission.discodeit.entity.Channel;
+import main.com.sprint.mission.discodeit.entity.Message;
+import main.com.sprint.mission.discodeit.entity.User;
+import main.com.sprint.mission.discodeit.service.ChannelService;
+import main.com.sprint.mission.discodeit.service.MessageService;
+import main.com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
 // MessageService interface를 참조하여 기능을 구현한다.
 public class JCFMessageService implements MessageService {
-    Map<UUID, Message> messagemap = new HashMap<UUID, Message>();
+    private final Map<UUID, Message> messagemap = new HashMap<UUID, Message>();
     UserService userservice;
     ChannelService channelservice;
 
@@ -21,7 +21,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public boolean createMessage(String message, String username, String channelname){
+    public void createMessage(String message, String username, String channelname){
         UUID userid = null;
         UUID channelid = null;
         Map<UUID, User> temp = userservice.getAllUser();

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity;
+package main.com.sprint.mission.discodeit.entity;
 
 // 채팅방을 관리하는 클래스
 public class Channel extends BaseEntity {

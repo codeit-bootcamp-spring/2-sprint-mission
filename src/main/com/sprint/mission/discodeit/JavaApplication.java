@@ -1,22 +1,35 @@
-package com.sprint.mission.discodeit;
+package main.com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import main.com.sprint.mission.discodeit.entity.Channel;
+import main.com.sprint.mission.discodeit.entity.Message;
+import main.com.sprint.mission.discodeit.entity.User;
+import main.com.sprint.mission.discodeit.service.ChannelService;
+import main.com.sprint.mission.discodeit.service.MessageService;
+import main.com.sprint.mission.discodeit.service.UserService;
+import main.com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import main.com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import main.com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
-import java.util.Map;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 public class JavaApplication {
+    // find user
+    public boolean checkUser(UserService userServ, String name) {
+        List<User> temp = userServ.getAllUser();
+        for (User eachuser : temp)
+            if (eachuser.getUsername().equals(name))
+                return true;
+        return false;
+    }
+    // find channel
+    public boolean checkChannel(ChannelService channelServ, String name) {
+        List<Channel> temp = channelServ.getAllChannel();
+    }
+    // find message
+
     public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
+        JavaApplication app = new JavaApplication();
 
         // service 구현 객체 생성
         UserService userService = new JCFUserService();
@@ -45,38 +58,29 @@ public class JavaApplication {
                 case 1:
                     System.out.print("User name: ");
                     String name = scanner.nextLine();
-                    userService.CreateUser(name);
-                    System.out.println("User Create Complete");
+                    if(app.checkUser(userService, name)) {
+                        userService.createUser(name);
+                        System.out.println("User Create Complete");
+                    }
+                    else
+                        System.out.println("User Create Failed");
                     break;
                 case 2:
                     System.out.print("User name for search: ");
                     String name2 = scanner.nextLine();
-                    Map<UUID, User> temp = userService.getAllUser();
-                    boolean exist = false;
-                    for(User eachuser : temp.values()) {
-                        if (eachuser.getUsername().equals(name2)) {
-                            System.out.println("User name: " + name2 + ", exist");
-                            exist = true;
-                            break;
-                        }
-                    }
-                    if(!exist)
+                    if(app.checkUser(userService, name2))
+                        System.out.println("User name: " + name2 + ", exist");
+                    else
                         System.out.println("Can't find user");
                     break;
                 case 3:
                     System.out.print("User name for delete: ");
                     String name3 = scanner.nextLine();
-                    Map<UUID, User> temp3 = userService.getAllUser();
-                    boolean exist3 = false;
-                    for(User eachuser : temp3.values()) {
-                        if (eachuser.getUsername().equals(name3)) {
-                            userService.DeleteUser(eachuser.getId());
-                            System.out.println("User name: " + name3 + ", delete complete");
-                            exist3 = true;
-                            break;
-                        }
+                    if(app.checkUser(userService, name3)){
+                        userService.DeleteUser(eachuser.getId());
+                        System.out.println("User name: " + name3 + ", delete complete");
                     }
-                    if(!exist3)
+                    else
                         System.out.println("Can't find user");
                     break;
                 // ----------------- Channel --------------------

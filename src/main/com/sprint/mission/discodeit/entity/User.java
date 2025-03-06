@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity;
+package main.com.sprint.mission.discodeit.entity;
 
 // parent = BaseEntity
 public class User extends BaseEntity {
