@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.List;
@@ -10,8 +11,8 @@ import java.util.UUID;
 public class JCFChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
-    public JCFChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
+    public JCFChannelService() {
+        this.channelRepository = new JCFChannelRepository();
     }
 
     @Override
@@ -23,7 +24,11 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel getChannel(UUID id) {
-        return channelRepository.findById(id);
+        Channel channel = channelRepository.findById(id);
+        if (channel == null) {
+            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
+        }
+        return channel;
     }
 
     @Override
@@ -33,15 +38,14 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void updateChannel(UUID id, String newChannelName) {
-        Channel channel = channelRepository.findById(id);
-        if (channel != null) {
-            channel.updateChannelName(newChannelName);
-            channelRepository.save(channel);
-        }
+        Channel channel = getChannel(id);
+        channel.updateChannelName(newChannelName);
+        channelRepository.save(channel);
     }
 
     @Override
     public void deleteChannel(UUID id) {
+        getChannel(id);
         channelRepository.delete(id);
     }
 }
