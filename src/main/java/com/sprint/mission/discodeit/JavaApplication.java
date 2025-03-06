@@ -4,12 +4,18 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import java.util.List;
 
 public class JavaApplication {
@@ -71,11 +77,35 @@ public class JavaApplication {
         System.out.println("메시지 삭제: " + foundMessagesAfterDelete.size());
     }
 
+    static User setupUser(UserService userService) {
+        User user = userService.create("sang", "sang@codeit.com", "sang1234");
+        return user;
+    }
+
+    static Channel setupChannel(ChannelService channelService) {
+        Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+        return channel;
+    }
+
     public static void main(String[] args) {
         // 서비스 초기화
-        UserService userService = FileUserService.getInstance();
-        ChannelService channelService = FileChannelService.getInstance();
-        MessageService messageService = FileMessageService.getInstance(userService, channelService);
+//        UserRepository userRepository = new FileUserRepository();
+//        ChannelRepository channelRepository = new FileChannelRepository();
+//        MessageRepository messageRepository = new FileMessageRepository();
+
+        UserRepository userRepository = new JCFUserRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
+
+        BasicUserService basicUserService = new BasicUserService(userRepository);
+        BasicChannelService basicChannelService = new BasicChannelService(channelRepository);
+
+        UserService userService = basicUserService;
+        ChannelService channelService = basicChannelService;
+
+        BasicMessageService basicMessageService = new BasicMessageService(messageRepository, userService,
+                channelService);
+        MessageService messageService = basicMessageService;
 
         // 테스트
         userCRUDTest(userService);
