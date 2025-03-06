@@ -42,6 +42,39 @@ public class FileChannelService implements ChannelService {
         saveInFile(channels, "Channels.csv");
     }
 
+    @Override
+    public void addMember(UUID channelId, User user) {
+        Channel channel = find(channelId);
+        if (channel == null) {
+            throw new RuntimeException("채널이 존재하지 않습니다.");
+        }
+        channel.addMember(user);
+        update(channel);
+        System.out.println("유저 [" + user.getName() + "]가 채널 [" + channel.getChannelName() + "]에 추가되었습니다.");
+    }
+
+    @Override
+    public void removeMember(UUID channelId, User user) {
+        Channel channel = find(channelId);
+        if (channel == null) {
+            throw new RuntimeException("채널이 존재하지 않습니다.");
+        }
+        channel.removeMember(user);
+        update(channel);
+        System.out.println("유저 [" + user.getName() + "]가 채널 [" + channel.getChannelName() + "]에서 제거되었습니다.");
+    }
+
+    @Override
+    public List<User> findMembers(UUID channelId) {
+        Channel channel = find(channelId);
+        if (channel == null) {
+            throw new RuntimeException("채널이 존재하지 않습니다.");
+        }
+        ArrayList<User> members = new ArrayList<>(channel.getMembers());
+        System.out.println("채널 [" + channel.getChannelName() + "]에 등록된 유저 목록: " + members);
+        return members;
+    }
+
     public static void saveInFile(Map<UUID, Channel> channels, String fileName) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
             // 헤더

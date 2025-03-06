@@ -24,6 +24,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void create(User user) {
+        System.out.println("==== 유저 생성 중... ===");
         if (user == null) {
             throw new IllegalArgumentException("유저 정보가 NULL입니다.");
         }
@@ -32,11 +33,12 @@ public class BasicUserService implements UserService {
             throw new RuntimeException("유저가 이미 존재합니다.");
         }
         userRepository.create(user);
-        System.out.println("[" + user +"] 생성을 완료하였습니다. " + user.getId());
+        System.out.println("[" + user +"] 유저 생성 완료 " + user.getId());
     }
 
     @Override
     public User find(UUID id) {
+        System.out.println("==== 유저(단건) 조회 중... ===");
         if (id == null) {
             throw new IllegalArgumentException("ID가 NULL입니다.");
         }
@@ -50,6 +52,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public List<User> findAll() {
+        System.out.println("==== 유저(다건) 조회 중... ===");
         if (userRepository.findAll().isEmpty()) {
             System.out.println("등록된 유저가 없습니다.");
         }
@@ -59,6 +62,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void update(User user) {
+        System.out.println("==== 유저 수정 중... ===");
         if (user == null) {
             throw new IllegalArgumentException("유저 정보가 NULL입니다.");
         }
@@ -67,11 +71,12 @@ public class BasicUserService implements UserService {
             throw new RuntimeException("유저가 존재하지 않습니다.");
         }
         userRepository.update(user);
-        System.out.println("[" + user +"] 수정을 완료하였습니다. " + user.getId());
+        System.out.println("[" + user +"] 유저 수정 완료 " + user.getId());
     }
 
     @Override
     public void delete(UUID id) {
+        System.out.println("==== 유저 삭제 중... ===");
         if (id == null) {
             throw new IllegalArgumentException("ID가 NULL입니다.");
         }
@@ -80,6 +85,6 @@ public class BasicUserService implements UserService {
             throw new RuntimeException("유저가 존재하지 않습니다.");
         }
         userRepository.delete(id);
-        System.out.println("유저 삭제를 완료하였습니다.");
+        System.out.println("유저 삭제 완료");
     }
 }

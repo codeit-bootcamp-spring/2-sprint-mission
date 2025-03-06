@@ -34,6 +34,11 @@ public class FileMessageService implements MessageService {
             return;
         }
 
+        if (!channel.isMember(sender)) {
+            System.out.println("유저가 채널에 등록되어 있지 않습니다.");
+            return;
+        }
+
         messages.put(message.getId(), message);
         saveInFile(messages, "messages.ser");
     }

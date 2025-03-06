@@ -17,20 +17,28 @@ import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 public class JavaApplication {
-    static User setupUser(UserService userService) {
-        User user = new User("빅뱅");
+    static User setupUser1(UserService userService) {
+        User user = new User("세종대왕");
         userService.create(user);
         return user;
     }
 
-    static Channel setupChannel(ChannelService channelService) {
-        Channel channel = new Channel("앨범");
+    static User setupUser2(UserService userService) {
+        User user = new User("이순신");
+        userService.create(user);
+        return user;
+    }
+
+    static Channel setupChannel(ChannelService channelService, User user) {
+        Channel channel = new Channel("과제");
         channelService.create(channel);
+        channelService.addMember(channel.getId(), user);
+        channelService.findMembers(channel.getId());
         return channel;
     }
 
     static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-        Message message = new Message(author, "봄여름가을겨울", channel);
+        Message message = new Message(author, "안녕하세요", channel);
         messageService.create(message);
     }
 
@@ -44,9 +52,11 @@ public class JavaApplication {
         MessageService messageService = BasicMessageService.getInstance(userService, channelService, messageRepository);
 
         // 셋업
-        User user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
+        User user1 = setupUser1(userService);
+        User user2 = setupUser2(userService);
+        Channel channel = setupChannel(channelService, user1);
         // 테스트
-        messageCreateTest(messageService, channel, user);
+        messageCreateTest(messageService, channel, user1);
+        messageCreateTest(messageService, channel, user2);
     }
 }

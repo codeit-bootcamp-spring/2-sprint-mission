@@ -8,10 +8,8 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 public class BasicMessageService implements MessageService {
     private static BasicMessageService instance;
@@ -34,6 +32,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void create(Message message) {
+        System.out.println("==== 메시지 생성 중... ===");
         User sender = message.getSender();
         Channel channel = message.getChannel();
 
@@ -46,12 +45,18 @@ public class BasicMessageService implements MessageService {
             System.out.println("채널이 존재하지 않습니다.");
             return;
         }
+
+        if (!channel.isMember(sender)) {
+            System.out.println("유저가 채널에 등록되어 있지 않습니다.");
+            return;
+        }
         messageRepository.create(message);
-        System.out.println("[" + message +"] 생성 완료 " + message.getId());
+        System.out.println("[" + message +"] 메시지 생성 완료 " + message.getId());
     }
 
     @Override
     public Message find(UUID id) {
+        System.out.println("==== 메시지(단건) 조회 중... ===");
         if (id == null) {
             throw new IllegalArgumentException("ID가 NULL입니다.");
         }
@@ -65,6 +70,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<Message> findAll() {
+        System.out.println("==== 메시지(다건) 조회 중... ===");
         if (messageRepository.findAll().isEmpty()) {
             System.out.println("등록된 메시지가 없습니다.");
         }
@@ -74,6 +80,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void update(Message message) {
+        System.out.println("==== 메시지 수정 중... ===");
         User sender = message.getSender();
         Channel channel = message.getChannel();
 
@@ -86,12 +93,18 @@ public class BasicMessageService implements MessageService {
             System.out.println("채널이 존재하지 않습니다.");
             return;
         }
-        System.out.println("[" + message +"] 수정 완료 " + message.getId());
+
+        if (!channel.isMember(sender)) {
+            System.out.println("유저가 채널에 등록되어 있지 않습니다.");
+            return;
+        }
+        System.out.println("[" + message +"] 메시지 수정 완료 " + message.getId());
         messageRepository.update(message);
     }
 
     @Override
     public void delete(UUID id) {
+        System.out.println("==== 메시지 삭제 중... ===");
         if (id == null) {
             throw new IllegalArgumentException("ID가 NULL입니다.");
         }
@@ -100,6 +113,6 @@ public class BasicMessageService implements MessageService {
             throw new RuntimeException("메시지가 존재하지 않습니다.");
         }
         messageRepository.delete(id);
-        System.out.println("메시지 삭제를 완료하였습니다.");
+        System.out.println("메시지 삭제 완료.");
     }
 }
