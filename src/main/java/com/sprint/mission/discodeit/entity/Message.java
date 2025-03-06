@@ -5,9 +5,9 @@ import java.util.UUID;
 
 public class Message extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 3L;
-    private UUID senderId;
+    private final UUID senderId;
     private String content;
-    private UUID channelId;
+    private final UUID channelId;
     private boolean isEdited;
 
     public Message(UUID senderId, String content, UUID channelId) {
