@@ -49,6 +49,7 @@ public class FileUserRepository implements UserRepository {
     private Map<UUID, User> loadUsers() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {
+            System.out.println("users.ser not found. Generating new one.");
             return new HashMap<>();
         }
 
@@ -56,6 +57,7 @@ public class FileUserRepository implements UserRepository {
             return (Map<UUID, User>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+            System.out.println("err. Returning new one.");
             return new HashMap<>();
         }
     }
@@ -63,6 +65,7 @@ public class FileUserRepository implements UserRepository {
     private void saveUsers(Map<UUID, User> users) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(users);
+            System.out.println("users saved.");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -49,6 +49,7 @@ public class FileChannelrepository implements ChannelRepository {
     private Map<UUID, Channel> loadChannels() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {
+            System.out.println("File not found. Generating new one.");
             return new HashMap<>();
         }
 
@@ -56,6 +57,7 @@ public class FileChannelrepository implements ChannelRepository {
             return (Map<UUID, Channel>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+            System.out.println("err. Returning new one.");
             return new HashMap<>();
         }
     }
@@ -63,6 +65,7 @@ public class FileChannelrepository implements ChannelRepository {
     private void saveChannels(Map<UUID, Channel> channels) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(channels);
+            System.out.println("channels saved.");
         } catch(IOException e) {
             e.printStackTrace();
         }

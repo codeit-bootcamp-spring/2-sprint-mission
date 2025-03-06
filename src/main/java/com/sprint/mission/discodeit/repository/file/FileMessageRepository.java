@@ -48,6 +48,7 @@ public class FileMessageRepository implements MessageRepository {
     private Map<UUID, Message> loadMessages() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {
+            System.out.println("file not found. Creating new one.");
             return new HashMap<>();
         }
 
@@ -55,6 +56,7 @@ public class FileMessageRepository implements MessageRepository {
             return (Map<UUID, Message>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+            System.out.println("err. Returning new one.");
             return new HashMap<>();
         }
     }
@@ -62,6 +64,7 @@ public class FileMessageRepository implements MessageRepository {
     private void saveMessages(Map<UUID, Message> messages) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(messages);
+            System.out.println("messages saved.");
         }catch (IOException e) {
             e.printStackTrace();
         }
