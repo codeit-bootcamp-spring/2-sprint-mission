@@ -10,13 +10,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileMessageRepository implements MessageRepository, FileRepository<Message> {
     private static volatile FileMessageRepository instance;
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "messages");
+    private final Map<UUID, Message> messageMap;
+
 
     public static FileMessageRepository getInstance() {
         if (instance == null) {
@@ -31,26 +32,30 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
 
     private FileMessageRepository() {
         SerializationUtil.init(directory);
+        messageMap = new ConcurrentHashMap<>();
+        loadCacheFromFile();
     }
 
     @Override
     public Message save(Message message) {
+        messageMap.put(message.getId(), message);
         saveToFile(message);
         return message;
     }
 
     @Override
     public Optional<Message> findById(UUID messageId) {
-        return loadOneFromFileById(messageId);
+        return Optional.ofNullable(messageMap.get(messageId));
     }
 
     @Override
     public List<Message> findAll() {
-        return loadAllFromFile();
+        return new ArrayList<>(messageMap.values());
     }
 
     @Override
     public void deleteById(UUID messageId) {
+        messageMap.remove(messageId);
         deleteFileById(messageId);
     }
 
@@ -61,10 +66,6 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
         SerializationUtil.serialization(filePath, message);
     }
 
-    @Override
-    public Optional<Message> loadOneFromFileById(UUID messageId) {
-        return Optional.ofNullable(SerializationUtil.reverseOneSerialization(directory,messageId));
-    }
 
     @Override
     public List<Message> loadAllFromFile() {
@@ -78,6 +79,13 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
             System.out.println("메시지 파일 삭제 예외 발생 : " + e.getMessage());
+        }
+    }
+
+    private void loadCacheFromFile() {
+        List<Message> messages = SerializationUtil.reverseSerialization(directory);
+        for (Message message : messages) {
+            messageMap.put(message.getId(), message);
         }
     }
 }
