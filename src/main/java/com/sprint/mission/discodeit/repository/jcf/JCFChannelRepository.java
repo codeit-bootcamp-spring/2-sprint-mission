@@ -69,6 +69,6 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public boolean exists(UUID channelId) {
-        return channels.containsKey(channelId) && channels.containsKey(channelId);
+        return channels.containsKey(channelId) && memberIdsByChannelId.containsKey(channelId);
     }
 }

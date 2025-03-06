@@ -4,18 +4,13 @@ import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicatedUserException;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.io.IOException;
@@ -33,8 +28,11 @@ public class JavaApplication {
 //
 //        test(jcfUserService, jcfChannelService, jcfMessageService);
 
-        UserRepository fileUserRepository = FileUserRepository.getInstance(Path.of("data/users.ser"));
+        UserRepository fileUserRepository = FileUserRepository.getInstance(Path.of("data/userData.ser"));
+        FileChannelRepository fileChannelRepository = FileChannelRepository.getInstance(Path.of("data/channelData.ser"));
         UserService fileUserService = JCFUserService.getInstance(fileUserRepository);
+        ChannelService fileChannelService = FileChannelService.getInstance(fileUserService, fileChannelRepository);
+
 
         System.out.println("=========== 유저 생성 및 유저 리스트 조회 테스트 ===========");
         System.out.println("=========== 예상 결과: 유저 7명 나옴 ===========");
@@ -94,6 +92,70 @@ public class JavaApplication {
         System.out.println("=========== 삭제 이후: 5명이여야 함 ===========");
         fileUserService.getAllUsers().forEach(System.out::println);
         System.out.println("=========== 유저 삭제 테스트 끝===========");
+        System.out.println();
+
+//////////////////////
+        //체널 등록 테스트
+        System.out.println("=========== 채널 생성 및 전체 채널 리스트 조회 테스트 ===========");
+        System.out.println("=========== 예상 결과: 채널 4개 나옴 ===========");
+        Channel channel1 = fileChannelService.createChannel(user1.getId(), "sb02", "코드잇 스프린트 2기");
+        Channel channel2 = fileChannelService.createChannel(user2.getId(), "스프링 공부방", "스프링 공부하는중");
+        Channel channel3 = fileChannelService.createChannel(user2.getId(), "이거거거거", "아아아아아");
+        Channel channel4 = fileChannelService.createChannel(user3.getId(), "스프링 공부방", "다른 방 베낌");
+
+        fileChannelService.getAllChannels().forEach(System.out::println);
+        System.out.println("=========== 채널 생성 및 전체 채널 리스트 조회 테스트 끝 ===========");
+        System.out.println();
+
+        //조회 테스트
+        System.out.println("=========== 채널 조회 테스트 ===========");
+        System.out.println("=========== 채널 주인 조회: Han이 나와야 함 ===========");
+        UUID ownerId1 = fileChannelService.getChannelOwnerId(channel1.getId());
+        System.out.println(fileUserService.getUserByUserId(ownerId1));
+        System.out.println("=========== 채널 id로 채널 조회: sb02 방이 나와야 함 ===========");
+        System.out.println(fileChannelService.getChannelByChannelId(channel1.getId()));
+        System.out.println("=========== 채널 조회 테스트 끝 ===========");
+        System.out.println();
+
+        //채널 멤버 추가 및 조회 테스트
+        System.out.println("=========== 채널 멤버 추가,삭제 및 조회 테스트 ===========");
+        fileChannelService.addUserToChannel(channel1.getId(), user1.getId());
+        fileChannelService.addUserToChannel(channel1.getId(), user2.getId());
+        fileChannelService.addUserToChannel(channel1.getId(), user2.getId());
+        fileChannelService.addUserToChannel(channel1.getId(), user3.getId());
+        System.out.println("=========== Han, Kim, Nice가 나와야 함 ===========");
+        fileChannelService.getChannelMembers(channel1.getId()).forEach((u) -> {
+            System.out.println(fileUserService.getUserByUserId(u));
+        });
+        System.out.println("=========== Kim, Han(오너여서 제거 안 됨) 삭제 시도: Han, Nice가 나와야 함 ===========");
+        try {
+            fileChannelService.deleteUserFromChannel(channel1.getId(), user1.getId());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+        fileChannelService.deleteUserFromChannel(channel1.getId(), user2.getId());
+        fileChannelService.getChannelMembers(channel1.getId()).forEach((u) -> {
+            System.out.println(fileUserService.getUserByUserId(u));
+        });
+        System.out.println("=========== 채널 멤버 추가,삭제 및 조회 테스트 끝 ===========");
+        System.out.println();
+
+        //채널 업데이트
+        System.out.println("=========== 채널 업데이트 테스트: 제목은 '바꿨으' ===========");
+        fileChannelService.updateChannel(channel1.getId(), "바꿨으", channel1.getDescription());
+        System.out.println(fileChannelService.getChannelByChannelId(channel1.getId()));
+
+
+        //채널 삭제 테스트
+        System.out.println("=========== 채널 삭제 테스트 ===========");
+        System.out.println("=========== 채널 목록: 4개 ===========");
+        fileChannelService.getAllChannels().forEach(System.out::println);
+
+        System.out.println("=========== 채널 하나 삭제: 3개 남아야 함 ===========");
+        fileChannelService.deleteChannelByChannelId(channel4.getId());
+        fileChannelService.getAllChannels().forEach(System.out::println);
+        System.out.println("=========== 채널 삭제 테스트 끝===========");
+        System.out.println();
         System.out.println();
 
 

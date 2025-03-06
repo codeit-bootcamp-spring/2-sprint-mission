@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
@@ -8,22 +8,22 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
-public class JCFChannelService implements ChannelService {
-    private static volatile JCFChannelService instance;
+public class FileChannelService implements ChannelService {
+    private static volatile FileChannelService instance;
 
     private final UserService userService;
     private final ChannelRepository channelRepository;
 
-    private JCFChannelService(UserService userService, ChannelRepository channelRepository) {
+    private FileChannelService(UserService userService, ChannelRepository channelRepository) {
         this.userService = userService;
         this.channelRepository = channelRepository;
     }
 
-    public static JCFChannelService getInstance(UserService userService, ChannelRepository channelRepository) {
+    public static FileChannelService getInstance(UserService userService, ChannelRepository channelRepository) {
         if (instance == null) {
-            synchronized (JCFChannelService.class) {
+            synchronized (FileChannelService.class) {
                 if (instance == null) {
-                    instance = new JCFChannelService(userService, channelRepository);
+                    instance = new FileChannelService(userService, channelRepository);
                 }
             }
         }
