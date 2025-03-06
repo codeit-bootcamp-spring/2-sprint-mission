@@ -19,14 +19,15 @@ public class JavaApplication_Basic {
 
         User user = new User("woody");
         userService.create(user);
-        System.out.println("✅ 사용자 생성: " + user.getUserName());
+        System.out.println("✅ 사용자 생성: " + user.getUserName() + "  ID: " + user.getId());
 
         Channel channel = new Channel("공지 채널입니다.");
         channelService.create(channel);
-        System.out.println("✅ 채널 생성: " + channel.getName());
+        System.out.println("✅ 채널 생성: " + channel.getName() + "  ID: " + channel.getId());
 
         Message message = new Message("안녕하세요.", channel.getId(), user.getId());
         messageService.create(message);
-        System.out.println("✅ 메시지 생성: " + message.getContent());
+        System.out.println("✅ 메시지 생성: " + message.getContent() + "  ID: " + message.getId());
+
     }
 }

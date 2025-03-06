@@ -24,7 +24,7 @@ public class JavaApplication_FileIO {
         // 사용자 저장 및 불러오기
         User user = new User("Jaeseok");
         userRepository.save(user);
-        System.out.println("✅ User 저장 완료: " + user.getUserName());
+        System.out.println("✅ User 저장 완료: " + user.getUserName() + "  ID: " + user.getId());
 
         Optional<User> loadedUser = userRepository.findById(user.getId());
         System.out.println("📁 Loaded User: " + loadedUser.map(User::getUserName).orElse("User not found"));
@@ -32,7 +32,7 @@ public class JavaApplication_FileIO {
         // 채널 저장 로드 테스트
         Channel channel = new Channel("Back-End Sprint 2");
         channelRepository.save(channel);
-        System.out.println("✅ Channel 저장 완료: " + channel.getName());
+        System.out.println("✅ Channel 저장 완료: " + channel.getName() + "  ID: " + channel.getId());
 
         Optional<Channel> loadedChannel = channelRepository.findById(channel.getId());
         System.out.println("📁 Loaded Channel: " + loadedChannel.map(Channel::getName).orElse("Channel not found"));
@@ -40,7 +40,7 @@ public class JavaApplication_FileIO {
         // 메시지 저장 및 로드 테스트
         Message message = new Message("안녕하세요. 저는 허재석입니다.", user.getId(), channel.getId());
         messageRepository.save(message);
-        System.out.println("✅ Message 저장 완료: " + message.getContent());
+        System.out.println("✅ Message 저장 완료: " + message.getContent() + "  ID: " + message.getId());
 
         Optional<Message> loadedMessage = messageRepository.findById(message.getId());
         System.out.println("📁 Loaded Message: " + loadedMessage.map(Message::getContent).orElse("Message not found"));
