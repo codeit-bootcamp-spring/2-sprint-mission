@@ -33,10 +33,12 @@ public class Channel extends BaseEntity implements Serializable {
 
     public void addMembers(UUID userId) {
         this.members.add(userId);
+        updateTimestamp();
     }
 
     public void removeMember(UUID userId) {
         this.members.remove(userId);
+        updateTimestamp();
     }
 
     public Set<UUID> getMessages() {
@@ -45,13 +47,15 @@ public class Channel extends BaseEntity implements Serializable {
 
     public void addMessages(UUID MessagesId) {
         this.messages.add(MessagesId);
+        updateTimestamp();
     }
 
     public void removeMessage(UUID MessagesId) {
         this.messages.remove(MessagesId);
+        updateTimestamp();
     }
 
-    public boolean isUserInChannel(UUID userId){
+    public boolean isUserInChannel(UUID userId) {
         return this.members.contains(userId);
     }
 
@@ -64,6 +68,7 @@ public class Channel extends BaseEntity implements Serializable {
         return "Channel{" +
                 "channelName='" + channelName + '\'' +  // 오타 수정
                 ", members=" + members +
+                ", lastUpdateTime= " + getUpdatedAt() +
                 '}';
     }
 }

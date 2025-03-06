@@ -40,6 +40,7 @@ public class Message extends BaseEntity implements Serializable {
                 ", sendTime= " + getCreatedAt() +
                 ", channelId= " + channelId +
                 ", content= '" + content + '\'' +
+                ", lastUpdateTime= " + getUpdatedAt() +
                 '}';
     }
 }

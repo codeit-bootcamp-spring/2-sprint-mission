@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 public abstract class BaseEntity {
-    protected UUID id;
-    protected Long createdAt;
+    protected final UUID id;
+    protected final Long createdAt;
     protected Long updatedAt;
 
     public BaseEntity() {
