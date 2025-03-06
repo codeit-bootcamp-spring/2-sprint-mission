@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity implements Comparable<User> {
+import java.io.Serializable;
+
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String userName;
     private String userEmail;
     private String password;
@@ -44,6 +47,7 @@ public class User extends BaseEntity implements Comparable<User> {
             throw new IllegalArgumentException("Username 은 null 이거나 공백일 수 없다!!!");
         }
     }
+
     public static void validateUserEmail(String userEmail) {
         if (userEmail == null || userEmail.trim().isEmpty()) {
             throw new IllegalArgumentException("UserEmail 은 null 이거나 공백일 수 없다!!!");
@@ -81,10 +85,5 @@ public class User extends BaseEntity implements Comparable<User> {
                 + "id: " + super.getId() + '\n'
                 + "createdAt: " + super.getCreatedAt() + '\n'
                 + "updatedAt: " + super.getUpdatedAt() + '\n';
-    }
-
-    @Override
-    public int compareTo(User other) {      // 아직 사용하지 않는듯? 내가 왜 구현해놨는지 모르겠다
-        return this.userName.compareTo(other.userName);
     }
 }
