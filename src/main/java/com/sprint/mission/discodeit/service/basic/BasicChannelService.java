@@ -14,10 +14,18 @@ public class BasicChannelService implements ChannelService {
 
     private static ChannelRepository channelRepository;
     private static UserRepository userRepository;
+    private static BasicChannelService INSTANCE;
 
     public BasicChannelService(ChannelRepository channelRepository, UserRepository userRepository) {
         this.channelRepository = channelRepository;
         this.userRepository = userRepository;
+    }
+
+    public static synchronized BasicChannelService getInstance(ChannelRepository channelRepository, UserRepository userRepository) {
+        if (INSTANCE == null) {
+            INSTANCE = new BasicChannelService(channelRepository, userRepository);
+        }
+        return INSTANCE;
     }
 
     @Override

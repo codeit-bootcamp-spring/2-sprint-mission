@@ -8,10 +8,19 @@ import java.util.List;
 import java.util.UUID;
 
 public class BasicUserService implements UserService {
+
+    private static BasicUserService INSTANCE;
     private final UserRepository userRepository;
 
-    public BasicUserService(UserRepository userRepository) {
+    private BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public static synchronized BasicUserService getInstance(UserRepository userRepository) {
+        if (INSTANCE == null) {
+            INSTANCE = new BasicUserService(userRepository);
+        }
+        return INSTANCE;
     }
 
     @Override

@@ -13,16 +13,26 @@ import java.util.stream.Collectors;
 
 public class BasicMessageService implements MessageService {
 
-    private static MessageRepository messageRepository;
-    private static ChannelRepository channelRepository;
-    private static UserRepository userRepository;
+    private static BasicMessageService INSTANCE;
+    private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
 
 
-    public BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository, UserRepository userRepository) {
+    private BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository, UserRepository userRepository) {
         this.messageRepository = messageRepository;
         this.channelRepository = channelRepository;
         this.userRepository = userRepository;
     }
+
+    public static synchronized BasicMessageService getInstance(MessageRepository messageRepository, ChannelRepository channelRepository, UserRepository userRepository) {
+        if (INSTANCE == null) {
+            INSTANCE = new BasicMessageService(messageRepository, channelRepository, userRepository);
+        }
+        return INSTANCE;
+    }
+
+
 
     @Override
     public Message createMessage(UUID senderId, UUID channelId, String content) {
