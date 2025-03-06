@@ -33,7 +33,7 @@ public class JCFMessageRepository extends AbstractRepository<Message> implements
             throw new NullPointerException("channelId is null");
         }
         return super.storage.values().stream()
-                .filter((m) -> Objects.equals(channelId, m.getChannel().getId()))
+                .filter((m) -> Objects.equals(channelId, m.getChannelId()))
                 .collect(Collectors.toList());
     }
 }
