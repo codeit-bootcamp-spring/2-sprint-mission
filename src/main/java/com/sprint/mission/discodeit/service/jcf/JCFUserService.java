@@ -44,7 +44,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        return new ArrayList<User>(users.values());
+        return new ArrayList<>(users.values());
     }
 
     @Override

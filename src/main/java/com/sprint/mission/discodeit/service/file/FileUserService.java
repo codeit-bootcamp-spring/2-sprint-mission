@@ -67,7 +67,7 @@ public class FileUserService implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        return new ArrayList<User>(users.values());
+        return new ArrayList<>(users.values());
     }
 
     @Override
@@ -79,7 +79,6 @@ public class FileUserService implements UserService {
     @Override
     public void updateUsername(UUID userID, String newUsername) {
         User user = getUserById(userID);
-        String oldUserName = user.getUsername();
         user.updateUsername(newUsername);
         saveUser();
     }

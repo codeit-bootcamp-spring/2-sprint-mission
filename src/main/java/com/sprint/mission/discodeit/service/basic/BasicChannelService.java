@@ -10,13 +10,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-;
-
 public class BasicChannelService implements ChannelService {
 
-    private static ChannelRepository channelRepository;
-    private static UserService userService;
     private static BasicChannelService INSTANCE;
+    private final ChannelRepository channelRepository;
+    private final UserService userService;
 
     public BasicChannelService(ChannelRepository channelRepository, UserService userService) {
         this.channelRepository = channelRepository;
