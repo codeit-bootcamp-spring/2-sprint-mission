@@ -1,103 +1,88 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> messageData;
     private final UserService userService;
     private final ChannelService channelService;
 
-     public JCFMessageService(UserService userService, ChannelService channelService) {
-        messageData = new HashMap<>();
+    public JCFMessageService(UserService userService, ChannelService channelService) {
+        this.messageData = new HashMap<>();
         this.userService = userService;
         this.channelService = channelService;
     }
 
-    public UUID getUserId(String userName) {
-         User user = userService.read(userName);
-         if(user == null){
-             throw new IllegalArgumentException("유효하지 않은 사용자명입니다.");
-         }
-         return user.getId();
-    }
-
-    public UUID getChannelId(String channelName) {
-         Channel channel = channelService.read(channelName);
-         if(channel == null){
-             throw new IllegalArgumentException("유효하지 않은 채널명입니다.");
-         }
-         return channel.getId();
-    }
-
-
-
 
     @Override
-    public Message create(String writingMessage, User user, Channel channel) {
-         if(user == null || channel == null){
-             throw new IllegalArgumentException("유저와 채널을 할당해주세요.");
-         }
-         Message message = new Message(writingMessage, user, channel);
-         messageData.put(message.getId(), message);
-         System.out.printf("(%d)[%s]%s: %s%n",message.getUpdatedAt(), user.getUserName()
-                 , user.getUserName(), writingMessage);
-         return message;
+    public Message create(String writingMessage, UUID userId, UUID channelId) {
+        try{
+            channelService.find(channelId);
+            userService.find(userId);
+        }catch (NoSuchElementException e){
+            throw new IllegalArgumentException("채널 혹은 유저가 존재하지 않습니다.");
+        }
+
+        Message message = new Message(writingMessage, userId, channelId);
+        messageData.put(message.getId(), message);
+        return message;
     }
 
     @Override
-    public void delete(UUID messageId) {
-         Message message = messageData.get(messageId);
-         if (message == null) {
-             throw new IllegalArgumentException("삭제할 메시지를 찾을 수 없습니다.");
-         }
-         messageData.remove(messageId);
+    public List<Message> readByUser(UUID userId) { 
+        List<Message> messages = messageData.values().stream().filter(m -> m.getUserId().equals(userId)).toList();
+        if(messages.isEmpty() || messages == null){
+            throw new NoSuchElementException("유저 " + userId + "가 존재하지 않습니다.");
+        }
+        return messages;
     }
 
     @Override
-    public void update(UUID messageId, String newMessage) {
-         Message message = messageData.get(messageId);
-         if (message == null) {
-             throw  new IllegalArgumentException("수정할 메세지를 찾을 수 없습니다.");
-         }
-         message.updateMessage(newMessage);
+    public List<Message> readByChannel(UUID channedId) {
+        List<Message> messages = messageData.values().stream().filter(m -> m.getChannelId().equals(channedId)).toList();
+        if(messages.isEmpty() || messages == null){
+            throw new NoSuchElementException("채널 " + channedId + "가 존재하지 않습니다.");
+        }
+        return messages;
     }
 
     @Override
-    public List<Message> readUser(String userName) {
-         UUID userId = getUserId(userName);
-         return messageData.values().stream()
-                 .filter(message -> message.getUser().getId().equals(userId))
-                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Message> readChannel(String channelName) {
-        UUID channelId = getChannelId(channelName);
-         return messageData.values().stream()
-                .filter(message -> message.getChannel().getId().equals(channelId))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Message> readFullFilter(String userName, String channelName) {
-         UUID userId = getUserId(userName);
-         UUID channelId = getChannelId(channelName);
-        return messageData.values().stream()
-                .filter(message -> message.getUser().getId().equals(userId))
-                .filter(message -> message.getChannel().getId().equals(channelId))
-                .collect(Collectors.toList());
+    public List<Message> readByUserAndByChannel(UUID userId, UUID channeId) {
+        List<Message> messages = messageData.values().stream().filter(m -> m.getUserId().equals(userId) && m.getChannelId().equals(channeId)).toList();
+        if (messages.isEmpty() || messages == null) {
+            throw new NoSuchElementException("유저 " + userId + " 혹은 채널 " + channeId + "가 존재하지 않습니다.");
+        }
+        return messages;
     }
 
     @Override
     public List<Message> readAll() {
         return messageData.values().stream().toList();
     }
+
+    @Override
+    public Message update(UUID messageId, String newMessage) {
+        Message messageNullable = messageData.get(messageId);
+        Message message = Optional.ofNullable(messageNullable).orElseThrow(() -> new NoSuchElementException("메세지 " + messageId + "가 존재하지 않습니다."));
+        message.updateMessage(newMessage);
+        return message; 
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        if(!messageData.containsKey(messageId)){
+            throw new NoSuchElementException("메세지 " + messageId + "가 존재하지 않습니다.");
+        }
+        messageData.remove(messageId);
+    }
 }
+
+
+
+
+

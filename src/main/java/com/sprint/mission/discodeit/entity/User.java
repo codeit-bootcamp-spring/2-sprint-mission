@@ -1,28 +1,50 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.Objects;
+
 
 public class User extends MainDomain {
     private String userName;
+    private String email;
+    private String password;
 
-    public User(String userName){
+
+    public User(String userName, String email, String password){
         super();
         this.userName = userName;
+        this.email = email;
+        this.password = password;
     }
 
     public String getUserName() {
         return userName;
     }
 
-    public void updateUser(String userName){
-        this.userName = userName;
-        update();
+    public String getEmail() {
+        return email;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "userName='" + userName + '\'' +
-                '}';
+    public String getPassword() {
+        return password;
     }
+
+
+    public void updateUser(String newUserName, String newEmail, String newPassword){
+        boolean anyValueUpdated = false;
+        if(newUserName != null && !newUserName.equals(this.userName)){
+            this.userName = newUserName;
+            anyValueUpdated = true;
+        }
+        if(newEmail != null && !newEmail.equals(this.email)){
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if(newPassword != null && !newPassword.equals(this.password)){
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if(anyValueUpdated){
+            update();
+        }
+    }
+
 }

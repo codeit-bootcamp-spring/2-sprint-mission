@@ -1,10 +1,14 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -16,46 +20,42 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void create(String channelName) {
-        Channel channel = new Channel(channelName);
-        if(read(channelName) != null){
-            System.out.println("이미 존재하는 채널입니다.");
-        }
+    public Channel create(ChannelType type, String name, String description) {
+        Channel channel = new Channel(type, name, description);
         channelData.put(channel.getId(), channel);
+        return channel;
+    }
+
+
+    @Override
+    public Channel find(UUID channelId) {
+        Channel channelNullable = channelData.get(channelId);
+        
+        return Optional.ofNullable(channelNullable).orElseThrow(() -> new NoSuchElementException("채널 " + channelId + "가 존재하지 않습니다."));
+    }
+
+
+    @Override
+    public List<Channel> findAll() {
+        return channelData.values().stream().toList();
     }
 
     @Override
-    public Channel read(String channelName) {
-        return channelData.values().stream()
-                .filter(channel -> channel.getChannelName().equals(channelName))
-                .findFirst()
-                .orElse(null);
+    public Channel update(UUID channelId, String newName, String newDescription) {       //채널명 수정
+        Channel channelNullable = channelData.get(channelId);
+        Channel channel = Optional.ofNullable(channelNullable).orElseThrow(() -> new NoSuchElementException("채널 " + channelId + "가 존재하지 않습니다."));
+        channel.updateChannel(newName, newDescription);
+        
+        return channel;
     }
 
     @Override
-    public Map<UUID, Channel> readAll() {
-        return channelData;
-    }
-
-    @Override
-    public void update(String oldName, String newName) {       //채널명 수정
-        Channel channel = read(oldName);
-        channel.updateChannel(newName);
-    }
-
-    @Override
-    public void delete(String channelName) {
-        Channel channel = read(channelName);
-        if(read(channelName) == null){
-            System.out.println("존재하지 않는 채널입니다.");
+    public void delete(UUID channelId) {
+        if(!channelData.containsKey(channelId)){
+            throw new NoSuchElementException("채널 " + channelId + "가 존재하지 않습니다.");
         }
-        channelData.remove(channel.getId());
+        
+        channelData.remove(channelId);
     }
 
-    @Override
-    public String toString() {
-        return "JCFChannelService{" +
-                "channelData=" + channelData +
-                '}';
-    }
 }

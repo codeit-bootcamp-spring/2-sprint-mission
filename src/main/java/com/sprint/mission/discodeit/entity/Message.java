@@ -1,42 +1,53 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.UUID;
+
 public class Message extends MainDomain {
     private String message;
-    private final User user;
-    private final Channel channel;
+    private final UUID userId;
+    private final UUID channelId;
 
 
 
-    public Message(String message,  User user, Channel channel) {
+    public Message(String message,  UUID userId, UUID channelId) {
         super();
         this.message = message;
-        this.user = user;
-        this.channel = channel;
+        this.userId = userId;
+        this.channelId = channelId;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public User getUser() {
-        return user;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public Channel getChannel() {
-        return channel;
+    public UUID getChannelId() {
+        return channelId;
     }
 
-    public void updateMessage(String message) {
-        this.message = message;
-        update();
+
+    public void updateMessage(String newMessage) {
+        boolean anyValueUpdated = false;
+        if (newMessage != null && !newMessage.equals(message)) {
+            message = newMessage;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            update();
+        }
     }
 
     @Override
     public String toString() {
         return "Message{" +
                 "message='" + message + '\'' +
-                ", user=" + user +
-                ", channel=" + channel +
+                ", userId=" + userId +
+                ", channelId=" + channelId +
                 '}';
+
     }
+
 }

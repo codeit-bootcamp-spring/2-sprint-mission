@@ -4,8 +4,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 public class MainDomain {
-    private UUID id;
-    private Long createdAt, updatedAt;
+    private final UUID id;
+    private final Long createdAt;
+    private Long updatedAt;
 
     public MainDomain() {
         this.id = UUID.randomUUID();
