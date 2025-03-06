@@ -29,6 +29,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(String username, String email, String password) {
+        validateUserField(username, email, password);
         User user = new User(username, email, password);
         userRepository.save(user);
         return user;
@@ -59,4 +60,11 @@ public class BasicUserService implements UserService {
         find(userId); // 유저가 존재하는지 확인
         userRepository.deleteById(userId);
     }
+
+    private void validateUserField(String username, String email, String password) {
+        if (username == null || username.isBlank() || email == null || email.isBlank() || password == null || password.isBlank()) {
+            throw new IllegalArgumentException("username, email, password는 필수 입력값입니다.");
+        }
+    }
+
 }

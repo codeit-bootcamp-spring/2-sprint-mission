@@ -30,6 +30,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel create(ChannelType type, String name, String description) {
+        validateChannelField(type, name, description);
         Channel channel = new Channel(type, name, description);
         channelRepository.save(channel);
         return channel;
@@ -59,5 +60,11 @@ public class BasicChannelService implements ChannelService {
     public void delete(UUID channelId) {
         find(channelId);
         channelRepository.deleteById(channelId);
+    }
+
+    private void validateChannelField(ChannelType type, String name, String description) {
+        if(type == null || name == null || name.isBlank() || description == null || description.isBlank()) {
+            throw new IllegalArgumentException("type, name, description은 필수 입력값입니다.");
+        }
     }
 }
