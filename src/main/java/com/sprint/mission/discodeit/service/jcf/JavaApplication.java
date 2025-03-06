@@ -10,9 +10,14 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelrepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
@@ -117,23 +122,30 @@ public class JavaApplication {
     }
 
     public static void main(String[] args) {
-        // 서비스 초기화 JCF
-//        UserRepository userRepository = new JCFUserRepository();
-//        ChannelRepository channelRepository = new JCFChannelRepository();
-//        MessageRepository messageRepository = new JCFMessageRepository();
-//
-//        UserService userService = new JCFUserService(userRepository);
-//        ChannelService channelService = new JCFChannelService(channelRepository);
-//        MessageService messageService = new JCFMessageService(messageRepository, channelService, userService);
+        String repositoryType = System.getenv("REPOSITORY_TYPE");
+        if (repositoryType == null) {
+            repositoryType = "jcf";
+        }
 
-        //서비스 초기화 FileI/O
-        UserRepository userRepository = new FileUserRepository();
-        ChannelRepository channelRepository = new FileChannelrepository();
-        MessageRepository messageRepository = new FileMessageRepository();
+        UserRepository userRepository;
+        ChannelRepository channelRepository;
+        MessageRepository messageRepository;
 
-        UserService userService = new FileUserService(userRepository);
-        ChannelService channelService = new FileChannelService(channelRepository);
-        MessageService messageService = new FileMessageService(messageRepository, channelService, userService);
+        if (repositoryType.equalsIgnoreCase("jcf")) {
+            userRepository = new JCFUserRepository();
+            channelRepository = new JCFChannelRepository();
+            messageRepository = new FileMessageRepository();
+        } else if (repositoryType.equalsIgnoreCase("file")) {
+            userRepository = new FileUserRepository();
+            channelRepository = new FileChannelrepository();
+            messageRepository = new FileMessageRepository();
+        } else{
+            throw new IllegalArgumentException("Unsupported repository type: " + repositoryType);
+        }
+
+        UserService userService = new BasicUserService(userRepository);
+        ChannelService channelService = new BasicChannelService(channelRepository);
+        MessageService messageService = new BasicMessageService(messageRepository, channelService, userService);
 
         //테스트
         userCRUDTest(userService);
