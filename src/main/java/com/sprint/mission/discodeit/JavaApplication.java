@@ -24,6 +24,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JavaApplication {

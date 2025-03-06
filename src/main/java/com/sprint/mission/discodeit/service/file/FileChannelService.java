@@ -11,12 +11,32 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileChannelService implements ChannelService, FileService<Channel> {
+    private final Map<UUID, Channel> channelMap;
+    private static FileChannelService instance;
+
+    private FileChannelService() {
+        this.channelMap = new ConcurrentHashMap<>();
+        loadCacheFromFile();
+    }
+
+    public static FileChannelService getInstance() {
+        if (instance == null) {
+            synchronized (FileChannelService.class) {
+                if (instance == null) {
+                    instance = new FileChannelService();
+                }
+            }
+        }
+        return instance;
+    }
 
     @Override
     public Channel create(ChannelType type, String name, String description) {
         Channel channel = new Channel(type, name, description);
+        channelMap.put(channel.getId(), channel);
         saveToFile(channel);
 
         return channel;
@@ -24,7 +44,7 @@ public class FileChannelService implements ChannelService, FileService<Channel> 
 
     @Override
     public Channel find(UUID channelId) {
-        Channel channelNullable = loadOneFromFile(channelId);
+        Channel channelNullable = channelMap.get(channelId);
         return Optional.ofNullable(channelNullable)
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
     }
@@ -36,19 +56,22 @@ public class FileChannelService implements ChannelService, FileService<Channel> 
 
     @Override
     public Channel update(UUID channelId, String newName, String newDescription) {
-        Channel channelNullable = loadOneFromFile(channelId);
+        Channel channelNullable = channelMap.get(channelId);
         Channel channel = Optional.ofNullable(channelNullable)
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
         channel.update(newName, newDescription);
+        channelMap.put(channel.getId(), channel);
+        saveToFile(channel);
 
         return channel;
     }
 
     @Override
     public void delete(UUID channelId) {
-        if (loadOneFromFile(channelId) == null) {
+        if (channelMap.get(channelId) == null) {
             throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
+        channelMap.remove(channelId);
         deleteFile(channelId);
     }
 
@@ -63,11 +86,6 @@ public class FileChannelService implements ChannelService, FileService<Channel> 
 
     }
 
-    @Override
-    public Channel loadOneFromFile(UUID channelId) {
-        Path directory = Paths.get(System.getProperty("user.dir"), "data", "channels");
-        return SerializationUtil.reverseOneSerialization(directory,channelId);
-    }
 
     @Override
     public List<Channel> loadAllFromFile() {
@@ -84,6 +102,12 @@ public class FileChannelService implements ChannelService, FileService<Channel> 
         } catch (IOException e) {
             System.out.println("채널 파일 삭제 예외 발생 : " + e.getMessage());
         }
+    }
 
+    private void loadCacheFromFile() {
+        List<Channel> channels = loadAllFromFile();
+        for (Channel channel : channels) {
+            channelMap.put(channel.getId(), channel);
+        }
     }
 }
