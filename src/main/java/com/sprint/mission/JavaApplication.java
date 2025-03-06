@@ -6,17 +6,15 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.NoSuchElementException;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserService userService = JCFUserService.getInstance();
-        ChannelService channelService = JCFChannelService.getInstance();
-        MessageService messageService = JCFMessageService.getInstance(userService, channelService);
+        AppConfig appConfig = new AppConfig();
+        UserService userService = appConfig.userService();
+        ChannelService channelService = appConfig.channelService();
+        MessageService messageService = appConfig.messageService();
 
         // 유저 등록
         User user1 = userService.saveUser("user1");
@@ -83,6 +81,7 @@ public class JavaApplication {
                         }
                 );
 
+        System.out.println("\n...no user, no channel test.............");
         //저장되지 않은 유저로 메시지 생성
         try {
             Message message = messageService.saveMessage(channel3, new User("anony user"), "Hello, message");
@@ -109,5 +108,15 @@ public class JavaApplication {
         messageService.delete(message1.getId());
         System.out.println("\n...Message findAll after delete<message1>............");
         messageService.findAll().forEach(System.out::println);
+
+
+        // FileClear: 테스트 반복할 때 불필요한 데이터 삭제
+        userService.delete(user2.getId());
+        userService.delete(user3.getId());
+
+        channelService.delete(channel2.getId());
+        channelService.delete(channel3.getId());
+
+        messageService.delete(message2.getId());
     }
 }
