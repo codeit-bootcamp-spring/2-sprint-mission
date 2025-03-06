@@ -11,7 +11,7 @@ import java.io.ObjectOutputStream;
 
 public class FileUserRepository implements UserRepository {
     @Override
-    public void userSave(String nickname, String password) {
+    public User userSave(String nickname, String password) {
         User user = new User(nickname, password);
         try {
             String fileName = "user.ser";
@@ -27,5 +27,6 @@ public class FileUserRepository implements UserRepository {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return user;
     }
 }

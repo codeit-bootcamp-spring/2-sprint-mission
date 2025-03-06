@@ -1,9 +1,13 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
@@ -14,7 +18,8 @@ import java.util.UUID;
 
 public class JavaApplication {
     static Scanner sc = new Scanner(System.in);
-    static UserService userService = new FileUserService();
+    static UserRepository userRepository = new JCFUserRepository();
+    static UserService userService = new BasicUserService(userRepository);
     static ChannelService channelService = new FileChannelService();
     static MessageService messageService = new FileMessageService(userService, channelService);
 
