@@ -22,15 +22,14 @@ public class FileChannelService implements ChannelService {
         return channel;
     }
 
+    @Override
     public Channel getChannel(UUID id) {
         Channel channel = channelRepository.findById(id);
         if (channel == null) {
-            System.out.println("Channel with ID " + id + " not found.");
-            return null;
+            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
         }
         return channel;
     }
-
 
     @Override
     public List<Channel> getAllChannels() {
@@ -39,14 +38,14 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public void updateChannel(UUID id, String newName) {
-        Channel channel = getChannel(id); // 예외 처리된 메서드 활용
+        Channel channel = getChannel(id);
         channel.updateChannelName(newName);
         channelRepository.save(channel);
     }
 
     @Override
     public void deleteChannel(UUID id) {
-        getChannel(id); // 존재 여부 체크
+        getChannel(id);
         channelRepository.delete(id);
     }
 }
