@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FileMessageService implements MessageService {
 
@@ -53,8 +54,8 @@ public class FileMessageService implements MessageService {
         channelService.validateChannelExists(channelId);
 
         Message message = new Message(userId, channelId, content);
-        channelService.addMessageToChannel(channelId, message.getId());
-        channelService.updataChannelData();
+        channelService.addMessage(channelId, message.getId());
+        channelService.updateChannelData();
         messages.put(message.getId(), message);
         saveMessage();
 
@@ -68,39 +69,25 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> getMessagesByUserAndChannel(UUID userId, UUID channelId) {
-        List<Message> messages = new ArrayList<>();
-        for (Message message : this.messages.values()) {
-            if (message.getSenderId().equals(userId) && message.getChannelId().equals(channelId)) {
-                messages.add(message);
-            }
-        }
-
-        return messages;
+    public List<Message> findMessagesByUserAndChannel(UUID senderId, UUID channelId) {
+        return messages.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .filter(message -> message.getSenderId().equals(senderId))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Message> getChannelMessages(UUID channelId) {
-        List<Message> messages = new ArrayList<>();
-        for (Message message : this.messages.values()) {
-            if (message.getChannelId().equals(channelId)) {
-                messages.add(message);
-            }
-        }
-
-        return messages;
+    public List<Message> findChannelMessages(UUID channelId) {
+        return messages.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Message> getUserMessages(UUID userId) {
-        List<Message> messages = new ArrayList<>();
-        for (Message message : this.messages.values()) {
-            if (message.getSenderId().equals(userId)) {
-                messages.add(message);
-            }
-        }
-
-        return messages;
+    public List<Message> findUserMessages(UUID senderId) {
+        return messages.values().stream()
+                .filter(message -> message.getSenderId().equals(senderId))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -116,8 +103,8 @@ public class FileMessageService implements MessageService {
         validateMessage(messageId);
 
         Message message = messages.get(messageId);
-        channelService.removeMessageFromChannel(message.getChannelId(), messageId);
-        channelService.updataChannelData();
+        channelService.removeMessage(message.getChannelId(), messageId);
+        channelService.updateChannelData();
         messages.remove(messageId);
         saveMessage();
     }
