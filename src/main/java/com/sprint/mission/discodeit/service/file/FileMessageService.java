@@ -68,7 +68,7 @@ public class FileMessageService implements MessageService {
 
     @Override
     public Message getMessageById(UUID messageId) {
-        validateMessage(messageId);
+        validateMessageExists(messageId);
         return messages.get(messageId);
     }
 
@@ -96,7 +96,7 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID messageId, String newContent) {
-        validateMessage(messageId);
+        validateMessageExists(messageId);
         Message message = messages.get(messageId);
         message.updateContent(newContent);
         saveMessage();
@@ -104,7 +104,7 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void deleteMessage(UUID messageId) {
-        validateMessage(messageId);
+        validateMessageExists(messageId);
 
         Message message = messages.get(messageId);
         channelService.removeMessage(message.getChannelId(), messageId);
@@ -114,7 +114,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void validateMessage(UUID messageId) {
+    public void validateMessageExists(UUID messageId) {
         if (!messages.containsKey(messageId)) {
             throw new NoSuchElementException("존재하지 않는 메세지입니다.");
         }

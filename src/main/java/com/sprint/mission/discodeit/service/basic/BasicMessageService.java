@@ -93,7 +93,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void validateMessage(UUID messageId) {
+    public void validateMessageExists(UUID messageId) {
         if(!messageRepository.existsById(messageId)){
             throw new IllegalArgumentException("존재하지 않는 메세지입니다.");
         }
