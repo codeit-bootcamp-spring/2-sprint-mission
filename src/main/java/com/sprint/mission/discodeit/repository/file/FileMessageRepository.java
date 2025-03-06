@@ -12,7 +12,7 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void save(Message message) {
         if (message == null || message.getId() == null) {
-            throw new IllegalArgumentException("Message or Message ID cannot be null");
+            throw new IllegalArgumentException("메세지나 ID가 공백입니다.");
         }
         List<Message> messages = readFromFile();
         messages.removeIf(m -> m.getId() != null && m.getId().equals(message.getId()));
