@@ -1,22 +1,21 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BaseEntity;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.AbstractRepository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 public abstract class AbstractFileRepository<T extends BaseEntity> extends AbstractRepository<T> {
     protected Path directory;
 
     protected AbstractFileRepository(Class<T> entityClass, Path directory) {
-        super(entityClass, new HashMap<>());
+        super(entityClass, new ConcurrentHashMap<>());
         this.directory = directory;
         init(directory);
         loadFromFile();             // 파일로 저장된 user들이 있다면 users에 불러오기, repository가 만들어질때만 파일을 불러옴. 파일 추가, 삭제는 계속 진행
