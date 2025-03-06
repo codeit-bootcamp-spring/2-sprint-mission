@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
@@ -11,24 +11,24 @@ import java.util.List;
 import java.util.UUID;
 
 // JCFMessageService, FileMessageService, BasicMessageService 전부 동일합니다. 최종적으로는 BasicMessageService 사용합니다 (스프린트 요구 사항으로 남겨두었습니다.)
-public class FileMessageService implements MessageService {
-    private static volatile FileMessageService instance;
+public class BasicMessageService implements MessageService {
+    private static volatile BasicMessageService instance;
 
     private UserService userService;
     private ChannelService channelService;
     private MessageRepository messageRepository;
 
-    private FileMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
+    private BasicMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         this.userService = userService;
         this.channelService = channelService;
         this.messageRepository = messageRepository;
     }
 
-    public static FileMessageService getInstance(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
+    public static BasicMessageService getInstance(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         if (instance == null) {
-            synchronized (FileMessageService.class) {
+            synchronized (BasicMessageService.class) {
                 if (instance == null) {
-                    instance = new FileMessageService(userService, channelService, messageRepository);
+                    instance = new BasicMessageService(userService, channelService, messageRepository);
                 }
             }
         }

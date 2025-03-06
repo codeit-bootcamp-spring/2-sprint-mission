@@ -10,9 +10,15 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -23,23 +29,41 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) throws IOException {
-//        UserRepository jcfUserRepository = JCFUserRepository.getInstance();
-//        ChannelRepository jcfChannelRepository = JCFChannelRepository.getInstance();
-//        MessageRepository jcfMessageRepository = JCFMessageRepository.getInstance();
-//        UserService jcfUserService = JCFUserService.getInstance(jcfUserRepository);
-//        ChannelService jcfChannelService = JCFChannelService.getInstance(jcfUserService, jcfChannelRepository);
-//        MessageService jcfMessageService = JCFMessageService.getInstance(jcfUserService, jcfChannelService, jcfMessageRepository);
-//
-//        test(jcfUserService, jcfChannelService, jcfMessageService);
+        testWithJCFRepo();
+//        testWithFileRepo();
+    }
+
+    private static void testWithJCFRepo() {
+        System.out.println("=========== =========== =========== ===========");
+        System.out.println("=========== 인 메모리 테스트 ===========");
+        System.out.println("=========== =========== =========== ===========");
+        UserRepository jcfUserRepository = JCFUserRepository.getInstance();
+        ChannelRepository jcfChannelRepository = JCFChannelRepository.getInstance();
+        MessageRepository jcfMessageRepository = JCFMessageRepository.getInstance();
+        UserService basicUserServiceWithJCFRepo = BasicUserService.getInstance(jcfUserRepository);
+        ChannelService basicChannelServiceWithJCFRepo = BasicChannelService.getInstance(basicUserServiceWithJCFRepo, jcfChannelRepository);
+        MessageService basicMessageServiceWithJCFRepo = BasicMessageService.getInstance(basicUserServiceWithJCFRepo, basicChannelServiceWithJCFRepo, jcfMessageRepository);
+
+        test(basicUserServiceWithJCFRepo, basicChannelServiceWithJCFRepo, basicMessageServiceWithJCFRepo);
+    }
+
+    private static void testWithFileRepo() {
+        System.out.println("=========== =========== =========== ===========");
+        System.out.println("=========== 직렬화 테스트 ===========");
+        System.out.println("=========== =========== =========== ===========");
+
 
         UserRepository fileUserRepository = FileUserRepository.getInstance(Path.of("data/userData.ser"));
         ChannelRepository fileChannelRepository = FileChannelRepository.getInstance(Path.of("data/channelData.ser"));
         MessageRepository fileMessageRepository = FileMessageRepository.getInstance(Path.of("data/messageData.ser"));
-        UserService fileUserService = JCFUserService.getInstance(fileUserRepository);
-        ChannelService fileChannelService = FileChannelService.getInstance(fileUserService, fileChannelRepository);
-        MessageService fileMessageService = FileMessageService.getInstance(fileUserService, fileChannelService, fileMessageRepository);
+        UserService basicUserServiceWithFileRepo = BasicUserService.getInstance(fileUserRepository);
+        ChannelService basicChannelServiceWithFileRepo = BasicChannelService.getInstance(basicUserServiceWithFileRepo, fileChannelRepository);
+        MessageService basicMessageServiceWithFileRepo = BasicMessageService.getInstance(basicUserServiceWithFileRepo, basicChannelServiceWithFileRepo, fileMessageRepository);
 
-        test(fileUserService, fileChannelService, fileMessageService);
+        test(basicUserServiceWithFileRepo, basicChannelServiceWithFileRepo, basicMessageServiceWithFileRepo);
+
+        //저장 문제 없는지 조회해보기
+//        saveTest(basicUserServiceWithFileRepo, basicChannelServiceWithFileRepo, basicMessageServiceWithFileRepo);
     }
 
     private static void saveTest(UserService userService, ChannelService channelService, MessageService messageService) {
@@ -182,7 +206,7 @@ public class JavaApplication {
 
         // 메시지 서비스 테스트
         System.out.println("=========== 메세지 생성 및 전체 메세지 조회 테스트 ===========");
-        System.out.println("=========== 예상 결과: 메세지 4개 ===========");
+        System.out.println("=========== 예상 결과: 메세지 3개 ===========");
         Message cm1 = messageService.sendMessage(user1.getId(), "단체 메일 보냄", channel1.getId());
         Message cm2 = messageService.sendMessage(user1.getId(), "하이하이", channel1.getId());
         Message cm3 = messageService.sendMessage(user2.getId(), "난 보내지면 안됨, 채널에 없거든", channel1.getId());

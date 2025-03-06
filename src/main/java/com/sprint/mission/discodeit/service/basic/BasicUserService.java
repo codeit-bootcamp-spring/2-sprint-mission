@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicatedUserException;
@@ -9,20 +9,20 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 // JCFUserService, FileUserService, BasicUserService 전부 동일합니다. 최종적으로는 BasicUserService 사용합니다 (스프린트 요구 사항으로 남겨두었습니다.)
-public class FileUserService implements UserService {
-    private static volatile FileUserService instance;
+public class BasicUserService implements UserService {
+    private static volatile BasicUserService instance;
 
     private final UserRepository userRepository;
 
-    private FileUserService(UserRepository userRepository) {
+    private BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public static FileUserService getInstance(UserRepository userRepository) {
+    public static BasicUserService getInstance(UserRepository userRepository) {
         if (instance == null) {
-            synchronized (FileUserService.class) {
+            synchronized (BasicUserService.class) {
                 if (instance == null) {
-                    instance = new FileUserService(userRepository);
+                    instance = new BasicUserService(userRepository);
                 }
             }
         }
