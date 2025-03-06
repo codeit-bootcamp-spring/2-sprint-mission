@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.io.IOException;
@@ -14,10 +15,13 @@ import java.util.UUID;
 public class FileChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final MessageRepository messageRepository;
 
-    public FileChannelService(UserRepository userRepository, ChannelRepository channelRepository) {
+    public FileChannelService(UserRepository userRepository, ChannelRepository channelRepository,
+                              MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.channelRepository = channelRepository;
+        this.messageRepository = messageRepository;
         Path directory = Paths.get(System.getProperty("user.dir"),
                 "src/main/java/com/sprint/mission/discodeit/data/Channel");
         init(directory);
@@ -61,6 +65,6 @@ public class FileChannelService implements ChannelService {
     @Override
     public void deleteChannel(UUID channelId) {
         channelRepository.deleteChannel(channelId);
-        // 해당 채널ID가지는 메시지들 삭제 메서드 추가하기
+        messageRepository.deleteMessagesByChannelId(channelId);
     }
 }

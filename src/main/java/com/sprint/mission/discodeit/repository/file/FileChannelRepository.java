@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -85,7 +86,9 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAll() {
-        return loadAllChannelsFile();
+        return Optional.ofNullable(loadAllChannelsFile())
+                .filter(list -> !list.isEmpty())
+                .orElseThrow(() -> new IllegalArgumentException("데이터가 존재하지 않습니다."));
     }
 
     @Override
@@ -118,7 +121,6 @@ public class FileChannelRepository implements ChannelRepository {
             throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
         }
         deleteChannelFile(channelId);
-        // 해당 채널ID가지는 메시지들 삭제 코드 추가
     }
 
     @Override
@@ -131,7 +133,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteChannelList(List<UUID> channelIdList) {
-        channelIdList.forEach(this::deleteChannel);
+        channelIdList.forEach(this::deleteChannelFile);
     }
 }
 

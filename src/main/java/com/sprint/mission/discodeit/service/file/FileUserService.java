@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import java.io.IOException;
@@ -8,13 +10,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 public class FileUserService implements UserService {
     private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
+    private final MessageRepository messageRepository;
 
-    public FileUserService(UserRepository userRepository) {
+    public FileUserService(UserRepository userRepository, ChannelRepository channelRepository,
+                           MessageRepository messageRepository) {
         this.userRepository = userRepository;
-        Path directory = Paths.get(System.getProperty("user.dir"), "src/main/java/com/sprint/mission/discodeit/User");
+        this.channelRepository = channelRepository;
+        this.messageRepository = messageRepository;
+        Path directory = Paths.get(System.getProperty("user.dir"),
+                "src/main/java/com/sprint/mission/discodeit/data/User");
         init(directory);
     }
 
@@ -55,8 +64,11 @@ public class FileUserService implements UserService {
 
     @Override
     public void deleteUser(String userName) {
+        List<UUID> channels = channelRepository.channelListByuserId(userRepository.findByName(userName).getId());
         userRepository.deleteUser(userName);
-        // 해당 userName가지는 channel들 삭제 코드
-        // 코드에 따라 message도 삭제하게 해야 함.
+        for (UUID channelId : channels) {
+            messageRepository.deleteMessagesByChannelId(channelId);
+        }
+        channelRepository.deleteChannelList(channels);
     }
 }
