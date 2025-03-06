@@ -7,7 +7,7 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
 
-    public final List<User> data = new ArrayList<>();
+    private final List<User> data = new ArrayList<>();
     private static JCFUserService getInstance;
 
     private JCFUserService() {
