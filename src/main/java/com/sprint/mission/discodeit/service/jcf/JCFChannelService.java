@@ -90,14 +90,12 @@ public class JCFChannelService implements ChannelService {
 
     // 채널 삭제
     @Override
-    public Channel delete(String channelName){
+    public void delete(String channelName){
         Channel delChannel = getChannel(channelName);
         if (delChannel != null) {
             channelsData.remove(delChannel);
-            return delChannel;
         }
         System.out.println("삭제 할 채널이 존재하지 않습니다.");
-        return null;
     }
 
 }

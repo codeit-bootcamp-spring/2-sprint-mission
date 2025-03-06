@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -8,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class FileUserService implements UserService {
     private static final Path directory = Paths.get(System.getProperty("user.dir"), "data", "user");
@@ -81,18 +83,10 @@ public class FileUserService implements UserService {
 
     private List<User> load() {
         if (Files.exists(directory)) {
-            try {
-                List<User> list = Files.list(directory)
-                        .map(path -> {
-                            try (FileInputStream fis = new FileInputStream(path.toFile());
-                                 ObjectInputStream in = new ObjectInputStream(fis)) {
-                                return (User) in.readObject();
-                            } catch (IOException | ClassNotFoundException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
+            try (Stream<Path> path = Files.list(directory)) {
+                return path
+                        .map(this::loadToFile)
                         .toList();
-                return list;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -101,8 +95,18 @@ public class FileUserService implements UserService {
         }
     }
 
+    private User loadToFile(Path path) {
+        try (FileInputStream fis = new FileInputStream(path.toFile());
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            return (User) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     //사용자 전체 조회
+    @Override
     public List<User> getAllUser() {
         List<User> userList = load();
         if (userList.isEmpty()) {
@@ -118,6 +122,7 @@ public class FileUserService implements UserService {
     public User update(String name, String changeName, String changeEmail) {
         User user = find(name);
         if (user == null) {
+            System.out.println("사용자가 존재하지 않습니다.");
             return null;
         } else {
             user.update(changeName, changeEmail);
@@ -131,12 +136,13 @@ public class FileUserService implements UserService {
     @Override
     public void delete(String name) {
         User user = find(name);
-        try {
-            if (user != null && Files.exists(directory.resolve(user.getId() + ".ser"))) {
+        try{
+            if (user == null && !Files.exists(directory.resolve(user.getId() + ".ser"))) {
+            } else {
                 Files.delete(directory.resolve(user.getId() + ".ser"));
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | NullPointerException e) {
+            System.out.println("사용자가 존재하지 않습니다.\n" + e.getMessage());
         }
     }
 }

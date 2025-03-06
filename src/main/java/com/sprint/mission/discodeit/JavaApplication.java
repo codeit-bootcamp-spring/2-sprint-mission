@@ -6,20 +6,19 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class JavaApplication1 {
+public class JavaApplication {
     public static void main(String[] args) {
         UserService userService = new FileUserService();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService(userService);
+        ChannelService channelService = new FileChannelService();
+        MessageService messageService = new FileMessageService(userService);
 
 
         Scanner sc = new Scanner(System.in);
@@ -71,8 +70,8 @@ public class JavaApplication1 {
                         case "3":
                             System.out.println("\n===사용자 전체 조회 ===");
                             List<User> printUser1 = userService.getAllUser();
-                            System.out.println(printUser1);
                             System.out.println();
+                            System.out.println(printUser1);
                             break;
 
                         case "4":
@@ -110,18 +109,18 @@ public class JavaApplication1 {
                         case "1":
                             System.out.println("채널 생성");
                             System.out.print("채널 이름 입력: ");
-                            String channelName1  =sc.nextLine();
+                            String channelName1 = sc.nextLine();
                             System.out.print("채널 설명 입력: ");
-                            String channelDesc  =sc.nextLine();
+                            String channelDesc = sc.nextLine();
                             Channel c = new Channel(channelName1, channelDesc);
                             channelService.create(c);
+                            System.out.println(c);
                             break;
 
                         case "2":
                             System.out.println("채널 조회");
                             System.out.print("채널 이름 입력: ");
                             String channelName2  =sc.nextLine();
-                            channelService.getChannel(channelName2);
                             Channel channelPrint = channelService.getChannel(channelName2);
                             System.out.println(channelPrint);
                             break;
@@ -129,6 +128,7 @@ public class JavaApplication1 {
                         case "3":
                             System.out.println("채널 전체 조회");
                             List<Channel> channelPrint2 = channelService.getAllChannel();
+                            System.out.println();
                             System.out.println(channelPrint2);
                             break;
 
