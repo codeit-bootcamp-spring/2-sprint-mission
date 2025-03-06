@@ -10,6 +10,10 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -65,7 +69,7 @@ public class JavaApplication {
         // 수정
         Message updatedMessage = messageService.update(message.getId(), "반갑습니다.");
         System.out.println("메시지 수정: " + updatedMessage.getContent());
-        // 삭재
+        // 삭제
         messageService.delete(message.getId());
         List<Message> foundMessagesAfterDelete = messageService.findAll();
         System.out.println("메시지 삭제: " + foundMessagesAfterDelete.size());
@@ -73,9 +77,9 @@ public class JavaApplication {
 
     public static void main(String[] args) {
         // 서비스 초기화
-        UserService userService = new JCFUserService();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService();
+        UserService userService = new FileUserService();
+        ChannelService channelService = new FileChannelService();
+        MessageService messageService = new FileMessageService();
 
         // 테스트
         userCRUDTest(userService);
