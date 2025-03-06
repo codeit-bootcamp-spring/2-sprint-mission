@@ -7,7 +7,6 @@ import java.util.UUID;
 
 public interface FileService<T> {
     void saveToFile(T t);
-    T loadOneFromFile(UUID id);
     List<T> loadAllFromFile();
     void deleteFile(UUID id);
 }
