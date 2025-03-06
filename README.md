@@ -11,7 +11,7 @@
   - [x] User
   - [x] Channel
   - [x] Message
-- [ ]  Application에서 서비스 구현체를 File*Service로 바꾸어 테스트해보세요.
+- [x]  Application에서 서비스 구현체를 File*Service로 바꾸어 테스트해보세요.
 
 ### 서비스 구현체 분석
 
@@ -54,7 +54,7 @@
 - [ ] DI 구현 보완: [싱글톤, 팩터리메서드, 서비스로케이터, 레지스터리]
 - [ ] OutputView - createUserName에서 id 비교하는 부분 equals로 수정[equals&hashCode]
 - [ ] Application 사용자 입력 처리부분 수정[조건문 다형성으로 추상화하기, 완전한 커맨드 패턴 적용해보기]
-- [ ] InputView Scanner 자원할당 방식에 문제 없는지 확인필요[try-with-resource]
+- [ ] InputView Scanner 자원할당 방식 수정필요[try-with-resource]
 - [ ] 도메인별 id 객체로 변경[플러그인, 식별자 필드]
     - 도메인 모델의 Id가 UUID에 의존하지 않도록 수정
 - [ ] 전체적인 예외처리[커스템 예외]
@@ -64,10 +64,9 @@
 - [ ] 파일 서비스들의 테스트와 본 서비스 저장소 격리 필요
 
 # 멘토님 피드백
-
 - [ ] findBean 한번만 선언
 - [ ] 커맨드패턴 보완
-- [ ] Unix TimeStamp ms로 수정
+- [x] Unix TimeStamp ms로 수정
 - [ ] updatedAt 메서드 이름 수정
 - [ ] toDto 정적 팩터리 메서드로 보완하기
 - [ ] Scanner사용 Test 격리성 높이기

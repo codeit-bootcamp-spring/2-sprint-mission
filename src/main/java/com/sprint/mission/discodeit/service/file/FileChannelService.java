@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -50,6 +51,7 @@ public class FileChannelService implements ChannelService {
 
         return channels.values()
                 .stream()
+                .sorted(Comparator.comparing(Channel::getCreatedAt))
                 .map(this::toDto)
                 .toList();
     }

@@ -17,7 +17,7 @@ public class Channel implements Serializable {
 
     public Channel(String name, UUID ownerId) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
+        this.createdAt = Instant.now().toEpochMilli();
         this.updatedAt = createdAt;
         this.name = name;
         this.userIds.add(ownerId);
@@ -47,5 +47,9 @@ public class Channel implements Serializable {
 
     public List<UUID> getUserIds() {
         return Collections.unmodifiableList(userIds);
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
     }
 }

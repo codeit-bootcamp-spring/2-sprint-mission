@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.config;
+package com.sprint.mission.config;
 
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_ACCESS_DENIED_TO_BEAN_STORAGE;
 
@@ -14,6 +14,9 @@ import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -24,6 +27,22 @@ public class Beans {
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     public Beans() {
+        setUpFileBeans();
+    }
+
+    private void setUpFileBeans() {
+        saveBean(UserService.class, new FileUserService());
+        saveBean(MessageService.class,
+                new FileMessageService(findBean(UserService.class)));
+        saveBean(ChannelService.class,
+                new FileChannelService(findBean(UserService.class)));
+
+        saveBean(UserController.class, new UserController(findBean(UserService.class)));
+        saveBean(MessageController.class, new MessageController(findBean(MessageService.class)));
+        saveBean(ChannelController.class, new ChannelController(findBean(ChannelService.class)));
+    }
+
+    private void setUpJCFBeans() {
         saveBean(UserRepository.class, new JCFUserRepository());
         saveBean(ChannelRepository.class, new JCFChannelRepository());
         saveBean(MessageRepository.class, new JCFMessageRepository());

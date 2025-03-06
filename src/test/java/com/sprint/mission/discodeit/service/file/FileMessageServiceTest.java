@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.constants.FilePath.CHANNEL_FILE;
+import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.constants.FilePath.MESSAGE_FILE;
 import static com.sprint.mission.discodeit.constants.FilePath.USER_FILE;
 import static com.sprint.mission.discodeit.constants.MessageInfo.MESSAGE_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +38,7 @@ class FileMessageServiceTest {
 
     @AfterEach
     void tearDown() throws IOException {
-        Files.deleteIfExists(CHANNEL_FILE.getPath());
+        Files.deleteIfExists(MESSAGE_FILE.getPath());
         Files.deleteIfExists(USER_FILE.getPath());
     }
 
