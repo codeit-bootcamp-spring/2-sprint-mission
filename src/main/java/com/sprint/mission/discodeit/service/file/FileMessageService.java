@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class FileMessageService implements MessageService {
@@ -26,6 +27,10 @@ public class FileMessageService implements MessageService {
     public void createMessage(UUID senderId, String content, UUID channelId) {
         UserService.validateUserId(senderId, this.fileUserRepository);
         ChannelService.validateChannelId(channelId, this.fileChannelRepository);
+        // 해당 채널에 sender가 participant로 있는지 확인하는 코드 필요?
+        if (!fileChannelRepository.findById(channelId).getParticipants().contains(senderId)) {
+            throw new NoSuchElementException("해당 senderId를 가진 사용자가 해당 channelId의 Channel에 참여하지 않았습니다.");
+        }
         Message newMessage = new Message(senderId, content, channelId);     //content에 대한 유효성 검증은 Message 생성자에게 맡긴다.
         fileMessageRepository.add(newMessage);
     }
@@ -41,8 +46,8 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessageContent(UUID messageId, String content) {
-        fileMessageRepository.findById(messageId).updateContent(content);
+    public void updateMessageContent(UUID messageId, String newContent) {
+        fileMessageRepository.updateMessageContent(messageId, newContent);
     }
 
     @Override
