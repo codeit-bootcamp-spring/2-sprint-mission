@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -8,10 +9,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileUserService implements UserService {
+    private static FileUserService instance;
     private final FileUserRepository fileUserRepository;
 
     public FileUserService(FileUserRepository fileUserRepository) {
         this.fileUserRepository = fileUserRepository;
+    }
+
+    public static synchronized FileUserService getInstance(FileUserRepository fileUserRepository) {
+        if (instance == null) {
+            instance = new FileUserService(fileUserRepository);
+        }
+        return instance;
     }
 
     @Override

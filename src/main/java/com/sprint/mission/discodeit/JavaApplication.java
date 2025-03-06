@@ -4,13 +4,11 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMassageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -21,13 +19,6 @@ import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 
 public class JavaApplication {
@@ -49,16 +40,27 @@ public class JavaApplication {
     }
 
     public static void main(String[] args) {
-        UserService userService = new FileUserService(new FileUserRepository());
-        ChannelService channelService = new FileChannelService(new FileChannelRepository());
-        MessageService messageService = new FileMessageService(new FileMessageRepository(), channelService, userService);
+        // Basic
+        UserService basicUserService = BasicUserService.getInstance(new JCFUserRepository());
+        ChannelService basicChannelService = BasicChannelService.getInstance(new JCFChannelRepository());
+        MessageService basicMessageService = BasicMessageService.getInstance(new JCFMessageRepository(), basicChannelService, basicUserService);
 
-        // 셋업
-        User user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
+        // File
+        UserService fileUserService = FileUserService.getInstance(new FileUserRepository());
+        ChannelService fileChannelService = FileChannelService.getInstance(new FileChannelRepository());
+        MessageService fileMessageService = FileMessageService.getInstance(new FileMessageRepository(), fileChannelService, fileUserService);
 
-        // 테스트
-        messageCreateTest(messageService, channel, user);
+        // Basic
+        System.out.println("Basic Service 테스트 결과입니다.");
+        User basicUser = setupUser(basicUserService);
+        Channel basicChannel = setupChannel(basicChannelService);
+        messageCreateTest(basicMessageService, basicChannel, basicUser);
+
+        // File
+        System.out.println("File Service 테스트 결과입니다.");
+        User fileUser = setupUser(fileUserService);
+        Channel fileChannel = setupChannel(fileChannelService);
+        messageCreateTest(fileMessageService, fileChannel, fileUser);
     }
 }
 

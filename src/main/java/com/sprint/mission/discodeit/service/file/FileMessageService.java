@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileMessageService implements MessageService {
+    private static FileMessageService instance;
     private final FileMessageRepository fileMessageRepository;
     private final ChannelService channelService;
     private final UserService userService;
@@ -19,6 +20,13 @@ public class FileMessageService implements MessageService {
         this.fileMessageRepository = fileMessageRepository;
         this.channelService = channelService;
         this.userService = userService;
+    }
+
+    public static synchronized FileMessageService getInstance(FileMessageRepository fileMessageRepository, ChannelService channelService, UserService userService) {
+        if (instance == null) {
+            instance = new FileMessageService(fileMessageRepository, channelService, userService);
+        }
+        return instance;
     }
 
     @Override

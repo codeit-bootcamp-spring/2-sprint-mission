@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class BasicMessageService implements MessageService {
+    private static BasicMessageService instance;
     private final MessageRepository messageRepository;
     private final ChannelService channelService;
     private final UserService userService;
@@ -21,6 +23,13 @@ public class BasicMessageService implements MessageService {
         this.messageRepository = messageRepository;
         this.channelService = channelService;
         this.userService = userService;
+    }
+
+    public static synchronized BasicMessageService getInstance(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
+        if (instance == null) {
+            instance = new BasicMessageService(messageRepository, channelService, userService);
+        }
+        return instance;
     }
 
     @Override

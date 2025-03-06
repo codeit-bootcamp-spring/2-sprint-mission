@@ -11,10 +11,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class BasicUserService implements UserService {
+    private static BasicUserService instance;
     private final UserRepository userRepository;
 
     public BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public static synchronized BasicUserService getInstance(UserRepository userRepository) {
+        if (instance == null) {
+        instance = new BasicUserService(userRepository);
+        }
+        return instance;
     }
 
     @Override

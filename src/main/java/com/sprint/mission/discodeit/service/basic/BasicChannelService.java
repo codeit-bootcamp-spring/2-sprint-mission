@@ -12,10 +12,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class BasicChannelService implements ChannelService {
+    private static BasicChannelService instance;
     private final ChannelRepository channelRepository;
 
     public BasicChannelService(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
+    }
+
+    public static synchronized BasicChannelService getInstance(ChannelRepository channelRepository) {
+        if (instance == null) {
+            instance = new BasicChannelService(channelRepository);
+        }
+        return instance;
     }
 
     @Override

@@ -5,10 +5,10 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
 
-public class JCFMassageRepository implements MessageRepository {
+public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> messageMap;
 
-    public JCFMassageRepository() {
+    public JCFMessageRepository() {
         messageMap = new HashMap<>();
     }
 

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -10,10 +11,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileChannelService implements ChannelService {
+    private static FileChannelService instance;
     private final FileChannelRepository fileChannelRepository;
 
     public FileChannelService(FileChannelRepository fileChannelRepository) {
         this.fileChannelRepository = fileChannelRepository;
+    }
+
+    public static synchronized FileChannelService getInstance(FileChannelRepository fileChannelRepository) {
+        if (instance == null) {
+            instance = new FileChannelService(fileChannelRepository);
+        }
+        return instance;
     }
 
 
