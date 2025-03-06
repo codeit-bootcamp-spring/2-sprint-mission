@@ -10,7 +10,10 @@ public class JCFMessageRepository implements MessageRepository {
     private static final Map<UUID, Message> messages = new HashMap<>();
 
     @Override
-    public void save(Message message) {
+    public void save() {}
+
+    @Override
+    public void addMessage(Message message) {
         messages.put(message.getId(), message);
     }
 

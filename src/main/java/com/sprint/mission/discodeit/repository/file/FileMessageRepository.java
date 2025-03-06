@@ -34,7 +34,12 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void save(Message message) {
+    public void save() {
+        saveFile();
+    }
+
+    @Override
+    public void addMessage(Message message) {
         messages.put(message.getId(), message);
         saveFile();
     }

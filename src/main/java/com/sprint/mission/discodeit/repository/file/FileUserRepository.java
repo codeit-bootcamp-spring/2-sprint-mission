@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FileUserRepository implements UserRepository {
 
@@ -34,7 +35,12 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void save(User user) {
+    public void save() {
+        saveFile();
+    }
+
+    @Override
+    public void addUser(User user) {
         users.put(user.getId(), user);
         saveFile();
     }
@@ -42,6 +48,13 @@ public class FileUserRepository implements UserRepository {
     @Override
     public User findUserById(UUID userId) {
         return users.get(userId);
+    }
+
+    @Override
+    public List<User> findUsersByIds(Set<UUID> userIds) {
+        return users.values().stream()
+                .filter(user -> userIds.contains(user.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override

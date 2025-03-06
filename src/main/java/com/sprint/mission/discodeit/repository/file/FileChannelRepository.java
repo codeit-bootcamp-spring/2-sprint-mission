@@ -34,7 +34,12 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void save(Channel channel) {
+    public void save() {
+        saveFile();
+    }
+
+    @Override
+    public void addChannel(Channel channel) {
         channels.put(channel.getId(), channel);
         saveFile();
     }

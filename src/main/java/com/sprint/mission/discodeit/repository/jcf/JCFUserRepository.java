@@ -4,19 +4,30 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFUserRepository implements UserRepository {
 
     private static final Map<UUID, User> users = new HashMap<>();
 
     @Override
-    public void save(User user) {
+    public void save() { }
+
+    @Override
+    public void addUser(User user) {
         users.put(user.getId(), user);
     }
 
     @Override
     public User findUserById(UUID userId) {
         return users.get(userId);
+    }
+
+    @Override
+    public List<User> findUsersByIds(Set<UUID> userIds) {
+        return users.values().stream()
+                .filter(user -> userIds.contains(user.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override
