@@ -41,7 +41,6 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User findById(UUID userId) {
-        validateUserExists(userId);
         return users.get(userId);
     }
 
@@ -52,7 +51,6 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void deleteById(UUID userId) {
-        validateUserExists(userId);
         users.remove(userId);
         saveFile();
     }
@@ -60,11 +58,5 @@ public class FileUserRepository implements UserRepository {
     @Override
     public boolean exists(UUID userId) {
         return users.containsKey(userId);
-    }
-
-    private void validateUserExists(UUID userId) {
-        if (!exists(userId)) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
-        }
     }
 }

@@ -41,7 +41,6 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message findById(UUID messageId) {
-        validateMessageExists(messageId);
         return messages.get(messageId);
     }
 
@@ -52,7 +51,6 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void delete(UUID messageId) {
-        validateMessageExists(messageId);
         messages.remove(messageId);
         saveFile();
     }
@@ -60,11 +58,5 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public boolean exists(UUID messageId) {
         return messages.containsKey(messageId);
-    }
-
-    private void validateMessageExists(UUID messageId) {
-        if(!exists(messageId)){
-            throw new IllegalStateException("존재하지 않는 메세지입니다.");
-        }
     }
 }

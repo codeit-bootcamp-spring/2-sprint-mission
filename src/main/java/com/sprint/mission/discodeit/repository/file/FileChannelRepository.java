@@ -41,7 +41,6 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel findById(UUID channelId) {
-         validateChannelExists(channelId);
         return channels.get(channelId);
     }
 
@@ -52,7 +51,6 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteById(UUID channelId) {
-        validateChannelExists(channelId);
         channels.remove(channelId);
         saveFile();
     }
@@ -60,11 +58,5 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public boolean exists(UUID channelId) {
         return channels.containsKey(channelId);
-    }
-
-    private void validateChannelExists(UUID channelId){
-        if(!exists(channelId)){
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
-        }
     }
 }

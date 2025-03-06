@@ -16,7 +16,6 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Channel findById(UUID channelId) {
-        validateChannelExists(channelId);
         return channels.get(channelId);
     }
 
@@ -27,18 +26,11 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteById(UUID channelId) {
-        validateChannelExists(channelId);
         channels.remove(channelId);
     }
 
     @Override
     public boolean exists(UUID channelId) {
         return channels.containsKey(channelId);
-    }
-
-    public void validateChannelExists(UUID channelId) {
-        if(!channels.containsKey(channelId)){
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
-        }
     }
 }

@@ -16,7 +16,6 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Message findById(UUID messageId) {
-        validateMessageExists(messageId);
         return messages.get(messageId);
     }
 
@@ -27,18 +26,11 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public void delete(UUID messageId) {
-        validateMessageExists(messageId);
         messages.remove(messageId);
     }
 
     @Override
     public boolean exists(UUID messageId) {
         return messages.containsKey(messageId);
-    }
-
-    private void validateMessageExists(UUID messageId) {
-        if(!exists(messageId)){
-            throw new IllegalStateException("존재하지 않는 메세지입니다.");
-        }
     }
 }
