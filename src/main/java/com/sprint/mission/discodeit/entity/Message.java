@@ -31,11 +31,12 @@ public class Message extends BaseEntity implements Serializable {
     }
     public void updateContent(String content) {
         this.content = content;
+        updateUpdatedAt(System.currentTimeMillis());
     }
 
     @Override
     public String toString() {
-        return "[" + channel.getChannelName() + "] " + sender.getName() + " : " + content;
+        return "[" + channel.getChannelName() + "] " + sender.getName() + " : " + content + " " + getCreatedAt();
     }
 
 }

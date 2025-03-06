@@ -6,9 +6,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
@@ -23,7 +20,6 @@ public class JavaApplication {
     static User setupUser(UserService userService) {
         User user = new User("빅뱅");
         userService.create(user);
-        System.out.println("유저 생성 완료: " + user);
         return user;
     }
 
@@ -36,18 +32,16 @@ public class JavaApplication {
     static void messageCreateTest(MessageService messageService, Channel channel, User author) {
         Message message = new Message(author, "봄여름가을겨울", channel);
         messageService.create(message);
-        System.out.println("메시지 생성 : " + message.getId());
-        System.out.println(messageService.findAll());
     }
 
     public static void main(String[] args) {
-        UserRepository userRepository = new FileUserRepository();
-        ChannelRepository channelRepository = new FileChannelRepository();
-        MessageRepository messageRepository = new FileMessageRepository();
+        UserRepository userRepository = new JCFUserRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
 
-        UserService userService = new BasicUserService(userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository);
-        MessageService messageService = new BasicMessageService(userService, channelService, messageRepository);
+        UserService userService = BasicUserService.getInstance(userRepository);
+        ChannelService channelService = BasicChannelService.getInstance(channelRepository);
+        MessageService messageService = BasicMessageService.getInstance(userService, channelService, messageRepository);
 
         // 셋업
         User user = setupUser(userService);
