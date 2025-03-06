@@ -1,42 +1,49 @@
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.util.FileSerializationUtil;
 
+import java.io.IOException;
 import java.util.*;
 
 public class JavaApplication {
-    static UserService userService = JCFUserService.getInstance();
-    static ChannelService channelService = JCFChannelService.getInstance();
-    static MessageService messageService = JCFMessageService.getInstance(userService, channelService);;
+    static UserService userService = FileUserService.getInstance(FileSerializationUtil.getInstance());
+    static ChannelService channelService = FileChannelService.getInstance(FileSerializationUtil.getInstance());
+    static MessageService messageService = FileMessageService.getInstance(FileSerializationUtil.getInstance(), userService, channelService);;
 
     public static void main(String[] args) {
+        try {
+            for (int i = 0; i < 5; i++) {
+                UUID userUuid = UUID.randomUUID();
+                UUID channelUuid = UUID.randomUUID();
+                UUID messageUuid = UUID.randomUUID();
+                long millis = System.currentTimeMillis();
 
+                testCreate(userUuid, channelUuid, messageUuid, millis);
+                if (i == 2) {
+                    delete(userUuid, channelUuid, messageUuid);
+                }
 
-        for(int i = 0; i<5; i++){
-            UUID userUuid = UUID.randomUUID();
-            UUID channelUuid = UUID.randomUUID();
-            UUID messageUuid = UUID.randomUUID();
-            long millis = System.currentTimeMillis();
+                if (i == 3) {
+                    findById(userUuid, channelUuid, messageUuid);
+                }
 
-            testCreate(userUuid, channelUuid, messageUuid, millis);
-            if( i == 2 ){
-                delete(userUuid, channelUuid, messageUuid);
+                if (i == 4) {
+                    update(userUuid, channelUuid, messageUuid);
+                }
+
             }
-
-            if( i == 3 ){
-                findById(userUuid, channelUuid, messageUuid);
-            }
-
-            if( i == 4 ){
-                update(userUuid, channelUuid, messageUuid);
-            }
-
+        }catch (Exception e) { // 모든 예외를 잡아서 처리
+            System.out.println(e);  // e는 인스턴스이다.
         }
 
         findAll();
@@ -55,7 +62,7 @@ public class JavaApplication {
         System.out.println(messageService.findById(messageUuid));
     }
 
-    public static void update(UUID userUuid, UUID channelUuid, UUID messageUuid) {
+    public static void update(UUID userUuid, UUID channelUuid, UUID messageUuid) throws IOException {
         userService.update(userUuid, "진호양", "yangjinho@naver.com");
         channelService.update(channelUuid, "진호양채널", "테스트1");
         messageService.update(messageUuid, "메신저1",channelUuid, userUuid);

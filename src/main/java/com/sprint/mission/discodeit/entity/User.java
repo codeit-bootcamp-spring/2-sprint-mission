@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String username;
     private String email;
 
