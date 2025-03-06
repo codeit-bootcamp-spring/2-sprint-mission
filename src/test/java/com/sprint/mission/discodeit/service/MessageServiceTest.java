@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.constants.MessageInfo.MESSAGE_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -16,14 +17,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class MessageServiceTest {
-    private static final String MESSAGE_CONTENT = "안녕하세요";
     private MessageService messageService;
     private MessageDto setUpMessage;
 
     @BeforeEach
     void setUp() {
         UserRepository userRepository = new JCFUserRepository();
-        User user = userRepository.save(new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
+        User user = userRepository.save(
+                new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
 
         messageService = new JCFMessageService(new JCFMessageRepository(), new JCFUserService(userRepository));
         setUpMessage = messageService.create(MESSAGE_CONTENT, UUID.randomUUID(), user.getId());

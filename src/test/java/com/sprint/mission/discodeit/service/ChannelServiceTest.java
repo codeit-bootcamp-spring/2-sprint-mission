@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import static com.sprint.mission.discodeit.config.ChannelInfo.CHANNEL_NAME;
-import static com.sprint.mission.discodeit.config.ChannelInfo.UPDATED_CHANNEL_NAME;
 import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.constants.ChannelInfo.CHANNEL_NAME;
+import static com.sprint.mission.discodeit.constants.ChannelInfo.UPDATED_CHANNEL_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

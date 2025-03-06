@@ -7,10 +7,10 @@
 - [x]  다음의 조건을 만족하는 서비스 인터페이스의 구현체를 작성하세요.
 - [x]  클래스 패키지명: com.sprint.mission.discodeit.service.file
 - [x]  클래스 네이밍 규칙: File[인터페이스 이름]
-- [ ]  JCF 대신 FileIO와 객체 직렬화를 활용해 메소드를 구현하세요.
+- [x]  JCF 대신 FileIO와 객체 직렬화를 활용해 메소드를 구현하세요.
   - [x] User
   - [x] Channel
-  - [ ] Message
+  - [x] Message
 - [ ]  Application에서 서비스 구현체를 File*Service로 바꾸어 테스트해보세요.
 
 ### 서비스 구현체 분석
@@ -51,7 +51,7 @@
 # 미완성 및 개선해야할 부분
 
 - "[]" 부분은 추후 공부를 위해 관련된 키워드의 모음을 적은 것 입니다.
-- [ ] DI 구현 수정: [싱글톤, 팩터리메서드, 서비스로케이터, 레지스터리]
+- [ ] DI 구현 보완: [싱글톤, 팩터리메서드, 서비스로케이터, 레지스터리]
 - [ ] OutputView - createUserName에서 id 비교하는 부분 equals로 수정[equals&hashCode]
 - [ ] Application 사용자 입력 처리부분 수정[조건문 다형성으로 추상화하기, 완전한 커맨드 패턴 적용해보기]
 - [ ] InputView Scanner 자원할당 방식에 문제 없는지 확인필요[try-with-resource]
@@ -64,6 +64,7 @@
 - [ ] 파일 서비스들의 테스트와 본 서비스 저장소 격리 필요
 
 # 멘토님 피드백
+
 - [ ] findBean 한번만 선언
 - [ ] 커맨드패턴 보완
 - [ ] Unix TimeStamp ms로 수정
