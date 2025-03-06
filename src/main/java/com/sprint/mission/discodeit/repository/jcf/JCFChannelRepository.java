@@ -1,16 +1,14 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
-
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channels = new LinkedHashMap<>();
+    private final Map<UUID, Channel> channels = new HashMap<>();
 
     @Override
     public Channel save(Channel channel) {
@@ -21,12 +19,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Channel findById(UUID id) {
-        Channel channel = channels.get(id);
-        if (channel == null) {
-            throw new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent());
-        }
-
-        return channel;
+        return channels.get(id);
     }
 
     @Override

@@ -46,4 +46,8 @@ public class Message implements Serializable {
     public UUID getUserId() {
         return userId;
     }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
 }

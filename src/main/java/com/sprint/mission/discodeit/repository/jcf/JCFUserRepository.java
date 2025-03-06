@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND;
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
-
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.HashMap;
@@ -16,17 +13,12 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         users.put(user.getId(), user);
-        return findById(user.getId());
+        return user;
     }
 
     @Override
     public User findById(UUID id) {
-        User user = users.get(id);
-        if (user == null) {
-            throw new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent());
-        }
-
-        return user;
+        return users.get(id);
     }
 
     @Override
@@ -43,7 +35,7 @@ public class JCFUserRepository implements UserRepository {
                 .stream()
                 .filter(user -> user.isSameEmail(email))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
+                .orElse(null);
     }
 
     @Override

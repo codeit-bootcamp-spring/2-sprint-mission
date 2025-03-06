@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND;
+import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
 
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
@@ -54,7 +55,12 @@ public class JCFUserService implements UserService {
 
     @Override
     public UserDto findByEmail(String email) {
-        return toDto(userRepository.findByEmail(email));
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent());
+        }
+
+        return toDto(user);
     }
 
     @Override
