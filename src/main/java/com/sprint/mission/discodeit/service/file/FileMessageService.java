@@ -15,6 +15,7 @@ public class FileMessageService implements MessageService {
         this.data = loadFromFile();
     }
 
+
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {
         Message message = new Message(content, channelId, authorId);

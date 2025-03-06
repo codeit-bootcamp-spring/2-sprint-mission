@@ -52,6 +52,7 @@ public class FileChannelService implements ChannelService {
         saveToFile();
     }
 
+
     private void saveToFile() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
             oos.writeObject(data);
