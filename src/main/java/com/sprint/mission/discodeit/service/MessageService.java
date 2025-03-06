@@ -11,5 +11,5 @@ public interface MessageService {
     List<Message> getMessage(String sender);
     List<Message> getAllMessage();
     Message update(String sender, UUID uuid , String changeMessage);
-    Message delete(String sender);
+    void delete(String sender, UUID uuid);
 }

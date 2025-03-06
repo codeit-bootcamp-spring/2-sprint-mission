@@ -5,14 +5,18 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class FileMessageService implements MessageService {
-    public final List<Message> messagesData;
-    public UserService userService;
+    private static final Path directory = Paths.get(System.getProperty("user.dir"), "data", "messages");
+
+    private final List<Message> messagesData;
+    private UserService userService;
 
     public FileMessageService(UserService userService) {
         messagesData = new ArrayList<>();
@@ -26,14 +30,11 @@ public class FileMessageService implements MessageService {
         if (!validateMessage(message)) {
             return null;
         }
-        return createMessage(message);
-    }
-
-    private Message createMessage(Message message) {
         messagesData.add(message);
-        System.out.println(message);
+        save(message);
         return message;
     }
+//     directory.resolve(message.getId() + ".ser");
 
     private boolean validateMessage(Message message) {
         User user = userService.getUser(message.getSender());
@@ -44,91 +45,115 @@ public class FileMessageService implements MessageService {
         return false;
     }
 
+    private void save(Message message) {
+        init();
+        Path path = directory.resolve(message.getId() + ".ser");
+        saveToFile(path, message);
+    }
+
+    private void init() {
+        try {
+            if (!Files.exists(directory)) {
+                Files.createDirectories(directory);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void saveToFile(Path path, Message message) {
+        try (FileOutputStream fos = new FileOutputStream(path.toFile());
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     // 메시지 단일 조회
     @Override
     public List<Message> getMessage(String sender) {
-        return findMessage(sender);
+        return find(sender);
     }
 
-    private List<Message> findMessage(String sender) {
-        boolean find = false;
-        List<Message> result = new ArrayList<>();
-        for (Message messageList : messagesData) {
-            if (messageList.getSender().equals(sender)) {
-                result.add(messageList);
-                find = true;
-            }
-        }
-        if (!find) {
-            System.out.println("메시지가 존재하지 않습니다.");
-        }
-        return result;
+    private List<Message> find(String sender) {
+        return load().stream()
+                .filter(message -> message.getSender().equals(sender))
+                .toList();
     }
 
-    private Message find(String sender) {
-        for (Message messageList : messagesData) {
-            if (messageList.getSender().equals(sender)) {
-                return messageList;
+    private List<Message> load() {
+        if (Files.exists(directory)) {
+            try (Stream<Path> path = Files.list(directory)) {
+                return path
+                        .map(this::loadToFile)
+                        .toList();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+        } else {
+            return Collections.emptyList();
         }
-        return null;
+    }
+
+    private Message loadToFile(Path path) {
+        try (FileInputStream fis = new FileInputStream(path.toFile());
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            return (Message) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     // 메시지 전체 조회
     @Override
     public List<Message> getAllMessage() {
-        return findAllMessage();
-    }
-
-    private List<Message> findAllMessage(){
-        if (messagesData.isEmpty()) {
+        List<Message> messageList = load();
+        if (messageList.isEmpty()) {
             System.out.println("전체 조회 결과가 없습니다.");
             return Collections.emptyList();
         }
-        for (Message messageList : messagesData) {
-            System.out.println(messageList);
-        }
-        return messagesData;
+        return messageList;
     }
-
 
 
     // 메시지 수정
     @Override
-    public Message update (String sender, UUID uuid, String changeMessage){
-        return updateMessage(sender, uuid, changeMessage);
-    }
-
-    private Message updateMessage(String sender,UUID uuid, String changeMessage){
-        Message senderName = find(sender);
-        if (senderName != null && senderName.getId().equals(uuid)) {
-            senderName.updateMessage(changeMessage);
-            System.out.printf("보낸 내용이 [ %s ] 로 변경되었습니다.", senderName.getMessage());
-            return senderName;
+    public Message update(String sender, UUID uuid, String changeMessage) {
+        List<Message> messageList = find(sender);
+        Message messages = messageList.stream()
+                .filter(message -> message.getId().equals(uuid))
+                .findAny()
+                .orElse(null);
+        if (messages == null) {
+            System.out.println("메시지가 존재하지 않습니다.");
+            return null;
+        } else {
+            messages.updateMessage(changeMessage);
+            save(messages);
         }
-        System.out.println("메시지가 존재하지 않습니다.");
-        return null;
+        return messages;
     }
-
-
 
 
     // 메시지 삭제
     @Override
-    public Message delete (String sender){
-        return deleteMessage(sender);
-    }
-    private Message deleteMessage(String sender){
-        Message sendName = find(sender);
-        if (sendName != null) {
-            messagesData.remove(sendName);
-            System.out.println("[ " + sendName.getSender() + " ] 이 삭제 되었습니다.");
-            return sendName;
+    public void delete(String sender, UUID uuid) {
+        List<Message> messageList = find(sender);
+        Message messages = messageList.stream()
+                .filter(message -> message.getId().equals(uuid))
+                .findAny()
+                .orElse(null);
+        try {
+            if (messages != null && Files.exists(directory.resolve(messages.getId() + ".ser"))) {
+                Files.delete(directory.resolve(directory.resolve(messages.getId() + ".ser")));
+            } else {
+                System.out.println("메시지가 존재하지 않습니다.");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        System.out.println("메시지가 존재하지 않습니다");
-        return null;
     }
-
 }

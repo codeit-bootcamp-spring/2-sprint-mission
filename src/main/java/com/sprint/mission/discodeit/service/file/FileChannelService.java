@@ -26,20 +26,15 @@ public class FileChannelService implements ChannelService {
     // 채널 생성
     @Override
     public Channel create(Channel channel) {
-        if (!validateChannel(channel)) {
-            return null;
-        }
-        channelsData.add(channel);
-        save(channel);
-        return channel;
-    }
-
-    private boolean validateChannel(Channel channel) {
-        if (getChannel(channel.getChannelName()) != null) {
+        if (find(channel.getChannelName()) != null) {
             System.out.println("등록된 채널이 존재합니다.");
-            return false;
+            return null;
+        } else {
+            channelsData.add(channel);
+            save(channel);
+            System.out.println(channel);
+            return channel;
         }
-        return true;
     }
 
     private void save(Channel channel) {
@@ -127,7 +122,7 @@ public class FileChannelService implements ChannelService {
         if (channel == null) {
             System.out.println("채널이 존재하지 않습니다.");
             return null;
-        } else{
+        } else {
             channel.updateChannel(changeChannel, changeDescription);
             save(channel);
             return channel;
@@ -139,13 +134,14 @@ public class FileChannelService implements ChannelService {
     @Override
     public void delete(String channelName) {
         Channel channel = find(channelName);
-        try{
-            if (channel == null && !Files.exists(directory.resolve(channel.getId() + ".ser"))) {
+        try {
+            if (channel != null && Files.exists(directory.resolve(channel.getId() + ".ser"))) {
+                Files.delete(directory.resolve(directory.resolve(channel.getId() + ".ser")));
             } else {
-                Files.delete(directory.resolve(channel.getId() + ".ser"));
+                System.out.println("메시지가 존재하지 않습니다.");
             }
-        } catch (IOException | NullPointerException e) {
-            System.out.println("채널이 존재하지 않습니다.\n" + e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -23,8 +23,7 @@ public class JavaApplication {
 
         Scanner sc = new Scanner(System.in);
 
-        boolean run = true;
-        while (run) {
+        loop: while (true) {
             System.out.println("\n=== 메뉴 ===");
             System.out.println("1. 사용자");
             System.out.println("2. 채널");
@@ -55,7 +54,6 @@ public class JavaApplication {
                             String userMail1 = sc.nextLine();
                             User user = new User(userName1, userMail1);
                             userService.create(user);
-                            System.out.println(user);
                             break;
 
                         case "2":
@@ -107,18 +105,17 @@ public class JavaApplication {
 
                     switch (choice12) {
                         case "1":
-                            System.out.println("채널 생성");
+                            System.out.println("\n===채널 생성===");
                             System.out.print("채널 이름 입력: ");
                             String channelName1 = sc.nextLine();
                             System.out.print("채널 설명 입력: ");
                             String channelDesc = sc.nextLine();
                             Channel c = new Channel(channelName1, channelDesc);
                             channelService.create(c);
-                            System.out.println(c);
                             break;
 
                         case "2":
-                            System.out.println("채널 조회");
+                            System.out.println("\n===채널 조회===");
                             System.out.print("채널 이름 입력: ");
                             String channelName2  =sc.nextLine();
                             Channel channelPrint = channelService.getChannel(channelName2);
@@ -126,14 +123,14 @@ public class JavaApplication {
                             break;
 
                         case "3":
-                            System.out.println("채널 전체 조회");
+                            System.out.println("\n===채널 전체 조회===");
                             List<Channel> channelPrint2 = channelService.getAllChannel();
                             System.out.println();
                             System.out.println(channelPrint2);
                             break;
 
                         case "4":
-                            System.out.println("채널 수정");
+                            System.out.println("\n===채널 수정===");
                             System.out.print("변경 할 채널 이름 입력: ");
                             String oldChannelName = sc.nextLine();
                             System.out.print("새로운 채널 이름 입력: ");
@@ -144,7 +141,7 @@ public class JavaApplication {
                             break;
 
                         case "5":
-                            System.out.println("채널 삭제");
+                            System.out.println("\n===채널 삭제===");
                             System.out.print("삭제할 채널 이름 입력: ");
                             String deleteChannelName = sc.nextLine();
                             channelService.delete(deleteChannelName);
@@ -165,7 +162,7 @@ public class JavaApplication {
 
                     switch (choice13) {
                         case "1":
-                            System.out.println("메시지 생성");
+                            System.out.println("\n===메시지 생성===");
                             System.out.print("보내는 사람 입력: ");
                             String sender1 = sc.nextLine();
                             System.out.print("보낼 메시지 내용 입력: ");
@@ -175,24 +172,25 @@ public class JavaApplication {
                             break;
 
                         case "2":
-                            System.out.println("메시지 조회");
+                            System.out.println("\n===메시지 조회===");
                             System.out.print("보낸 사람 입력: ");
                             String sender2  =sc.nextLine();
-                            List<Message> messagePrint = messageService.getMessage(sender2);
-                            if (messagePrint.size() < 0) {
+                            List<Message> messagePrint1 = messageService.getMessage(sender2);
+                            if (messagePrint1.size() < 0) {
                                 break;
                             } else{
-                                System.out.println(messagePrint);
+                                System.out.println(messagePrint1);
                             }
                             break;
 
                         case "3":
-                            System.out.println("메시지 전체 조회");
-                            messageService.getAllMessage();
+                            System.out.println("\n===메시지 전체 조회===");
+                            List<Message> messagePrint2 = messageService.getAllMessage();
+                            System.out.println(messagePrint2);
                             break;
 
                         case "4":
-                            System.out.println("메시지 수정");
+                            System.out.println("\n===메시지 수정===");
                             System.out.print("보낸 사람 입력: ");
                             String sender3  =sc.nextLine();
                             System.out.print("메시지 UUID 입력: ");
@@ -205,22 +203,23 @@ public class JavaApplication {
                             break;
 
                         case "5":
-                            System.out.println("메시지 삭제");
+                            System.out.println("\n===메시지 삭제===");
                             System.out.print("보낸 사람 입력: ");
                             String sender4  =sc.nextLine();
-                            messageService.delete(sender4);
+                            System.out.print("메시지 UUID 입력: ");
+                            String uuid3  =sc.nextLine();
+                            UUID uuid4 = UUID.fromString(uuid3);
+                            messageService.delete(sender4, uuid4);
                             break;
                     }
                     continue;
 
                 case "4":
-                    run = false;
                     System.out.println("[Info] 종료합니다.");
-                    break;
+                    break loop;
 
                 default:
                     System.out.println("[Error] 잘못된 입력입니다.");
-
             }
         }
         sc.close();

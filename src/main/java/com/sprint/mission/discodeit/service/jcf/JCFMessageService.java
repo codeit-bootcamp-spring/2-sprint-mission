@@ -113,22 +113,14 @@ public class JCFMessageService implements MessageService {
     }
 
 
-
-
     // 메시지 삭제
     @Override
-    public Message delete (String sender){
-        return deleteMessage(sender);
-    }
-    private Message deleteMessage(String sender){
+    public void delete (String sender, UUID uuid){
         Message sendName = find(sender);
-        if (sendName != null) {
+        if (sendName != null && sendName.getId().equals(uuid)) {
             messagesData.remove(sendName);
-            System.out.println("[ " + sendName.getSender() + " ] 이 삭제 되었습니다.");
-            return sendName;
+            System.out.println("[ " + sendName.getSender() + " ] 이 삭제 되었습니다.");;
         }
         System.out.println("메시지가 존재하지 않습니다");
-        return null;
     }
-
 }

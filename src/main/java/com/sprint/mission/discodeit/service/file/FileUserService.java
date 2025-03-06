@@ -23,20 +23,15 @@ public class FileUserService implements UserService {
     // 사용자 생성
     @Override
     public User create(User user) {
-        if (!validateUser(user)) {
-            return null;
-        }
-        usersData.add(user);
-        save(user);
-        return user;
-    }
-
-    private boolean validateUser(User user) {
-        if (getUser(user.getName()) != null) {
+        if (find(user.getName()) != null) {
             System.out.println("등록된 사용자가 존재합니다.");
-            return false;
+            return null;
+        } else{
+            usersData.add(user);
+            save(user);
+            System.out.println(user);
+            return user;
         }
-        return true;
     }
 
     private void save(User user) {
@@ -136,7 +131,7 @@ public class FileUserService implements UserService {
     @Override
     public void delete(String name) {
         User user = find(name);
-        try{
+        try {
             if (user == null && !Files.exists(directory.resolve(user.getId() + ".ser"))) {
             } else {
                 Files.delete(directory.resolve(user.getId() + ".ser"));

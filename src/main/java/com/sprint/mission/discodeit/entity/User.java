@@ -1,10 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serial;
-import java.io.Serializable;
-
 public class User extends BaseEntity {
 
     private String name;
@@ -41,10 +36,10 @@ public class User extends BaseEntity {
 
     @Override
     public String toString() {
-        return "\n이름: " + name + "\n메일: " + email +
-                "\n사용자 ID: " + this.getId() +
-                "\n생성 시간: " + this.getCreatedAtFormatted() +
-                "\n업데이트 시간: " + this.getupdatedAttFormatted();
+        return "\nName: " + name + "\nMail: " + email +
+                "\nUUID: " + this.getId() +
+                "\nCreatedAt: " + this.getCreatedAtFormatted() +
+                "\nUpdatedAt: " + this.getUpdatedAttFormatted();
 
     }
 }
