@@ -39,6 +39,9 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void registerChannel(String channelName, String userName) {
+        if (userRepository.userExists(userName)) {
+            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+        }
         channelRepository.createChannel(channelName, userRepository.findByName(userName));
     }
 

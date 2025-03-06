@@ -5,10 +5,6 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,19 +18,6 @@ public class FileChannelService implements ChannelService {
         this.userRepository = userRepository;
         this.channelRepository = channelRepository;
         this.messageRepository = messageRepository;
-        Path directory = Paths.get(System.getProperty("user.dir"),
-                "src/main/java/com/sprint/mission/discodeit/data/Channel");
-        init(directory);
-    }
-
-    private void init(Path directory) {
-        if (!Files.exists(directory)) {
-            try {
-                Files.createDirectories(directory);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     @Override

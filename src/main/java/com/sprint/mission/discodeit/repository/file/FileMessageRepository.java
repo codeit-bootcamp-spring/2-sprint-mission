@@ -22,6 +22,20 @@ public class FileMessageRepository implements MessageRepository {
     Path directory = Paths.get(System.getProperty("user.dir"),
             "src/main/java/com/sprint/mission/discodeit/data/Message");
 
+    public FileMessageRepository() {
+        init(directory);
+    }
+
+    private void init(Path directory) {
+        if (!Files.exists(directory)) {
+            try {
+                Files.createDirectories(directory);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     @Override
     public boolean messageExists(UUID messageId) {
         return !Files.exists(directory.resolve(messageId + ".ser"));

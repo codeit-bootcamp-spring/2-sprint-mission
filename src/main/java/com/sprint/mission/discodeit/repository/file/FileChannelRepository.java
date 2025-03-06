@@ -21,6 +21,20 @@ public class FileChannelRepository implements ChannelRepository {
     Path directory = Paths.get(System.getProperty("user.dir"),
             "src/main/java/com/sprint/mission/discodeit/data/Channel");
 
+    public FileChannelRepository() {
+        init(directory);
+    }
+
+    private void init(Path directory) {
+        if (!Files.exists(directory)) {
+            try {
+                Files.createDirectories(directory);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     @Override
     public boolean channelExists(UUID channelId) {
         return !Files.exists(directory.resolve(channelId + ".ser"));

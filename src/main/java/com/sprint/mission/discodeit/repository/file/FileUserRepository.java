@@ -19,6 +19,20 @@ public class FileUserRepository implements UserRepository {
     private final Path directory = Paths.get(System.getProperty("user.dir"),
             "src/main/java/com/sprint/mission/discodeit/data/User");
 
+    public FileUserRepository() {
+        init(directory);
+    }
+
+    private void init(Path directory) {
+        if (!Files.exists(directory)) {
+            try {
+                Files.createDirectories(directory);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     @Override
     public boolean userExists(String userName) {
         return !Files.exists(directory.resolve(userName + ".ser"));

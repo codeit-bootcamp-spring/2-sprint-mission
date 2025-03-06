@@ -39,11 +39,14 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void registerMessage(UUID channelId, String userName, String messageContent) {
-        if (channelRepository.channelExists(channelId)) {
-            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
+        if (channelRepository.channelExists(channelId) && userRepository.userExists(userName)) {
+            throw new IllegalArgumentException("존재하지 않는 ID입니다.");
         }
-        messageRepository.createMessage(channelRepository.findById(channelId), userRepository.findByName(userName),
-                messageContent);
+        messageRepository.createMessage(
+                channelRepository.findById(channelId),
+                userRepository.findByName(userName),
+                messageContent
+        );
     }
 
     @Override
