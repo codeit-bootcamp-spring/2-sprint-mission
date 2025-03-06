@@ -32,12 +32,12 @@ public class FileUserService implements UserService {
 
     @Override
     public void updateUserName(UUID userId, String newUserName) {
-        readUser(userId).updateUserName(newUserName);
+        fileUserRepository.updateUserName(userId, newUserName);
     }
 
     @Override
     public void updatePassword(UUID userId, String newPassword) {
-        readUser(userId).updateUserPassword(newPassword);
+        fileUserRepository.updatePassword(userId, newPassword);
     }
 
     @Override

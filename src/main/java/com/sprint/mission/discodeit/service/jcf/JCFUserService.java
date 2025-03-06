@@ -32,12 +32,12 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUserName(UUID userId, String newUserName) {
-        readUser(userId).updateUserName(newUserName);
+        this.jcfUserRepository.updateUserName(userId, newUserName);
     }
 
     @Override
     public void updatePassword(UUID userId, String newPassword) {
-        readUser(userId).updateUserPassword(newPassword);
+        this.jcfUserRepository.updatePassword(userId, newPassword);
     }
 
     @Override
