@@ -30,11 +30,11 @@ public class Channel extends BaseEntity implements Serializable {
         super.updateUpdatedAt();
     }
 
-    public void addParticipant(User newParticipant) {
-        if (this.participantsId.contains(newParticipant.getId())) {
+    public void addParticipant(UUID newParticipantId) {
+        if (this.participantsId.contains(newParticipantId)) {
             throw new IllegalArgumentException("newParticipant 는 이미 채널에 참여 중 입니다!!! ");
         }
-        this.participantsId.add(newParticipant.getId());
+        this.participantsId.add(newParticipantId);
         super.updateUpdatedAt();
     }
 
