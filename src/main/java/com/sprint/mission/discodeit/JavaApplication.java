@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.exception.DuplicatedUserException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
@@ -17,17 +18,90 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.UUID;
 
 public class JavaApplication {
-    public static void main(String[] args) {
-        UserRepository userRepository = JCFUserRepository.getInstance();
-        ChannelRepository channelRepository = JCFChannelRepository.getInstance();
-        MessageRepository messageRepository = JCFMessageRepository.getInstance();
-        UserService userService = JCFUserService.getInstance(userRepository);
-        ChannelService channelService = JCFChannelService.getInstance(userService, channelRepository);
-        MessageService messageService = JCFMessageService.getInstance(userService, channelService, messageRepository);
+    public static void main(String[] args) throws IOException {
+//        UserRepository jcfUserRepository = JCFUserRepository.getInstance();
+//        ChannelRepository jcfChannelRepository = JCFChannelRepository.getInstance();
+//        MessageRepository jcfMessageRepository = JCFMessageRepository.getInstance();
+//        UserService jcfUserService = JCFUserService.getInstance(jcfUserRepository);
+//        ChannelService jcfChannelService = JCFChannelService.getInstance(jcfUserService, jcfChannelRepository);
+//        MessageService jcfMessageService = JCFMessageService.getInstance(jcfUserService, jcfChannelService, jcfMessageRepository);
+//
+//        test(jcfUserService, jcfChannelService, jcfMessageService);
 
+        UserRepository fileUserRepository = FileUserRepository.getInstance(Path.of("data/users.ser"));
+        UserService fileUserService = JCFUserService.getInstance(fileUserRepository);
+
+        System.out.println("=========== 유저 생성 및 유저 리스트 조회 테스트 ===========");
+        System.out.println("=========== 예상 결과: 유저 7명 나옴 ===========");
+        User user1 = fileUserService.createUser("Han", "Han@gmail.com", "", "hello I'm sam");
+        User user2 = fileUserService.createUser("Kim", "Kim@gmail.com", "dog pic", "I like dogs");
+        User user3 = fileUserService.createUser("Nick", "Nick@ggg.io", "cat pic", "I love cats");
+        User user4 = fileUserService.createUser("Jack", "Jack@harlow.co", "", "");
+        User user5 = fileUserService.createUser("Jamie", "Jamie@naver.com", "korean flag", "I am Korean");
+        User user6 = fileUserService.createUser("Mr.delete", "delete@naver.com", "XXXXX", "I am gonna be deleted soon");
+        User user7 = fileUserService.createUser("Oreo", "delete2@naver.com", "", "");
+
+        System.out.println("=========== 바로 아래에 중복된 이메일 나와야 함 ===========");
+        try {
+            User user8 = fileUserService.createUser("나오지 마", "Jamie@naver.com", "korean", "I am Korean"); // 이메일 중복이므로 생성 안 하고 null 반환
+        } catch (DuplicatedUserException e) {
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println("=========== 바로 아래에 '유효하지 않은 이메일' 나와야 함 ===========");
+        try {
+            User user9 = fileUserService.createUser("나오면 안 됨", "잘못된 이메일","","");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
+        fileUserService.getAllUsers().forEach(System.out::println);
+        System.out.println("=========== 유저 생성 및 전체 조회 테스트 끝 ===========");
+        System.out.println();
+
+        // 유저 읽기
+        System.out.println("=========== 특정 유저 get 테스트 ===========");
+        System.out.println("=========== id로 조회: 'Han' ===========");
+        System.out.println(fileUserService.getUserByUserId(user1.getId()));
+
+        System.out.println("=========== 특정 유저 get 테스트 끝 ===========");
+        System.out.println();
+
+        // 유저 업데이트
+        System.out.println("=========== 유저 update 테스트 ===========");
+        System.out.println("=========== 'Nick 유저 업데이트' ===========");
+        System.out.println("=========== 'Nick 수정 이전' ===========");
+        System.out.println(fileUserService.getUserByUserId(user3.getId()));
+        System.out.println("=========== 'Nick 의 닉네임을 Nice로 변경, 상태 메세지 빈칸 만들기 ' ===========");
+        fileUserService.updateUser(user3.getId(), "Nice", user3.getAvatar(), "");
+        System.out.println(fileUserService.getUserByUserId(user3.getId()));
+        System.out.println("=========== 유저 update 테스트 끝 ===========");
+        System.out.println();
+
+        // 유저 삭제
+        System.out.println("=========== 유저 삭제 테스트 ===========");
+        System.out.println("=========== 삭제 이전: 7명 ===========");
+        fileUserService.getAllUsers().forEach(System.out::println);
+        System.out.println("=========== 유저 'Oreo'를 id로 삭제 ===========");
+        fileUserService.deleteUserById(user7.getId());
+        System.out.println("=========== 유저 'Mr.delete'를 id로 삭제 ===========");
+        fileUserService.deleteUserById(user6.getId());
+        System.out.println("=========== 삭제 이후: 5명이여야 함 ===========");
+        fileUserService.getAllUsers().forEach(System.out::println);
+        System.out.println("=========== 유저 삭제 테스트 끝===========");
+        System.out.println();
+
+
+
+
+    }
+
+    private static void test(UserService userService, ChannelService channelService, MessageService messageService) {
         // User Service 테스트
         // 유저 등록 테스트
         System.out.println("=========== 유저 생성 및 유저 리스트 조회 테스트 ===========");
@@ -89,7 +163,6 @@ public class JavaApplication {
         userService.getAllUsers().forEach(System.out::println);
         System.out.println("=========== 유저 삭제 테스트 끝===========");
         System.out.println();
-
 
 
         //////////////////////
@@ -191,7 +264,5 @@ public class JavaApplication {
 
         System.out.println();
         System.out.println();
-
-
     }
 }

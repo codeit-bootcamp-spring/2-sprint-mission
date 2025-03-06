@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicatedUserException;
@@ -8,20 +8,21 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
-public class JCFUserService implements UserService {
-    private static volatile JCFUserService instance;
+// JCFUserService와 동일하며, 추후 BasicUserService도 동일할 예정입니다. (스프린트 요구 사항으로 남겨두었습니다.)
+public class FileUserService implements UserService {
+    private static volatile FileUserService instance;
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private JCFUserService(UserRepository userRepository) {
+    private FileUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public static JCFUserService getInstance(UserRepository userRepository) {
+    public static FileUserService getInstance(UserRepository userRepository) {
         if (instance == null) {
-            synchronized (JCFUserService.class) {
+            synchronized (FileUserService.class) {
                 if (instance == null) {
-                    instance = new JCFUserService(userRepository);
+                    instance = new FileUserService(userRepository);
                 }
             }
         }
@@ -40,7 +41,6 @@ public class JCFUserService implements UserService {
         return userRepository.findById(userId);
     }
 
-
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -52,7 +52,6 @@ public class JCFUserService implements UserService {
         user.update(nickname, avatar, status);
         return userRepository.save(user);
     }
-
 
     @Override
     public void deleteUserById(UUID userId) {
