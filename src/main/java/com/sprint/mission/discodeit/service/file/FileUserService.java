@@ -25,10 +25,13 @@ public class FileUserService implements UserService {
         return user;
     }
 
-
     @Override
     public User getUser(UUID id) {
-        return userRepository.findById(id);
+        User user = userRepository.findById(id);
+        if (user == null) {
+            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+        }
+        return user;
     }
 
     @Override
@@ -38,20 +41,14 @@ public class FileUserService implements UserService {
 
     @Override
     public void updateUser(UUID id, String newUsername) {
-        User user = userRepository.findById(id);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found!");
-        }
+        User user = getUser(id);
         user.updateUsername(newUsername);
         userRepository.save(user);
     }
 
     @Override
     public void deleteUser(UUID id) {
-        User user = userRepository.findById(id);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found!");
-        }
+        getUser(id);
         userRepository.delete(id);
     }
 }
