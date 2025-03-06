@@ -14,7 +14,27 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository, FileRepository<Channel> {
+    private static volatile FileChannelRepository instance;
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "channels");
+
+    public static FileChannelRepository getInstance() {
+        if (instance == null) {
+            synchronized (FileChannelRepository.class) {
+                if (instance == null) {
+                    instance = new FileChannelRepository();
+                }
+            }
+        }
+        return instance;
+    }
+
+    private FileChannelRepository() {
+        SerializationUtil.init(directory);
+    }
+
+
+    // 조회할 떄 마다 파일 I/O를 이용해 로드하기 vs Map을 이용해 메모리에 저장해놓고 꺼내쓰기
+    // private final Map<UUID, Channel> channels = new HashMap<>();;
 
     @Override
     public Channel save(Channel channel) {

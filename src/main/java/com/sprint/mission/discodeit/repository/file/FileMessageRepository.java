@@ -15,7 +15,23 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository, FileRepository<Message> {
+    private static volatile FileMessageRepository instance;
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "messages");
+
+    public static FileMessageRepository getInstance() {
+        if (instance == null) {
+            synchronized (FileMessageRepository.class) {
+                if (instance == null) {
+                    instance = new FileMessageRepository();
+                }
+            }
+        }
+        return instance;
+    }
+
+    private FileMessageRepository() {
+        SerializationUtil.init(directory);
+    }
 
     @Override
     public Message save(Message message) {

@@ -14,7 +14,23 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileUserRepository implements FileRepository<User>, UserRepository {
+    private static volatile FileUserRepository instance;
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "users");
+
+    public static FileUserRepository getInstance() {
+        if (instance == null) {
+            synchronized (FileUserRepository.class) {
+                if (instance == null) {
+                    instance = new FileUserRepository();
+                }
+            }
+        }
+        return instance;
+    }
+
+    private FileUserRepository() {
+        SerializationUtil.init(directory);
+    }
 
     @Override
     public User save(User user) {
