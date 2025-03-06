@@ -12,42 +12,30 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void save(Channel channel) {
         if (channel.getId() == null) {
-            throw new IllegalArgumentException("Channel ID cannot be null!");
+            throw new IllegalArgumentException("채널ID가 공백입니다.");
         }
-
         List<Channel> channels = readFromFile();
         channels.removeIf(c -> c.getId().equals(channel.getId()));
         channels.add(channel);
         writeToFile(channels);
     }
 
-
     @Override
     public Channel findById(UUID id) {
-        System.out.println("Searching for Channel with ID: " + id);
-        List<Channel> channels = readFromFile();
-        Channel found = channels.stream()
+        if (id == null) return null;
+        return readFromFile().stream()
                 .filter(c -> c.getId().equals(id))
                 .findFirst()
                 .orElse(null);
-        if (found == null) {
-            System.err.println("Channel with ID " + id + " not found.");
-        }
-        return found;
     }
-
-
-
 
     @Override
     public void delete(UUID id) {
+        if (id == null) return;
         List<Channel> channels = readFromFile();
         boolean removed = channels.removeIf(c -> c.getId().equals(id));
         if (removed) {
             writeToFile(channels);
-            System.out.println("Channel with ID " + id + " deleted.");
-        } else {
-            System.err.println("Failed to delete. Channel with ID " + id + " not found.");
         }
     }
 
