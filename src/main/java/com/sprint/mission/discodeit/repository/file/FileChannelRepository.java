@@ -86,7 +86,7 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
 
     // 서버 시작 시 기존 저장된 데이터 메모리에 캐싱
     private void loadCacheFromFile() {
-        List<Channel> channels = SerializationUtil.reverseSerialization(directory);
+        List<Channel> channels = loadAllFromFile();
         for (Channel channel : channels) {
             channelMap.put(channel.getId(), channel);
         }

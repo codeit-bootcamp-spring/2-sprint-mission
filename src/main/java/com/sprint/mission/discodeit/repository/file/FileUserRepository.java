@@ -81,7 +81,7 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
     }
 
     private void loadCacheFromFile() {
-        List<User> users = SerializationUtil.reverseSerialization(directory);
+        List<User> users = loadAllFromFile();
         for (User user : users) {
             userMap.put(user.getId(), user);
         }

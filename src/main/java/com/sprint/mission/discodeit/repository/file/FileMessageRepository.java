@@ -83,7 +83,7 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
     }
 
     private void loadCacheFromFile() {
-        List<Message> messages = SerializationUtil.reverseSerialization(directory);
+        List<Message> messages = loadAllFromFile();
         for (Message message : messages) {
             messageMap.put(message.getId(), message);
         }
