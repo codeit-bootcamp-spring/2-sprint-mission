@@ -27,7 +27,7 @@ public class Beans {
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     public Beans() {
-        initializeJCFBeans();
+        initializeFileBeans();
         initializeBeans();
     }
 
