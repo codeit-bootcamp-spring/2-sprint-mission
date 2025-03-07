@@ -5,145 +5,70 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.Repository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 
 public class JavaApplication {
+    static User setupUser(UserService userService) {
+        User user = userService.createUser("testUser1", "test1@codeit.com", "1234");
+        return user;
+    }
+
+    static Channel setupChannel(ChannelService channelService) {
+        Channel channel = channelService.createChannel("testChannel1");
+        return channel;
+    }
+
+    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+        Message message = messageService.createMessage(author.getId(), "testMessage1", channel.getId());
+        System.out.println("메시지 생성: " + message.getId());
+    }
+
     public static void main(String[] args) {
+        // JCF
         UserRepository jcfUserRepository = JCFUserRepository.getInstance();
         ChannelRepository jcfChannelRepository = JCFChannelRepository.getInstance();
         MessageRepository jcfMessageRepository = JCFMessageRepository.getInstance();
 
-        UserService userService = new JCFUserService(jcfUserRepository);
-        ChannelService channelService = new JCFChannelService(jcfUserRepository, jcfChannelRepository, jcfMessageRepository);
-        MessageService messageService = new JCFMessageService(jcfUserRepository, jcfChannelRepository, jcfMessageRepository);
+        UserService jcfUserService = new JCFUserService(jcfUserRepository);
+        ChannelService jcfChannelService = new JCFChannelService(jcfUserRepository, jcfChannelRepository, jcfMessageRepository);
+        MessageService jcfMessageService = new JCFMessageService(jcfUserRepository, jcfChannelRepository, jcfMessageRepository);
 
-        // userService
-        // createUser 검증
-        System.out.println("UserSerivce의 createUser 메서드 검증");
-        userService.createUser("user01", "user01@gmail.com", "1111");
-        userService.createUser("user02", "user02@gmail.com", "2222");
-        userService.createUser("user03", "user03@gmail.com", "3333");
-        System.out.println(userService.readAllUsers());
+        User user1 = setupUser(jcfUserService);
+        Channel channel1 = setupChannel(jcfChannelService);
+        messageCreateTest(jcfMessageService, channel1, user1);
 
 
-        // read
-        // createUser로 생성할 경우, id 를 가져올 방법이 없어 생성자로 생성 후, repository에 직접 추가
-        System.out.println("UserService의 readUser 메서드 검증");
-        User testUser01 = new User("testUser01", "testUser01@gmail.com", "1111");
-        User testUser02 = new User("testUser02", "testUser02@gmail.com", "2222");
-        User testUser03 = new User("testUser03", "testUser03@gmail.com", "3333");
-        jcfUserRepository.add(testUser01);
-        jcfUserRepository.add(testUser02);
-        jcfUserRepository.add(testUser03);
-        System.out.println(userService.readUser(testUser01.getId()));
-        System.out.println(userService.readUser(testUser02.getId()));
-        System.out.println(userService.readUser(testUser03.getId()));
+        // File
+        UserRepository fileUserRepository = FileUserRepository.getInstance();
+        ChannelRepository fileChannelRepository = FileChannelRepository.getInstance();
+        MessageRepository fileMessageRepository = FileMessageRepository.getInstance();
 
-        // readAll          //userRepository의 정렬순서 확인해볼 것
-        System.out.println("UserService의 readAllUsers 검증");
-        System.out.println(userService.readAllUsers());
+        UserService fileUserService = new FileUserService(fileUserRepository);
+        ChannelService fileChannelService = new FileChannelService(fileUserRepository, fileChannelRepository, fileMessageRepository);
+        MessageService fileMessageService = new FileMessageService(fileUserRepository, fileChannelRepository, fileMessageRepository);
 
-        // update
-        userService.updateUserName(testUser02.getId(), "updateUserName02");
-        userService.updatePassword(testUser03.getId(), "updatePassword03");
-        System.out.println(userService.readAllUsers());
-
-        // delete
-        /*userService.deleteUser(testUser01.getId());
-        System.out.println(userService.readAllUsers());
-*/
-
-
-
-
-        // ChannelService
-        // create
-        System.out.println("ChannelSerivce의 createChannel 메서드 검증");
-        channelService.createChannel("channel01");
-        channelService.createChannel("channel02");
-        channelService.createChannel("channel03");
-
-        // read
-        System.out.println("ChannelService의 readChannel 메서드 검증");
-        Channel testChannel01 = new Channel("testChannel01");
-        Channel testChannel02 = new Channel("testChannel02");
-        Channel testChannel03 = new Channel("testChannel03");
-        jcfChannelRepository.add(testChannel01);
-        jcfChannelRepository.add(testChannel02);
-        jcfChannelRepository.add(testChannel03);
-        System.out.println(channelService.readChannel(testChannel01.getId()));
-        System.out.println(channelService.readChannel(testChannel02.getId()));
-        System.out.println(channelService.readChannel(testChannel03.getId()));
-
-        // readAll
-        System.out.println("ChannelService의 readAllChannels 메서드 검증");
-        System.out.println(channelService.readAllChannels());
-
-        // update
-        System.out.println("ChannelService의 update 메서드 검증");
-        channelService.updateChannelName(testChannel01.getId(), "updateChannelName01");
-        channelService.addChannelParticipant(testChannel03.getId(), testUser03);
-        System.out.println(channelService.readAllChannels());
-
-        //delete
-        /*System.out.println("ChannelService의 deleteChannel 메서드 검증");
-        channelService.deleteChannel(testChannel01.getId());
-        System.out.println(channelService.readAllChannels());*/
-
-
-
-
-
-
-
-        // MessageService
-        //create
-        System.out.println("MessageSerivce의 createMessage 메서드 검증");
-        // messageService.createMessage(testUser01, "test01", testChannel01);   // 위에서 testUser01 삭제함.
-        messageService.createMessage(testUser02, "test02", testChannel02);
-        messageService.createMessage(testUser03, "test03", testChannel03);
-
-        // read
-        System.out.println("MessageSerivce의 readMessage 메서드 검증");
-        // Message testMessage01 = new Message(testUser01, "01test01", testChannel01);   // 위에서 testUser01 삭제함.
-        Message testMessage02 = new Message(testUser02, "02test02", testChannel02);
-        Message testMessage03 = new Message(testUser03, "03test03", testChannel03);
-        jcfMessageRepository.add(testMessage02);
-        jcfMessageRepository.add(testMessage03);
-        // System.out.println(messageService.readMessage(testMessage01.getId()));
-        System.out.println(messageService.readMessage(testMessage02.getId()));
-        System.out.println(messageService.readMessage(testMessage03.getId()));
-
-        // readAll
-        System.out.println("MessageSerivce의 readAllMessage 메서드 검증");
-        messageService.readAllMessages();
-
-       // update
-        System.out.println("MessageSerivce의 updateMessageContent 메서드 검증");
-        messageService.updateMessageContent(testMessage02.getId(), "updateMessageContent02");
-        System.out.println(messageService.readAllMessages());
-
-       // delete
-        System.out.println("MessageSerivce의 deleteMessage 메서드 검증");
-        messageService.deleteMessage(testMessage03.getId());
-        System.out.println(messageService.readAllMessages());
-
-
-
-
-        // ChannelService 의 readMessageList (메세지가 있어야 해서 끝에 두었음)
-        System.out.println("ChannelService의 readMessageListByChannelId 메서드 검증");
-        System.out.println(channelService.readMessageListByChannelId(testChannel02.getId()));
-
+        User user2 = setupUser(fileUserService);
+        Channel channel2 = setupChannel(fileChannelService);
+        messageCreateTest(fileMessageService, channel2, user2);
     }
 }
