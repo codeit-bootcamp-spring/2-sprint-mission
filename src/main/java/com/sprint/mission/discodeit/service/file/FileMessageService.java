@@ -16,7 +16,7 @@ public class FileMessageService implements MessageService {
     private static final Path directory = Paths.get(System.getProperty("user.dir"), "data", "messages");
 
     private final List<Message> messagesData;
-    private UserService userService;
+    private final UserService userService;
 
     public FileMessageService(UserService userService) {
         messagesData = new ArrayList<>();
@@ -34,7 +34,6 @@ public class FileMessageService implements MessageService {
         save(message);
         return message;
     }
-//     directory.resolve(message.getId() + ".ser");
 
     private boolean validateMessage(Message message) {
         User user = userService.getUser(message.getSender());

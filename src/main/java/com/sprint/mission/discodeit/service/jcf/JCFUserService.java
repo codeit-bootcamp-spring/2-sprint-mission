@@ -4,13 +4,12 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 
 public class JCFUserService implements UserService {
-    public final List<User> usersData;
+    private final List<User> usersData;
 
     public JCFUserService() {
         usersData = new ArrayList<>();

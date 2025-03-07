@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.UserService;
+
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,18 +11,17 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 public class FileMessageRepository implements MessageRepository {
     private static final Path directory = Paths.get(System.getProperty("user.dir"), "data", "messages");
 
     private final List<Message> messagesData;
-    private final UserService userService;
 
-    public FileMessageRepository(UserService userService) {
+
+    public FileMessageRepository() {
         messagesData = new ArrayList<>();
-        this.userService = userService;
+
     }
 
     @Override

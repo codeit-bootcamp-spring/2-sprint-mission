@@ -86,31 +86,4 @@ public class FileUserRepository implements UserRepository {
             throw new RuntimeException(e);
         }
     }
-
-//  FileUserSerivce
-//    public User delete(String name) {
-//        <User> user = find();
-//        UserRepository.deleteFromFile(user)
-//    }
-
-
-
-
-
-//    public User deleteFromFile(User user) {
-//        List <User> userList = load();
-//        User result = userList.stream()
-//                .filter(r -> r.getName().equals(user.getName()))
-//                .findAny()
-//                .orElse(null);
-//        try{
-//            if (result != null && Files.exists(directory.resolve(result.getId() + ".ser"))) {
-//                Files.delete(directory.resolve(user.getId() + ".ser"));
-//            }
-//        }catch (Exception e){
-//            throw new RuntimeException(e);
-//        }
-//        return user;
-//    }
-
 }

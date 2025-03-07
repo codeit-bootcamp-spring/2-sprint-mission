@@ -3,12 +3,18 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.util.List;
 import java.util.Scanner;
@@ -16,9 +22,13 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserService userService = new FileUserService();
-        ChannelService channelService = new FileChannelService();
-        MessageService messageService = new FileMessageService(userService);
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
+
+        UserService userService = new BasicUserService(userRepository);
+        ChannelService channelService = new BasicChannelService(channelRepository);
+        MessageService messageService = new BasicMessageService(messageRepository, userService);
 
 
         Scanner sc = new Scanner(System.in);
@@ -75,19 +85,19 @@ public class JavaApplication {
                         case "4":
                             System.out.println("\n===사용자 수정 ===");
                             System.out.print("변경 할 사용자 이름 입력: ");
-                            String username3 = sc.nextLine();
+                            String userName3 = sc.nextLine();
                             System.out.print("새로운 사용자 이름 입력: ");
-                            String changename = sc.nextLine();
+                            String changedName = sc.nextLine();
                             System.out.print("새로운 사용자 이메일 입력: ");
-                            String changeemail = sc.nextLine();
-                            userService.update(username3, changename, changeemail);
+                            String changedEmail = sc.nextLine();
+                            userService.update(userName3, changedName, changedEmail);
                             break;
 
                         case "5":
                             System.out.println("\n===사용자 삭제 ===");
                             System.out.print("삭제 할 사용자 이름 입력: ");
-                            String username4 = sc.nextLine();
-                            userService.delete(username4);
+                            String userName4 = sc.nextLine();
+                            userService.delete(userName4);
                             break;
 
                     }

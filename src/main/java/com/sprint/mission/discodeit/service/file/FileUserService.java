@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
@@ -14,12 +13,10 @@ import java.util.stream.Stream;
 public class FileUserService implements UserService {
     private static final Path directory = Paths.get(System.getProperty("user.dir"), "data", "user");
 
-    public final List<User> usersData;
-    public FileUserRepository fileUserRepository;
+    private final List<User> usersData;
 
     public FileUserService() {
         usersData = new ArrayList<>();
-        fileUserRepository = new FileUserRepository();
     }
 
     // 사용자 생성
@@ -140,19 +137,6 @@ public class FileUserService implements UserService {
                 System.out.println("사용자가 존재하지 않습니다.");
             }
         } catch (IOException | NullPointerException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void deleteTest(String name) {
-        User userList = find(name);
-        try{
-            if (userList != null && Files.exists(directory.resolve(userList.getId() + ".ser"))) {
-                Files.delete(directory.resolve(userList.getId() + ".ser"));
-            } else {
-                System.out.println("사용자가 존재하지 않습니다.");
-            }
-        }catch (Exception e){
             throw new RuntimeException(e);
         }
     }

@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
-    public final List<Message> messagesData;
-    public UserService userService;
+    private final List<Message> messagesData;
+    private UserService userService;
 
     public JCFMessageService(UserService userService) {
         messagesData = new ArrayList<>();
@@ -119,7 +119,7 @@ public class JCFMessageService implements MessageService {
         Message sendName = find(sender);
         if (sendName != null && sendName.getId().equals(uuid)) {
             messagesData.remove(sendName);
-            System.out.println("[ " + sendName.getSender() + " ] 이 삭제 되었습니다.");;
+            System.out.println("[ " + sendName.getSender() + " ] 이 삭제 되었습니다.");
         }
         System.out.println("메시지가 존재하지 않습니다");
     }

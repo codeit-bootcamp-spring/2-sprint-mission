@@ -9,6 +9,6 @@ public interface ChannelService {
     Channel create(Channel channel);
     Channel getChannel(String channelName);
     List<Channel> getAllChannel();
-    Channel update(String channel, String changeChannel, String changeDescription);
+    Channel update(String channelName, String changeChannel, String changeDescription);
     void delete(String channelName);
 }
