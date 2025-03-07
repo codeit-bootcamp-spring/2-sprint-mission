@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.*;
 
 public interface UserService {
-    void createUser(String userName, String userEmail, String password);
+    User createUser(String userName, String userEmail, String password);
     User readUser(UUID id);
     Map<UUID, User> readAllUsers();
     void updateUserName(UUID id, String newUserName);

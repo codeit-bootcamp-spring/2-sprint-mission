@@ -15,9 +15,10 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void createUser(String userName, String userEmail, String password) {
+    public User createUser(String userName, String userEmail, String password) {
         User newUser = new User(userName, userEmail, password); //각 요소에 대한 유효성 검증은 User 생성자에게 맡긴다
         this.jcfUserRepository.add(newUser);
+        return newUser;
     }
 
     @Override

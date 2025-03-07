@@ -24,9 +24,10 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void createChannel(String channelName) {
+    public Channel createChannel(String channelName) {
         Channel newChannel = new Channel(channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
         fileChannelRepository.add(newChannel);
+        return newChannel;
     }
 
     @Override

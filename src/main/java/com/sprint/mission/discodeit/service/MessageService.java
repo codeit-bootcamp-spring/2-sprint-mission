@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public interface MessageService {
-    void createMessage(UUID senderId, String content, UUID channelId);
+    Message createMessage(UUID senderId, String content, UUID channelId);
     Message readMessage(UUID messageId);
     Map<UUID, Message> readAllMessages();
     void updateMessageContent(UUID messageId, String newContent);
