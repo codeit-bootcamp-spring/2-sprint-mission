@@ -10,9 +10,9 @@ import java.util.List;
 
 public class JCFChannelService implements ChannelService {
 
-    public List<Channel> channelsData;
+    private List<Channel> channelsData;
 
-    public JCFChannelService() {
+    private JCFChannelService() {
         channelsData = new ArrayList<>();
     }
 

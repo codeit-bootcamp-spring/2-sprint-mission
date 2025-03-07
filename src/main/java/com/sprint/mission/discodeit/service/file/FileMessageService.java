@@ -87,7 +87,7 @@ public class FileMessageService implements MessageService {
         if (Files.exists(directory)) {
             try (Stream<Path> path = Files.list(directory)) {
                 return path
-                        .map(this::loadToFile)
+                        .map(this::loadFromFile)
                         .toList();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -97,7 +97,7 @@ public class FileMessageService implements MessageService {
         }
     }
 
-    private Message loadToFile(Path path) {
+    private Message loadFromFile(Path path) {
         try (FileInputStream fis = new FileInputStream(path.toFile());
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             return (Message) ois.readObject();
