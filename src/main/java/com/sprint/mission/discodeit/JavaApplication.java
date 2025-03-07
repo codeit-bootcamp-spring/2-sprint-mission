@@ -2,15 +2,17 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
 
 import java.util.Collections;
 import java.util.Scanner;
@@ -20,9 +22,10 @@ public class JavaApplication {
     static Scanner sc = new Scanner(System.in);
     static UserRepository userRepository = new FileUserRepository();
     static ChannelRepository channelRepository = new FileChannelRepository();
+    static MessageRepository messageRepository = new FileMessageRepository();
     static UserService userService = new BasicUserService(userRepository);
     static ChannelService channelService = new BasicChannelService(channelRepository);
-    static MessageService messageService = new FileMessageService(userService, channelService);
+    static MessageService messageService = new BasicMessageService(messageRepository, userService, channelService);
 
     public static void main(String[] args) {
 
@@ -56,7 +59,7 @@ public class JavaApplication {
 
             switch (num) {
                 case 1:
-                    System.out.println("===등록===");
+                    System.out.println("===채널 이용===");
                     System.out.println("1. 채널 개설\n2. 채널 선택\n3. 개설된 채널 조회\n4. 메뉴로 돌아가기");
                     System.out.print("입력란: ");
                     int createNum = sc.nextInt();
@@ -86,7 +89,6 @@ public class JavaApplication {
                             break;
                     }
                     break;
-
                 case 2:
                     System.out.println("=== 조회 ===");
                     System.out.println("1. 사용자 조회\n2. 채널 조회\n3. 메세지 조회\n4. 메뉴로 돌아가기");
@@ -192,9 +194,7 @@ public class JavaApplication {
                     case 1:
                         System.out.print("조회할 채널 아이디: ");
                         UUID chennelUUID = UUID.fromString(sc.nextLine());
-
                         System.out.println(channelService.findChannel(chennelUUID));
-
                         break;
                     case 2:
                         channelService.findAllChannel()
@@ -212,7 +212,7 @@ public class JavaApplication {
                     case 1:
                         System.out.print("조회할 메시지 아이디: ");
                         UUID MessageUUID = UUID.fromString(sc.nextLine());
-                        messageService.findMessageById(MessageUUID);
+                        System.out.println(messageService.findMessageById(MessageUUID));
                         break;
                     case 2:
                         messageService.findAllMessages()
