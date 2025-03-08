@@ -47,4 +47,12 @@ public class User extends MainDomain {
         }
     }
 
+    @Override
+    public String toString() {
+        return "User {" +
+                "userID= " + getId()  +
+                ", userName= " + userName +
+                ", email= " + email +
+                ", password= " + password + "}";
+    }
 }
