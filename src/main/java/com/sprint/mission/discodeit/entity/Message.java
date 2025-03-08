@@ -1,9 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Message extends BaseEntity {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Message extends BaseEntity implements Serializable {
     private User sender;
     private String content;
     private Channel channel;
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public Message(User sender, String content, Channel channel) {
         super();
@@ -25,11 +31,12 @@ public class Message extends BaseEntity {
     }
     public void updateContent(String content) {
         this.content = content;
+        updateUpdatedAt(System.currentTimeMillis());
     }
 
     @Override
     public String toString() {
-        return "[" + channel.getChannelName() + "] " + sender.getName() + " : " + content + ", " + getId();
+        return "[" + channel.getChannelName() + "] " + sender.getName() + " : " + content + " " + getCreatedAt();
     }
 
 }
