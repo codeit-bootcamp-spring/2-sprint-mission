@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class FileMessageService implements MessageService {
     private static final FileMessageService instance = new FileMessageService(FileUserService.getInstance(), FileChannelService.getInstance());
-    private static final String FILE_TYPE = "message.ser";
+    private static final String FILE_PATH = "message.ser";
     private final Map<UUID, Message> data;
     private final UserService userService;
     private final ChannelService channelService;
@@ -27,7 +27,7 @@ public class FileMessageService implements MessageService {
     }
 
     private void saveData() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_TYPE))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(data);
         } catch (IOException e) {
             e.printStackTrace();
@@ -35,7 +35,7 @@ public class FileMessageService implements MessageService {
     }
 
     private Map<UUID, Message> loadData() {
-        File file = new File(FILE_TYPE);
+        File file = new File(FILE_PATH);
         if (!file.exists()) {
             return new HashMap<>();
         }
