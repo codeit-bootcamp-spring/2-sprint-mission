@@ -34,14 +34,12 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void createMessage(Message message) {
-        //데이터 유효성 확인
-        messageValidationCheck(message);
         //요청자 확인
         User user = findUserOrThrow(message.getUserId());
         //채널 확인
         Channel channel = findChannelOrThrow(message.getChannelId());
         //작성 권한 확인
-        validateUserPermission(user, null, channel.getWritePermission(), ActionType.WRITE);
+        validateWritePermission(user, channel.getWritePermission());
         //create
         messageRepository.createMessage(message);
     }
@@ -65,11 +63,9 @@ public class JCFMessageService implements MessageService {
         //채널 확인
         ensureMessageBelongsToChannel(message, channelId);
         //수정 권한 확인
-        validateUserPermission(user, message.getUserId(), null, ActionType.EDIT);
+        validateEditDeletePermission(user, message.getUserId());
         //update
-        if (content != null) {
-            messageRepository.updateMessage(id, content, userId, channelId);
-        }
+        messageRepository.updateMessage(id, content, userId, channelId);
     }
 
     @Override
@@ -81,7 +77,7 @@ public class JCFMessageService implements MessageService {
         //채널 확인
         ensureMessageBelongsToChannel(message, channelId);
         //삭제 권한 확인
-        validateUserPermission(user, message.getUserId(), null, ActionType.DELETE);
+        validateEditDeletePermission(user, message.getUserId());
         //delete
         messageRepository.deleteMessage(id, userId, channelId);
     }
@@ -89,40 +85,21 @@ public class JCFMessageService implements MessageService {
     /*******************************
      * Validation check
      *******************************/
-    private void messageValidationCheck(Message message){
-        // 1. null check
-        if (message == null) {
-            throw new IllegalArgumentException("message 객체가 null입니다.");
-        }
-        if (message.getId() == null) {
-            throw new IllegalArgumentException("ID 값이 없습니다.");
-        }
-        if (message.getContent() == null) {
-            throw new IllegalArgumentException("메시지 내용이 null입니다.");
-        }
-        if (message.getUserId() == null) {
-            throw new IllegalArgumentException("채널 개설자의 ID가 없습니다.");
-        }
-        if (message.getChannelId() == null) {
-            throw new IllegalArgumentException("채널의 ID가 없습니다.");
-        }
-    }
-
     private void ensureMessageBelongsToChannel(Message message, UUID channelId){
         if (!message.getChannelId().equals(channelId)) {
             throw new RuntimeException("해당 메시지는 요청한 채널에 속하지 않습니다.");
         }
     }
 
-    private void validateUserPermission(User user, UUID messageUserId, UserRole channelRequiredRole, ActionType action) {
-        if (action == ActionType.WRITE) {
-            if (user.getRole() != channelRequiredRole && user.getRole() != UserRole.ADMIN) {
-                throw new RuntimeException("메시지를 작성할 권한이 없습니다.");
-            }
-        } else {
-            if (!user.getId().equals(messageUserId) && user.getRole() != UserRole.ADMIN) {
-                throw new RuntimeException(String.format("메시지를 %s할 권한이 없습니다.", action == ActionType.EDIT ? "수정" : "삭제"));
-            }
+    private void validateWritePermission(User user, UserRole channelRequiredRole) {
+        if (user.getRole() != channelRequiredRole && user.getRole() != UserRole.ADMIN) {
+            throw new RuntimeException("메시지를 작성할 권한이 없습니다.");
+        }
+    }
+
+    private void validateEditDeletePermission(User user, UUID messageUserId) {
+        if (!user.getId().equals(messageUserId) && user.getRole() != UserRole.ADMIN) {
+            throw new RuntimeException("메시지를 수정/삭제할 권한이 없습니다.");
         }
     }
 
@@ -140,4 +117,5 @@ public class JCFMessageService implements MessageService {
         return userService.selectUserById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다. : " + userId));
     }
+
 }
