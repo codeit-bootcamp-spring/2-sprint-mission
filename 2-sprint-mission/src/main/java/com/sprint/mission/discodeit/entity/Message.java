@@ -5,14 +5,15 @@ import java.util.UUID;
 
 public class Message implements Serializable {
     private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
+    private final Long createdAt;
+    private Long updatedAt;
     private final UUID userId;
     private final UUID channelId;
     private String content;
     private static final long serialVersionUID = 1L;
 
     public Message(UUID userId, UUID channelId, String content) {
+        validateMessage(userId, channelId, content);
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = this.createdAt;
@@ -25,11 +26,11 @@ public class Message implements Serializable {
         return id;
     }
 
-    public long getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public long getUpdatedAt() {
+    public Long getUpdatedAt() {
         return updatedAt;
     }
 
@@ -45,12 +46,14 @@ public class Message implements Serializable {
         return content;
     }
 
-    public void updateContent(String content) {
-        this.content = content;
-        updateTimestamp();
+    public void update(String content) {
+        if (content != null) {
+            this.content = content;
+            updateLastModifiedAt();
+        }
     }
 
-    protected final void updateTimestamp() {
+    protected final void updateLastModifiedAt() {
         this.updatedAt = System.currentTimeMillis();
     }
 
@@ -63,4 +66,21 @@ public class Message implements Serializable {
                 ", channelId=" + channelId +
                 '}';
     }
+
+    /*******************************
+     * Validation check
+     *******************************/
+    private void validateMessage(UUID userId, UUID channelId, String content) {
+        // 1. null check
+        if (content == null) {
+            throw new IllegalArgumentException("메시지 내용이 null입니다.");
+        }
+        if (userId == null) {
+            throw new IllegalArgumentException("채널 개설자의 ID가 없습니다.");
+        }
+        if (channelId == null) {
+            throw new IllegalArgumentException("채널의 ID가 없습니다.");
+        }
+    }
+
 }

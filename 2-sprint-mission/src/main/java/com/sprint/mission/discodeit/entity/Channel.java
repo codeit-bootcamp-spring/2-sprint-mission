@@ -8,8 +8,8 @@ import java.util.UUID;
 
 public class Channel implements Serializable {
     private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
+    private final Long createdAt;
+    private Long updatedAt;
     private ChannelType type;
     private String category;
     private String name;
@@ -19,6 +19,7 @@ public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public Channel(ChannelType type, String category, String name, UUID userId, UserRole writePermission) {
+        validateChannel(type, category, name, userId, writePermission);
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = this.createdAt;
@@ -34,14 +35,13 @@ public class Channel implements Serializable {
         return id;
     }
 
-    public long getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public long getUpdatedAt() {
+    public Long getUpdatedAt() {
         return updatedAt;
     }
-
 
     public ChannelType getType() {
         return type;
@@ -68,37 +68,46 @@ public class Channel implements Serializable {
         return writePermission;
     }
 
-    public void updateType(ChannelType type) {
-        this.type = type;
-        updateTimestamp();
-    }
+    public void update(String name, String category, ChannelType type) {
+        boolean isUpdated = false;
 
-    public void updateCategory(String category) {
-        this.category = category;
-        updateTimestamp();
-    }
+        if (name != null && !name.equals(this.name)) {
+            validateName(name);
+            this.name = name;
+            isUpdated = true;
+        }
+        if (category != null && !category.equals(this.category)) {
+            validateCategory(category);
+            this.category = category;
+            isUpdated = true;
+        }
+        if (type != null && !type.equals(this.type)) {
+            this.type = type;
+            isUpdated = true;
+        }
 
-    public void updateName(String name) {
-        this.name = name;
-        updateTimestamp();
-    }
-
-    public void updateWritePermission(UserRole writePermission) {
-        this.writePermission = writePermission;
-        updateTimestamp();
+        if (isUpdated) {
+            updateLastModifiedAt();
+        }
     }
 
     public void addMember(UUID memberId){
+        if (userMembers.contains(memberId)) {
+            throw new RuntimeException("이미 채널에 포함된 사용자입니다: " + memberId);
+        }
         this.userMembers.add(memberId);
-        updateTimestamp();
+        updateLastModifiedAt();
     }
 
     public void removeMember(UUID memberId){
+        if (!userMembers.contains(memberId)) {
+            throw new RuntimeException("채널에 존재하지 않는 사용자입니다: " + memberId);
+        }
         this.userMembers.remove(memberId);
-        updateTimestamp();
+        updateLastModifiedAt();
     }
 
-    protected final void updateTimestamp() {
+    private void updateLastModifiedAt() {
         this.updatedAt = System.currentTimeMillis();
     }
 
@@ -114,4 +123,40 @@ public class Channel implements Serializable {
                 ", writePermission=" + writePermission +
                 '}';
     }
+
+    /*******************************
+     * Validation check
+     *******************************/
+    private void validateChannel(ChannelType type, String category, String name, UUID userId, UserRole writePermission){
+        // 1. null check
+        if (type == null) {
+            throw new IllegalArgumentException("Type 값이 없습니다.");
+        }
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("채널명이 없습니다.");
+        }
+        if (userId == null) {
+            throw new IllegalArgumentException("채널 개설자의 ID가 없습니다.");
+        }
+        if (writePermission == null) {
+            throw new IllegalArgumentException("채널 권한 값이 없습니다.");
+        }
+        // 2. 카테고리명 길이 check
+        validateCategory(category);
+        // 3. 채널명 길이 check
+        validateName(name);
+    }
+
+    private void validateCategory(String category){
+        if (category != null && category.length() > 20) {
+            throw new IllegalArgumentException("카테고리명은 20자 미만이어야 합니다.");
+        }
+    }
+
+    private void validateName(String name){
+        if (name != null && name.length() > 20) {
+            throw new IllegalArgumentException("채널명은 20자 미만이어야 합니다.");
+        }
+    }
+
 }
