@@ -3,68 +3,49 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final List<User> userList;
+    private final Map<UUID, User> userMap;
 
     public JCFUserService() {
-        this.userList = new ArrayList<>();
+        this.userMap = new HashMap<>();
     }
 
     @Override
-    public User create(User user) {
-        for (User existingUser : userList) {
-            if (existingUser.getUserId().equals(user.getUserId())) {
-                throw new IllegalArgumentException("사용자 ID가 이미 존재합니다.");
-            }
-            if (existingUser.getUserEmail().equals(user.getUserEmail())) {
-                throw new IllegalArgumentException("해당 이메일이 이미 존재합니다.");
-            }
-            if (existingUser.getUserName().equals(user.getUserName())) {
-                throw new IllegalArgumentException("사용자 이름이 이미 존재합니다.");
-            }
-        }
-        this.userList.add(user);
+    public User create(String userName, String userEmail, String userPassword) {
+        User user = new User(userName, userEmail, userPassword);
+        this.userMap.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User find(String identifier) {
-        for (User user : userList) {
-            if (user.getUserId().equals(identifier) || user.getUserName().equals(identifier) || user.getUserEmail().equals(identifier)) {
-                return user;
-            }
-        }
-        throw new IllegalArgumentException("사용자를 찾을 수 없습니다: " + identifier);
-    }
-
-    @Override
     public List<User> findAll() {
-        return new ArrayList<>(userList);
+        return new ArrayList<>(userMap.values());
     }
 
     @Override
-    public User update(String identifier, User user) {
-        for (User existingUser : userList) {
-            if (existingUser.getUserId().equals(identifier)) {
-                if (user.getUserEmail() != null) {
-                    existingUser.setUserEmail(user.getUserEmail());
-                }
-                if (user.getUserPassword() != null) {
-                    existingUser.setUserPassword(user.getUserPassword());
-                }
-                return existingUser;
-            }
+    public User findById(UUID userId) {
+        User userNullable = this.userMap.get(userId);
+        return Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("해당 사용자를 찾을 수 없습니다: " + userId));
+    }
+
+    @Override
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User userNullable = this.userMap.get(userId);
+        User user = Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("해당 사용자를 찾을 수 없습니다: " + userId));
+        user.update(newUsername, newEmail, newPassword);
+        return user;
+    }
+
+
+    @Override
+    public void delete(UUID userId) {
+        User removedUser = this.userMap.remove(userId);
+        if (removedUser == null) {
+            throw new NoSuchElementException("해당 사용자를 찾을 수 없습니다 : " + userId);
         }
-        return null;
-    }
-
-    @Override
-    public void delete(String identifier) {
-        userList.removeIf(user -> user.getUserId().equals(identifier) ||
-                user.getUserName().equals(identifier) ||
-                user.getUserEmail().equals(identifier));
     }
 }

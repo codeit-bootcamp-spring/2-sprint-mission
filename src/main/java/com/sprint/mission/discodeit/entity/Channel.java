@@ -1,54 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
 
-public class Channel extends BaseEntity {
+public class Channel extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private ChannelType type;
     private String channelName;
-    private List<User> users;
-    private int userCount;
+    private String description;
 
-    public Channel(String channelName) {
+    public Channel(ChannelType type, String channelName, String description) {
         super();
+        this.type = type;
         this.channelName = channelName;
-        this.users = new ArrayList<>();
-        this.userCount = 0;
+        this.description = description;
+    }
+
+    public ChannelType getType() {
+        return type;
     }
 
     public String getChannelName() {
         return channelName;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public String getDescription() {
+        return description;
     }
 
-    public int getUserCount() {
-        return userCount;
-    }
-
-    public void addUser(User user) {
-        if (!users.contains(user)) {
-            users.add(user);
-            userCount++;
-            System.out.println("사용자 " + user.getUserName() + "이(가) '" + channelName + "'에 추가되었습니다.");
-        } else {
-            System.out.println("사용자 " + user.getUserName() + "은(는) 이미 '" + channelName + "'에 존재합니다.");
+    public void update(String newChannelName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newChannelName != null && !newChannelName.equals(this.channelName)) {
+            this.channelName = newChannelName;
+            anyValueUpdated = true;
         }
-    }
-
-    public void removeUser(User user) {
-        if (users.contains(user)) {
-            users.remove(user);
-            userCount--;
-            System.out.println("사용자 " + user.getUserName() + "이(가) '" + channelName + "'에서 삭제되었습니다.");
-        } else {
-            System.out.println("사용자 " + user.getUserName() + "은(는) '" + channelName + "'에 존재하지 않습니다.");
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
         }
-    }
-
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
-        update();
+        if (anyValueUpdated) {
+            this.update();
+        }
     }
 }
