@@ -21,19 +21,20 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public UUID create(String content, UUID userUuid, UUID channelUuid) {
+    public UUID create(String content, UUID userKey, UUID channelKey) {
         if (content == null || content.isEmpty()) {
             throw new IllegalArgumentException("[Error] 내용을 입력해주세요");
         }
         int messageId = messageNum.getAndIncrement();
-        Message text = new Message(messageId, content, userService.getUserName(userUuid), channelService.getChannelName(channelUuid));
+        Message text = new Message(messageId, content, userKey, channelKey, userService.getUserName(userKey), channelService.getChannelName(channelKey));
+
         data.put(text.getUuid(), text);
         return text.getUuid();
     }
 
     @Override
-    public Message read(UUID channelUuid) {
-        Message lastMessage = getLastMessage(channelUuid);
+    public Message read(UUID channelKey) {
+        Message lastMessage = getLastMessage(channelKey);
         if (lastMessage == null) {
             throw new IllegalStateException("[Error] 읽을 메시지가 없습니다.");
         }
@@ -41,12 +42,12 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> readAll(UUID channelUuid) {
-        List<Message> allMessage = getAllMessage(channelUuid);
+    public List<Message> readAll(UUID channelKey) {
+        List<Message> allMessage = getAllMessage(channelKey);
         if (allMessage.isEmpty()) {
             throw new IllegalStateException("[Error] 읽을 메시지가 없습니다.");
         }
-        return getAllMessage(channelUuid);
+        return getAllMessage(channelKey);
     }
 
     @Override
@@ -72,16 +73,16 @@ public class JCFMessageService implements MessageService {
         data.remove(messageUuid);
     }
 
-    private Message getLastMessage(UUID channelUuid) {
+    private Message getLastMessage(UUID channelKey) {
         return data.values().stream()
-                .filter(m -> m.getChannelName().equals(channelService.getChannelName(channelUuid)))
+                .filter(m -> m.getChannelName().equals(channelService.getChannelName(channelKey)))
                 .max(Comparator.comparing(Message::getCreatedAt))
                 .orElse(null);
     }
 
-    private List<Message> getAllMessage(UUID channelUuid) {
+    private List<Message> getAllMessage(UUID channelKey) {
         return data.values().stream()
-                .filter(m -> m.getChannelName().equals(channelService.getChannelName(channelUuid)))
+                .filter(m -> m.getChannelName().equals(channelService.getChannelName(channelKey)))
                 .toList();
     }
 

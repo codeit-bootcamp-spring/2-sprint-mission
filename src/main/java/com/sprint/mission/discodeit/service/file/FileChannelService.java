@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -19,36 +17,34 @@ public class FileChannelService implements ChannelService {
 
     public FileChannelService(UserService userService) {
         this.userService = userService;
-        loadFromFile();
     }
 
     @Override
-    public UUID signUp(String name, UUID userUuid) {
-        UUID channelKey = getChannelKey(name,userUuid);
-        Channel channel = data.get(channelKey);
+    public UUID signUp(String name, UUID userKey) {
+        Channel channel = data.get(getChannelKey(name,userKey));
 
         if (channel == null) {
             throw new IllegalArgumentException("[Error] 가입하려는 채널이 존재하지 않습니다.");
         }
-        if (isSignUp(name, userUuid)) {
+        if (isSignUp(name, userKey)) {
             throw new IllegalStateException("[Error] 이미 가입된 채널입니다.");
         }
-        channel.updateMemberName(userService.getUserName(userUuid));
+        channel.updateMemberKeys(userKey);
+        channel.updateMemberNames(userService.getUserName(userKey));
         saveToFile();
         return channel.getUuid();
     }
 
     @Override
-    public UUID create(String category, String name, String introduction, UUID memberUuid, UUID ownerUuid) {
-        String memberName = userService.getUserName(memberUuid);
-        String ownerName = userService.getUserName(ownerUuid);
+    public UUID create(String category, String name, String introduction, UUID memberKey, UUID ownerKey) {
+        
         if (isChannelCheck(name)) {
             throw new IllegalArgumentException("[Error] 동일한 채널명이 존재합니다.");
         }
-        if (memberName == null || ownerName == null) {
+        if (userService.getUserName(memberKey) == null || userService.getUserName(ownerKey) == null) {
             throw new IllegalStateException("[Error] 존재하지 않는 유저 입니다.");
         }
-        Channel channel = new Channel(category, name, introduction, memberName, ownerName);
+        Channel channel = new Channel(category, name, introduction, memberKey, ownerKey, userService.getUserName(memberKey), userService.getUserName(ownerKey));
         data.put(channel.getUuid(), channel);
         saveToFile();
         return channel.getUuid();
@@ -105,8 +101,8 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void delete(String name, UUID userUuid) {
-        UUID channelUuid = convertToKey(name, userUuid);
+    public void delete(String name, UUID userKey) {
+        UUID channelUuid = convertToKey(name, userKey);
         Channel channel = data.get(channelUuid);
         if (channel == null) {
             throw new IllegalArgumentException("[Error] 존재하지 않는 채널입니다.");
@@ -138,14 +134,14 @@ public class FileChannelService implements ChannelService {
                 .anyMatch(c -> c.getName().equals(name));
     }
 
-    private boolean isSignUp(String name, UUID userUuid) {
+    private boolean isSignUp(String name, UUID userKey) {
         return data.values().stream()
-                .anyMatch(c -> c.getName().equals(name) && c.getMemberName().contains(userService.getUserId(userUuid)));
+                .anyMatch(c -> c.getName().equals(name) && c.getMemberKeys().contains(userKey));
     }
 
     private UUID convertToKey(String inputName, UUID userKey) {
         return data.values().stream()
-                .filter(c -> c.getName().equals(inputName) && c.getMemberName().contains(userService.getUserName(userKey)))
+                .filter(c -> c.getName().equals(inputName) && c.getMemberKeys().contains(userKey))
                 .map(Channel::getUuid)
                 .findFirst()
                 .orElse(null);
