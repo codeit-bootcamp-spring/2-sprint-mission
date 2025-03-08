@@ -1,19 +1,40 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity {
+import java.io.Serializable;
+import java.util.UUID;
+
+public class User implements Serializable {
+    private final UUID id;
+    private final long createdAt;
+    private long updatedAt;
     private final String email;
     private String password;
     private String nickname;
     private UserStatus status;
     private UserRole role;
+    private static final long serialVersionUID = 1L;
 
     public User(String email, String password, String nickname, UserStatus status, UserRole role) {
-        super();
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = this.createdAt;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.status = status;
         this.role = role;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
     }
 
     public String getEmail() {
@@ -56,10 +77,14 @@ public class User extends BaseEntity {
         updateTimestamp();
     }
 
+    protected final void updateTimestamp() {
+        this.updatedAt = System.currentTimeMillis();
+    }
+
     @Override
     public String toString() {
         return "User{" +
-                "id=" + getId() +
+                "id=" + id +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", nickname='" + nickname + '\'' +

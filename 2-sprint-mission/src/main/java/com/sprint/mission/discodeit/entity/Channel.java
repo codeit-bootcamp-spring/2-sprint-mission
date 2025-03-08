@@ -1,20 +1,27 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class Channel extends BaseEntity {
+public class Channel implements Serializable {
+    private final UUID id;
+    private final long createdAt;
+    private long updatedAt;
     private ChannelType type;
     private String category;
     private String name;
     private final UUID userId;
     private final Set<UUID> userMembers;
     private UserRole writePermission;
+    private static final long serialVersionUID = 1L;
 
     public Channel(ChannelType type, String category, String name, UUID userId, UserRole writePermission) {
-        super();
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = this.createdAt;
         this.type = type;
         this.category = category;
         this.name = name;
@@ -22,6 +29,19 @@ public class Channel extends BaseEntity {
         this.userMembers = new HashSet<>();
         this.writePermission = writePermission;
     }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
 
     public ChannelType getType() {
         return type;
@@ -78,10 +98,14 @@ public class Channel extends BaseEntity {
         updateTimestamp();
     }
 
+    protected final void updateTimestamp() {
+        this.updatedAt = System.currentTimeMillis();
+    }
+
     @Override
     public String toString() {
         return "Channel{" +
-                "id=" + getId() +
+                "id=" + id +
                 ", type=" + type +
                 ", category='" + category + '\'' +
                 ", name='" + name + '\'' +
