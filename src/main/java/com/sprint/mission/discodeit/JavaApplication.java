@@ -5,16 +5,18 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.*;
 
 public class JavaApplication {
-    static UserService userService = new JCFUserService();
-    static ChannelService channelService = new JCFChannelService(userService);
-    static MessageService messageService = new JCFMessageService(userService, channelService);
+    static final UserService userService = new FileUserService();
+    static final ChannelService channelService = new FileChannelService(userService);
+    static final MessageService messageService = new FileMessageService(userService, channelService);
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -49,7 +51,6 @@ public class JavaApplication {
     }
 
     private static UUID userMenu(final Scanner sc, UUID loginUserKey) {
-
         while (true) {
             System.out.println("유저 페이지");
             System.out.println("=====================================");
@@ -273,7 +274,7 @@ public class JavaApplication {
                         channelService.update(inputNameToModify, inputCategory, inputName, inputIntroduction);
                         System.out.println("[Info] 정상 업데이트 되었습니다.");
                         continue;
-                    } catch (IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
                         continue;
                     }
@@ -298,7 +299,7 @@ public class JavaApplication {
         }
     }
 
-    private static void messageMenu(final Scanner sc, UUID loginUserKey, UUID loginChannelKey){
+    private static void messageMenu(final Scanner sc, UUID loginUserKey, UUID loginChannelKey) {
         try {
             Optional.ofNullable(loginUserKey).orElseThrow(() -> new IllegalArgumentException("[Error] 로그인을 해주세요"));
             Optional.ofNullable(loginChannelKey).orElseThrow(() -> new IllegalArgumentException("[Error] 채널에 가입 해주세요"));

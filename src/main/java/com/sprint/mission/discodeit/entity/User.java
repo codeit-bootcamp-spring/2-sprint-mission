@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.time.Instant;
 
-public class User extends SharedEntity{
+public class User extends SharedEntity implements Serializable{
     private String id;
     private final String name;
     private String pwd;
