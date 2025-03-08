@@ -16,7 +16,7 @@ public class FileMessageRepository implements MessageRepository {
         this.data = loadData();
     }
 
-    public FileMessageRepository getInstance () {
+    public static FileMessageRepository getInstance() {
         return instance;
     }
 
