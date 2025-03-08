@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
 
-public class Channel extends BaseEntity {
+public class Channel extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String channelName;
-    private Set<String> members;
-    private Set<Message> messages;
+    private Set<UUID> members;
+    private Set<UUID> messages;
 
     public Channel(String channelName) {
         super();
@@ -23,36 +24,36 @@ public class Channel extends BaseEntity {
         this.channelName = channelName;
     }
 
-    public Set<String> getMembers() {
+    public Set<UUID> getMembers() {
         return members;
     }
 
-    public void updateMembers(String newMember) {
-        this.members.add(newMember);
+    public void addMembers(UUID userId) {
+        this.members.add(userId);
     }
 
-    public void removeMember(String member) {
-        this.members.remove(member);
+    public void removeMember(UUID userId) {
+        this.members.remove(userId);
     }
 
-    public Set<Message> getMessages() {
+    public Set<UUID> getMessages() {
         return messages;
     }
 
-    public void updateMessages(Message newMessages) {
-        this.messages.add(newMessages);
+    public void addMessages(UUID MessagesId) {
+        this.messages.add(MessagesId);
     }
 
-    public void removeMessage(Message message) {
-        this.messages.remove(message);
+    public void removeMessage(UUID MessagesId) {
+        this.messages.remove(MessagesId);
     }
 
-    public boolean isUserInChannel(String userName){
-        return this.members.contains(userName);
+    public boolean isUserInChannel(UUID userId){
+        return this.members.contains(userId);
     }
 
-    public boolean isMessageInChannel(Message message){
-        return this.messages.contains(message);
+    public boolean isMessageInChannel(UUID MessageId) {
+        return this.messages.contains(MessageId);
     }
 
     @Override
