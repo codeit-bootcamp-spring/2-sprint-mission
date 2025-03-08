@@ -60,10 +60,7 @@ public class FileUserRepository implements UserRepository {
     public void updateUser(UUID id, String password, String nickname, UserStatus status, UserRole role) {
         FileUtil.loadFromFile(DIRECTORY, id).ifPresent(object -> {
             if (object instanceof User user) {
-                user.updatePassword(password);
-                user.updateNickname(nickname);
-                user.updateStatus(status);
-                user.updateRole(role);
+                user.update(password, nickname, status, role);
                 FileUtil.saveToFile(DIRECTORY, user, id);
             } else {
                 throw new IllegalArgumentException("User 타입의 객체가 아닙니다. " + id);

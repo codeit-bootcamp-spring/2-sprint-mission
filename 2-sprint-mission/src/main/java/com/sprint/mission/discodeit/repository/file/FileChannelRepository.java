@@ -63,9 +63,7 @@ public class FileChannelRepository implements ChannelRepository {
     public void updateChannel(UUID id, String name, String category, ChannelType type, UUID userId) {
         FileUtil.loadFromFile(DIRECTORY, id).ifPresent(object -> {
             if (object instanceof Channel channel) {
-                channel.updateName(name);
-                channel.updateCategory(category);
-                channel.updateType(type);
+                channel.update(name, category, type);
                 FileUtil.saveToFile(DIRECTORY, channel, id);
             } else {
                 throw new IllegalArgumentException("Channel 타입의 객체가 아닙니다. " + id);

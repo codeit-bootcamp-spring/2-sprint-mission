@@ -41,7 +41,7 @@ public class FileMessageRepository implements MessageRepository {
     public void updateMessage(UUID id, String content, UUID userId, UUID channelId) {
         FileUtil.loadFromFile(DIRECTORY, id).ifPresent(object -> {
             if (object instanceof Message message) {
-                message.updateContent(content);
+                message.update(content);
                 FileUtil.saveToFile(DIRECTORY, message, id);
             } else {
                 throw new IllegalArgumentException("Message 타입의 객체가 아닙니다. " + id);
