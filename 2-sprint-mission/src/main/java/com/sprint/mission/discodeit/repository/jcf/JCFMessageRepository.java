@@ -29,7 +29,7 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void updateMessage(UUID id, String content, UUID userId, UUID channelId) {
         Message message = data.get(id);
-        message.updateContent(content);
+        message.update(content);
     }
 
     @Override

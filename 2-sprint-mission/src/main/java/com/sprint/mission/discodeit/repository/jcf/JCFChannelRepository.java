@@ -40,10 +40,7 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public void updateChannel(UUID id, String name, String category, ChannelType type, UUID userId) {
         Channel channel = data.get(id);
-
-        channel.updateName(name);
-        channel.updateCategory(category);
-        channel.updateType(type);
+        channel.update(name, category, type);
     }
 
     @Override
