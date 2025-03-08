@@ -26,7 +26,7 @@ public class FileUtil {
             try (FileInputStream fis = new FileInputStream(filePath.toFile());
                  ObjectInputStream ois = new ObjectInputStream(fis)) {
                 T object = (T) ois.readObject();
-                return Optional.of(object);  // 파일에서 채널 읽어오기
+                return Optional.of(object);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
