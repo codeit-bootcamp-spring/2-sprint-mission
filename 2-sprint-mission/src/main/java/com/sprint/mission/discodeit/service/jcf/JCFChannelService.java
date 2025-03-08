@@ -1,6 +1,7 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -9,19 +10,19 @@ import java.util.*;
 public class JCFChannelService implements ChannelService {
 
     private static volatile JCFChannelService instance;
-    private final Map<UUID, Channel> data;
     private final UserService userService;
+    private final ChannelRepository channelRepository;
 
-    private JCFChannelService(UserService userService) {
-        this.data = new HashMap<>();
+    private JCFChannelService(UserService userService, ChannelRepository channelRepository) {
         this.userService = userService;
+        this.channelRepository = channelRepository;
     }
 
-    public static JCFChannelService getInstance(UserService userService) {
+    public static JCFChannelService getInstance(UserService userService, ChannelRepository channelRepository) {
         if(instance == null) {
             synchronized (JCFChannelService.class) {
                 if(instance == null) {
-                    instance = new JCFChannelService(userService);
+                    instance = new JCFChannelService(userService, channelRepository);
                 }
             }
         }
@@ -37,7 +38,7 @@ public class JCFChannelService implements ChannelService {
         //개설 권한 확인
         validateUserPermission(user, ActionType.CREATE_CHANNEL);
         //create
-        data.put(channel.getId(), channel);
+        channelRepository.createChannel(channel);
     }
 
     @Override
@@ -51,7 +52,7 @@ public class JCFChannelService implements ChannelService {
         //멤버 확인
         validateMembers(userMembers, channel, ActionType.ADD_MEMBER);
         //addMember
-        userMembers.forEach(channel::addMember);
+        channelRepository.addMembers(id, userMembers, userId);
     }
 
     @Override
@@ -65,17 +66,17 @@ public class JCFChannelService implements ChannelService {
         //멤버 확인
         validateMembers(userMembers, channel, ActionType.REMOVE_MEMBER);
         //removeMember
-        userMembers.forEach(channel::removeMember);
+        channelRepository.removeMembers(id, userMembers, userId);
     }
 
     @Override
     public Optional<Channel> selectChannelById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+        return channelRepository.selectChannelById(id);
     }
 
     @Override
     public List<Channel> selectAllChannels() {
-        return new ArrayList<>(data.values());
+        return channelRepository.selectAllChannels();
     }
 
     @Override
@@ -91,14 +92,12 @@ public class JCFChannelService implements ChannelService {
         //update
         if (name != null && !name.equals(channel.getName())) {
             validateName(name);
-            channel.updateName(name);
         }
         if (category != null && !category.equals(channel.getCategory())) {
             validateCategory(category);
-            channel.updateCategory(category);
         }
-        if (type != null && !type.equals(channel.getType())) {
-            channel.updateType(type);
+        if (name != null || category != null || type != null) {
+            channelRepository.updateChannel(id, name, category, type, userId);
         }
     }
 
@@ -113,7 +112,7 @@ public class JCFChannelService implements ChannelService {
         //채널 확인
         Channel channel = findChannelOrThrow(id);
         //delete
-        data.remove(channel.getId());
+        channelRepository.deleteChannel(id, userId);
     }
 
     /*******************************

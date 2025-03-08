@@ -1,6 +1,7 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -10,21 +11,21 @@ import java.util.*;
 public class JCFMessageService implements MessageService {
 
     private static volatile JCFMessageService instance;
-    private final Map<UUID, Message> data;
     private final ChannelService channelService;
     private final UserService userService;
+    private final MessageRepository messageRepository;
 
-    private JCFMessageService(UserService userService, ChannelService channelService) {
-        this.data = new HashMap<>();
+    private JCFMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         this.userService = userService;
         this.channelService = channelService;
+        this.messageRepository = messageRepository;
     }
 
-    public static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
+    public static JCFMessageService getInstance(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         if (instance == null) {
             synchronized (JCFMessageService.class) {
                 if (instance == null) {
-                    instance = new JCFMessageService(userService, channelService);
+                    instance = new JCFMessageService(userService, channelService, messageRepository);
                 }
             }
         }
@@ -42,19 +43,17 @@ public class JCFMessageService implements MessageService {
         //작성 권한 확인
         validateUserPermission(user, null, channel.getWritePermission(), ActionType.WRITE);
         //create
-        data.put(message.getId(), message);
+        messageRepository.createMessage(message);
     }
 
     @Override
     public Optional<Message> selectMessageById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+        return messageRepository.selectMessageById(id);
     }
 
     @Override
     public List<Message> selectMessagesByChannel(UUID channelId) {
-        return data.values().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
-                .toList();
+        return messageRepository.selectMessagesByChannel(channelId);
     }
 
     @Override
@@ -69,7 +68,7 @@ public class JCFMessageService implements MessageService {
         validateUserPermission(user, message.getUserId(), null, ActionType.EDIT);
         //update
         if (content != null) {
-            message.updateContent(content);
+            messageRepository.updateMessage(id, content, userId, channelId);
         }
     }
 
@@ -84,7 +83,7 @@ public class JCFMessageService implements MessageService {
         //삭제 권한 확인
         validateUserPermission(user, message.getUserId(), null, ActionType.DELETE);
         //delete
-        data.remove(id);
+        messageRepository.deleteMessage(id, userId, channelId);
     }
 
     /*******************************

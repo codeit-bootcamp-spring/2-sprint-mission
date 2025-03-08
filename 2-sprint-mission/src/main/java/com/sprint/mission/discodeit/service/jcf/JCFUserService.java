@@ -1,26 +1,30 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserRole;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class JCFUserService implements UserService {
 
     private static volatile JCFUserService instance;
-    private final Map<UUID, User> data;
+    private final UserRepository userRepository;
 
-    private JCFUserService() {
-        this.data = new HashMap<>();
+
+    private JCFUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public static JCFUserService getInstance() {
+    public static JCFUserService getInstance(UserRepository userRepository) {
         if (instance == null) {
             synchronized (JCFUserService.class) {
                 if (instance == null) {
-                    instance = new JCFUserService();
+                    instance = new JCFUserService(userRepository);
                 }
             }
         }
@@ -34,12 +38,12 @@ public class JCFUserService implements UserService {
         //사용자 중복 확인
         checkUserExists(user);
         //create
-        data.put(user.getId(), user);
+        userRepository.createUser(user);
     }
 
     @Override
     public Optional<User> selectUserById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+        return userRepository.selectUserById(id);
     }
 
     @Override
@@ -47,9 +51,7 @@ public class JCFUserService implements UserService {
         if (nickname == null) {
             return Optional.empty();
         }
-        return data.values().stream()
-                .filter(user -> user.getNickname().equals(nickname))
-                .findFirst();
+        return userRepository.selectUserByNickname(nickname);
     }
 
     @Override
@@ -57,14 +59,12 @@ public class JCFUserService implements UserService {
         if (email == null) {
             return Optional.empty();
         }
-        return data.values().stream()
-                .filter(user -> user.getEmail().equals(email))
-                .findFirst();
+        return userRepository.selectUserByEmail(email);
     }
 
     @Override
     public List<User> selectAllUsers() {
-        return new ArrayList<>(data.values());
+        return userRepository.selectAllUsers();
     }
 
     @Override
@@ -76,18 +76,13 @@ public class JCFUserService implements UserService {
         //update
         if (password != null && !password.equals(user.getPassword())) {
             validatePassword(password);
-            user.updatePassword(password);
         }
         if (nickname != null && !nickname.equals(user.getNickname())) {
             validateNickname(nickname);
             checkUserNicknameExists(nickname);
-            user.updateNickname(nickname);
         }
-        if (status != null && status != user.getStatus()) {
-            user.updateStatus(status);
-        }
-        if (role != null && role != user.getRole()) {
-            user.updateRole(role);
+        if (password != null || nickname != null || status != null || role != null) {
+            userRepository.updateUser(id, password, nickname, status, role);
         }
     }
 
@@ -96,9 +91,14 @@ public class JCFUserService implements UserService {
         //데이터 유효성 확인
         validateId(id);
         //사용자 확인
-        User user = findUserOrThrow(id);
+        findUserOrThrow(id);
         //delete
-        data.remove(user.getId());
+        userRepository.deleteUser(id);
+    }
+
+    @Override
+    public void clearUsers() {
+        userRepository.clearUsers();
     }
 
     /****************************
