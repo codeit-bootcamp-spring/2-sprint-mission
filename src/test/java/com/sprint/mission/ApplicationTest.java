@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.nio.file.Files;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import testmethod.ConsoleTestTemplate;
 
@@ -19,6 +20,7 @@ class ApplicationTest extends ConsoleTestTemplate {
         Files.deleteIfExists(USER_FILE.getPath());
     }
 
+    @DisplayName("초기 유저가 등록되었다고 가정했을떄 처음 서버를 생성했을떄 화면을 출력한다")
     @Test
     void 초기_채널_생성_테스트() {
         run("6");
@@ -39,6 +41,7 @@ class ApplicationTest extends ConsoleTestTemplate {
         );
     }
 
+    @DisplayName("초기 서버생성 이후 같이 생성된 초기 채널의 이름을 변경한 후 변경된 채널명을 출력한다")
     @Test
     void 채널_이름_변경_테스트() {
         run("3", "7팀", "6");
@@ -65,6 +68,7 @@ class ApplicationTest extends ConsoleTestTemplate {
         );
     }
 
+    @DisplayName("서버 생성이전에 처음에 등록해두었던 유저를 현재 채널에 초대하고 현재 채널에 속한 유저들을 보여준다")
     @Test
     void 채널_유저_초대_테스트() {
         run("2", "park@naver.com", "6");
@@ -92,6 +96,7 @@ class ApplicationTest extends ConsoleTestTemplate {
         );
     }
 
+    @DisplayName("채널에 메세지를 입력(영문만 가능)하고 입력한 메세지를 현재 로그인한 사람의 이름과 같이 출력한다")
     @Test
     void 채널_메세지_입력_테스트() {
         run("4", "Hello, 7team!!", "6");
@@ -118,6 +123,7 @@ class ApplicationTest extends ConsoleTestTemplate {
         );
     }
 
+    @DisplayName("현재 채널외 다른 채널을 추가한 후 출력한다")
     @Test
     void 채널_추가_생성_테스트() {
         run("1", "Study", "6");
@@ -145,6 +151,7 @@ class ApplicationTest extends ConsoleTestTemplate {
         );
     }
 
+    @DisplayName("새 채널로 이동된 상태에서 다른 채널로 이동한다")
     @Test
     void 채널_이동_테스트() {
         run("1", "Study", "5", "1", "6");
@@ -181,6 +188,7 @@ class ApplicationTest extends ConsoleTestTemplate {
         );
     }
 
+    @DisplayName("채널 이름 변경, 현재 채널에 친구추가, 채널 생성, 채널이동과정을 진행하고 출력한다")
     @Test
     void 채널_채팅입력_전체_시나리오_테스트() {
         run("3", "7팀", "2", "park@naver.com", "4", "Hello, 7team!!", "1", "Study", "5", "1", "6");
