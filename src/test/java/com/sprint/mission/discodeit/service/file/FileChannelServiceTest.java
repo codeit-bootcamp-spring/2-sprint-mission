@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
-import static com.sprint.mission.config.FilePath.CHANNEL_FILE;
-import static com.sprint.mission.config.FilePath.USER_FILE;
+import static com.sprint.mission.config.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
 import static com.sprint.mission.config.SetUpUserInfo.OTHER_USER;
 import static com.sprint.mission.discodeit.constants.ChannelInfo.CHANNEL_NAME;
@@ -12,10 +11,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,12 +25,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class FileChannelServiceTest {
-    private final UserService userService = new FileUserService();
-    private final ChannelService channelService = new FileChannelService(userService);
+    private static final Path USER_TEST_PATH = STORAGE_DIRECTORY.getPath()
+            .resolve("channelTestUser.ser");
+    private static final Path CHANNEL_TEST_PATH = STORAGE_DIRECTORY.getPath()
+            .resolve("channelTest.ser");
+    private final UserService userService = new FileUserService(
+            new FileUserRepository(USER_TEST_PATH));
+    private final ChannelService channelService = new FileChannelService(
+            new FileChannelRepository(CHANNEL_TEST_PATH), userService);
     private ChannelDto setUpChannel;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
+        initializeFiles();
         UserDto loginUser = userService.register(
                 new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
 
@@ -38,8 +47,12 @@ class FileChannelServiceTest {
 
     @AfterEach
     void tearDown() throws IOException {
-        Files.deleteIfExists(CHANNEL_FILE.getPath());
-        Files.deleteIfExists(USER_FILE.getPath());
+        initializeFiles();
+    }
+
+    private void initializeFiles() throws IOException {
+        Files.deleteIfExists(USER_TEST_PATH);
+        Files.deleteIfExists(CHANNEL_TEST_PATH);
     }
 
     @DisplayName("친구의 이메일을 통해 같은 채널에 멤버를 추가합니다")

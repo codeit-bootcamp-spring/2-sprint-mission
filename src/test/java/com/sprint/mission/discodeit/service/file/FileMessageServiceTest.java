@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
-import static com.sprint.mission.config.FilePath.MESSAGE_FILE;
-import static com.sprint.mission.config.FilePath.USER_FILE;
+import static com.sprint.mission.config.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
 import static com.sprint.mission.discodeit.constants.MessageInfo.MESSAGE_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,10 +10,13 @@ import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -23,13 +25,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class FileMessageServiceTest {
-    private final UserService userService = new FileUserService();
-    private final MessageService messageService = new FileMessageService(new FileUserService());
+    private static final Path USER_TEST_PATH = STORAGE_DIRECTORY.getPath()
+            .resolve("messageTestUser.ser");
+    private static final Path MESSAGE_TEST_PATH = STORAGE_DIRECTORY.getPath()
+            .resolve("messageTest.ser");
+    private final UserService userService = new FileUserService(
+            new FileUserRepository(USER_TEST_PATH));
+    private final MessageService messageService = new FileMessageService(
+            new FileMessageRepository(MESSAGE_TEST_PATH), userService);
     private MessageDto setUpMessage;
     private UserDto loginUser;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
+        initializeFiles();
         loginUser = userService.register(
                 new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
 
@@ -38,8 +47,12 @@ class FileMessageServiceTest {
 
     @AfterEach
     void tearDown() throws IOException {
-        Files.deleteIfExists(MESSAGE_FILE.getPath());
-        Files.deleteIfExists(USER_FILE.getPath());
+        initializeFiles();
+    }
+
+    private void initializeFiles() throws IOException {
+        Files.deleteIfExists(MESSAGE_TEST_PATH);
+        Files.deleteIfExists(USER_TEST_PATH);
     }
 
     @DisplayName("메세지 생성")

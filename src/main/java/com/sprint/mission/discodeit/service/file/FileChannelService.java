@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.Comparator;
@@ -14,10 +13,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class FileChannelService implements ChannelService {
-    private final ChannelRepository channelRepository = new FileChannelRepository();
+    private final ChannelRepository channelRepository;
     private final UserService userService;
 
-    public FileChannelService(UserService userService) {
+    public FileChannelService(ChannelRepository channelRepository, UserService userService) {
+        this.channelRepository = channelRepository;
         this.userService = userService;
     }
 

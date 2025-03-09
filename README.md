@@ -88,8 +88,7 @@ public class JavaApplication {
 
 ## 현재 미션
 - [ ] null 반환부분 Optional이나 null객체로 바꾸기[Optional, null객체]
-- [ ] 코드잇 모범답안의 예외처리 부분 추가하기
-- [ ] 파일 서비스들의 테스트 저장소끼리 격리 필요[테스트 격리성]
+- [x] 파일 서비스들의 테스트 저장소끼리 격리 필요[테스트 격리성]
 - [ ] protocol Buffer 사용
 
 ## 공통 미션

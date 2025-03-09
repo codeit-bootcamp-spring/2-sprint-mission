@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
-import static com.sprint.mission.config.FilePath.USER_FILE;
+import static com.sprint.mission.config.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
 import static com.sprint.mission.config.SetUpUserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,9 +8,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -19,19 +21,23 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class FileUserServiceTest {
-    private UserService userService;
+    private static final Path USER_TEST_PATH = STORAGE_DIRECTORY.getPath()
+            .resolve("userTest.ser");
+    private final UserService userService = new FileUserService(
+            new FileUserRepository(USER_TEST_PATH));
     private UserDto setUpUser;
 
     @BeforeEach
-    void setUp() {
-        userService = new FileUserService();
+    void setUp() throws IOException {
+        Files.deleteIfExists(USER_TEST_PATH);
+
         setUpUser = userService.register(
                 new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        Files.deleteIfExists(USER_FILE.getPath());
+        Files.deleteIfExists(USER_TEST_PATH);
     }
 
     @DisplayName("입력받은 유저정보를 서버에 등록한다")

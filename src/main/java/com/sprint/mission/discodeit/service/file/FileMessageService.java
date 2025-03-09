@@ -6,17 +6,17 @@ import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
 public class FileMessageService implements MessageService {
-    private final MessageRepository messageRepository = new FileMessageRepository();
+    private final MessageRepository messageRepository;
     private final UserService userService;
 
-    public FileMessageService(UserService userService) {
+    public FileMessageService(MessageRepository messageRepository, UserService userService) {
+        this.messageRepository = messageRepository;
         this.userService = userService;
     }
 

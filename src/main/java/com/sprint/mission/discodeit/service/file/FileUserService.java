@@ -7,13 +7,16 @@ import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
 public class FileUserService implements UserService {
-    private final UserRepository userRepository = new FileUserRepository();
+    private final UserRepository userRepository;
+
+    public FileUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public UserDto register(UserRegisterDto userRegisterDto) {

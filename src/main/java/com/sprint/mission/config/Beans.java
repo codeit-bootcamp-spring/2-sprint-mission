@@ -1,5 +1,8 @@
 package com.sprint.mission.config;
 
+import static com.sprint.mission.config.FilePath.CHANNEL_FILE;
+import static com.sprint.mission.config.FilePath.MESSAGE_FILE;
+import static com.sprint.mission.config.FilePath.USER_FILE;
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_ACCESS_DENIED_TO_BEAN_STORAGE;
 
 import com.sprint.mission.discodeit.controller.ChannelController;
@@ -45,9 +48,9 @@ public class Beans {
     }
 
     private void initializeFileBeans() {
-        saveBean(UserRepository.class, new FileUserRepository());
-        saveBean(ChannelRepository.class, new FileChannelRepository());
-        saveBean(MessageRepository.class, new FileMessageRepository());
+        saveBean(UserRepository.class, new FileUserRepository(USER_FILE.getPath()));
+        saveBean(ChannelRepository.class, new FileChannelRepository(CHANNEL_FILE.getPath()));
+        saveBean(MessageRepository.class, new FileMessageRepository(MESSAGE_FILE.getPath()));
     }
 
     private void initializeJCFBeans() {
