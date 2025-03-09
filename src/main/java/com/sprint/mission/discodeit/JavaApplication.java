@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.front.AccessPage;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -32,26 +33,16 @@ public class JavaApplication {
         UUID userToken = null;
         UUID channelToken = null;
 
+        AccessPage userPage = new AccessPage();
+
         while (true) {
             if (userToken == null) {
-                System.out.println("\n ======== 메뉴 ======== ");
-                System.out.println("1. 로그인\n2. 회원 가입");
-                System.out.print("입력란: ");
-                int initPage = sc.nextInt();
-                sc.nextLine();
-                switch (initPage) {
-                    case 1:
-                        userToken = loginPage();
-                        break;
-                    case 2:
-                        joinPage();
-                        break;
-                }
+                userToken = userPage.initPage();
             }
             if (userToken == null) continue;
 
             System.out.println(" ======== 메뉴 ======== ");
-            System.out.println("1. 채널\n2. 조회\n3. 수정\n4. 삭제\n5. 로그아웃\n6. 나가기");
+            System.out.println("1. 채널 이용\n2. 조회\n3. 수정\n4. 삭제\n5. 로그아웃\n6. 나가기");
             System.out.print("입력란: ");
 
             int num = sc.nextInt();
@@ -119,24 +110,6 @@ public class JavaApplication {
                     return;
             }
         }
-    }
-
-    private static UUID loginPage() {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("유저 아이디 입력: ");
-        UUID userUUID = UUID.fromString(sc.nextLine());
-        System.out.print("비밀번호 입력: ");
-        String password = sc.nextLine();
-        UUID userToken = userService.login(userUUID, password);
-        return userToken;
-    }
-
-    private static void joinPage() {
-        System.out.print("닉네임 입력: ");
-        String nickname = sc.nextLine();
-        System.out.print("비밀번호 입력: ");
-        String savePassword = sc.nextLine();
-        userService.save(nickname, savePassword);
     }
 
     private static void createChannelPage() {
