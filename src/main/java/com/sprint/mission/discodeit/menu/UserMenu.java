@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.menu;
 
 public enum UserMenu {
     CREATE_USER(1),

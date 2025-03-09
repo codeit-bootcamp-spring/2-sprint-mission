@@ -1,15 +1,14 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.menu;
 
-public enum ChannelMenu {
-    CREATE_CHANNEL(1),
-    GET_CHANNEL(2),
-    UPDATE_CHANNEL(3),
-    DELETE_CHANNEL(4),
-    BACK(0);
+public enum MainMenu {
+    USER_MANAGEMENT(1),
+    CHANNEL_MANAGEMENT(2),
+    MESSAGE_MANAGEMENT(3),
+    EXIT(0);
 
     private final int value;
 
-    ChannelMenu(int value) {
+    MainMenu(int value) {
         this.value = value;
     }
 
@@ -17,8 +16,8 @@ public enum ChannelMenu {
         return value;
     }
 
-    public static ChannelMenu from(int value) {
-        for (ChannelMenu menu : values()) {
+    public static MainMenu from(int value) {
+        for (MainMenu menu : values()) {
             if (menu.value == value) {
                 return menu;
             }
