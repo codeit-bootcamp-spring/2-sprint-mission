@@ -24,7 +24,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public UUID create(String content, UUID userKey, UUID channelKey) {
+    public Message create(String content, UUID userKey, UUID channelKey) {
         if (content == null || content.isEmpty()) {
             throw new IllegalArgumentException("[Error] 내용을 입력해주세요");
         }
@@ -32,7 +32,7 @@ public class FileMessageService implements MessageService {
         Message text = new Message(messageId, content, userKey, channelKey, userService.getUserName(userKey), channelService.getChannelName(channelKey));
         data.put(text.getUuid(), text);
         saveToFile();
-        return text.getUuid();
+        return text;
     }
 
     @Override
@@ -111,7 +111,7 @@ public class FileMessageService implements MessageService {
     private void loadFromFile() {
         File file = new File(FILE_NAME);
         if (!file.exists()) {
-            System.out.println("[Info] 데이터 파일이 없습니다. 빈 데이터로 시작합니다.");
+            System.out.println("[Info] 메세지 데이터 파일이 없습니다. 빈 데이터로 시작합니다.");
             data = new HashMap<>();
             return;
         }

@@ -31,13 +31,13 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public UUID create(String id, String name, String pwd, String email, String phone) {
+    public User create(String id, String name, String pwd, String email, String phone) {
         if (isUserCheck(id)) {
             throw new IllegalArgumentException("[Error] 동일한 사용자가 존재합니다.");
         }
         User user = new User(id, name, pwd, email, phone);
         data.put(user.getUuid(), user);
-        return user.getUuid();
+        return user;
     }
 
     @Override

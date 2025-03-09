@@ -16,7 +16,10 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public UUID signUp(String name, UUID userKey) {
-        Channel channel = data.get(getChannelKey(name,userKey));
+        Channel channel = data.values().stream()
+                .filter(c -> c.getName().equals(name) && c.getMemberKeys().contains(userKey))
+                .findFirst()
+                .orElse(null);
 
         if (channel == null) {
             throw new IllegalArgumentException("[Error] 가입하려는 채널이 존재하지 않습니다.");
@@ -30,7 +33,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public UUID create(String category, String name, String introduction, UUID memberKey, UUID ownerKey) {
+    public Channel create(String category, String name, String introduction, UUID memberKey, UUID ownerKey) {
 
         if (isChannelCheck(name)) {
             throw new IllegalArgumentException("[Error] 동일한 채널명이 존재합니다.");
@@ -40,7 +43,7 @@ public class JCFChannelService implements ChannelService {
         }
         Channel channel = new Channel(category, name, introduction, memberKey, ownerKey, userService.getUserName(memberKey), userService.getUserName(ownerKey));
         data.put(channel.getUuid(), channel);
-        return channel.getUuid();
+        return channel;
     }
 
     @Override
@@ -64,16 +67,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> readAll() {
-        List<Channel> info = data.values().stream().toList();
-        if (info.isEmpty()) {
-            throw new IllegalStateException("[Error] 조회할 채널이 존재하지 않습니다.");
-        }
-        return info;
-    }
-
-    @Override
-    public Channel update(String inputNameToModify, String category, String name, String introduction) {
+    public Channel update(String inputNameToModify, String category, String name, String introduction, UUID userKey) {
         UUID channelKey = convertToKey(inputNameToModify);
         Channel currentChannel = data.get(channelKey);
 
@@ -103,15 +97,6 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public UUID getChannelKey(String inputName, UUID userKey) {
-        UUID channelKey = convertToKey(inputName, userKey);
-        if (channelKey == null) {
-            throw new IllegalArgumentException("[Error] 올바르지 않은 Key");
-        }
-        return channelKey;
-    }
-
-    @Override
     public String getChannelName(UUID channelKey) {
         if (channelKey == null) {
             throw new IllegalStateException("[Error] 올바르지 않은 Key");
@@ -119,6 +104,17 @@ public class JCFChannelService implements ChannelService {
         return data.get(channelKey).getName();
     }
 
+    @Override
+    public UUID login(String name, UUID userKey) {
+        UUID channelKey = convertToKey(name, userKey);
+        if (channelKey == null) {
+            throw new IllegalArgumentException("[Error] 채널을 찾을 수 없습니다.");
+        }
+        if (!isSignUp(name,userKey)) {
+            throw new IllegalStateException("[Error] 해당 채널에 가입되지 않았습니다.");
+        }
+        return channelKey;
+    }
 
     private boolean isChannelCheck(String name) {
         return data.values().stream()

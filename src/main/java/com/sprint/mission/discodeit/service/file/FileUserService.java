@@ -38,14 +38,14 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public UUID create(String id, String name, String pwd, String email, String phone) {
+    public User create(String id, String name, String pwd, String email, String phone) {
         if (isUserCheck(id)) {
             throw new IllegalArgumentException("[Error] 동일한 사용자가 존재합니다.");
         }
         User user = new User(id, name, pwd, email, phone);
         data.put(user.getUuid(), user);
         saveToFile();
-        return user.getUuid();
+        return user;
     }
 
     @Override
@@ -144,7 +144,7 @@ public class FileUserService implements UserService {
     private void loadFromFile() {
         File file = new File(FILE_NAME);
         if (!file.exists()) {
-            System.out.println("[Info] 데이터 파일이 없습니다. 빈 데이터로 시작합니다.");
+            System.out.println("[Info] 유저 데이터 파일이 없습니다. 빈 데이터로 시작합니다.");
             data = new HashMap<>();
             return;
         }

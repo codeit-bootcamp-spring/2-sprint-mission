@@ -21,7 +21,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public UUID create(String content, UUID userKey, UUID channelKey) {
+    public Message create(String content, UUID userKey, UUID channelKey) {
         if (content == null || content.isEmpty()) {
             throw new IllegalArgumentException("[Error] 내용을 입력해주세요");
         }
@@ -29,7 +29,7 @@ public class JCFMessageService implements MessageService {
         Message text = new Message(messageId, content, userKey, channelKey, userService.getUserName(userKey), channelService.getChannelName(channelKey));
 
         data.put(text.getUuid(), text);
-        return text.getUuid();
+        return text;
     }
 
     @Override

@@ -2,21 +2,26 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 
 import java.util.*;
 
 public class JavaApplication {
-    static final UserService userService = new FileUserService();
-    static final ChannelService channelService = new FileChannelService(userService);
-    static final MessageService messageService = new FileMessageService(userService, channelService);
+    static final UserService userService = new BasicUserService(new JCFUserRepository());
+    static final ChannelService channelService = new BasicChannelService(new JCFChannelRepository(), userService);
+    static final MessageService messageService = new BasicMessageService(new JCFMessageRepository(), userService, channelService);
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -201,7 +206,7 @@ public class JavaApplication {
                         System.out.println("채널 입장\n");
                         System.out.print("입장 할 채널 명: ");
                         final String inputName = sc.nextLine();
-                        loginChannelKey = channelService.getChannelKey(inputName, loginUserKey);
+                        loginChannelKey = channelService.login(inputName, loginUserKey);
                         messageMenu(sc, loginUserKey, loginChannelKey);
                         continue;
                     } catch (IllegalStateException | IllegalArgumentException e) {
@@ -212,13 +217,10 @@ public class JavaApplication {
                 case 2: {
                     try {
                         System.out.println("채널 가입\n");
-                        System.out.println("존재하는 채널 정보\n");
-                        final List<Channel> existingChannels = channelService.readAll();
-                        System.out.println(existingChannels + "\n");
                         System.out.print("가입 할 채널 명: ");
                         final String inputName = sc.nextLine();
                         UUID channelUuid = channelService.signUp(inputName, loginUserKey);
-                        System.out.println("[Info] " + channelService.getChannelName(channelUuid) + " 에 가입되셨습니다.");
+                        System.out.println("[Info] " + channelUuid + " 에 가입되셨습니다.");
                         continue;
                     } catch (IllegalStateException | IllegalArgumentException e) {
                         System.out.println(e.getMessage());
@@ -234,8 +236,8 @@ public class JavaApplication {
                         final String inputName = sc.nextLine();
                         System.out.print("채널 소개: ");
                         final String inputIntroduction = sc.nextLine();
-                        UUID channelUUID = channelService.create(inputCategory, inputName, inputIntroduction, loginUserKey, loginUserKey);
-                        System.out.println("[Info] " + channelService.getChannelName(channelUUID) + " 채널이 생성되었습니다.");
+                        Channel channel = channelService.create(inputCategory, inputName, inputIntroduction, loginUserKey, loginUserKey);
+                        System.out.println("[Info] " + channel.getUuid() + " 채널이 생성되었습니다.");
                         continue;
                     } catch (IllegalStateException | IllegalArgumentException e) {
                         System.out.println(e.getMessage());
@@ -271,7 +273,7 @@ public class JavaApplication {
                         final String inputName = sc.nextLine();
                         System.out.print("채널 소개: ");
                         final String inputIntroduction = sc.nextLine();
-                        channelService.update(inputNameToModify, inputCategory, inputName, inputIntroduction);
+                        channelService.update(inputNameToModify, inputCategory, inputName, inputIntroduction, loginUserKey);
                         System.out.println("[Info] 정상 업데이트 되었습니다.");
                         continue;
                     } catch (IllegalArgumentException e) {
