@@ -12,13 +12,14 @@ import java.util.UUID;
 
 public class BasicUserService implements UserService {
 
-    private static volatile BasicUserService instance;
     private final UserRepository userRepository;
 
-    private BasicUserService(UserRepository userRepository) {
+    public BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    /*
+    private static volatile BasicUserService instance;
     public static BasicUserService getInstance(UserRepository userRepository) {
         if (instance == null) {
             synchronized (BasicUserService.class) {
@@ -29,6 +30,7 @@ public class BasicUserService implements UserService {
         }
         return instance;
     }
+    */
 
     @Override
     public void createUser(User user) {

@@ -9,15 +9,16 @@ import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
-    private static volatile JCFChannelService instance;
     private final UserService userService;
     private final ChannelRepository channelRepository;
 
-    private JCFChannelService(UserService userService, ChannelRepository channelRepository) {
+    public JCFChannelService(UserService userService, ChannelRepository channelRepository) {
         this.userService = userService;
         this.channelRepository = channelRepository;
     }
 
+    /*
+    private static volatile JCFChannelService instance;
     public static JCFChannelService getInstance(UserService userService, ChannelRepository channelRepository) {
         if(instance == null) {
             synchronized (JCFChannelService.class) {
@@ -28,6 +29,7 @@ public class JCFChannelService implements ChannelService {
         }
         return instance;
     }
+    */
 
     @Override
     public void createChannel(Channel channel) {

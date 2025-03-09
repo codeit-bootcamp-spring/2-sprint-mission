@@ -10,17 +10,18 @@ import java.util.*;
 
 public class BasicMessageService implements MessageService {
 
-    private static volatile BasicMessageService instance;
     private final ChannelService channelService;
     private final UserService userService;
     private final MessageRepository messageRepository;
 
-    private BasicMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
+    public BasicMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         this.userService = userService;
         this.channelService = channelService;
         this.messageRepository = messageRepository;
     }
 
+    /*
+    private static volatile BasicMessageService instance;
     public static BasicMessageService getInstance(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         if (instance == null) {
             synchronized (BasicMessageService.class) {
@@ -31,6 +32,7 @@ public class BasicMessageService implements MessageService {
         }
         return instance;
     }
+    */
 
     @Override
     public void createMessage(Message message) {

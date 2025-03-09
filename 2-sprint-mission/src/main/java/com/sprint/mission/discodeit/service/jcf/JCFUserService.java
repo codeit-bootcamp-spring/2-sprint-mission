@@ -12,13 +12,14 @@ import java.util.UUID;
 
 public class JCFUserService implements UserService {
 
-    private static volatile JCFUserService instance;
     private final UserRepository userRepository;
 
-
-    private JCFUserService(UserRepository userRepository) {
+    public JCFUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
+    /*
+    private static volatile JCFUserService instance;
 
     public static JCFUserService getInstance(UserRepository userRepository) {
         if (instance == null) {
@@ -30,6 +31,7 @@ public class JCFUserService implements UserService {
         }
         return instance;
     }
+    */
 
     @Override
     public void createUser(User user) {

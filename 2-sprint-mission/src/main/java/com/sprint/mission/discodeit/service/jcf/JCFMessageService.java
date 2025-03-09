@@ -10,17 +10,18 @@ import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
-    private static volatile JCFMessageService instance;
     private final ChannelService channelService;
     private final UserService userService;
     private final MessageRepository messageRepository;
 
-    private JCFMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
+    public JCFMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         this.userService = userService;
         this.channelService = channelService;
         this.messageRepository = messageRepository;
     }
 
+    /*
+    private static volatile JCFMessageService instance;
     public static JCFMessageService getInstance(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         if (instance == null) {
             synchronized (JCFMessageService.class) {
@@ -31,6 +32,7 @@ public class JCFMessageService implements MessageService {
         }
         return instance;
     }
+    */
 
     @Override
     public void createMessage(Message message) {

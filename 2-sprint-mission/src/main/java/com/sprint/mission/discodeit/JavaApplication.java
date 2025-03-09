@@ -31,17 +31,17 @@ public class JavaApplication {
     static ChannelRepository channelRepository = new FileChannelRepository();
     static MessageRepository messageRepository = new FileMessageRepository();
 
-    static UserService userService = BasicUserService.getInstance(userRepository);
-    static ChannelService channelService = BasicChannelService.getInstance(userService, channelRepository);
-    static MessageService messageService = BasicMessageService.getInstance(userService, channelService, messageRepository);
+    static UserService userService = new BasicUserService(userRepository);
+    static ChannelService channelService = new BasicChannelService(userService, channelRepository);
+    static MessageService messageService = new BasicMessageService(userService, channelService, messageRepository);
 
     public static void main(String[] args) {
 
         //userService.clearUsers();
 
         //1. User 생성 및 조회
-        createUser("hanna@email.net", "12345*", "hanna", UserStatus.OFFLINE, UserRole.ADMIN);
-        createUser("dog@email.net", "54321*", "dog", UserStatus.OFFLINE, UserRole.USER);
+        createUser("hanna1@email.net", "12345*", "hanna1", UserStatus.OFFLINE, UserRole.ADMIN);
+        createUser("dog1@email.net", "54321*", "dog1", UserStatus.OFFLINE, UserRole.USER);
 
         Optional<User> userOpt = userService.selectUserByEmail("hanna@email.net");
         UUID userId = userOpt.get().getId();

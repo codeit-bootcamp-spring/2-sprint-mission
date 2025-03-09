@@ -12,13 +12,14 @@ import java.util.UUID;
 
 public class FileUserService implements UserService {
 
-    private static volatile FileUserService instance;
     private final UserRepository userRepository;
 
-    private FileUserService(UserRepository userRepository) {
+    public FileUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    /*
+    private static volatile FileUserService instance;
     public static FileUserService getInstance(UserRepository userRepository) {
         if (instance == null) {
             synchronized (FileUserService.class) {
@@ -29,6 +30,7 @@ public class FileUserService implements UserService {
         }
         return instance;
     }
+    */
 
     @Override
     public void createUser(User user) {

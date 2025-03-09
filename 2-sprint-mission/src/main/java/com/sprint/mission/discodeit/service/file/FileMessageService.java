@@ -12,17 +12,17 @@ import java.util.UUID;
 
 public class FileMessageService implements MessageService {
 
-    private static volatile FileMessageService instance;
     private final UserService userService;
     private final ChannelService channelService;
     private final MessageRepository messageRepository;
 
-    private FileMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
+    public FileMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         this.userService = userService;
         this.channelService = channelService;
         this.messageRepository = messageRepository;
     }
-
+    /*
+    private static volatile FileMessageService instance;
     public static FileMessageService getInstance(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         if(instance == null) {
             synchronized (FileMessageService.class) {
@@ -33,6 +33,7 @@ public class FileMessageService implements MessageService {
         }
         return instance;
     }
+    */
 
     @Override
     public void createMessage(Message message) {

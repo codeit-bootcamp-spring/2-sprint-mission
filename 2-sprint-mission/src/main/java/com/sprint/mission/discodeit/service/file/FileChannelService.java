@@ -12,15 +12,16 @@ import java.util.UUID;
 
 public class FileChannelService implements ChannelService {
 
-    private static volatile FileChannelService instance;
     private final UserService userService;
     private final ChannelRepository channelRepository;
 
-    private FileChannelService(UserService userService, ChannelRepository channelRepository) {
+    public FileChannelService(UserService userService, ChannelRepository channelRepository) {
         this.userService = userService;
         this.channelRepository = channelRepository;
     }
 
+    /*
+    private static volatile FileChannelService instance;
     public static FileChannelService getInstance(UserService userService, ChannelRepository channelRepository) {
         if(instance == null) {
             synchronized (FileChannelService.class) {
@@ -31,6 +32,7 @@ public class FileChannelService implements ChannelService {
         }
         return instance;
     }
+    */
 
     @Override
     public void createChannel(Channel channel) {

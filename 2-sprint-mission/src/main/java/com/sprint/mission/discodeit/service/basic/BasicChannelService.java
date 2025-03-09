@@ -9,15 +9,16 @@ import java.util.*;
 
 public class BasicChannelService implements ChannelService {
 
-    private static volatile BasicChannelService instance;
     private final UserService userService;
     private final ChannelRepository channelRepository;
 
-    private BasicChannelService(UserService userService, ChannelRepository channelRepository) {
+    public BasicChannelService(UserService userService, ChannelRepository channelRepository) {
         this.userService = userService;
         this.channelRepository = channelRepository;
     }
 
+    /*
+    private static volatile BasicChannelService instance;
     public static BasicChannelService getInstance(UserService userService, ChannelRepository channelRepository) {
         if(instance == null) {
             synchronized (BasicChannelService.class) {
@@ -28,6 +29,7 @@ public class BasicChannelService implements ChannelService {
         }
         return instance;
     }
+    */
 
     @Override
     public void createChannel(Channel channel) {
