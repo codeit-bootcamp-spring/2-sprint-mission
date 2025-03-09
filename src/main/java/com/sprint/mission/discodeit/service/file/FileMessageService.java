@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -45,49 +44,37 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId) {
-        try {
-            channelService.find(channelId);
-            userService.find(authorId);
-        } catch (NoSuchElementException e){
-            throw e;
-        }
-        Message message = new Message(content, channelId, authorId);
-        data.put(message.getId(), message);
-        saveData();
-
-        return message;
+    public Message create(String message, UUID userId, UUID channelId) {
+        return null;
     }
 
     @Override
-    public Message find(UUID messageId) {
-        Message messageNullable = this.data.get(messageId);
+    public List<Message> findByUser(UUID userId) {
+        return List.of();
+    }
 
-        return Optional.ofNullable(messageNullable)
-                .orElseThrow(() -> new NoSuchElementException("Message" + messageId + "가 존재하지 않습니다."));
+    @Override
+    public List<Message> findByChannel(UUID channelId) {
+        return List.of();
+    }
+
+    @Override
+    public List<Message> findByUserAndByChannel(UUID userId, UUID channelId) {
+        return List.of();
     }
 
     @Override
     public List<Message> findAll() {
-        return this.data.values().stream().toList();
+        return List.of();
     }
 
     @Override
-    public Message update(UUID messageId, String newContent) {
-        Message messageNullable = this.data.get(messageId);
-        Message message = Optional.ofNullable(messageNullable)
-                .orElseThrow(() -> new NoSuchElementException("Message" + messageId + "가 존재하지 않습니다."));
-        message.update(newContent);
-        saveData();
-
-        return message;
+    public Message update(UUID messageId, String newMessage) {
+        return null;
     }
 
     @Override
     public void delete(UUID messageId) {
-        if (!this.data.containsKey(messageId)) {
-            throw new NoSuchElementException("Message" + messageId + "가 존재하지 않습니다.");
-        }
-        this.data.remove(messageId);
+
     }
 }

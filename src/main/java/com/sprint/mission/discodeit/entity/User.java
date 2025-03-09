@@ -1,43 +1,22 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 
-public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
-    //
-    private String username;
+public class User extends MainDomain {
+    private String userName;
     private String email;
     private String password;
 
-    public User(String username, String email, String password) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
-        //
-        this.username = username;
+
+    public User(String userName, String email, String password){
+        super();
+        this.userName = userName;
         this.email = email;
         this.password = password;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
     public String getEmail() {
@@ -48,23 +27,32 @@ public class User implements Serializable {
         return password;
     }
 
-    public void update(String newUsername, String newEmail, String newPassword) {
+
+    public void updateUser(String newUserName, String newEmail, String newPassword){
         boolean anyValueUpdated = false;
-        if (newUsername != null && !newUsername.equals(this.username)) {
-            this.username = newUsername;
+        if(newUserName != null && !newUserName.equals(this.userName)){
+            this.userName = newUserName;
             anyValueUpdated = true;
         }
-        if (newEmail != null && !newEmail.equals(this.email)) {
+        if(newEmail != null && !newEmail.equals(this.email)){
             this.email = newEmail;
             anyValueUpdated = true;
         }
-        if (newPassword != null && !newPassword.equals(this.password)) {
+        if(newPassword != null && !newPassword.equals(this.password)){
             this.password = newPassword;
             anyValueUpdated = true;
         }
-
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
+        if(anyValueUpdated){
+            update();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "User {" +
+                "userID= " + getId()  +
+                ", userName= " + userName +
+                ", email= " + email +
+                ", password= " + password + "}";
     }
 }

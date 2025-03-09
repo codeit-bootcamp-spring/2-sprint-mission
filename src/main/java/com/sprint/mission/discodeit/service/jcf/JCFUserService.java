@@ -6,48 +6,55 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> data;
+    private final Map<UUID,User> userData;
 
     public JCFUserService() {
-        this.data = new HashMap<>();
+        this.userData = new HashMap<>();
     }
 
     @Override
-    public User create(String username, String email, String password) {
-        User user = new User(username, email, password);
-        this.data.put(user.getId(), user);
-
-        return user;
+    public User create(String userName, String email, String password) {
+        User newUser = new User(userName, email, password);
+        userData.put(newUser.getId(), newUser);
+        return newUser;
     }
 
     @Override
     public User find(UUID userId) {
-        User userNullable = this.data.get(userId);
+        User userNullable = userData.get(userId);
 
         return Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User" + userId + "가 존재하지 않습니다."));
+        .orElseThrow(() -> new NoSuchElementException("유저 " + userId + "가 존재하지 않습니다."));
     }
 
     @Override
     public List<User> findAll() {
-        return this.data.values().stream().toList();
+        return userData.values().stream().toList();
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User userNullable = this.data.get(userId);
-        User user = Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User" + userId + "가 존재하지 않습니다."));
-        user.update(newUsername, newEmail, newPassword);
+    public User update(UUID userId, String newUserName, String newEmail, String newPassword) {
+        User userNullable = userData.get(userId);
+        User user = Optional.ofNullable(userNullable).orElseThrow(() -> new NoSuchElementException(userId + "가 존재하지 않습니다."));
+        user.updateUser(newUserName, newEmail, newPassword);
 
         return user;
     }
 
     @Override
     public void delete(UUID userId) {
-        if (!this.data.containsKey(userId)) {
-            throw new NoSuchElementException("User" + userId + "가 존재하지 않습니다.");
+        if (!userData.containsKey(userId)) {
+            throw new NoSuchElementException("유저 " + userId + "가 존재하지 않습니다.");
         }
-        this.data.remove(userId);
+        userData.remove(userId);
+    }
+
+
+
+    @Override
+    public String toString() {
+        return "JCFUserService{" +
+                "userData=" + userData +
+                '}';
     }
 }

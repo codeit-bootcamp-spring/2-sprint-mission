@@ -38,41 +38,26 @@ public class FileUserService implements UserService {
 
     @Override
     public User create(String username, String email, String password) {
-        User user = new User(username, email, password);
-        this.data.put(user.getId(), user);
-        saveData();
-        return user;
+        return null;
     }
 
     @Override
     public User find(UUID userId) {
-        User userNullable = this.data.get(userId);
-        return Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User" + userId + "가 존재하지 않습니다."));
+        return null;
     }
 
     @Override
     public List<User> findAll() {
-        return this.data.values().stream().toList();
+        return List.of();
     }
 
     @Override
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User userNullable = this.data.get(userId);
-        User user = Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User" + userId + "가 존재하지 않습니다."));
-        user.update(newUsername, newEmail, newPassword);
-        saveData();
-
-        return user;
+        return null;
     }
 
     @Override
     public void delete(UUID userId) {
-        if (!this.data.containsKey(userId)) {
-            throw new NoSuchElementException("User" + userId + "가 존재하지 않습니다.");
-        }
-        this.data.remove(userId);
-        saveData();
+
     }
 }

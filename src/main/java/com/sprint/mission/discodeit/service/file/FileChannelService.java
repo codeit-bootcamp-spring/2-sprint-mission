@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.io.*;
@@ -39,43 +38,27 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(ChannelType type, String name, String description) {
-        Channel channel = new Channel(type, name, description);
-        this.data.put(channel.getId(), channel);
-        saveData();
-
-        return channel;
+    public Channel create(ChannelType type, String name) {
+        return null;
     }
 
     @Override
     public Channel find(UUID channelId) {
-        Channel channelNullable = this.data.get(channelId);
-        return Optional.ofNullable(channelNullable)
-                .orElseThrow(() -> new NoSuchElementException("Channel" + channelId + "이 존재하지 않습니다."));
+        return null;
     }
 
     @Override
     public List<Channel> findAll() {
-        return this.data.values().stream().toList();
+        return List.of();
     }
 
     @Override
-    public Channel update(UUID channelId, String newName, String newDescription) {
-        Channel channelNullable = this.data.get(channelId);
-        Channel channel = Optional.ofNullable(channelNullable)
-                .orElseThrow(() -> new NoSuchElementException("Channel" + channelId + "이 존재하지 않습니다."));
-        channel.update(newName, newDescription);
-        saveData();
-
-        return channel;
+    public Channel update(UUID channelId, String newName, ChannelType newType) {
+        return null;
     }
 
     @Override
     public void delete(UUID channelId) {
-        if (!this.data.containsKey(channelId)) {
-            throw new NoSuchElementException("Channel " + channelId +"이 존재하지 않습니다. ");
-        }
-        this.data.remove(channelId);
-        saveData();
+
     }
 }

@@ -1,63 +1,53 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.UUID;
 
-public class Message implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
-    //
-    private String content;
-    //
-    private UUID channelId;
-    private UUID authorId;
+public class Message extends MainDomain {
+    private String message;
+    private final UUID userId;
+    private final UUID channelId;
 
-    public Message(String content, UUID channelId, UUID authorId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
-        //
-        this.content = content;
+
+
+    public Message(String message,  UUID userId, UUID channelId) {
+        super();
+        this.message = message;
+        this.userId = userId;
         this.channelId = channelId;
-        this.authorId = authorId;
     }
 
-    public UUID getId() {
-        return id;
+    public String getMessage() {
+        return message;
     }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getContent() {
-        return content;
+    public UUID getUserId() {
+        return userId;
     }
 
     public UUID getChannelId() {
         return channelId;
     }
 
-    public UUID getAuthorId() {
-        return authorId;
-    }
 
-    public void update(String newContent) {
+    public void updateMessage(String newMessage) {
         boolean anyValueUpdated = false;
-        if (newContent != null && !newContent.equals(this.content)) {
-            this.content = newContent;
+        if (newMessage != null && !newMessage.equals(message)) {
+            message = newMessage;
             anyValueUpdated = true;
         }
-
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
+            update();
         }
     }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "message=" + message + "\n" +
+                ", userId=" + userId +
+                ", channelId=" + channelId +
+                '}';
+
+    }
+
 }
