@@ -1,7 +1,10 @@
-package main.com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity;
+
+import java.io.Serializable;
 
 // parent = BaseEntity
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     // 사용자 이름
     private String username;
 
@@ -15,5 +18,10 @@ public class User extends BaseEntity {
     public void updateUser(String username) {
         this.username = username;
         updateTimestamp();
+    }
+
+    @Override
+    public String toString() {
+        return "User{name= " + username + '}';
     }
 }

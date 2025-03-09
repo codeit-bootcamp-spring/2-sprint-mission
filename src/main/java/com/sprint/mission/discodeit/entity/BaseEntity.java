@@ -1,9 +1,11 @@
-package main.com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 // parent class (abstract)
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Serializable {
+    private static final long serialVersionUID = 2L;
     // 각 객체를 식별하는 UUID
     // user, message, channel 모두 각 객체 별 할당
     protected UUID id;

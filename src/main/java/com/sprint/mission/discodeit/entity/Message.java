@@ -1,8 +1,10 @@
-package main.com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message extends BaseEntity {
+public class Message extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 100L;
     // 메시지 내용
     private String content;
     // 메시지 작성자 id

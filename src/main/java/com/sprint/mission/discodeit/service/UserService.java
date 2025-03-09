@@ -1,6 +1,7 @@
-package main.com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service;
 
-import main.com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.User;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +20,7 @@ public interface UserService {
     List<User> getAllUser();
     // 특정 user 조회(단건)
     // optional은 null값 반환 시 오류가 나지 않도록 해준다.
-    Optional<User> getOneUser(UUID id);
+    User getOneUser(UUID id);
 
     // Update - 수정
     void updateUser(String newName, UUID id);
