@@ -40,10 +40,10 @@ public class JavaApplication {
         //userService.clearUsers();
 
         //1. User 생성 및 조회
-        createUser("hanna1@email.net", "12345*", "hanna1", UserStatus.OFFLINE, UserRole.ADMIN);
-        createUser("dog1@email.net", "54321*", "dog1", UserStatus.OFFLINE, UserRole.USER);
+        createUser("hanna3@email.net", "12345*", "hanna3", UserStatus.OFFLINE, UserRole.ADMIN);
+        createUser("dog3@email.net", "54321*", "dog3", UserStatus.OFFLINE, UserRole.USER);
 
-        Optional<User> userOpt = userService.selectUserByEmail("hanna@email.net");
+        Optional<User> userOpt = userService.selectUserByEmail("hanna3@email.net");
         UUID userId = userOpt.get().getId();
 
         //2. Channel 생성 및 조회
