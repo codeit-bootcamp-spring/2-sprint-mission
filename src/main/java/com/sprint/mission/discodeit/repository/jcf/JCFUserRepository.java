@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
@@ -13,12 +14,13 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         users.put(user.getId(), user);
+
         return user;
     }
 
     @Override
-    public User findById(UUID id) {
-        return users.get(id);
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
@@ -30,12 +32,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return users.values()
                 .stream()
                 .filter(user -> user.isSameEmail(email))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -47,7 +48,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void updateName(UUID id, String name) {
-        User user = users.get(findById(id).getId());
+        User user = users.get(id);
         user.updateName(name);
     }
 

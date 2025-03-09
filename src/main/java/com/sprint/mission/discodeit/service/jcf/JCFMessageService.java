@@ -33,10 +33,8 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public MessageDto findById(UUID id) {
-        Message message = messageRepository.findById(id);
-        if (message == null) {
-            throw new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent());
-        }
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
         return toDto(message);
     }

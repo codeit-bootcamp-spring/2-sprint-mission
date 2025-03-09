@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
@@ -29,10 +30,10 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findById(UUID id) {
+    public Optional<Message> findById(UUID id) {
         Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
 
-        return messages.get(id);
+        return Optional.ofNullable(messages.get(id));
     }
 
     @Override

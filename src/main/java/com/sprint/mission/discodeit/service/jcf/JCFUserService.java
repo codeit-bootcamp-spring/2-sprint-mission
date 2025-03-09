@@ -29,10 +29,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public UserDto findById(UUID id) {
-        User user = userRepository.findById(id);
-        if (user == null) {
-            throw new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent());
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         return toDto(user);
     }
@@ -55,10 +53,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public UserDto findByEmail(String email) {
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent());
-        }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
 
         return toDto(user);
     }

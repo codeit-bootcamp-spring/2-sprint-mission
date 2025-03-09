@@ -15,7 +15,6 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserService userService;
 
-
     public BasicMessageService(MessageRepository messageRepository, UserService userService) {
         this.messageRepository = messageRepository;
         this.userService = userService;
@@ -30,10 +29,8 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageDto findById(UUID id) {
-        Message message = messageRepository.findById(id);
-        if (message == null) {
-            throw new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent());
-        }
+        Message message = messageRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
         return toDto(message);
     }

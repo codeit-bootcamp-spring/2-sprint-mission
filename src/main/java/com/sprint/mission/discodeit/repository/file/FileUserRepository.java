@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileUserRepository implements UserRepository {
@@ -30,10 +31,10 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID id) {
+    public Optional<User> findById(UUID id) {
         Map<UUID, User> users = loadObjectsFromFile(userPath);
 
-        return users.get(id);
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
@@ -47,14 +48,13 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         Map<UUID, User> users = loadObjectsFromFile(userPath);
 
         return users.values()
                 .stream()
                 .filter(user -> user.isSameEmail(email))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override

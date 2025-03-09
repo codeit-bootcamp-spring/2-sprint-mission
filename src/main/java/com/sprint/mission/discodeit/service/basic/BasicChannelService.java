@@ -23,7 +23,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelDto addMember(UUID id, String friendEmail) {
-        Channel channel = channelRepository.findById(id);
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
+
         UserDto friend = userService.findByEmail(friendEmail);
         channel.addMember(friend.id());
         channelRepository.save(channel);
@@ -41,10 +43,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelDto findById(UUID id) {
-        Channel channel = channelRepository.findById(id);
-        if (channel == null) {
-            throw new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent());
-        }
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
         return toDto(channel);
     }

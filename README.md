@@ -87,7 +87,7 @@ public class JavaApplication {
 # 미완성 및 개선해야할 부분
 
 ## 현재 미션
-- [ ] null 반환부분 Optional이나 null객체로 바꾸기[Optional, null객체]
+- [x] null 반환부분 Optional이나 null객체로 바꾸기[Optional, null객체]
 - [x] 파일 서비스들의 테스트 저장소끼리 격리 필요[테스트 격리성]
 - [ ] protocol Buffer 사용
 

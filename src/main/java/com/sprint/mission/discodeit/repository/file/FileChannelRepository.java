@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository {
@@ -29,10 +30,10 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID id) {
+    public Optional<Channel> findById(UUID id) {
         Map<UUID, Channel> channels = loadObjectsFromFile(channelPath);
 
-        return channels.get(id);
+        return Optional.ofNullable(channels.get(id));
     }
 
     @Override

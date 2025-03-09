@@ -31,10 +31,8 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public ChannelDto findById(UUID id) {
-        Channel channel = channelRepository.findById(id);
-        if (channel == null) {
-            throw new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent());
-        }
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
         return toDto(channel);
     }
@@ -60,7 +58,9 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public ChannelDto addMember(UUID chanelId, String friendEmail) {
-        Channel channel = channelRepository.findById(chanelId);
+        Channel channel = channelRepository.findById(chanelId)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
+
         UserDto friend = userService.findByEmail(friendEmail);
         channel.addMember(friend.id());
         channelRepository.save(channel);
