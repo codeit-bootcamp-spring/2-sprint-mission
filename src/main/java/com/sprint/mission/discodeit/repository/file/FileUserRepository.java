@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,11 +15,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FileUserService implements UserService {
+public class FileUserRepository implements UserRepository {
     private Map<UUID, User> userData;
     private static final String USER_FILE_PATH = "users.ser";
 
-    public FileUserService() {
+    public FileUserRepository() {
         dataLoad();
     }
 
@@ -48,50 +48,24 @@ public class FileUserService implements UserService {
         }
     }
 
-    @Override
-    public User create(String username, String email, String password) {
-        if(userData.values().stream()
-                .anyMatch(user -> user.getUsername().equals(username))){
-            throw new RuntimeException("같은 이름을 가진 사람이 있습니다.");
-        }
-        User user = new User(username, email, password);
+    public User save(User user){
         this.userData.put(user.getId(), user);
-
         dataSave();
+
         return user;
     }
 
-    @Override
-    public User find(UUID userId) {
-        User userNullable = this.userData.get(userId);
-
-        return Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-    }
-
-    @Override
-    public List<User> findAll() {
+    public List<User> findAll(){
         return this.userData.values().stream().toList();
     }
 
-    @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User userNullable = this.userData.get(userId);
-        User user = Optional.ofNullable(userNullable)
+    public User findById(UUID userId){
+        return Optional.ofNullable(userData.get(userId))
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword);
-
-        dataSave();
-        return user;
     }
 
-    @Override
-    public void delete(UUID userId) {
-        if (!this.userData.containsKey(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " not found");
-        }
-        this.userData.remove(userId);
-
+    public void delete(UUID userId){
+        userData.remove(userId);
         dataSave();
     }
 }
