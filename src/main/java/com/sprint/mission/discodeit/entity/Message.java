@@ -24,11 +24,11 @@ public class Message implements Serializable {
 
     public void updateContext(String context) {
         this.context = context;
-        updatedAt();
+        updateTimestamp();
     }
 
-    private void updatedAt() {
-        this.updatedAt = Instant.now().getEpochSecond();
+    private void updateTimestamp() {
+        this.updatedAt = Instant.now().toEpochMilli();
     }
 
     public UUID getId() {

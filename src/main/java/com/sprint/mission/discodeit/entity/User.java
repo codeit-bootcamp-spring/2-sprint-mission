@@ -24,7 +24,7 @@ public class User implements Serializable {
 
     public void updateName(String name) {
         this.name = name;
-        updatedAt();
+        updateTimestamp();
     }
 
     public boolean isSameName(String name) {
@@ -35,8 +35,8 @@ public class User implements Serializable {
         return this.email.equals(email);
     }
 
-    private void updatedAt() {
-        this.updatedAt = Instant.now().getEpochSecond();
+    private void updateTimestamp() {
+        this.updatedAt = Instant.now().toEpochMilli();
     }
 
     public UUID getId() {
