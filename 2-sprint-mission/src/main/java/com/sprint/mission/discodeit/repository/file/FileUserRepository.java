@@ -73,22 +73,21 @@ public class FileUserRepository implements UserRepository {
         FileUtil.deleteFile(DIRECTORY, id);
     }
 
-    /// ///
-    public void clearUsers() {
-        try (Stream<Path> paths = Files.walk(DIRECTORY)) {
-            paths.filter(Files::isRegularFile)
-                    .forEach(path -> {
-                        try {
-                            Files.delete(path);  // 파일 삭제
-                            System.out.println(path + " 파일이 삭제되었습니다.");
-                        } catch (IOException e) {
-                            System.err.println("파일 삭제 중 오류 발생: " + e.getMessage());
-                        }
-                    });
-            System.out.println("모든 사용자 데이터가 초기화되었습니다.");
-        } catch (IOException e) {
-            System.err.println("파일 접근 중 오류 발생: " + e.getMessage());
-        }
-    }
+//    public void clearUsers() {
+//        try (Stream<Path> paths = Files.walk(DIRECTORY)) {
+//            paths.filter(Files::isRegularFile)
+//                    .forEach(path -> {
+//                        try {
+//                            Files.delete(path);  // 파일 삭제
+//                            System.out.println(path + " 파일이 삭제되었습니다.");
+//                        } catch (IOException e) {
+//                            System.err.println("파일 삭제 중 오류 발생: " + e.getMessage());
+//                        }
+//                    });
+//            System.out.println("모든 사용자 데이터가 초기화되었습니다.");
+//        } catch (IOException e) {
+//            System.err.println("파일 접근 중 오류 발생: " + e.getMessage());
+//        }
+//    }
 
 }

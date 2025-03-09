@@ -37,7 +37,7 @@ public class JavaApplication {
 
     public static void main(String[] args) {
 
-        userService.clearUsers();
+        //userService.clearUsers();
 
         //1. User 생성 및 조회
         createUser("hanna@email.net", "12345*", "hanna", UserStatus.OFFLINE, UserRole.ADMIN);

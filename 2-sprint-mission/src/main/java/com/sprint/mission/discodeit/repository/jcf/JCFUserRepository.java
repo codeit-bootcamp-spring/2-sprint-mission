@@ -51,8 +51,8 @@ public class JCFUserRepository implements UserRepository {
         data.remove(id);
     }
 
-    @Override
-    public void clearUsers() {
-        data.clear();
-    }
+//    @Override
+//    public void clearUsers() {
+//        data.clear();
+//    }
 }

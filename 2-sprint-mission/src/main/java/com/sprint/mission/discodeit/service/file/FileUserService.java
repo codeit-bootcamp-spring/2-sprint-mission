@@ -86,10 +86,10 @@ public class FileUserService implements UserService {
         userRepository.deleteUser(user.getId());
     }
 
-    @Override
-    public void clearUsers() {
-        userRepository.clearUsers();
-    }
+//    @Override
+//    public void clearUsers() {
+//        userRepository.clearUsers();
+//    }
 
     /****************************
      * Validation check

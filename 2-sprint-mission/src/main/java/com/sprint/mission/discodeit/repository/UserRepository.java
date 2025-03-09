@@ -16,5 +16,5 @@ public interface UserRepository {
     List<User> selectAllUsers();
     void updateUser(UUID id, String password, String nickname, UserStatus status, UserRole role);
     void deleteUser(UUID id);
-    void clearUsers();
+    //void clearUsers();
 }
