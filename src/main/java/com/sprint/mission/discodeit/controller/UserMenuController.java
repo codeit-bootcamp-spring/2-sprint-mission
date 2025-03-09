@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.enums.UserMenu;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
@@ -33,11 +32,11 @@ public class UserMenuController {
                 continue;
             }
 
-            run = excute(selectedMenu);
+            run = execute(selectedMenu);
         }
     }
 
-    private boolean excute(UserMenu selectedMenu) {
+    private boolean execute(UserMenu selectedMenu) {
         switch (selectedMenu) {
             case CREATE:
                 createUser();
@@ -62,14 +61,32 @@ public class UserMenuController {
         }
     }
 
+    private UUID getUserIdFromInput(String description) {
+        try {
+            System.out.print(description);
+            return UUID.fromString(scanner.nextLine());
+        }catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    private String getUserInput(String description) {
+        try {
+            System.out.print(description);
+            return scanner.nextLine();
+        }catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
     private void createUser() {
         System.out.println("생성할 유저명, 이메일, 비밀번호를 입력해주세요.");
-        System.out.print("유저명: ");
-        String userName = scanner.nextLine();
-        System.out.print("이메일: ");
-        String email = scanner.nextLine();
-        System.out.print("비밀번호: ");
-        String password = scanner.nextLine();
+
+        String userName = getUserInput("유저명: ");
+        String email = getUserInput("이메일: ");
+        String password = getUserInput("비밀번호: ");
 
         try {
             System.out.println("유저 생성 완료: \n" +
@@ -80,8 +97,7 @@ public class UserMenuController {
     }
 
     private void findUser() {
-        System.out.print("조회할 유저ID를 입력해주세요: ");
-        UUID id = UUID.fromString(scanner.nextLine());
+        UUID id = getUserIdFromInput("조회할 유저 ID를 입력해주세요: ");
         try {
             System.out.println("조회된 유저: " + userService.find(id));
         }catch (NoSuchElementException e){
@@ -93,15 +109,11 @@ public class UserMenuController {
     }
 
     private void updateUser() {
-        System.out.print("업데이트를 할 유저ID를 입력해주세요: ");
-        UUID id = UUID.fromString(scanner.nextLine());
+        UUID id = getUserIdFromInput("업데이트할 유저 ID를 입력해주세요: ");
         System.out.println("변경할 유저명, 이메일, 비밀번호를 입력하세요.");
-        System.out.print("유저명: ");
-        String userName = scanner.nextLine();
-        System.out.print("이메일: ");
-        String email = scanner.nextLine();
-        System.out.print("비밀번호: ");
-        String password = scanner.nextLine();
+        String userName = getUserInput("유저명: ");
+        String email = getUserInput("이메일: ");
+        String password = getUserInput("비밀번호: ");
         try {
             System.out.println("업데이트 완료: \n"
                     + userService.update(id, userName, email, password));
@@ -111,8 +123,7 @@ public class UserMenuController {
     }
 
     private void deleteUser() {
-        System.out.print("삭제할 유저ID를 입력하세요: ");
-        UUID id = UUID.fromString(scanner.nextLine());
+        UUID id = getUserIdFromInput("삭제할 유저ID를 입력하세요: ");
         try {
             userService.delete(id);
         }catch (NoSuchElementException e){

@@ -7,10 +7,10 @@ import java.util.UUID;
 
 public interface MessageService {
     Message create(String message, UUID userId, UUID channelId);
-    List<Message> readByUser(UUID userId);
-    List<Message> readByChannel(UUID channelId);
-    List<Message> readByUserAndByChannel(UUID userId, UUID channelId);
-    List<Message> readAll();
+    List<Message> findByUser(UUID userId);
+    List<Message> findByChannel(UUID channelId);
+    List<Message> findByUserAndByChannel(UUID userId, UUID channelId);
+    List<Message> findAll();
     Message update(UUID messageId, String newMessage);
     void delete(UUID messageId);
 }

@@ -17,8 +17,6 @@ public class JavaApplication {
         JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService();
         JCFMessageService messageService = new JCFMessageService(userService, channelService);
-        User loginUser = null;
-        Channel enterChannel = null;
 
         Scanner scanner = new Scanner(System.in);
 

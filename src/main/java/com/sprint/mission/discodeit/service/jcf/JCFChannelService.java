@@ -20,8 +20,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(ChannelType type, String name, String description) {
-        Channel channel = new Channel(type, name, description);
+    public Channel create(ChannelType type, String name) {
+        Channel channel = new Channel(type, name);
         channelData.put(channel.getId(), channel);
         return channel;
     }
@@ -41,10 +41,11 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(UUID channelId, String newName, String newDescription) {       //채널명 수정
+    public Channel update(UUID channelId, String newName, ChannelType newType) {       //채널명 수정
         Channel channelNullable = channelData.get(channelId);
         Channel channel = Optional.ofNullable(channelNullable).orElseThrow(() -> new NoSuchElementException("채널 " + channelId + "가 존재하지 않습니다."));
-        channel.updateChannel(newName, newDescription);
+        channel.updateChannel(newName);
+        channel.updateChannelType(newType);
         
         return channel;
     }

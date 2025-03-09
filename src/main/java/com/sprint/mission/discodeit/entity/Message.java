@@ -43,7 +43,7 @@ public class Message extends MainDomain {
     @Override
     public String toString() {
         return "Message{" +
-                "message='" + message + '\'' +
+                "message=" + message + "\n" +
                 ", userId=" + userId +
                 ", channelId=" + channelId +
                 '}';

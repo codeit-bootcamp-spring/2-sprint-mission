@@ -34,7 +34,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> readByUser(UUID userId) { 
+    public List<Message> findByUser(UUID userId) {
         List<Message> messages = messageData.values().stream().filter(m -> m.getUserId().equals(userId)).toList();
         if(messages.isEmpty() || messages == null){
             throw new NoSuchElementException("유저 " + userId + "가 존재하지 않습니다.");
@@ -43,25 +43,25 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> readByChannel(UUID channedId) {
-        List<Message> messages = messageData.values().stream().filter(m -> m.getChannelId().equals(channedId)).toList();
+    public List<Message> findByChannel(UUID channelId) {
+        List<Message> messages = messageData.values().stream().filter(m -> m.getChannelId().equals(channelId)).toList();
         if(messages.isEmpty() || messages == null){
-            throw new NoSuchElementException("채널 " + channedId + "가 존재하지 않습니다.");
+            throw new NoSuchElementException("채널 " + channelId + "가 존재하지 않습니다.");
         }
         return messages;
     }
 
     @Override
-    public List<Message> readByUserAndByChannel(UUID userId, UUID channeId) {
-        List<Message> messages = messageData.values().stream().filter(m -> m.getUserId().equals(userId) && m.getChannelId().equals(channeId)).toList();
+    public List<Message> findByUserAndByChannel(UUID userId, UUID channelId) {
+        List<Message> messages = messageData.values().stream().filter(m -> m.getUserId().equals(userId) && m.getChannelId().equals(channelId)).toList();
         if (messages.isEmpty() || messages == null) {
-            throw new NoSuchElementException("유저 " + userId + " 혹은 채널 " + channeId + "가 존재하지 않습니다.");
+            throw new NoSuchElementException("유저 " + userId + " 혹은 채널 " + channelId + "가 존재하지 않습니다.");
         }
         return messages;
     }
 
     @Override
-    public List<Message> readAll() {
+    public List<Message> findAll() {
         return messageData.values().stream().toList();
     }
 

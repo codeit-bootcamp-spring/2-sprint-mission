@@ -6,7 +6,8 @@ public enum MessageMenu {
     FINDALL("3", "전체 메세지"),
     UPDATE("4", "메세지 수정"),
     DELETE("5", "메세지 삭제"),
-    BACK("6", "뒤로 가기");
+    CHANGEDCHANNEL("6","채널 변경"),
+    BACK("7", "뒤로 가기");
 
     private final String code;
     private final String description;

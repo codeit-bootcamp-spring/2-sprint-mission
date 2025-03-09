@@ -10,14 +10,14 @@ import java.util.Scanner;
 public class MainMenuController {
     private final Scanner scanner;
     private final UserMenuController userMenuController;
-//    private final ChannelMenuController channelMenuController;
-//    private final MassegeMenuController massegeMenuController;
+    private final ChannelMenuController channelMenuController;
+    private final MassegeMenuController massegeMenuController;
 
     public MainMenuController(Scanner scanner, JCFUserService jcfUserService, JCFChannelService jcfChannelService, JCFMessageService jcfMessageService) {
         this.scanner = scanner;
         this.userMenuController = new UserMenuController(jcfUserService,scanner);
-//        this.channelMenuController = new ChannelMenuController(jcfChannelService, scanner);
-//        this.massegeMenuController = new MassegeMenuController(jcfMessageService, scanner);
+        this.channelMenuController = new ChannelMenuController(jcfChannelService, scanner);
+        this.massegeMenuController = new MassegeMenuController(jcfUserService,jcfChannelService,jcfMessageService, scanner);
     }
 
     public void run(){
@@ -34,20 +34,20 @@ public class MainMenuController {
                 System.out.println("잘못된 입력입니다.");
                 continue;
             }
-            run = excute(selectedMenu);
+            run = execute(selectedMenu);
         }
     }
 
-    private boolean excute(MainMenu selectedMenu) {
+    private boolean execute(MainMenu selectedMenu) {
         switch (selectedMenu) {
             case USER:
                 userMenuController.handleUserMenu();
                 return true;
             case CHANNEL:
-                System.out.println("구현중..");
+                channelMenuController.handleChannelMenu();
                 return true;
             case MESSAGE:
-                System.out.println("구현중..");
+                massegeMenuController.handleMessageMenu();
                 return true;
             case EXIT:
                 return false;

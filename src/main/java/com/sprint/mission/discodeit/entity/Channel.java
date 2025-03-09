@@ -3,14 +3,12 @@ package com.sprint.mission.discodeit.entity;
 public class Channel extends MainDomain {
     private String channelName;
     private ChannelType type;
-    private String description;
 
 
-    public Channel(ChannelType type, String channelName,  String description) {
+    public Channel(ChannelType type, String channelName) {
         super();
         this.type = type;
         this.channelName = channelName;
-        this.description = description;
     }
 
     public String getChannelName() {
@@ -21,19 +19,12 @@ public class Channel extends MainDomain {
         return type;
     }
 
-    public String getDescription() {
-        return description;
-    }
 
 
-    public void updateChannel(String newName, String newDescription) {
+    public void updateChannel(String newName) {
         boolean anyValueUpdated = false;
         if (newName != null && !newName.equals(this.channelName)) {
             this.channelName = newName;
-            anyValueUpdated = true;
-        }
-        if (newDescription != null && !newDescription.equals(this.description)) {
-            this.description = newDescription;
             anyValueUpdated = true;
         }
 
@@ -42,5 +33,19 @@ public class Channel extends MainDomain {
         }
     }
 
+    public void updateChannelType(ChannelType newType) {
+        if(type==newType || newType==null){
+            return;
+        }
+        this.type = newType;
+    }
 
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "channelID= " + getId() +
+                ", channelName=" + channelName  +
+                ", type=" + type + '}';
+    }
 }
