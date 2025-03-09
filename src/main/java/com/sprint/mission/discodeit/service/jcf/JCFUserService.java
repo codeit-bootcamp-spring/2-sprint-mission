@@ -13,15 +13,15 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User create(String username, String email, String password) {
-        User user = new User(username, email, password);
+    public User create(String username, String password) {
+        User user = new User(username, password);
         this.data.put(user.getId(), user);
 
         return user;
     }
 
     @Override
-    public User find(UUID userId) {
+    public User findById(UUID userId) {
         User userNullable = this.data.get(userId);
 
         return Optional.ofNullable(userNullable)
@@ -34,11 +34,21 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+    public User updateName(UUID userId, String newUsername) {
         User userNullable = this.data.get(userId);
         User user = Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword);
+                .orElseThrow(() -> new NoSuchElementException(userId + " 존재하지 않는 유저입니다."));
+        user.updateName(newUsername);
+
+        return user;
+    }
+
+    @Override
+    public User updatePassword(UUID userId, String newPassword) {
+        User userNullable = this.data.get(userId);
+        User user = Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException(userId + " 존재하지 않는 유저입니다."));
+        user.updatePassword(newPassword);
 
         return user;
     }
@@ -46,7 +56,7 @@ public class JCFUserService implements UserService {
     @Override
     public void delete(UUID userId) {
         if (!this.data.containsKey(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " not found");
+            throw new NoSuchElementException(userId + " 삭제할 대상이 존재하지 않습니다.");
         }
         this.data.remove(userId);
     }

@@ -26,6 +26,7 @@ public class Channel implements Serializable {
     public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
+        this.updatedAt = Instant.now().getEpochSecond();
         this.type = type;
         this.name = name;
         this.description = description;
@@ -77,5 +78,17 @@ public class Channel implements Serializable {
         if (anyValueUpdated) {
             this.updatedAt = Instant.now().getEpochSecond();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", type=" + type +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

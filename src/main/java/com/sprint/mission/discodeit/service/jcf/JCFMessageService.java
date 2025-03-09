@@ -23,7 +23,7 @@ public class JCFMessageService implements MessageService {
     public Message create(String content, UUID channelId, UUID authorId) {
         try {
             channelService.findById(channelId);
-            userService.find(authorId);
+            userService.findById(authorId);
         } catch (NoSuchElementException e) {
             throw e;
         }
@@ -35,7 +35,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message find(UUID messageId) {
+    public Message findById(UUID messageId) {
         Message messageNullable = this.data.get(messageId);
 
         return Optional.ofNullable(messageNullable)

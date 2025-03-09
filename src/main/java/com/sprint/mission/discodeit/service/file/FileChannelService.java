@@ -20,18 +20,15 @@ public class FileChannelService implements ChannelService {
      * 데이터를 파일에 저장하는 메서드
      */
     private void saveData() {
-        try (FileOutputStream fos = new FileOutputStream("channel.ser");
+        // 바이트 단위 데이터를 저장할 파일 생성
+        try (FileOutputStream fos = new FileOutputStream(file);
+             // 자바 객체를 바이트 단위로 변환하여, channel.ser 파일에 저장
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
-            oos.writeObject(data); // 채널 map 객체 내용 다 저장
+            oos.writeObject(data); // 채널 map 객체 내용을 직렬화해서 파일에 저장
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
-//            oos.writeObject(data);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     /**
@@ -43,9 +40,10 @@ public class FileChannelService implements ChannelService {
         }
 
         try (FileInputStream fis = new FileInputStream(file);
+             //이미 있는 파일에 바이트 단위 직렬화된 데이터를 스트림 형태로 묶어서 불러오기
              ObjectInputStream ois = new ObjectInputStream(fis)) {
 
-            Object data = ois.readObject();
+            Object data = ois.readObject(); // 객체를 읽는다
             return (Map<UUID, Channel>) data; // 저장된 데이터 로드(불러오기)
 
         } catch (IOException | ClassNotFoundException e) {
@@ -77,7 +75,7 @@ public class FileChannelService implements ChannelService {
     @Override
     public Channel findById(UUID channelId) {
         return Optional.ofNullable(data.get(channelId))
-                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+                .orElseThrow(() -> new NoSuchElementException(channelId + " 존재하지 않는 아이디입니다."));
     }
 
     /**
@@ -116,9 +114,12 @@ public class FileChannelService implements ChannelService {
     @Override
     public void delete(UUID channelId) {
         if (!data.containsKey(channelId)) {
-            throw new NoSuchElementException("Channel with id " + channelId + " not found");
+            throw new NoSuchElementException(channelId + " 삭제할 대상이 존재하지 않습니다.");
         }
         data.remove(channelId);
         saveData(); // 삭제 후 파일 업데이트
     }
 }
+
+
+// 컬랙션 객체의 crud를 유지하고, 그 내용을 파일에 file io를 반영하는 것

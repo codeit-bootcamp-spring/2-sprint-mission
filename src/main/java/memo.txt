@@ -9,3 +9,19 @@ Entity에 객체(User, Channel, Mess)의 데이터를 관리하는 역할(서비
 서비스를 통해서 객체 생성. 그래서 인터페이스가 있는 것.
 유저의 데이터와 데이터를 활용하는것 구분.
 
+-----------
+비즈니스 로직(유효성 검사, 등), 저장 로직 (CRUD)
+
+FileInputStream fis = new FileInputStream(file) // 이미 존재하는 파일 읽어오기
+FileOutputStream fos = new FileOutputStream(file) // 파일 생성, 쓰기
+
+역할
+ObjectOutputStream(fileName) : 자바 객체를 스트림 형태로 변환 (그래야 바이트 단위로 변환 가능)
+writeObject(data): 스트림 형태의 객체를 → 바이트 스트림 변환 후 파일에 저장 (직렬화)
+ObjectInputStream(fileName) : 파일에서 바이트 데이터를 통째로 읽어옴 (아직 객체 아니고, 스트림 형태의 바이트 데이터)
+readObject() : 바이트 데이터를 실제 자바 객체로 변환해서 읽는다 (역직렬화)
+
+serialVersionUID란?	-> 직렬화된 객체의 버전을 식별하는 ID
+왜 필요함? ->	클래스가 변경되어도 예전 데이터를 호환 가능하게 하려고
+없으면 어떻게 됨? -> 자동 생성되는데, 클래스가 변경되면 ID가 바뀌어 역직렬화 오류 발생 가능 ❌
+해결 방법 ->	private static final long serialVersionUID = 1L; 명시적으로 추가! -> 클래스마다 고유 번호 -> 달라야함.
