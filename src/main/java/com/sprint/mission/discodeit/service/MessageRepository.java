@@ -1,19 +1,21 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 
-import java.util.*;
-import java.util.ArrayList;
+
+import com.sprint.mission.discodeit.entity.Message;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface MessageRepository {
     //메세지 저장
-    void addMessage(Message m);
+    void register(Message m);
     //보낸 전체메세지 조회
-    List<Message> getMessages(Message m);
-    //특정인물에게 보낸 메세지들을 조회
-    List<Message> allMessages();
-    List<Message> deleteMessages(Message m);
+    List<Message> findAll();
+    Optional<Message> findById(UUID messageId);
+
+    boolean deleteMessage(UUID messageId);
 
 
 }
