@@ -41,7 +41,7 @@ public class TestJavaApplication {
         ChannelService channelService = new BasicChannelService(new FileChannelRepository(), userService);
         MessageService messageService = new BasicMessageService(new FileMessageRepository(), userService, channelService);
 
-        // 셋업
+        // 셋업 및 테스트 실행
         try {
             User user = setupUser(userService);
             Channel channel = setupChannel(channelService, user);
@@ -49,8 +49,5 @@ public class TestJavaApplication {
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
         }
-
-        // 테스트 실행
-       //
     }
 }
