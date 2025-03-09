@@ -51,10 +51,4 @@ public class JCFUserService implements UserService {
 
 
 
-    @Override
-    public String toString() {
-        return "JCFUserService{" +
-                "userData=" + userData +
-                '}';
-    }
 }

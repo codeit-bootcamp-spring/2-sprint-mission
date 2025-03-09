@@ -9,10 +9,10 @@ import java.util.*;
 
 public class FileChannelService implements ChannelService {
     private final String CHANNEL_FILE = "channels.ser";
-    private final Map<UUID, Channel> data;
+    private final Map<UUID, Channel> channelData;
 
     public FileChannelService() {
-        this.data = loadData();
+        this.channelData = loadData();
     }
 
     private Map<UUID, Channel> loadData(){
@@ -31,7 +31,7 @@ public class FileChannelService implements ChannelService {
     private void saveData(){
         try(FileOutputStream fos = new FileOutputStream(CHANNEL_FILE);
             ObjectOutputStream oos = new ObjectOutputStream(fos)){
-            oos.writeObject(this.data);
+            oos.writeObject(this.channelData);
         }catch (IOException e){
             throw new RuntimeException(e);
         }
@@ -39,26 +39,43 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public Channel create(ChannelType type, String name) {
-        return null;
+        Channel channel = new Channel(type, name);
+        this.channelData.put(channel.getId(), channel);
+        saveData();
+
+        return channel;
     }
 
     @Override
     public Channel find(UUID channelId) {
-        return null;
+        Channel channelNullable = channelData.get(channelId);
+
+        return Optional.ofNullable(channelNullable).orElseThrow(() -> new NoSuchElementException("채널 " + channelId + "가 존재하지 않습니다."));
     }
 
     @Override
     public List<Channel> findAll() {
-        return List.of();
+        return channelData.values().stream().toList();
     }
 
     @Override
-    public Channel update(UUID channelId, String newName, ChannelType newType) {
-        return null;
+    public Channel update(UUID channelId, String newName, ChannelType newType) {       //채널명 수정
+        Channel channelNullable = channelData.get(channelId);
+        Channel channel = Optional.ofNullable(channelNullable).orElseThrow(() -> new NoSuchElementException("채널 " + channelId + "가 존재하지 않습니다."));
+        channel.updateChannel(newName);
+        channel.updateChannelType(newType);
+        saveData();
+
+        return channel;
     }
 
     @Override
     public void delete(UUID channelId) {
-
+        if(!channelData.containsKey(channelId)){
+            throw new NoSuchElementException("채널 " + channelId + "가 존재하지 않습니다.");
+        }
+        channelData.remove(channelId);
+        saveData();
     }
+
 }
