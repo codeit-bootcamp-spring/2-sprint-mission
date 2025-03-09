@@ -89,7 +89,7 @@ public class JavaApplication {
 ## 현재 미션
 - [x] null 반환부분 Optional이나 null객체로 바꾸기[Optional, null객체]
 - [x] 파일 서비스들의 테스트 저장소끼리 격리 필요[테스트 격리성]
-- [ ] protocol Buffer 사용
+- [ ] Protocol Buffer 사용
 
 ## 공통 미션
 - [ ] DI 구현 보완: [싱글톤, 팩터리메서드, 서비스로케이터, 레지스터리]
@@ -106,5 +106,5 @@ public class JavaApplication {
 - [x] Unix TimeStamp ms로 수정
 - [x] updatedAt 메서드 이름 수정
 - [ ] toDto 정적 팩터리 메서드로 보완하기[정적 팩터리 메서드]
-- [ ] Scanner등 자원 사용시 Test 격리성 높이기[try-with-resource, 테스트 격리성]
+- [x] Scanner등 자원 사용시 Test 격리성 높이기[try-with-resource, 테스트 격리성]
 - [x] 테스트 명칭 조금 더 명확하게[~하면 ~가 출력된다]

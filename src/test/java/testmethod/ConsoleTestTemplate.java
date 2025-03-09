@@ -1,6 +1,5 @@
 package testmethod;
 
-import com.sprint.mission.discodeit.view.Console;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -31,12 +30,8 @@ public abstract class ConsoleTestTemplate {
     }
 
     protected final void run(final String... args) {
-        try {
-            command(args);
-            runMain();
-        } finally {
-            Console.close();
-        }
+        command(args);
+        runMain();
     }
 
     protected final void runException(final String... args) {
