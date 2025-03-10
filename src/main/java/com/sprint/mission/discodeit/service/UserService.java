@@ -12,8 +12,9 @@ public interface UserService {
     void createUser(User user);
     Optional<User> selectUserById(UUID id);
     Optional<User> selectUserByNickname(String nickname);
-    Optional<User> selectUserByEmail(String username);
+    Optional<User> selectUserByEmail(String email);
     List<User> selectAllUsers();
     void updateUser(UUID id, String password, String nickname, UserStatus status, UserRole role);
     void deleteUser(UUID id);
+    //void clearUsers();
 }
