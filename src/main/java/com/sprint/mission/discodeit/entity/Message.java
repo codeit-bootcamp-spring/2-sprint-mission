@@ -5,10 +5,6 @@ public class Message extends BaseEntity {
     private final String sender; // 메시지를 받는 사람
     private String message; // 메시지 내용
 
-    public Message(String sender) {
-        this.sender = sender;
-    }
-
     public Message(String sender, String message) {
         this.sender = sender;
         this.message = message;
@@ -27,13 +23,14 @@ public class Message extends BaseEntity {
     public void updateMessage(String message) {
         this.message = message;
         super.update();
+        System.out.printf("내용이 [ %s ] 로 변경되었습니다.", this.message);
     }
 
     @Override
     public String toString() {
-        return "보낸 사람: " + sender + "\n보낸 내용: " + message +
-                "\n생성 시간: " + this.getCreatedAtFormatted() +
-                "\n업데이트 시간: " + this.getupdatedAttFormatted() +
-                "\n메시지 ID: " + this.getId() + "\n";
+        return "\nSender: " + sender + "\nMessage: " + message +
+                "\nCreatedAt: " + this.getCreatedAtFormatted() +
+                "\nUpdatedAt: " + this.getUpdatedAttFormatted() +
+                "\nUUID: " + this.getId();
     }
 }
