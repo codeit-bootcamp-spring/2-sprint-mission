@@ -1,42 +1,35 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     protected final UUID id;
-    protected final Long createAt;
-    protected Long updateAt;
+    protected final Long createdAt;
+    protected Long updatedAt;
 
-    public BaseEntity() {
+    protected BaseEntity() {
         this.id = UUID.randomUUID();
-        this.createAt = System.currentTimeMillis();
+        this.createdAt = System.currentTimeMillis();
     }
 
     public UUID getId() {
         return id;
     }
 
-    public Long getCreateAt() {
-        return createAt;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    public Long getUpdateAt() {
-        return updateAt;
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void updateTime() {
-        this.updateAt = System.currentTimeMillis();
+    protected void updateTime() {
+        this.updatedAt = System.currentTimeMillis();
     }
 
-    public String formatTime(long time){
-        LocalDateTime datetime = Instant.ofEpochMilli(time)
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return datetime.format(formatter);
-    }
 }

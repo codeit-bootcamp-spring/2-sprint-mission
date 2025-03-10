@@ -1,6 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity {
+import static com.sprint.mission.discodeit.entity.Util.formatTime;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+public class User extends BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private String userName;
     private String nickName;
 
@@ -19,17 +26,17 @@ public class User extends BaseEntity {
         return nickName;
     }
 
-    public void userUpdate(String userName, String nickName){
+    public void userUpdate(String userName, String nickName) {
         updateTime();
         this.userName = userName;
         this.nickName = nickName;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "[uid: " + id +
-                ", userCreateAt: " + formatTime(getCreateAt()) +
-                ", userUpdateAt: " + (getUpdateAt() == null ? "null" : formatTime(getUpdateAt())) +
+                ", userCreateAt: " + formatTime(getCreatedAt()) +
+                ", userUpdateAt: " + (getUpdatedAt() == null ? "null" : formatTime(getUpdatedAt())) +
                 ", userName: " + userName +
                 ", nickName: " + nickName + "]\n";
     }

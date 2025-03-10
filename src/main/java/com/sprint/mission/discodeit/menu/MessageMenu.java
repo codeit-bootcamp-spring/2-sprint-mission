@@ -1,39 +1,41 @@
-package com.sprint.mission.menu;
+package com.sprint.mission.discodeit.menu;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.jcf.JCFMessageService;
-
+import com.sprint.mission.discodeit.service.MessageService;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
 public class MessageMenu {
     static Scanner sc = new Scanner(System.in);
-    public static void display(JCFMessageService messageService) {
-        while(true){
+
+    public static void display(MessageService messageService) {
+        while (true) {
             int choice = crudMenu();
 
-            if(choice == 7) return;
-            switch(choice){
+            if (choice == 7) {
+                return;
+            }
+            switch (choice) {
                 case 1:
-                    try{
+                    try {
                         System.out.print("메시지 ID 입력: ");
                         UUID messageId = UUID.fromString(sc.nextLine());
                         System.out.print(messageService.getMessage(messageId));
-                    }catch(IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         System.out.println("메시지 조회에 실패하였습니다.");
                     }
                     break;
                 case 2:
                     System.out.println("<모든 메시지의 정보 출력>\n");
-                    try{
+                    try {
                         System.out.println(messageService.getAllMessages());
-                    }catch(IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
                     }
                     break;
                 case 3:
-                    try{
+                    try {
                         System.out.print("메시지를 작성할 채널ID 입력: ");
                         UUID channelId = UUID.fromString(sc.nextLine());
                         System.out.print("사용자명 입력: ");
@@ -41,38 +43,38 @@ public class MessageMenu {
                         System.out.print("메시지 내용 입력: ");
                         messageService.registerMessage(channelId, userName, sc.nextLine());
                         System.out.println("완료되었습니다.");
-                    }catch(IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         System.out.println("채널 등록에 실패하였습니다.");
                     }
                     break;
                 case 4:
-                    try{
+                    try {
                         System.out.print("메시지ID 입력: ");
                         UUID messageId = UUID.fromString(sc.nextLine());
                         System.out.print("새로운 메시지 내용 입력: ");
                         messageService.updateMessage(messageId, sc.nextLine());
                         System.out.println("완료되었습니다.");
-                    }catch (IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
                     }
                     break;
                 case 5:
                     System.out.println("<수정된 메시지 정보 출력>\n");
                     List<Message> updatedMessages = messageService.getUpdatedMessages();
-                    if(updatedMessages.isEmpty()){
+                    if (updatedMessages.isEmpty()) {
                         System.out.println("수정된 메시지 정보가 존재하지 않습니다.");
                         break;
                     }
                     System.out.println(updatedMessages);
                     break;
                 case 6:
-                    try{
+                    try {
                         System.out.print("메시지ID 입력: ");
                         UUID messageId = UUID.fromString(sc.nextLine());
                         messageService.deleteMessage(messageId);
                         System.out.println("완료되었습니다.\n<모든 메시지의 정보 출력>");
                         System.out.print(messageService.getAllMessages());
-                    }catch (IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
                     }
                     break;
@@ -83,7 +85,7 @@ public class MessageMenu {
         }
     }
 
-    public static int crudMenu(){
+    public static int crudMenu() {
         System.out.println("\n=============================");
         System.out.println("1. 조회");
         System.out.println("2. 모든 데이터 조회");
