@@ -1,11 +1,18 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.service.jcf.*;
+import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 
 public class JavaApplication {
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         // Initialize services
         JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService();
@@ -35,7 +42,7 @@ public class JavaApplication {
         System.out.println("Updated User1: " + userService.getUser(user1.getId()).getUsername());
 
         // Delete User with Validation
-        if (messageService.getAllMessages().stream().noneMatch(m -> m.getUserId().equals(user2.getId()))) {
+        if (messageService.getAllMessages().stream().noneMatch(m -> m.getauthorId().equals(user2.getId()))) {
             userService.deleteUser(user2.getId());
         }
         System.out.println("All Users After Deletion: " + userService.getAllUsers());
@@ -59,5 +66,37 @@ public class JavaApplication {
         // Delete Message
         messageService.deleteMessage(message1.getId());
         System.out.println("All Messages After Deletion: " + messageService.getAllMessages());
+    }*/
+    static User setupUser(UserService userService) {
+        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        return user;
+    }
+
+    static Channel setupChannel(ChannelService channelService) {
+        Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+        return channel;
+    }
+
+    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+        Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
+        System.out.println("메시지 생성: " + message.getId());
+    }
+
+    public static void main(String[] args) {
+        // 서비스 초기화
+        UserRepository U =  new FileUserRepository();
+        ChannelRepository C =  new FileChannelRepository();
+        MessageRepository M =  new FileMessageRepository();
+
+        // TODO Basic*Service 구현체를 초기화하세요.
+        UserService userService = new BasicUserService(U);
+        ChannelService channelService = new BasicChannelService(C);
+        MessageService messageService = new BasicMessageService(M);
+
+        // 셋업
+        User user = setupUser(userService);
+        Channel channel = setupChannel(channelService);
+        // 테스트
+        messageCreateTest(messageService, channel, user);
     }
 }

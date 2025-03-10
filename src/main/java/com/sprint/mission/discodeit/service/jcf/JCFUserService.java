@@ -1,17 +1,43 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.UserService;
+
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> data = new HashMap<>();
+    private final Map<UUID, User> users = new HashMap<>();
 
-    public void createUser(User user) { data.put(user.getId(), user); }
-    public User getUser(UUID id) { return data.get(id); }
-    public List<User> getAllUsers() { return new ArrayList<>(data.values()); }
-    public void updateUser(UUID id, String username) {
-        if (data.containsKey(id)) data.get(id).updateUsername(username);
+    @Override
+    public User create(String username, String password, String email) {
+        User user = new User(UUID.randomUUID(), username, password, email);
+        users.put(user.getId(), user);
+        return user;
     }
-    public void deleteUser(UUID id) { data.remove(id); }
+
+    @Override
+    public User find(UUID userId) {
+        return users.get(userId);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return new ArrayList<>(users.values());
+    }
+
+    @Override
+    public User update(UUID userId, String newUsername, String newPassword, String newEmail) {
+        User user = users.get(userId);
+        if (user != null) {
+            user.updateUsername(newUsername);
+            user.setPassword(newPassword);
+            user.setEmail(newEmail);
+        }
+        return user;
+    }
+
+    @Override
+    public void delete(UUID authorId) {
+        users.remove(authorId);
+    }
 }

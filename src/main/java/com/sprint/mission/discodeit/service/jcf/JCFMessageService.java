@@ -6,27 +6,45 @@ import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data = new HashMap<>();
-    private JCFUserService userService;
-    private JCFChannelService channelService;
 
-    public JCFMessageService(JCFUserService userService, JCFChannelService channelService) {
-        this.userService = userService;
-        this.channelService = channelService;
+    public JCFMessageService() {}
+
+    @Override
+    public Message create(String content, UUID channelId, UUID authorId) {
+        Message message = new Message(content, channelId, authorId);
+        this.data.put(message.getId(), message);
+
+        return message;
     }
 
-    public void createMessage(Message message) {
-        if(userService.getUser(message.getUserId()) != null && channelService.getChannel(message.getChannelId()) != null)
-        {
-            data.put(message.getId(), message);
+    @Override
+    public Message find(UUID messageId) {
+        Message messageNullable = this.data.get(messageId);
+
+        return Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+    }
+
+    @Override
+    public List<Message> findAll() {
+        return this.data.values().stream().toList();
+    }
+
+    @Override
+    public Message update(UUID messageId, String newContent) {
+        Message messageNullable = this.data.get(messageId);
+        Message message = Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.updateContent(newContent);
+
+        return message;
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        if (!this.data.containsKey(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
-        else System.out.println("User not found");
+        this.data.remove(messageId);
     }
-    public Message getMessage(UUID id) { return data.get(id); }
-    public List<Message> getAllMessages() { return new ArrayList<>(data.values()); }
-    public void updateMessage(UUID id, String content) {
-        Message messageToUpdate = getMessage(id);
-        if (data.containsKey(id)&& messageToUpdate != null && userService.getUser(messageToUpdate.getUserId()) != null)
-            data.get(id).updateContent(content);
-    }
-    public void deleteMessage(UUID id) { data.remove(id); }
 }
