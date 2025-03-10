@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 public class Channel extends BaseEntity {
+    private static final long serialVersionUID = 1L;
     private String channelName;
 
     public Channel(String channelName) {
@@ -11,7 +12,8 @@ public class Channel extends BaseEntity {
         return channelName;
     }
 
-    public void setChannelName(String channelName) {
+    public void updateChannelName(String channelName) {
+        super.updateTime();
         this.channelName = channelName;
     }
 
