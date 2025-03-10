@@ -1,6 +1,7 @@
 package com.sprint.mission.service;
 
-import com.sprint.mission.view.output.UserOutput;
+import com.sprint.sprint1.mission.service.UserServiceImpl;
+import com.sprint.sprint1.mission.view.output.UserOutput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +13,7 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
        // userOutput = mock(UserOutput.class);
-        userService = new UserServiceImpl(userOutput);
+       // userService = new UserServiceImpl(userOutput);
 
         userService.createUser("John", "codit@naver.com", "codit1234");
         //userService.createUser("John Doe", "john@example.com", "password123");
