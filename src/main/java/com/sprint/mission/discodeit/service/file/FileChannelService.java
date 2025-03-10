@@ -1,31 +1,23 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.List;
 import java.util.UUID;
 
-public class JCFChannelService implements ChannelService {
-    private static JCFChannelService instance;
+public class FileChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
-    private JCFChannelService() {
-        this.channelRepository = new JCFChannelRepository();
-    }
-
-    public static synchronized JCFChannelService getInstance() {
-        if (instance == null) {
-            instance = new JCFChannelService();
-        }
-        return instance;
+    public FileChannelService() {
+        this.channelRepository = new FileChannelRepository();
     }
 
     @Override
-    public Channel createChannel(String channelName) {
-        Channel channel = new Channel(channelName);
+    public Channel createChannel(String name) {
+        Channel channel = new Channel(name);
         channelRepository.save(channel);
         return channel;
     }
@@ -45,9 +37,9 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UUID id, String newChannelName) {
+    public void updateChannel(UUID id, String newName) {
         Channel channel = getChannel(id);
-        channel.updateChannelName(newChannelName);
+        channel.updateChannelName(newName);
         channelRepository.save(channel);
     }
 

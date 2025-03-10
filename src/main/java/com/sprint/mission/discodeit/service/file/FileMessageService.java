@@ -1,32 +1,23 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
 import java.util.UUID;
 
-public class JCFMessageService implements MessageService {
+public class FileMessageService implements MessageService {
     private final MessageRepository messageRepository;
-    private final UserService userService;
-    private final ChannelService channelService;
 
-    public JCFMessageService(UserService userService, ChannelService channelService) {
-        this.messageRepository = new JCFMessageRepository();
-        this.userService = userService;
-        this.channelService = channelService;
+    public FileMessageService() {
+        this.messageRepository = new FileMessageRepository();
     }
 
     @Override
-    public Message createMessage(UUID userId, UUID channelId, String content) {
-        userService.getUser(userId);
-        channelService.getChannel(channelId);
-
-        Message message = new Message(userId, channelId, content);
+    public Message createMessage(UUID channelId, UUID userId, String content) {
+        Message message = new Message(channelId, userId, content);
         messageRepository.save(message);
         return message;
     }
@@ -35,7 +26,7 @@ public class JCFMessageService implements MessageService {
     public Message getMessage(UUID id) {
         Message message = messageRepository.findById(id);
         if (message == null) {
-            throw new IllegalArgumentException("존재하지 않는 메시지입니다.");
+            throw new IllegalArgumentException("존재하지 않는 메세지입니다.");
         }
         return message;
     }
