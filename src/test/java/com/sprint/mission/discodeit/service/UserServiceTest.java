@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.service;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
+import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.config.SetUpUserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
-import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.List;
 import java.util.UUID;
@@ -20,15 +20,14 @@ class UserServiceTest {
     private UserDto setUpUser;
 
     @BeforeEach
-    void init() {
+    void setUp() {
         userService = new JCFUserService(new JCFUserRepository());
-
-        this.setUpUser = userService.register(
+        setUpUser = userService.register(
                 new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
     }
 
     @AfterEach
-    void teardown() {
+    void tearDown() {
         userService.delete(setUpUser.id());
     }
 
@@ -57,8 +56,8 @@ class UserServiceTest {
 
     @Test
     void 유저_이름_다수_조회() {
-        UserRegisterDto otherUser = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword());
-
+        UserRegisterDto otherUser = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(),
+                OTHER_USER.getPassword());
         userService.register(otherUser);
 
         assertThat(userService.findByName(LONGIN_USER.getName())).hasSize(2);

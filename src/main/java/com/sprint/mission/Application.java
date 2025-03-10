@@ -1,51 +1,76 @@
 package com.sprint.mission;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
-import static com.sprint.mission.discodeit.view.InputView.readCommand;
+import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.config.SetUpUserInfo.OTHER_USER;
 import static com.sprint.mission.discodeit.view.OutputView.printHello;
 import static com.sprint.mission.discodeit.view.OutputView.printServer;
 
+import com.sprint.mission.config.Beans;
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
-import com.sprint.mission.discodeit.config.Beans;
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
 import com.sprint.mission.discodeit.controller.UserController;
 import com.sprint.mission.discodeit.view.ChannelCommand;
+import com.sprint.mission.discodeit.view.InputView;
 import java.util.List;
+import java.util.Scanner;
 
 public class Application {
     private static final String SETUP_CHANNEL_NAME = "general";
 
     public static void main(String[] args) {
-        printHello();
         Beans beans = new Beans();
-        UserDto loginUser = registerSetupUser(beans.findBean(UserController.class));
+        UserController userController = beans.findBean(UserController.class);
+        ChannelController channelController = beans.findBean(ChannelController.class);
+        MessageController messageController = beans.findBean(MessageController.class);
 
-        ChannelDto currentChannel = (beans.findBean(ChannelController.class)).create(SETUP_CHANNEL_NAME, loginUser);
+        printHello();
+        UserDto loginUser = setupUser(userController);
+        ChannelDto currentChannel = setupChannel(channelController, loginUser);
+
+        try (Scanner scanner = new Scanner(System.in)) {
+            InputView inputView = new InputView(scanner);
+
+            run(channelController, messageController, loginUser, currentChannel, inputView);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private static void run(ChannelController channelController, MessageController messageController,
+                            UserDto loginUser, ChannelDto currentChannel, InputView inputView) {
         while (true) {
-            List<MessageDto> currentChannelMessages = (beans.findBean(MessageController.class)).findByChannelId(
-                    currentChannel.id());
-            printServer((beans.findBean(ChannelController.class)).findAll(), loginUser, currentChannelMessages,
-                    currentChannel);
+            List<MessageDto> currentChannelMessages = messageController.findByChannelId(currentChannel.id());
+            printServer(channelController.findAll(), loginUser, currentChannelMessages, currentChannel);
 
-            try {
-                currentChannel = ChannelCommand.fromNumber(readCommand())
-                        .execute((beans.findBean(ChannelController.class)),
-                                (beans.findBean(MessageController.class)), loginUser, currentChannel);
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
+            currentChannel = handleChannelCommand(channelController, messageController, loginUser, currentChannel,
+                    inputView);
             if (currentChannel == null) {
                 break;
             }
         }
     }
 
-    private static UserDto registerSetupUser(UserController userController) {
+    private static ChannelDto handleChannelCommand(ChannelController channelController,
+                                                   MessageController messageController,
+                                                   UserDto loginUser, ChannelDto currentChannel, InputView inputView) {
+        try {
+            currentChannel = ChannelCommand.fromNumber(inputView.readCommand())
+                    .execute(channelController, messageController, loginUser, currentChannel, inputView);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+        return currentChannel;
+    }
+
+    private static ChannelDto setupChannel(ChannelController channelController, UserDto loginUser) {
+        return channelController.create(SETUP_CHANNEL_NAME, loginUser);
+    }
+
+    private static UserDto setupUser(UserController userController) {
         UserDto loginUser = userController.register(
                 new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword())
         );

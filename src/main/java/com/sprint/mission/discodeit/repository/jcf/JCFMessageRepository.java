@@ -1,31 +1,26 @@
-package com.sprint.mission.discodeit.infra.jcf;
-
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.infra.MessageRepository;
-import java.util.LinkedHashMap;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> messages = new LinkedHashMap<>();
+    private final Map<UUID, Message> messages = new HashMap<>();
 
     @Override
     public Message save(Message message) {
         messages.put(message.getId(), message);
-        return findById(message.getId());
+
+        return message;
     }
 
     @Override
-    public Message findById(UUID id) {
-        Message message = messages.get(id);
-        if (message == null) {
-            throw new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent());
-        }
-
-        return message;
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(messages.get(id));
     }
 
     @Override

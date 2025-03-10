@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
 
@@ -8,15 +8,14 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-public class JCFMessageService implements MessageService {
+public class FileMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserService userService;
 
-    public JCFMessageService(MessageRepository messageRepository, UserService userService) {
+    public FileMessageService(MessageRepository messageRepository, UserService userService) {
         this.messageRepository = messageRepository;
         this.userService = userService;
     }
@@ -24,9 +23,6 @@ public class JCFMessageService implements MessageService {
     @Override
     public MessageDto create(String context, UUID channelId, UUID userId) {
         Message message = messageRepository.save(new Message(context, channelId, userId));
-        if (message == null) {
-            throw new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent());
-        }
 
         return toDto(message);
     }
@@ -43,7 +39,6 @@ public class JCFMessageService implements MessageService {
     public List<MessageDto> findAll() {
         return messageRepository.findAll()
                 .stream()
-                .sorted(Comparator.comparing(Message::getCreatedAt))
                 .map(this::toDto)
                 .toList();
     }

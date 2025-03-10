@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
 
@@ -12,18 +12,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-public class JCFChannelService implements ChannelService {
+public class FileChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserService userService;
 
-    public JCFChannelService(ChannelRepository channelRepository, UserService userService) {
+    public FileChannelService(ChannelRepository channelRepository, UserService userService) {
         this.channelRepository = channelRepository;
         this.userService = userService;
     }
 
     @Override
     public ChannelDto create(String name, UserDto owner) {
-        Channel channel = channelRepository.save(new Channel(name, owner.id()));
+        Channel channel = channelRepository
+                .save(new Channel(name, owner.id()));
 
         return toDto(channel);
     }
@@ -56,11 +57,11 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto addMember(UUID id, String email) {
-        Channel channel = channelRepository.findById(id)
+    public ChannelDto addMember(UUID chanelId, String friendEmail) {
+        Channel channel = channelRepository.findById(chanelId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
-        UserDto friend = userService.findByEmail(email);
+        UserDto friend = userService.findByEmail(friendEmail);
         channel.addMember(friend.id());
         channelRepository.save(channel);
 
