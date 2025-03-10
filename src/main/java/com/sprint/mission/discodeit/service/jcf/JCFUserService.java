@@ -13,48 +13,42 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void create(String userName) {
-        if(read(userName)!=null){
-            System.out.println("이미 존재하는 유저입니다.");
-            return;
-        }
-        User newUser = new User(userName);
+    public User create(String userName, String email, String password) {
+        User newUser = new User(userName, email, password);
         userData.put(newUser.getId(), newUser);
+        return newUser;
     }
 
     @Override
-    public void delete(String userName) {
-        User deletedUser = read(userName);
-        if(deletedUser==null){
-            System.out.println("존재하는 유저가 없습니다.");
-            return;
+    public User find(UUID userId) {
+        User userNullable = userData.get(userId);
+
+        return Optional.ofNullable(userNullable)
+        .orElseThrow(() -> new NoSuchElementException("유저 " + userId + "가 존재하지 않습니다."));
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userData.values().stream().toList();
+    }
+
+    @Override
+    public User update(UUID userId, String newUserName, String newEmail, String newPassword) {
+        User userNullable = userData.get(userId);
+        User user = Optional.ofNullable(userNullable).orElseThrow(() -> new NoSuchElementException(userId + "가 존재하지 않습니다."));
+        user.updateUser(newUserName, newEmail, newPassword);
+
+        return user;
+    }
+
+    @Override
+    public void delete(UUID userId) {
+        if (!userData.containsKey(userId)) {
+            throw new NoSuchElementException("유저 " + userId + "가 존재하지 않습니다.");
         }
-        userData.remove(deletedUser.getId());
+        userData.remove(userId);
     }
 
-    @Override
-    public void update(String oldName,String newName) {
-        User user = read(oldName);
-        user.updateUser(newName);
-    }
 
-    @Override
-    public User read(String userName) {
-        return userData.values().stream()
-                .filter(user -> user.getUserName().equals(userName))
-                .findFirst()
-                .orElse(null);
-    }
 
-    @Override
-    public Map<UUID,User> readAll() {
-        return userData;
-    }
-
-    @Override
-    public String toString() {
-        return "JCFUserService{" +
-                "userData=" + userData +
-                '}';
-    }
 }

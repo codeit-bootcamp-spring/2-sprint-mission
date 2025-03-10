@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-public class MainDomain {
-    private UUID id;
-    private Long createdAt, updatedAt;
+public class MainDomain implements Serializable {
+    private final UUID id;
+    private final Long createdAt;
+    private Long updatedAt;
 
     public MainDomain() {
         this.id = UUID.randomUUID();
