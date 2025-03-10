@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String username;
     private String email;
 
@@ -29,4 +31,12 @@ public class User extends BaseEntity {
         this.email = email;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                super.toString() +
+                "username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }
