@@ -1,49 +1,66 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.*;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Date;
 import java.util.UUID;
 
-public class Message {
-    private UUID id;
-    private String Sender;
-    private String Receiver;
-    private String Message;
-    private Long cratedAt;
-    private Long updateAt;//메세지 저장
+public class Message implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 103L;
 
-    public Message(String Sender, String Receiver, String Message) {
+    private final UUID id; //메세지 아이디
+    private String message; //메세지내용
+    private final Long createdAt;
+    private Long updateAt;//
+    private final UUID channelId;
+    private final UUID authorId; //작성한 사람
+
+    public Message(UUID channelId, UUID authorId, String message) {
         this.id = UUID.randomUUID();
-        this.cratedAt = new Date().getTime();
-        this.Sender = Sender;//보내는 사람
-        this.Receiver = Receiver;//받는사람
-        this.Message = Message; //메세지 내용
+        this.channelId = channelId; //어떤 채널
+        this.authorId = authorId; //
+        this.createdAt = new Date().getTime();
+        this.message = message; //메세지 내용
+        this.updateAt = null;
     }
 
     public String getMessage() {
-
-        return Message;
+        return message;
     }
-    public String getSender() {
-        return Sender;
+    //메세지 내용 변경
+    public void updateMessage(String message) {
+        this.message=message;
+        this.updateAt = new Date().getTime();
     }
-    public String getReceiver() {
-        return Receiver;
-    }
-
     public UUID getId() {
         return id;
     }
 
-    public Long getCratedAt() {
-        return cratedAt;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
     public Long getUpdateAt() {
         return updateAt;
     }
-    public void UpdateAt(Long updateAt) {
+    
+    public void setUpdateAt() {
+        this.updateAt = new Date().getTime();
+    }
+    
+    public void setUpdateAt(Long updateAt) {
         this.updateAt = updateAt;
     }
+    
+    public UUID getChannelId() {
+        return channelId;
+    }
+    
+    public UUID getAuthorId() {
+        return authorId;
+    }
 }
+
 
 
