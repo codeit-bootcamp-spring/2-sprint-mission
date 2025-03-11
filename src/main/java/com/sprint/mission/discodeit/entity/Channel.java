@@ -1,25 +1,26 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class Channel extends BaseEntity {
+public class Channel extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 2L;
     private String channelName;
-    private TreeSet<User> participants;     //중복X && 이름순으로 정렬
+    private Set<UUID> participantsId;     //중복X && 이름순으로 정렬
 
     public Channel(String channelName) {
         super();
         validateChannelName(channelName);
         this.channelName = channelName;
-        this.participants = new TreeSet<>();
+        this.participantsId = new HashSet<>();
     }
 
     public String getChannelName() {
         return channelName;
     }
 
-    public TreeSet<User> getParticipants() {
-        return participants;
+    public Set<UUID> getParticipants() {
+        return participantsId;
     }
 
     public void updateChannelName(String newChannelName) {
@@ -28,11 +29,11 @@ public class Channel extends BaseEntity {
         super.updateUpdatedAt();
     }
 
-    public void addParticipant(User newParticipant) {
-        if (this.participants.contains(newParticipant)) {
+    public void addParticipant(UUID newParticipantId) {
+        if (this.participantsId.contains(newParticipantId)) {
             throw new IllegalArgumentException("newParticipant 는 이미 채널에 참여 중 입니다!!! ");
         }
-        this.participants.add(newParticipant);
+        this.participantsId.add(newParticipantId);
         super.updateUpdatedAt();
     }
 
@@ -46,7 +47,7 @@ public class Channel extends BaseEntity {
     public String toString() {
         return "\nChannel\n"
                 + "channelName: " + channelName + '\n'
-                + "participants:\n" + participants + '\n'
+                + "participants:\n" + participantsId + '\n'
                 + "id: " + super.getId() + '\n'
                 + "createdAt: " + super.getCreatedAt() + '\n'
                 + "updatedAt: " + super.getUpdatedAt() + '\n';

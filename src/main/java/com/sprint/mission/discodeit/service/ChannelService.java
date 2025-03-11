@@ -2,25 +2,21 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
-import java.util.ArrayDeque;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public interface ChannelService {
-    void createChannel(String channelName);
+    Channel createChannel(String channelName);
     Channel readChannel(UUID channelId);
-    ArrayDeque<Channel> readAllChannels();
+    Map<UUID, Channel> readAllChannels();
     List<Message> readMessageListByChannelId(UUID channelId);
     void updateChannelName(UUID channelId, String newChannelName);
-    void addChannelParticipant(UUID channelId, User newParticipant);
+    void addChannelParticipant(UUID channelId, UUID newParticipantId);
     void deleteChannel(UUID channelId);
-    static void validateChannelId(UUID channelId, ChannelRepository channelRepository) {
-        if (channelId == null) {
-            throw new IllegalArgumentException("input channelId is null!!!");
+    static void validateChannelId(UUID channelId, ChannelRepository jcfChannelRepository) {
+        if (!jcfChannelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("해당 channelId를 가진 채널이 존재하지 않습니다 : " + channelId);
         }
-        channelRepository.findChannelById(channelId);
     }
 }

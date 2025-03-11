@@ -1,23 +1,21 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public interface MessageService {
-    void createMessage(User sender, String content, Channel channel);
+    Message createMessage(UUID senderId, String content, UUID channelId);
     Message readMessage(UUID messageId);
-    List<Message> readAllMessages();
-    void updateMessageContent(UUID messageId, String content);
+    Map<UUID, Message> readAllMessages();
+    void updateMessageContent(UUID messageId, String newContent);
     void deleteMessage(UUID messageId);
-    static void validateMessageId(UUID messageId, MessageRepository messageRepository) {
-        if (messageId == null) {
-            throw new IllegalArgumentException("입력받은 messageId 가 null 입니다!!!");
+    static void validateMessageId(UUID messageId, MessageRepository jcfMessageRepository) {
+        if (!jcfMessageRepository.existsById(messageId)) {
+            throw new NoSuchElementException("해당 messageId를 가진 사용자를 찾을 수 없습니다 : " + messageId);
         }
-        messageRepository.findMessageByMessageId(messageId);
     }
 }

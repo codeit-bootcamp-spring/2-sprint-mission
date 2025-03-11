@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -12,47 +12,47 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-public class JCFMessageService implements MessageService {
-    private final UserRepository jcfUserRepository;
-    private final ChannelRepository jcfChannelRepository;
-    private final MessageRepository jcfMessageRepository;
+public class FileMessageService implements MessageService {
+    private final UserRepository fileUserRepository;
+    private final ChannelRepository fileChannelRepository;
+    private final MessageRepository fileMessageRepository;
 
-    public JCFMessageService(UserRepository jcfUserRepository, ChannelRepository jcfChannelRepository, MessageRepository jcfMessageRepository) {
-        this.jcfUserRepository = jcfUserRepository;
-        this.jcfChannelRepository = jcfChannelRepository;
-        this.jcfMessageRepository = jcfMessageRepository;
+    public FileMessageService(UserRepository fileUserRepository, ChannelRepository fileChannelRepository, MessageRepository fileMessageRepository) {
+        this.fileUserRepository = fileUserRepository;
+        this.fileChannelRepository = fileChannelRepository;
+        this.fileMessageRepository = fileMessageRepository;
     }
 
     @Override
     public Message createMessage(UUID senderId, String content, UUID channelId) {
-        UserService.validateUserId(senderId, this.jcfUserRepository);
-        ChannelService.validateChannelId(channelId, this.jcfChannelRepository);
+        UserService.validateUserId(senderId, this.fileUserRepository);
+        ChannelService.validateChannelId(channelId, this.fileChannelRepository);
         // 해당 채널에 sender가 participant로 있는지 확인하는 코드 필요?
-        if (!jcfChannelRepository.findById(channelId).getParticipants().contains(senderId)) {
+        if (!fileChannelRepository.findById(channelId).getParticipants().contains(senderId)) {
             throw new NoSuchElementException("해당 senderId를 가진 사용자가 해당 channelId의 Channel에 참여하지 않았습니다.");
         }
         Message newMessage = new Message(senderId, content, channelId);     //content에 대한 유효성 검증은 Message 생성자에게 맡긴다.
-        jcfMessageRepository.add(newMessage);
+        fileMessageRepository.add(newMessage);
         return newMessage;
     }
 
     @Override
     public Message readMessage(UUID messageId) {
-        return jcfMessageRepository.findById(messageId);
+        return fileMessageRepository.findById(messageId);
     }
 
     @Override
     public Map<UUID, Message> readAllMessages() {
-        return jcfMessageRepository.getAll();
+        return fileMessageRepository.getAll();
     }
 
     @Override
     public void updateMessageContent(UUID messageId, String newContent) {
-        jcfMessageRepository.updateMessageContent(messageId, newContent);
+        fileMessageRepository.updateMessageContent(messageId, newContent);
     }
 
     @Override
     public void deleteMessage(UUID messageId) {
-        jcfMessageRepository.deleteById(messageId);
+        fileMessageRepository.deleteById(messageId);
     }
 }
