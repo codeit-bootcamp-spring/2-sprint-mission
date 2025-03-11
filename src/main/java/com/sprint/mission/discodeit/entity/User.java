@@ -2,10 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class User implements Serializable {
     @Serial
@@ -14,9 +11,9 @@ public class User implements Serializable {
     // 유저아이디
     private final UUID userId;
     private final Long createdAt; // 객체 생성 시간
-    private Long updateAt; 
+    private Long updateAt;
     private final Set<UUID> belongChannels = new HashSet<>();
-    
+
     // 이메일과 비밀번호
     private String email;
     private String password;
@@ -71,26 +68,29 @@ public class User implements Serializable {
     public void removeBelongChannel(UUID channelId) {
         belongChannels.remove(channelId);
     }
-    
+
     public String getEmail() {
         return email;
     }
-    
+
     public void setEmail(String email) {
         this.email = email;
         setUpdateAt(new Date().getTime()); // 이메일 변경 시 업데이트 시간 갱신
     }
-    
+
     // 비밀번호 관련 메소드
     public void setPassword(String password) {
         this.password = password;
         setUpdateAt(new Date().getTime()); // 비밀번호 변경 시 업데이트 시간 갱신
     }
-    
+    public String getPassword() {
+        return this.password;
+    }
     // 비밀번호 확인
     public boolean checkPassword(String inputPassword) {
         return this.password != null && this.password.equals(inputPassword);
     }
+
     public boolean checkEmail(String inputEmail) {
         return this.email != null && this.email.equals(inputEmail);
     }
@@ -105,4 +105,5 @@ public class User implements Serializable {
                 ", Channel='" + belongChannels + '\'' +
                 '}';
     }
+
 }

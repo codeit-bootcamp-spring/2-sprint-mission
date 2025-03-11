@@ -14,9 +14,21 @@ public class FileUserRepositoryImplement implements UserRepository {
     private static final String USER_DATA_FILE = "users.dat";
     
     private Map<UUID, User> userRepository;
-
-    public FileUserRepositoryImplement() {
+    
+    // 싱글톤 인스턴스
+    private static FileUserRepositoryImplement instance;
+    
+    // private 생성자로 변경
+    private FileUserRepositoryImplement() {
         loadData();
+    }
+    
+    // 싱글톤 인스턴스를 반환하는 정적 메소드
+    public static synchronized FileUserRepositoryImplement getInstance() {
+        if (instance == null) {
+            instance = new FileUserRepositoryImplement();
+        }
+        return instance;
     }
     
     /**
@@ -36,8 +48,7 @@ public class FileUserRepositoryImplement implements UserRepository {
                 userRepository = (Map<UUID, User>) in.readObject();
                 System.out.println("사용자 데이터 로드 완료: " + userRepository.size() + "명의 사용자");
             } catch (IOException | ClassNotFoundException e) {
-                System.err.println("사용자 데이터 로드 중 오류 발생: " + e.getMessage());
-                userRepository = new HashMap<>();
+                throw new RuntimeException("사용자 데이터 로드 중 오류 발생: " + e.getMessage());
             }
         } else {
             userRepository = new HashMap<>();
@@ -48,12 +59,11 @@ public class FileUserRepositoryImplement implements UserRepository {
     /**
      * 메모리의 데이터를 파일에 저장합니다.
      */
-    private void saveData() {
+    private synchronized void saveData() {
         File dir = new File(DATA_DIR);
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
-                System.err.println("데이터 디렉토리 생성 실패: " + DATA_DIR);
-                return;
+                throw new RuntimeException("데이터 디렉토리 생성 실패: " + DATA_DIR);
             }
         }
         
@@ -63,7 +73,7 @@ public class FileUserRepositoryImplement implements UserRepository {
             out.writeObject(userRepository);
             System.out.println("사용자 데이터 저장 완료: " + userRepository.size() + "명의 사용자");
         } catch (IOException e) {
-            System.err.println("사용자 데이터 저장 중 오류 발생: " + e.getMessage());
+            throw new RuntimeException("사용자 데이터 저장 중 오류 발생: " + e.getMessage());
         }
     }
 
@@ -73,24 +83,31 @@ public class FileUserRepositoryImplement implements UserRepository {
     }
 
     @Override
-    public boolean registerUserId(User user) {
+    public boolean register(User user) {
         userRepository.put(user.getId(), user);
-        saveData(); // 데이터 변경 시 저장
+        saveData();
         return true;
     }
 
     @Override
-    public boolean removeUser(UUID userId) {
-        boolean result = userRepository.remove(userId) != null;
-        if (result) {
-            saveData(); // 데이터 변경 시 저장
-        }
-        return result;
+    public boolean deleteUser(UUID userId) {
+        boolean removed = userRepository.remove(userId) != null;
+        saveData();
+        return removed;
     }
 
     @Override
     public Set<UUID> findAllUsers() {
-        // 방어적 복사를 통해 원본 데이터 보호
         return new HashSet<>(userRepository.keySet());
+    }
+    
+    @Override
+    public boolean updateUser(User user) {
+        if (user == null || !userRepository.containsKey(user.getId())) {
+            return false;
+        }
+        userRepository.put(user.getId(), user);
+        saveData();
+        return true;
     }
 } 

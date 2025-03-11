@@ -5,11 +5,10 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.file.FileChannelRepositoryImplement;
 import com.sprint.mission.discodeit.file.FileMessageRepositoryImplement;
 import com.sprint.mission.discodeit.file.FileUserRepositoryImplement;
-import com.sprint.mission.discodeit.jcf.serviceimpl.JCFChannelServiceImplement;
-import com.sprint.mission.discodeit.jcf.serviceimpl.JCFMessageServiceImplement;
-import com.sprint.mission.discodeit.jcf.serviceimpl.JCFUserServiceImplement;
-import com.sprint.mission.discodeit.jcf.serviceimpl.UserChannelService;
-import com.sprint.mission.discodeit.jcf.serviceimpl.ValidationService;
+import com.sprint.mission.discodeit.basic.serviceimpl.ChannelServiceImplement;
+import com.sprint.mission.discodeit.basic.serviceimpl.MessageServiceImplement;
+import com.sprint.mission.discodeit.basic.serviceimpl.UserServiceImplement;
+import com.sprint.mission.discodeit.basic.serviceimpl.UserChannelService;
 import com.sprint.mission.discodeit.service.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageRepository;
@@ -60,19 +59,18 @@ public class Main {
     }
 
     private static void initializeServices() {
-        // 레포지토리 객체 생성
-        UserRepository userRepository = new FileUserRepositoryImplement();
-        ChannelRepository channelRepository = new FileChannelRepositoryImplement();
-        MessageRepository messageRepository = new FileMessageRepositoryImplement();
+        // 레포지토리 객체 생성 - 싱글톤 패턴 사용
+        UserRepository userRepository = FileUserRepositoryImplement.getInstance();
+        ChannelRepository channelRepository = FileChannelRepositoryImplement.getInstance();
+        MessageRepository messageRepository = FileMessageRepositoryImplement.getInstance();
 
-        // ValidationService 및 UserChannelService 생성
-        ValidationService validationService = new ValidationService(userRepository, channelRepository);
-        UserChannelService userChannelService = new UserChannelService(userRepository, channelRepository, validationService);
+        // UserChannelService 생성 - 싱글톤 패턴 사용
+        UserChannelService userChannelService = UserChannelService.getInstance(userRepository, channelRepository);
 
-        // 서비스 객체 생성
-        userService = new JCFUserServiceImplement(userRepository, validationService, userChannelService);
-        channelService = new JCFChannelServiceImplement(channelRepository, validationService, userChannelService);
-        messageService = new JCFMessageServiceImplement(messageRepository, validationService);
+        // 서비스 객체 생성 - 싱글톤 패턴 사용
+        userService = UserServiceImplement.getInstance(userRepository, userChannelService);
+        channelService = ChannelServiceImplement.getInstance(channelRepository, userChannelService);
+        messageService = MessageServiceImplement.getInstance(messageRepository, userRepository, channelRepository);
 
         System.out.println("서비스 객체 초기화 완료");
     }
@@ -100,10 +98,10 @@ public class Main {
             User foundUser = userService.findByUserId(userId);
             System.out.println("유저 조회: " + foundUser.getEmail());
 
-            // 유저 이메일 수정
-            String newEmail = "updated@example.com";
-            userService.updateEmail(userId, newEmail);
-            System.out.println("이메일 수정: " + newEmail);
+//            // 유저 이메일 수정
+//            String newEmail = "updated@example.com";
+//            userService.updateEmail(userId, newEmail);
+//            System.out.println("이메일 수정: " + newEmail);
 
             // 유저 삭제 테스트 이후 수행을 위해 삭제 코드 주석 처리
             // userService.deleteUser(userId);
@@ -142,16 +140,16 @@ public class Main {
             System.out.println("채널 생성 성공: " + channelName);
 
             // 채널 목록 조회
-            Set<UUID> channels = channelService.allChannelList();
+            Set<UUID> channels = channelService.findByAllChannel();
             if (!channels.isEmpty()) {
                 channelId = channels.iterator().next();
                 System.out.println("채널 ID: " + channelId);
             }
 
-            // 채널 이름 변경
-            String newChannelName = "수정된채널";
-            channelService.setChannelName(channelId, newChannelName, userId);
-            System.out.println("채널 이름 변경: " + newChannelName);
+//            // 채널 이름 변경
+//            String newChannelName = "수정된채널";
+//            channelService.setChannelName(channelId,newChannelName,userId);
+//            System.out.println("채널 이름 변경: " + newChannelName);
 
             // 채널 사용자 목록
             Set<UUID> channelUsers = channelService.getChannelUserList(channelId);
