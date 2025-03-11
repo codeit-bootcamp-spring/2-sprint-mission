@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -7,10 +7,10 @@ import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
 
-public class JCFChannelService implements ChannelService {
+public class FileChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
-    public JCFChannelService(ChannelRepository channelRepository) {
+    public FileChannelService(ChannelRepository channelRepository){
         this.channelRepository = channelRepository;
     }
 
@@ -22,7 +22,11 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel find(UUID channelId) {
-        return channelRepository.findById(channelId);
+        Channel channel = channelRepository.findById(channelId);
+        if (channel == null) {
+            throw new NoSuchElementException("Channel with id " + channelId + " not found");
+        }
+        return channel;
     }
 
     @Override
@@ -33,13 +37,18 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel update(UUID channelId, String newName, String newDescription) {
         Channel channel = channelRepository.findById(channelId);
+        if (channel == null) {
+            throw new NoSuchElementException("Channel with id " + channelId + " not found");
+        }
         channel.update(newName, newDescription);
-
         return channelRepository.save(channel);
     }
 
     @Override
     public void delete(UUID channelId) {
+        if(!channelRepository.exists(channelId)) {
+            throw new NoSuchElementException("Channel with id " + channelId + " not found");
+        }
         channelRepository.delete(channelId);
     }
 

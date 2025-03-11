@@ -12,4 +12,6 @@ public interface ChannelService {
         List<Channel> findAll();
         Channel update(UUID channelId, String newName, String newDescription);
         void delete(UUID channelId);
+
+        boolean exists(UUID channelId);
 }

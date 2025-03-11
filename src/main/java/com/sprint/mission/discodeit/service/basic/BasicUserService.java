@@ -1,22 +1,23 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
-public class JCFUserService implements UserService {
+public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
-    public JCFUserService(UserRepository userRepository) {
+    public BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
     public User create(String username, String email, String password) {
-        User user = new User(username, email, password);
-        return userRepository.save(user);
+        User newUser = new User(username, email, password);
+        return userRepository.save(newUser);
     }
 
     @Override
@@ -31,10 +32,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User user = userRepository.findById(userId);
-        user.update(newUsername, newEmail, newPassword);
-
-        return userRepository.save(user);
+        User existingUser = userRepository.findById(userId);
+        existingUser.update(newUsername, newEmail, newPassword);
+        return userRepository.update(existingUser);
     }
 
     @Override
@@ -44,6 +44,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public boolean exists(UUID authorId) {
-        return userRepository.exists(authorId);
+        return false;
     }
+
 }
