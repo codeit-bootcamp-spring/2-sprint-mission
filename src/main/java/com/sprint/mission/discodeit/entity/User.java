@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.service.TimeFormatter;
 
-public class User extends BaseEntity {
-    private String name;
+import java.io.Serializable;
 
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String name;
 
     public User(String name) {
         super();
@@ -15,9 +17,15 @@ public class User extends BaseEntity {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-        setUpdatedAt();
+    public void setName(String newName) {
+        boolean anyValueUpdated = false;
+        if(newName != null && !newName.equals(this.name)){
+            anyValueUpdated = true;
+        }
+        if(anyValueUpdated){
+            this.name = newName;
+            setUpdatedAt();
+        }
     }
 
     @Override
@@ -25,8 +33,8 @@ public class User extends BaseEntity {
         return "User{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", createdAt=" + TimeFormatter.format(createdAt) +
-                ", updatedAt=" + TimeFormatter.format(updatedAt) +
+                ", createdAt=" + TimeFormatter.format(createdAt, "yyyy-MM-dd HH:mm:ss") +
+                ", updatedAt=" + TimeFormatter.format(updatedAt, "yyyy-MM-dd HH:mm:ss") +
                 '}';
     }
 }

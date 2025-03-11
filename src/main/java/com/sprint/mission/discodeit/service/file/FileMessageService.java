@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -7,29 +7,53 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
+import java.io.*;
 import java.util.*;
 
-public class JCFMessageService implements MessageService {
-    private volatile static JCFMessageService instance = null;
+public class FileMessageService implements MessageService {
+    private volatile static FileMessageService instance = null;
     private final UserService userService;
     private final ChannelService channelService;
+    private static final String FILE_PATH = "message.dat";
     private final Map<UUID, Message> messageRepository;
 
-    public JCFMessageService(UserService userService, ChannelService channelService) {
-        this.messageRepository = new HashMap<>();
+    public FileMessageService(UserService userService, ChannelService channelService) {
+        this.messageRepository = loadAll();
         this.userService = userService;
         this.channelService = channelService;
     }
 
-    public static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
-        if (instance == null) {
-            synchronized (JCFMessageService.class) {
-                if(instance == null) {
-                    instance = new JCFMessageService(userService, channelService);
+    public static FileMessageService getInstance(UserService userService, ChannelService channelService) {
+        if(instance == null){
+            synchronized (FileMessageService.class){
+                if(instance == null){
+                    instance = new FileMessageService(userService, channelService);
                 }
             }
         }
         return instance;
+    }
+
+    private Map<UUID, Message> loadAll(){
+        File file = new File(FILE_PATH);
+        if(!file.exists()){
+            return new HashMap<>();
+        }
+
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))){
+            return (Map<UUID, Message>) ois.readObject();
+        }catch(IOException | ClassNotFoundException e){
+            e.printStackTrace();
+            return new HashMap<>();
+        }
+    }
+
+    private void saveToFile(){
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))){
+            oos.writeObject(messageRepository);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -43,6 +67,7 @@ public class JCFMessageService implements MessageService {
 
         Message message = new Message(channel.getId(), user.getId(), text);
         messageRepository.put(message.getId(), message);
+        saveToFile();
         return message;
     }
 
@@ -70,10 +95,12 @@ public class JCFMessageService implements MessageService {
         }
 
         messageRepository.get(id).setText(text);
+        saveToFile();
     }
 
     @Override
     public void delete(UUID id) {
         messageRepository.remove(id);
+        saveToFile();
     }
 }
