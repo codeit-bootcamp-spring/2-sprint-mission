@@ -1,12 +1,18 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.*;
-
-import java.util.*;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
-    private volatile static JCFMessageService intance = null;
+    private volatile static JCFMessageService instance = null;
     private final Map<UUID, Message> data;
     private final UserService userService;
     private final ChannelService channelService;
@@ -18,47 +24,70 @@ public class JCFMessageService implements MessageService {
     }
 
     public static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
-        if (intance == null) {
+        if (instance == null) {
             synchronized (JCFMessageService.class) {
-                if (intance == null)
-                    intance = new JCFMessageService(userService, channelService);
+                if (instance == null) {
+                    instance = new JCFMessageService(userService, channelService);
+                }
             }
         }
-        return intance;
+
+        return instance;
     }
 
     @Override
-    public Message createMessage(UUID userId, UUID channelId, String content) {
-        // User가 존재하는지 검증
-        if(userService.getUserById(userId).isEmpty()) return null;
-
-        // Channel이 존재하는지 검증
-        if(channelService.getChannelById(channelId).isEmpty()) return null;
-
-        Message message = new Message(userId, channelId, content);
+    public Message create(UUID authorId, UUID channelId, String content) {
+        try {
+            userService.findById(authorId);
+            channelService.findById(channelId);
+        } catch (NoSuchElementException e) {
+            throw e;
+        }
+        Message message = new Message(authorId, channelId, content);
         data.put(message.getId(), message);
+
         return message;
     }
 
     @Override
-    public Optional<Message> getMessageById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+    public Message findById(UUID messageId) {
+        return Optional.ofNullable(data.get(messageId))
+                .orElseThrow(() -> new NoSuchElementException(messageId + " 메시지를 찾을 수 없습니다."));
     }
 
     @Override
-    public List<Message> getAllMessages() {
+    public List<Message> findByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
+    public List<Message> findByAuthorId(UUID authorId) {
+        return data.values().stream()
+                .filter(message -> message.getAuthorId().equals(authorId))
+                .toList();
+    }
+
+    @Override
+    public List<Message> findAll() {
         return data.values().stream().toList();
     }
 
     @Override
-    public void updateMessageContent(UUID id, String content) {
-        if(data.containsKey(id)) {
-            data.get(id).updateContent(content);
-        }
+    public Message update(UUID messageId, String newContent) {
+        Message message = Optional.ofNullable(data.get(messageId))
+                .orElseThrow(() -> new NoSuchElementException(messageId + " 메시지를 찾을 수 없습니다."));
+        message.update(newContent);
+
+        return message;
     }
 
     @Override
-    public void deleteMessage(UUID id) {
-        data.remove(id);
+    public void delete(UUID messageId) {
+        if (!data.containsKey(messageId)) {
+            throw new NoSuchElementException(messageId + " 메시지를 찾을 수 없습니다.");
+        }
+        data.remove(messageId);
     }
 }

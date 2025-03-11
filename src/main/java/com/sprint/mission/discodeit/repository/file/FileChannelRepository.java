@@ -1,0 +1,83 @@
+package com.sprint.mission.discodeit.repository.file;
+
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+public class FileChannelRepository implements ChannelRepository {
+
+    private static final Path DIRECTORY_PATH = Paths.get(System.getProperty("user.dir"), "data",
+            "channels");
+
+    public FileChannelRepository() {
+        init();
+    }
+
+    private void init() {
+        try {
+            Files.createDirectories(DIRECTORY_PATH);
+        } catch (IOException e) {
+            throw new RuntimeException("Channel 디렉토리 생성을 실패했습니다: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Channel save(Channel channel) {
+        Path filePath = getFilePath(channel.getId());
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
+            oos.writeObject(channel);
+            return channel;
+        } catch (IOException e) {
+            throw new RuntimeException(filePath.getFileName() + " Channel 저장을 실패했습니다: " + e.getMessage());
+        }
+    }
+
+    private Path getFilePath(UUID channelId) {
+        return DIRECTORY_PATH.resolve(channelId + ".ser");
+    }
+
+    @Override
+    public List<Channel> findAll() {
+        try (Stream<Path> paths = Files.list(DIRECTORY_PATH)) {
+            return paths.map(this::readUserFromFile).toList();
+        } catch (IOException e) {
+            throw new RuntimeException("Channels 데이터 로드를 실패했습니다: " + e.getMessage());
+        }
+    }
+
+    private Channel readUserFromFile(Path filePath) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
+            return (Channel) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(filePath.getFileName() + " Channel 로드를 실패했습니다: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Channel findById(UUID channelId) {
+        return findAll().stream()
+                .filter(channel -> channel.getId().equals(channelId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public void delete(UUID channelId) {
+        Path filePath = getFilePath(channelId);
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(filePath.getFileName() + " Channel 삭제를 실패했습니다: " + e.getMessage());
+        }
+    }
+}
