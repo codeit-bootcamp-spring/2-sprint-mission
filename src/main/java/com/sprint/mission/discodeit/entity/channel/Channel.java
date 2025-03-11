@@ -1,4 +1,6 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.channel;
+
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 
 import java.util.UUID;
 
@@ -9,9 +11,7 @@ public class Channel extends BaseEntity {
 
     public Channel(UUID ownerId, String title, String description) {
         super();
-        setOwnerId(ownerId);
-        setTitle(title);
-        setDescription(description);
+        updateFields(ownerId, title, description);
     }
 
     private void setOwnerId(UUID ownerId) {
@@ -48,11 +48,14 @@ public class Channel extends BaseEntity {
     }
 
     public void update(UUID ownerId, String title, String description) {
-        if (ownerId != null) setOwnerId(ownerId);
-        if (title != null) setTitle(title);
-        if (description != null) setDescription(description);
-
+        updateFields(ownerId, title, description);
         updateModifiedAt();
+    }
+
+    private void updateFields(UUID ownerId, String title, String description) {
+        setOwnerId(ownerId);
+        setTitle(title);
+        setDescription(description);
     }
 
     @Override

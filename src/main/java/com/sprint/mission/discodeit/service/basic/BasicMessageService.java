@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
@@ -7,26 +7,28 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
-public class JCFMessageService implements MessageService {
-    private static volatile JCFMessageService instance;
+// JCFMessageService, FileMessageService, BasicMessageService 전부 동일합니다. 최종적으로는 BasicMessageService 사용합니다 (스프린트 요구 사항으로 남겨두었습니다.)
+public class BasicMessageService implements MessageService {
+    private static volatile BasicMessageService instance;
 
     private UserService userService;
     private ChannelService channelService;
     private MessageRepository messageRepository;
 
-    private JCFMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
+    private BasicMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         this.userService = userService;
         this.channelService = channelService;
         this.messageRepository = messageRepository;
     }
 
-    public static JCFMessageService getInstance(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
+    public static BasicMessageService getInstance(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
         if (instance == null) {
-            synchronized (JCFMessageService.class) {
+            synchronized (BasicMessageService.class) {
                 if (instance == null) {
-                    instance = new JCFMessageService(userService, channelService, messageRepository);
+                    instance = new BasicMessageService(userService, channelService, messageRepository);
                 }
             }
         }
@@ -64,7 +66,7 @@ public class JCFMessageService implements MessageService {
         Message message = getMessageById(messageId);
         message.update(content);
 
-        return message;
+        return messageRepository.save(message);
     }
 
     @Override

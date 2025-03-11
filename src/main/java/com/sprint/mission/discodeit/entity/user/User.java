@@ -1,6 +1,8 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.user;
 
-public class User extends BaseEntity{
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+
+public class User extends BaseEntity {
     private String nickname;
     private String email;
     private String avatar = "";
@@ -9,10 +11,8 @@ public class User extends BaseEntity{
 
     public User(String nickname, String email, String avatar, String status) {
         super();
-        setNickname(nickname);
         setEmail(email);
-        setAvatar(avatar);
-        setStatus(status);
+        updateProfile(nickname, avatar, status);
     }
 
     private void setNickname(String nickname) {
@@ -60,11 +60,14 @@ public class User extends BaseEntity{
     }
 
     public void update(String nickname, String avatar, String status) {
-        if (nickname != null) setNickname(nickname);
-        if (avatar != null) setAvatar(avatar);
-        if (status != null) setStatus(status);
-
+        updateProfile(nickname, avatar, status);
         updateModifiedAt();
+    }
+
+    public void updateProfile(String nickname, String avatar, String status) {
+        setNickname(nickname);
+        setAvatar(avatar);
+        setStatus(status);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
@@ -6,24 +6,27 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
-public class JCFChannelService implements ChannelService {
-    private static volatile JCFChannelService instance;
+// JCFChannelService, FileChannelService, BasicChannelService 전부 동일합니다. 최종적으로는 BasicChannelService 사용합니다 (스프린트 요구 사항으로 남겨두었습니다.)
+public class BasicChannelService implements ChannelService {
+    private static volatile BasicChannelService instance;
 
     private final UserService userService;
     private final ChannelRepository channelRepository;
 
-    private JCFChannelService(UserService userService, ChannelRepository channelRepository) {
+    private BasicChannelService(UserService userService, ChannelRepository channelRepository) {
         this.userService = userService;
         this.channelRepository = channelRepository;
     }
 
-    public static JCFChannelService getInstance(UserService userService, ChannelRepository channelRepository) {
+    public static BasicChannelService getInstance(UserService userService, ChannelRepository channelRepository) {
         if (instance == null) {
-            synchronized (JCFChannelService.class) {
+            synchronized (BasicChannelService.class) {
                 if (instance == null) {
-                    instance = new JCFChannelService(userService, channelRepository);
+                    instance = new BasicChannelService(userService, channelRepository);
                 }
             }
         }

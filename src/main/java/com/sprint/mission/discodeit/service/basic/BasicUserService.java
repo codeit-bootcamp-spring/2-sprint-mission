@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicatedUserException;
@@ -8,20 +8,21 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
-public class JCFUserService implements UserService {
-    private static volatile JCFUserService instance;
+// JCFUserService, FileUserService, BasicUserService 전부 동일합니다. 최종적으로는 BasicUserService 사용합니다 (스프린트 요구 사항으로 남겨두었습니다.)
+public class BasicUserService implements UserService {
+    private static volatile BasicUserService instance;
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private JCFUserService(UserRepository userRepository) {
+    private BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public static JCFUserService getInstance(UserRepository userRepository) {
+    public static BasicUserService getInstance(UserRepository userRepository) {
         if (instance == null) {
-            synchronized (JCFUserService.class) {
+            synchronized (BasicUserService.class) {
                 if (instance == null) {
-                    instance = new JCFUserService(userRepository);
+                    instance = new BasicUserService(userRepository);
                 }
             }
         }
@@ -40,7 +41,6 @@ public class JCFUserService implements UserService {
         return userRepository.findById(userId);
     }
 
-
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -48,11 +48,11 @@ public class JCFUserService implements UserService {
 
     @Override
     public User updateUser(UUID userId, String nickname, String avatar, String status) {
+        validateUserId(userId);
         User user = getUserByUserId(userId);
         user.update(nickname, avatar, status);
         return userRepository.save(user);
     }
-
 
     @Override
     public void deleteUserById(UUID userId) {

@@ -1,22 +1,19 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.message;
+
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 
 import java.util.UUID;
 
 public class Message extends BaseEntity {
     private final UUID senderId;
     private String content;
+    private final UUID channelId;
 
-    protected Message(UUID senderId, String content) {
+    public Message(UUID senderId, String content, UUID channelId) {
         super();
-        validateSenderId(senderId);
         this.senderId = senderId;
+        this.channelId = channelId;
         setContent(content);
-    }
-
-    private void validateSenderId(UUID senderId) {
-        if (senderId == null) {
-            throw new IllegalArgumentException("유효하지 않은 송신자입니다");
-        }
     }
 
     private void setContent(String content) {
@@ -30,13 +27,13 @@ public class Message extends BaseEntity {
         return senderId;
     }
 
-    public String getContent() {
-        return content;
+    public void update(String content) {
+        setContent(content);
+        updateModifiedAt();
     }
 
-    public void update(String content) {
-        if (content != null) setContent(content);
-        updateModifiedAt();
+    public UUID getChannelId() {
+        return channelId;
     }
 
     @Override
