@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserService implements UserService {
     private volatile static JCFUserService instance = null;
@@ -27,7 +24,6 @@ public class JCFUserService implements UserService {
         return instance;
     }
 
-
     @Override
     public User saveUser(String name) {
         User user = new User(name);
@@ -36,25 +32,24 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void findAll() {
-        userRepository.values().stream()
-                .findFirst()
-                .ifPresentOrElse(
-                        user -> userRepository.values()
-                                .forEach(System.out::println),
-                        () -> System.out.println("유저가 없습니다.")
-                );
+    public List<User> findAll() {
+        if(userRepository.isEmpty()){
+            throw new NoSuchElementException("유저가 없습니다.");
+        }
+
+        return userRepository.values().stream().toList();
     }
 
     @Override
-    public void findByName(String name) {
-        userRepository.values().stream()
+    public List<User> findByName(String name) {
+        List<User> users = userRepository.values().stream()
                 .filter(user -> user.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .ifPresentOrElse(
-                        System.out::println,
-                        () -> System.out.println(name + "으로 등록된 유저가 없습니다.")
-                );
+                .toList();
+
+        if(users.isEmpty()){
+            throw new NoSuchElementException("해당 이름의 유저가 없습니다.");
+        }
+        return users;
     }
 
     @Override
@@ -65,10 +60,13 @@ public class JCFUserService implements UserService {
     @Override
     public void update(UUID id, String name) {
         if(!userRepository.containsKey(id)){
-            System.out.println("없는 유저 입니다.");
+            throw new NoSuchElementException("유저가 없습니다.");
         }
+        if(name == null){
+            throw new IllegalArgumentException("수정할 이름은 null일 수 없습니다.");
+        }
+
         userRepository.get(id).setName(name);
-        userRepository.get(id).setUpdatedAt();
     }
 
     @Override

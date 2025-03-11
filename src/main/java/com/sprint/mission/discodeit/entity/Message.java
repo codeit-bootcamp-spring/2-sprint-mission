@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.service.TimeFormatter;
+
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message extends BaseEntity{
+public class Message extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final UUID channelId;
     private final UUID userId;
     private String text;
@@ -26,9 +30,15 @@ public class Message extends BaseEntity{
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
-        setUpdatedAt();
+    public void setText(String newText) {
+        boolean anyValueUpdated = false;
+        if(newText != null && !newText.equals(this.text)){
+            anyValueUpdated = true;
+        }
+        if(anyValueUpdated){
+            this.text = newText;
+            setUpdatedAt();
+        }
     }
 
     @Override
@@ -38,8 +48,8 @@ public class Message extends BaseEntity{
                 ", channelId=" + channelId +
                 ", userId=" + userId +
                 ", text='" + text + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
+                ", createdAt=" + TimeFormatter.format(createdAt, "yyyy-MM-dd HH:mm:ss") +
+                ", updatedAt=" + TimeFormatter.format(updatedAt, "yyyy-MM-dd HH:mm:ss") +
                 '}';
     }
 }
