@@ -35,7 +35,6 @@ public class Application {
     private static final String SETUP_CHANNEL_NAME = "general";
 
     public static void main(String[] args) {
-
         Beans beans = new Beans();
         UserController userController = beans.findBean(UserController.class);
         ChannelController channelController = beans.findBean(ChannelController.class);
