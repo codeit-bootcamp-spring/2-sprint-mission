@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    UUID signUp(String name, UUID userId);
-    UUID create(String category, String name, String introduction, UUID memberUuid, UUID ownerUuid);
+    UUID signUp(String name, UUID userKey);
+    UUID login(String name, UUID userKey);
+    Channel create(String category, String name, String introduction, UUID memberKey, UUID ownerKey);
     Channel read(String name);
-    List<Channel> readAll(List<String> nameList);
-    List<Channel> readAll();
-    Channel update(String originName, String category, String name, String introduction);
-    void delete(String channelName, UUID userUuid);
-    UUID getChannelKey(String inputName, UUID userKey);
+    List<Channel> readAll(List<String> names);
+    Channel update(String originName, String category, String name, String introduction, UUID userKey);
+    void delete(String channelName, UUID userKey);
     String getChannelName(UUID channelKey);
 }
