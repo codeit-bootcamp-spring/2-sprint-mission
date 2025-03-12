@@ -1,17 +1,16 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
-public class JCFUserService implements UserService {
+public class BasicUserService implements UserService {
     private final UserRepository repository;
 
-    public JCFUserService() {
-        this.repository = new JCFUserRepository();
+    public BasicUserService(UserRepository repository) {
+        this.repository = repository;
     }
 
     @Override
@@ -45,9 +44,10 @@ public class JCFUserService implements UserService {
 
     @Override
     public User updatePassword(UUID userId, String newPassword) {
-        User user = findById(userId);
+        User user = repository.findById(userId);
         user.updatePassword(newPassword);
         repository.save(user);
+        System.out.println("사용자 비밀번호 변경 완료");
         return user;
     }
 

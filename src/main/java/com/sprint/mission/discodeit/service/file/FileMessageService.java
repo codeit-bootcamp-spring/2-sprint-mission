@@ -1,32 +1,39 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
-public class JCFMessageService implements MessageService {
+public class FileMessageService implements MessageService {
     private final MessageRepository repository;
     private final ChannelService channelService;
     private final UserService userService;
 
-    public JCFMessageService(ChannelService channelService, UserService userService) {
-        this.repository = new JCFMessageRepository();
+    public FileMessageService(String filename, ChannelService channelService, UserService userService) {
+        this.repository = new FileMessageRepository(filename);
         this.channelService = channelService;
         this.userService = userService;
     }
 
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {
-        channelService.findById(channelId);
-        userService.findById(authorId);
+        try {
+            channelService.findById(channelId);
+            userService.findById(authorId);
+        } catch (NoSuchElementException e) {
+            System.err.println("🚨 메시지를 보낼 채널 또는 사용자가 존재하지 않습니다.");
+            throw e;
+        }
+
         Message message = new Message(content, channelId, authorId);
         repository.save(message);
-        System.out.println("메시지 생성 완료: " + message.getId());
+        System.out.println("메시지 생성 및 저장 완료: " + message.getId());
         return message;
     }
 
@@ -38,7 +45,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> findAll() {
-        System.out.println("모든 메시지 조회");
+        System.out.println("저장된 모든 메시지 조회");
         return repository.findAll();
     }
 
@@ -54,6 +61,6 @@ public class JCFMessageService implements MessageService {
     @Override
     public void delete(UUID messageId) {
         repository.delete(messageId);
-        System.out.println("메시지 삭제 완료: " + messageId);
+        System.out.println("메시지 삭제 및 저장 완료: " + messageId);
     }
 }

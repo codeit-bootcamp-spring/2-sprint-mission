@@ -1,32 +1,76 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity {
-    private String userName;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-    public User(String userName) {
-        super(); //id, createdAt, updatedAt
-        this.userName = userName;
+public class User implements Serializable {
+    private static final long serialVersionUID = 2L; // 클래스마다 고유 번호 -> 채널 1, 유저 2, 메세지 3
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String username;
+    private transient String password; // transient 직렬화 제외 키워드
+
+    public User(String username, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        this.updatedAt = Instant.now().getEpochSecond();
+        this.username = username;
+        this.password = password;
     }
 
-    public String getUserName() {
-        return userName;
+    public UUID getId() {
+        return id;
     }
 
-    public void setUserName(String userName) {
-        // 데이터 필드를 조작하기 위한 기본 규칙 (예: 10살은 가입 못한다.)
-        // -> 업데이트 방향 getter setter 캡슐화
-        this.userName = userName;
-        this.updatedAt = System.currentTimeMillis();
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    //유저 객체 생성하면 toString() 메소드 자동 반영돼서 출력함.
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void updateName(String newUsername) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
+    }
+
+    public void updatePassword(String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
+    }
+
     @Override
     public String toString() {
-        return "{" +
-                "userName='" + userName + '\'' +
-                ", id=" + id +
+        return "User{" +
+                "id=" + id +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
                 '}';
     }
 }
