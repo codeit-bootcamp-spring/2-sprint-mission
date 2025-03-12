@@ -2,7 +2,11 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.service.TimeFormatter;
 
-public class Channel extends BaseEntity {
+import java.io.Serializable;
+
+public class Channel extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String name;
 
     public Channel(String name) {

@@ -1,26 +1,24 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-public class JCFMessageService implements MessageService {
-    private static final JCFMessageService instance = new JCFMessageService(JCFUserService.getInstance(), JCFChannelService.getInstance());
-    private final Map<UUID, Message> data = new HashMap<>();
+public class BasicMessageService implements MessageService {
+    private final MessageRepository messageRepository;
     private final UserService userService;
     private final ChannelService channelService;
 
-    private JCFMessageService(UserService userService, ChannelService channelService) {
+    public BasicMessageService(MessageRepository messageRepository, UserService userService, ChannelService channelService) {
+        this.messageRepository = messageRepository;
         this.userService = userService;
         this.channelService = channelService;
-    }
-
-    public static JCFMessageService getInstance() {
-        return instance;
     }
 
     @Override
@@ -38,33 +36,31 @@ public class JCFMessageService implements MessageService {
             throw new IllegalArgumentException("존재하지 않는 채널입니다: " + channelId);
         }
         Message message = new Message(userId, channelId, text);
-        data.put(message.getId(), message);
+        messageRepository.save(message);
         return message;
     }
 
     @Override
     public Optional<Message> getMessageById(UUID messageId) {
-        return Optional.ofNullable(data.get(messageId));
+        return messageRepository.getMessageById(messageId);
     }
 
     @Override
     public List<Message> getAllMessagesByChannel(UUID channelId) {
-        return data.values().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
-                .collect(Collectors.toList());
+        return messageRepository.getAllMessagesByChannel(channelId);
     }
 
     @Override
     public void updateMessage(UUID messageId, String newText) {
-        Message message = data.get(messageId);
-        if (message != null) {
-            long currentTime = System.currentTimeMillis();
-            message.update(newText, currentTime);
-        }
+        messageRepository.getMessageById(messageId).ifPresent(message -> {
+            long updatedTime = System.currentTimeMillis();
+            message.update(newText, updatedTime);
+            messageRepository.save(message);
+        });
     }
 
     @Override
     public void deleteMessage(UUID messageId) {
-        data.remove(messageId);
+        messageRepository.deleteMessage(messageId);
     }
 }

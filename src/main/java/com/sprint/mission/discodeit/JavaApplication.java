@@ -3,9 +3,25 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.menu.ChannelMenu;
+import com.sprint.mission.discodeit.menu.MainMenu;
+import com.sprint.mission.discodeit.menu.MessageMenu;
+import com.sprint.mission.discodeit.menu.UserMenu;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
+//import com.sprint.mission.discodeit.service.file.FileChannelService;
+//import com.sprint.mission.discodeit.service.file.FileMessageService;
+//import com.sprint.mission.discodeit.service.file.FileUserService;
+//import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+//import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+//import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.Scanner;
 import java.util.UUID;
@@ -14,9 +30,13 @@ public class JavaApplication {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        JCFUserService userService = JCFUserService.getInstance();
-        JCFChannelService channelService = JCFChannelService.getInstance();
-        JCFMessageService messageService = JCFMessageService.getInstance();
+//        JCFUserService userService = JCFUserService.getInstance();
+//        JCFChannelService channelService = JCFChannelService.getInstance();
+//        JCFMessageService messageService = JCFMessageService.getInstance();
+
+        UserService userService = new BasicUserService(FileUserRepository.getInstance());
+        ChannelService channelService = new BasicChannelService(FileChannelRepository.getInstance());
+        MessageService messageService = new BasicMessageService(FileMessageRepository.getInstance(), userService, channelService);
 
         while (true) {
             System.out.println("\n===== 메뉴 선택 =====");
