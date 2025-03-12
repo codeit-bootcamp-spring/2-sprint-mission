@@ -7,8 +7,6 @@ public interface DiscordService {
 
     public abstract User create(String name);
 
-    public abstract void register(User user);
-
     public abstract User get();
 
     public abstract User get(User user);

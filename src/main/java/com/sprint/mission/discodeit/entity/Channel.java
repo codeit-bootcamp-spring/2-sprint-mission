@@ -5,40 +5,40 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-public class Message implements Serializable {
+public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
     public final Long createdAt;
     public Long updatedAt;
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
 
-    private String str;
+    private String name;
 
 
-    public Message(String str) {
-        this(UUID.randomUUID(), System.currentTimeMillis(), str);
+    public Channel(String name) {
+        this(UUID.randomUUID(), System.currentTimeMillis(), name);
     }
 
-    public Message(UUID id, Long createdAt, String str) {
+    public Channel(UUID id, Long createdAt, String name) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
-        this.str = str;
+        this.name = name;
     }
 
-    public String getStr() {
-        return str;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setStr(String str) {
-        this.str = str;
+    public String getName() {
+        return name;
     }
 
     @Override
     public String toString() {
-        return "Message{" +
+        return "Channel{" +
                 "id='" + this.getId() + '\'' +
-                "str='" + str + '\'' +
+                "name='" + name + '\'' +
                 "creadAt='" + format.format(new Date(createdAt)) + '\'' +
                 '}';
     }
@@ -57,5 +57,4 @@ public class Message implements Serializable {
         System.out.println("수정 시각: " + format.format(new Date(updatedAt)));
         return updatedAt;
     }
-
 }

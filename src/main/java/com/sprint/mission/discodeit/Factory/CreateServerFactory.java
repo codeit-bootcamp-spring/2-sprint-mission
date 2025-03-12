@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.entity.Server;
 
 import java.util.Scanner;
 
-public class CreateServerFactory implements Factory<Server>{
-    private static CreateServerFactory instance;
+public class CreateServerFactory implements Factory<Server> {
+    private static volatile CreateServerFactory instance;
     private final Scanner sc = new Scanner(System.in);
 
     private CreateServerFactory() {
@@ -13,7 +13,11 @@ public class CreateServerFactory implements Factory<Server>{
 
     public static CreateServerFactory getInstance() {
         if (instance == null) {
-            instance = new CreateServerFactory();
+            synchronized (CreateServerFactory.class) {
+                if (instance == null) {
+                    instance = new CreateServerFactory();
+                }
+            }
         }
         return instance;
     }

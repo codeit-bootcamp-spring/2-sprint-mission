@@ -1,11 +1,28 @@
 package com.sprint.mission.discodeit.entity;
 
 
-public class Server extends BaseEntity {
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
+public class Server implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private final UUID id;
+    public final Long createdAt;
+    public Long updatedAt;
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
+
     private String name;
 
     public Server(String name) {
-        super();
+        this(UUID.randomUUID(), System.currentTimeMillis(), name);
+    }
+
+    public Server(UUID id, Long createdAt, String name) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.updatedAt = createdAt;
         this.name = name;
     }
 
@@ -17,4 +34,27 @@ public class Server extends BaseEntity {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return "Server{" +
+                "id='" + this.getId() + '\'' +
+                "name='" + name + '\'' +
+                "creadAt='" + format.format(new Date(createdAt)) + '\'' +
+                '}';
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+
+    public Long getCreatedAt() {
+        System.out.println("생성 시각: " + format.format(new Date(createdAt)));
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        System.out.println("수정 시각: " + format.format(new Date(updatedAt)));
+        return updatedAt;
+    }
 }

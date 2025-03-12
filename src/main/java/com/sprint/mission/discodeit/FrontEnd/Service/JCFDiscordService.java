@@ -1,21 +1,29 @@
-package com.sprint.mission.discodeit.FrontEnd;
+package com.sprint.mission.discodeit.FrontEnd.Service;
 
 import com.sprint.mission.discodeit.Factory.CreateUserFactory;
+import com.sprint.mission.discodeit.FrontEnd.DiscordRepository;
+import com.sprint.mission.discodeit.FrontEnd.DiscordService;
+import com.sprint.mission.discodeit.FrontEnd.Repository.JCFDiscordRepository;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.Scanner;
 
 public class JCFDiscordService implements DiscordService {
-    private static JCFDiscordService instance;
-    DiscordRepository discordRepository = DiscordRepository.getInstance();
-    List<User> list = discordRepository.getList();
+    private static volatile JCFDiscordService instance;
+    DiscordRepository discordRepository = JCFDiscordRepository.getInstance();
+    List<User> list = discordRepository.getUserList();
+
     private JCFDiscordService() {
     }
 
     public static JCFDiscordService getInstance() {
         if (instance == null) {
-            instance = new JCFDiscordService();
+            synchronized (JCFDiscordService.class){
+                if (instance == null) {
+                    instance = new JCFDiscordService();
+                }
+            }
         }
         return instance;
     }
@@ -23,20 +31,15 @@ public class JCFDiscordService implements DiscordService {
     @Override
     public User create() {
         User user = CreateUserFactory.getInstance().create();
-        register(user);
+        discordRepository.register(user);
         return user;
     }
 
     @Override
     public User create(String name) {
         User user = CreateUserFactory.getInstance().create(name);
-        register(user);
+        discordRepository.register(user);
         return user;
-    }
-
-    public void register(User user) {
-        list.add(user);
-        System.out.println(user.getName() + "유저 저장 성공");
     }
 
     @Override
@@ -58,11 +61,11 @@ public class JCFDiscordService implements DiscordService {
 
     @Override
     public User get(String targetName) {
-        for (User data : list) {
-            if (data.getName().equals(targetName)) {
-                System.out.println(data.getName() + "유저 조회 성공");
-                return data;
-            }
+        User user = list.stream().filter(u -> u.getName().equals(targetName))
+                .findFirst().orElse(null);
+        if (user != null) {
+            System.out.println(user.getName() + " 유저 조회 성공");
+            return user;
         }
         System.out.println("해당 유저가 존재하지 않습니다.");
         return null;
@@ -81,7 +84,7 @@ public class JCFDiscordService implements DiscordService {
 
     @Override
     public boolean remove(User user) {
-        if (list == null) {
+        if (list == null || user == null) {
             System.out.println("아무것도 저장되어있지 않습니다.");
             return false;
         }
@@ -94,12 +97,12 @@ public class JCFDiscordService implements DiscordService {
             System.out.println("아무것도 저장되어있지 않습니다.");
             return false;
         }
-        for (User data : list) {
-            if (data.getName().equals(targetName)) {
-                list.remove(data);
-                System.out.println(data.getName() + "유저 삭제 성공");
-                return true;
-            }
+        User user = list.stream().filter(u -> u.getName().equals(targetName))
+                .findFirst().orElse(null);
+        if (user != null) {
+            list.remove(user);
+            System.out.println(user.getName() + "유저 삭제 성공");
+            return true;
         }
         System.out.println("해당 유저가 존재하지 않습니다.");
         return false;
@@ -110,9 +113,7 @@ public class JCFDiscordService implements DiscordService {
             return;
         }
         System.out.println("\n==============유저 정보===================");
-        for (User data : list) {
-            System.out.println(data.getName());
-        }
+        list.forEach(u-> System.out.println(u.getName()));
         System.out.println("======================================\n");
     }
 
@@ -161,12 +162,12 @@ public class JCFDiscordService implements DiscordService {
 
     @Override
     public boolean update(String targetName, String replaceName) {
-        for (User data : list) {
-            if (data.getName().equals(targetName)) {
-                data.setName(replaceName);
-                System.out.println(data.getName() + "유저 이름 변경 성공");
-                return true;
-            }
+        User user = list.stream().filter(u -> u.getName().equals(targetName))
+                .findFirst().orElse(null);
+        if (user != null) {
+            user.setName(replaceName);
+            System.out.println(targetName +" 이(가) "+ user.getName() + " 으로 이름 변경 성공");
+            return true;
         }
         System.out.println("해당 유저가 존재하지 않습니다.");
         return false;

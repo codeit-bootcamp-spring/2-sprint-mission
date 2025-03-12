@@ -18,6 +18,9 @@ out/
 !**/src/main/**/out/
 */src/test
 
+### data ###
+/data
+
 ### Eclipse ###
 .apt_generated
 .classpath
@@ -44,3 +47,5 @@ bin/
 .DS_Store
 
 /src/test/java
+/data
+
