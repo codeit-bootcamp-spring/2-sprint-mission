@@ -102,9 +102,11 @@ public class JavaApplication {
 
 # 멘토님 피드백
 - [x] findBean 한번만 선언
-- [ ] Enum 리펙토링부분 커맨드패턴으로 보완
+- [x] Enum 리펙토링부분 커맨드패턴으로 보완
 - [x] Unix TimeStamp ms로 수정
 - [x] updatedAt 메서드 이름 수정
 - [ ] toDto 정적 팩터리 메서드로 보완하기[정적 팩터리 메서드]
 - [x] Scanner등 자원 사용시 Test 격리성 높이기[try-with-resource, 테스트 격리성]
 - [x] 테스트 명칭 조금 더 명확하게[~하면 ~가 출력된다]
+
+

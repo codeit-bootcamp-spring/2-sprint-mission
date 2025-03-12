@@ -19,6 +19,13 @@ public class OutputView {
         System.out.println("안녕하세요 코드잇2기 서버입니다.");
     }
 
+    public static void printOtherChannels(List<ChannelDto> channels) {
+        System.out.println("# 이동할 채널을 선택해주세요");
+        int count = 1;
+        for (ChannelDto channel : channels) {
+            System.out.println("- " + channel.name() + " : " + count++ + "번");
+        }
+    }
 
     public static void printServer(List<ChannelDto> channels, UserDto loginUser, List<MessageDto> messages,
                                    ChannelDto currentChannel) {

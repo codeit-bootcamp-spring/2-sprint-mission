@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.view;
 
-import com.sprint.mission.discodeit.application.ChannelDto;
-import java.util.List;
 import java.util.Scanner;
 
 public class InputView {
@@ -25,7 +23,7 @@ public class InputView {
         return scanner.nextLine();
     }
 
-    public String readChannelName() {
+    public String readChangeChannelName() {
         System.out.println("# 현재 채널을 어떤 이름으로 변경하시겠습니까? : ");
 
         return scanner.nextLine();
@@ -43,19 +41,16 @@ public class InputView {
         return scanner.nextLine();
     }
 
-    public String readNewChannelName() {
+    public String readCreationChannelName() {
         System.out.println("# 생성할 채널의 이름을 설정해주세요 : ");
 
         return scanner.nextLine();
     }
 
-    public int readChangeChannelNumber(List<ChannelDto> channels) {
-        System.out.println("# 이동할 채널을 선택해주세요");
-        int count = 1;
-        for (ChannelDto channel : channels) {
-            System.out.println("- " + channel.name() + " : " + count++ + "번");
-        }
+    public int readChangeNumber() {
+        int number = scanner.nextInt();
+        scanner.nextLine();
 
-        return Integer.parseInt(scanner.nextLine());
+        return number - 1;
     }
 }
