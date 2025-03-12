@@ -43,3 +43,6 @@ bin/
 
 ### IntelliJ ###
 .idea
+
+### 직렬화된 파일 ###
+*.ser
