@@ -1,15 +1,15 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
+import java.io.*;
 import java.util.*;
 
-public class JCFUserService implements UserService {
-    private final UserRepository userRepository = new JCFUserRepository();
-    // UUID를 키로 사용하여 User 객체를 저장 / 일반적으로 키는 String UUID Integer 타입(변하지 않는 값)
+public class FileUserService implements UserService {
+    private final UserRepository userRepository = new FileUserRepository();
 
     @Override
     public void create(User entity) {
