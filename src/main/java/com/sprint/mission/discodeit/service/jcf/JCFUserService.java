@@ -19,7 +19,6 @@ public class JCFUserService implements UserService {
     private final UserRepository userRepository;
 
     public JCFUserService() {
-        System.out.println("JCF User Service 가동");
         userRepository = new JCFUserRepository();
     }
 
