@@ -10,12 +10,12 @@ import java.util.UUID;
 @Getter
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
-    private UUID id;
-    private Instant createdAt;
+    private final UUID id;
+    private final Instant createdAt;
     private Instant updatedAt;
     private String content;
-    private UUID channelId;
-    private UUID authorId;
+    private final UUID channelId;
+    private final UUID authorId;
 
     public Message(String content, UUID channelId, UUID authorId) {
         this.id = UUID.randomUUID();
