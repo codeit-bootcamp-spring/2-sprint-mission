@@ -11,16 +11,15 @@ import java.util.UUID;
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
     private String content;
     private UUID channelId;
     private UUID authorId;
 
     public Message(String content, UUID channelId, UUID authorId) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
-        //
+        this.createdAt = Instant.now();
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
@@ -35,7 +34,7 @@ public class Message implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
+            this.updatedAt = Instant.now();
         }
     }
 }
