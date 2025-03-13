@@ -10,7 +10,7 @@ public class FileUserService implements UserService {
 
     private static FileUserService INSTANCE;
     private final String FILE_PATH = "src/main/resources/users.dat";
-    private Map<UUID, User> users = new HashMap<>();
+    private final Map<UUID, User> users = new HashMap<>();
 
     private FileUserService() {
         loadUser();

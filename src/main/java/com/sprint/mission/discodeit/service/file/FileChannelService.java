@@ -12,7 +12,7 @@ public class FileChannelService implements ChannelService {
     private static FileChannelService INSTANCE;
     private final String FILE_PATH = "src/main/resources/channels.dat";
     private final UserService userService;
-    private  Map<UUID, Channel> channels = new HashMap<>();
+    private final Map<UUID, Channel> channels = new HashMap<>();
 
     private FileChannelService(UserService userService) {
         loadChannel();
