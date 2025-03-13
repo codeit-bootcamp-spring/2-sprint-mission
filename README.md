@@ -2,9 +2,9 @@
 
 ## 기본 요구사항
 1. git 브랜치 관리
-- [ ] 브랜치 변경 : part1-황지환-sprint3
-- [ ] git rebase를 통한 커밋 관리
-- [ ] git push를 통해 내 레포지토리 상태 동기화
+- [x] 브랜치 변경 : part1-황지환-sprint3
+- [x] git rebase를 통한 커밋 관리
+- [x] git push를 통해 내 레포지토리 상태 동기화
 
 2. Spring 프로젝트 초기화
 - [ ] Spring Initializr를 통해 zip 파일을 다운로드하세요.
