@@ -3,20 +3,23 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.custom.AppendObjectOutputStream;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
 public class FileUserRepository implements UserRepository {
+    private final static File FILE = new File("user.ser");
+
     @Override
     public User userSave(String nickname, String password) {
         User user = new User(nickname, password);
         try {
-            String fileName = "user.ser";
 
-            boolean append = new File(fileName).exists();
+            boolean append = FILE.exists();
 
-            FileOutputStream fos = new FileOutputStream(fileName, true);
+            FileOutputStream fos = new FileOutputStream(FILE, true);
             ObjectOutputStream oos = append ? new AppendObjectOutputStream(fos) : new ObjectOutputStream(fos);
             oos.writeObject(user);
 
@@ -33,7 +36,11 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findUserById(UUID userUUID) {
-        try (FileInputStream fis = new FileInputStream("user.ser");
+        if (!FILE.exists()) {
+            return Optional.empty();
+        }
+
+        try (FileInputStream fis = new FileInputStream(FILE);
              ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             while (true) {
@@ -56,7 +63,11 @@ public class FileUserRepository implements UserRepository {
     @Override
     public List<User> findAllUser() {
         List<User> userList = new ArrayList<>();
-        try (FileInputStream fis = new FileInputStream("user.ser");
+        if (!FILE.exists()) {
+            return userList;
+        }
+
+        try (FileInputStream fis = new FileInputStream(FILE);
              ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             while (true) {
@@ -79,7 +90,7 @@ public class FileUserRepository implements UserRepository {
     public User updateUserNickname(UUID userUUID, String nickname) {
         List<User> userList = findAllUser();
 
-        User UpdateUser = userList.stream()
+        userList.stream()
                 .filter(user -> user.getId().equals(userUUID))
                 .findAny()
                 .map(user -> {
@@ -87,7 +98,7 @@ public class FileUserRepository implements UserRepository {
                     return user;
                 })
                 .orElse(null);
-        try (FileOutputStream fos = new FileOutputStream("user.ser");
+        try (FileOutputStream fos = new FileOutputStream(FILE);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
             for (User user : userList) {
@@ -106,7 +117,7 @@ public class FileUserRepository implements UserRepository {
         List<User> userList = findAllUser();
         boolean removed  = userList.removeIf(user -> user.getId().equals(userUUID));
         if (!removed) return false;
-        try (FileOutputStream fos = new FileOutputStream("user.ser");
+        try (FileOutputStream fos = new FileOutputStream(FILE);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
             for (User user : userList) {

@@ -53,15 +53,15 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<List<Channel>> findAllChannel() {
-        List<Channel> channels = new ArrayList<>();
+    public List<Channel> findAllChannel() {
+        List<Channel> channelList = new ArrayList<>();
         try (FileInputStream fis = new FileInputStream("channel.ser");
              ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             while (true) {
                 try {
                     Channel channel = (Channel) ois.readObject();
-                    channels.add(channel);
+                    channelList.add(channel);
                 } catch (EOFException e) {
                     // 파일의 끝 도달 시 브레이크
                     break;
@@ -72,14 +72,14 @@ public class FileChannelService implements ChannelService {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        return Optional.of(channels);
+        return channelList;
     }
 
     @Override
     public void updateChannel(UUID channelUUID, String channelName) {
-        List<Channel> channels = findAllChannel().orElse(Collections.emptyList());
+        List<Channel> channelList = findAllChannel();
 
-        channels.stream()
+        channelList.stream()
                 .filter(channel -> channel.getId().equals(channelUUID))
                 .findAny()
                 .ifPresentOrElse(
@@ -92,7 +92,7 @@ public class FileChannelService implements ChannelService {
         try (FileOutputStream fos = new FileOutputStream("channel.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
-            for (Channel channel : channels) {
+            for (Channel channel : channelList) {
                 oos.writeObject(channel);
             }
 
@@ -103,7 +103,7 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID channelUUId) {
-        List<Channel> channels = findAllChannel().orElse(Collections.emptyList());
+        List<Channel> channels = findAllChannel();
 
         boolean removed = channels.removeIf(channel -> channel.getId().equals(channelUUId));
 

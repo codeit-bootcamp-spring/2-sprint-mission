@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class BasicMessageService implements MessageService {
 
@@ -50,23 +51,21 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Optional<List<Message>> findAllMessages() {
+    public List<Message> findAllMessages() {
         List<Message> messageList = messageRepository.findAllMessage();
         if (messageList.isEmpty()) {
             System.out.println("메세지가 존재하지 않습니다.");
-            return Optional.empty();
         }
-        return Optional.of(messageList);
+        return messageList;
     }
 
     @Override
-    public Optional<List<Message>> findMessageByChannelId(UUID channelUUID) {
+    public List<Message> findMessageByChannelId(UUID channelUUID) {
         List<Message> channelMessageList = messageRepository.findMessageByChannel(channelUUID);
         if (channelMessageList.isEmpty()) {
             System.out.println("해당 채널에 메세지가 존재하지 않습니다");
-            return Optional.empty();
         }
-        return Optional.of(channelMessageList);
+        return channelMessageList;
     }
 
     @Override

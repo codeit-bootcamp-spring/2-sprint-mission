@@ -54,15 +54,15 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public Optional<List<User>> findAllUser() {
-        List<User> users = new ArrayList<>();
+    public List<User> findAllUser() {
+        List<User> userList = new ArrayList<>();
         try (FileInputStream fis = new FileInputStream("user.ser");
              ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             while (true) {
                 try {
                     User user = (User) ois.readObject();
-                    users.add(user);
+                    userList.add(user);
                 } catch (EOFException e) {
                     // 파일의 끝 도달 시 브레이크
                     break;
@@ -73,14 +73,14 @@ public class FileUserService implements UserService {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        return Optional.of(users);
+        return userList;
     }
 
     @Override
     public void update(UUID userUUID, String nickname) {
-        List<User> users = findAllUser().orElse(Collections.emptyList());
+        List<User> userList = findAllUser();
 
-        users.stream()
+        userList.stream()
                 .filter(user -> user.getId().equals(userUUID))
                 .findAny()
                 .ifPresentOrElse(
@@ -93,7 +93,7 @@ public class FileUserService implements UserService {
         try (FileOutputStream fos = new FileOutputStream("user.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
-            for (User user : users) {
+            for (User user : userList) {
                 oos.writeObject(user);
             }
 
@@ -104,7 +104,7 @@ public class FileUserService implements UserService {
 
     @Override
     public void delete(UUID uuid) {
-        List<User> users = findAllUser().orElse(Collections.emptyList());
+        List<User> users = findAllUser();
 
         boolean removed = users.removeIf(user -> user.getId().equals(uuid));
 

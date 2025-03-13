@@ -38,14 +38,13 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public Optional<List<User>> findAllUser() {
+    public List<User> findAllUser() {
         List<User> userList = userRepository.findAllUser();
 
         if (userList.isEmpty()) {
             System.out.println("회원이 존재하지 않습니다");
-            return Optional.empty();
         }
-        return Optional.of(userList);
+        return userList;
     }
 
     @Override

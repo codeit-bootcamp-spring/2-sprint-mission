@@ -3,22 +3,25 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.custom.AppendObjectOutputStream;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
+
+    private static final File FILE = new File("message.ser");
 
     @Override
     public Message messageSave(UUID channelUUID, UUID userUUID, String content) {
         Message message = new Message(channelUUID, userUUID, content);
 
         try {
-            String fileName = "message.ser";
             // 파일 존재 여부 확인
-            boolean append = new File(fileName).exists();
+            boolean append = FILE.exists();
 
-            FileOutputStream fos = new FileOutputStream(fileName, true);
+            FileOutputStream fos = new FileOutputStream(FILE, true);
             ObjectOutputStream oos = append ? new AppendObjectOutputStream(fos) : new ObjectOutputStream(fos);
             oos.writeObject(message);
 
@@ -34,12 +37,11 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Optional<Message> findMessageById(UUID messageUUID) {
-        boolean fileCheck = new File("message.ser").exists();
-        if (!fileCheck) {
+        if (!FILE.exists()) {
             return Optional.empty();
         }
 
-        try (FileInputStream fis = new FileInputStream("message.ser");
+        try (FileInputStream fis = new FileInputStream(FILE);
              ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             while (true) {
@@ -60,18 +62,17 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findAllMessage() {
-        List<Message> messages = new ArrayList<>();
+        List<Message> messageList = new ArrayList<>();
 
-        boolean fileCheck = new File("message.ser").exists();
-        if (!fileCheck) return null;
+        if (!FILE.exists()) return messageList;
 
-        try (FileInputStream fis = new FileInputStream("message.ser");
+        try (FileInputStream fis = new FileInputStream(FILE);
              ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             while (true) {
                 try {
                     Message message = (Message) ois.readObject();
-                    messages.add(message);
+                    messageList.add(message);
                 } catch (EOFException e) {
                     break;
                 }
@@ -81,19 +82,14 @@ public class FileMessageRepository implements MessageRepository {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        return messages;
+        return messageList;
     }
 
     @Override
     public List<Message> findMessageByChannel(UUID channelUUID) {
-        String fileName = "message.ser";
-
-        boolean append = new File(fileName).exists();
-        if (!append) return null;
-
         List<Message> messages = findAllMessage();
 
-        try (FileInputStream fis = new FileInputStream("message.ser");
+        try (FileInputStream fis = new FileInputStream(FILE);
              ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             while (true) {
@@ -125,7 +121,7 @@ public class FileMessageRepository implements MessageRepository {
                 })
                 .orElse(null);
 
-        try (FileOutputStream fos = new FileOutputStream("message.ser");
+        try (FileOutputStream fos = new FileOutputStream(FILE);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
             for (Message message : messages) {
@@ -146,7 +142,7 @@ public class FileMessageRepository implements MessageRepository {
 
         if (!removed) return false;
 
-        try (FileOutputStream fos = new FileOutputStream("message.ser");
+        try (FileOutputStream fos = new FileOutputStream(FILE);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
             for (Message message : messages) {

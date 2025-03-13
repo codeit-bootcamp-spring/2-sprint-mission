@@ -6,31 +6,18 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    private final List<Channel> data = new ArrayList<>();
-    private static JCFChannelService instance;
-
-    private JCFChannelService() {
-
-    }
-
-    public static JCFChannelService getInstance() {
-        if (instance == null) {
-            instance = new JCFChannelService();
-        }
-        return instance;
-    }
-
+    private final List<Channel> channelList = new ArrayList<>();
 
     @Override
     public void createChannel(String channelName) {
         Channel channel = new Channel(channelName);
-        data.add(channel);
+        channelList.add(channel);
         System.out.println("채널 개설 성공" + channel);
     }
 
     @Override
     public Channel findChannel(UUID id) {
-        for (Channel channel : data) {
+        for (Channel channel : channelList) {
             if (channel.getId().equals(id)) {
                 return channel;
             }
@@ -40,22 +27,21 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<List<Channel>> findAllChannel() {
-        if (data.isEmpty()) {
+    public List<Channel> findAllChannel() {
+        if (channelList.isEmpty()) {
             System.out.println("개설된 채널이 없습니다.");
-            return Optional.empty();
         }
-        return Optional.of(data);
+        return channelList;
     }
 
     @Override
     public void updateChannel(UUID uuid, String channelName) {
-        if (data.stream().noneMatch(data -> data.getId().equals(uuid))) {
+        if (channelList.stream().noneMatch(data -> data.getId().equals(uuid))) {
             System.out.println("[실패]수정하려는 채널이 존재하지 않습니다.");
             return;
         }
 
-        for (Channel channel : data) {
+        for (Channel channel : channelList) {
             if (channel.getId().equals(uuid)) {
                 channel.updateChannelName(channelName);
                 System.out.println("[성공]채널 변경 완료[채널 아이디: " + channel.getId() +
@@ -67,7 +53,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID uuid) {
-        boolean isremove = data.removeIf(data -> data.getId().equals(uuid));
+        boolean isremove = channelList.removeIf(data -> data.getId().equals(uuid));
 
         if (!isremove) {
             System.out.println("[실패]삭제하려는 채널이 존재하지 않습니다.");

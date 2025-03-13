@@ -70,11 +70,10 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Optional<List<Message>> findAllMessages() {
-        List<Message> messages = new ArrayList<>();
+    public List<Message> findAllMessages() {
+        List<Message> messageList = new ArrayList<>();
 
         boolean fileCheck = new File("message.ser").exists();
-        if (!fileCheck) return Optional.empty();
 
         try (FileInputStream fis = new FileInputStream("message.ser");
              ObjectInputStream ois = new ObjectInputStream(fis);
@@ -82,7 +81,7 @@ public class FileMessageService implements MessageService {
             while (true) {
                 try {
                     Message message = (Message) ois.readObject();
-                    messages.add(message);
+                    messageList.add(message);
                 } catch (EOFException e) {
                     // 파일의 끝 도달 시 브레이크
                     break;
@@ -93,17 +92,14 @@ public class FileMessageService implements MessageService {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        return Optional.of(messages);
+        return messageList;
     }
 
     @Override
-    public Optional<List<Message>> findMessageByChannelId(UUID channelUUID) {
+    public List<Message> findMessageByChannelId(UUID channelUUID) {
         String fileName = "message.ser";
-        // 파일 존재 여부 확인
-        boolean append = new File(fileName).exists();
-        if (!append) return Optional.empty();
 
-        List<Message> messages = findAllMessages().orElse(Collections.emptyList());
+        List<Message> messageList = findAllMessages();
 
         try (FileInputStream fis = new FileInputStream("message.ser");
              ObjectInputStream ois = new ObjectInputStream(fis);
@@ -111,7 +107,7 @@ public class FileMessageService implements MessageService {
             while (true) {
                 try {
                     Message message = (Message) ois.readObject();
-                    if(message.getChannelUUID().equals(channelUUID)) messages.add(message);
+                    if(message.getChannelUUID().equals(channelUUID)) messageList.add(message);
                 } catch (EOFException e) {
                     // 파일의 끝 도달 시 브레이크
                     break;
@@ -122,14 +118,14 @@ public class FileMessageService implements MessageService {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        return Optional.of(messages);
+        return messageList;
     }
 
     @Override
     public void updateMessage(UUID messageUUID, String content) {
-        List<Message> messages = findAllMessages().orElse(Collections.emptyList());
+        List<Message> messageList = findAllMessages();
 
-        messages.stream()
+        messageList.stream()
                 .filter(message -> message.getId().equals(messageUUID))
                 .findAny()
                 .ifPresentOrElse(
@@ -142,7 +138,7 @@ public class FileMessageService implements MessageService {
         try (FileOutputStream fos = new FileOutputStream("message.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
-            for (Message message : messages) {
+            for (Message message : messageList) {
                 oos.writeObject(message);
             }
 
@@ -153,9 +149,9 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void deleteMessageById(UUID messageUUID) {
-        List<Message> messages = findAllMessages().orElse(Collections.emptyList());
+        List<Message> messageList = findAllMessages();
 
-        boolean removed = messages.removeIf(message -> message.getId().equals(messageUUID));
+        boolean removed = messageList.removeIf(message -> message.getId().equals(messageUUID));
 
         if (!removed) {
             System.out.println("[실패]메시지가 존재하지 않습니다");
@@ -167,7 +163,7 @@ public class FileMessageService implements MessageService {
         try (FileOutputStream fos = new FileOutputStream("message.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
-            for (Message message : messages) {
+            for (Message message : messageList) {
                 oos.writeObject(message);
             }
 

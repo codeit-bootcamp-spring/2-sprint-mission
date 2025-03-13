@@ -36,14 +36,13 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<List<Channel>> findAllChannel() {
+    public List<Channel> findAllChannel() {
         List<Channel> channelList = channelRepository.findAllChannel();
         if (channelList.isEmpty()) {
             System.out.println("채널이 존재하지 않습니다.");
-            return Optional.empty();
         }
 
-        return Optional.of(channelRepository.findAllChannel());
+        return channelList;
     }
 
     @Override

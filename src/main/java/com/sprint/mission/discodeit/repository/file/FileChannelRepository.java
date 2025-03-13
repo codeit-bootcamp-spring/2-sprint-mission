@@ -3,27 +3,28 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.custom.AppendObjectOutputStream;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
+    private final static File FILE = new File("channel.ser");
 
     @Override
     public Channel channelSave(String channelName) {
         Channel channel = new Channel(channelName);
         try {
-            String fileName = "channel.ser";
-            boolean append = new File(fileName).exists();
+            boolean append = FILE.exists();
 
-            FileOutputStream fos = new FileOutputStream(fileName, true);
+            FileOutputStream fos = new FileOutputStream(FILE, true);
             ObjectOutputStream oos = append ? new AppendObjectOutputStream(fos) : new ObjectOutputStream(fos);
             oos.writeObject(channel);
 
             oos.close();
             fos.close();
 
-            System.out.println("[성공]" + channel);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -32,7 +33,11 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Optional<Channel> findChannelById(UUID channelUUID) {
-        try (FileInputStream fis = new FileInputStream("channel.ser");
+        if(!FILE.exists()){
+            return Optional.empty();
+        }
+
+        try (FileInputStream fis = new FileInputStream(FILE);
              ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             while (true) {
@@ -54,7 +59,12 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public List<Channel> findAllChannel() {
         List<Channel> channelList = new ArrayList<>();
-        try (FileInputStream fis = new FileInputStream("channel.ser");
+
+        if(!FILE.exists()){
+            return channelList;
+        }
+
+        try (FileInputStream fis = new FileInputStream(FILE);
              ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             while (true) {
@@ -75,6 +85,10 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel updateChannelChannelName(UUID channelUUID, String channelName) {
+        if(!FILE.exists()){
+            return null;
+        }
+
         List<Channel> channels = findAllChannel();
 
         Channel updateChannel = channels.stream()
@@ -86,7 +100,7 @@ public class FileChannelRepository implements ChannelRepository {
                 })
                 .orElse(null);
 
-        try (FileOutputStream fos = new FileOutputStream("channel.ser");
+        try (FileOutputStream fos = new FileOutputStream(FILE);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
             for (Channel channel : channels) {
@@ -108,7 +122,7 @@ public class FileChannelRepository implements ChannelRepository {
 
         if (!removed) return false;
 
-        try (FileOutputStream fos = new FileOutputStream("channel.ser");
+        try (FileOutputStream fos = new FileOutputStream(FILE);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
             for (Channel channel : channelList) {

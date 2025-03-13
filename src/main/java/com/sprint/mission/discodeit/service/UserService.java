@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface UserService {
     void save(String nickname, String password);
     User findByUser(UUID uuid);
-    Optional<List<User>> findAllUser();
+    List<User> findAllUser();
     void update(UUID uuid, String nickname);
     void delete(UUID uuid);
     UUID login(UUID userUUID, String password);

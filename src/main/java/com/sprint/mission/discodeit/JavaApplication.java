@@ -15,7 +15,6 @@ import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
-import java.util.Collections;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -63,19 +62,13 @@ public class JavaApplication {
                             channelToken = selectChannel();
                             if (channelToken == null) break;
                             messageService.findMessageByChannelId(channelToken)
-                                    .orElse(Collections.emptyList())
-                                    .forEach(message -> {
-                                        System.out.println(userService.findByUser(message.getUserUUID()).getNickname());
-                                        System.out.println(message.getContent());
-                                    });
+                                            .forEach(System.out::println);
 
                             sendMessageByChannel(channelToken, userToken);
                             channelToken = null;
                             break;
                         case 3:
-                            channelService.findAllChannel()
-                                    .orElse(Collections.emptyList())
-                                    .forEach(System.out::println);
+                            System.out.println(channelService.findAllChannel());
                         case 4:
                             break;
                     }
@@ -151,9 +144,7 @@ public class JavaApplication {
                         System.out.println(userService.findByUser(UserUUID));
                         break;
                     case 2:
-                        userService.findAllUser()
-                                .orElse(Collections.emptyList())
-                                .forEach(System.out::println);
+                        userService.findAllUser().forEach(System.out::println);
                         break;
                 }
                 break;
@@ -170,9 +161,7 @@ public class JavaApplication {
                         System.out.println(channelService.findChannel(chennelUUID));
                         break;
                     case 2:
-                        channelService.findAllChannel()
-                                .orElse(Collections.emptyList())
-                                .forEach(System.out::println);
+                        channelService.findAllChannel().forEach(System.out::println);
                 }
                 break;
             case 3:
@@ -189,14 +178,12 @@ public class JavaApplication {
                         break;
                     case 2:
                         messageService.findAllMessages()
-                                .orElse(Collections.emptyList())
                                 .forEach(System.out::println);
                         break;
                     case 3:
                         System.out.print("조회할 채널 아이디: ");
                         UUID channelUUID = UUID.fromString(sc.nextLine());
                         messageService.findMessageByChannelId(channelUUID)
-                                .orElse(Collections.emptyList())
                                 .forEach(System.out::println);
                 }
                 break;
