@@ -2,11 +2,13 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Repository
 public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository {
     private static volatile FileMessageRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
 

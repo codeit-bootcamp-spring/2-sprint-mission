@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
 import java.util.UUID;
 
+@Repository
 public class FileChannelRepository extends AbstractFileRepository<Channel> implements ChannelRepository {
     private static volatile FileChannelRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
 

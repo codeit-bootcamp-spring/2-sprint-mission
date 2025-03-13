@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
 import java.util.UUID;
 
+@Repository
 public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository {
     private static volatile FileUserRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
 
