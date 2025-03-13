@@ -5,13 +5,17 @@ import com.sprint.mission.discodeit.repository.FileStorageManager;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class FileMessageRepository implements MessageRepository {
 
     private static final String FILE_PATH = "src/main/resources/messages.dat";
-    private static Map<UUID, Message> messages = new HashMap<>();
+    private static Map<UUID, Message> messages = new ConcurrentHashMap<>();
     private final FileStorageManager fileStorageManager;
 
     public FileMessageRepository(FileStorageManager fileStorageManager) {

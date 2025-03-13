@@ -6,13 +6,14 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
 public class FileUserRepository implements UserRepository {
 
     private static final String FILE_PATH = "src/main/resources/users.dat";
-    private static Map<UUID, User> users = new HashMap<>();
+    private static Map<UUID, User> users = new ConcurrentHashMap<>();
     private final FileStorageManager fileStorageManager;
 
     public FileUserRepository(FileStorageManager fileStorageManager) {

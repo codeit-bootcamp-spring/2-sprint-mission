@@ -5,13 +5,17 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.FileStorageManager;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class FileChannelRepository implements ChannelRepository {
 
     private static final String FILE_PATH = "src/main/resources/channels.dat";
-    private static Map<UUID, Channel> channels = new HashMap<>();
+    private static Map<UUID, Channel> channels = new ConcurrentHashMap<>();
     private final FileStorageManager fileStorageManager;
 
     public FileChannelRepository(FileStorageManager fileStorageManager) {
