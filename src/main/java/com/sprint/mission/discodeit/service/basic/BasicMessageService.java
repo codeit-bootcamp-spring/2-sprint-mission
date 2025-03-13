@@ -39,7 +39,7 @@ public class BasicMessageService implements MessageService {
     public Message sendMessage(UUID senderId, String content, UUID channelId) {
         channelService.validateChannelId(channelId);
         userService.validateUserId(senderId);
-        if (!channelService.isChannelMember(channelId, senderId)) {
+        if (channelService.isChannelMember(channelId, senderId) == false) {
             return null;
         }
         Message message = new Message(senderId, content, channelId);

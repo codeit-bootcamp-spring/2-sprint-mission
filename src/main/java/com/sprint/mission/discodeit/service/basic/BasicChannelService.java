@@ -104,7 +104,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void validateChannelId(UUID channelId) {
-        if (!channelRepository.exists(channelId)) {
+        if (channelRepository.exists(channelId) == false) {
             throw new ChannelNotFoundException("없는 채널");
         }
     }
