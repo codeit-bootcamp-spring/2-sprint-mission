@@ -49,7 +49,8 @@ public class FileChannelRepository implements ChannelRepository {
     public Channel save(Channel channel) {
         channels.put(channel.getId(), channel);
         memberIdsByChannelId.putIfAbsent(channel.getId(), new HashSet<>());
-        memberIdsByChannelId.get(channel.getId()).add(channel.getOwnerId());
+        Set<UUID> memberIds = memberIdsByChannelId.get(channel.getId());
+        memberIds.add(channel.getOwnerId());
         saveChannelData();
         return channel;
     }
