@@ -71,7 +71,6 @@ public class BasicUserService implements UserService {
         System.out.println("=========================\n");
     }
 
-    @Override
     public boolean removeServer(UUID userId) {
         UserRepository userRepository = getUserRepository(userId);
         List<Server> list = userRepository.getServerList();

@@ -9,15 +9,15 @@ import java.util.Queue;
 import java.util.UUID;
 
 public interface UserRepository {
-    public void save(Server server);
+     void save(Server server);
 
-    public List<Server> getServerList();
+     List<Server> getServerList();
 
-    public void updateServerList(List<Server> serverList);
+     void updateServerList(List<Server> serverList);
 
-    public Map<UUID, Queue<Message>> getMessageList();
+     Map<UUID, Queue<Message>> getMessageList();
 
-    public void updateMessageList(Map<UUID, Queue<Message>> messageList);
+     void updateMessageList(Map<UUID, Queue<Message>> messageList);
 
 
 }

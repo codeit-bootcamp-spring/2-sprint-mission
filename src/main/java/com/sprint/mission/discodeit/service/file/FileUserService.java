@@ -6,8 +6,6 @@ import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class FileUserService implements UserService {
