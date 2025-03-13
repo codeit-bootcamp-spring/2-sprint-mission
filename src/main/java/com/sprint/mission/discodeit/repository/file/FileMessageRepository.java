@@ -1,97 +1,100 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.message.Message;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
-    private static volatile FileMessageRepository instance;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    private final Path path;
-    private Map<UUID, Message> messages;
-
-    private FileMessageRepository(Path path) {
-        messages = new HashMap<>();
-        this.path = path;
-        init(path.getParent());
-        loadMessageData();
-    }
-
-    public static FileMessageRepository getInstance(Path path) {
-        if (instance == null) {
-            synchronized (FileMessageRepository.class) {
-                if (instance == null) {
-                    instance = new FileMessageRepository(path);
-                }
+    public FileMessageRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
-        return instance;
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
     public Message save(Message message) {
-        messages.put(message.getId(), message);
-        saveMessageData();
+        Path path = resolvePath(message.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return message;
     }
 
     @Override
-    public Message findById(UUID messageId) {
-        return messages.get(messageId);
+    public Optional<Message> findById(UUID id) {
+        Message messageNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                messageNullable = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(messageNullable);
     }
 
     @Override
     public List<Message> findAll() {
-        return new ArrayList<>(messages.values());
-    }
-
-    @Override
-    public void delete(UUID messageId) {
-        messages.remove(messageId);
-        saveMessageData();
-    }
-
-    @Override
-    public boolean exists(UUID messageId) {
-        return messages.containsKey(messageId);
-    }
-
-    private void init(Path directory) {
-        if (!Files.exists(directory)) {
-            try {
-                Files.createDirectories(directory);
-            } catch (IOException e) {
-                throw new RuntimeException("디렉토리 생성 안 됨");
-            }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void loadMessageData() {
-        if (Files.exists(path)) {
-            try (InputStream is = Files.newInputStream(path);
-                 ObjectInputStream ois = new ObjectInputStream(is)) {
-                Object messageDataObject = ois.readObject();
-
-                if (messageDataObject instanceof Map) {
-                    messages = (Map<UUID, Message>) messageDataObject;
-                }
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException("메세지 데이터 로드 실패");
-            }
-        }
-    }
-
-    private void saveMessageData() {
-        try (OutputStream os = Files.newOutputStream(path);
-             ObjectOutputStream oos = new ObjectOutputStream(os)) {
-            oos.writeObject(messages);
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Message) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
         } catch (IOException e) {
-            throw new RuntimeException("메세지 데이터 저장 실패");
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

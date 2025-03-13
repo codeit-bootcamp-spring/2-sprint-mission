@@ -1,61 +1,40 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
-    private static volatile JCFUserRepository instance;
+    private final Map<UUID, User> data;
 
-    private final Map<UUID, User> users;
-
-    private JCFUserRepository() {
-        users = new HashMap<>();
-    }
-
-    public static JCFUserRepository getInstance() {
-        if (instance == null) {
-            synchronized (JCFUserRepository.class) {
-                if(instance == null) {
-                    instance = new JCFUserRepository();
-                }
-            }
-        }
-        return instance;
+    public JCFUserRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
     public User save(User user) {
-        users.put(user.getId(), user);
+        this.data.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User findById(UUID userId) {
-        return users.get(userId);
-    }
-
-    @Override
-    public User findByEmail(String email) {
-        return users.values().stream()
-                .filter(u -> email.equals(u.getEmail()))
-                .findFirst()
-                .orElse(null);
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(users.values());
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public void delete(UUID userId) {
-        users.remove(userId);
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public boolean exists(UUID userId) {
-        return users.containsKey(userId);
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }
