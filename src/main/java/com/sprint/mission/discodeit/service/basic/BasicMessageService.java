@@ -8,21 +8,16 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
     private final UserService userService;
     private final ChannelService channelService;
-
-    public BasicMessageService(MessageRepository messageRepository, UserService userService,
-                               ChannelService channelService) {
-        this.messageRepository = messageRepository;
-        this.userService = userService;
-        this.channelService = channelService;
-    }
 
     @Override
     public Message create(UUID authorId, UUID channelId, String content) {
