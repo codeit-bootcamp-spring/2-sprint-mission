@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 
 @Repository
 public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository {
-    private static volatile FileMessageRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
-
     public FileMessageRepository() {
         super(Message.class, Paths.get(System.getProperty("user.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\messagedata"));
     }
