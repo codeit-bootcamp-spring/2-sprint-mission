@@ -19,6 +19,10 @@ public interface ServerRepository {
 
     Channel findChannelByChanelId(Server server, UUID channelId);
 
+    Channel findChannelByChanelId(UUID serverId, Channel channel);
+
+    Channel findChannelByChanelId(UUID serverId, UUID channelId);
+
     List<User> findUserListByChannelId(UUID channelId);
 
     List<Channel> findChannelListByServerId(UUID serverId);

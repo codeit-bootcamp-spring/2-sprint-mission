@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
+import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -9,115 +12,70 @@ import java.util.*;
 
 
 public class JCFChannelService implements ChannelService {
-    private static volatile JCFChannelService instance;
-    private final Map<UUID, ChannelRepository> channelTable = new HashMap<>();
+    private ServerRepository serverRepository;
+    private ChannelRepository channelRepository;
 
-    private JCFChannelService() {
-    }
-
-    public static JCFChannelService getInstance() {
-        if (instance == null) {
-            synchronized (JCFChannelService.class) {
-                if (instance == null) {
-                    instance = new JCFChannelService();
-                }
-            }
-        }
-        return instance;
-    }
-
-    private ChannelRepository getChannelRepository(UUID channelId) {
-        ChannelRepository channelRepository = channelTable.get(channelId);
-        if (channelRepository == null) {
-            ChannelRepository repository = new JCFChannelRepository();
-            channelTable.put(channelId, repository);
-            channelRepository = repository;
-        }
-        return channelRepository;
+    public JCFChannelService() {
+        serverRepository = new JCFServerRepository();
+        channelRepository = new JCFChannelRepository();
     }
 
     @Override
-    public Message write(UUID channelId) {
-        ChannelRepository channelRepository = getChannelRepository(channelId);
-        Scanner sc = new Scanner(System.in);
-        System.out.print("메시지를 작성하시오. : ");
-        String str = sc.nextLine();
-        Message message = new Message(str);
-        return write(channelRepository, message);
-    }
-
-    @Override
-    public Message write(UUID channelId, String str) {
-        ChannelRepository channelRepository = getChannelRepository(channelId);
-        Message message = new Message(str);
-
-        return write(channelRepository, message);
-    }
-
-    private Message write(ChannelRepository channelRepository, Message message) {
-        channelRepository.save(message);
-        System.out.println("메시지 생성 : " + message.getStr());
+    public Message write(String creatorId, String channelId, String text) {
+        UUID UID = UUID.fromString(channelId);
+        UUID CID = UUID.fromString(channelId);
+        Message message = new Message(UID, CID, text);
+        channelRepository.saveMessage(message);
         return message;
     }
 
     @Override
-    public Message getMessage(UUID channelId, String str) {
-        ChannelRepository channelRepository = getChannelRepository(channelId);
-        List<Message> list = channelRepository.getList();
-        Message message = list.stream().filter(m -> m.getStr().equals(str))
-                .findFirst().orElse(null);
-        if (message != null) {
-            //로그
-            System.out.println(message.getStr() + " 이(가) 반환됩니다.");
-            return message;
-        }
-        //로그
-        System.out.println("해당 메시지가 존재하지 않습니다.");
-        return null;
+    public Message getMessage(String serverId, String channelId, String messageId) {
+        UUID SID = UUID.fromString(serverId);
+        UUID CID = UUID.fromString(channelId);
+        UUID MID = UUID.fromString(messageId);
+
+        Channel channel = serverRepository.findChannelByChanelId(SID, CID);
+        Message message = channelRepository.findMessageByChannel(channel, MID);
+
+        return message;
     }
 
     @Override
-    public void printChannel(UUID channelId) {
-        ChannelRepository channelRepository = getChannelRepository(channelId);
-        List<Message> list = channelRepository.getList();
-        printChannel(list);
-    }
+    public void printMessage(String serverId, String channelId) {
+        UUID SID = UUID.fromString(serverId);
+        UUID CID = UUID.fromString(channelId);
+        Channel channel = serverRepository.findChannelByChanelId(SID, CID);
 
-    private void printChannel(List<Message> list) {
-        System.out.println("\n=========채널 메시지 목록==========");
-        list.forEach(m -> System.out.println(m.getStr()));
-        System.out.println("=========================\n");
+        List<Message> messages = channelRepository.findMessageListByChannel(channel);
+
+        System.out.println(channel.getName());
+        for (Message message : messages) {
+            System.out.println(message.getCreatorId() + " : " + message.getText());
+        }
     }
 
     @Override
-    public boolean removeMessage(UUID channelId, String targetName) {
-        ChannelRepository channelRepository = getChannelRepository(channelId);
-        List<Message> list = channelRepository.getList();
-        Message message = list.stream().filter(m -> m.getStr().equals(targetName))
-                .findFirst().orElse(null);
-        if (message != null) {
-            //로그
-            System.out.println(message.getStr() + " 이(가) 삭제됩니다.");
-            list.remove(message);
-            return true;
-        }
-        System.out.println("해당 메시지가 존재하지 않습니다.");
-        return false;
+    public boolean removeMessage(String serverId,String channelId, String messageId) {
+        UUID SID = UUID.fromString(serverId);
+        UUID CID = UUID.fromString(channelId);
+        UUID MID = UUID.fromString(messageId);
+        Channel channel = serverRepository.findChannelByChanelId(SID, CID);
+        Message message = channelRepository.findMessageByChannel(channel, MID);
+
+        channelRepository.removeMessage(channel, message);
+        return true;
     }
 
     @Override
-    public boolean updateMessage(UUID channelId, String targetName, String replaceName) {
-        ChannelRepository channelRepository = getChannelRepository(channelId);
-        List<Message> list = channelRepository.getList();
-        Message targetMessage = list.stream().filter(m -> m.getStr().equals(targetName))
-                .findFirst().orElse(null);
-        if (targetMessage == null) {
-            System.out.println("업데이트할 메시지가 존재하지 않습니다.");
-            return false;
-        }
-        targetMessage.setStr(replaceName);
-        //로그
-        System.out.println(targetName + " 이(가) " + targetMessage.getStr() + " 이(가) 됩니다.");
+    public boolean updateMessage(String serverId,String channelId, String messageId, String replaceText) {
+        UUID SID = UUID.fromString(serverId);
+        UUID CID = UUID.fromString(channelId);
+        UUID MID = UUID.fromString(messageId);
+        Channel channel = serverRepository.findChannelByChanelId(SID, CID);
+        Message message = channelRepository.findMessageByChannel(channel, MID);
+
+        channelRepository.updateMessage(channel, message, replaceText);
         return true;
     }
 }

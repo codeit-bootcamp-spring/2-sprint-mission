@@ -1,27 +1,58 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
+import com.sprint.mission.discodeit.Exception.EmptyMessageListException;
+import com.sprint.mission.discodeit.Exception.MessageNotFoundException;
+import com.sprint.mission.discodeit.Repository.ChannelRepository;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class JCFChannelRepository implements com.sprint.mission.discodeit.Repository.ChannelRepository {
-    private List<Message> list;
+public class JCFChannelRepository implements ChannelRepository {
+    private Map<UUID, List<Message>> messageList = new ConcurrentHashMap<>();
 
-    public JCFChannelRepository() {
-        this.list = new LinkedList<>();
+    @Override
+    public void saveMessage(Message message) {
+        messageList.computeIfAbsent(message.getChannelId(), k -> new ArrayList<>()).add(message);
     }
 
-    public void save(Message message) {
-        list.add(message);
+    @Override
+    public List<Message> findMessageListByChannel(Channel channel) {
+        return findMessageListByChannel(channel.getChannelId());
     }
 
-    public void updateMessageList(List<Message> list) {
-        this.list = list;
+    @Override
+    public List<Message> findMessageListByChannel(UUID channelId) {
+        List<Message> messages = Optional.ofNullable(messageList.get(channelId))
+                .orElseThrow(() -> new EmptyMessageListException("메시지함이 비어있습니다."));
+        return messages;
     }
 
-    public List<Message> getList() {
-        return list;
+    @Override
+    public Message findMessageByChannel(Channel channel, UUID messageId) {
+        List<Message> messages = findMessageListByChannel(channel);
+        Message findMessage = messages.stream().filter(m -> m.getMessageId().equals(messageId))
+                .findFirst().orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
+        return findMessage;
     }
 
+    @Override
+    public UUID updateMessage(Channel channel, Message message, String replaceText) {
+        Message findMessage = findMessageByChannel(channel, message.getMessageId());
+        findMessage.setText(replaceText);
+        return findMessage.getMessageId();
+    }
+
+    @Override
+    public UUID removeMessage(Channel channel,  Message message) {
+        List<Message> messages = findMessageListByChannel(channel);
+        Message findMessage = findMessageByChannel(channel, message.getMessageId());
+
+        messages.remove(findMessage);
+        messageList.put(channel.getChannelId(), messages);
+
+        return findMessage.getMessageId();
+
+    }
 }

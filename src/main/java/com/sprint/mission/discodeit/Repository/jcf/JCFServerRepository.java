@@ -38,19 +38,28 @@ public class JCFServerRepository implements ServerRepository {
 
     @Override
     public Channel findChannel(Server server, Channel channel) {
-        return findChannelByChanelId(server, channel.getChannelId());
+        return findChannelByChanelId(server.getServerId(), channel.getChannelId());
     }
-
-
 
     @Override
     public Channel findChannelByChanelId(Server server, UUID channelId) {
-        List<Channel> channels = findChannelListByServerId(server.getServerId());
+        return findChannelByChanelId(server.getServerId(), channelId);
+    }
+
+    @Override
+    public Channel findChannelByChanelId(UUID serverId, Channel channel) {
+        return findChannelByChanelId(serverId, channel.getChannelId());
+    }
+
+    @Override
+    public Channel findChannelByChanelId(UUID serverId, UUID channelId) {
+        List<Channel> channels = findChannelListByServerId(serverId);
         Channel findChannel = channels.stream().filter(c -> c.getChannelId().equals(channelId))
                 .findFirst()
                 .orElseThrow(() -> new ChannelNotFoundException("채널이 존재하지 않습니다."));
         return findChannel;
     }
+
 
     @Override
     public List<User> findUserListByChannelId(UUID channelId) {
