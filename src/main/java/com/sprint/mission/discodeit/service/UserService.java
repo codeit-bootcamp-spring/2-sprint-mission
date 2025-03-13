@@ -5,10 +5,10 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.UUID;
 
-public interface UserService{
-    void create(User user);
-    User find(UUID id);
+public interface UserService {
+    User create(String username, String email, String password);
+    User find(UUID userId);
     List<User> findAll();
-    void update(User user);
-    void delete(UUID id);
+    User update(UUID userId, String newUsername, String newEmail, String newPassword);
+    void delete(UUID userId);
 }

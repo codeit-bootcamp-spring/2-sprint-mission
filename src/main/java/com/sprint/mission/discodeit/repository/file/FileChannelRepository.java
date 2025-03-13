@@ -4,81 +4,97 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channels;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
     public FileChannelRepository() {
-        channels = loadFromFile("Channels.csv");
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Channel.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public void create(Channel channel) {
-        channels.put(channel.getId(), channel);
-        saveInFile(channels, "Channels.csv");
+    public Channel save(Channel channel) {
+        Path path = resolvePath(channel.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(channel);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return channel;
     }
 
     @Override
-    public void update(Channel channel) {
-        channels.put(channel.getId(), channel);
-        saveInFile(channels, "Channels.csv");
-    }
-
-    @Override
-    public void delete(UUID id) {
-        channels.remove(id);
-        saveInFile(channels, "Channels.csv");
+    public Optional<Channel> findById(UUID id) {
+        Channel channelNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                channelNullable = (Channel) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(channelNullable);
     }
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(channels.values());
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Channel) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public Channel find(UUID id) {
-        return channels.getOrDefault(id, null);
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
-    public static void saveInFile(Map<UUID, Channel> channels, String fileName) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
-            // 헤더
-            bw.write("key,value");
-            bw.newLine();
-
-            for (Map.Entry<UUID, Channel> entry : channels.entrySet()) {
-                UUID key = entry.getKey();
-                Channel value = entry.getValue();
-                bw.write(key + "," + value);
-                bw.newLine();
-            }
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-    }
-
-    public static Map<UUID, Channel> loadFromFile(String filename){
-        Map<UUID, Channel> loadedMap = new HashMap<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-            String line;
-            boolean header = true;
-            while ((line = br.readLine()) != null) {
-                if (header) {
-                    header = false; // 첫 줄(헤더) 건너뛰기
-                    continue;
-                }
-                String[] tokens = line.split(",");
-                UUID key = UUID.fromString(tokens[0]);
-                Channel value = new Channel(tokens[1]);
-                loadedMap.put(key, value);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return loadedMap;
     }
 }

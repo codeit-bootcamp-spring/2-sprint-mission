@@ -5,86 +5,46 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class BasicUserService implements UserService {
-    private static BasicUserService instance;
     private final UserRepository userRepository;
 
-    private BasicUserService(UserRepository userRepository) {
+    public BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public static synchronized BasicUserService getInstance(UserRepository userRepository) {
-        if (instance == null) {
-            instance = new BasicUserService(userRepository);
-        }
-        return instance;
+    @Override
+    public User create(String username, String email, String password) {
+        User user = new User(username, email, password);
+        return userRepository.save(user);
     }
 
     @Override
-    public void create(User user) {
-        System.out.println("==== 유저 생성 중... ===");
-        if (user == null) {
-            throw new IllegalArgumentException("유저 정보가 NULL입니다.");
-        }
-
-        if (userRepository.find(user.getId()) != null) {
-            throw new RuntimeException("유저가 이미 존재합니다.");
-        }
-        userRepository.create(user);
-        System.out.println("[" + user +"] 유저 생성 완료 " + user.getId());
-    }
-
-    @Override
-    public User find(UUID id) {
-        System.out.println("==== 유저(단건) 조회 중... ===");
-        if (id == null) {
-            throw new IllegalArgumentException("ID가 NULL입니다.");
-        }
-
-        if (userRepository.find(id) == null) {
-            throw new RuntimeException("유저가 존재하지 않습니다.");
-        }
-        System.out.println("선택한 유저를 조회합니다.");
-        return userRepository.find(id);
+    public User find(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
     @Override
     public List<User> findAll() {
-        System.out.println("==== 유저(다건) 조회 중... ===");
-        if (userRepository.findAll().isEmpty()) {
-            System.out.println("등록된 유저가 없습니다.");
-        }
-        System.out.println("모든 유저를 조회합니다.");
         return userRepository.findAll();
     }
 
     @Override
-    public void update(User user) {
-        System.out.println("==== 유저 수정 중... ===");
-        if (user == null) {
-            throw new IllegalArgumentException("유저 정보가 NULL입니다.");
-        }
-
-        if (userRepository.find(user.getId()) == null) {
-            throw new RuntimeException("유저가 존재하지 않습니다.");
-        }
-        userRepository.update(user);
-        System.out.println("[" + user +"] 유저 수정 완료 " + user.getId());
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        user.update(newUsername, newEmail, newPassword);
+        return userRepository.save(user);
     }
 
     @Override
-    public void delete(UUID id) {
-        System.out.println("==== 유저 삭제 중... ===");
-        if (id == null) {
-            throw new IllegalArgumentException("ID가 NULL입니다.");
+    public void delete(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
         }
-
-        if (userRepository.find(id) == null) {
-            throw new RuntimeException("유저가 존재하지 않습니다.");
-        }
-        userRepository.delete(id);
-        System.out.println("유저 삭제 완료");
+        userRepository.deleteById(userId);
     }
 }
