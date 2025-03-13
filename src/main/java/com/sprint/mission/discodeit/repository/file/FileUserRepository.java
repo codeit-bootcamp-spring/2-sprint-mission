@@ -9,30 +9,23 @@ import java.util.*;
 public class FileUserRepository implements UserRepository {
     private final String fileName = "user.ser";
     private final Map<UUID, User> userMap;
+    private final FileDataManager fileDataManager;
 
     public FileUserRepository() {
+        this.fileDataManager = new FileDataManager(fileName);
         this.userMap = loadUserList();
     }
 
     public void saveUserList() {
-        try (FileOutputStream fos = new FileOutputStream(fileName);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(userMap);
-        } catch (IOException e) {
-            throw new RuntimeException("데이터를 저장하는데 실패했습니다.", e);
-        }
+        fileDataManager.saveObjectToFile(userMap);
     }
 
     public Map<UUID, User> loadUserList() {
-        try (FileInputStream fis = new FileInputStream(fileName);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            Object userMap = ois.readObject();
-            return (Map<UUID, User>) userMap;
-        } catch (FileNotFoundException e) {
+        Map<UUID, User> loadedData = fileDataManager.loadObjectFromFile();
+        if (loadedData == null) {
             return new HashMap<>();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("데이터를 불러오는데 실패했습니다", e);
         }
+        return loadedData;
     }
 
     @Override

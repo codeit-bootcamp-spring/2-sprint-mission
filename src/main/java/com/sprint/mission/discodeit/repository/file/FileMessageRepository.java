@@ -9,30 +9,23 @@ import java.util.*;
 public class FileMessageRepository implements MessageRepository {
     private final String fileName = "message.ser";
     private final Map<UUID, Message> messageMap;
+    private final FileDataManager fileDataManager;
 
     public FileMessageRepository() {
+        this.fileDataManager = new FileDataManager(fileName);
         this.messageMap = loadMessageList();
     }
 
     public void saveMessageList() {
-        try (FileOutputStream fos = new FileOutputStream(fileName);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(messageMap);
-        } catch (IOException e) {
-            throw new RuntimeException("데이터를 저장하는데 실패했습니다.", e);
-        }
+        fileDataManager.saveObjectToFile(messageMap);
     }
 
     public Map<UUID, Message> loadMessageList() {
-        try (FileInputStream fis = new FileInputStream(fileName);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            Object messageMap = ois.readObject();
-            return (Map<UUID, Message>) messageMap;
-        } catch (FileNotFoundException e) {
+        Map<UUID, Message> loadedData = fileDataManager.loadObjectFromFile();
+        if (loadedData == null) {
             return new HashMap<>();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("데이터를 불러오는데 실패했습니다", e);
         }
+        return loadedData;
     }
 
     @Override

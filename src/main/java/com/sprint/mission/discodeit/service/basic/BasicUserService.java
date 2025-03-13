@@ -14,7 +14,7 @@ public class BasicUserService implements UserService {
     private static BasicUserService instance;
     private final UserRepository userRepository;
 
-    public BasicUserService(UserRepository userRepository) {
+    private BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

@@ -7,8 +7,8 @@ public class Message extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String content;
-    private UUID userId;
-    private UUID channelId;
+    private final UUID userId;
+    private final UUID channelId;
 
     public Message(String content, UUID userId, UUID channelId) {
         super();

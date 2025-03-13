@@ -15,7 +15,7 @@ public class BasicChannelService implements ChannelService {
     private static BasicChannelService instance;
     private final ChannelRepository channelRepository;
 
-    public BasicChannelService(ChannelRepository channelRepository) {
+    private BasicChannelService(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
     }
 

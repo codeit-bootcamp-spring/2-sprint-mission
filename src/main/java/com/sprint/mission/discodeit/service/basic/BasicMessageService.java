@@ -19,7 +19,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelService channelService;
     private final UserService userService;
 
-    public BasicMessageService(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
+    private BasicMessageService(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
         this.messageRepository = messageRepository;
         this.channelService = channelService;
         this.userService = userService;

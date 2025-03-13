@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
@@ -9,30 +10,23 @@ import java.util.*;
 public class FileChannelRepository implements ChannelRepository {
     private final String fileName = "channel.ser";
     private final Map<UUID, Channel> channelMap;
+    private final FileDataManager fileDataManager;
 
     public FileChannelRepository() {
+        this.fileDataManager = new FileDataManager(fileName);
         this.channelMap = loadChannelList();
     }
 
     public void saveChannelList() {
-        try (FileOutputStream fos = new FileOutputStream(fileName);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(channelMap);
-        } catch (IOException e) {
-            throw new RuntimeException("데이터를 저장하는데 실패했습니다.", e);
-        }
+        fileDataManager.saveObjectToFile(channelMap);
     }
 
     public Map<UUID, Channel> loadChannelList() {
-        try (FileInputStream fis = new FileInputStream(fileName);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            Object channelMap = ois.readObject();
-            return (Map<UUID, Channel>) channelMap;
-        } catch (FileNotFoundException e) {
+        Map<UUID, Channel> loadedData = fileDataManager.loadObjectFromFile();
+        if (loadedData == null) {
             return new HashMap<>();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("데이터를 불러오는데 실패했습니다", e);
         }
+        return loadedData;
     }
 
     @Override
@@ -66,5 +60,9 @@ public class FileChannelRepository implements ChannelRepository {
             saveChannelList();
         }
         return removed;
+    }
+
+    public Map<UUID, Channel> getChannelMap() {
+        return channelMap;
     }
 }
