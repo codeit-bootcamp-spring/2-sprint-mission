@@ -3,9 +3,8 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -18,10 +17,10 @@ public class JavaApplication {
 //        ChannelService channelService = JCFChannelService.getInstance(userService);
 //        MessageService  messageService = JCFMessageService.getInstance(userService, channelService);
 
-        UserService userService = FileUserService.getInstance();
-        ChannelService channelService = FileChannelService.getInstance(userService);
-        MessageService messageService = FileMessageService.getInstance(userService, channelService);
-
+        ApplicationContext context = SpringApplication.run(JavaApplication.class, args);
+        UserService userService = context.getBean(UserService.class);
+        ChannelService channelService = context.getBean(ChannelService.class);
+        MessageService messageService = context.getBean(MessageService.class);
 
         Scanner scanner = new Scanner(System.in);
 
