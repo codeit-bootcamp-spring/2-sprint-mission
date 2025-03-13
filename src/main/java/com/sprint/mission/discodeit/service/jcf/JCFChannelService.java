@@ -23,11 +23,6 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannelData() {
-
-    }
-
-    @Override
     public Channel createChannel(String channelName) {
         Channel channel = new Channel(channelName);
         channels.put(channel.getId(), channel);

@@ -18,8 +18,6 @@ public class FileUserRepository implements UserRepository {
         users = fileStorageManager.loadFile(FILE_PATH);
     }
 
-
-
     @Override
     public void save() {
         fileStorageManager.saveFile(FILE_PATH, users);

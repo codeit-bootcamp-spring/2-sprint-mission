@@ -20,11 +20,6 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void updateUserData() {
-
-    }
-
-    @Override
     public User createUser(String username) {
         User user = new User(username);
         users.put(user.getId(), user);
