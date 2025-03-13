@@ -12,21 +12,8 @@ import java.util.stream.Collectors;
 public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository {
     private static volatile FileMessageRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
 
-    private FileMessageRepository() {
+    public FileMessageRepository() {
         super(Message.class, Paths.get(System.getProperty("user.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\messagedata"));
-    }
-
-    public static FileMessageRepository getInstance() {
-        // 첫 번째 null 체크 (성능 최적화)
-        if (instance == null) {
-            synchronized (FileMessageRepository.class) {
-                // 두 번째 null 체크 (동기화 구간 안에서 중복 생성 방지)
-                if (instance == null) {
-                    instance = new FileMessageRepository();
-                }
-            }
-        }
-        return instance;
     }
 
     @Override

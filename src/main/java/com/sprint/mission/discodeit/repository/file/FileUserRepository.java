@@ -11,21 +11,8 @@ import java.util.UUID;
 public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository {
     private static volatile FileUserRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
 
-    private FileUserRepository() {
+    public FileUserRepository() {
         super(User.class, Paths.get(System.getProperty("user.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\userdata"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
-    }
-
-    public static FileUserRepository getInstance() {
-        // 첫 번째 null 체크 (성능 최적화)
-        if (instance == null) {
-            synchronized (FileUserRepository.class) {
-                // 두 번째 null 체크 (동기화 구간 안에서 중복 생성 방지)
-                if (instance == null) {
-                    instance = new FileUserRepository();
-                }
-            }
-        }
-        return instance;
     }
 
     @Override

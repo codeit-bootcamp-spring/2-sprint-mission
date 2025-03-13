@@ -11,21 +11,8 @@ import java.util.UUID;
 public class FileChannelRepository extends AbstractFileRepository<Channel> implements ChannelRepository {
     private static volatile FileChannelRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
 
-    private FileChannelRepository() {
+    public FileChannelRepository() {
         super(Channel.class, Paths.get(System.getProperty("user.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\channeldata"));   // 현재 프로그램이 실행되고 있는 디렉토리로 설정
-    }
-
-    public static FileChannelRepository getInstance() {
-        // 첫 번째 null 체크 (성능 최적화)
-        if (instance == null) {
-            synchronized (FileChannelRepository.class) {
-                // 두 번째 null 체크 (동기화 구간 안에서 중복 생성 방지)
-                if (instance == null) {
-                    instance = new FileChannelRepository();
-                }
-            }
-        }
-        return instance;
     }
 
     @Override
