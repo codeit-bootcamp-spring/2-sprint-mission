@@ -8,18 +8,17 @@ import java.util.UUID;
 
 @Getter
 public class BaseEntity implements Serializable {
-
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
     public BaseEntity() {
         id = UUID.randomUUID();
-        createdAt = Instant.now().getEpochSecond();
+        createdAt = Instant.now();
         updatedAt = createdAt;
     }
 
     public void updateUpdatedAt() {
-        this.updatedAt = Instant.now().getEpochSecond();
+        this.updatedAt = Instant.now();
     }
 }
