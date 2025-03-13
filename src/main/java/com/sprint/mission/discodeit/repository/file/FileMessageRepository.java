@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.FileStorageManager;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class FileMessageRepository implements MessageRepository {
     private static Map<UUID, Message> messages = new ConcurrentHashMap<>();
     private final FileStorageManager fileStorageManager;
 
+    @Autowired
     public FileMessageRepository(FileStorageManager fileStorageManager) {
         this.fileStorageManager = fileStorageManager;
         messages = fileStorageManager.loadFile(FILE_PATH);

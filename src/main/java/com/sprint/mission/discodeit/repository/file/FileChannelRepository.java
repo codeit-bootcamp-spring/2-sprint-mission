@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.FileStorageManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -18,7 +20,8 @@ public class FileChannelRepository implements ChannelRepository {
     private static Map<UUID, Channel> channels = new ConcurrentHashMap<>();
     private final FileStorageManager fileStorageManager;
 
-    public FileChannelRepository(FileStorageManager fileStorageManager) {
+    @Autowired
+    public FileChannelRepository(@Lazy FileStorageManager fileStorageManager) {
         this.fileStorageManager = fileStorageManager;
         channels = fileStorageManager.loadFile(FILE_PATH);
     }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.FileStorageManager;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -16,6 +17,7 @@ public class FileUserRepository implements UserRepository {
     private static Map<UUID, User> users = new ConcurrentHashMap<>();
     private final FileStorageManager fileStorageManager;
 
+    @Autowired
     public FileUserRepository(FileStorageManager fileStorageManager) {
         this.fileStorageManager = fileStorageManager;
         users = fileStorageManager.loadFile(FILE_PATH);
