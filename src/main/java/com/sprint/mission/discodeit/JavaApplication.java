@@ -1,105 +1,89 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.UserEntity;
-import com.sprint.mission.discodeit.entity.ChannelEntity;
-import com.sprint.mission.discodeit.entity.MessageEntity;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
 
-import java.util.Comparator;
+
+import java.util.List;
 import java.util.UUID;
-import java.util.Optional;
 
 public class JavaApplication {
+    static void userCRUDTest(UserService userService) {
+        // 생성
+        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        System.out.println("유저 생성: " + user.getId());
+        // 조회
+        User foundUser = userService.find(user.getId());
+        System.out.println("유저 조회(단건): " + foundUser.getId());
+        List<User> foundUsers = userService.findAll();
+        System.out.println("유저 조회(다건): " + foundUsers.size());
+        // 수정
+        User updatedUser = userService.update(user.getId(), null, null, "woody5678");
+        System.out.println("유저 수정: " + String.join("/", updatedUser.getUsername(), updatedUser.getEmail(), updatedUser.getPassword()));
+        // 삭제
+        userService.delete(user.getId());
+        List<User> foundUsersAfterDelete = userService.findAll();
+        System.out.println("유저 삭제: " + foundUsersAfterDelete.size());
+    }
+
+    static void channelCRUDTest(ChannelService channelService) {
+        // 생성
+        Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+        System.out.println("채널 생성: " + channel.getId());
+        // 조회
+        Channel foundChannel = channelService.find(channel.getId());
+        System.out.println("채널 조회(단건): " + foundChannel.getId());
+        List<Channel> foundChannels = channelService.findAll();
+        System.out.println("채널 조회(다건): " + foundChannels.size());
+        // 수정
+        Channel updatedChannel = channelService.update(channel.getId(), "공지사항", null);
+        System.out.println("채널 수정: " + String.join("/", updatedChannel.getName(), updatedChannel.getDescription()));
+        // 삭제
+        channelService.delete(channel.getId());
+        List<Channel> foundChannelsAfterDelete = channelService.findAll();
+        System.out.println("채널 삭제: " + foundChannelsAfterDelete.size());
+    }
+
+    static void messageCRUDTest(MessageService messageService) {
+        // 생성
+        UUID channelId = UUID.randomUUID();
+        UUID authorId = UUID.randomUUID();
+        Message message = messageService.create("안녕하세요.", channelId, authorId);
+        System.out.println("메시지 생성: " + message.getId());
+        // 조회
+        Message foundMessage = messageService.find(message.getId());
+        System.out.println("메시지 조회(단건): " + foundMessage.getId());
+        List<Message> foundMessages = messageService.findAll();
+        System.out.println("메시지 조회(다건): " + foundMessages.size());
+        // 수정
+        Message updatedMessage = messageService.update(message.getId(), "반갑습니다.");
+        System.out.println("메시지 수정: " + updatedMessage.getContent());
+        // 삭제
+        messageService.delete(message.getId());
+        List<Message> foundMessagesAfterDelete = messageService.findAll();
+        System.out.println("메시지 삭제: " + foundMessagesAfterDelete.size());
+    }
+
     public static void main(String[] args) {
-        //User
-        JCFUserService userService = new JCFUserService();
-        UserEntity user1 = new UserEntity("username1", "nickname1", "010-1111-1111", "user1@google.com","password1" );
-        UserEntity user2 = new UserEntity("username2", "nickname2", "010-2222-2222", "user2@google.com","password2" );
-        UserEntity user3 = new UserEntity("username3", "nickname3", "010-3333-3333", "user3@google.com","password3" );
-        UserEntity user4 = new UserEntity("username4", "nickname4", "010-4444-4444", "user4@google.com","password4" );
-        userService.create(user1);
-        userService.create(user2);
-        userService.create(user3);
-        userService.create(user4);
-        System.out.println("사용자 등록: ");
-        userService.findAll().forEach(user -> System.out.println("- " + user.getUsername()));
+        // 서비스 초기화
+        UserService userService = new FileUserService();
+        ChannelService channelService = new FileChannelService();
+        MessageService messageService = new FileMessageService();
 
-        Optional<UserEntity> foundUser = userService.findById(user1.getId());
-        foundUser.ifPresent(user -> System.out.println("조회한 사용자: " + user.getUsername()));
-
-        userService.updateUsername(user1.getId(), "useruser");
-        System.out.println("사용자명 변경: " + user1.getUsername());
-
-        System.out.println("삭제할 사용자: " + user3.getUsername());
-        userService.deleteById(user3.getId());
-        System.out.println("사용자명 삭제 완료");
-
-        System.out.println("현재 사용자 목록: ");
-        userService.findAll().forEach(user -> System.out.println("- " + user.getUsername()));
-
-        //Channel
-        JCFMessageService messageService = new JCFMessageService(userService);
-        JCFChannelService channelService = new JCFChannelService(messageService);
-
-
-        ChannelEntity channel1 = new ChannelEntity("channelHi1", "text");
-        ChannelEntity channel2 = new ChannelEntity("channelHi2", "text");
-        ChannelEntity channel3 = new ChannelEntity("channelHi3" , "text");
-        ChannelEntity channel4 = new ChannelEntity("channelHi4", "text");
-        channelService.create(channel1);
-        channelService.create(channel2);
-        channelService.create(channel3);
-        channelService.create(channel4);
-        System.out.println("======================\n채널 등록: ");
-        channelService.findAll().forEach(channel -> System.out.println("- " + channel.getName()));
-
-        Optional <ChannelEntity> foundChannel = channelService.getChannelByName("channelHi1");
-        foundChannel.ifPresent(channel -> System.out.println("조회한 채널: "+channel.getName()));
-
-        channelService.updateChannelName("channelHi1","channelBye1");
-
-        Optional<ChannelEntity> updatedChannelOptional = channelService.getChannelByName("channelBye1");
-
-        ChannelEntity updatedChannel = updatedChannelOptional.get();
-        System.out.println("채널명 변경: "+ updatedChannel.getName());
-
-        System.out.println("삭제할 채널: " + channel2.getId());
-        channelService.deleteById(channel2.getId());
-        System.out.println("채널 삭제 완료");
-
-        System.out.println("현재 채널 목록: ");
-        channelService.findAll().forEach(channel -> System.out.println("- " + channel.getName()));
-
-        //Message
-        MessageEntity message1 = new MessageEntity("안녕하세요 !", user1,channel1);
-        MessageEntity message2 = new MessageEntity("좋은",user2,channel2);
-        MessageEntity message3 = new MessageEntity("아침", user3,channel3);
-        MessageEntity message4 = new MessageEntity("입니다:)", user4, channel4);
-        messageService.create(message1);
-        messageService.create(message2);
-        messageService.create(message3);
-        messageService.create(message4);
-        System.out.println("======================\n메시지 등록: ");
-        messageService.findAll().forEach(message -> System.out.println("- " + message.getContent()));
-
-        Optional <MessageEntity> foundMessage = messageService.getMessageById(message4.getId());
-        foundMessage.ifPresent(message -> System.out.println("조회한 메시지: " + message.getContent()));
-
-        messageService.updateMessage(message4.getId(),"보내시길 바랍니다.");
-        System.out.println("수정할 메시지: " + message4.getContent());
-
-        System.out.println("메시지 변경: " + message1.getContent());
-        messageService.deleteById(message1.getId());
-        System.out.println("메시지 삭제 완료");
-
-        System.out.println("현재 메시지 목록: ");
-        messageService.findAll()
-                .stream()
-                .sorted(Comparator.comparing(MessageEntity::getCreatedTime)) // 생성 시간 기준 정렬
-                .forEach(message -> System.out.println("- " + message.getContent()));
-
-
+        // 테스트
+        userCRUDTest(userService);
+        channelCRUDTest(channelService);
+        messageCRUDTest(messageService);
     }
 }

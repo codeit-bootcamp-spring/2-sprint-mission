@@ -1,92 +1,53 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.UserEntity;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
-public class JCFUserService extends JCFBaseService<UserEntity> implements UserService{
+public class JCFUserService implements UserService {
+    private final Map<UUID, User> data;
 
-    @Override
-    public Optional<UserEntity> getUserByUsername(String username) {
-        return data.stream()
-                .filter(user -> user.getUsername().equals(username))
-                .findFirst();
+    public JCFUserService() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public Optional<UserEntity> findById(UUID id) {
-        return super.findById(id);
+    public User create(String username, String email, String password) {
+        User user = new User(username, email, password);
+        this.data.put(user.getId(), user);
+
+        return user;
     }
 
     @Override
-    public UserEntity updateUsername(UUID userId, String newUsername) {
-        Optional<UserEntity> userOptional = findById(userId);
-        if (userOptional.isPresent()) {
-            UserEntity user = userOptional.get();
+    public User find(UUID userId) {
+        User userNullable = this.data.get(userId);
 
-            boolean exists = data.stream()
-                    .anyMatch(existingUser -> !existingUser.getId().equals(userId)
-                    && existingUser.getUsername().equals(newUsername));
-
-            if (exists) {
-                throw new IllegalArgumentException("이미 존재하는 사용자명입니다.");
-            }
-
-            user.updateUsername(newUsername, data);
-            return update(user);
-            }
-        throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
-        }
-
-    @Override
-    public UserEntity updateNickname(String nickname, String newNickname) {
-        Optional<UserEntity> userOptional = data.stream()
-                .filter(user -> user.getNickname().equals(nickname))
-                .findFirst();
-        if (userOptional.isPresent()) {
-            UserEntity user = userOptional.get();
-            user.updateNickname(newNickname);
-            return update(user);
-        }
-        throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+        return Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
-    @Override
-    public UserEntity updatePhoneNumber(String phoneNumber, String newPhoneNumber) {
-        Optional<UserEntity> userOptional = data.stream()
-                .filter(user -> user.getPhonenumber().equals(phoneNumber))
-                .findFirst();
 
-        if (userOptional.isPresent()) {
-            UserEntity user = userOptional.get();
-            user.updatePhoneNumber(newPhoneNumber);
-            return update(user);
-        }
-        throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
-    }
     @Override
-    public UserEntity updateEmail(String email, String newEmail) {
-        Optional<UserEntity> userOptional = data.stream()
-                .filter(user -> user.getEmail().equals(email))
-                .findFirst();
+    public List<User> findAll() {
+        return this.data.values().stream().toList();
+    }
 
-        if (userOptional.isPresent()) {
-            UserEntity user = userOptional.get();
-            user.updateEmail(newEmail);
-            return update(user);
-        }
-        throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
-    }
     @Override
-    public UserEntity updatePassword(String password, String newPassword) {
-        Optional<UserEntity> userOptional = data.stream()
-                .filter(user->user.getPassword().equals(password))
-                .findFirst();
-        if (userOptional.isPresent()) {
-            UserEntity user = userOptional.get();
-            return update(user);
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User userNullable = this.data.get(userId);
+        User user = Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        user.update(newUsername, newEmail, newPassword);
+
+        return user;
+    }
+
+    @Override
+    public void delete(UUID userId) {
+        if (!this.data.containsKey(userId)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
         }
-        throw new IllegalArgumentException("사용자를 찾을 수없습니다.");
+        this.data.remove(userId);
     }
 }

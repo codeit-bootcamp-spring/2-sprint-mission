@@ -1,66 +1,53 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.MessageEntity;
-import com.sprint.mission.discodeit.entity.UserEntity;
-import com.sprint.mission.discodeit.entity.ChannelEntity;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
-public class JCFMessageService extends JCFBaseService<MessageEntity> implements MessageService {
+public class JCFMessageService implements MessageService {
+    private final Map<UUID, Message> data;
 
-    private UserService userService;
-
-    public JCFMessageService(UserService userService) {
-        this.userService = userService;
+    public JCFMessageService() {
+        this.data = new HashMap<>();
     }
 
-    private UserEntity findUserById(UUID userId) {
-        return userService.findById(userId).orElse(null);
-    }
     @Override
-    public MessageEntity createMessage(String content, UUID senderId, ChannelEntity channel ){
-        UserEntity sender = findUserById(senderId);
+    public Message create(String content, UUID channelId, UUID authorId) {
+        Message message = new Message(content, channelId, authorId);
+        this.data.put(message.getId(), message);
 
-        if (sender == null || channel == null){
-            throw new IllegalArgumentException("존재하지 않는 사용자 또는 채널입니다.");
-        }
-
-        MessageEntity message = new MessageEntity(content, sender, channel);
-        channel.addMessage(message);
-        data.add(message);
         return message;
     }
 
     @Override
-    public Optional<MessageEntity> getMessageById(UUID messageId) {
-        return findById(messageId);
+    public Message find(UUID messageId) {
+        Message messageNullable = this.data.get(messageId);
+
+        return Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
     @Override
-    public List<MessageEntity> getAllMessages() {
-        return findAll();
+    public List<Message> findAll() {
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public void updateMessage (UUID messageId, String newContent){
-        findById(messageId).ifPresent(message -> {
-            message.updateMessage(newContent);
-            update(message);
-        });
+    public Message update(UUID messageId, String newContent) {
+        Message messageNullable = this.data.get(messageId);
+        Message message = Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
+
+        return message;
     }
 
     @Override
-    public void delete(MessageEntity message) {
-        message.getChannel().getMessages().remove(message);
-        data.remove(message); //객체로 메시지 삭제
-    }
-
-    @Override
-    public void deleteById(UUID messageId){
-        findById(messageId).ifPresent(this::delete); //ID로 메시지 삭제
+    public void delete(UUID messageId) {
+        if (!this.data.containsKey(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
+        }
+        this.data.remove(messageId);
     }
 }
