@@ -158,25 +158,6 @@ public class JavaApplication {
     }
 
     public static void main(String[] args) {
-        // Repository 인스턴스 생성
-        UserRepository userRepository = FileUserRepository.getInstance();
-        ChannelRepository channelRepository = FileChannelRepository.getInstance();
-        MessageRepository messageRepository = FileMessageRepository.getInstance();
 
-        // Service 인스턴스 생성
-        UserService userService = BasicUserService.getInstance(userRepository);
-        ChannelService channelService = BasicChannelService.getInstance(channelRepository);
-        MessageService messageService = BasicMessageService.getInstance(messageRepository, channelRepository, userRepository);
-
-        // 테스트
-        userCRUDTest(userService);
-        channelCRUDTest(channelService);
-        messageCRUDTest(userService, channelService, messageService);
-
-        // 셋업
-        User user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
-        // 테스트
-        messageCreateTest(messageService, channel, user);
     }
 }
