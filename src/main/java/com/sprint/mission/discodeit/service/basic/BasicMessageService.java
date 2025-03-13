@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 @Service
 public class BasicMessageService implements MessageService {
 
-    private static BasicMessageService INSTANCE;
     private final MessageRepository messageRepository;
     private final ChannelService channelService;
     private final UserService userService;
@@ -28,17 +27,9 @@ public class BasicMessageService implements MessageService {
         this.userService = userService;
     }
 
-    public static synchronized BasicMessageService getInstance(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
-        if (INSTANCE == null) {
-            INSTANCE = new BasicMessageService(messageRepository, channelService, userService);
-        }
-        return INSTANCE;
-    }
-
     private void saveMessageData() {
         messageRepository.save();
     }
-
 
     @Override
     public Message createMessage(UUID senderId, UUID channelId, String content) {

@@ -13,18 +13,10 @@ import java.util.UUID;
 @Service
 public class BasicUserService implements UserService {
 
-    private static BasicUserService INSTANCE;
     private final UserRepository userRepository;
 
     private BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-    }
-
-    public static synchronized BasicUserService getInstance(UserRepository userRepository) {
-        if (INSTANCE == null) {
-            INSTANCE = new BasicUserService(userRepository);
-        }
-        return INSTANCE;
     }
 
     private void saveUser() {

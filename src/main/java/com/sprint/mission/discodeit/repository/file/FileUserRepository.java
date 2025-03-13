@@ -3,16 +3,18 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.FileStorageManager;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Repository
 public class FileUserRepository implements UserRepository {
 
     private static final String FILE_PATH = "src/main/resources/users.dat";
     private static Map<UUID, User> users = new HashMap<>();
     private final FileStorageManager fileStorageManager;
-    
+
     public FileUserRepository(FileStorageManager fileStorageManager) {
         this.fileStorageManager = fileStorageManager;
         users = fileStorageManager.loadFile(FILE_PATH);

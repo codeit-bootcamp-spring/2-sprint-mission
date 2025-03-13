@@ -3,20 +3,21 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.FileStorageManager;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
 
     private static final String FILE_PATH = "src/main/resources/messages.dat";
     private static Map<UUID, Message> messages = new HashMap<>();
     private final FileStorageManager fileStorageManager;
-    
+
     public FileMessageRepository(FileStorageManager fileStorageManager) {
         this.fileStorageManager = fileStorageManager;
         messages = fileStorageManager.loadFile(FILE_PATH);
     }
-    
 
     @Override
     public void save() {

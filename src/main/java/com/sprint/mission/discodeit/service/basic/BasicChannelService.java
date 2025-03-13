@@ -1,31 +1,24 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@Service
 public class BasicChannelService implements ChannelService {
 
-    private static BasicChannelService INSTANCE;
     private final ChannelRepository channelRepository;
     private final UserService userService;
 
     public BasicChannelService(ChannelRepository channelRepository, UserService userService) {
         this.channelRepository = channelRepository;
         this.userService = userService;
-    }
-
-    public static synchronized BasicChannelService getInstance(ChannelRepository channelRepository, UserService userService) {
-        if (INSTANCE == null) {
-            INSTANCE = new BasicChannelService(channelRepository, userService);
-        }
-        return INSTANCE;
     }
 
     private void saveChannelData() {
