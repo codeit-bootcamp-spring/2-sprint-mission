@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
+import java.util.UUID;
 import lombok.Getter;
 
 @Getter
@@ -9,6 +10,8 @@ public class User extends BaseEntity implements Serializable {
     private String username;
     private String email;
     private String password;
+
+    private UUID profileId;
 
     public User(String username, String email, String password) {
         super();
