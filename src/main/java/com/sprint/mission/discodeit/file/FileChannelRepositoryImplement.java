@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.util.ValidationUtil;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class FileChannelRepositoryImplement implements ChannelRepository {
@@ -50,7 +51,7 @@ public class FileChannelRepositoryImplement implements ChannelRepository {
                 throw new RuntimeException("채널 데이터 로드 중 오류 발생: " + e.getMessage());
             }
         } else {
-            channelRepository = new HashMap<>();
+            channelRepository = new ConcurrentHashMap<>();//동시성 문제
             System.out.println("새로운 채널 저장소 생성");
         }
     }

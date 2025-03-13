@@ -5,9 +5,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.file.FileChannelRepositoryImplement;
 import com.sprint.mission.discodeit.file.FileMessageRepositoryImplement;
 import com.sprint.mission.discodeit.file.FileUserRepositoryImplement;
-import com.sprint.mission.discodeit.basic.serviceimpl.ChannelServiceImplement;
-import com.sprint.mission.discodeit.basic.serviceimpl.MessageServiceImplement;
-import com.sprint.mission.discodeit.basic.serviceimpl.UserServiceImplement;
+import com.sprint.mission.discodeit.basic.serviceimpl.BasicChannelService;
+import com.sprint.mission.discodeit.basic.serviceimpl.BasicMessageService;
+import com.sprint.mission.discodeit.basic.serviceimpl.BasicUserService;
 import com.sprint.mission.discodeit.basic.serviceimpl.UserChannelService;
 import com.sprint.mission.discodeit.service.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -68,9 +68,9 @@ public class Main {
         UserChannelService userChannelService = UserChannelService.getInstance(userRepository, channelRepository);
 
         // 서비스 객체 생성 - 싱글톤 패턴 사용
-        userService = UserServiceImplement.getInstance(userRepository, userChannelService);
-        channelService = ChannelServiceImplement.getInstance(channelRepository, userChannelService);
-        messageService = MessageServiceImplement.getInstance(messageRepository, userRepository, channelRepository);
+        userService = BasicUserService.getInstance(userRepository, userChannelService);
+        channelService = BasicChannelService.getInstance(channelRepository, userChannelService);
+        messageService = BasicMessageService.getInstance(messageRepository, userRepository, channelRepository);
 
         System.out.println("서비스 객체 초기화 완료");
     }

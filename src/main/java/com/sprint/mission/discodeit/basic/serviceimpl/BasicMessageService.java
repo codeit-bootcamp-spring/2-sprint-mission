@@ -12,14 +12,14 @@ import com.sprint.mission.discodeit.service.UserRepository;
 import java.util.List;
 import java.util.UUID;
 
-public class MessageServiceImplement implements MessageService {
+public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
-    private static MessageServiceImplement instance;
+    private static BasicMessageService instance;
 
-    private MessageServiceImplement(
+    private BasicMessageService(
             MessageRepository messageRepository,
             UserRepository userRepository,
             ChannelRepository channelRepository) {
@@ -28,12 +28,12 @@ public class MessageServiceImplement implements MessageService {
         this.channelRepository = channelRepository;
     }
 
-    public static synchronized MessageServiceImplement getInstance(
+    public static synchronized BasicMessageService getInstance(
             MessageRepository messageRepository,
             UserRepository userRepository,
             ChannelRepository channelRepository) {
         if (instance == null) {
-            instance = new MessageServiceImplement(messageRepository, userRepository, channelRepository);
+            instance = new BasicMessageService(messageRepository, userRepository, channelRepository);
         }
         return instance;
     }

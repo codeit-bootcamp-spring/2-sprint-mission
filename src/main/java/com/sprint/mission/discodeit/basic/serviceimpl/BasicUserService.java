@@ -9,15 +9,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public class UserServiceImplement implements UserService {
+public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserChannelService userChannelService;
     
     // 싱글톤 인스턴스
-    private static UserServiceImplement instance;
+    private static BasicUserService instance;
     
     // private 생성자로 변경하여 외부에서 인스턴스 생성을 제한
-    private UserServiceImplement(
+    private BasicUserService(
             UserRepository userRepository,
             UserChannelService userChannelService) {
         this.userRepository = userRepository;
@@ -25,11 +25,11 @@ public class UserServiceImplement implements UserService {
     }
     
     // 싱글톤 인스턴스를 반환하는 정적 메소드
-    public static synchronized UserServiceImplement getInstance(
+    public static synchronized BasicUserService getInstance(
             UserRepository userRepository,
             UserChannelService userChannelService) {
         if (instance == null) {
-            instance = new UserServiceImplement(userRepository, userChannelService);
+            instance = new BasicUserService(userRepository, userChannelService);
         }
         return instance;
     }

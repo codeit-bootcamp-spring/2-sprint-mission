@@ -7,14 +7,14 @@ import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
 
-public class ChannelServiceImplement implements ChannelService {
+public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserChannelService userChannelService;
     
 
-    private static ChannelServiceImplement instance;
+    private static BasicChannelService instance;
 
-    private ChannelServiceImplement(
+    private BasicChannelService(
             ChannelRepository channelRepository,
             UserChannelService userChannelService) {
         this.channelRepository = channelRepository;
@@ -22,11 +22,11 @@ public class ChannelServiceImplement implements ChannelService {
     }
     
     
-    public static synchronized ChannelServiceImplement getInstance(
+    public static synchronized BasicChannelService getInstance(
             ChannelRepository channelRepository,
             UserChannelService userChannelService) {
         if (instance == null) {
-            instance = new ChannelServiceImplement(channelRepository, userChannelService);
+            instance = new BasicChannelService(channelRepository, userChannelService);
         }
         return instance;
     }
