@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data = new HashMap<>();
-    private static final String FILE_NAME = "channel.sar";
+    private static final String FILE_NAME = "channel.ser";
 
     public FileChannelRepository() {
         loadFromFile();
@@ -36,27 +36,23 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findAllByKeys(List<UUID> channelKeys) {
-        return channelKeys.stream().map(data::get).toList();
-    }
-
-    @Override
     public boolean existsByKey(UUID channelKey) {
         return data.containsKey(channelKey);
     }
 
     @Override
-    public UUID findKeyByName(String name) {
+    public Channel findByName(String name) {
         return data.values().stream()
                 .filter(c -> c.getName().equals(name))
-                .map(Channel::getUuid)
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
-    public List<UUID> findKeyByNames(List<String> names) {
-        return null;
+    public List<Channel> findAllByNames(List<String> names) {
+        return data.values().stream()
+                .filter(c -> names.contains(c.getName()))
+                .toList();
     }
 
     private void saveToFile() {

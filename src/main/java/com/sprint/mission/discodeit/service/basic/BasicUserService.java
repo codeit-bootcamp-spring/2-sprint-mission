@@ -15,14 +15,14 @@ public class BasicUserService implements UserService {
 
     @Override
     public UUID login(String id, String pwd, UUID loginUserKey) {
-        UUID userKey = userRepository.findUserKeyById(id);
-        if (userKey == null) {
+        User user = userRepository.findByUserId(id);
+        if (user == null) {
             throw new IllegalArgumentException("[Error] 잘못된 ID 또는 비밀번호 입니다.");
         }
         if (isLoginCheck(loginUserKey)) {
             throw new IllegalStateException("[Error] 이미 로그인 되어 있습니다.");
         }
-        return userKey;
+        return user.getUuid();
     }
 
 
@@ -35,8 +35,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(String id, String name, String pwd, String email, String phone) {
-        UUID userKey = userRepository.findUserKeyById(id);
-        if (userKey != null && userRepository.existsByKey(userKey)) {
+        User checkedUser = userRepository.findByUserId(id);
+        if (checkedUser != null && userRepository.existsByKey(checkedUser.getUuid())) {
             throw new IllegalArgumentException("[Error] 동일한 사용자가 존재합니다.");
         }
         User user = new User(id, name, pwd, email, phone);
@@ -45,20 +45,20 @@ public class BasicUserService implements UserService {
 
     @Override
     public User read(String id) {
-        UUID userKey = userRepository.findUserKeyById(id);
-        if (userKey == null) {
+        User user = userRepository.findByUserId(id);
+        if (user == null) {
             throw new IllegalArgumentException("[Error] 조회할 사용자가 존재하지 않습니다.");
         }
-        return userRepository.findByKey(userKey);
+        return user;
     }
 
     @Override
     public List<User> readAll(List<String> ids) {
-        List<UUID> userKeys = userRepository.findUserKeyByIds(ids);
-        if (userKeys.isEmpty()) {
+        List<User> users = userRepository.findAllByIds(ids);
+        if (users.isEmpty()) {
             throw new IllegalArgumentException("[Error] 조회할 사용자가 존재하지 않습니다.");
         }
-        return userRepository.findAllByKeys(userKeys);
+        return users;
     }
 
     @Override
@@ -96,7 +96,7 @@ public class BasicUserService implements UserService {
         if (userKey == null) {
             throw new IllegalArgumentException("[Error] 이름을 찾을 수 없습니다.");
         }
-        return userRepository.findUserName(userKey);
+        return userRepository.findByKey(userKey).getName();
     }
 
     @Override
@@ -104,7 +104,7 @@ public class BasicUserService implements UserService {
         if (userKey == null) {
             throw new IllegalArgumentException("[Error] ID를 찾을 수 없습니다.");
         }
-        return userRepository.findUserId(userKey);
+        return userRepository.findByKey(userKey).getId();
     }
 
     private boolean isLoginCheck(UUID userKey) {

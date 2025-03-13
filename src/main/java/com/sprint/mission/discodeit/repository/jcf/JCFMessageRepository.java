@@ -25,13 +25,6 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findByChannelKey(UUID channelKey) {
-        return data.values().stream()
-                .filter(m -> m.getChannelKey().equals(channelKey))
-                .findFirst()
-                .orElse(null);
-    }
-    @Override
     public List<Message> findAllByChannelKey(UUID channelKey) {
         return data.values().stream()
                 .filter(m -> m.getChannelKey().equals(channelKey))
@@ -39,10 +32,9 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public UUID findKeyByMessageId(int messageId) {
+    public Message findByMessageId(int messageId) {
         return data.values().stream()
                 .filter(m -> m.getMessageId() == messageId)
-                .map(Message::getUuid)
                 .findFirst()
                 .orElse(null);
     }

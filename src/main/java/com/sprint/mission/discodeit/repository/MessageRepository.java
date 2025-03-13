@@ -9,7 +9,6 @@ public interface MessageRepository {
     Message save(Message message);
     void delete(UUID messageKey);
     Message findByKey(UUID messageKey);
-    Message findByChannelKey(UUID channelKey);
     List<Message> findAllByChannelKey(UUID channelKey);
-    UUID findKeyByMessageId(int messageId);
+    Message findByMessageId(int messageId);
 }

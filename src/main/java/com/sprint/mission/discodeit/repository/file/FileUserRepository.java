@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.*;
 
 public class FileUserRepository implements UserRepository {
-    private static final String FILE_NAME = "users.sar";
+    private static final String FILE_NAME = "users.ser";
     private final Map<UUID, User> data = new HashMap<>();
 
     public FileUserRepository() {
@@ -27,11 +27,6 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findAllByKeys(List<UUID> userKeys) {
-        return userKeys.stream().map(data::get).toList();
-    }
-
-    @Override
     public boolean existsByKey(UUID userKey) {
         return data.containsKey(userKey);
     }
@@ -43,30 +38,16 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public String findUserName(UUID userKey) {
-        return data.get(userKey).getName();
-    }
-
-    @Override
-    public String findUserId(UUID userKey) {
-        return data.get(userKey).getId();
-    }
-
-    @Override
-    public UUID findUserKeyById(String userId) {
+    public User findByUserId(String userId) {
         return data.values().stream()
                 .filter(u -> u.getId().equals(userId))
-                .map(User::getUuid)
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
-    public List<UUID> findUserKeyByIds(List<String> userIds) {
-        return data.values().stream()
-                .filter(u -> userIds.contains(u.getId()))
-                .map(User::getUuid)
-                .toList();
+    public List<User> findAllByIds(List<String> userIds) {
+        return data.values().stream().filter(u -> userIds.contains(u.getId())).toList();
     }
 
     private void saveToFile() {

@@ -26,29 +26,22 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findAllByKeys(List<UUID> channelKeys) {
-        return channelKeys.stream().map(data::get).toList();
-    }
-
-    @Override
     public boolean existsByKey(UUID channelKey) {
         return data.containsKey(channelKey);
     }
 
     @Override
-    public UUID findKeyByName(String name) {
+    public Channel findByName(String name) {
         return data.values().stream()
                 .filter(c -> c.getName().equals(name))
-                .map(Channel::getUuid)
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
-    public List<UUID> findKeyByNames(List<String> names) {
+    public List<Channel> findAllByNames(List<String> names) {
         return data.values().stream()
                 .filter(c -> names.contains(c.getName()))
-                .map(Channel::getUuid)
                 .toList();
     }
 }

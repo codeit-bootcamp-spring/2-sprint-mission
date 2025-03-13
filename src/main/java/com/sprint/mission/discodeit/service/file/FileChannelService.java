@@ -41,7 +41,6 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public Channel create(String category, String name, String introduction, UUID memberKey, UUID ownerKey) {
-
         if (isChannelCheck(name)) {
             throw new IllegalArgumentException("[Error] 동일한 채널명이 존재합니다.");
         }

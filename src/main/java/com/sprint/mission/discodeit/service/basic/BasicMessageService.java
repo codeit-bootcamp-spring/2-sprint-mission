@@ -55,21 +55,18 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public UUID update(int messageId, String content) {
-        UUID messageKey = messageRepository.findKeyByMessageId(messageId);
-        if (messageKey == null) {
+        Message message = messageRepository.findByMessageId(messageId);
+        if (message == null) {
             throw new IllegalArgumentException("[Error] 해당 메시지가 존재하지 않습니다");
         }
-
-        Message message = messageRepository.findByKey(messageKey);
         if (!content.isEmpty()) {
             message.updateContent(content);
         }
-        return messageKey;
+        return message.getUuid();
     }
 
     @Override
     public void delete(int messageId) {
-        UUID messageKey = messageRepository.findKeyByMessageId(messageId);
-        messageRepository.delete(messageKey);
+        messageRepository.delete(messageRepository.findByMessageId(messageId).getUuid());
     }
 }
