@@ -13,7 +13,7 @@ public class JCFUserRepository implements UserRepository {
     private final List<User> userList = new ArrayList<>();
 
     @Override
-    public User userSave(String nickname, String password) {
+    public User save(String nickname, String password) {
         User user = new User(nickname, password);
         userList.add(user);
         return user;

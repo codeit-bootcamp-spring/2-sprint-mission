@@ -33,7 +33,7 @@ public class BasicMessageService implements MessageService {
             return;
         }
 
-        Message message = messageRepository.messageSave(channelUUID, userUUID, content);
+        Message message = messageRepository.save(channelUUID, userUUID, content);
         if (message == null) {
             System.out.println("[실패] 메세지 저장 실패");
             return;

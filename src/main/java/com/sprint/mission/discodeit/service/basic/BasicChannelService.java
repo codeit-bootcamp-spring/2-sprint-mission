@@ -18,7 +18,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void createChannel(String channelName) {
-        Channel channel = channelRepository.channelSave(channelName);
+        Channel channel = channelRepository.save(channelName);
         if (channel == null) {
             System.out.println("[실패] 채널 저장 실패");
             return;

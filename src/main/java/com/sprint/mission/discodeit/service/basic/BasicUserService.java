@@ -18,7 +18,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void save(String nickname, String password) {
-        User user = userRepository.userSave(nickname, password);
+        User user = userRepository.save(nickname, password);
 
         if (user == null) {
             System.out.println("[실패] 저장 실패.");
