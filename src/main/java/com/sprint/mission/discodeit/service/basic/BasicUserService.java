@@ -19,7 +19,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(String username, String email, String password) {
-        boolean isExistUser = findAll().stream().anyMatch(user -> user.getUsername().equals(email)); // 동일한 이메일 == 같은 유저
+        boolean isExistUser = findAll().stream().anyMatch(user -> user.getEmail().equals(email)); // 동일한 이메일 == 같은 유저
 
         if (isExistUser) {
             throw new RuntimeException(email + " 이메일은 이미 가입되었습니다.");
@@ -48,6 +48,12 @@ public class BasicUserService implements UserService {
 
     @Override
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        boolean isExistUser = findAll().stream().anyMatch(user -> user.getEmail().equals(newEmail)); // 동일한 이메일 == 같은 유저
+
+        if (isExistUser) {
+            throw new RuntimeException(newEmail + " 이메일은 이미 가입되어 수정할 수 없습니다.");
+        }
+
         User user = findById(userId);
         user.update(newUsername, newEmail, newPassword);
 
