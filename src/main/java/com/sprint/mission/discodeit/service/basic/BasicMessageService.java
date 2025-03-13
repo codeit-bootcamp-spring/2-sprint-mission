@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -14,16 +15,11 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
-
-    public BasicMessageService(UserRepository userRepository, ChannelRepository channelRepository, MessageRepository messageRepository) {
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
-        this.messageRepository = messageRepository;
-    }
 
     @Override
     public Message createMessage(UUID senderId, String content, UUID channelId) {
