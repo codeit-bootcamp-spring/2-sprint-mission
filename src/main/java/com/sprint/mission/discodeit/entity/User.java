@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Getter
 public class User extends BaseEntity implements Serializable {
@@ -10,8 +11,9 @@ public class User extends BaseEntity implements Serializable {
     private String userName;
     private String userEmail;
     private String password;
+    private UUID profileId;
 
-    public User(String userName, String userEmail, String password) {
+    public User(String userName, String userEmail, String password, UUID profileId) {
         super();
         validateUserName(userName);
         validateUserEmail(userEmail);
@@ -19,6 +21,7 @@ public class User extends BaseEntity implements Serializable {
         this.userName = userName;
         this.userEmail = userEmail;
         this.password = password;
+        this.profileId = profileId;
     }
 
     public void updateUserName(String newUserName) {
