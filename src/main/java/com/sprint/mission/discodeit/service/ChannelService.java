@@ -13,7 +13,6 @@ public interface ChannelService {
     String findChannelNameById(UUID channelId); //채널 이름 조회
     List<Channel> getAllChannels(); //모든 채널 조회
 
-    void updateChannelData();
     void updateChannelName(UUID channelId, String newChannelName); //채널 이름 변경
     void addUser(UUID channelId, UUID userId); //유저 추가
     void addMessage(UUID channelId, UUID messageId);   //메세지 추가
