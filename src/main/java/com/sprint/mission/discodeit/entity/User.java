@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 
+@Getter
 public class User extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private String userName;
@@ -16,18 +19,6 @@ public class User extends BaseEntity implements Serializable {
         this.userName = userName;
         this.userEmail = userEmail;
         this.password = password;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void updateUserName(String newUserName) {
