@@ -6,71 +6,48 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private volatile static JCFUserService instance = null;
-    private final Map<UUID, User> userRepository;
+    private final Map<UUID, User> data;
 
     public JCFUserService() {
-        this.userRepository = new HashMap<>();
-    }
-
-    public static JCFUserService getInstance() {
-        if (instance == null) {
-            synchronized (JCFUserService.class) {
-                if (instance == null) {
-                    instance = new JCFUserService();
-                }
-            }
-        }
-        return instance;
+        this.data = new HashMap<>();
     }
 
     @Override
-    public User saveUser(String name) {
-        User user = new User(name);
-        userRepository.put(user.getId(), user);
+    public User create(String username, String email, String password) {
+        User user = new User(username, email, password);
+        this.data.put(user.getId(), user);
+
         return user;
     }
 
     @Override
+    public User find(UUID userId) {
+        User userNullable = this.data.get(userId);
+
+        return Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+    }
+
+    @Override
     public List<User> findAll() {
-        if(userRepository.isEmpty()){
-            throw new NoSuchElementException("유저가 없습니다.");
-        }
-
-        return userRepository.values().stream().toList();
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public List<User> findByName(String name) {
-        List<User> users = userRepository.values().stream()
-                .filter(user -> user.getName().equalsIgnoreCase(name))
-                .toList();
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User userNullable = this.data.get(userId);
+        User user = Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        user.update(newUsername, newEmail, newPassword);
 
-        if(users.isEmpty()){
-            throw new NoSuchElementException("해당 이름의 유저가 없습니다.");
-        }
-        return users;
+        return user;
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(userRepository.get(id));
-    }
-
-    @Override
-    public void update(UUID id, String name) {
-        if(!userRepository.containsKey(id)){
-            throw new NoSuchElementException("유저가 없습니다.");
+    public void delete(UUID userId) {
+        if (!this.data.containsKey(userId)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
         }
-        if(name == null){
-            throw new IllegalArgumentException("수정할 이름은 null일 수 없습니다.");
-        }
-
-        userRepository.get(id).setName(name);
-    }
-
-    @Override
-    public void delete(UUID id){
-        userRepository.remove(id);
+        this.data.remove(userId);
     }
 }
