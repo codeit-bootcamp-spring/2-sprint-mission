@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
 import java.util.UUID;
+import lombok.Getter;
 
+@Getter
 public class Message extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID authorId;
@@ -14,18 +16,6 @@ public class Message extends BaseEntity implements Serializable {
         this.authorId = authorId;
         this.channelId = channelId;
         this.content = content;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public UUID getAuthorId() {
-        return authorId;
     }
 
     public void update(String newContent) {
