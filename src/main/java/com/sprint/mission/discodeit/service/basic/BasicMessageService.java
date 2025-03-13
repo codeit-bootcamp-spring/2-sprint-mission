@@ -6,11 +6,14 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
+@Service
 public class BasicMessageService implements MessageService {
 
     private static BasicMessageService INSTANCE;
@@ -32,6 +35,10 @@ public class BasicMessageService implements MessageService {
         return INSTANCE;
     }
 
+    private void saveMessageData() {
+        messageRepository.save();
+    }
+
 
     @Override
     public Message createMessage(UUID senderId, UUID channelId, String content) {
@@ -41,7 +48,6 @@ public class BasicMessageService implements MessageService {
         channel.addMessages(message.getId());
 
         messageRepository.addMessage(message);
-        channelService.updateChannelData();
         return message;
     }
 
@@ -81,7 +87,7 @@ public class BasicMessageService implements MessageService {
     public void updateMessage(UUID messageId, String newContent) {
         Message message = messageRepository.findMessageById(messageId);
         message.updateContent(newContent);
-        messageRepository.addMessage(message);
+        saveMessageData();
     }
 
     @Override
@@ -90,7 +96,6 @@ public class BasicMessageService implements MessageService {
 
         channelService.removeMessage(message.getChannelId(), messageId);
 
-        channelService.updateChannelData();
         messageRepository.deleteMessageById(messageId);
     }
 

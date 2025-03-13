@@ -3,11 +3,14 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+
+@Service
 public class BasicUserService implements UserService {
 
     private static BasicUserService INSTANCE;
@@ -24,7 +27,7 @@ public class BasicUserService implements UserService {
         return INSTANCE;
     }
 
-    public void saveUserData() {
+    private void saveUser() {
         userRepository.save();
     }
 
@@ -59,14 +62,14 @@ public class BasicUserService implements UserService {
     public void updateUsername(UUID userId, String newUsername) {
         User user = userRepository.findUserById(userId);
         user.updateUsername(newUsername);
-        userRepository.addUser(user);
+        saveUser();
     }
 
     @Override
     public void addChannel(UUID userID, UUID channelId) {
         User user = userRepository.findUserById(userID);
         user.addJoinedChannel(channelId);
-        userRepository.addUser(user);
+        saveUser();
     }
 
     @Override
@@ -76,14 +79,14 @@ public class BasicUserService implements UserService {
 
     @Override
     public void removeChannel(UUID userId, UUID channelId) {
-    User user = userRepository.findUserById(userId);
+        User user = userRepository.findUserById(userId);
         user.removeJoinedChannel(channelId);
-    userRepository.addUser(user);
+        saveUser();
     }
 
     @Override
     public void validateUserExists(UUID userId) {
-        if(!userRepository.existsById(userId)){
+        if (!userRepository.existsById(userId)) {
             throw new RuntimeException("존재하지 않는 유저입니다.");
         }
     }
