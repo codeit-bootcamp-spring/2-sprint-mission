@@ -24,7 +24,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void createMessage(UUID senderId, String content, UUID channelId) {
+    public Message createMessage(UUID senderId, String content, UUID channelId) {
         UserService.validateUserId(senderId, this.userRepository);
         ChannelService.validateChannelId(channelId, this.channelRepository);
         // 해당 채널에 sender가 participant로 있는지 확인하는 코드 필요?
@@ -33,6 +33,7 @@ public class BasicMessageService implements MessageService {
         }
         Message newMessage = new Message(senderId, content, channelId);     //content에 대한 유효성 검증은 Message 생성자에게 맡긴다.
         this.messageRepository.add(newMessage);
+        return newMessage;
     }
 
     @Override
