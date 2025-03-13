@@ -1,51 +1,38 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.io.*;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class FileMessageService implements MessageService {
 
     private static FileMessageService INSTANCE;
-    private final String FILE_PATH = "src/main/resources/messages.dat";
     private final UserService userService;
     private final ChannelService channelService;
-    private final Map<UUID, Message> messages = new HashMap<>();
+    private final FileMessageRepository fileMessageRepository;
 
-    private FileMessageService(UserService userService, ChannelService channelService) {
-        loadMessage();
+    private FileMessageService(UserService userService, ChannelService channelService, FileMessageRepository fileMessageRepository) {
+        this.fileMessageRepository = fileMessageRepository;
         this.userService = userService;
         this.channelService = channelService;
     }
 
-    public static synchronized FileMessageService getInstance(UserService userService, ChannelService channelService) {
+    public static synchronized FileMessageService getInstance(UserService userService, ChannelService channelService, FileMessageRepository fileMessageRepository) {
         if (INSTANCE == null) {
-            INSTANCE = new FileMessageService(userService, channelService);
+            INSTANCE = new FileMessageService(userService, channelService, fileMessageRepository);
         }
         return INSTANCE;
     }
 
     private void saveMessage(){
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(messages);
-        } catch (IOException e) {
-            throw new RuntimeException("메시지 저장 중 오류 발생", e);
-        }
-    }
-    
-    private void loadMessage(){
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
-            messages = (Map<UUID, Message>) ois.readObject();
-        } catch (EOFException e) {
-            System.out.println("⚠ messages.dat 파일이 비어 있습니다. 빈 데이터로 유지합니다.");
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("메시지 로드 중 오류 발생", e);
-        }
+        fileMessageRepository.save();
     }
 
     @Override
@@ -59,22 +46,19 @@ public class FileMessageService implements MessageService {
 
         Message message = new Message(senderId, channelId, content);
         channelService.addMessage(channelId, message.getId());
-        channelService.updateChannelData();
-        messages.put(message.getId(), message);
-        saveMessage();
-
+        fileMessageRepository.addMessage(message);
         return message;
     }
 
     @Override
     public Message getMessageById(UUID messageId) {
         validateMessageExists(messageId);
-        return messages.get(messageId);
+        return fileMessageRepository.findMessageById(messageId);
     }
 
     @Override
     public List<Message> findMessagesByUserAndChannel(UUID senderId, UUID channelId) {
-        return messages.values().stream()
+        return fileMessageRepository.findMessageAll().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .filter(message -> message.getSenderId().equals(senderId))
                 .collect(Collectors.toList());
@@ -82,14 +66,14 @@ public class FileMessageService implements MessageService {
 
     @Override
     public List<Message> findChannelMessages(UUID channelId) {
-        return messages.values().stream()
+        return fileMessageRepository.findMessageAll().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Message> findUserMessages(UUID senderId) {
-        return messages.values().stream()
+        return fileMessageRepository.findMessageAll().stream()
                 .filter(message -> message.getSenderId().equals(senderId))
                 .collect(Collectors.toList());
     }
@@ -97,7 +81,7 @@ public class FileMessageService implements MessageService {
     @Override
     public void updateMessage(UUID messageId, String newContent) {
         validateMessageExists(messageId);
-        Message message = messages.get(messageId);
+        Message message = fileMessageRepository.findMessageById(messageId);
         message.updateContent(newContent);
         saveMessage();
     }
@@ -106,16 +90,14 @@ public class FileMessageService implements MessageService {
     public void deleteMessage(UUID messageId) {
         validateMessageExists(messageId);
 
-        Message message = messages.get(messageId);
+        Message message = fileMessageRepository.findMessageById(messageId);
         channelService.removeMessage(message.getChannelId(), messageId);
-        channelService.updateChannelData();
-        messages.remove(messageId);
-        saveMessage();
+        fileMessageRepository.deleteMessageById(messageId);
     }
 
     @Override
     public void validateMessageExists(UUID messageId) {
-        if (!messages.containsKey(messageId)) {
+        if (!fileMessageRepository.existsById(messageId)) {
             throw new NoSuchElementException("존재하지 않는 메세지입니다.");
         }
     }

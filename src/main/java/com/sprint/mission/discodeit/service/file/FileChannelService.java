@@ -1,84 +1,64 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.io.*;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 public class FileChannelService implements ChannelService {
 
     private static FileChannelService INSTANCE;
-    private final String FILE_PATH = "src/main/resources/channels.dat";
     private final UserService userService;
-    private final Map<UUID, Channel> channels = new HashMap<>();
+    private final FileChannelRepository fileChannelRepository;
 
-    private FileChannelService(UserService userService) {
-        loadChannel();
+    private FileChannelService(UserService userService, FileChannelRepository fileChannelRepository) {
+        this.fileChannelRepository = fileChannelRepository;
         this.userService = userService;
     }
 
-    public static synchronized FileChannelService getInstance(UserService userService){
+    public static synchronized FileChannelService getInstance(UserService userService, FileChannelRepository fileChannelRepository){
         if(INSTANCE == null){
-            INSTANCE = new FileChannelService(userService);
+            INSTANCE = new FileChannelService(userService,fileChannelRepository);
         }
         return INSTANCE;
     }
 
-    private void saveChannel(){
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(channels);
-        } catch (IOException e) {
-            throw new RuntimeException("채널 저장 중 오류 발생", e);
-        }
-    }
-
-
-    private void loadChannel(){
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
-            channels = (Map<UUID, Channel>) ois.readObject();// ✅ 두 번째 Map 로드
-        }catch (EOFException e) {
-            System.out.println("⚠ channels.dat 파일이 비어 있습니다. 빈 데이터로 유지합니다.");
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("채널 로드 중 오류 발생", e);
-        }
-    }
-
-    public void updateChannelData() {
-        saveChannel();
+    public void saveChannelData() {
+        fileChannelRepository.save();
     }
 
     @Override
     public Channel createChannel(String channelName) {
         Channel channel = new Channel(channelName);
-        channels.put(channel.getId(), channel);
-        saveChannel();
+        fileChannelRepository.addChannel(channel);
         return channel;
     }
 
     @Override
     public Channel findChannelById(UUID channelId) {
         validateChannelExists(channelId);
-        return channels.get(channelId);
+        return fileChannelRepository.findChannelById(channelId);
     }
 
     @Override
     public String findChannelNameById(UUID channelId) {
         validateChannelExists(channelId);
-        return channels.get(channelId).getChannelName();
+        return fileChannelRepository.findChannelById(channelId).getChannelName();
     }
 
     @Override
     public List<Channel> getAllChannels() {
-        return new ArrayList<>(channels.values());
+        return fileChannelRepository.findAllChannels();
     }
 
     @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
         Channel channel = findChannelById(channelId);
         channel.updateChannelName(newChannelName);
-        saveChannel();
+        saveChannelData();
     }
 
     @Override
@@ -90,8 +70,7 @@ public class FileChannelService implements ChannelService {
         }
 
         userService.addChannel(userId, channelId);
-        userService.updateUserData();
-        saveChannel();
+        saveChannelData();
     }
 
     @Override
@@ -99,7 +78,7 @@ public class FileChannelService implements ChannelService {
         Channel channel = findChannelById(channelId);
 
         channel.addMessages(messageId);
-        saveChannel();
+        saveChannelData();
     }
 
     @Override
@@ -110,9 +89,7 @@ public class FileChannelService implements ChannelService {
             userService.removeChannel(userId, channelId);
         }
 
-        channels.remove(channelId);
-        userService.updateUserData();
-        saveChannel();
+        fileChannelRepository.deleteChannelById(channelId);
     }
 
     @Override
@@ -123,9 +100,8 @@ public class FileChannelService implements ChannelService {
         }
 
         userService.removeChannel(userId, channelId);
-        userService.updateUserData();
         channel.removeMember(userId);
-        saveChannel();
+        saveChannelData();
     }
 
     @Override
@@ -136,11 +112,11 @@ public class FileChannelService implements ChannelService {
         }
 
         channel.removeMessage(messageId);
-        saveChannel();
+        saveChannelData();
     }
 
     public void validateChannelExists(UUID channelId) {
-        if (!channels.containsKey(channelId)) {
+        if (!fileChannelRepository.existsById(channelId)) {
             throw new IllegalArgumentException("존재하지 않는 채널입니다.");
         }
     }

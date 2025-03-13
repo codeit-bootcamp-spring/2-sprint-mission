@@ -1,63 +1,45 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.io.*;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class FileUserService implements UserService {
 
     private static FileUserService INSTANCE;
-    private final String FILE_PATH = "src/main/resources/users.dat";
-    private final Map<UUID, User> users = new HashMap<>();
+    private final FileUserRepository fileUserRepository;
 
-    private FileUserService() {
-        loadUser();
+    private FileUserService(FileUserRepository fileUserRepository) {
+        this.fileUserRepository = fileUserRepository;
     }
 
-    public static synchronized FileUserService getInstance() {
+    public static synchronized FileUserService getInstance(FileUserRepository fileUserRepository) {
         if (INSTANCE == null) {
-            INSTANCE = new FileUserService();
+            INSTANCE = new FileUserService(fileUserRepository);
         }
         return INSTANCE;
     }
 
-    private void saveUser() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(users);
-        } catch (IOException e) {
-            throw new RuntimeException("유저 저장 중 오류 발생", e);
-        }
-    }
 
-
-    public void loadUser() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
-            users = (Map<UUID, User>) ois.readObject();
-        } catch (EOFException e) {
-            System.out.println("⚠ users.dat 파일이 비어 있습니다. 빈 데이터로 유지합니다.");
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("유저 로드 중 오류 발생", e);
-        }
-    }
-
-    public void updateUserData() {
-        saveUser();
+    public void saveUserData() {
+        fileUserRepository.save();
     }
 
     @Override
     public User createUser(String username) {
         User user = new User(username);
-        users.put(user.getId(), user);
-        saveUser();
+        fileUserRepository.addUser(user);
         return user;
     }
 
     @Override
     public User getUserById(UUID userId) {
         validateUserExists(userId);
-        return users.get(userId);
+        return fileUserRepository.findUserById(userId);
     }
 
     @Override
@@ -67,20 +49,20 @@ public class FileUserService implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        return new ArrayList<>(users.values());
+        return fileUserRepository.findUserAll();
     }
 
     @Override
     public String getUserNameById(UUID userId) {
         validateUserExists(userId);
-        return users.get(userId).getUsername();
+        return fileUserRepository.findUserById(userId).getUsername();
     }
 
     @Override
     public void updateUsername(UUID userID, String newUsername) {
         User user = getUserById(userID);
         user.updateUsername(newUsername);
-        saveUser();
+        saveUserData();
     }
 
     @Override
@@ -92,26 +74,24 @@ public class FileUserService implements UserService {
         }
 
         user.addJoinedChannel(channelId);
-        saveUser();
+        saveUserData();
     }
 
     @Override
     public void deleteUser(UUID userID) {
-        User user = getUserById(userID);
-        users.remove(user.getId());
-        saveUser();
+        fileUserRepository.deleteUserById(userID);
     }
 
     @Override
     public void removeChannel(UUID userID, UUID channelId) {
         User user = getUserById(userID);
         user.removeJoinedChannel(channelId);
-        saveUser();
+        saveUserData();
     }
 
 
     public void validateUserExists(UUID userId) {
-        if (!users.containsKey(userId)) {
+        if (!fileUserRepository.existsById(userId)) {
             throw new IllegalArgumentException("존재하지 않는 유저입니다.");
         }
     }
