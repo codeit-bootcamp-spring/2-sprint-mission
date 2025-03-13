@@ -4,101 +4,130 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
 public class FileUserService implements UserService {
-    private volatile static FileUserService instance = null;
-    private static final String FILE_PATH = "users.dat";
-    private final Map<UUID, User> userRepository;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
     public FileUserService() {
-        this.userRepository = loadAll();
-    }
-
-    public static FileUserService getInstance(){
-        if(instance == null){
-            synchronized (FileUserService.class){
-                if(instance == null){
-                    instance = new FileUserService();
-                }
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
-        return instance;
     }
 
-    private Map<UUID, User> loadAll(){
-        File file = new File(FILE_PATH);
-        if(!file.exists()){
-            return new HashMap<>();
-        }
-
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))){
-            return (Map<UUID, User>) ois.readObject();
-        } catch(IOException | ClassNotFoundException e){
-            e.printStackTrace();
-            return new HashMap<>();
-        }
-    }
-
-    private void saveToFile(){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))){
-            oos.writeObject(userRepository);
-        }catch(IOException e){
-            e.printStackTrace();
-        }
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public User saveUser(String name) {
-        if(name == null || name.isEmpty()){
-            throw new IllegalArgumentException("name is null or empty");
+    public User create(String username, String email, String password) {
+        User user = new User(username, email, password);
+        Path path = resolvePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        User user = new User(name);
-        userRepository.put(user.getId(), user);
-        saveToFile();
+
         return user;
     }
 
     @Override
-    public List<User> findByName(String name) {
-        List<User> users = userRepository.values().stream()
-                .filter(u -> u.getName().equalsIgnoreCase(name))
-                .toList();
-        if(users.isEmpty()){
-            throw new NoSuchElementException("해당 이름의 유저가 없습니다.");
+    public User find(UUID userId) {
+        User userNullable = null;
+        Path path = resolvePath(userId);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return users;
-    }
 
-    @Override
-    public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(userRepository.get(id));
+        return Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
     @Override
     public List<User> findAll() {
-        if(userRepository.isEmpty()){
-            throw new NoSuchElementException("유저가 없습니다.");
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return userRepository.values().stream().toList();
     }
 
     @Override
-    public void update(UUID id, String name) {
-        if(!userRepository.containsKey(id)){
-            throw new NoSuchElementException("유저가 없습니다.");
-        }
-        if(name == null){
-            throw new IllegalArgumentException("수정할 이름은 null일 수 없습니다.");
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User userNullable = null;
+        Path path = resolvePath(userId);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
 
-        userRepository.get(id).setName(name);
-        saveToFile();
+        User user = Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        user.update(newUsername, newEmail, newPassword);
+
+        try(
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return user;
     }
 
     @Override
-    public void delete(UUID id) {
-        userRepository.remove(id);
-        saveToFile();
+    public void delete(UUID userId) {
+        Path path = resolvePath(userId);
+        if (Files.notExists(path)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
+        }
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

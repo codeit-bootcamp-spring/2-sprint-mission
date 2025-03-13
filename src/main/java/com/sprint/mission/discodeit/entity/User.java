@@ -1,40 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.service.TimeFormatter;
+import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-public class User extends BaseEntity implements Serializable {
+@Getter
+public class User implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String name;
 
-    public User(String name) {
-        super();
-        this.name = name;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    private String username;
+    private String email;
+    private String password;
+
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String newName) {
+    public void update(String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
-        if(newName != null && !newName.equals(this.name)){
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
             anyValueUpdated = true;
         }
-        if(anyValueUpdated){
-            this.name = newName;
-            setUpdatedAt();
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
         }
-    }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", createdAt=" + TimeFormatter.format(createdAt, "yyyy-MM-dd HH:mm:ss") +
-                ", updatedAt=" + TimeFormatter.format(updatedAt, "yyyy-MM-dd HH:mm:ss") +
-                '}';
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
