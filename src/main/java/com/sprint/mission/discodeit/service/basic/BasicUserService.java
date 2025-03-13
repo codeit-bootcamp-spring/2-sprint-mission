@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND;
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
@@ -11,18 +11,19 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
-public class JCFUserService implements UserService {
+public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
-    public JCFUserService(UserRepository userRepository) {
+    public BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
     public UserDto register(UserRegisterDto userRegisterDto) {
-        User savedUser = userRepository.save(
-                new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password())
-        );
+        User requestUser = new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password());
+        validateDuplicateEmail(requestUser);
+
+        User savedUser = userRepository.save(requestUser);
 
         return toDto(savedUser);
     }
@@ -79,5 +80,15 @@ public class JCFUserService implements UserService {
 
     private UserDto toDto(User user) {
         return new UserDto(user.getId(), user.getName(), user.getEmail());
+    }
+
+    private void validateDuplicateEmail(User requestUser) {
+        userRepository.findAll()
+                .stream()
+                .filter(existingUser -> existingUser.isSameEmail(requestUser.getEmail()))
+                .findFirst()
+                .ifPresent(u -> {
+                    throw new IllegalArgumentException("이미 존재하는 유저입니다");
+                });
     }
 }

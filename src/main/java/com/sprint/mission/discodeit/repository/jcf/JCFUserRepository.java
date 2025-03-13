@@ -1,13 +1,11 @@
-package com.sprint.mission.discodeit.infra.jcf;
-
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND;
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.infra.UserRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
@@ -16,19 +14,14 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         users.put(user.getId(), user);
-        return findById(user.getId());
-    }
-
-    @Override
-    public User findById(UUID id) {
-        User user = users.get(id);
-        if (user == null) {
-            throw new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent());
-        }
 
         return user;
     }
 
+    @Override
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(users.get(id));
+    }
 
     @Override
     public List<User> findByName(String name) {
@@ -39,12 +32,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return users.values()
                 .stream()
                 .filter(user -> user.isSameEmail(email))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
+                .findFirst();
     }
 
     @Override
@@ -56,7 +48,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void updateName(UUID id, String name) {
-        User user = users.get(findById(id).getId());
+        User user = users.get(id);
         user.updateName(name);
     }
 

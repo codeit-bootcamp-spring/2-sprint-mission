@@ -1,32 +1,26 @@
-package com.sprint.mission.discodeit.infra.jcf;
-
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.infra.ChannelRepository;
-import java.util.LinkedHashMap;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channels = new LinkedHashMap<>();
+    private final Map<UUID, Channel> channels = new HashMap<>();
 
     @Override
     public Channel save(Channel channel) {
         channels.put(channel.getId(), channel);
 
-        return findById(channel.getId());
+        return channel;
     }
 
     @Override
-    public Channel findById(UUID id) {
-        Channel channel = channels.get(id);
-        if (channel == null) {
-            throw new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent());
-        }
-
-        return channel;
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(channels.get(id));
     }
 
     @Override

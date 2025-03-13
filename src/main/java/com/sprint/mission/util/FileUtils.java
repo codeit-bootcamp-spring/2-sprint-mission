@@ -1,0 +1,72 @@
+package com.sprint.mission.util;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+
+public final class FileUtils {
+    private FileUtils() {
+    }
+
+    public static <U, T> void saveObjectsToFile(Path directory, Path filePath, Map<U, T> objects) {
+        init(directory);
+        serializeObjectToFile(filePath, objects);
+    }
+
+    private static <U, T> void serializeObjectToFile(Path filePath, Map<U, T> objects) {
+        try (
+                FileOutputStream fileOutputStream = new FileOutputStream(filePath.toFile());
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)
+        ) {
+            objectOutputStream.writeObject(objects);
+        } catch (IOException e) {
+            throw new UncheckedIOException("파일에 저장하는 작업을 실패했습니다.", e);
+        }
+    }
+
+    public static <U, T> Map<U, T> loadObjectsFromFile(Path filePath) {
+        if (Files.notExists(filePath)) {
+            return new HashMap<>();
+        }
+
+        return deserializeFromFile(filePath);
+    }
+
+    private static <U, T> Map<U, T> deserializeFromFile(Path filePath) {
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
+            Object object = objectInputStream.readObject();
+            if (object instanceof Map) {
+                return (Map<U, T>) object;
+            }
+
+            throw new ClassCastException("잘못된 데이터 타입: List를 기대했지만, " + object.getClass() + "을(를) 발견했습니다.");
+        } catch (IOException e) {
+            throw new UncheckedIOException("파일을 불러오는 작업을 실패했습니다", e);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("파일을 읽었지만, 필요한 클래스를 찾을 수 없습니다");
+        }
+    }
+
+    private static void init(Path directory) {
+        if (Files.exists(directory)) {
+            return;
+        }
+
+        creatDirectory(directory);
+    }
+
+    private static void creatDirectory(Path directory) {
+        try {
+            Files.createDirectories(directory);
+        } catch (IOException e) {
+            throw new UncheckedIOException("디렉터리 생성 실패: " + directory, e);
+        }
+    }
+}

@@ -1,6 +1,5 @@
 package testmethod;
 
-import com.sprint.mission.discodeit.view.Console;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -9,9 +8,6 @@ import java.util.NoSuchElementException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-/* 원본은 camp.nextstep.edu 라이브러리에 있습니다.
-   이해를 위해 주석을 작성했습니다. 추후 보강하겠습니다
-* */
 public abstract class ConsoleTestTemplate {
     private PrintStream standardOut;
     private OutputStream captor;
@@ -34,12 +30,8 @@ public abstract class ConsoleTestTemplate {
     }
 
     protected final void run(final String... args) {
-        try {
-            command(args);
-            runMain();
-        } finally {
-            Console.close();
-        }
+        command(args);
+        runMain();
     }
 
     protected final void runException(final String... args) {

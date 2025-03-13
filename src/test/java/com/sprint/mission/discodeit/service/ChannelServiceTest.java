@@ -1,15 +1,17 @@
 package com.sprint.mission.discodeit.service;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.constants.ChannelInfo.CHANNEL_NAME;
+import static com.sprint.mission.discodeit.constants.ChannelInfo.UPDATED_CHANNEL_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.infra.UserRepository;
-import com.sprint.mission.discodeit.infra.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.infra.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.UUID;
@@ -17,23 +19,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ChannelServiceTest {
-    private static final String NAME = "7팀";
-    private static final String UPDATED_CHANNEL_NAME = "7팀 스터디";
     private ChannelService channelService;
     private ChannelDto setUpChannel;
 
     @BeforeEach
     void setUp() {
         UserRepository userRepository = new JCFUserRepository();
-        User user = userRepository.save(new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
+        User user = userRepository.save(
+                new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
 
         channelService = new JCFChannelService(new JCFChannelRepository(), new JCFUserService(userRepository));
-        setUpChannel = channelService.create(NAME, new UserDto(user.getId(), LONGIN_USER.getName()));
+        setUpChannel = channelService.create(CHANNEL_NAME,
+                new UserDto(user.getId(), LONGIN_USER.getName(), LONGIN_USER.getEmail()));
     }
 
     @Test
     void 채널_생성() {
-        assertThat(setUpChannel.name()).isEqualTo(NAME);
+        assertThat(setUpChannel.name()).isEqualTo(CHANNEL_NAME);
     }
 
     @Test

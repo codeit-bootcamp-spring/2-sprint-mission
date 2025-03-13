@@ -1,11 +1,5 @@
 package com.sprint.mission.discodeit.view;
 
-import static com.sprint.mission.discodeit.view.InputView.readChangeChannelNumber;
-import static com.sprint.mission.discodeit.view.InputView.readChannelName;
-import static com.sprint.mission.discodeit.view.InputView.readEmail;
-import static com.sprint.mission.discodeit.view.InputView.readMessage;
-import static com.sprint.mission.discodeit.view.InputView.readNewChannelName;
-
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.controller.ChannelController;
@@ -17,35 +11,35 @@ public enum ChannelCommand {
         @Override
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
                                   UserDto loginUser,
-                                  ChannelDto currentChannel) {
+                                  ChannelDto currentChannel, InputView inputView) {
 
-            return channelController.create(readNewChannelName(), loginUser);
+            return channelController.create(inputView.readNewChannelName(), loginUser);
         }
     },
     USER_ADDITION("2") {
         @Override
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
                                   UserDto loginUser,
-                                  ChannelDto currentChannel) {
+                                  ChannelDto currentChannel, InputView inputView) {
 
-            return channelController.addMember(currentChannel, readEmail());
+            return channelController.addMember(currentChannel, inputView.readEmail());
         }
     },
     NAME_CHANGE("3") {
         @Override
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
                                   UserDto loginUser,
-                                  ChannelDto currentChannel) {
+                                  ChannelDto currentChannel, InputView inputView) {
 
-            return channelController.updateName(currentChannel, readChannelName());
+            return channelController.updateName(currentChannel, inputView.readChannelName());
         }
     },
     MESSAGE_SENT("4") {
         @Override
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
                                   UserDto loginUser,
-                                  ChannelDto currentChannel) {
-            messageController.createMessage(readMessage(), currentChannel.id(), loginUser.id());
+                                  ChannelDto currentChannel, InputView inputView) {
+            messageController.createMessage(inputView.readMessage(), currentChannel.id(), loginUser.id());
 
             return currentChannel;
         }
@@ -53,20 +47,20 @@ public enum ChannelCommand {
     CHANNEL_CHANGE("5") {
         @Override
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
-                                  UserDto loginUser, ChannelDto currentChannel) {
+                                  UserDto loginUser, ChannelDto currentChannel, InputView inputView) {
             List<ChannelDto> channels = channelController.findAll()
                     .stream()
                     .filter(channel -> !channel.equals(currentChannel))
                     .toList();
 
-            return channels.get(readChangeChannelNumber(channels) - 1);
+            return channels.get(inputView.readChangeChannelNumber(channels) - 1);
         }
     },
     EXIT("6") {
         @Override
         public ChannelDto execute(ChannelController channelController, MessageController messageController,
                                   UserDto loginUser,
-                                  ChannelDto currentChannel) {
+                                  ChannelDto currentChannel, InputView inputView) {
 
             return null;
         }
@@ -75,7 +69,7 @@ public enum ChannelCommand {
     private final String number;
 
     public abstract ChannelDto execute(ChannelController channelController, MessageController messageController,
-                                       UserDto loginUser, ChannelDto currentChannel);
+                                       UserDto loginUser, ChannelDto currentChannel, InputView inputView);
 
     ChannelCommand(String number) {
         this.number = number;
