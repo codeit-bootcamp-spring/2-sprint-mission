@@ -2,46 +2,30 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.FileStorageManager;
 
-import java.io.*;
 import java.util.*;
 
 public class FileChannelRepository implements ChannelRepository {
 
     private static final String FILE_PATH = "src/main/resources/channels.dat";
     private static Map<UUID, Channel> channels = new HashMap<>();
+    private final FileStorageManager fileStorageManager;
 
-    public FileChannelRepository() {
-        loadFile();
-    }
-
-    private void loadFile(){
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))){
-            channels = (Map<UUID, Channel>) ois.readObject();
-        }catch (EOFException e) {
-            System.out.println("⚠ channels.dat 파일이 비어 있습니다. 빈 데이터로 유지합니다.");
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("채널 로드 중 오류 발생", e);
-        }
-    }
-
-    private void saveFile(){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))){
-            oos.writeObject(channels);
-        } catch (IOException e) {
-            throw new RuntimeException("채널 저장 중 오류 발생", e);
-        }
+    public FileChannelRepository(FileStorageManager fileStorageManager) {
+        this.fileStorageManager = fileStorageManager;
+        channels = fileStorageManager.loadFile(FILE_PATH);
     }
 
     @Override
     public void save() {
-        saveFile();
+        fileStorageManager.saveFile(FILE_PATH, channels);
     }
 
     @Override
     public void addChannel(Channel channel) {
         channels.put(channel.getId(), channel);
-        saveFile();
+        fileStorageManager.saveFile(FILE_PATH, channels);
     }
 
     @Override
@@ -57,7 +41,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void deleteChannelById(UUID channelId) {
         channels.remove(channelId);
-        saveFile();
+        fileStorageManager.saveFile(FILE_PATH, channels);
     }
 
     @Override
