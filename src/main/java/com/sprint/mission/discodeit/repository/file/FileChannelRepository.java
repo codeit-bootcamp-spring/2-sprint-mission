@@ -13,7 +13,9 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
 
     private static final Path DIRECTORY_PATH = Paths.get(System.getProperty("user.dir"), "data",
