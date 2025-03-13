@@ -1,36 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Message extends BaseEntity{
-    private User user;
-    private String message;
-    private Channel channel;
+import java.io.Serializable;
+import java.util.UUID;
 
-    public Message(User user, String message, Channel channel) {
+public class Message extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private String content;
+    private UUID userId;
+    private UUID channelId;
+
+    public Message(String content, UUID userId, UUID channelId) {
         super();
-        this.user = user;
-        this.message = message;
-        this.channel = channel;
+        this.content = content;
+        this.userId = userId;
+        this.channelId = channelId;
+
     }
 
-    public User getUser() {
-        return user;
+    public String getContent() {
+        return content;
     }
 
-    public String getMessage() {
-        return message;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-        update();
+    public UUID getChannelId() {
+        return channelId;
     }
 
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel channel) {
-        this.channel = channel;
-        update();
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.update();
+        }
     }
 }

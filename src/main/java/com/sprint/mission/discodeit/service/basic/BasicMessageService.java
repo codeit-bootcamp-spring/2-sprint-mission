@@ -1,21 +1,35 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> messageList;
+public class BasicMessageService implements MessageService {
+    private static BasicMessageService instance;
+    private final MessageRepository messageRepository;
     private final ChannelService channelService;
     private final UserService userService;
 
-    public JCFMessageService(ChannelService channelService, UserService userService) {
-        this.messageList = new HashMap<>();
+    public BasicMessageService(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
+        this.messageRepository = messageRepository;
         this.channelService = channelService;
         this.userService = userService;
+    }
+
+    public static synchronized BasicMessageService getInstance(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
+        if (instance == null) {
+            instance = new BasicMessageService(messageRepository, channelService, userService);
+        }
+        return instance;
     }
 
     @Override
@@ -27,37 +41,35 @@ public class JCFMessageService implements MessageService {
             throw new IllegalArgumentException("유효하지 않은 채널 ID 또는 유저 ID입니다.", e);
         }
         Message message = new Message(content, channelId, userId);
-        this.messageList.put(message.getId(), message);
-
+        messageRepository.save(message);
         return message;
     }
 
     @Override
     public List<Message> findAll() {
-        return new ArrayList<>(messageList.values());
+        return messageRepository.findAll().stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override
     public Message findById(UUID messageId) {
-        Message message = this.messageList.get(messageId);
-        return Optional.ofNullable(message)
+        return messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("해당 메시지를 찾을 수 없습니다 : " + messageId));
     }
 
     @Override
     public Message update(UUID messageId, String newContent) {
-        Message messageNullable = this.messageList.get(messageId);
-        Message message = Optional.ofNullable(messageNullable)
+        Message existingMessage = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("해당 메시지를 찾을 수 없습니다 : " + messageId));
-        message.update(newContent);
-
-        return message;
+        existingMessage.update(newContent);
+        messageRepository.save(existingMessage);
+        return existingMessage;
     }
 
     @Override
     public void delete(UUID messageId) {
-        Message removeMessage = this.messageList.remove(messageId);
-        if (removeMessage == null) {
+        if (!messageRepository.delete(messageId)) {
             throw new NoSuchElementException("해당 메시지를 찾을 수 없습니다 : " + messageId);
         }
     }
