@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.FileRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
+import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,23 +13,13 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class FileUserRepository implements FileRepository<User>, UserRepository {
-    private static volatile FileUserRepository instance;
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "users");
     private final Map<UUID, User> userMap;
 
-    public static FileUserRepository getInstance() {
-        if (instance == null) {
-            synchronized (FileUserRepository.class) {
-                if (instance == null) {
-                    instance = new FileUserRepository();
-                }
-            }
-        }
-        return instance;
-    }
 
-    private FileUserRepository() {
+    public FileUserRepository() {
         SerializationUtil.init(directory);
         userMap = new ConcurrentHashMap<>();
         loadCacheFromFile();

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.FileRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
+import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,24 +14,12 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class FileMessageRepository implements MessageRepository, FileRepository<Message> {
-    private static volatile FileMessageRepository instance;
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "messages");
     private final Map<UUID, Message> messageMap;
 
-
-    public static FileMessageRepository getInstance() {
-        if (instance == null) {
-            synchronized (FileMessageRepository.class) {
-                if (instance == null) {
-                    instance = new FileMessageRepository();
-                }
-            }
-        }
-        return instance;
-    }
-
-    private FileMessageRepository() {
+    public FileMessageRepository() {
         SerializationUtil.init(directory);
         messageMap = new ConcurrentHashMap<>();
         loadCacheFromFile();

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.FileRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
+import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,25 +14,15 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository, FileRepository<Channel> {
-    private static volatile FileChannelRepository instance;
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "channels");
 
-    // 조회할 떄 마다 파일 I/O를 이용해 로드하기 vs Map을 이용해 메모리에 저장해놓고 꺼내쓰기
+
     private final Map<UUID, Channel> channelMap;
 
-    public static FileChannelRepository getInstance() {
-        if (instance == null) {
-            synchronized (FileChannelRepository.class) {
-                if (instance == null) {
-                    instance = new FileChannelRepository();
-                }
-            }
-        }
-        return instance;
-    }
-
-    private FileChannelRepository() {
+    // Map을 ConcurrentHashMap으로 초기화해주고싶으므로 @RequiredArgsConstructor는 안쓰고 직접 생성자 만듦
+    public FileChannelRepository() {
         SerializationUtil.init(directory);
         channelMap = new ConcurrentHashMap<>(); // 멀티쓰레드 환경 고려
         loadCacheFromFile(); // 서버 메모리와 파일 동기화
