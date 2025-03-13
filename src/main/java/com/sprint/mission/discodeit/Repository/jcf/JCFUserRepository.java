@@ -39,11 +39,19 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User findUserByUserId(UUID userId) {
+        System.out.println("🔍 요청된 userId: " + userId);
+        System.out.println("🔍 현재 저장된 유저 목록: " + registeredUsers);
+
         User user = registeredUsers.stream()
                 .filter(u -> u.getId().equals(userId))
                 .findFirst()
-                .orElseThrow(()->new UserNotFoundException("해당 유저는 존재하지 않습니다." + userId));
+                .orElseThrow(() -> new UserNotFoundException("해당 유저는 존재하지 않습니다." + userId));
         return user;
+    }
+
+    @Override
+    public List<User> findUserList() {
+        return registeredUsers;
     }
 
     @Override

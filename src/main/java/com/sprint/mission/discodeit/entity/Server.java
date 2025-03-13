@@ -16,7 +16,6 @@ public class Server implements Serializable {
     private final UUID userOwnerId;
     public final Instant createdAt;
     public Instant updatedAt;
-    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
 
     private String name;
 

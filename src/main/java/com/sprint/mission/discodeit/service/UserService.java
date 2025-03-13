@@ -68,6 +68,12 @@ public interface UserService {
      */
     Server getServer(String userId, String name);
 
+    /**
+     * 등록된 사용자 정보를 출력합니다.
+     *
+     * @throws EmptyServerListException 사용자가 없는 경우
+     */
+    void printUser();
 
     /**
      * 사용자가 속한 서버 정보를 출력합니다.
@@ -77,6 +83,8 @@ public interface UserService {
      * @throws EmptyServerListException 사용자가 가입한 서버가 없는 경우
      */
     void printServer(String userId);
+
+
 
     /**
      * 특정 사용자를 삭제합니다.

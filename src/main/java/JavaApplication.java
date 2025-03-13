@@ -1,28 +1,3 @@
-import com.sprint.mission.discodeit.FrontEnd.DiscordService;
-import com.sprint.mission.discodeit.FrontEnd.Repository.FileDiscordRepository;
-import com.sprint.mission.discodeit.FrontEnd.Repository.JCFDiscordRepository;
-import com.sprint.mission.discodeit.Repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.Repository.file.FileServerRepository;
-import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.Repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
-import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.Server;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.ServerService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicDiscordService;
-import com.sprint.mission.discodeit.service.basic.BasicServerService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Scanner;
-
 public class JavaApplication {
 //    public static Server serverEngine(UserService userService, User user) {
 //        //서버 생성

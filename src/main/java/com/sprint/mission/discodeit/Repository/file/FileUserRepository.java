@@ -135,6 +135,11 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public List<User> findUserList() {
+        return registeredUsers;
+    }
+
+    @Override
     public List<Server> findServerListByOwner(User owner) {
         List<Server> list = Optional.ofNullable(serverList.get(owner.getId())).orElseThrow(() -> new ServerNotFoundException("서버 리스트가 비어있습니다."));
         return list;

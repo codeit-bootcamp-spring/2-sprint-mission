@@ -25,6 +25,9 @@ public class JCFUserService implements UserService {
     @Override
     public UUID registerUser(String userName, String password) {
         User user = new User(userName, password);
+        userRepository.saveUser(user);
+
+        System.out.println("✅ 새 유저 등록됨: " + user);
 
         return user.getId();
     }
@@ -72,6 +75,14 @@ public class JCFUserService implements UserService {
                 .findFirst().orElseThrow(() -> new UnauthorizedAccessException("서버에 가입해 있지 않습니다."));
 
         return server;
+    }
+
+    @Override
+    public void printUser() {
+        List<User> list = userRepository.findUserList();
+        for (User user : list) {
+            System.out.println(user);
+        }
     }
 
     @Override

@@ -4,15 +4,14 @@ import com.sprint.mission.discodeit.Exception.InvalidPasswordException;
 import com.sprint.mission.discodeit.Exception.ServerNotFoundException;
 import com.sprint.mission.discodeit.Exception.UnauthorizedAccessException;
 import com.sprint.mission.discodeit.Exception.UserNotFoundException;
-import com.sprint.mission.discodeit.Factory.CreateServerFactory;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 public class FileUserService implements UserService {
     private final UserRepository userRepository;
@@ -71,6 +70,14 @@ public class FileUserService implements UserService {
                 .findFirst().orElseThrow(() -> new UnauthorizedAccessException("서버에 가입해 있지 않습니다."));
 
         return server;
+    }
+
+    @Override
+    public void printUser() {
+        List<User> list = userRepository.findUserList();
+        for (User user : list) {
+            System.out.println(user);
+        }
     }
 
     @Override

@@ -65,6 +65,14 @@ public interface UserRepository {
      * @throws ServerNotFoundException 사용자가 소유한 서버가 없는 경우
      */
     List<Server> findServerListByOwner(User owner);
+
+    /**
+     * 사용자 목록을 조회합니다.
+     *
+     * @return 사용자 목록
+     * @throws ServerNotFoundException 사용자가 소유한 서버가 없는 경우
+     */
+    List<User> findUserList( );
     /**
      * 특정 사용자가 소유한 서버 중 특정 서버를 조회합니다.
      *
