@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,18 +15,12 @@ import java.util.stream.Collectors;
 
 
 @Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
     private final ChannelService channelService;
     private final UserService userService;
-
-    @Autowired
-    private BasicMessageService(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
-        this.messageRepository = messageRepository;
-        this.channelService = channelService;
-        this.userService = userService;
-    }
 
     private void saveMessageData() {
         messageRepository.save();
