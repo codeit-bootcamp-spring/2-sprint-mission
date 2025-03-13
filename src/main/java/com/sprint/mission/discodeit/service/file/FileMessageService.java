@@ -9,59 +9,83 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 public class FileMessageService implements MessageService {
-    private final Path directory;
-    private final UserService userservice;
-    private final ChannelService channelservice;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    public FileMessageService(UserService userservice, ChannelService channelservice){
-        this.directory = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName())
-                .toAbsolutePath().normalize();
-        this.userservice = userservice;
-        this.channelservice = channelservice;
-        init();
-    }
+    //
+    private final ChannelService channelService;
+    private final UserService userService;
 
-    private void init() {
-        if (!Files.isDirectory(directory)) {
+    public FileMessageService(ChannelService channelService, UserService userService) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
             try {
-                Files.createDirectories(directory);
+                Files.createDirectories(DIRECTORY);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+        this.channelService = channelService;
+        this.userService = userService;
     }
 
-    private void save(Message message){
-        Path filePath = directory.resolve(message.getId() + ".ser");
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))){
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
+
+    @Override
+    public Message create(String content, UUID channelId, UUID authorId) {
+        try {
+            channelService.find(channelId);
+            userService.find(authorId);
+        } catch (NoSuchElementException e) {
+            throw e;
+        }
+
+        Message message = new Message(content, channelId, authorId);
+        Path path = resolvePath(message.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
             oos.writeObject(message);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        return message;
     }
 
     @Override
-    public void createMessage(String message, UUID userId, UUID channelId) {
-        Message newMessage = new Message(message, userId, channelId);
-        save(newMessage);
+    public Message find(UUID messageId) {
+        Message messageNullable = null;
+        Path path = resolvePath(messageId);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                messageNullable = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
     @Override
-    public Optional<Message> getOneMessage(UUID id){
-        return getAllMessage().stream().filter(message -> message.getId().equals(id)).findFirst();
-    }
-
-    @Override
-    public List<Message> getAllMessage(){
+    public List<Message> findAll() {
         try {
-            return Files.list(directory)
-                    .filter(path -> path.toString().endsWith(".ser"))
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
                         try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
@@ -79,20 +103,35 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(String message, UUID id){
-        List<Message> messages = getAllMessage();
-        for(Message msg : messages){
-            msg.updateMessage(message);
-            save(msg);
-            break;
+    public Message update(UUID messageId, String newContent) {
+        Message messageNullable = null;
+        Path path = resolvePath(messageId);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                messageNullable = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
+
+        Message message = Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
+
+        return message;
     }
 
     @Override
-    public void deleteMessage(UUID id){
-        Path filePath = directory.resolve(id + ".ser");
-        try{
-            Files.deleteIfExists(filePath);
+    public void delete(UUID messageId) {
+        Path path = resolvePath(messageId);
+        if (Files.notExists(path)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
+        }
+        try {
+            Files.delete(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

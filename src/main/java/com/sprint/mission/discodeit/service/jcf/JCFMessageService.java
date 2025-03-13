@@ -7,41 +7,61 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
-// MessageService interface를 참조하여 기능을 구현한다.
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> messagemap = new HashMap<UUID, Message>();
-    UserService userservice;
-    ChannelService channelservice;
+    private final Map<UUID, Message> data;
+    //
+    private final ChannelService channelService;
+    private final UserService userService;
 
-    public JCFMessageService(UserService userservice, ChannelService channelservice){
-        this.userservice = userservice;
-        this.channelservice = channelservice;
+    public JCFMessageService(ChannelService channelService, UserService userService) {
+        this.data = new HashMap<>();
+        this.channelService = channelService;
+        this.userService = userService;
     }
 
     @Override
-    public void createMessage(String message, UUID userid, UUID channelid){
-        Message newmessage = new Message(message, userid, channelid);
-        messagemap.put(newmessage.getId(), newmessage);
+    public Message create(String content, UUID channelId, UUID authorId) {
+        try {
+            channelService.find(channelId);
+            userService.find(authorId);
+        } catch (NoSuchElementException e) {
+            throw e;
+        }
+
+        Message message = new Message(content, channelId, authorId);
+        this.data.put(message.getId(), message);
+
+        return message;
     }
 
     @Override
-    public Optional<Message> getOneMessage(UUID id){
-        return Optional.ofNullable(messagemap.get(id));
+    public Message find(UUID messageId) {
+        Message messageNullable = this.data.get(messageId);
+
+        return Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
     @Override
-    public List<Message> getAllMessage(){
-        List<Message> messageList = new ArrayList<>(messagemap.values());
-        return messageList;
+    public List<Message> findAll() {
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public void updateMessage(String message, UUID id){
-        messagemap.get(id).updateMessage(message);
+    public Message update(UUID messageId, String newContent) {
+        Message messageNullable = this.data.get(messageId);
+        Message message = Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
+
+        return message;
     }
 
     @Override
-    public void deleteMessage(UUID id){
-        messagemap.remove(id);
+    public void delete(UUID messageId) {
+        if (!this.data.containsKey(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
+        }
+        this.data.remove(messageId);
     }
 }
