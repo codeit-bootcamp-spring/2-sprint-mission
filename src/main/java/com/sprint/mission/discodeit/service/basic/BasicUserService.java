@@ -24,6 +24,10 @@ public class BasicUserService implements UserService {
         return INSTANCE;
     }
 
+    public void saveUserData() {
+        userRepository.save();
+    }
+
     @Override
     public User createUser(String username) {
         User user = new User(username);
@@ -49,11 +53,6 @@ public class BasicUserService implements UserService {
     @Override
     public List<User> getAllUsers() {
         return userRepository.findUserAll();
-    }
-
-    @Override
-    public void updateUserData() {
-        userRepository.save();
     }
 
     @Override

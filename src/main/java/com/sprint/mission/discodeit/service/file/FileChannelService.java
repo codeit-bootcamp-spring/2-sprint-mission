@@ -26,7 +26,7 @@ public class FileChannelService implements ChannelService {
         return INSTANCE;
     }
 
-    public void saveChannelData() {
+    private void saveChannelData() {
         fileChannelRepository.save();
     }
 

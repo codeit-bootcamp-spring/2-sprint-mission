@@ -24,8 +24,7 @@ public class FileUserService implements UserService {
         return INSTANCE;
     }
 
-
-    public void saveUserData() {
+    private void saveUserData() {
         fileUserRepository.save();
     }
 

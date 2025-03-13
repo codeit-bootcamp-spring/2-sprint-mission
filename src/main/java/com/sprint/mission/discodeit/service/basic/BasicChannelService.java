@@ -28,6 +28,10 @@ public class BasicChannelService implements ChannelService {
         return INSTANCE;
     }
 
+    private void saveChannelData() {
+        channelRepository.save();
+    }
+
     @Override
     public Channel createChannel(String channelName) {
         Channel channel = new Channel(channelName);
@@ -52,10 +56,7 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.findAllChannels();
     }
 
-    @Override
-    public void updateChannelData() {
-        channelRepository.save();
-    }
+
 
     @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
@@ -72,7 +73,6 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findChannelById(channelId);
         userService.addChannel(userId, channelId);
 
-        userService.updateUserData();
         channelRepository.addChannel(channel);
     }
 
@@ -92,7 +92,6 @@ public class BasicChannelService implements ChannelService {
 
         users.forEach(user -> user.removeJoinedChannel(channelId));
 
-        userService.updateUserData();
         channelRepository.deleteChannelById(channelId);
     }
 
