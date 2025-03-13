@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.UUID;
 
+@ToString
 @Getter
 public class Server implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -29,4 +31,13 @@ public class Server implements Serializable {
         this.updatedAt = createdAt;
         this.name = name;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
+
