@@ -20,11 +20,9 @@ public class FileMessageRepository implements MessageRepository {
         return instance;
     }
 
-    private void saveData() {
+    private void saveData() throws IOException {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(data);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -44,7 +42,11 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void save(Message message) {
         data.put(message.getId(), message);
-        saveData();
+        try {
+            saveData();
+        } catch (IOException e) {
+            throw new RuntimeException("메시지 저장 중 오류 발생", e);
+        }
     }
 
     @Override
@@ -62,6 +64,10 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void deleteMessage(UUID messageId) {
         data.remove(messageId);
-        saveData();
+        try {
+            saveData();
+        } catch (IOException e) {
+            throw new RuntimeException("메시지 삭제 후 저장 중 오류 발생", e);
+        }
     }
 }

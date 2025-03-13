@@ -20,11 +20,9 @@ public class FileChannelRepository implements ChannelRepository {
         return instance;
     }
 
-    public void saveData() {
+    public void saveData() throws IOException {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(data);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -44,7 +42,11 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void save(Channel channel) {
         data.put(channel.getId(), channel);
-        saveData();
+        try {
+            saveData();
+        } catch (IOException e) {
+            throw new RuntimeException("채널 저장 중 오류 발생", e);
+        }
     }
 
     @Override
@@ -60,6 +62,10 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void deleteChannel(UUID ChannelId) {
         data.remove(ChannelId);
-        saveData();
+        try {
+            saveData();
+        } catch (IOException e) {
+            throw new RuntimeException("채널 삭제 후 저장 중 오류 발생", e);
+        }
     }
 }

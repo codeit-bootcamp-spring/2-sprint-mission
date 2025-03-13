@@ -19,11 +19,9 @@ public class FileUserRepository implements UserRepository {
         return instance;
     }
 
-    private void saveData() {
+    private void saveData() throws IOException {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(data);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -43,7 +41,11 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void save(User user) {
         data.put(user.getId(), user);
-        saveData();
+        try {
+            saveData();
+        } catch (IOException e) {
+            throw new RuntimeException("사용자 저장 중 오류 발생", e);
+        }
     }
 
     @Override
@@ -59,6 +61,10 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void deleteUser(UUID userId) {
         data.remove(userId);
-        saveData();
+        try {
+            saveData();
+        } catch (IOException e) {
+            throw new RuntimeException("사용자 삭제 후 저장 중 오류 발생", e);
+        }
     }
 }
