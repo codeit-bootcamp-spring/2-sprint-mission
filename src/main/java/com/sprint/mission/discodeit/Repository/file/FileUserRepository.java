@@ -44,10 +44,10 @@ public class FileUserRepository implements UserRepository {
 
                 List<Server> list = (List<Server>) ois.readObject();
                 for (Server server : list) {
-                    Server s = new Server(server.getId(), server.getCreatedAt(), server.getName());
+                    Server s = new Server(server.getServerId(), server.getCreatedAt(), server.getName());
 
                     this.serverList.add(s);
-                    System.out.println("서버 로드 완료 - ID 유지: " + s.getId());
+                    System.out.println("서버 로드 완료 - ID 유지: " + s.getServerId());
                 }
 
                 System.out.println("서버 리스트 로드 완료: " + path);
@@ -61,7 +61,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void save(Server server) {
         // 중복 서버 체크
-        if (serverList.stream().noneMatch(s -> s.getId().equals(server.getId()))) {
+        if (serverList.stream().noneMatch(s -> s.getServerId().equals(server.getServerId()))) {
             serverList.add(server);
             //현재 리스트에 저장과 동시에 디스크에 기록
             saveServerList();

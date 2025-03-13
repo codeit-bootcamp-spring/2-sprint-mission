@@ -38,7 +38,7 @@ public class BasicUserService implements UserService {
         userRepository.save(server);
 
         //로그
-        System.out.println("저장 시점 name :" + server.getId());
+        System.out.println("저장 시점 name :" + server.getServerId());
     }
 
     @Override
@@ -47,7 +47,7 @@ public class BasicUserService implements UserService {
         userRepository.save(server);
 
         //로그
-        System.out.println("저장 시점 server:" + server.getId());
+        System.out.println("저장 시점 server:" + server.getServerId());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class BasicUserService implements UserService {
     @Override
     public void printServer(List<Server> list) {
         System.out.println("\n=========서버 목록==========");
-        list.forEach(s -> System.out.println(s.getId() + " : " + s.getName()));
+        list.forEach(s -> System.out.println(s.getServerId() + " : " + s.getName()));
         System.out.println("=========================\n");
     }
 

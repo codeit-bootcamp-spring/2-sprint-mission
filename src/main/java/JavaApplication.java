@@ -80,36 +80,36 @@ public class JavaApplication {
 
         //채널 등록
         if (isJCF || !saveContainerData) {
-            serverService.addChannel(server1.getId(), channel1);
-            serverService.addChannel(server1.getId(), channel2);
-            serverService.addChannel(server1.getId(), channel3);
+            serverService.addChannel(server1.getServerId(), channel1);
+            serverService.addChannel(server1.getServerId(), channel2);
+            serverService.addChannel(server1.getServerId(), channel3);
         }
         //채널 불러오기
-        channel1 = serverService.getChannel(server1.getId(), "channel1");
-        channel2 = serverService.getChannel(server1.getId(), "channel2");
-        channel3 = serverService.getChannel(server1.getId(), "channel3");
+        channel1 = serverService.getChannel(server1.getServerId(), "channel1");
+        channel2 = serverService.getChannel(server1.getServerId(), "channel2");
+        channel3 = serverService.getChannel(server1.getServerId(), "channel3");
 
         // 모든 채널 조회
-        serverService.printChannel(server1.getId());
+        serverService.printChannel(server1.getServerId());
 
         // 특정 채널 조회
-        Channel getChannel = serverService.getChannel(server1.getId(), "channel1");
+        Channel getChannel = serverService.getChannel(server1.getServerId(), "channel1");
         System.out.println("getChannel = \n" + getChannel);
 
         // 채널명 수정
-        serverService.updateChannel(server1.getId(), "channel3", "replaceChannel");
-        serverService.printChannel(server1.getId());
+        serverService.updateChannel(server1.getServerId(), "channel3", "replaceChannel");
+        serverService.printChannel(server1.getServerId());
 
-        serverService.updateChannel(server1.getId(), "replaceChannel", "channel3");
-        serverService.printChannel(server1.getId());
+        serverService.updateChannel(server1.getServerId(), "replaceChannel", "channel3");
+        serverService.printChannel(server1.getServerId());
 
         // 채널 삭제
         Channel remove = serverService.createChannel("remove");
-        serverService.addChannel(server1.getId(), remove);
-        serverService.printChannel(server1.getId());
+        serverService.addChannel(server1.getServerId(), remove);
+        serverService.printChannel(server1.getServerId());
 
-        serverService.removeChannel(server1.getId(), "remove");
-        serverService.printChannel(server1.getId());
+        serverService.removeChannel(server1.getServerId(), "remove");
+        serverService.printChannel(server1.getServerId());
 
         return channel1;
     }

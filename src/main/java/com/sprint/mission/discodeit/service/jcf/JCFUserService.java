@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.Factory.CreateServerFactory;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
@@ -36,7 +35,7 @@ public class JCFUserService implements UserService {
     public UUID createServer(String name) {
         Server server = new Server(name);
         userRepository.save(server);
-        return server.getId();
+        return server.getServerId();
     }
 
     @Override
@@ -56,7 +55,7 @@ public class JCFUserService implements UserService {
     public void printServer(UUID userId) {
         List<Server> list = userRepository.getServerList();
         System.out.println("\n=========서버 목록==========");
-        list.forEach(s -> System.out.println(s.getId() + " : " + s.getName()));
+        list.forEach(s -> System.out.println(s.getServerId() + " : " + s.getName()));
         System.out.println("=========================\n");
 
     }
