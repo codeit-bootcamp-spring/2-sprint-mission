@@ -10,7 +10,7 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Message save(Message message) {
-        data.put(message.getAuthorId(), message);
+        data.put(message.getId(), message);
         return message;
     }
 

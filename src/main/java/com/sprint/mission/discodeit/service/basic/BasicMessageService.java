@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class BasicMessageService implements MessageService {
@@ -23,6 +24,14 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {
+        try{
+            channelService.find(channelId);
+            userService.find(authorId);
+        } catch (NoSuchElementException e){
+            throw e;
+        }
+
+        Message message = new Message(content, channelId, authorId);
         return messageRepository.save(new Message(content, channelId, authorId));
     }
 

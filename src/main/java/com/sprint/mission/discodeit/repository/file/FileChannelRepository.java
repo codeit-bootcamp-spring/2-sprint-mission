@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.io.*;
 import java.util.*;
 
-public class FileChannelrepository implements ChannelRepository {
+public class FileChannelRepository implements ChannelRepository {
     private static final String FILE_PATH = "channels.ser";
 
     @Override
