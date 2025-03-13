@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.Exception.*;
 import com.sprint.mission.discodeit.entity.Server;
-import com.sprint.mission.discodeit.entity.User;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -76,7 +74,7 @@ public interface UserService {
      *
      * @param userId 조회할 사용자 ID(UUID)
      * @throws UserNotFoundException 해당 ID의 사용자가 존재하지 않는 경우
-     * @throws NoServersFoundException 사용자가 가입한 서버가 없는 경우
+     * @throws EmptyServerListException 사용자가 가입한 서버가 없는 경우
      */
     void printServer(String userId);
 

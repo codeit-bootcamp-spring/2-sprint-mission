@@ -1,33 +1,21 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
-
 import java.util.UUID;
 
 public interface ServerService {
-    public abstract Channel createChannel(String name);
+    UUID createChannel(String serverId, String creatorId, String name);
 
-    //주입
-    public abstract void addChannel(UUID serverId, String name);
+    UUID joinChannel(String serverId, String userId, String channelId);
 
-    public abstract void addChannel(UUID serverId, Channel channel);
+    UUID quitChannel(String serverId, String userId, String channelId);
 
-    //단건 조회
-    public abstract Channel getChannel(UUID serverId, String name);
+    boolean printUsers(String serverId);
 
-    //출력
-    public abstract void printChannel(UUID serverId);
+    boolean printChannels(String serverId);
 
-    //삭제
-    public abstract boolean removeChannel(UUID serverId);
+    boolean printUsersInChannel(String channelId);
 
-    public abstract boolean removeChannel(UUID serverId, String targetName);
+    boolean removeChannel(String serverId, String creatorId, String channelId);
 
-    //업데이트
-    public abstract boolean updateChannel(UUID serverId);
-
-    public abstract boolean updateChannel(UUID serverId, String targetName);
-
-    public abstract boolean updateChannel(UUID serverId, String targetName, String replaceName);
-
+    boolean updateChannelName(String serverId, String creatorId, String channelId, String replaceName);
 }

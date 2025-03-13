@@ -1,26 +1,33 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.ToString;
+
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
+@ToString
+@Getter
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final UUID id;
-    public final Long createdAt;
-    public Long updatedAt;
-    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
+    private final UUID channelId;
+    private final UUID serverId;
+    private final UUID creatorId;
+    public final Instant createdAt;
+    public Instant updatedAt;
 
     private String name;
 
 
-    public Channel(String name) {
-        this(UUID.randomUUID(), System.currentTimeMillis(), name);
+    public Channel(UUID serverId, UUID creatorId, String name) {
+        this(UUID.randomUUID(), serverId, creatorId,Instant.now(), name);
     }
 
-    public Channel(UUID id, Long createdAt, String name) {
-        this.id = id;
+    public Channel(UUID channelId, UUID serverId, UUID creatorId, Instant createdAt, String name) {
+        this.channelId = channelId;
+        this.serverId = serverId;
+        this.creatorId = creatorId;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
         this.name = name;
@@ -28,33 +35,6 @@ public class Channel implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "id='" + this.getId() + '\'' +
-                "name='" + name + '\'' +
-                "creadAt='" + format.format(new Date(createdAt)) + '\'' +
-                '}';
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-
-    public Long getCreatedAt() {
-        System.out.println("생성 시각: " + format.format(new Date(createdAt)));
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        System.out.println("수정 시각: " + format.format(new Date(updatedAt)));
-        return updatedAt;
+        updatedAt = Instant.now();
     }
 }

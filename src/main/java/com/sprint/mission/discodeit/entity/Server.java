@@ -34,10 +34,7 @@ public class Server implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
+        updatedAt = Instant.now();
     }
 }
 

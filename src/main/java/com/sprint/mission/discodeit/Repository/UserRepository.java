@@ -42,11 +42,11 @@ public interface UserRepository {
     /**
      * 특정 사용자를 조회합니다.
      *
-     * @param targetUser 조회할 사용자 객체
+     * @param user 조회할 사용자 객체
      * @return 조회된 사용자 객체
      * @throws UserNotFoundException 사용자가 존재하지 않는 경우
      */
-    User findUser(User targetUser);
+    User findUser(User user);
 
     /**
      * 사용자 ID(UUID)를 통해 특정 사용자를 조회합니다.

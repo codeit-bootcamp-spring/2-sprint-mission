@@ -12,12 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class JCFUserRepository implements UserRepository {
-    private final List<User> userList = new ArrayList<>();
+    private final List<User> registeredUsers = new ArrayList<>();
     private final Map<UUID, List<Server>> serverList = new ConcurrentHashMap<>();
 
     @Override
     public UUID saveUser(User user) {
-        userList.add(user);
+        registeredUsers.add(user);
         return user.getId();
     }
 
@@ -30,7 +30,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User findUser(User targetUser) {
-        User user = userList.stream()
+        User user = registeredUsers.stream()
                 .filter(u -> u.getId().equals(targetUser.getId()))
                 .findFirst()
                 .orElseThrow(()->new UserNotFoundException("해당 유저는 존재하지 않습니다." + targetUser.getId()));
@@ -39,7 +39,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User findUserByUserId(UUID userId) {
-        User user = userList.stream()
+        User user = registeredUsers.stream()
                 .filter(u -> u.getId().equals(userId))
                 .findFirst()
                 .orElseThrow(()->new UserNotFoundException("해당 유저는 존재하지 않습니다." + userId));
@@ -86,7 +86,7 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public UUID removeUser(User user) {
         User targetUser = findUser(user);
-        userList.remove(targetUser);
+        registeredUsers.remove(targetUser);
         return targetUser.getId();
     }
 
