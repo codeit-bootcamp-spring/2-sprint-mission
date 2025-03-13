@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
 public class Channel extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private final Set<UUID> members;
@@ -18,17 +21,9 @@ public class Channel extends BaseEntity implements Serializable {
         this.messages = new HashSet<>();
     }
 
-    public String getChannelName() {
-        return channelName;
-    }
-
     public void updateChannelName(String channelName) {
         this.channelName = channelName;
         updateTimestamp();
-    }
-
-    public Set<UUID> getMembers() {
-        return members;
     }
 
     public void addMembers(UUID userId) {
@@ -39,10 +34,6 @@ public class Channel extends BaseEntity implements Serializable {
     public void removeMember(UUID userId) {
         this.members.remove(userId);
         updateTimestamp();
-    }
-
-    public Set<UUID> getMessages() {
-        return messages;
     }
 
     public void addMessages(UUID MessagesId) {
