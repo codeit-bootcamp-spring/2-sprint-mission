@@ -1,102 +1,105 @@
 package com.sprint.mission.discodeit.service.basic;
 
-public class BasicChannelService   {
-//    private final Map<UUID, ChannelRepository> channelTable = new HashMap<>();
-//    private final ChannelRepository repository;
-//
-//    public BasicChannelService(ChannelRepository repository) {
-//        this.repository = repository;
-//    }
-//
-//    private ChannelRepository getChannelRepository(UUID channelId) {
-//        ChannelRepository channelRepository = channelTable.get(channelId);
-//        if (channelRepository == null) {
-//            channelTable.put(channelId, repository);
-//            channelRepository = repository;
-//        }
-//        return channelRepository;
-//    }
-//
-//    @Override
-//    public Message write(UUID channelId) {
-//        ChannelRepository channelRepository = getChannelRepository(channelId);
-//        Scanner sc = new Scanner(System.in);
-//        System.out.print("메시지를 작성하시오. : ");
-//        String str = sc.nextLine();
-//        Message message = new Message(str);
-//        return write(channelRepository, message);
-//    }
-//
-//    @Override
-//    public Message write(UUID channelId, String str) {
-//        ChannelRepository channelRepository = getChannelRepository(channelId);
-//        Message message = new Message(str);
-//
-//        return write(channelRepository, message);
-//    }
-//
-//    private Message write(ChannelRepository channelRepository, Message message) {
-//        channelRepository.save(message);
-//        System.out.println("메시지 생성 : " + message.getStr());
-//        return message;
-//    }
-//
-//    @Override
-//    public Message getMessage(UUID channelId, String str) {
-//        ChannelRepository channelRepository = getChannelRepository(channelId);
-//        List<Message> list = channelRepository.getList();
-//        Message message = list.stream().filter(m -> m.getStr().equals(str)).findFirst().orElse(null);
-//        if (message != null) {
-//            //로그
-//            System.out.println(message.getStr() + " 이(가) 반환됩니다.");
-//            return message;
-//        }
-//        //로그
-//        System.out.println("해당 메시지가 존재하지 않습니다.");
-//        return null;
-//    }
-//
-//    @Override
-//    public void printChannel(UUID channelId) {
-//        ChannelRepository channelRepository = getChannelRepository(channelId);
-//        List<Message> list = channelRepository.getList();
-//        printChannel(list);
-//    }
-//
-//    private void printChannel(List<Message> list) {
-//        System.out.println("\n=========채널 메시지 목록==========");
-//        list.forEach(m -> System.out.println(m.getStr()));
-//        System.out.println("=========================\n");
-//    }
-//
-//    @Override
-//    public boolean removeMessage(UUID channelId, String targetName) {
-//        ChannelRepository channelRepository = getChannelRepository(channelId);
-//        List<Message> list = channelRepository.getList();
-//        Message message = list.stream().filter(m -> m.getStr().equals(targetName)).findFirst().orElse(null);
-//        if (message != null) {
-//            System.out.println(message.getStr() + " 이(가) 삭제됩니다.");
-//            list.remove(message);
-//            channelRepository.updateMessageList(list);
-//            return true;
-//        }
-//        System.out.println("해당 메시지가 존재하지 않습니다.");
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean updateMessage(UUID channelId, String targetName, String replaceName) {
-//        ChannelRepository channelRepository = getChannelRepository(channelId);
-//        List<Message> list = channelRepository.getList();
-//        Message targetMessage = list.stream().filter(m -> m.getStr().equals(targetName))
-//                .findFirst().orElse(null);
-//        if (targetMessage == null) {
-//            System.out.println("업데이트할 메시지가 존재하지 않습니다.");
-//            return false;
-//        }
-//        targetMessage.setStr(replaceName);
-//        channelRepository.updateMessageList(list);
-//        System.out.println(targetName + " 이(가) " + targetMessage.getStr() + " 이(가) 됩니다.");
-//        return true;
-//    }
+import com.sprint.mission.discodeit.Exception.EmptyMessageListException;
+import com.sprint.mission.discodeit.Repository.ChannelRepository;
+import com.sprint.mission.discodeit.Repository.ServerRepository;
+import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class BasicChannelService implements ChannelService {
+    private final UserRepository userRepository;
+    private final ServerRepository serverRepository;
+    private final ChannelRepository channelRepository;
+
+    public BasicChannelService(UserRepository userRepository, ServerRepository serverRepository, ChannelRepository channelRepository) {
+        this.userRepository = userRepository;
+        this.serverRepository = serverRepository;
+        this.channelRepository = channelRepository;
+    }
+
+    @Override
+    public void reset(boolean adminAuth) {
+        if (adminAuth == true) {
+            channelRepository.reset();
+        }
+    }
+
+    @Override
+    public Message write(String creatorId, String channelId, String text) {
+        UUID UID = UUID.fromString(creatorId);
+        UUID CID = UUID.fromString(channelId);
+        System.out.println("🔍 write: 요청된 creatorId: " + creatorId);
+        System.out.println("🔍 write: 요청된 channelId: " + channelId);
+
+        User user = userRepository.findUserByUserId(UID);
+        System.out.println("🔍 write: 반환된 user: " + user.getId());
+
+        Message message = new Message(UID,user.getName(), CID, text);
+
+        channelRepository.saveMessage(message);
+        return message;
+    }
+
+    @Override
+    public Message getMessage(String serverId, String channelId, String messageId) {
+        UUID SID = UUID.fromString(serverId);
+        UUID CID = UUID.fromString(channelId);
+        UUID MID = UUID.fromString(messageId);
+
+        Channel channel = serverRepository.findChannelByChanelId(SID, CID);
+        Message message = channelRepository.findMessageByChannel(channel, MID);
+
+        return message;
+    }
+
+    @Override
+    public void printMessage(String serverId, String channelId) {
+        try {
+            UUID SID = UUID.fromString(serverId);
+            UUID CID = UUID.fromString(channelId);
+
+            Channel channel = serverRepository.findChannelByChanelId(SID, CID);
+            System.out.println(channel.getName());
+
+            List<Message> messages = channelRepository.findMessageListByChannel(channel);
+            for (Message message : messages) {
+                System.out.println(message.getCreatorName() + " : " + message.getText());
+            }
+        } catch (EmptyMessageListException e) {
+            System.out.println("메시지 함이 비어있습니다.");
+        }
+
+    }
+
+    @Override
+    public boolean removeMessage(String serverId,String channelId, String messageId) {
+        UUID SID = UUID.fromString(serverId);
+        UUID CID = UUID.fromString(channelId);
+        UUID MID = UUID.fromString(messageId);
+        Channel channel = serverRepository.findChannelByChanelId(SID, CID);
+        Message message = channelRepository.findMessageByChannel(channel, MID);
+
+        channelRepository.removeMessage(channel, message);
+        return true;
+    }
+
+    @Override
+    public boolean updateMessage(String serverId,String channelId, String messageId, String replaceText) {
+        UUID SID = UUID.fromString(serverId);
+        UUID CID = UUID.fromString(channelId);
+        UUID MID = UUID.fromString(messageId);
+        Channel channel = serverRepository.findChannelByChanelId(SID, CID);
+        Message message = channelRepository.findMessageByChannel(channel, MID);
+
+        channelRepository.updateMessage(channel, message, replaceText);
+        return true;
+    }
 }

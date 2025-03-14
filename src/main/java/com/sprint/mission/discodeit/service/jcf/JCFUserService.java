@@ -22,6 +22,13 @@ public class JCFUserService implements UserService {
     }
 
     @Override
+    public void reset(boolean adminAuth) {
+        if (adminAuth == true) {
+            userRepository.reset();
+        }
+    }
+
+    @Override
     public UUID registerUser(String userName, String password) {
         User user = new User(userName, password);
         userRepository.saveUser(user);

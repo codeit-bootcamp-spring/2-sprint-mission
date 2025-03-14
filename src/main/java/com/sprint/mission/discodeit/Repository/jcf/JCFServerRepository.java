@@ -18,8 +18,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class JCFServerRepository implements ServerRepository {
-    private Map<UUID, List<User>> channelUsers = new ConcurrentHashMap<>( );
+    private Map<UUID, List<User>> channelUsers = new ConcurrentHashMap<>();
     private Map<UUID, List<Channel>> channelList = new ConcurrentHashMap<>();
+
+    @Override
+    public void reset() {
+        channelUsers = new ConcurrentHashMap<>();
+        channelList = new ConcurrentHashMap<>();
+    }
 
     @Override
     public UUID saveUser(Channel channel, User user) {
@@ -84,7 +90,7 @@ public class JCFServerRepository implements ServerRepository {
 
         List<User> users = channelUsers.get(channelId);
         if (users == null) {
-            throw  new EmptyUserListException("유저 리스트가 비어있습니다.");
+            throw new EmptyUserListException("유저 리스트가 비어있습니다.");
         }
 
         return users;

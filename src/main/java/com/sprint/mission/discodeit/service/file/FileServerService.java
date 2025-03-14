@@ -22,16 +22,10 @@ public class FileServerService implements ServerService {
         this.serverRepository = serverRepository;
     }
 
-    public void clearAll(boolean adminAuth) {
+    @Override
+    public void reset(boolean adminAuth) {
         if (adminAuth == true) {
-            userRepository.clear();
-            serverRepository.clearChannel();
-        }
-    }
-
-    public void clearServerRepository(boolean adminAuth) {
-        if (adminAuth == true) {
-            serverRepository.clearChannel();
+            serverRepository.reset();
         }
     }
 

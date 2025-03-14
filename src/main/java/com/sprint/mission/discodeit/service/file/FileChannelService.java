@@ -25,9 +25,10 @@ public class FileChannelService implements ChannelService{
         this.channelRepository = channelRepository;
     }
 
-    public void clearMessage(boolean adminAuth) {
+    @Override
+    public void reset(boolean adminAuth) {
         if (adminAuth == true) {
-            channelRepository.clear();
+            channelRepository.reset();
         }
     }
 

@@ -20,6 +20,12 @@ public class JCFServerService implements ServerService {
         this.userRepository = userRepository;
         this.serverRepository = serverRepository;
     }
+    @Override
+    public void reset(boolean adminAuth) {
+        if (adminAuth == true) {
+            serverRepository.reset();
+        }
+    }
 
     @Override
     public UUID createChannel(String serverId, String creatorId, String name) {

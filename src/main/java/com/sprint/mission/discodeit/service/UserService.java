@@ -16,6 +16,12 @@ import java.util.UUID;
  */
 public interface UserService {
     /**
+     * 저장소를 초기화합니다.
+     *
+     * @param adminAuth 권한 여부
+     * */
+    void reset(boolean adminAuth);
+    /**
      * 유저를 등록합니다.
      *
      * @param userName 가입할 유저 이름

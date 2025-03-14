@@ -13,7 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 public class JCFChannelRepository implements ChannelRepository {
     private Map<UUID, List<Message>> messageList = new ConcurrentHashMap<>();
-
+    @Override
+    public void reset() {
+        messageList = new ConcurrentHashMap<>();
+    }
     @Override
     public void saveMessage(Message message) {
         messageList.computeIfAbsent(message.getChannelId(), k -> new ArrayList<>()).add(message);

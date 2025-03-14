@@ -27,6 +27,13 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
+    public void reset(boolean adminAuth) {
+        if (adminAuth == true) {
+            channelRepository.reset();
+        }
+    }
+
+    @Override
     public Message write(String creatorId, String channelId, String text) {
         UUID UID = UUID.fromString(creatorId);
         UUID CID = UUID.fromString(channelId);

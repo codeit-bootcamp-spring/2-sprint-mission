@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.Exception.ServerNotFoundException;
 import com.sprint.mission.discodeit.Exception.UserNotFoundException;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +20,12 @@ import java.util.UUID;
  * @version 1.0
  */
 
+@Repository
 public interface UserRepository {
+    /**
+     * 리스트를 초기화합니다.
+     */
+    void reset();
     /**
      * 새로운 사용자를 저장합니다.
      *

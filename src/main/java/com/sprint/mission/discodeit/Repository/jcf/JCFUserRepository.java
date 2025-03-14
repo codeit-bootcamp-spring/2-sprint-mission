@@ -12,9 +12,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class JCFUserRepository implements UserRepository {
-    private  List<User> registeredUsers = new ArrayList<>();
-    private  Map<UUID, List<Server>> serverList = new ConcurrentHashMap<>();
-    private  Map<UUID, List<User>> serverUser = new ConcurrentHashMap<>();
+    private List<User> registeredUsers = new ArrayList<>();
+    private Map<UUID, List<Server>> serverList = new ConcurrentHashMap<>();
+    private Map<UUID, List<User>> serverUser = new ConcurrentHashMap<>();
+
+    @Override
+    public void reset() {
+        registeredUsers = new ArrayList<>();
+        serverList = new ConcurrentHashMap<>();
+        serverUser = new ConcurrentHashMap<>();
+    }
 
     @Override
     public UUID saveUser(User user) {
@@ -55,7 +62,7 @@ public class JCFUserRepository implements UserRepository {
         User user = registeredUsers.stream()
                 .filter(u -> u.getId().equals(targetUser.getId()))
                 .findFirst()
-                .orElseThrow(()->new UserNotFoundException("해당 유저는 존재하지 않습니다." + targetUser.getId()));
+                .orElseThrow(() -> new UserNotFoundException("해당 유저는 존재하지 않습니다." + targetUser.getId()));
         return user;
     }
 

@@ -130,7 +130,8 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
-    public void clear() {
+    @Override
+    public void reset() {
         init();
         try {
             Files.deleteIfExists(userPath);

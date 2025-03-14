@@ -14,7 +14,10 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
@@ -101,8 +104,8 @@ public class FileServerRepository implements ServerRepository {
         }
     }
 
-
-    public void clearChannel() {
+    @Override
+    public void reset() {
         init();
         try {
             Files.deleteIfExists(channelPath);

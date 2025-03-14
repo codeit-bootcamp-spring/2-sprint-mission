@@ -21,9 +21,10 @@ public class FileUserService implements UserService {
         this.userRepository = userRepository;
     }
 
-    public void clear(boolean adminAuth) {
+    @Override
+    public void reset(boolean adminAuth) {
         if (adminAuth == true) {
-            userRepository.clear();
+            userRepository.reset();
         }
     }
 

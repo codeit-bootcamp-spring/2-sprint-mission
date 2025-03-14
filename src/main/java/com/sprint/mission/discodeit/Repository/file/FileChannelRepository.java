@@ -66,7 +66,8 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
-    public void clear() {
+    @Override
+    public void reset() {
         init();
         try {
             Files.deleteIfExists(path);

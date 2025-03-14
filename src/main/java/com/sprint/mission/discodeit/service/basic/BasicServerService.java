@@ -1,179 +1,155 @@
 package com.sprint.mission.discodeit.service.basic;
 
-public class BasicServerService {
-//    private final Map<UUID, ServerRepository> serverTable = new HashMap<>();
-//    private final ServerRepository repository;
-//
-//    //생성될 때 어떤 repository 를 쓸 지 결정함
-//    public BasicServerService(ServerRepository repository) {
-//        this.repository = repository;
-//    }
-//
-//
-//    private ServerRepository getServerRepository(UUID id) {
-//        ServerRepository serverRepository = serverTable.get(id);
-//        if (serverRepository == null) {
-//            serverTable.put(id, repository);
-//            serverRepository = repository;
-//        }
-//        return serverRepository;
-//    }
-//
-//
-//    @Override
-//    public Channel createChannel(String name) {
-//        return CreateChannalFactory.getInstance().create(name);
-//    }
-//
-//    @Override
-//    public void addChannel(UUID serverId, String name) {
-//        ServerRepository serverRepository = getServerRepository(serverId);
-//        Channel channel = CreateChannalFactory.getInstance().create(name);
-//        serverRepository.save(channel);
-//
-//        //로그
-//        System.out.println(channel.getName() + " 채널 추가 성공");
-//    }
-//
-//    @Override
-//    public void addChannel(UUID serverId, Channel channel) {
-//        ServerRepository serverRepository = getServerRepository(serverId);
-//        serverRepository.save(channel);
-//
-//        //로그
-//        System.out.println(channel.getName() + " 채널 추가 성공");
-//    }
-//
-//    @Override
-//    public Channel getChannel(UUID serverId, String name) {
-//        ServerRepository serverRepository = getServerRepository(serverId);
-//        List<Channel> channelList = serverRepository.getContainerList();
-//        Channel channel = channelList.stream().filter(c -> c.getName().equals(name))
-//                .findFirst().orElse(null);
-//        if (channel != null) {
-//            //로그
-//            System.out.println(channel.getName() + " 이(가) 반환됩니다.");
-//            return channel;
-//        }
-//        //로그
-//        System.out.println("존재하지 않습니다.");
-//        return null;
-//    }
-//
-//    @Override
-//    public void printChannel(UUID serverId) {
-//        ServerRepository serverRepository = getServerRepository(serverId);
-//        List<Channel> channelList = serverRepository.getContainerList();
-//        printChannel(channelList);
-//    }
-//
-//
-//    private void printChannel(List<Channel> list) {
-//        System.out.println("\n=========채널 목록==========");
-//        list.forEach(c -> System.out.println(c.getId() + " : " + c.getName()));
-//        System.out.println("=========================\n");
-//    }
-//
-//    @Override
-//    public boolean removeChannel(UUID serverId) {
-//        ServerRepository serverRepository = getServerRepository(serverId);
-//        List<Channel> channelList = serverRepository.getContainerList();
-//        if (channelList == null) {
-//            System.out.println("채널 삭제 실패 : list null값");
-//            return false;
-//        }
-//        Scanner sc = new Scanner(System.in);
-//        System.out.print("삭제할 채널 이름을 입력하시오. : ");
-//        String targetName = sc.nextLine();
-//
-//        return removeChannel(channelList, targetName, serverRepository);
-//    }
-//
-//    @Override
-//    public boolean removeChannel(UUID serverId, String targetName) {
-//        ServerRepository serverRepository = getServerRepository(serverId);
-//        List<Channel> channelList = serverRepository.getContainerList();
-//        if (channelList == null) {
-//            System.out.println("채널 삭제 실패 : list null값");
-//            return false;
-//        }
-//
-//        return removeChannel(channelList, targetName, serverRepository);
-//    }
-//
-//
-//    private boolean removeChannel(List<Channel> list, String targetName, ServerRepository serverRepository) {
-//        Channel targetChannel = list.stream().filter(c -> c.getName().equals(targetName))
-//                .findFirst().orElse(null);
-//        if (targetChannel == null) {
-//            System.out.println("삭제할 채널이 존재하지 않습니다.");
-//            return false;
-//        }
-//        System.out.println(targetChannel.getName() + " 이(가) 삭제됩니다.");
-//        list.remove(targetChannel);
-//
-//        //삭제한 내용 적용
-//        serverRepository.updateContainerList(list);
-//
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean updateChannel(UUID serverId) {
-//        ServerRepository serverRepository = getServerRepository(serverId);
-//        List<Channel> channelList = serverRepository.getContainerList();
-//
-//        Scanner sc = new Scanner(System.in);
-//        System.out.print("바꿀려고 하는 채널의 이름을 입력하시오. : ");
-//        String targetName = sc.nextLine();
-//
-//        return updateChannel(serverId, channelList, targetName);
-//    }
-//
-//    @Override
-//    public boolean updateChannel(UUID serverId, String targetName) {
-//        ServerRepository serverRepository = getServerRepository(serverId);
-//        List<Channel> channelList = serverRepository.getContainerList();
-//
-//        Scanner sc = new Scanner(System.in);
-//        System.out.print("채널 이름을 무엇으로 바꾸시겠습니까? : ");
-//        String replaceName = sc.nextLine();
-//
-//        return updateChannel(serverId, channelList, targetName, replaceName);
-//    }
-//
-//    @Override
-//    public boolean updateChannel(UUID serverId, String targetName, String replaceName) {
-//        ServerRepository serverRepository = getServerRepository(serverId);
-//        List<Channel> channelList = serverRepository.getContainerList();
-//
-//        return updateChannel(serverId, channelList, targetName, replaceName);
-//    }
-//
-//
-//    private boolean updateChannel(UUID serverId, List<Channel> list, String targetName) {
-//        Scanner sc = new Scanner(System.in);
-//        System.out.print("채널 이름을 무엇으로 바꾸시겠습니까? : ");
-//        String replaceName = sc.nextLine();
-//
-//        return updateChannel(serverId, list, targetName, replaceName);
-//
-//    }
-//
-//
-//    private boolean updateChannel(UUID serverId, List<Channel> list, String targetName, String replaceName) {
-//        ServerRepository serverRepository = getServerRepository(serverId);
-//        Channel targetChannel = list.stream().filter(c -> c.getName().equals(targetName))
-//                .findFirst().orElse(null);
-//        if (targetChannel != null) {
-//            targetChannel.setName(replaceName);
-//            serverRepository.updateContainerList(list);
-//            System.out.println(targetName + " 이름이 " + targetChannel.getName() + " 이(가) 됩니다.");
-//            return true;
-//        }
-//        System.out.println("업데이트할 채널이 존재하지 않습니다.");
-//        return false;
-//    }
-//
+import com.sprint.mission.discodeit.Repository.ServerRepository;
+import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ServerService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class BasicServerService implements ServerService {
+    private final UserRepository userRepository;
+    private final ServerRepository serverRepository;
+
+    public BasicServerService(UserRepository userRepository, ServerRepository serverRepository) {
+        this.userRepository = userRepository;
+        this.serverRepository = serverRepository;
+    }
+
+    @Override
+    public void reset(boolean adminAuth) {
+        if (adminAuth == true) {
+            serverRepository.reset();
+        }
+    }
+
+    @Override
+    public UUID createChannel(String serverId, String creatorId, String name) {
+        UUID SID = UUID.fromString(serverId);
+        UUID UID = UUID.fromString(creatorId);
+
+        User user = userRepository.findUserByUserId(UID);
+        Server findServer = userRepository.findServerByServerId(user, SID);
+
+        Channel channel = new Channel(findServer.getServerId(), user.getId(), name);
+        serverRepository.saveChannel(findServer, channel);
+
+        return channel.getChannelId();
+    }
+
+
+    @Override
+    public UUID joinChannel(String serverId, String userId, String ownerId,String channelId) {
+        UUID SID = UUID.fromString(serverId);
+        UUID UID = UUID.fromString(userId);
+        UUID UOID = UUID.fromString(ownerId);
+        UUID CID = UUID.fromString(channelId);
+
+        User user = userRepository.findUserByUserId(UID);
+        User owner = userRepository.findUserByUserId(UOID);
+        Server findServer = userRepository.findServerByServerId(owner, SID);
+        Channel findChannel = serverRepository.findChannelByChanelId(findServer, CID);
+
+        UUID uuid = serverRepository.saveUser(findChannel, user);
+
+        return uuid;
+    }
+
+    @Override
+    public UUID quitChannel(String serverId, String userId, String channelId) {
+        UUID SID = UUID.fromString(serverId);
+        UUID UID = UUID.fromString(userId);
+        UUID CID = UUID.fromString(channelId);
+
+        User user = userRepository.findUserByUserId(UID);
+        Server findServer = userRepository.findServerByServerId(user, SID);
+        Channel findChannel = serverRepository.findChannelByChanelId(findServer, CID);
+
+        UUID uuid = serverRepository.quitChannel(findChannel, user);
+
+        return uuid;
+    }
+
+    @Override
+    public boolean printUsers(String serverId) {
+        UUID SID = UUID.fromString(serverId);
+
+        List<Channel> channels = serverRepository.findChannelListByServerId(SID);
+
+        for (Channel channel : channels) {
+            List<User> users = serverRepository.findUserListByChannelId(channel.getServerId());
+            System.out.println(channel.getName());
+            for (User user : users) {
+                System.out.println(user);
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean printChannels(String serverId) {
+        UUID SID = UUID.fromString(serverId);
+
+        List<Channel> channels = serverRepository.findChannelListByServerId(SID);
+        for (Channel channel : channels) {
+            System.out.println(channel);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean printUsersInChannel(String channelId) {
+        UUID CID = UUID.fromString(channelId);
+
+        List<User> users = serverRepository.findUserListByChannelId(CID);
+        for (User user : users) {
+            System.out.println(user);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean removeChannel(String serverId, String creatorId, String channelId) {
+        UUID SID = UUID.fromString(serverId);
+        UUID UID = UUID.fromString(creatorId);
+        UUID CID = UUID.fromString(channelId);
+
+        User user = userRepository.findUserByUserId(UID);
+        Server findServer = userRepository.findServerByServerId(user, SID);
+        Channel findChannel = serverRepository.findChannelByChanelId(findServer, CID);
+
+        if (findChannel.getCreatorId().equals(UID)) {
+            serverRepository.removeChannel(findServer, findChannel);
+            return true;
+        } else {
+            System.out.println("채널 삭제 권한 없음");
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updateChannelName(String serverId, String creatorId, String channelId, String replaceName) {
+        UUID SID = UUID.fromString(serverId);
+        UUID UID = UUID.fromString(creatorId);
+        UUID CID = UUID.fromString(channelId);
+
+        User user = userRepository.findUserByUserId(UID);
+        Server findServer = userRepository.findServerByServerId(user, SID);
+        Channel findChannel = serverRepository.findChannelByChanelId(findServer, CID);
+
+        if (findChannel.getCreatorId().equals(UID)) {
+            serverRepository.updateChannelName(findServer, findChannel, replaceName);
+            return true;
+        } else {
+            System.out.println("채널 수정 권한 없음");
+            return false;
+        }
+    }
 
 }

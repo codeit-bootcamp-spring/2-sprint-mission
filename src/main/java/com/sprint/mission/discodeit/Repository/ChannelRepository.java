@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelRepository {
+    /**
+     * 리스트를 초기화합니다.
+     */
+    void reset();
     void saveMessage(Message message);
 
     Message findMessageByChannel(Channel channel, UUID messageId);

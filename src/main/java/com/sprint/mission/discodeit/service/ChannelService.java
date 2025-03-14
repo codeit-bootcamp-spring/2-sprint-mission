@@ -4,6 +4,13 @@ import com.sprint.mission.discodeit.entity.Message;
 
 
 public interface ChannelService {
+    /**
+     * 저장소를 초기화합니다.
+     *
+     * @param adminAuth 권한 여부
+     * */
+    void reset(boolean adminAuth);
+
     Message write(String creatorId, String channelId, String text);
 
     //단건 조회
