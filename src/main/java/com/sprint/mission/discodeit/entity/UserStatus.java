@@ -11,6 +11,7 @@ public class UserStatus extends BaseEntity {
     private final UUID userId;
 
     public UserStatus(UUID userId) {
+        super();
         this.userId = userId;
     }
 
