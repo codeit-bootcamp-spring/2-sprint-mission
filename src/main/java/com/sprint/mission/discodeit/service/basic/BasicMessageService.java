@@ -5,65 +5,61 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class BasicMessageService implements MessageService {
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
+    //
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
 
-    public BasicMessageService(UserRepository userRepository, ChannelRepository channelRepository,
-                               MessageRepository messageRepository) {
-        this.userRepository = userRepository;
+    public BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository, UserRepository userRepository) {
         this.messageRepository = messageRepository;
         this.channelRepository = channelRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public Message getMessage(UUID messageId) {
-        if (messageRepository.messageExists(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
+    public Message create(String content, UUID channelId, UUID authorId) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("Channel not found with id " + channelId);
         }
-        return messageRepository.findById(messageId);
+        if (!userRepository.existsById(authorId)) {
+            throw new NoSuchElementException("Author not found with id " + authorId);
+        }
+
+        Message message = new Message(content, channelId, authorId);
+        return messageRepository.save(message);
     }
 
     @Override
-    public List<Message> getAllMessages() {
+    public Message find(UUID messageId) {
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+    }
+
+    @Override
+    public List<Message> findAll() {
         return messageRepository.findAll();
     }
 
     @Override
-    public List<Message> getUpdatedMessages() {
-        return messageRepository.findUpdatedMessages();
+    public Message update(UUID messageId, String newContent) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
+        return messageRepository.save(message);
     }
 
     @Override
-    public void registerMessage(UUID channelId, String userName, String messageContent) {
-        if (channelRepository.channelExists(channelId) && userRepository.userExists(userName)) {
-            throw new IllegalArgumentException("존재하지 않는 ID입니다.");
+    public void delete(UUID messageId) {
+        if (!messageRepository.existsById(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
-        messageRepository.createMessage(
-                channelRepository.findById(channelId),
-                userRepository.findByName(userName),
-                messageContent
-        );
+        messageRepository.deleteById(messageId);
     }
-
-    @Override
-    public void updateMessage(UUID messageId, String messageContent) {
-        if (messageRepository.messageExists(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
-        }
-        messageRepository.updateMessage(messageId, messageContent);
-    }
-
-    @Override
-    public void deleteMessage(UUID messageId) {
-        if (messageRepository.messageExists(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
-        }
-        messageRepository.deleteMessage(messageId);
-    }
-
 }

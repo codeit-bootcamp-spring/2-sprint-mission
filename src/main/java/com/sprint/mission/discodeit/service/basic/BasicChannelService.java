@@ -1,64 +1,51 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class BasicChannelService implements ChannelService {
-    private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
-    private final MessageRepository messageRepository;
 
-    public BasicChannelService(UserRepository userRepository, ChannelRepository channelRepository,
-                               MessageRepository messageRepository) {
-        this.userRepository = userRepository;
+    public BasicChannelService(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
-        this.messageRepository = messageRepository;
     }
 
     @Override
-    public Channel getChannel(UUID channelId) {
-        if (channelRepository.channelExists(channelId)) {
-            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
-        }
-        return channelRepository.findById(channelId);
+    public Channel create(ChannelType type, String name, String description) {
+        Channel channel = new Channel(type, name, description);
+        return channelRepository.save(channel);
     }
 
     @Override
-    public List<Channel> getAllChannels() {
+    public Channel find(UUID channelId) {
+        return channelRepository.findById(channelId)
+                        .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+    }
+
+    @Override
+    public List<Channel> findAll() {
         return channelRepository.findAll();
     }
 
-    public List<Channel> getUpdatedChannels() {
-        return channelRepository.findUpdatedChannels();
+    @Override
+    public Channel update(UUID channelId, String newName, String newDescription) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+        channel.update(newName, newDescription);
+        return channelRepository.save(channel);
     }
 
     @Override
-    public void registerChannel(String channelName, String userName) {
-        if (userRepository.userExists(userName)) {
-            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+    public void delete(UUID channelId) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
-        channelRepository.createChannel(channelName, userRepository.findByName(userName));
-    }
-
-    @Override
-    public void updateChannel(UUID channelId, String channelName) {
-        if (channelRepository.channelExists(channelId)) {
-            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
-        }
-        channelRepository.updateChannel(channelId, channelName);
-    }
-
-    @Override
-    public void deleteChannel(UUID channelId) {
-        if (channelRepository.channelExists(channelId)) {
-            throw new IllegalArgumentException("존재하지 않는 채널ID입니다.");
-        }
-        channelRepository.deleteChannel(channelId);
-        messageRepository.deleteMessagesByChannelId(channelId);
+        channelRepository.deleteById(channelId);
     }
 }

@@ -1,69 +1,40 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+
+import java.util.*;
 
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channelData = new HashMap<>();
+    private final Map<UUID, Channel> data;
 
-    @Override
-    public boolean channelExists(UUID channelId) {
-        return !channelData.containsKey(channelId);
+    public JCFChannelRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-        return channelData.get(channelId);
+    public Channel save(Channel channel) {
+        this.data.put(channel.getId(), channel);
+        return channel;
+    }
+
+    @Override
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public List<Channel> findAll() {
-        if (channelData.isEmpty()) {
-            throw new IllegalArgumentException("데이터가 존재하지 않습니다.");
-        }
-        return new ArrayList<>(channelData.values());
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public List<Channel> findUpdatedChannels() {
-        return channelData.values().stream()
-                .filter(entry -> entry.getUpdatedAt() != null)
-                .collect(Collectors.toList());
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public void createChannel(String channelName, User user) {
-        Channel channel = new Channel(channelName, user);
-        this.channelData.put(channel.getId(), channel);
-    }
-
-    @Override
-    public void updateChannel(UUID channelId, String channelName) {
-        channelData.get(channelId).updateChannel(channelName);
-    }
-
-    @Override
-    public void deleteChannel(UUID channelId) {
-        channelData.remove(channelId);
-    }
-
-    @Override
-    public List<UUID> channelListByuserId(UUID userId) {
-        return channelData.values().stream()
-                .filter(channel -> channel.getUser().getId().equals(userId))
-                .map(Channel::getId)
-                .toList();
-    }
-
-    @Override
-    public void deleteChannelList(List<UUID> channelIdList) {
-        channelIdList.forEach(channelData::remove);
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }

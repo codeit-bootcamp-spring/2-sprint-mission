@@ -1,44 +1,72 @@
 package com.sprint.mission.discodeit.entity;
 
-import static com.sprint.mission.discodeit.entity.Util.formatTime;
-
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-public class User extends BaseEntity implements Serializable {
+public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private String userName;
-    private String nickName;
 
-    public User(String userName, String nickName) {
-        super();
-        this.userName = userName;
-        this.nickName = nickName;
+    private final UUID id;
+    private final Long createdAt;
+    private Long updatedAt;
+    //
+    private String username;
+    private String email;
+    private String password;
+
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
-
-    public String getUserName() {
-        return userName;
+    public UUID getId() {
+        return id;
     }
 
-    public String getNickName() {
-        return nickName;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    public void userUpdate(String userName, String nickName) {
-        updateTime();
-        this.userName = userName;
-        this.nickName = nickName;
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    @Override
-    public String toString() {
-        return "[uid: " + id +
-                ", userCreateAt: " + formatTime(getCreatedAt()) +
-                ", userUpdateAt: " + (getUpdatedAt() == null ? "null" : formatTime(getUpdatedAt())) +
-                ", userName: " + userName +
-                ", nickName: " + nickName + "]\n";
+    public String getUsername() {
+        return username;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
+    }
 }

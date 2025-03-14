@@ -1,69 +1,67 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
-import java.util.List;
-import java.util.UUID;
+import com.sprint.mission.discodeit.service.UserService;
+
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
-    private final MessageRepository messageRepository;
+    private final Map<UUID, Message> data;
+    //
+    private final ChannelService channelService;
+    private final UserService userService;
 
-    public JCFMessageService(UserRepository userRepository, ChannelRepository channelRepository,
-                             MessageRepository messageRepository) {
-        this.userRepository = userRepository;
-        this.messageRepository = messageRepository;
-        this.channelRepository = channelRepository;
+    public JCFMessageService(ChannelService channelService, UserService userService) {
+        this.data = new HashMap<>();
+        this.channelService = channelService;
+        this.userService = userService;
     }
 
     @Override
-    public Message getMessage(UUID messageId) {
-        if (messageRepository.messageExists(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
+    public Message create(String content, UUID channelId, UUID authorId) {
+        try {
+            channelService.find(channelId);
+            userService.find(authorId);
+        } catch (NoSuchElementException e) {
+            throw e;
         }
-        return messageRepository.findById(messageId);
+
+        Message message = new Message(content, channelId, authorId);
+        this.data.put(message.getId(), message);
+
+        return message;
     }
 
     @Override
-    public List<Message> getAllMessages() {
-        return messageRepository.findAll();
+    public Message find(UUID messageId) {
+        Message messageNullable = this.data.get(messageId);
+
+        return Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
     @Override
-    public List<Message> getUpdatedMessages() {
-        return messageRepository.findUpdatedMessages();
+    public List<Message> findAll() {
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public void registerMessage(UUID channelId, String userName, String messageContent) {
-        if (channelRepository.channelExists(channelId) && userRepository.userExists(userName)) {
-            throw new IllegalArgumentException("존재하지 않는 ID입니다.");
+    public Message update(UUID messageId, String newContent) {
+        Message messageNullable = this.data.get(messageId);
+        Message message = Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
+
+        return message;
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        if (!this.data.containsKey(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
-        messageRepository.createMessage(
-                channelRepository.findById(channelId),
-                userRepository.findByName(userName),
-                messageContent
-        );
+        this.data.remove(messageId);
     }
-
-    @Override
-    public void updateMessage(UUID messageId, String messageContent) {
-        if (messageRepository.messageExists(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
-        }
-        messageRepository.updateMessage(messageId, messageContent);
-    }
-
-    @Override
-    public void deleteMessage(UUID messageId) {
-        if (messageRepository.messageExists(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
-        }
-        messageRepository.deleteMessage(messageId);
-    }
-
 }

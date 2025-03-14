@@ -1,69 +1,133 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileUserService implements UserService {
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
-    private final MessageRepository messageRepository;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    public FileUserService(UserRepository userRepository, ChannelRepository channelRepository,
-                           MessageRepository messageRepository) {
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
-        this.messageRepository = messageRepository;
-    }
-
-    @Override
-    public User getUser(String userName) {
-        if (userRepository.userExists(userName)) {
-            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+    public FileUserService() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return userRepository.findByName(userName);
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    @Override
-    public List<User> getUpdatedUsers() {
-        return userRepository.findUpdatedUsers();
-    }
-
-    @Override
-    public void registerUser(String userName, String nickName) {
-        if (!userRepository.userExists(userName)) {
-            throw new IllegalArgumentException("존재하는 사용자명입니다.");
+    public User create(String username, String email, String password) {
+        User user = new User(username, email, password);
+        Path path = resolvePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        userRepository.createUser(userName, nickName);
+
+        return user;
     }
 
     @Override
-    public void updateName(String oldUserName, String newUserName, String newNickName) {
-        if (userRepository.userExists(oldUserName)) {
-            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+    public User find(UUID userId) {
+        User userNullable = null;
+        Path path = resolvePath(userId);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
-        userRepository.updateUser(oldUserName, newUserName, newNickName);
+
+        return Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
     @Override
-    public void deleteUser(String userName) {
-        if (userRepository.userExists(userName)) {
-            throw new IllegalArgumentException("존재하지 않는 사용자명입니다.");
+    public List<User> findAll() {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        List<UUID> channels = channelRepository.channelListByuserId(userRepository.findByName(userName).getId());
-        userRepository.deleteUser(userName);
-        for (UUID channelId : channels) {
-            messageRepository.deleteMessagesByChannelId(channelId);
+    }
+
+    @Override
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User userNullable = null;
+        Path path = resolvePath(userId);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
-        channelRepository.deleteChannelList(channels);
+
+        User user = Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        user.update(newUsername, newEmail, newPassword);
+
+        try(
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return user;
+    }
+
+    @Override
+    public void delete(UUID userId) {
+        Path path = resolvePath(userId);
+        if (Files.notExists(path)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
+        }
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

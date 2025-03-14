@@ -1,51 +1,65 @@
 package com.sprint.mission.discodeit.entity;
 
-import static com.sprint.mission.discodeit.entity.Util.formatTime;
-
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-public class Message extends BaseEntity implements Serializable {
+public class Message implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private final Channel channel;
-    private final User user;
-    private String messageContent;
 
-    public Message(Channel channel, User user, String messageContent) {
-        super();
-        this.channel = channel;
-        this.user = user;
-        this.messageContent = messageContent;
+    private final UUID id;
+    private final Long createdAt;
+    private Long updatedAt;
+    //
+    private String content;
+    //
+    private final UUID channelId;
+    private final UUID authorId;
+
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    public Channel getChannel() {
-        return channel;
+    public UUID getId() {
+        return id;
     }
 
-    public User getUser() {
-        return user;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    public String getMessageContent() {
-        return messageContent;
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void messageUpdate(String messageContent) {
-        updateTime();
-        this.messageContent = messageContent;
+    public String getContent() {
+        return content;
     }
 
-    @Override
-    public String toString() {
-        return "[mid: " + getId() +
-                ", cid: " + channel.getId() +
-                ", channelName: " + channel.getChannelName() +
-                ", userName: " + user.getUserName() +
-                ", nickName: " + user.getNickName() +
-                "\n\t, messageCreateAt: " + formatTime(getCreatedAt()) +
-                ", messageUpdateAt: " + (getUpdatedAt() == null ? "null" : formatTime(getUpdatedAt())) +
-                ", messageContent: " + messageContent + "]\n";
+    public UUID getChannelId() {
+        return channelId;
     }
 
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
+    }
 }

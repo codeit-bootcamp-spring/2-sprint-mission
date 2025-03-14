@@ -1,42 +1,67 @@
 package com.sprint.mission.discodeit.entity;
 
-import static com.sprint.mission.discodeit.entity.Util.formatTime;
-
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-public class Channel extends BaseEntity implements Serializable {
+public class Channel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private String channelName;
-    private final User user;
+    private final UUID id;
+    private final Long createdAt;
+    private Long updatedAt;
+    //
+    private final ChannelType type;
+    private String name;
+    private String description;
 
-    public Channel(String channelName, User user) {
-        super();
-        this.channelName = channelName;
-        this.user = user;
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.type = type;
+        this.name = name;
+        this.description = description;
     }
 
-    public String getChannelName() {
-        return channelName;
+    public UUID getId() {
+        return id;
     }
 
-    public User getUser() {
-        return user;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    public void updateChannel(String channelName) {
-        updateTime();
-        this.channelName = channelName;
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    @Override
-    public String toString() {
-        return "[cid: " + getId() +
-                ", channelCreateAt: " + formatTime(getCreatedAt()) +
-                ", channelUpdateAt: " + (getUpdatedAt() == null ? "null" : formatTime(getUpdatedAt())) +
-                ", channelName: " + channelName +
-                ", userName: " + user.getUserName() + "]\n";
+    public ChannelType getType() {
+        return type;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
+    }
 }
