@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface MessageRepository {
     Message save(Message message);
-    Optional<Message> findById(UUID messageId);
+    Optional<Message> findById(UUID id);
     List<Message> findAll();
-    void deleteById(UUID messageId);
+    void deleteById(UUID id);
 }
