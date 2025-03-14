@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserReadResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
 
 public interface UserService {
-    User createUser(String userName, String userEmail, String password);
+    User createUser(UserCreateRequest userCreateRequest);
     User readUser(UUID id);
     Map<UUID, User> readAllUsers();
     void updateUserName(UUID id, String newUserName);
