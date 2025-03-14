@@ -17,11 +17,13 @@ public class User implements Serializable {
 
     @ToString.Include
     private String name;
+    private String password;
+
+    public UUID profileId;
 
     public final Instant createdAt;
     public Instant updatedAt;
 
-    private String password;
 
     public User(String name, String password) {
         this(UUID.randomUUID(), Instant.now(), name, password);

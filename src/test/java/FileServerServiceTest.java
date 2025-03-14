@@ -20,7 +20,7 @@ public class FileServerServiceTest {
         String owner = "a86064f9-e05f-4186-a8d3-5b389a76bdd6";
         String testUser = "bee340eb-5682-4d4a-86dc-2bfe87de2306";
 
-        serverService.clearServerRepository(true);
+        serverService.reset(true);
 
         //유저 확인
         userService.printUser();
