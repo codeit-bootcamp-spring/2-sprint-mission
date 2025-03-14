@@ -3,10 +3,12 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private static final FileChannelRepository instance = new FileChannelRepository();
     private static final String FILE_PATH = "channels.ser";
