@@ -24,9 +24,6 @@ public class JCFMessageService implements MessageService {
     @Override
     public MessageDto create(String context, UUID channelId, UUID userId) {
         Message message = messageRepository.save(new Message(context, channelId, userId));
-        if (message == null) {
-            throw new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent());
-        }
 
         return toDto(message);
     }

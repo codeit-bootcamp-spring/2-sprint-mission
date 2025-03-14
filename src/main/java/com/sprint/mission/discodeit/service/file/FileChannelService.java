@@ -26,8 +26,7 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public ChannelDto create(String name, UserDto owner) {
-        Channel channel = channelRepository
-                .save(new Channel(name, owner.id()));
+        Channel channel = channelRepository.save(new Channel(name, owner.id()));
 
         return toDto(channel);
     }
