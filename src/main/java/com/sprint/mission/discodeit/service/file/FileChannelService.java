@@ -2,75 +2,57 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import java.io.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class FileChannelService implements ChannelService {
-    private static final String FILE_NAME = "channel.ser";
-    private Map<UUID, Channel> data;
+    private final ChannelRepository channelRepository;
 
-    public FileChannelService() {
-        this.data = loadFromFile();
+    public FileChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
 
     @Override
     public Channel create(ChannelType type, String name, String description) {
         Channel channel = new Channel(type, name, description);
-        data.put(channel.getId(), channel);
-        saveToFile();
-        return channel;
+        return channelRepository.save(channel);
     }
 
     @Override
     public Channel find(UUID channelId) {
-        Channel channel = data.get(channelId);
-        return Optional.ofNullable(channel)
-                .orElseThrow(() -> new NoSuchElementException("Channel with id" + channelId + "not found"));
+        return channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
     }
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(data.values());
+        return channelRepository.findAll();
     }
 
     @Override
     public Channel update(UUID channelId, String newName, String newDescription) {
         Channel channel = find(channelId);
         channel.update(newName, newDescription);
-        saveToFile();
-        return channel;
+        return channelRepository.save(channel);
     }
 
     @Override
     public void delete(UUID channelId) {
-        if (!data.containsKey(channelId)) {
-            throw new NoSuchElementException("Channel with id" + channelId + "not found");
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("Channel with id" + channelId + " not found");
         }
-        data.remove(channelId);
-        saveToFile();
-    }
-
-
-    private void saveToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
-            oos.writeObject(data);
-        } catch (IOException e) {
-            throw new RuntimeException("Error saving channels data", e);
-        }
-    }
-
-    private Map<UUID, Channel> loadFromFile() {
-        File file = new File(FILE_NAME);
-        if (!file.exists()) {
-            return new HashMap<>();
-        }
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
-            return (Map<UUID, Channel>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Error loading channels data", e);
-        }
+        channelRepository.deleteById(channelId);
     }
 }
-

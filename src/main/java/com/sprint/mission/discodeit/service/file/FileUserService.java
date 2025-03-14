@@ -1,73 +1,56 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.dto.UpdateDefinition;
+import com.sprint.mission.discodeit.dto.CreateDefinition;
 
 import java.io.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
 public class FileUserService implements UserService {
-    private static final String FILE_NAME = "user.ser";
-    private Map<UUID, User> data;
+    private final UserRepository userRepository;
 
-    public FileUserService() {
-        this.data = loadFromFile();
+    public FileUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
-    public User create(String username, String email, String password) {
-        User user = new User(username, email, password);
-        data.put(user.getId(), user);
-        saveToFile();
-        return user;
+    public User create(CreateDefinition createDefinition) {
+        User user = new User(createDefinition.getUsername(), createDefinition.getEmail(), createDefinition.getPassword());
+        return userRepository.save(user);
     }
 
     @Override
     public User find(UUID userId) {
-        User user = data.get(userId);
-        return Optional.ofNullable(user)
-                .orElseThrow(() -> new NoSuchElementException("User with id" + userId + "not found"));
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
     @Override
-    public List<User> findAll(){
-        return new ArrayList<>(data.values());
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+    public User update(UUID userId, UpdateDefinition updateDefinition) {
         User user = find(userId);
-        user.update(newUsername, newEmail, newPassword);
-        saveToFile();
-        return user;
+        user.update(updateDefinition.getUsername(), updateDefinition.getEmail(), updateDefinition.getPassword());
+        return userRepository.save(user);
     }
 
     @Override
     public void delete(UUID userId) {
-        if (!data.containsKey(userId)) {
-            throw new NoSuchElementException("User with id" + userId + " not found");
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
         }
-        data.remove(userId);
-        saveToFile();
-    }
-
-    private void saveToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
-            oos.writeObject(data);
-        } catch (IOException e){
-            throw new RuntimeException("Error saving users data", e);
-        }
-    }
-
-    private Map<UUID,User> loadFromFile() {
-        File file = new File(FILE_NAME);
-        if (!file.exists()) {
-            return new HashMap<>();
-        }
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
-            return (Map<UUID, User>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Error loading users data", e);
-        }
+        userRepository.deleteById(userId);
     }
 }

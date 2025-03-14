@@ -1,53 +1,51 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-
+import com.sprint.mission.discodeit.dto.UpdateDefinition;
+import com.sprint.mission.discodeit.dto.CreateDefinition;
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> data;
+    private final UserRepository userRepository;
 
-    public JCFUserService() {
-        this.data = new HashMap<>();
+    public JCFUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
-    public User create(String username, String email, String password) {
-        User user = new User(username, email, password);
-        this.data.put(user.getId(), user);
-
-        return user;
+    public User create(CreateDefinition createDefinition) {
+        User user = new User(createDefinition.getUsername(), createDefinition.getPassword(), createDefinition.getEmail());
+        return userRepository.save(user);
     }
 
     @Override
     public User find(UUID userId) {
-        User userNullable = this.data.get(userId);
-
-        return Optional.ofNullable(userNullable)
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
     @Override
     public List<User> findAll() {
-        return this.data.values().stream().toList();
+        return userRepository.findAll();
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User userNullable = this.data.get(userId);
-        User user = Optional.ofNullable(userNullable)
+    public User update(UUID userId, UpdateDefinition updateDefinition) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword);
+        user.update(updateDefinition.getUsername(), updateDefinition.getEmail(), updateDefinition.getPassword());
 
-        return user;
+        return userRepository.save(user);
     }
 
     @Override
     public void delete(UUID userId) {
-        if (!this.data.containsKey(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("User with id " + userId + " not found");
         }
-        this.data.remove(userId);
+        userRepository.deleteById(userId);
     }
 }
+
