@@ -36,6 +36,11 @@ public class User extends BaseEntity implements Serializable {
         super.updateUpdatedAt();
     }
 
+    public void updateProfileId(UUID profileId) {
+        this.profileId = profileId;
+        super.updateUpdatedAt();
+    }
+
     public static void validateUserName(String userName) {
         if (userName == null || userName.trim().isEmpty()) {
             throw new IllegalArgumentException("Username 은 null 이거나 공백일 수 없다!!!");
@@ -76,6 +81,7 @@ public class User extends BaseEntity implements Serializable {
                 + "userName: " + userName + '\n'
                 + "userEmail: " + userEmail + '\n'
                 + "password: " + password + '\n'
+                + "profileId: " + profileId + '\n'
                 + "id: " + super.getId() + '\n'
                 + "createdAt: " + super.getCreatedAt() + '\n'
                 + "updatedAt: " + super.getUpdatedAt() + '\n';
