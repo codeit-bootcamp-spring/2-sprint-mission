@@ -62,11 +62,11 @@ public abstract class AbstractFileRepository<T extends BaseEntity> extends Abstr
         }
     }
 
-    public void deleteFile(UUID channelId) {
+    public void deleteFile(UUID id) {
         //file 삭제
         try {
-            if (!Files.deleteIfExists(directory.resolve(channelId.toString() + ".ser"))) {
-                throw new NoSuchElementException("해당 Id를 가진 파일이 존재하지 않습니다. : " + channelId);
+            if (!Files.deleteIfExists(directory.resolve(id.toString() + ".ser"))) {
+                throw new NoSuchElementException("해당 Id를 가진 파일이 존재하지 않습니다. : " + id);
             }
         } catch (IOException e) {
             e.printStackTrace();
