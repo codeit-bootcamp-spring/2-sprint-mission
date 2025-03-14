@@ -8,15 +8,10 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class User extends BaseEntity implements Serializable {
+public class UserStatus extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String username;
-    private String password;
-    private String nickname;
-    private String profile;
-
-    public void updateNickname(String nickname) {
+    UUID userUUID;
+    public void updateLastStatus() {
         super.updateTime();
-        this.nickname = nickname;
     }
 }

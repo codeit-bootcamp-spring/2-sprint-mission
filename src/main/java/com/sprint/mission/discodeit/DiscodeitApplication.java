@@ -4,9 +4,11 @@ import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.dto.FindChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicAuthService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -21,6 +23,7 @@ public class DiscodeitApplication {
 		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
 		final UserService userService = context.getBean(UserService.class);
+		final AuthService authService = context.getBean(BasicAuthService.class);
 		final ChannelService channelService = context.getBean(ChannelService.class);
 		final MessageService messageService = context.getBean(MessageService.class);
 
@@ -31,7 +34,7 @@ public class DiscodeitApplication {
 
 		while (true) {
 			if (userToken == null) {
-				userToken = initPage(userService);
+				userToken = initPage(userService, authService);
 			}
 			if (userToken == null) continue;
 
@@ -126,7 +129,7 @@ public class DiscodeitApplication {
 		}
 	}
 
-	private static UUID initPage(UserService userService) {
+	private static UUID initPage(UserService userService, AuthService authService) {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("\n1. 로그인\n2. 회원 가입");
 		System.out.print("입력: ");
@@ -134,7 +137,7 @@ public class DiscodeitApplication {
 		sc.nextLine();
 		switch (choice) {
 			case 1:
-				return loginPage(userService);
+				return loginPage(authService);
 			case 2:
 				registerPage(userService);
 				break;
@@ -142,22 +145,26 @@ public class DiscodeitApplication {
 		return null;
 	}
 
-	private static UUID loginPage(UserService userService) {
+	private static UUID loginPage(AuthService authService) {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("유저 아이디 입력: ");
-		UUID userUUID = UUID.fromString(sc.nextLine());
+		String username = sc.nextLine();
 		System.out.print("비밀번호 입력: ");
 		String password = sc.nextLine();
-		return userService.login(userUUID, password);
+		return authService.login(username, password).getId();
 	}
 
 	private static void registerPage(UserService userService) {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("닉네임 입력: ");
-		String nickname = sc.nextLine();
+		String useranme = sc.nextLine();
 		System.out.print("비밀번호 입력: ");
 		String password = sc.nextLine();
-		userService.save(nickname, password);
+		System.out.print("닉네임 입력: ");
+		String nickname = sc.nextLine();
+		System.out.print("이미지 경로: ");
+		String profile = sc.nextLine();
+		userService.save(useranme, password, nickname, profile);
 	}
 
 	private static UUID selectChannel(ChannelService channelService, UUID channelUUID) {

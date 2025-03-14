@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.utils.FileManager;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,8 +17,8 @@ public class FileUserRepository implements UserRepository {
     private final FileManager fileManager;
 
     @Override
-    public User save(String nickname, String password) {
-        User user = new User(nickname, password);
+    public User save(String username, String password, String nickname, String profile) {
+        User user = new User(username, password, nickname, profile);
         fileManager.writeToFile(SubDirectory.USER, user, user.getId());
         return user;
     }
@@ -28,6 +27,13 @@ public class FileUserRepository implements UserRepository {
     public Optional<User> findUserById(UUID userUUID) {
         Optional<User> user = fileManager.readFromFileById(SubDirectory.USER, userUUID, User.class);
         return user;
+    }
+
+    @Override
+    public Optional<User> findUserByUsername(String username) {
+        return findAllUser().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findAny();
     }
 
     @Override

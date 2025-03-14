@@ -10,8 +10,8 @@ import java.util.*;
 public class FileUserService implements UserService {
 
     @Override
-    public void save(String nickname, String password) {
-        User user = new User(nickname, password);
+    public void save(String username, String password, String nickname, String profile) {
+        User user = new User(username, password, nickname, profile);
         try {
             String fileName = "user.ser";
             // 파일 존재 여부 확인
@@ -125,21 +125,5 @@ public class FileUserService implements UserService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public UUID login(UUID userUUID, String password) {
-        User userInfo = findByUser(userUUID);
-        if (userInfo == null) {
-            return null;
-        }
-
-        if (!userInfo.getPassword().equals(password)) {
-            System.out.println("[실패]비밀번호가 일치하지 않습니다.");
-            return null;
-        }
-
-        System.out.println("[성공] 로그인 완료");
-        return userInfo.getId();
     }
 }

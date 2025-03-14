@@ -17,8 +17,8 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public void save(String nickname, String password) {
-        User user = userRepository.save(nickname, password);
+    public void save(String username, String password, String nickname, String profile) {
+        User user = userRepository.save(username, password, nickname, profile);
 
         if (user == null) {
             System.out.println("[실패] 저장 실패.");
@@ -67,21 +67,5 @@ public class BasicUserService implements UserService {
             return;
         }
         System.out.println("[성공]");
-    }
-
-    @Override
-    public UUID login(UUID userUUID, String password) {
-        User userInfo = findByUser(userUUID);
-        if (userInfo == null) {
-            return null;
-        }
-
-        if (!userInfo.getPassword().equals(password)) {
-            System.out.println("[실패]비밀번호가 일치하지 않습니다.");
-            return null;
-        }
-
-        System.out.println("[성공] 로그인 완료");
-        return userInfo.getId();
     }
 }
