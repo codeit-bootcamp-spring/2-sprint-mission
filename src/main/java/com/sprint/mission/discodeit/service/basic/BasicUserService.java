@@ -12,8 +12,11 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,8 +51,16 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public Map<UUID, User> readAllUsers() {
-        return this.userRepository.getAll();
+    public List<UserReadResponse> readAllUsers() {
+        List<UserReadResponse> UserReadResponses = new ArrayList<>();
+        for(User user : this.userRepository.getAll().values()) {
+            UserStatus userStatus = this.userStatusRepository.findById(user.getId());
+            UserReadResponse userReadResponse = new UserReadResponse(user.getUserName(), user.getUserEmail(), user.getProfileId(), userStatus.isOnline());
+            UserReadResponses.add(userReadResponse);
+        }
+        return UserReadResponses;
+
+
     }
 
     @Override
