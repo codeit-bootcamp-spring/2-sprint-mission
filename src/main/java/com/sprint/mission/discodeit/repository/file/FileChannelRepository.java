@@ -12,23 +12,14 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class FileChannelRepository implements ChannelRepository {
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "channels");
     private final FileSerializationUtil fileUtil;
-    private static FileChannelRepository channelRepository;
 
-
-    private FileChannelRepository(FileSerializationUtil fileUtil){
+    public FileChannelRepository(FileSerializationUtil fileUtil){
         this.fileUtil = fileUtil;
-    }
-
-    public static FileChannelRepository getInstance(FileSerializationUtil fileUtil){
-        if(channelRepository == null){
-            channelRepository = new FileChannelRepository(fileUtil);
-        }
-
-        return channelRepository;
     }
 
 
@@ -44,8 +35,8 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Optional<List<Channel>> findAll() {
-        try {
-            List<Channel> channel = Files.list(directory)
+        try(Stream<Path> paths = Files.list(directory)) {
+            List<Channel> channel = paths
                     .map(fileUtil::<Channel>readObjectFromFile)
                     .filter(Optional::isPresent)
                     .map(Optional::get)

@@ -15,23 +15,18 @@ import java.util.UUID;
 
 public class FileUserRepository implements UserRepository {
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "users");
-    private final FileSerializationUtil fileUtil;
-    private static FileUserRepository userRepository;
 
-    private FileUserRepository(FileSerializationUtil fileUtil) {
+    private final FileSerializationUtil fileUtil;
+
+    public FileUserRepository(FileSerializationUtil fileUtil) {
         this.fileUtil = fileUtil;
     }
 
-    public static FileUserRepository getInstance(FileSerializationUtil fileUtil) {
-        if(userRepository == null){
-            userRepository = new FileUserRepository(fileUtil);
-        }
-
-        return userRepository;
-    }
 
     @Override
     public void save(User user) {
+        Path parentDir = directory.getParent();
+
         fileUtil.<User>writeObjectToFile(user, FilePathUtil.getFilePath(directory, user.getId()));
     }
 

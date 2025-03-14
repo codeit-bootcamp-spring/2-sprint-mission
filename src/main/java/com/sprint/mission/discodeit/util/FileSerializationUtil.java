@@ -8,18 +8,10 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public class FileSerializationUtil {
-    private static FileSerializationUtil fileserializationUtil;
 
-    private FileSerializationUtil() {}
-
-    public static FileSerializationUtil getInstance() {
-        if(fileserializationUtil == null){
-            fileserializationUtil = new FileSerializationUtil();
         }
-        return fileserializationUtil;
-    }
 
-    public <T extends BaseEntity> void writeObjectToFile(T t, Path filePath) {
+
         try (FileOutputStream fos = new FileOutputStream(filePath.toFile());
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(t);
@@ -35,7 +27,7 @@ public class FileSerializationUtil {
         try (FileInputStream fis = new FileInputStream(filePath.toFile());
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             T obj = (T) ois.readObject();
-            return Optional.ofNullable(obj);
+            return Optional.of(obj);
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("파일 읽기 실패했습니다: " + filePath, e);
         }

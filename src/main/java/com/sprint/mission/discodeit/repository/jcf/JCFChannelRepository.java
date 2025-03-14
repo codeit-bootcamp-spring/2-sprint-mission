@@ -7,19 +7,6 @@ import java.util.*;
 
 public class JCFChannelRepository implements ChannelRepository {
     private final HashMap<UUID, Channel> channels = new HashMap<>();
-    private static JCFChannelRepository channelRepository;
-
-
-    private JCFChannelRepository(){}
-
-    public static JCFChannelRepository getInstance(){
-        if(channelRepository == null){
-            channelRepository = new JCFChannelRepository();
-        }
-
-        return channelRepository;
-    }
-
 
     @Override
     public void save(Channel channel) {

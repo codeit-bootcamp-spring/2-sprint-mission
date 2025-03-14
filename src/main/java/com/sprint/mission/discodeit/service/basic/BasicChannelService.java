@@ -1,26 +1,19 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.ChannelService;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+
 import java.util.*;
 
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
-    private static BasicChannelService channelService;
 
+    public BasicChannelService(ChannelRepository channelRepository){
 
-    private BasicChannelService(ChannelRepository channelRepository){
         this.channelRepository = channelRepository;
     }
 
-    public static BasicChannelService getInstance(ChannelRepository channelRepository){
-        if(channelService == null){
-            channelService = new BasicChannelService(channelRepository);
-        }
-
-        return channelService;
-    }
 
     @Override
     public void create(Channel channel) {

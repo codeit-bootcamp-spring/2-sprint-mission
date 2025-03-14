@@ -16,21 +16,10 @@ import java.util.UUID;
 public class FileMessageRepository implements MessageRepository {
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "messages");
     private final FileSerializationUtil fileUtil;
-    private static FileMessageRepository messageRepository;
 
-
-    private FileMessageRepository(FileSerializationUtil fileUtil){
+    public FileMessageRepository(FileSerializationUtil fileUtil){
         this.fileUtil = fileUtil;
     }
-
-    public static FileMessageRepository getInstance(FileSerializationUtil fileUtil){
-        if(messageRepository == null){
-            messageRepository = new FileMessageRepository(fileUtil);
-        }
-
-        return messageRepository;
-    }
-
 
     @Override
     public void save(Message message) {

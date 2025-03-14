@@ -1,12 +1,18 @@
-import com.sprint.mission.discodeit.ChannelService;
-import com.sprint.mission.discodeit.MessageService;
-import com.sprint.mission.discodeit.UserService;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
@@ -17,38 +23,57 @@ import java.util.*;
 
 public class JavaApplication {
 
-    static UserService userService = BasicUserService.getInstance(FileUserRepository.getInstance(FileSerializationUtil.getInstance()));
-    static ChannelService channelService = BasicChannelService.getInstance(FileChannelRepository.getInstance(FileSerializationUtil.getInstance()));
-    static MessageService messageService = BasicMessageService.getInstance(userService, channelService, FileMessageRepository.getInstance(FileSerializationUtil.getInstance()));;
+    static FileSerializationUtil fileSerializationUtil = new FileSerializationUtil();
+
+//    static UserRepository userRepository = new JCFUserRepository();
+//    static ChannelRepository channelRepository = new JCFChannelRepository();
+//    static MessageRepository messageRepository = new JCFMessageRepository();
+    static UserRepository userRepository = new FileUserRepository(fileSerializationUtil);
+    static ChannelRepository channelRepository = new FileChannelRepository(fileSerializationUtil);
+    static MessageRepository messageRepository = new FileMessageRepository(fileSerializationUtil);
+
+
+    static UserService userService = new BasicUserService(userRepository);
+    static ChannelService channelService = new BasicChannelService(channelRepository);
+    static MessageService messageService = new BasicMessageService(userService, channelService, messageRepository);
 
     public static void main(String[] args) {
         try {
-            for (int i = 0; i < 5; i++) {
-                UUID userUuid = UUID.randomUUID();
-                UUID channelUuid = UUID.randomUUID();
-                UUID messageUuid = UUID.randomUUID();
-                long millis = System.currentTimeMillis();
+            System.out.println("====== 테스트 1: 기본 생성 ======");
+            UUID user1Uuid = UUID.randomUUID();
+            UUID channel1Uuid = UUID.randomUUID();
+            UUID message1Uuid = UUID.randomUUID();
+            testCreate(user1Uuid, channel1Uuid, message1Uuid, System.currentTimeMillis());
 
-                testCreate(userUuid, channelUuid, messageUuid, millis);
-                if (i == 2) {
-                    delete(userUuid, channelUuid, messageUuid);
-                }
+            System.out.println("\n====== 테스트 2: 생성 후 삭제 ======");
+            UUID user2Uuid = UUID.randomUUID();
+            UUID channel2Uuid = UUID.randomUUID();
+            UUID message2Uuid = UUID.randomUUID();
+            testCreate(user2Uuid, channel2Uuid, message2Uuid, System.currentTimeMillis());
+            delete(user2Uuid, channel2Uuid, message2Uuid);
 
-                if (i == 3) {
-                    findById(userUuid, channelUuid, messageUuid);
-                }
+            System.out.println("\n====== 테스트 3: 생성 후 조회 ======");
+            UUID user3Uuid = UUID.randomUUID();
+            UUID channel3Uuid = UUID.randomUUID();
+            UUID message3Uuid = UUID.randomUUID();
+            testCreate(user3Uuid, channel3Uuid, message3Uuid, System.currentTimeMillis());
+            findById(user3Uuid, channel3Uuid, message3Uuid);
 
-                if (i == 4) {
-                    update(userUuid, channelUuid, messageUuid);
-                }
+            System.out.println("\n====== 테스트 4: 생성 후 업데이트 ======");
+            UUID user4Uuid = UUID.randomUUID();
+            UUID channel4Uuid = UUID.randomUUID();
+            UUID message4Uuid = UUID.randomUUID();
+            testCreate(user4Uuid, channel4Uuid, message4Uuid, System.currentTimeMillis());
+            update(user4Uuid, channel4Uuid, message4Uuid);
 
-            }
-        }catch (Exception e) { // 모든 예외를 잡아서 처리
-            System.out.println(e);  // e는 인스턴스이다.
+            System.out.println("\n====== 테스트 5: 전체 항목 조회 ======");
+            findAll();
+
+            System.out.println("\n모든 테스트가 성공적으로 완료되었습니다!");
+        } catch (Exception e) {
+            System.err.println("테스트 실패: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        findAll();
-
     }
 
     public static void testCreate(UUID userUuid, UUID channelUuid, UUID messageUuid, long millis) {

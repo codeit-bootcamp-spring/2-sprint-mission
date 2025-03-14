@@ -7,18 +7,6 @@ import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
     private final HashMap<UUID, Message> messages = new HashMap<>();
-    private static JCFMessageRepository messageRepository;
-
-
-    private JCFMessageRepository(){}
-
-    public static JCFMessageRepository getInstance(){
-        if(messageRepository == null){
-            messageRepository = new JCFMessageRepository();
-        }
-
-        return messageRepository;
-    }
 
     @Override
     public void save(Message message) {
