@@ -15,9 +15,12 @@ public class UserStatus implements Serializable {
     private UUID id;
     private Instant createdAt;
 
+    private UUID userId;
+
     private Instant lastLoginAt;
 
-    public UserStatus() {
+    public UserStatus(UUID userId) {
+        this.userId = userId;
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
     }
