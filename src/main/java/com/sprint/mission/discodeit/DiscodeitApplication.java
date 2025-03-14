@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.dto.FindChannelDto;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -13,7 +12,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.UUID;
 
 @SpringBootApplication
 public class DiscodeitApplication {
@@ -151,6 +153,11 @@ public class DiscodeitApplication {
         String username = sc.nextLine();
         System.out.print("비밀번호 입력: ");
         String password = sc.nextLine();
+
+        User user = authService.login(username, password);
+        if (user == null) {
+            return null;
+        }
         return authService.login(username, password).getId();
     }
 
@@ -198,7 +205,7 @@ public class DiscodeitApplication {
                         System.out.println(userService.findByUser(UserUUID));
                         break;
                     case 2:
-                        userService.findAllUser().forEach(System.out::println);
+                        userService.findAllUser().forEach((user -> System.out.println(user.getId().toString())));
                         break;
                 }
                 break;

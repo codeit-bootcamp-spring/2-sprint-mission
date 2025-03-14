@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.FindUserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -17,13 +18,13 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User findByUser(UUID uuid) {
-        for (User u : userList) {
-            if (u.getId().equals(uuid)) {
-                return u;
-            }
-        }
-        System.out.print("[실패]일치하는 회원이 없습니다.  ");
+    public FindUserDto findByUser(UUID uuid) {
+        //for (User u : userList) {
+        //    if (u.getId().equals(uuid)) {
+        //        return u;
+        //    }
+        //}
+        //System.out.print("[실패]일치하는 회원이 없습니다.  ");
         return null;
     }
 

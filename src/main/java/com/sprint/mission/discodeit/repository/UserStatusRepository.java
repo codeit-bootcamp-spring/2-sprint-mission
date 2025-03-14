@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface JCFUserStatusRepository {
-    void save(UUID userId);
+public interface UserStatusRepository {
+    void save(UUID userUUID);
     Optional<UserStatus> findByUser(UUID userUUID);
     List<UserStatus> findAll();
-    void update(UUID userId);
-    void delete(UUID userId);
+    void update(UUID userUUID);
+    void delete(UUID userUUID);
 }

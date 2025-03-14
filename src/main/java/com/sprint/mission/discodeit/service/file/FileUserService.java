@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.custom.AppendObjectOutputStream;
+import com.sprint.mission.discodeit.dto.FindUserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -31,25 +32,25 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User findByUser(UUID userUUID) {
-        try (FileInputStream fis = new FileInputStream("user.ser");
-             ObjectInputStream ois = new ObjectInputStream(fis);
-        ) {
-            while (true) {
-                try {
-                    User user = (User) ois.readObject();
-                    if (user.getId().equals(userUUID)) return user;
-                } catch (EOFException e) {
-                    // 파일의 끝 도달 시 브레이크
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("[실패] 회원아이디가 존재하지 않습니다.");
+    public FindUserDto findByUser(UUID userUUID) {
+        //try (FileInputStream fis = new FileInputStream("user.ser");
+        //     ObjectInputStream ois = new ObjectInputStream(fis);
+        //) {
+        //    while (true) {
+        //        try {
+        //            User user = (User) ois.readObject();
+        //            if (user.getId().equals(userUUID)) return user;
+        //        } catch (EOFException e) {
+        //            // 파일의 끝 도달 시 브레이크
+        //            break;
+        //        }
+        //    }
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //} catch (ClassNotFoundException e) {
+        //    throw new RuntimeException(e);
+        //}
+        //System.out.println("[실패] 회원아이디가 존재하지 않습니다.");
         return null;
     }
 
