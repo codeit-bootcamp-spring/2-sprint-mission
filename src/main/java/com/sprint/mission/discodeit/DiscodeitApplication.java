@@ -20,6 +20,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -170,6 +171,7 @@ public class DiscodeitApplication {
         Channel channel = setupChannel(channelService);
         // 테스트
         messageCreateTest(messageService, channel, user);
+
 
     }
 

@@ -28,7 +28,7 @@ public class JCFMessageService implements MessageService {
             throw e;
         }
 
-        Message message = new Message(content, channelId, authorId);
+        Message message = new Message(content, channelId, authorId, null);
         this.data.put(message.getId(), message);
 
         return message;
@@ -52,7 +52,7 @@ public class JCFMessageService implements MessageService {
         Message messageNullable = this.data.get(messageId);
         Message message = Optional.ofNullable(messageNullable)
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
-        message.update(newContent);
+        message.updateMessageInfo(newContent);
 
         return message;
     }

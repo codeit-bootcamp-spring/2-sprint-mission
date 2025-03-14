@@ -38,7 +38,7 @@ public class JCFUserService implements UserService {
         User userNullable = this.data.get(userId);
         User user = Optional.ofNullable(userNullable)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword);
+        user.updateUserInfo(newUsername, newEmail, newPassword);
 
         return user;
     }

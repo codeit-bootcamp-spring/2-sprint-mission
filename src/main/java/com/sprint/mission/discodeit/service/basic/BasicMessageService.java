@@ -24,7 +24,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {
         validateMessageInput(content, channelId, authorId);
-        Message message = new Message(content, channelId, authorId);
+        Message message = new Message(content, channelId, authorId, null);
         messageRepository.save(message);
         return message;
     }
@@ -44,7 +44,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message update(UUID messageId, String newContent) {
         Message message = find(messageId);
-        message.update(newContent);
+        message.updateMessageInfo(newContent);
         messageRepository.save(message);
         return message;
     }

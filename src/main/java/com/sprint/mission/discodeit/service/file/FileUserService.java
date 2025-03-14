@@ -60,7 +60,7 @@ public class FileUserService implements UserService, FileService<User> {
         User userNullable = userMap.get(userId);
         User user = Optional.ofNullable(userNullable)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword);
+        user.updateUserInfo(newUsername, newEmail, newPassword);
         userMap.put(user.getId(), user);
         saveToFile(user);
 

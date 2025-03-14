@@ -18,6 +18,7 @@ public class ReadStatus {
         this.userId = userId;
         this.channelId = channelId;
         this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public void updateReadStatus() {

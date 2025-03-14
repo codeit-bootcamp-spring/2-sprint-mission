@@ -49,7 +49,7 @@ public class FileMessageService implements MessageService, FileService<Message> 
             throw e;
         }
 
-        Message message = new Message(content, channelId, authorId);
+        Message message = new Message(content, channelId, authorId, null);
         messageMap.put(message.getId(), message);
         saveToFile(message);
 
@@ -74,7 +74,7 @@ public class FileMessageService implements MessageService, FileService<Message> 
         Message messageNullable = messageMap.get(messageId);
         Message message = Optional.ofNullable(messageNullable)
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
-        message.update(newContent);
+        message.updateMessageInfo(newContent);
         messageMap.put(message.getId(), message);
         saveToFile(message);
 

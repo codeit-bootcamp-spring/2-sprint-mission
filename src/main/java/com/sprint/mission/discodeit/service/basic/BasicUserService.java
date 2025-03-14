@@ -40,7 +40,7 @@ public class BasicUserService implements UserService {
     @Override
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
         User user = find(userId);
-        user.update(newUsername, newEmail, newPassword);
+        user.updateUserInfo(newUsername, newEmail, newPassword);
         userRepository.save(user);
         return user;
     }
