@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.service.TimeFormatter;
-
+import lombok.Getter;
 import java.io.Serializable;
 
+@Getter
 public class Channel extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -12,10 +13,6 @@ public class Channel extends BaseEntity implements Serializable {
     public Channel(String name) {
         super();
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public void update(String name, long updatedAt) {
