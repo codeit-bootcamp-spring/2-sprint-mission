@@ -9,7 +9,7 @@ import java.util.*;
 
 public interface UserService {
     User createUser(UserCreateRequest userCreateRequest);
-    User readUser(UUID id);
+    UserReadResponse readUser(UUID id);
     Map<UUID, User> readAllUsers();
     void updateUserName(UUID id, String newUserName);
     void updatePassword(UUID id, String newPassword);

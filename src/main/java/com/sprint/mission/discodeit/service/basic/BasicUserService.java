@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserReadResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
@@ -36,8 +37,14 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User readUser(UUID userId) {
-        return this.userRepository.findById(userId);
+    public UserReadResponse readUser(UUID userId) {
+        User findUser = this.userRepository.findById(userId);
+        UserStatus findUserStatus = this.userStatusRepository.findById(userId);
+        return new UserReadResponse(
+                findUser.getUserName(),
+                findUser.getUserEmail(),
+                findUser.getProfileId(),
+                findUserStatus.isOnline());
     }
 
     @Override
