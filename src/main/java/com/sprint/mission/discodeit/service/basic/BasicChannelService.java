@@ -1,9 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserReadResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -20,11 +24,17 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public Channel createPrivateChannel(String channelName) {
-        Channel newChannel = new Channel(channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
+    public Channel createPrivateChannel(PrivateChannelCreateRequest privateChannelCreateRequest) {
+        Channel newChannel = new Channel("private");      // name과 description 속성은 생략을 어떤식으로 할까???????????
         this.channelRepository.add(newChannel);
+
+        // for 문이 transaction 처리가 간편하다 하여 stream 사용X
+        for(UserReadResponse user : privateChannelCreateRequest.users()) {
+            this.readStatusRepository.add(new ReadStatus(user.userId(), newChannel.getId()));
+        }
         return newChannel;
     }
 
