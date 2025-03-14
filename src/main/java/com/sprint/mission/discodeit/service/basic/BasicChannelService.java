@@ -5,6 +5,7 @@ import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT
 
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.application.UsersDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -25,25 +26,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto addMember(UUID id, String friendEmail) {
-        Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
-
-        User friend = userRepository.findByEmail(friendEmail)
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
-
-        channel.addMember(friend.getId());
-        channelRepository.save(channel);
-
-        return toDto(channel);
-    }
-
-    @Override
     public ChannelDto create(String name, UserDto owner) {
-        Channel channel = channelRepository
-                .save(new Channel(name, owner.id()));
+        Channel channel = channelRepository.save(new Channel(name, owner.id()));
 
-        return toDto(channel);
+        return ChannelDto.fromEntity(channel, UsersDto.fromEntity(findChannelUsers(channel)));
     }
 
     @Override
@@ -51,7 +37,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
-        return toDto(channel);
+        return ChannelDto.fromEntity(channel, UsersDto.fromEntity(findChannelUsers(channel)));
     }
 
     @Override
@@ -59,7 +45,7 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.findAll()
                 .stream()
                 .sorted(Comparator.comparing(Channel::getCreatedAt))
-                .map(this::toDto)
+                .map(channel -> ChannelDto.fromEntity(channel, UsersDto.fromEntity(findChannelUsers(channel))))
                 .toList();
     }
 
@@ -73,15 +59,27 @@ public class BasicChannelService implements ChannelService {
         channelRepository.delete(id);
     }
 
-    private ChannelDto toDto(Channel channel) {
-        List<UserDto> users = channel.getUserIds()
+    @Override
+    public ChannelDto addMember(UUID id, String friendEmail) {
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
+
+        User friend = userRepository.findByEmail(friendEmail)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
+
+        channel.addMember(friend.getId());
+        channelRepository.save(channel);
+
+        return ChannelDto.fromEntity(channel, UsersDto.fromEntity(findChannelUsers(channel)));
+    }
+
+    private List<User> findChannelUsers(Channel channel) {
+        return channel.getUserIds()
                 .stream()
                 .map(userRepository::findById)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(user -> new UserDto(user.getId(), user.getName(), user.getEmail()))
                 .toList();
-
-        return new ChannelDto(channel.getId(), channel.getName(), users);
     }
 }
+

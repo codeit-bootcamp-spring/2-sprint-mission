@@ -5,9 +5,11 @@ import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_MESSAGE_
 import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +26,7 @@ public class FileMessageService implements MessageService {
     public MessageDto create(String context, UUID channelId, UUID userId) {
         Message message = messageRepository.save(new Message(context, channelId, userId));
 
-        return toDto(message);
+        return MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message)));
     }
 
     @Override
@@ -32,14 +34,15 @@ public class FileMessageService implements MessageService {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
-        return toDto(message);
+        return MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message)));
     }
 
     @Override
     public List<MessageDto> findAll() {
         return messageRepository.findAll()
                 .stream()
-                .map(this::toDto)
+                .sorted(Comparator.comparing(Message::getCreatedAt))
+                .map(message -> MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message))))
                 .toList();
     }
 
@@ -48,7 +51,7 @@ public class FileMessageService implements MessageService {
         return messageRepository.findAll()
                 .stream()
                 .filter(message -> message.getChannelId().equals(channelId))
-                .map(this::toDto)
+                .map(message -> MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message))))
                 .toList();
     }
 
@@ -62,11 +65,8 @@ public class FileMessageService implements MessageService {
         messageRepository.delete(id);
     }
 
-    private MessageDto toDto(Message message) {
-        UserDto userDto = userRepository.findById(message.getUserId())
-                .map(user -> new UserDto(user.getId(), user.getName(), user.getEmail()))
+    private User findMessageUser(Message message) {
+        return userRepository.findById(message.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("메세지에 등록된 아이디의 유저가 없습니다: " + message.getUserId()));
-
-        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(), userDto);
     }
 }

@@ -85,7 +85,7 @@ class FileChannelServiceTest {
                 OTHER_USER.getPassword()));
 
         ChannelDto channelDto = channelService.addMember(initializedChannel.id(), OTHER_USER.getEmail());
-        assertThat(channelDto.users()).contains(otherUser);
+        assertThat(channelDto.usersDto().users()).contains(otherUser);
     }
 
     @DisplayName("로그인된 유저와 채널 이름을 통해 채널 생성합니다")

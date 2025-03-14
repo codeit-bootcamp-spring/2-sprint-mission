@@ -47,7 +47,7 @@ public class OutputView {
 
         List<String> formattedChannels = formatChannels(channels, currentChannel);
         List<String> formattedMessages = formatMessages(currentChannelMessages);
-        List<String> formattedUsers = formatUsers(loginUser, currentChannel.users());
+        List<String> formattedUsers = formatUsers(loginUser, currentChannel.usersDto().users());
 
         addPadding(formattedChannels, formattedMessages, formattedUsers);
 

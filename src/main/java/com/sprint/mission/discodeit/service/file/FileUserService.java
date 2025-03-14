@@ -24,7 +24,7 @@ public class FileUserService implements UserService {
         validateDuplicateEmail(requestUser);
         User savedUser = userRepository.save(requestUser);
 
-        return toDto(savedUser);
+        return UserDto.fromEntity(savedUser);
     }
 
     @Override
@@ -32,14 +32,14 @@ public class FileUserService implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
-        return toDto(user);
+        return UserDto.fromEntity(user);
     }
 
     @Override
     public List<UserDto> findByName(String name) {
         return userRepository.findByName(name)
                 .stream()
-                .map(this::toDto)
+                .map(UserDto::fromEntity)
                 .toList();
     }
 
@@ -47,7 +47,7 @@ public class FileUserService implements UserService {
     public List<UserDto> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(this::toDto)
+                .map(UserDto::fromEntity)
                 .toList();
     }
 
@@ -56,7 +56,7 @@ public class FileUserService implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
 
-        return toDto(user);
+        return UserDto.fromEntity(user);
     }
 
     @Override
@@ -75,10 +75,6 @@ public class FileUserService implements UserService {
     @Override
     public void delete(UUID id) {
         userRepository.delete(id);
-    }
-
-    private UserDto toDto(User user) {
-        return new UserDto(user.getId(), user.getName(), user.getEmail());
     }
 
     private void validateDuplicateEmail(User requestUser) {
