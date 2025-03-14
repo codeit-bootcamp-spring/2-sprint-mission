@@ -10,8 +10,8 @@ import java.util.*;
 public class FileUserService implements UserService {
 
     @Override
-    public void save(String username, String password, String nickname, String profile) {
-        User user = new User(username, password, nickname, profile);
+    public void save(String username, String password, String nickname, String email, String profile) {
+        User user = new User(username, password, nickname, email, profile);
         try {
             String fileName = "user.ser";
             // 파일 존재 여부 확인
@@ -84,11 +84,11 @@ public class FileUserService implements UserService {
                 .filter(user -> user.getId().equals(userUUID))
                 .findAny()
                 .ifPresentOrElse(
-                    user -> {
-                        user.updateNickname(nickname);
-                        System.out.println("[성공]닉네임 변경 완료" + user);
-                    },
-                    () -> System.out.println("[실패]수정하려는 아이디가 존재하지 않습니다"));
+                        user -> {
+                            user.updateNickname(nickname);
+                            System.out.println("[성공]닉네임 변경 완료" + user);
+                        },
+                        () -> System.out.println("[실패]수정하려는 아이디가 존재하지 않습니다"));
 
         try (FileOutputStream fos = new FileOutputStream("user.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {

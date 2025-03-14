@@ -15,8 +15,8 @@ public class JCFUserRepository implements UserRepository {
     private final List<User> userList = new ArrayList<>();
 
     @Override
-    public User save(String username, String password, String nickname, String profile) {
-        User user = new User(username,password, nickname, profile);
+    public User save(String username, String password, String nickname, String email, String profile) {
+        User user = new User(username, password, nickname, email, profile);
         userList.add(user);
         return user;
     }
@@ -32,6 +32,13 @@ public class JCFUserRepository implements UserRepository {
     public Optional<User> findUserByUsername(String username) {
         return userList.stream()
                 .filter(user -> user.getUsername().equals(username))
+                .findAny();
+    }
+
+    @Override
+    public Optional<User> findUserByEmail(String email) {
+        return userList.stream()
+                .filter(user -> user.getEmail().equals(email))
                 .findAny();
     }
 

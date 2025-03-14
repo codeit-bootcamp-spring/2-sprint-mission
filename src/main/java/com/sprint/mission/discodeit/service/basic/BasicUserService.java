@@ -17,8 +17,18 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public void save(String username, String password, String nickname, String profile) {
-        User user = userRepository.save(username, password, nickname, profile);
+    public void save(String username, String password, String nickname, String email, String profile) {
+        if(userRepository.findUserByUsername(username).isPresent()){
+            System.out.println("[실패] 회원아이디 중복");
+            return;
+        }
+
+        if(userRepository.findUserByEmail(email).isPresent()){
+            System.out.println("[실패] 회원이메일 중복");
+            return;
+        }
+
+        User user = userRepository.save(username, password, nickname, email, profile);
 
         if (user == null) {
             System.out.println("[실패] 저장 실패.");

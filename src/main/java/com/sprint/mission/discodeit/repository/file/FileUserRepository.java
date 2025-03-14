@@ -17,8 +17,8 @@ public class FileUserRepository implements UserRepository {
     private final FileManager fileManager;
 
     @Override
-    public User save(String username, String password, String nickname, String profile) {
-        User user = new User(username, password, nickname, profile);
+    public User save(String username, String password, String nickname, String email, String profile) {
+        User user = new User(username, password, nickname, email, profile);
         fileManager.writeToFile(SubDirectory.USER, user, user.getId());
         return user;
     }
@@ -33,6 +33,13 @@ public class FileUserRepository implements UserRepository {
     public Optional<User> findUserByUsername(String username) {
         return findAllUser().stream()
                 .filter(user -> user.getUsername().equals(username))
+                .findAny();
+    }
+
+    @Override
+    public Optional<User> findUserByEmail(String email) {
+        return findAllUser().stream()
+                .filter(user -> user.getEmail().equals(email))
                 .findAny();
     }
 

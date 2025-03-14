@@ -10,8 +10,8 @@ public class JCFUserService implements UserService {
     private final List<User> userList = new ArrayList<>();
 
     @Override
-    public void save(String username, String password, String nickname, String profile) {
-        User user = new User(username, password, nickname, profile);
+    public void save(String username, String password, String nickname, String email, String profile) {
+        User user = new User(username, password, nickname, email, profile);
         userList.add(user);
         System.out.println("유저 생성 완료" + user);
     }

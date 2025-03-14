@@ -13,6 +13,7 @@ public class User extends BaseEntity implements Serializable {
     private String username;
     private String password;
     private String nickname;
+    private String email;
     private String profile;
 
     public void updateNickname(String nickname) {
