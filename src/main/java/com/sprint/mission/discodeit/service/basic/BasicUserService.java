@@ -52,15 +52,16 @@ public class BasicUserService implements UserService {
 
     @Override
     public List<UserReadResponse> readAllUsers() {
-        List<UserReadResponse> UserReadResponses = new ArrayList<>();
-        for(User user : this.userRepository.getAll().values()) {
-            UserStatus userStatus = this.userStatusRepository.findById(user.getId());
-            UserReadResponse userReadResponse = new UserReadResponse(user.getUserName(), user.getUserEmail(), user.getProfileId(), userStatus.isOnline());
-            UserReadResponses.add(userReadResponse);
-        }
-        return UserReadResponses;
-
-
+        return this.userRepository.getAll().values().stream()
+                .map(user ->
+                        new UserReadResponse(
+                                user.getUserName(),
+                                user.getUserEmail(),
+                                user.getProfileId(),
+                                this.userStatusRepository.findById(user.getId()).isOnline()
+                        )
+                )
+                .collect(Collectors.toList());
     }
 
     @Override
