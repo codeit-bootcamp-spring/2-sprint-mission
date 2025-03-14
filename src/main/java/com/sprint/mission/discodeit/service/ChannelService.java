@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -7,7 +8,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.util.*;
 
 public interface ChannelService {
-    Channel createPrivateChannel(String channelName);
+    Channel createPrivateChannel(PrivateChannelCreateRequest privateChannelCreateRequest);
     Channel createPublicChannel(String channelName);
     Channel readChannel(UUID channelId);
     Map<UUID, Channel> readAllChannels();
