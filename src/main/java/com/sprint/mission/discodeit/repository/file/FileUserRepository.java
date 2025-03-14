@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.discodeit.constants.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 
@@ -25,7 +25,7 @@ public class FileUserRepository implements UserRepository {
 
         users.put(requestUser.getId(), requestUser);
 
-        saveObjectsToFile(STORAGE_DIRECTORY.getPath(), userPath, users);
+        saveObjectsToFile(STORAGE_DIRECTORY, userPath, users);
 
         return requestUser;
     }
@@ -73,7 +73,7 @@ public class FileUserRepository implements UserRepository {
         User user = users.get(id);
         user.updateName(name);
 
-        saveObjectsToFile(STORAGE_DIRECTORY.getPath(), userPath, users);
+        saveObjectsToFile(STORAGE_DIRECTORY, userPath, users);
     }
 
     @Override
@@ -82,6 +82,6 @@ public class FileUserRepository implements UserRepository {
 
         users.remove(id);
 
-        saveObjectsToFile(STORAGE_DIRECTORY.getPath(), userPath, users);
+        saveObjectsToFile(STORAGE_DIRECTORY, userPath, users);
     }
 }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.discodeit.constants.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 
@@ -24,7 +24,7 @@ public class FileMessageRepository implements MessageRepository {
         Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
 
         messages.put(message.getId(), message);
-        saveObjectsToFile(STORAGE_DIRECTORY.getPath(), messagePath, messages);
+        saveObjectsToFile(STORAGE_DIRECTORY, messagePath, messages);
 
         return message;
     }
@@ -51,13 +51,13 @@ public class FileMessageRepository implements MessageRepository {
         messages.get(id)
                 .updateContext(context);
 
-        saveObjectsToFile(STORAGE_DIRECTORY.getPath(), messagePath, messages);
+        saveObjectsToFile(STORAGE_DIRECTORY, messagePath, messages);
     }
 
     @Override
     public void delete(UUID id) {
         Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
         messages.remove(id);
-        saveObjectsToFile(STORAGE_DIRECTORY.getPath(), messagePath, messages);
+        saveObjectsToFile(STORAGE_DIRECTORY, messagePath, messages);
     }
 }

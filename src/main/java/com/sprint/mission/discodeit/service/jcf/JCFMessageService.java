@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
 
 import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.application.UserDto;

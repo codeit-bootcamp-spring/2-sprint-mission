@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.file;
 
 import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.constants.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.discodeit.constants.MessageInfo.MESSAGE_CONTENT;
+import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.discodeit.constant.FilePath.USER_FILE;
+import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -27,8 +29,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class FileMessageServiceTest {
-    private Path userFilePath;
-    private Path messageFilePath;
+    private Path userTestFilePath;
+    private Path messageTestFilePath;
     private UserService userService;
     private MessageService messageService;
     private MessageDto initializedMessage;
@@ -37,25 +39,23 @@ class FileMessageServiceTest {
     @BeforeEach
     void setUp() {
         setUpTestFilePath();
-        initializeService();
-
+        setUpService();
         setUpUser();
         setUpMessage();
     }
 
-    private void initializeService() {
-        UserRepository userRepository = new FileUserRepository(userFilePath);
-        MessageRepository messageRepository = new FileMessageRepository(messageFilePath);
+    private void setUpTestFilePath() {
+        String random = UUID.randomUUID().toString();
+        userTestFilePath = STORAGE_DIRECTORY.resolve(random + USER_FILE);
+        messageTestFilePath = STORAGE_DIRECTORY.resolve(random + MESSAGE_FILE);
+    }
+
+    private void setUpService() {
+        UserRepository userRepository = new FileUserRepository(userTestFilePath);
+        MessageRepository messageRepository = new FileMessageRepository(messageTestFilePath);
 
         userService = new FileUserService(userRepository);
         messageService = new FileMessageService(messageRepository, userRepository);
-    }
-
-    private void setUpTestFilePath() {
-        userFilePath = STORAGE_DIRECTORY.getPath()
-                .resolve(UUID.randomUUID() + ".ser");
-        messageFilePath = STORAGE_DIRECTORY.getPath()
-                .resolve(UUID.randomUUID() + ".ser");
     }
 
     private void setUpMessage() {
@@ -73,8 +73,8 @@ class FileMessageServiceTest {
     }
 
     private void initializeFiles() throws IOException {
-        Files.deleteIfExists(userFilePath);
-        Files.deleteIfExists(messageFilePath);
+        Files.deleteIfExists(userTestFilePath);
+        Files.deleteIfExists(messageTestFilePath);
     }
 
     @DisplayName("메세지 생성")

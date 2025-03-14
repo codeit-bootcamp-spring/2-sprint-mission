@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.constants;
+package com.sprint.mission.discodeit.constant;
 
 public enum ErrorMessages {
     ERROR_CHANNEL_NOT_FOUND("해당 id의 채널이 존재하지 않습니다"),

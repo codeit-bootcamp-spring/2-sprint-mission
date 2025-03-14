@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
 
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;

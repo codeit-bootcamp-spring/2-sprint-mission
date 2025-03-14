@@ -2,7 +2,8 @@ package com.sprint.mission.discodeit.service.file;
 
 import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
 import static com.sprint.mission.config.SetUpUserInfo.OTHER_USER;
-import static com.sprint.mission.discodeit.constants.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.discodeit.constant.FilePath.USER_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -21,29 +22,40 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class FileUserServiceTest {
-    private static final Path USER_TEST_PATH = STORAGE_DIRECTORY.getPath()
-            .resolve("userTest.ser");
-    private final UserService userService = new FileUserService(
-            new FileUserRepository(USER_TEST_PATH));
-    private UserDto setUpUser;
+    private Path userPath;
+    private UserService userService;
+    private UserDto initializedUser;
 
     @BeforeEach
-    void setUp() throws IOException {
-        Files.deleteIfExists(USER_TEST_PATH);
+    void setUp() {
+        setUpTestPath();
+        setUpService();
+        setUpUser();
+    }
 
-        setUpUser = userService.register(
+    private void setUpService() {
+        userService = new FileUserService(new FileUserRepository(userPath));
+    }
+
+    private void setUpTestPath() {
+        String random = UUID.randomUUID().toString();
+        userPath = STORAGE_DIRECTORY.resolve(random + USER_FILE);
+    }
+
+    private void setUpUser() {
+        initializedUser = userService.register(
                 new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        Files.deleteIfExists(USER_TEST_PATH);
+        Files.deleteIfExists(userPath);
     }
 
     @DisplayName("입력받은 유저정보를 서버에 등록한다")
     @Test
     void register() {
-        assertThat(setUpUser.email()).isEqualTo(LONGIN_USER.getEmail());
+        assertThat(initializedUser.email()).isEqualTo(LONGIN_USER.getEmail());
     }
 
     @DisplayName("유저 등록시 서버에 이메일이 같은 이미 등록된 유저가 있을떄 예외를 반환한다")
@@ -60,9 +72,9 @@ class FileUserServiceTest {
     @DisplayName("id가 같은 통해 유저를 반환한다")
     @Test
     void findById() {
-        UserDto user = userService.findById(setUpUser.id());
+        UserDto user = userService.findById(initializedUser.id());
 
-        assertThat(setUpUser.email())
+        assertThat(initializedUser.email())
                 .isEqualTo(user.email());
     }
 
@@ -81,7 +93,7 @@ class FileUserServiceTest {
                 OTHER_USER.getPassword());
 
         userService.register(otherUserWithSameEmail);
-        List<UserDto> users = userService.findByName(setUpUser.name());
+        List<UserDto> users = userService.findByName(initializedUser.name());
 
         assertThat(users).hasSize(2);
     }
@@ -91,24 +103,24 @@ class FileUserServiceTest {
     void findByEmail() {
         UserDto user = userService.findByEmail(LONGIN_USER.getEmail());
 
-        assertThat(setUpUser.id()).isEqualTo(user.id());
+        assertThat(initializedUser.id()).isEqualTo(user.id());
     }
 
     @DisplayName("이름을 수정하고 유저를 반환한다")
     @Test
     void updateName() {
         String userName = "김철수";
-        userService.updateName(setUpUser.id(), userName);
+        userService.updateName(initializedUser.id(), userName);
 
-        UserDto updatedUserInfo = userService.findById(setUpUser.id());
+        UserDto updatedUserInfo = userService.findById(initializedUser.id());
 
-        assertThat(setUpUser.name()).isNotEqualTo(updatedUserInfo.name());
+        assertThat(initializedUser.name()).isNotEqualTo(updatedUserInfo.name());
     }
 
     @DisplayName("유저를 삭제한다")
     @Test
     void delete() {
-        UUID id = setUpUser.id();
+        UUID id = initializedUser.id();
         userService.delete(id);
 
         assertThatThrownBy(() -> userService.findById(id))

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.discodeit.constants.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 
@@ -24,7 +24,7 @@ public class FileChannelRepository implements ChannelRepository {
         Map<UUID, Channel> channels = loadObjectsFromFile(channelPath);
         channels.put(channel.getId(), channel);
 
-        saveObjectsToFile(STORAGE_DIRECTORY.getPath(), channelPath, channels);
+        saveObjectsToFile(STORAGE_DIRECTORY, channelPath, channels);
 
         return channel;
     }
@@ -51,7 +51,7 @@ public class FileChannelRepository implements ChannelRepository {
         Channel channel = channels.get(id);
         channel.updateName(name);
 
-        saveObjectsToFile(STORAGE_DIRECTORY.getPath(), channelPath, channels);
+        saveObjectsToFile(STORAGE_DIRECTORY, channelPath, channels);
     }
 
     @Override
@@ -59,6 +59,6 @@ public class FileChannelRepository implements ChannelRepository {
         Map<UUID, Channel> channels = loadObjectsFromFile(channelPath);
         channels.remove(id);
 
-        saveObjectsToFile(STORAGE_DIRECTORY.getPath(), channelPath, channels);
+        saveObjectsToFile(STORAGE_DIRECTORY, channelPath, channels);
     }
 }

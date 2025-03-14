@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.constants.MessageInfo.MESSAGE_CONTENT;
+import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

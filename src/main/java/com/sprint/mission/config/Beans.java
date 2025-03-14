@@ -1,9 +1,10 @@
 package com.sprint.mission.config;
 
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_ACCESS_DENIED_TO_BEAN_STORAGE;
-import static com.sprint.mission.discodeit.constants.FilePath.CHANNEL_FILE;
-import static com.sprint.mission.discodeit.constants.FilePath.MESSAGE_FILE;
-import static com.sprint.mission.discodeit.constants.FilePath.USER_FILE;
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_ACCESS_DENIED_TO_BEAN_STORAGE;
+import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.discodeit.constant.FilePath.USER_FILE;
 
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
@@ -30,7 +31,7 @@ public class Beans {
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     public Beans() {
-        initializeJCFBeans();
+        initializeFileBeans();
         initializeBeans();
     }
 
@@ -48,9 +49,9 @@ public class Beans {
     }
 
     private void initializeFileBeans() {
-        saveBean(UserRepository.class, new FileUserRepository(USER_FILE.getPath()));
-        saveBean(ChannelRepository.class, new FileChannelRepository(CHANNEL_FILE.getPath()));
-        saveBean(MessageRepository.class, new FileMessageRepository(MESSAGE_FILE.getPath()));
+        saveBean(UserRepository.class, new FileUserRepository(STORAGE_DIRECTORY.resolve(USER_FILE)));
+        saveBean(ChannelRepository.class, new FileChannelRepository(STORAGE_DIRECTORY.resolve(CHANNEL_FILE)));
+        saveBean(MessageRepository.class, new FileMessageRepository(STORAGE_DIRECTORY.resolve(MESSAGE_FILE)));
     }
 
     private void initializeJCFBeans() {

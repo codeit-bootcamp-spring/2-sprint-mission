@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.constants;
+package com.sprint.mission.discodeit.constant;
 
 public class ChannelInfo {
     public static final String CHANNEL_NAME = "7팀";
