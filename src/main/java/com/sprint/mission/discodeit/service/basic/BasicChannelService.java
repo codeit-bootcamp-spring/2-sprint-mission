@@ -22,7 +22,14 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
 
     @Override
-    public Channel createChannel(String channelName) {
+    public Channel createPrivateChannel(String channelName) {
+        Channel newChannel = new Channel(channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
+        this.channelRepository.add(newChannel);
+        return newChannel;
+    }
+
+    @Override
+    public Channel createPublicChannel(String channelName) {
         Channel newChannel = new Channel(channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
         this.channelRepository.add(newChannel);
         return newChannel;

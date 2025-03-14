@@ -7,7 +7,8 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.util.*;
 
 public interface ChannelService {
-    Channel createChannel(String channelName);
+    Channel createPrivateChannel(String channelName);
+    Channel createPublicChannel(String channelName);
     Channel readChannel(UUID channelId);
     Map<UUID, Channel> readAllChannels();
     List<Message> readMessageListByChannelId(UUID channelId);
