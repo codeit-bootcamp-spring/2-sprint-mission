@@ -25,7 +25,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(UserCreateDto userCreateDto) {
+    public UserResponseDto create(UserCreateDto userCreateDto) {
         List<User> users = userRepository.findAll();
 
         boolean isEmailExist = users.stream().anyMatch(user -> user.getEmail().equals(userCreateDto.email()));
@@ -42,7 +42,9 @@ public class BasicUserService implements UserService {
         UserStatus newUserStatus = new UserStatus(newUser.getId());
 
         userStatusRepository.save(newUserStatus);
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
+
+        return new UserResponseDto(newUser, newUserStatus.isActive());
     }
 
     @Override
@@ -54,9 +56,8 @@ public class BasicUserService implements UserService {
         }
 
         UserStatus userStatus = new UserStatus(user.getId());
-        UserResponseDto userResponseDto = new UserResponseDto(user, userStatus.isActive());
 
-        return userResponseDto;
+        return new UserResponseDto(user, userStatus.isActive());
     }
 
     @Override
@@ -68,7 +69,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateDto userUpdateDto) {
+    public UserResponseDto update(UserUpdateDto userUpdateDto) {
         List<User> users = userRepository.findAll();
         boolean isEmailExist = users.stream().anyMatch(
                 user -> user.getEmail().equals(userUpdateDto.newEmail()));
@@ -87,8 +88,11 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userUpdateDto.id());
         user.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(),
                 userUpdateDto.newProfileId());
+        userRepository.save(user);
 
-        return userRepository.save(user);
+        UserStatus userStatues = userStatusRepository.findById(user.getId());
+
+        return new UserResponseDto(user, userStatues.isActive());
     }
 
     @Override
