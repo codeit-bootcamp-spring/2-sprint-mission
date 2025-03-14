@@ -6,13 +6,14 @@ import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
 public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository {
     // userName과 email의 빠른 중복 확인을 위한 필드
-    private Map<String, User> usernames;
-    private Map<String, User> emails;
+    private Set<String> usernames;
+    private Set<String> emails;
 
     public FileUserRepository() {
         super(User.class, Paths.get(System.getProperty("user.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\userdata"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
@@ -22,8 +23,8 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     public void add(User newUser) {
         super.add(newUser);                                                                 // users에 반영
         super.saveToFile(directory.resolve(newUser.getId().toString() + ".ser"), newUser);    // file에 반영
-        usernames.put(newUser.getUserName(), newUser);
-        emails.put(newUser.getUserName(), newUser);
+        usernames.add(newUser.getUserName());
+        emails.add(newUser.getUserName());
     }
 
     // existsById(),findById(), getAll()  굳이 file을 탐색할 필요 없다고 생각해 storage를 통해 정보 확인, -> super.add, super.findById, super.getAll 사용
@@ -43,7 +44,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
         }
         saveToFile(directory.resolve(userId.toString() + ".ser"), super.storage.get(userId));
         usernames.remove(super.findById(userId).getUserName());
-        usernames.put(userName, super.findById(userId));
+        usernames.add(userName);
     }
 
     @Override
@@ -55,12 +56,20 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     }
 
     @Override
+    public void updateProfileId(UUID userId, UUID newProfileId) {
+        if (existsById(userId)) {
+            super.storage.get(userId).updateProfileId(newProfileId);
+        }
+        saveToFile(directory.resolve(userId.toString() + ".ser"), super.storage.get(userId));
+    }
+
+    @Override
     public boolean existsByUserName(String userName) {
-        return usernames.containsKey(userName);
+        return usernames.contains(userName);
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return emails.containsKey(email);
+        return emails.contains(email);
     }
 }
