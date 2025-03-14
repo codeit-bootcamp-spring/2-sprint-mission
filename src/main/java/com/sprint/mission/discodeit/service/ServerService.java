@@ -5,7 +5,7 @@ import java.util.UUID;
 public interface ServerService {
     UUID createChannel(String serverId, String creatorId, String name);
 
-    UUID joinChannel(String serverId, String userId, String channelId);
+    UUID joinChannel(String serverId, String userId, String ownerId,String channelId);
 
     UUID quitChannel(String serverId, String userId, String channelId);
 

@@ -39,13 +39,15 @@ public class JCFServerService implements ServerService {
 
 
     @Override
-    public UUID joinChannel(String serverId, String userId, String channelId) {
+    public UUID joinChannel(String serverId, String userId, String ownerId,String channelId) {
         UUID SID = UUID.fromString(serverId);
         UUID UID = UUID.fromString(userId);
+        UUID UOID = UUID.fromString(ownerId);
         UUID CID = UUID.fromString(channelId);
 
         User user = userRepository.findUserByUserId(UID);
-        Server findServer = userRepository.findServerByServerId(user, SID);
+        User owner = userRepository.findUserByUserId(UOID);
+        Server findServer = userRepository.findServerByServerId(owner, SID);
         Channel findChannel = serverRepository.findChannelByChanelId(findServer, CID);
 
         UUID uuid = serverRepository.saveUser(findChannel, user);

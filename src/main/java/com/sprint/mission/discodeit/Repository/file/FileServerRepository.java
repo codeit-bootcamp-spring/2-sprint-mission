@@ -102,7 +102,7 @@ public class FileServerRepository implements ServerRepository {
     }
 
 
-    public void clear() {
+    public void clearChannel() {
         init();
         try {
             Files.deleteIfExists(channelPath);

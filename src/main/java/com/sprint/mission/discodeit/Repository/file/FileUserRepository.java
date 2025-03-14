@@ -60,7 +60,7 @@ public class FileUserRepository implements UserRepository {
 
     private void loadServerUserList() {
         if (Files.exists(serverUserPath)) {
-            try (FileInputStream fis = new FileInputStream(serverPath.toFile());
+            try (FileInputStream fis = new FileInputStream(serverUserPath.toFile());
                  ObjectInputStream ois = new ObjectInputStream(fis)) {
 
                 Map<UUID, List<User>> list = (Map<UUID, List<User>>) ois.readObject();
@@ -210,8 +210,8 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<Server> findServerListByOwner(User owner) {
-        System.out.println("🔍 요청된 userId (서버 검색): " + owner.getId());
-        System.out.println("🔍 현재 저장된 서버 목록: " + serverList);
+        System.out.println("🔍 findServerListByOwner 요청된 userId (서버 검색): " + owner.getId());
+        System.out.println("🔍 findServerListByOwner 현재 저장된 서버 목록: " + serverList);
 
         List<Server> list = Optional.ofNullable(serverList.get(owner.getId())).orElseThrow(() -> new ServerNotFoundException("서버 리스트가 비어있습니다."));
         return list;
