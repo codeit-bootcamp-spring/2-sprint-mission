@@ -1,4 +1,4 @@
-package com.sprint.mission.config;
+package com.sprint.mission.discodeit.config;
 
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_ACCESS_DENIED_TO_BEAN_STORAGE;
 import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_FILE;

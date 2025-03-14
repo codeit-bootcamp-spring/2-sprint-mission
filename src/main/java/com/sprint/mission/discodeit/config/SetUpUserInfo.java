@@ -1,4 +1,4 @@
-package com.sprint.mission.config;
+package com.sprint.mission.discodeit.config;
 
 public enum SetUpUserInfo {
     LONGIN_USER("황지환", "hwang@naver.com", "12345"),

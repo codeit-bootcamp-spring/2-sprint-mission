@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.config.SetUpUserInfo.OTHER_USER;
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

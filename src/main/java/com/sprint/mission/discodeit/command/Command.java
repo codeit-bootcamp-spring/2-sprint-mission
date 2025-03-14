@@ -1,4 +1,4 @@
-package com.sprint.mission.command;
+package com.sprint.mission.discodeit.command;
 
 public class Command {
     private Command() {

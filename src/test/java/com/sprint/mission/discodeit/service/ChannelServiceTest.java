@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
 import static com.sprint.mission.discodeit.constant.ChannelInfo.CHANNEL_NAME;
 import static com.sprint.mission.discodeit.constant.ChannelInfo.UPDATED_CHANNEL_NAME;
 import static org.assertj.core.api.Assertions.assertThat;

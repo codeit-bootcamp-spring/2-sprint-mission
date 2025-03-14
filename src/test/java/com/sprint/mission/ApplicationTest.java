@@ -6,6 +6,7 @@ import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.discodeit.constant.FilePath.USER_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sprint.mission.discodeit.Application;
 import java.io.IOException;
 import java.nio.file.Files;
 import org.junit.jupiter.api.AfterEach;

@@ -8,18 +8,18 @@
 
 2. Spring 프로젝트 초기화
 - [ ] Spring Initializr를 통해 zip 파일을 다운로드하세요.
-  - [ ] 빌드 시스템은 Gradle - Groovy를 사용합니다.
-  - [ ] 언어는 Java 17를 사용합니다.
-  - [ ] Spring Boot의 버전은 3.4.0입니다.
-  - [ ] GroupId는 com.sprint.mission입니다.
-  - [ ] ArtifactId와 Name은 discodeit입니다.
-  - [ ] packaging 형식은 Jar입니다
-  - [ ] Dependency를 추가합니다.
-    - [ ] Lombok
-    - [ ] Spring Web
-- [ ] zip 파일을 압축해제하고 원래 진행 중이던 프로젝트에 붙여넣기하세요. 일부 파일은 덮어쓰기할 수 있습니다.
-- [ ] application.properties 파일을 yaml 형식으로 변경하세요.
-- [ ] DiscodeitApplication의 main 메서드를 실행하고 로그를 확인해보세요.
+  - [x] 빌드 시스템은 Gradle - Groovy를 사용합니다.
+  - [x] 언어는 Java 17를 사용합니다.
+  - [x] Spring Boot의 버전은 3.4.0입니다.
+  - [x] GroupId는 com.sprint.mission입니다.
+  - [x] ArtifactId와 Name은 discodeit입니다.
+  - [x] packaging 형식은 Jar입니다
+  - [x] Dependency를 추가합니다.
+    - [x] Lombok
+    - [x] Spring Web
+- [x] zip 파일을 압축해제하고 원래 진행 중이던 프로젝트에 붙여넣기하세요. 일부 파일은 덮어쓰기할 수 있습니다.
+- [x] application.properties 파일을 yaml 형식으로 변경하세요.
+- [x] DiscodeitApplication의 main 메서드를 실행하고 로그를 확인해보세요.
 
 
 3. Bean 선언 및 테스트
@@ -28,7 +28,7 @@
 - [ ] JavaApplication에서 테스트했던 코드를 DiscodeitApplication에서 테스트해보세요.
   - [ ]  JavaApplication 의 main 메소드를 제외한 모든 메소드를 DiscodeitApplication클래스로 복사하세요.
   - [ ]  JavaApplication의 main 메소드에서 Service를 초기화하는 코드를 Spring Context를 활용하여 대체하세요.
-  ~~~java
+~~~java
   // JavaApplication
   public static void main(String[] args) {
       // 레포지토리 초기화

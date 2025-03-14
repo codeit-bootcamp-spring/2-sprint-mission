@@ -1,4 +1,4 @@
-package com.sprint.mission.command.handler;
+package com.sprint.mission.discodeit.command.handler;
 
 import static com.sprint.mission.discodeit.view.OutputView.printOtherChannels;
 
