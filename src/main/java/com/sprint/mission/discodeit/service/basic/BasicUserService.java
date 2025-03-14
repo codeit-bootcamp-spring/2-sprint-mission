@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -41,7 +42,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User findById(UUID userId) {
+    public UserResponseDto findById(UUID userId) {
         User user = userRepository.findById(userId);
 
         if (user == null) {
@@ -55,8 +56,11 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserResponseDto> findAll() {
+        return userRepository.findAll().stream().map(user -> {
+            UserStatus userStatus = userStatusRepository.findById(user.getId());
+            return new UserResponseDto(user, userStatus.isActive());
+        }).toList();
     }
 
     @Override
