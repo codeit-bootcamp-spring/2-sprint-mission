@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.constant.ChannelType;
+import com.sprint.mission.discodeit.dto.FindChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
@@ -9,20 +12,25 @@ public class JCFChannelService implements ChannelService {
     private final List<Channel> channelList = new ArrayList<>();
 
     @Override
-    public void createChannel(String channelName) {
-        Channel channel = new Channel(channelName);
+    public void createPublicChannel(String channelName, ChannelType channelType) {
+        Channel channel = new Channel(channelName, channelType);
         channelList.add(channel);
         System.out.println("채널 개설 성공" + channel);
     }
 
     @Override
-    public Channel findChannel(UUID id) {
-        for (Channel channel : channelList) {
-            if (channel.getId().equals(id)) {
-                return channel;
-            }
-        }
-        System.out.print("[실패]찾으시는 채널이 존재하지 않습니다.  ");
+    public void createPrivateChannel(String channelName, ChannelType channelType, List<UUID> userList) {
+
+    }
+
+    @Override
+    public FindChannelDto findChannel(UUID id) {
+        //for (Channel channel : channelList) {
+        //    if (channel.getId().equals(id)) {
+        //        return channel;
+        //    }
+        //}
+        //System.out.print("[실패]찾으시는 채널이 존재하지 않습니다.  ");
         return null;
     }
 

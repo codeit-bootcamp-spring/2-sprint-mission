@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.util.*;
 
-@Repository
+//@Repository
 @RequiredArgsConstructor
 public class FileMessageRepository implements MessageRepository {
 

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.constant.SubDirectory;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -11,15 +12,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
+//@Repository
 @RequiredArgsConstructor
 public class FileChannelRepository implements ChannelRepository {
 
     private final FileManager fileManager;
 
     @Override
-    public Channel save(String channelName) {
-        Channel channel = new Channel(channelName);
+    public Channel save(String channelName, ChannelType channelType) {
+        Channel channel = new Channel(channelName, channelType);
         fileManager.writeToFile(SubDirectory.CHANNEL, channel, channel.getId());
         return channel;
     }

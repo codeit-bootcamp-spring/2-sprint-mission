@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.custom.AppendObjectOutputStream;
+import com.sprint.mission.discodeit.dto.FindChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -9,8 +11,8 @@ import java.util.*;
 
 public class FileChannelService implements ChannelService {
     @Override
-    public void createChannel(String channelName) {
-        Channel channel = new Channel(channelName);
+    public void createPublicChannel(String channelName, ChannelType channelType) {
+        Channel channel = new Channel(channelName, channelType);
         try {
             String fileName = "channel.ser";
             // 파일 존재 여부 확인
@@ -30,25 +32,30 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel findChannel(UUID channelUUID) {
-        try (FileInputStream fis = new FileInputStream("channel.ser");
-             ObjectInputStream ois = new ObjectInputStream(fis);
-        ) {
-            while (true) {
-                try {
-                    Channel channel = (Channel) ois.readObject();
-                    if (channel.getId().equals(channelUUID)) return channel;
-                } catch (EOFException e) {
-                    // 파일의 끝 도달 시 브레이크
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("[실패] 채널이 존재하지 않습니다.");
+    public void createPrivateChannel(String channelName, ChannelType channelType, List<UUID> userList) {
+
+    }
+
+    @Override
+    public FindChannelDto findChannel(UUID channelUUID) {
+        //try (FileInputStream fis = new FileInputStream("channel.ser");
+        //     ObjectInputStream ois = new ObjectInputStream(fis);
+        //) {
+        //    while (true) {
+        //        try {
+        //            Channel channel = (Channel) ois.readObject();
+        //            if (channel.getId().equals(channelUUID)) return channel;
+        //        } catch (EOFException e) {
+        //            // 파일의 끝 도달 시 브레이크
+        //            break;
+        //        }
+        //    }
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //} catch (ClassNotFoundException e) {
+        //    throw new RuntimeException(e);
+        //}
+        //System.out.println("[실패] 채널이 존재하지 않습니다.");
         return null;
     }
 

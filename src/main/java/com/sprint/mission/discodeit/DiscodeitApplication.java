@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.constant.ChannelType;
+import com.sprint.mission.discodeit.dto.FindChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -8,8 +11,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 @SpringBootApplication
 public class DiscodeitApplication {
@@ -49,9 +51,31 @@ public class DiscodeitApplication {
 					sc.nextLine();
 					switch (createNum) {
 						case 1:
+							System.out.println("======== 채널 타입 ========");
+							System.out.println("1. public(공개 채널)\n2. private(비공개 채널");
+							int typeChoice = sc.nextInt();
 							System.out.print("채널명 입력: ");
 							String channelName = sc.nextLine();
-							channelService.createChannel(channelName);
+							sc.nextLine();
+							switch (typeChoice) {
+								case 1:
+									channelService.createPublicChannel(channelName, ChannelType.PUBLIC);
+									break;
+								case 2:
+									List<UUID> userList = new ArrayList<>();
+									while(true) {
+										String appendUser = sc.nextLine();
+										if(appendUser.equalsIgnoreCase("EXIT")) break;
+										UUID userUUID = UUID.fromString(appendUser);
+										if (userService.findByUser(userUUID) != null) {
+											userList.add(userUUID);
+										}
+									}
+									channelService.createPrivateChannel(channelName, ChannelType.PUBLIC, userList);
+									break;
+								default:
+									break;
+							}
 							break;
 						case 2:
 							System.out.print("채널 아이디 입력: ");
@@ -137,9 +161,9 @@ public class DiscodeitApplication {
 	}
 
 	private static UUID selectChannel(ChannelService channelService, UUID channelUUID) {
-		Channel channel = channelService.findChannel(channelUUID);
-		if (channel == null) return null;
-		return channel.getId();
+		FindChannelDto findChannelDto = channelService.findChannel(channelUUID);
+		if (findChannelDto == null) return null;
+		return findChannelDto.channelUUID();
 	}
 
 	private static void sendMessageByChannel(MessageService messageService, UUID channelUUID, UUID userUUID, String content) {
