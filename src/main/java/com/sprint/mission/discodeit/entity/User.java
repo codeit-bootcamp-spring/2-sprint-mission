@@ -17,11 +17,11 @@ public class User implements Serializable {
     private String email;
     private String password;
 
-    private final UUID defaultProfileId = UUID.fromString("00000000-0000-0000-0000-000000000000"); // 기본 프로필 이미지 ID
+    private static final UUID DEFAULT_PROFILE_ID = UUID.fromString("00000000-0000-0000-0000-000000000000"); // 기본 프로필 이미지 ID
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
-        this.profileId = defaultProfileId;
+        this.profileId = profileId == null ? DEFAULT_PROFILE_ID : profileId;
         this.createdAt = Instant.now();
         this.username = username;
         this.email = email;
@@ -50,7 +50,7 @@ public class User implements Serializable {
     }
 
     public void updateProfile(UUID profileId) {
-        UUID newProfileId = profileId == null ? defaultProfileId : profileId;
+        UUID newProfileId = profileId == null ? DEFAULT_PROFILE_ID : profileId;
 
         if(!this.profileId.equals(profileId)) {
             this.profileId = newProfileId;
