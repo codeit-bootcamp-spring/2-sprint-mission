@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.DTO.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import lombok.RequiredArgsConstructor;
@@ -15,22 +16,23 @@ public class BinaryContentService {
 
     BinaryContent create() {
         BinaryContent binaryContent = new BinaryContent();
-        binaryContentRepository.save(binaryContent);
+        BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(binaryContent);
+        binaryContentRepository.save(binaryContentCreateDTO);
         return binaryContent;
     }
 
-    BinaryContent find(UUID id) {
-        BinaryContent binaryContent = binaryContentRepository.find(id);
+    BinaryContent find(UUID binaryId) {
+        BinaryContent binaryContent = binaryContentRepository.find(binaryId);
         return binaryContent;
     }
 
-    List<BinaryContent> findAllByIdIn(UUID id) {
-        List<BinaryContent> contentList = binaryContentRepository.findAllByIdIn(id);
+    List<BinaryContent> findAllByIdIn() {
+        List<BinaryContent> contentList = binaryContentRepository.findAllByIdIn();
         return contentList;
     }
 
-    boolean delete(UUID id) {
-        boolean delete = binaryContentRepository.delete(id);
+    boolean delete(UUID binaryId) {
+        boolean delete = binaryContentRepository.delete(binaryId);
         return delete;
     }
 }

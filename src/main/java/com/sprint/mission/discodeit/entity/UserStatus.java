@@ -10,7 +10,7 @@ import java.util.UUID;
 @ToString
 @Getter
 public class UserStatus {
-    private final UUID userStatusId;
+    private UUID userStatusId;
     private final UUID userId;
     public final Instant createdAt;
     public Instant updatedAt;
@@ -25,18 +25,26 @@ public class UserStatus {
         this.userId = userId;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
+        this.status = UserStatusType.ONLINE;
     }
 
-    public boolean isONLine() {
-        Instant now = Instant.now();
-        Duration duration = Duration.between(updatedAt, now);
-        long minutes = duration.toMinutes();
-        if (minutes <= 5) {
-            this.status = UserStatusType.ONLINE;
-            return true;
-        } else {
-            this.status = UserStatusType.OFFLINE;
-            return false;
-        }
+    public void setUserStatusId(UUID userStatusId) {
+        this.userStatusId = userStatusId;
+        this.updatedAt = Instant.now();
     }
+
+    public void updatedTime() {
+        this.updatedAt = Instant.now();
+    }
+
+    public boolean isOnline() {
+        return Duration.between(updatedAt, Instant.now()).getSeconds() <= 300;
+    }
+
+    public void updateStatus() {
+        this.status = isOnline() ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
+    }
+
+
+
 }
