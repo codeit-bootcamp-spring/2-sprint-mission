@@ -45,6 +45,7 @@ public class BasicUserService implements UserService {
         User findUser = this.userRepository.findById(userId);
         UserStatus findUserStatus = this.userStatusRepository.findById(userId);
         return new UserReadResponse(
+                findUser.getId(),
                 findUser.getUserName(),
                 findUser.getUserEmail(),
                 findUser.getProfileId(),
@@ -56,6 +57,7 @@ public class BasicUserService implements UserService {
         return this.userRepository.getAll().values().stream()
                 .map(user ->
                         new UserReadResponse(
+                                user.getId(),
                                 user.getUserName(),
                                 user.getUserEmail(),
                                 user.getProfileId(),
