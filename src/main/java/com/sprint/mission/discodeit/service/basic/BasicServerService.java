@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ServerService;
@@ -26,14 +27,14 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public UUID createChannel(String serverId, String creatorId, String name) {
+    public UUID createChannel(String serverId, String creatorId, String name, ChannelType type) {
         UUID SID = UUID.fromString(serverId);
         UUID UID = UUID.fromString(creatorId);
 
         User user = userRepository.findUserByUserId(UID);
         Server findServer = userRepository.findServerByServerId(user, SID);
 
-        Channel channel = new Channel(findServer.getServerId(), user.getId(), name);
+        Channel channel = new Channel(findServer.getServerId(), user.getId(), name, type);
         serverRepository.saveChannel(findServer, channel);
 
         return channel.getChannelId();

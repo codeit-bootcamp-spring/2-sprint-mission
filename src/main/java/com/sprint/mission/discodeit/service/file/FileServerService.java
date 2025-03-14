@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.Repository.file.FileServerRepository;
 import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ServerService;
@@ -28,7 +29,7 @@ public class FileServerService implements ServerService {
     }
 
     @Override
-    public UUID createChannel(String serverId, String creatorId, String name) {
+    public UUID createChannel(String serverId, String creatorId, String name, ChannelType type) {
         UUID SID = UUID.fromString(serverId);
         UUID UID = UUID.fromString(creatorId);
 
@@ -37,7 +38,7 @@ public class FileServerService implements ServerService {
         Server findServer = userRepository.findServerByServerId(user, SID);
         System.out.println(JCFUserRepository.class + " : " + "createChannel" + " : " + findServer.getServerId());
 
-        Channel channel = new Channel(findServer.getServerId(), user.getId(), name);
+        Channel channel = new Channel(findServer.getServerId(), user.getId(), name,type);
         serverRepository.saveChannel(findServer, channel);
 
         return channel.getChannelId();

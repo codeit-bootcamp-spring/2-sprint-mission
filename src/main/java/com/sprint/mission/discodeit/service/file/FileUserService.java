@@ -78,7 +78,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public List<User> findUserAll() {
+    public List<user> findUserAll() {
         return userRepository.findUserList();
     }
 

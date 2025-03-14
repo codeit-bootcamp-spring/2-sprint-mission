@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
+import com.sprint.mission.discodeit.DTO.Server.ServerUpdateDTO;
+import com.sprint.mission.discodeit.DTO.User.UserUpdateDTO;
 import com.sprint.mission.discodeit.Exception.ServerNotFoundException;
 import com.sprint.mission.discodeit.Exception.UserNotFoundException;
 import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;
@@ -25,10 +28,9 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public UUID saveUser(User user) {
+
         registeredUsers.add(user);
 
-        System.out.println("🔍 saveUser: 요청된 userId: " + user.getId());
-        System.out.println("🔍 saveUser: 현재 저장된 유저 목록: " + registeredUsers);
 
         return user.getId();
     }
@@ -106,20 +108,33 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public UUID updateUserName(User user, String replaceName) {
-        User targetUser = findUser(user);
-        targetUser.setName(replaceName);
-        return targetUser.getId();
+    public UUID updateUser(User user, UserUpdateDTO userUpdateDTO) {
+        if (userUpdateDTO.replaceId() != null) {
+            user.setId(userUpdateDTO.replaceId());
+        }
+        if (userUpdateDTO.replaceName() != null) {
+            user.setName(userUpdateDTO.replaceName());
+        }
+        if (userUpdateDTO.replaceEmail() != null) {
+            user.setEmail(userUpdateDTO.replaceEmail());
+        }
+        if (userUpdateDTO.binaryContentId() != null) {
+            user.setProfileId(userUpdateDTO.binaryContentId());
+        }
+        return user.getId();
     }
 
     @Override
-    public UUID updateServerName(User owner, Server server, String replaceName) {
-        List<Server> serverListByOwner = findServerListByOwner(owner);
-        Server targetServer = findServerByOwner(owner, server);
-
-        targetServer.setName(replaceName);
-        serverList.put(owner.getId(), serverListByOwner);
-
+    public UUID updateServer(Server targetServer, ServerUpdateDTO serverUpdateDTO) {
+        if (serverUpdateDTO.replaceServerId() != null) {
+            targetServer.setServerId(serverUpdateDTO.replaceServerId());
+        }
+        if (serverUpdateDTO.replaceOwnerId() != null) {
+            targetServer.setUserOwnerId(serverUpdateDTO.replaceOwnerId());
+        }
+        if (serverUpdateDTO.replaceName() != null) {
+            targetServer.setName(serverUpdateDTO.replaceName());
+        }
         return targetServer.getServerId();
     }
 
@@ -137,7 +152,6 @@ public class JCFUserRepository implements UserRepository {
 
         serverListByOwner.remove(targetServer);
         serverList.put(owner.getId(), serverListByOwner);
-
         return targetServer.getServerId();
     }
 

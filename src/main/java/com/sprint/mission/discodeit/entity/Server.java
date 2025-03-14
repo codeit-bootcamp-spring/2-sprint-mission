@@ -8,24 +8,19 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.UUID;
 
-@ToString(onlyExplicitlyIncluded = true)
+@ToString
 @Getter
 public class Server implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @ToString.Include
-    private final UUID serverId;
+    private UUID serverId;
 
-    @ToString.Include
-    private final UUID userOwnerId;
+    private UUID userOwnerId;
 
-    @ToString.Include
     private String name;
 
     public final Instant createdAt;
     public Instant updatedAt;
-
-
 
     public Server(UUID userOwnerId, String name) {
         this(UUID.randomUUID(), userOwnerId, Instant.now(), name);
@@ -37,6 +32,16 @@ public class Server implements Serializable {
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
         this.name = name;
+    }
+
+    public void setServerId(UUID serverId) {
+        this.serverId = serverId;
+        updatedAt = Instant.now();
+    }
+
+    public void setUserOwnerId(UUID userOwnerId) {
+        this.userOwnerId = userOwnerId;
+        updatedAt = Instant.now();
     }
 
     public void setName(String name) {

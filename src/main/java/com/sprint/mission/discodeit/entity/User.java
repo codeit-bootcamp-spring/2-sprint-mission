@@ -7,36 +7,40 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-@ToString(onlyExplicitlyIncluded = true)
+@ToString
 @Getter
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @ToString.Include
-    private final UUID id;
+    private UUID id;
+    public UUID profileId;
 
-    @ToString.Include
     private String name;
     private String email;
+    @ToString.Exclude
     private String password;
-
-    public UUID profileId;
 
     public final Instant createdAt;
     public Instant updatedAt;
 
 
     public User(String name, String email, String password) {
-        this(UUID.randomUUID(), Instant.now(), name, email, password);
+        this(UUID.randomUUID(), null, Instant.now(), name, email, password);
     }
 
-    public User(UUID id, Instant createdAt, String name, String email, String password) {
+    public User(UUID id, UUID profileId, Instant createdAt, String name, String email, String password) {
         this.id = id;
+        this.profileId = profileId;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
         this.name = name;
         this.email = email;
         this.password = password;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+        updatedAt = Instant.now();
     }
 
     public void setName(String name) {
@@ -46,6 +50,11 @@ public class User implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+        updatedAt = Instant.now();
+    }
+
+    public void setProfileId(UUID profileId) {
+        this.profileId = profileId;
         updatedAt = Instant.now();
     }
 }

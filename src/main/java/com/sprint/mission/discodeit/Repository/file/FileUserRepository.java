@@ -79,7 +79,7 @@ public class FileUserRepository implements UserRepository {
 
                 List<User> list = (List<User>) ois.readObject();
                 for (User user : list) {
-                    User u = new User(user.getId(), user.getCreatedAt(), user.getName(), user.getPassword());
+                    User u = new User(user.getId(), user.getCreatedAt(), user.getName(), user.getEmail(), user.getPassword());
                     registeredUsers.add(u);
                 }
 
@@ -149,8 +149,7 @@ public class FileUserRepository implements UserRepository {
     public UUID saveUser(User user) {
         registeredUsers.add(user);
 
-        System.out.println("🔍 saveUser: 요청된 userId: " + user.getId());
-        System.out.println("🔍 saveUser: 현재 저장된 유저 목록: " + registeredUsers);
+
 
         saveUserList();
 

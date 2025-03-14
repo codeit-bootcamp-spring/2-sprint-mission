@@ -14,6 +14,7 @@ public class UserStatus {
     private final UUID userId;
     public final Instant createdAt;
     public Instant updatedAt;
+    public UserStatusType status;
 
     public UserStatus(UUID userId) {
         this(UUID.randomUUID(), userId, Instant.now());
@@ -26,13 +27,15 @@ public class UserStatus {
         this.updatedAt = createdAt;
     }
 
-    public boolean onLine() {
+    public boolean isONLine() {
         Instant now = Instant.now();
         Duration duration = Duration.between(updatedAt, now);
         long minutes = duration.toMinutes();
         if (minutes <= 5) {
+            this.status = UserStatusType.ONLINE;
             return true;
         } else {
+            this.status = UserStatusType.OFFLINE;
             return false;
         }
     }

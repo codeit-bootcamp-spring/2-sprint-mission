@@ -7,37 +7,32 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-@ToString(onlyExplicitlyIncluded = true)
+@ToString
 @Getter
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @ToString.Include
     private final UUID channelId;
-    @ToString.Include
     private final UUID serverId;
-    @ToString.Include
     private final UUID creatorId;
-    @ToString.Include
     private String name;
+    private ChannelType type;
 
     public final Instant createdAt;
     public Instant updatedAt;
 
-
-
-
-    public Channel(UUID serverId, UUID creatorId, String name) {
-        this(UUID.randomUUID(), serverId, creatorId,Instant.now(), name);
+    public Channel(UUID serverId, UUID creatorId, String name, ChannelType type) {
+        this(UUID.randomUUID(), serverId, creatorId,Instant.now(), name, type);
     }
 
-    public Channel(UUID channelId, UUID serverId, UUID creatorId, Instant createdAt, String name) {
+    public Channel(UUID channelId, UUID serverId, UUID creatorId, Instant createdAt, String name,ChannelType type) {
         this.channelId = channelId;
         this.serverId = serverId;
         this.creatorId = creatorId;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
         this.name = name;
+        this.type = type;
     }
 
     public void setName(String name) {

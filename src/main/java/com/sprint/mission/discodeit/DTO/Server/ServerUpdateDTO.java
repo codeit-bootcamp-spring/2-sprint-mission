@@ -1,4 +1,10 @@
 package com.sprint.mission.discodeit.DTO.Server;
 
-public record ServerUpdateDTO(String ownerId, String serverId, String replaceName) {
+import java.util.UUID;
+
+public record ServerUpdateDTO(
+        UUID replaceServerId,
+        UUID replaceOwnerId,
+        String replaceName
+) {
 }

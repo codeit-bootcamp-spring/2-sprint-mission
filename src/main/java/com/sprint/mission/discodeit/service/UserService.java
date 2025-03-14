@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.DTO.Server.ServerJoinDTO;
 import com.sprint.mission.discodeit.DTO.Server.ServerUpdateDTO;
 import com.sprint.mission.discodeit.DTO.User.UserCreateDTO;
 import com.sprint.mission.discodeit.DTO.User.UserDeleteDTO;
+import com.sprint.mission.discodeit.DTO.User.UserFindDTO;
 import com.sprint.mission.discodeit.DTO.User.UserUpdateDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -24,9 +25,9 @@ public interface UserService {
 
     UUID joinServer(ServerJoinDTO serverJoinDTO);
 
-    User findUser(String name);
+    UserFindDTO findUser(String name);
 
-    List<User> findUserAll();
+    List<UserFindDTO> findUserAll();
 
     Server findServer(String ownerId, String name);
 
@@ -40,8 +41,8 @@ public interface UserService {
 
     boolean deleteServer(ServerDeleteDTO serverDeleteDTO);
 
-    boolean updateUser(UserUpdateDTO userUpdateDTO);
+    boolean updateUser(String userId, UserUpdateDTO userUpdateDTO);
 
 
-    boolean updateServer(ServerUpdateDTO serverUpdateDTO);
+    boolean updateServer(ServerDeleteDTO serverDeleteDTO, ServerUpdateDTO serverUpdateDTO);
 }
