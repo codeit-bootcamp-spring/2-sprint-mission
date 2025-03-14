@@ -3,24 +3,25 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+@Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
 
-    public BasicChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
-    }
-
-
     @Override
-    public Channel create(Channel channel) {
-        if (find(channel.getChannelName()) != null) {
-            System.out.println("등록된 채널이 존재합니다.");
-            return null;
+    public Channel create(String channelName, String description) {
+        Channel channel = new Channel(channelName, description);
+        Optional<Channel> ChannelList = channelRepository.load().stream()
+                .filter(c -> c.getChannelName().equals(channelName))
+                .findAny();
+        if (ChannelList.isPresent()) {
+            throw new IllegalArgumentException("등록된 채널이 존재합니다.");
         } else {
             channelRepository.save(channel);
             System.out.println(channel);
@@ -28,16 +29,14 @@ public class BasicChannelService implements ChannelService {
         }
     }
 
-    @Override
-    public Channel getChannel(String channelName) {
-        return find(channelName);
-    }
 
-    private Channel find(String channelName) {
-        return channelRepository.load().stream()
-                .filter(c -> c.getChannelName().equals(channelName))
-                .findAny()
-                .orElse(null);
+    @Override
+    public Channel getChannel(UUID channelId) {
+        Optional<Channel> channel = channelRepository.load().stream()
+                .filter(c -> c.getId().equals(channelId))
+                .findAny();
+        return channel.orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다"));
+
     }
 
     @Override
@@ -51,25 +50,16 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(String channelName, String changeChannel, String changeDescription) {
-        Channel channel = find(channelName);
-        if (channel == null) {
-            System.out.println("채널이 존재하지 않습니다.");
-            return null;
-        } else {
-            channel.updateChannel(changeChannel, changeDescription);
-            channelRepository.save(channel);
-            return channel;
-        }
+    public Channel update(UUID channelId, String changeChannel, String changeDescription) {
+        Channel channel = getChannel(channelId);
+        channel.updateChannel(changeChannel, changeDescription);
+        channelRepository.save(channel);
+        return channel;
     }
 
     @Override
-    public void delete(String channelName) {
-        Channel channel = find(channelName);
-        if (channel == null) {
-            System.out.println("채널이 존재하지 않습니다.");
-        } else {
-            channelRepository.deleteFromFile(channel);
-        }
+    public void delete(UUID channelId) {
+        Channel channel = getChannel(channelId);
+        channelRepository.remove(channel);
     }
 }

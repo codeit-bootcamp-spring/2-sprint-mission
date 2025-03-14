@@ -8,6 +8,6 @@ public interface ChannelRepository {
 
     void save(Channel channel);
     List<Channel> load();
-    void deleteFromFile(Channel channel);
+    void remove(Channel channel);
 
 }

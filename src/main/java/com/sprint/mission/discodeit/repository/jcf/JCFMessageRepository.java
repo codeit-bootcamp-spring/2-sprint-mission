@@ -9,8 +9,7 @@ import java.util.List;
 
 public class JCFMessageRepository implements MessageRepository {
 
-    public final List<Message> messageData;
-    public UserService userService;
+    private final List<Message> messageData;
 
     public JCFMessageRepository() {
         messageData = new ArrayList<>();
@@ -27,7 +26,7 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void deleteFromFile(Message message) {
+    public void remove(Message message) {
         messageData.remove(message);
     }
 }

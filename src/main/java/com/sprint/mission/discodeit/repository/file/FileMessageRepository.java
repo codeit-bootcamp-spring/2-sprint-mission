@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 
 import java.io.*;
@@ -13,29 +14,30 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
-    private static final Path directory = Paths.get(System.getProperty("user.dir"), "data", "messages");
+    private static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data", "messages");
 
     private final List<Message> messagesData;
 
 
     public FileMessageRepository() {
         messagesData = new ArrayList<>();
+        init();
 
     }
 
     @Override
     public void save(Message message) {
-        init();
         messagesData.add(message);
-        Path path = directory.resolve(message.getId() + ".ser");
+        Path path = DIRECTORY.resolve(message.getId() + ".ser");
         saveToFile(path, message);
     }
 
     private void init() {
         try {
-            if (!Files.exists(directory)) {
-                Files.createDirectories(directory);
+            if (!Files.exists(DIRECTORY)) {
+                Files.createDirectories(DIRECTORY);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -54,16 +56,12 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> load() {
-        if (Files.exists(directory)) {
-            try (Stream<Path> path = Files.list(directory)) {
-                return path
-                        .map(this::loadFromFile)
-                        .toList();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return Collections.emptyList();
+        try (Stream<Path> path = Files.list(DIRECTORY)) {
+            return path
+                    .map(this::loadFromFile)
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -78,10 +76,10 @@ public class FileMessageRepository implements MessageRepository {
 
 
     @Override
-    public void deleteFromFile(Message message) {
+    public void remove(Message message) {
         try {
-            if (message != null && Files.exists(directory.resolve(message.getId() + ".ser"))) {
-                Files.delete(directory.resolve(directory.resolve(message.getId() + ".ser")));
+            if (message != null && Files.exists(DIRECTORY.resolve(message.getId() + ".ser"))) {
+                Files.delete(DIRECTORY.resolve(DIRECTORY.resolve(message.getId() + ".ser")));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

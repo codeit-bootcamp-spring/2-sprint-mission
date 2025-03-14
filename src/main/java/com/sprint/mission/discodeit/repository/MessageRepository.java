@@ -9,7 +9,7 @@ public interface MessageRepository {
 
     void save(Message message);
     List<Message> load();
-    void deleteFromFile(Message message);
+    void remove(Message message);
 
 
 }

@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class FileChannelService implements ChannelService {
@@ -23,8 +24,9 @@ public class FileChannelService implements ChannelService {
 
     // 채널 생성
     @Override
-    public Channel create(Channel channel) {
-        if (find(channel.getChannelName()) != null) {
+    public Channel create(String channelName, String description) {
+        Channel channel = new Channel(channelName, description);
+        if (find(channel.getId()) != null) {
             System.out.println("등록된 채널이 존재합니다.");
             return null;
         } else {
@@ -66,13 +68,13 @@ public class FileChannelService implements ChannelService {
 
     // 채널 단일 조회
     @Override
-    public Channel getChannel(String channelName) {
-        return find(channelName);
+    public Channel getChannel(UUID channelId) {
+        return find(channelId);
     }
 
-    private Channel find(String channelName) {
+    private Channel find(UUID channelId) {
         return load().stream()
-                .filter(c -> c.getChannelName().equals(channelName))
+                .filter(c -> c.getId().equals(channelId))
                 .findAny()
                 .orElse(null);
     }
@@ -115,8 +117,8 @@ public class FileChannelService implements ChannelService {
 
     // 채널 정보 수정
     @Override
-    public Channel update(String channelName, String changeChannel, String changeDescription) {
-        Channel channel = find(channelName);
+    public Channel update(UUID channelId, String changeChannel, String changeDescription) {
+        Channel channel = find(channelId);
         if (channel == null) {
             System.out.println("채널이 존재하지 않습니다.");
             return null;
@@ -130,8 +132,8 @@ public class FileChannelService implements ChannelService {
 
     // 채널 삭제
     @Override
-    public void delete(String channelName) {
-        Channel channel = find(channelName);
+    public void delete(UUID channelId) {
+        Channel channel = find(channelId);
         try {
             if (channel != null && Files.exists(directory.resolve(channel.getId() + ".ser"))) {
                 Files.delete(directory.resolve(directory.resolve(channel.getId() + ".ser")));

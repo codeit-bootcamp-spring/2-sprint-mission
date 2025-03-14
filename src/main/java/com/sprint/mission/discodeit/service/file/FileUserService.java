@@ -21,8 +21,9 @@ public class FileUserService implements UserService {
 
     // 사용자 생성
     @Override
-    public User create(User user) {
-        if (find(user.getName()) != null) {
+    public User create(String name, String email, String password) {
+        User user = new User(name, email, password);
+        if (find(user.getId()) != null) {
             System.out.println("등록된 사용자가 존재합니다.");
             return null;
         } else{
@@ -64,13 +65,13 @@ public class FileUserService implements UserService {
 
     // 사용자 조회
     @Override
-    public User getUser(String name) {
-        return find(name);
+    public User getUser(UUID userId) {
+        return find(userId);
     }
 
-    private User find(String name) {
+    private User find(UUID userId) {
         return load().stream()
-                .filter(user -> user.getName().equals(name))
+                .filter(user -> user.getId().equals(userId))
                 .findAny()
                 .orElse(null);
     }
@@ -113,13 +114,13 @@ public class FileUserService implements UserService {
 
     // 사용자 수정
     @Override
-    public User update(String name, String changeName, String changeEmail) {
-        User user = find(name);
+    public User update(UUID userId, String changeName, String changeEmail, String changePassword) {
+        User user = find(userId);
         if (user == null) {
             System.out.println("사용자가 존재하지 않습니다.");
             return null;
         } else {
-            user.update(changeName, changeEmail);
+            user.update(changeName, changeEmail, changePassword);
             save(user);
         }
         return user;
@@ -128,8 +129,8 @@ public class FileUserService implements UserService {
 
     // 사용자 삭제
     @Override
-    public void delete(String name) {
-        User user = find(name);
+    public void delete(UUID userId) {
+        User user = find(userId);
         try {
             if (user != null && Files.exists(directory.resolve(user.getId() + ".ser"))) {
                 Files.delete(directory.resolve(user.getId() + ".ser"));

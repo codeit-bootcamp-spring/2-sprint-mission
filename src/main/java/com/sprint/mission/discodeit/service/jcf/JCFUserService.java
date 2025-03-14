@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 
 public class JCFUserService implements UserService {
@@ -18,7 +19,8 @@ public class JCFUserService implements UserService {
 
     // 사용자 생성
     @Override
-    public User create(User user) {
+    public User create(String name, String email, String password) {
+        User user = new User(name, email, password);
         if (!validateUser(user)) {
             return null;
         }
@@ -32,7 +34,7 @@ public class JCFUserService implements UserService {
     }
 
     private boolean validateUser(User user) {
-        if (getUser(user.getName()) != null) {
+        if (getUser(user.getId()) != null) {
             System.out.println("등록된 사용자가 존재합니다.");
             return false;
         }
@@ -42,13 +44,13 @@ public class JCFUserService implements UserService {
 
     // 사용자 조회
     @Override
-    public User getUser(String name) {
-        return find(name);
+    public User getUser(UUID userId) {
+        return find(userId);
     }
 
-    private User find(String name) {
+    private User find(UUID userId) {
         for (User userList : usersData) {
-            if (userList.getName().equals(name)) {
+            if (userList.getId().equals(userId)) {
                 return userList;
             }
         }
@@ -75,14 +77,14 @@ public class JCFUserService implements UserService {
 
     // 사용자 수정
     @Override
-    public User update(String name, String changeName, String changeEmail) {
-        return updateUser(name, changeName, changeEmail);
+    public User update(UUID userId, String changeName, String changeEmail, String changePassword) {
+        return updateUser(userId, changeName, changeEmail, changePassword);
     }
 
-    private User updateUser(String name, String changeName, String changeEmail) {
+    private User updateUser(UUID userId, String changeName, String changeEmail, String changePassword) {
         for (User userList : usersData) {
-            if (userList.getName().equals(name)) {
-                userList.update(changeName, changeEmail);
+            if (userList.getId().equals(userId)) {
+                userList.update(changeName, changeEmail, changePassword);
                 System.out.printf("[ %s ], [ %s ] 로 변경되었습니다.", userList.getName(), userList.getEmail());
                 return userList;
             }
@@ -94,9 +96,9 @@ public class JCFUserService implements UserService {
 
     // 사용자 삭제
     @Override
-    public void delete(String name) {
+    public void delete(UUID userId) {
         for (User userList : usersData) {
-            if (userList.getName().equals(name)) {
+            if (userList.getId().equals(userId)) {
                 usersData.remove(userList);
                 System.out.println("[ " + userList.getName() + " ] 이 삭제 되었습니다.");
             }

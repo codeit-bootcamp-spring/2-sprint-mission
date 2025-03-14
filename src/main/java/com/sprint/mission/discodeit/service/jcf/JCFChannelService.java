@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 
 public class JCFChannelService implements ChannelService {
@@ -18,7 +19,8 @@ public class JCFChannelService implements ChannelService {
 
     // 채널 생성
     @Override
-    public Channel create(Channel channel) {
+    public Channel create(String channelName, String description) {
+        Channel channel = new Channel(channelName, description);
         if (!validateChannel(channel)) {
             return null;
         }
@@ -32,7 +34,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     private boolean validateChannel(Channel channel) {
-        if (getChannel(channel.getChannelName()) != null) {
+        if (getChannel(channel.getId()) != null) {
             System.out.println("등록된 채널이 존재합니다.");
             return false;
         }
@@ -42,13 +44,13 @@ public class JCFChannelService implements ChannelService {
 
     // 채널 단일 조회
     @Override
-    public Channel getChannel(String channelName) {
-        return findChannel(channelName);
+    public Channel getChannel(UUID channelId) {
+        return findChannel(channelId);
     }
 
-    private Channel findChannel(String channelName) {
+    private Channel findChannel(UUID channelId) {
         for (Channel channelList : channelsData) {
-            if (channelList.getChannelName().equals(channelName)) {
+            if (channelList.getId().equals(channelId)) {
                 return channelList;
             }
         }
@@ -72,12 +74,12 @@ public class JCFChannelService implements ChannelService {
 
     // 채널 정보 수정
     @Override
-    public Channel update(String channelName, String changeChannel, String changeDescription){
-        return updateChannel(channelName, changeChannel, changeDescription);
+    public Channel update(UUID channelId, String changeChannel, String changeDescription){
+        return updateChannel(channelId, changeChannel, changeDescription);
     }
 
-    private Channel updateChannel(String channelName, String changeChannel, String changeDescription){
-        Channel channel = getChannel(channelName);
+    private Channel updateChannel(UUID channelId, String changeChannel, String changeDescription){
+        Channel channel = getChannel(channelId);
         if (channel != null) {
             channel.updateChannel(changeChannel, changeDescription);
             System.out.printf("[ %s ], [ %s ] 로 변경되었습니다.", channel.getChannelName(), channel.getDescription());
@@ -90,8 +92,8 @@ public class JCFChannelService implements ChannelService {
 
     // 채널 삭제
     @Override
-    public void delete(String channelName){
-        Channel delChannel = getChannel(channelName);
+    public void delete(UUID channelId){
+        Channel delChannel = getChannel(channelId);
         if (delChannel != null) {
             channelsData.remove(delChannel);
         }

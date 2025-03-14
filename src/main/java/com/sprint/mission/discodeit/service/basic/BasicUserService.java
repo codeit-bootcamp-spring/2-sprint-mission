@@ -3,24 +3,25 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
 
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-
     @Override
-    public User create(User user) {
-        if (find(user.getName()) != null) {
-            System.out.println("등록된 사용자가 존재합니다.");
-            return null;
+    public User create(String name, String email, String password) {
+        User user = new User(name, email, password);
+        Optional<User> userList = userRepository.load().stream()
+                .filter(u -> u.getName().equals(name))
+                .findAny();
+        if (userList.isPresent()) {
+            throw new IllegalArgumentException("등록된 사용자가 존재합니다.");
         } else{
             userRepository.save(user);
             System.out.println(user);
@@ -28,16 +29,13 @@ public class BasicUserService implements UserService {
         }
     }
 
-    @Override
-    public User getUser(String name) {
-        return find(name);
-    }
 
-    private User find(String name) {
-        return userRepository.load().stream()
-                .filter(user -> user.getName().equals(name))
-                .findAny()
-                .orElse(null);
+    @Override
+    public User getUser(UUID userId) {
+        Optional<User> user = userRepository.load().stream()
+                .filter(u -> u.getId().equals(userId))
+                .findAny();
+        return user.orElseThrow(() -> new NoSuchElementException("사용자가 존재하지 않습니다."));
     }
 
 
@@ -52,25 +50,16 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(String name, String changeName, String changeEmail) {
-        User user = find(name);
-        if (user == null) {
-            System.out.println("사용자가 존재하지 않습니다.");
-            return null;
-        } else {
-            user.update(changeName, changeEmail);
-            userRepository.save(user);
-        }
+    public User update(UUID userId, String changeName, String changeEmail, String changePassword) {
+        User user = getUser(userId);
+        user.update(changeName, changeEmail, changePassword);
+        userRepository.save(user);
         return user;
     }
 
     @Override
-    public void delete(String name) {
-        User user = find(name);
-        if (user == null) {
-            System.out.println("채널이 존재하지 않습니다.");
-        } else {
-            userRepository.deleteFromFile(user);
-        }
+    public void delete(UUID userId) {
+        User user = getUser(userId);
+        userRepository.remove(user);
     }
 }

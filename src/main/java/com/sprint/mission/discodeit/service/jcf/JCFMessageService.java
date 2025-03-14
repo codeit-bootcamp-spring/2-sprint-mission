@@ -5,10 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private final List<Message> messagesData;
@@ -22,11 +19,12 @@ public class JCFMessageService implements MessageService {
 
     // 메시지 생성
     @Override
-    public Message create(Message message) {
-        if (!validateMessage(message)) {
+    public Message create(String message, UUID channelId, UUID senderId) {
+        Message messages = new Message(message, channelId, senderId);
+        if (!validateMessage(channelId)) {
             return null;
         }
-        return createMessage(message);
+        return createMessage(messages);
     }
 
     private Message createMessage(Message message) {
@@ -35,9 +33,9 @@ public class JCFMessageService implements MessageService {
         return message;
     }
 
-    private boolean validateMessage(Message message) {
-        User user = userService.getUser(message.getSender());
-        if (user != null && user.getName().equals(message.getSender())) {
+    private boolean validateMessage(UUID messageId) {
+        User user = userService.getUser(messageId);
+        if (user != null && user.getId().equals(messageId)) {
             return true;
         }
         System.out.println("등록 된 사용자가 없습니다.");
@@ -47,15 +45,16 @@ public class JCFMessageService implements MessageService {
 
     // 메시지 단일 조회
     @Override
-    public List<Message> getMessage(String sender) {
-        return findMessage(sender);
+    public Message getMessage(UUID messageId) {
+        Optional<Message> message = findMessage(messageId).stream().findAny();
+        return message.orElseThrow(() -> new NoSuchElementException("메시지가 존재하지 않습니다."));
     }
 
-    private List<Message> findMessage(String sender) {
+    private List<Message> findMessage(UUID messageId) {
         boolean find = false;
         List<Message> result = new ArrayList<>();
         for (Message messageList : messagesData) {
-            if (messageList.getSender().equals(sender)) {
+            if (messageList.getId().equals(messageId)) {
                 result.add(messageList);
                 find = true;
             }
@@ -66,9 +65,9 @@ public class JCFMessageService implements MessageService {
         return result;
     }
 
-    private Message find(String sender) {
+    private Message find(UUID messageIdr) {
         for (Message messageList : messagesData) {
-            if (messageList.getSender().equals(sender)) {
+            if (messageList.getId().equals(messageIdr)) {
                 return messageList;
             }
         }
@@ -97,13 +96,13 @@ public class JCFMessageService implements MessageService {
 
     // 메시지 수정
     @Override
-    public Message update (String sender, UUID uuid, String changeMessage){
-        return updateMessage(sender, uuid, changeMessage);
+    public Message update (UUID messageId, String changeMessage){
+        return updateMessage(messageId, changeMessage);
     }
 
-    private Message updateMessage(String sender,UUID uuid, String changeMessage){
-        Message senderName = find(sender);
-        if (senderName != null && senderName.getId().equals(uuid)) {
+    private Message updateMessage(UUID messageId, String changeMessage){
+        Message senderName = find(messageId);
+        if (senderName != null && senderName.getId().equals(messageId)) {
             senderName.updateMessage(changeMessage);
             System.out.printf("보낸 내용이 [ %s ] 로 변경되었습니다.", senderName.getMessage());
             return senderName;
@@ -115,11 +114,11 @@ public class JCFMessageService implements MessageService {
 
     // 메시지 삭제
     @Override
-    public void delete (String sender, UUID uuid){
-        Message sendName = find(sender);
-        if (sendName != null && sendName.getId().equals(uuid)) {
+    public void delete (UUID messageId){
+        Message sendName = find(messageId);
+        if (sendName != null && sendName.getId().equals(messageId)) {
             messagesData.remove(sendName);
-            System.out.println("[ " + sendName.getSender() + " ] 이 삭제 되었습니다.");
+            System.out.println("[ " + sendName.getId() + " ] 이 삭제 되었습니다.");
         }
         System.out.println("메시지가 존재하지 않습니다");
     }

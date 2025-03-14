@@ -26,18 +26,19 @@ public class FileMessageService implements MessageService {
 
     // 메시지 생성
     @Override
-    public Message create(Message message) {
-        if (!validateMessage(message)) {
+    public Message create(String message, UUID channelId, UUID senderId) {
+        Message messages = new Message(message, channelId, senderId);
+        if (!validateMessage(channelId)) {
             return null;
         }
-        messagesData.add(message);
-        save(message);
-        return message;
+        messagesData.add(messages);
+        save(messages);
+        return messages;
     }
 
-    private boolean validateMessage(Message message) {
-        User user = userService.getUser(message.getSender());
-        if (user != null && user.getName().equals(message.getSender())) {
+    private boolean validateMessage(UUID messageId) {
+        User user = userService.getUser(messageId);
+        if (user != null && user.getId().equals(messageId)) {
             return true;
         }
         System.out.println("등록 된 사용자가 없습니다.");
@@ -72,13 +73,14 @@ public class FileMessageService implements MessageService {
 
     // 메시지 단일 조회
     @Override
-    public List<Message> getMessage(String sender) {
-        return find(sender);
+    public Message getMessage(UUID messageId) {
+        Optional<Message> message = find(messageId).stream().findAny();
+        return message.orElseThrow(() -> new NoSuchElementException("메시지가 존재하지 않습니다."));
     }
 
-    private List<Message> find(String sender) {
+    private List<Message> find(UUID messageId) {
         return load().stream()
-                .filter(message -> message.getSender().equals(sender))
+                .filter(message -> message.getId().equals(messageId))
                 .toList();
     }
 
@@ -120,10 +122,10 @@ public class FileMessageService implements MessageService {
 
     // 메시지 수정
     @Override
-    public Message update(String sender, UUID uuid, String changeMessage) {
-        List<Message> messageList = find(sender);
+    public Message update(UUID messageId, String changeMessage) {
+        List<Message> messageList = find(messageId);
         Message messages = messageList.stream()
-                .filter(message -> message.getId().equals(uuid))
+                .filter(message -> message.getId().equals(messageId))
                 .findAny()
                 .orElse(null);
         if (messages == null) {
@@ -139,10 +141,10 @@ public class FileMessageService implements MessageService {
 
     // 메시지 삭제
     @Override
-    public void delete(String sender, UUID uuid) {
-        List<Message> messageList = find(sender);
+    public void delete(UUID messageId) {
+        List<Message> messageList = find(messageId);
         Message messages = messageList.stream()
-                .filter(message -> message.getId().equals(uuid))
+                .filter(message -> message.getId().equals(messageId))
                 .findAny()
                 .orElse(null);
         try {

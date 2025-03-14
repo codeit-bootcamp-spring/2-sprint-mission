@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -28,8 +29,7 @@ public class JavaApplication {
 
         UserService userService = new BasicUserService(userRepository);
         ChannelService channelService = new BasicChannelService(channelRepository);
-        MessageService messageService = new BasicMessageService(messageRepository, userService);
-
+        MessageService messageService = new BasicMessageService(messageRepository, userRepository, channelRepository);
 
         Scanner sc = new Scanner(System.in);
 
@@ -62,17 +62,26 @@ public class JavaApplication {
                             String userName1 = sc.nextLine();
                             System.out.print("사용자 이메일 입력: ");
                             String userMail1 = sc.nextLine();
-                            User user = new User(userName1, userMail1);
-                            userService.create(user);
+                            System.out.print("사용자 비밀번호 입력: ");
+                            String userPassword1 = sc.nextLine();
+                            try {
+                                userService.create(userName1, userMail1, userPassword1);
+                            } catch (IllegalArgumentException e) {
+                                System.out.println(e.getMessage());
+                            }
                             break;
 
                         case "2":
                             System.out.println("\n===사용자 조회 ===");
-                            System.out.print("사용자 이름 입력: ");
-                            String userName2 = sc.nextLine();
-                            userService.getUser(userName2);
-                            User userPrint = userService.getUser(userName2);
-                            System.out.println(userPrint);
+                            System.out.print("사용자 UUID 입력: ");
+                            String userUuid1  =sc.nextLine();
+                            UUID userUuid2 = UUID.fromString(userUuid1);
+                            try {
+                                User userPrint = userService.getUser(userUuid2);
+                                System.out.println(userPrint);
+                            } catch (NoSuchElementException e) {
+                                System.out.println(e.getMessage());
+                            }
                             break;
 
                         case "3":
@@ -84,20 +93,32 @@ public class JavaApplication {
 
                         case "4":
                             System.out.println("\n===사용자 수정 ===");
-                            System.out.print("변경 할 사용자 이름 입력: ");
-                            String userName3 = sc.nextLine();
+                            System.out.print("변경 할 사용자 UUID 입력: ");
+                            String userUuid3  =sc.nextLine();
+                            UUID userUuid4 = UUID.fromString(userUuid3);
                             System.out.print("새로운 사용자 이름 입력: ");
                             String changedName = sc.nextLine();
                             System.out.print("새로운 사용자 이메일 입력: ");
                             String changedEmail = sc.nextLine();
-                            userService.update(userName3, changedName, changedEmail);
+                            System.out.print("새로운 사용자 비밀번호 입력: ");
+                            String changedPassword = sc.nextLine();
+                            try {
+                                userService.update(userUuid4, changedName, changedEmail, changedPassword);
+                            } catch (NoSuchElementException e){
+                                System.out.println(e.getMessage());
+                            }
                             break;
 
                         case "5":
                             System.out.println("\n===사용자 삭제 ===");
-                            System.out.print("삭제 할 사용자 이름 입력: ");
-                            String userName4 = sc.nextLine();
-                            userService.delete(userName4);
+                            System.out.print("삭제 할 사용자 UUID 입력: ");
+                            String userUuid5  =sc.nextLine();
+                            UUID userUuid6 = UUID.fromString(userUuid5);
+                            try {
+                                userService.delete(userUuid6);
+                            } catch (NoSuchElementException e){
+                                System.out.println(e.getMessage());
+                            }
                             break;
 
                     }
@@ -120,16 +141,24 @@ public class JavaApplication {
                             String channelName1 = sc.nextLine();
                             System.out.print("채널 설명 입력: ");
                             String channelDesc = sc.nextLine();
-                            Channel c = new Channel(channelName1, channelDesc);
-                            channelService.create(c);
+                            try {
+                                channelService.create(channelName1, channelDesc);
+                            } catch (IllegalArgumentException e) {
+                                System.out.println(e.getMessage());
+                            }
                             break;
 
                         case "2":
                             System.out.println("\n===채널 조회===");
-                            System.out.print("채널 이름 입력: ");
-                            String channelName2  =sc.nextLine();
-                            Channel channelPrint = channelService.getChannel(channelName2);
-                            System.out.println(channelPrint);
+                            System.out.print("채널 UUID 입력: ");
+                            String channelUuid1  =sc.nextLine();
+                            UUID channelUuid2 = UUID.fromString(channelUuid1);
+                            try {
+                                Channel channelPrint = channelService.getChannel(channelUuid2);
+                                System.out.println(channelPrint);
+                            } catch (NoSuchElementException e) {
+                                System.out.println(e.getMessage());
+                            }
                             break;
 
                         case "3":
@@ -141,20 +170,30 @@ public class JavaApplication {
 
                         case "4":
                             System.out.println("\n===채널 수정===");
-                            System.out.print("변경 할 채널 이름 입력: ");
-                            String oldChannelName = sc.nextLine();
+                            System.out.print("변경 할 채널 UUID 입력: ");
+                            String channelUuid3  =sc.nextLine();
+                            UUID channelUuid4 = UUID.fromString(channelUuid3);
                             System.out.print("새로운 채널 이름 입력: ");
                             String newChannelName = sc.nextLine();
                             System.out.print("새로운 채널 설명 입력: ");
                             String newChannelDesc = sc.nextLine();
-                            channelService.update(oldChannelName, newChannelName, newChannelDesc);
+                            try {
+                                channelService.update(channelUuid4, newChannelName, newChannelDesc);
+                            } catch (NoSuchElementException e) {
+                                System.out.println(e.getMessage());
+                            }
                             break;
 
                         case "5":
                             System.out.println("\n===채널 삭제===");
-                            System.out.print("삭제할 채널 이름 입력: ");
-                            String deleteChannelName = sc.nextLine();
-                            channelService.delete(deleteChannelName);
+                            System.out.print("삭제할 채널 UUID 입력: ");
+                            String channelUuid5  =sc.nextLine();
+                            UUID channelUuid6 = UUID.fromString(channelUuid5);
+                            try {
+                                channelService.delete(channelUuid6);
+                            } catch (NoSuchElementException e) {
+                                System.out.println(e.getMessage());
+                            }
                             break;
 
                     }
@@ -173,23 +212,31 @@ public class JavaApplication {
                     switch (choice13) {
                         case "1":
                             System.out.println("\n===메시지 생성===");
-                            System.out.print("보내는 사람 입력: ");
-                            String sender1 = sc.nextLine();
                             System.out.print("보낼 메시지 내용 입력: ");
-                            String sendMessage = sc.nextLine();
-                            Message m1= new Message(sender1, sendMessage);
-                            messageService.create(m1);
+                            String message = sc.nextLine();
+                            System.out.print("보낼 채널 UUID 입력: ");
+                            String messageUuid1  =sc.nextLine();
+                            UUID channelUuid2 = UUID.fromString(messageUuid1);
+                            System.out.print("보낼 사용자 UUID 입력: ");
+                            String messageUuid3  =sc.nextLine();
+                            UUID channelUuid4 = UUID.fromString(messageUuid3);
+                            try {
+                                messageService.create(message, channelUuid2, channelUuid4);
+                            } catch (IllegalArgumentException e) {
+                                System.out.println(e.getMessage());
+                            }
                             break;
 
                         case "2":
                             System.out.println("\n===메시지 조회===");
-                            System.out.print("보낸 사람 입력: ");
-                            String sender2  =sc.nextLine();
-                            List<Message> messagePrint1 = messageService.getMessage(sender2);
-                            if (messagePrint1.size() < 0) {
-                                break;
-                            } else{
+                            System.out.print("보낸 메시지 UUID 입력: ");
+                            String messageUuid5  =sc.nextLine();
+                            UUID messageUuid6 = UUID.fromString(messageUuid5);
+                            try {
+                                Message messagePrint1 = messageService.getMessage(messageUuid6);
                                 System.out.println(messagePrint1);
+                            } catch (NoSuchElementException e) {
+                                System.out.println(e.getMessage());
                             }
                             break;
 
@@ -201,25 +248,29 @@ public class JavaApplication {
 
                         case "4":
                             System.out.println("\n===메시지 수정===");
-                            System.out.print("보낸 사람 입력: ");
-                            String sender3  =sc.nextLine();
-                            System.out.print("메시지 UUID 입력: ");
-                            String uuid  =sc.nextLine();
-                            UUID uuid2 = UUID.fromString(uuid);
+                            System.out.print("보낸 메시지 UUID 입력: ");
+                            String messageUuid7  =sc.nextLine();
+                            UUID messageUuid8 = UUID.fromString(messageUuid7);
                             System.out.print("수정 할 메시지 입력: ");
                             String newMessage = sc.nextLine();
-                            messageService.update(sender3, uuid2, newMessage);
-                            System.out.println();
+                            try {
+                                messageService.update(messageUuid8, newMessage);
+                                System.out.println();
+                            } catch (NoSuchElementException e) {
+                                System.out.println(e.getMessage());
+                            }
                             break;
 
                         case "5":
                             System.out.println("\n===메시지 삭제===");
-                            System.out.print("보낸 사람 입력: ");
-                            String sender4  =sc.nextLine();
                             System.out.print("메시지 UUID 입력: ");
-                            String uuid3  =sc.nextLine();
-                            UUID uuid4 = UUID.fromString(uuid3);
-                            messageService.delete(sender4, uuid4);
+                            String messageUuid9  =sc.nextLine();
+                            UUID messageUuid10 = UUID.fromString(messageUuid9);
+                            try {
+                                messageService.delete(messageUuid10);
+                            } catch (NoSuchElementException e) {
+                                System.out.println(e.getMessage());
+                            }
                             break;
                     }
                     continue;

@@ -25,7 +25,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void deleteFromFile(Channel channel) {
+    public void remove(Channel channel) {
         channelData.remove(channel);
     }
 }

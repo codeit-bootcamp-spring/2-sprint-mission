@@ -9,6 +9,6 @@ public interface UserRepository {
 
     void save(User user);
     List<User> load();
-    void deleteFromFile(User user);
+    void remove(User user);
 
 }

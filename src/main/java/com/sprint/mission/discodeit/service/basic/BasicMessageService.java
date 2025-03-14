@@ -1,47 +1,53 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
-    private final UserService userService;
-
-    public BasicMessageService(MessageRepository messageRepository, UserService userService) {
-        this.messageRepository = messageRepository;
-        this.userService = userService;
-    }
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
 
     @Override
-    public Message create(Message message) {
-        User user = userService.getUser(message.getSender());
-        if (user == null) {
-            System.out.println("등록된 사용자가 없습니다.");
-            return null;
-        } else {
-            messageRepository.save(message);
-            return message;
+    public Message create(String message, UUID channelId, UUID senderId) {
+        List<User> userList = userRepository.load();
+        List<Channel> channelList = channelRepository.load();
+        Optional<User> user = userList.stream()
+                .filter(u -> u.getId().equals(senderId))
+                .findAny();
+        Optional<Channel> channel = channelList.stream()
+                .filter(c -> c.getId().equals(channelId))
+                .findAny();
+        if (user.isEmpty()) {
+            throw new IllegalArgumentException("등록된 사용자가 없습니다.");
         }
+        if (channel.isEmpty()) {
+            throw new IllegalArgumentException("등록된 채널이 없습니다.");
+        }
+        Message messages = new Message(message, channelId, senderId);
+        messageRepository.save(messages);
+        return messages;
     }
 
 
     @Override
-    public List<Message> getMessage(String sender) {
-        return find(sender);
-    }
-
-    private List<Message> find(String sender) {
-        return messageRepository.load().stream()
-                .filter(message -> message.getSender().equals(sender))
-                .toList();
+    public Message getMessage(UUID messageId) {
+        Optional<Message> message = messageRepository.load().stream()
+                .filter(m -> m.getId().equals(messageId))
+                .findAny();
+        return message.orElseThrow(() -> new NoSuchElementException("메시지가 존재하지 않습니다."));
     }
 
 
@@ -57,34 +63,17 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public Message update(String sender, UUID uuid, String changeMessage) {
-        List<Message> messageList = find(sender);
-        Message messages = messageList.stream()
-                .filter(message -> message.getId().equals(uuid))
-                .findAny()
-                .orElse(null);
-        if (messages == null) {
-            System.out.println("메시지가 존재하지 않습니다.");
-            return null;
-        } else {
-            messages.updateMessage(changeMessage);
-            messageRepository.save(messages);
-        }
-        return messages;
+    public Message update(UUID messageId, String changeMessage) {
+        Message message = getMessage(messageId);
+        message.updateMessage(changeMessage);
+        messageRepository.save(message);
+        return message;
     }
 
 
     @Override
-    public void delete(String sender, UUID uuid) {
-        List<Message> messageList = find(sender);
-        Message messages = messageList.stream()
-                .filter(message -> message.getId().equals(uuid))
-                .findAny()
-                .orElse(null);
-        if(messages == null) {
-            System.out.println("메시지가 존재하지 않습니다.");
-        } else {
-            messageRepository.deleteFromFile(messages);
-        }
+    public void delete(UUID messageId) {
+        Message message = getMessage(messageId);
+        messageRepository.remove(message);
     }
 }
