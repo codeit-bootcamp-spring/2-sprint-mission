@@ -12,7 +12,7 @@ public class ReadStatus {
     private final UUID channelId;
     private Instant lastReadAt;
 
-    public ReadStatus(UUID id, UUID userId, UUID channelId, Instant lastReadAt, UUID id1) {
+    public ReadStatus(UUID userId, UUID channelId) {
         this.id = UUID.randomUUID();
         this.userId = userId;
         this.channelId = channelId;
