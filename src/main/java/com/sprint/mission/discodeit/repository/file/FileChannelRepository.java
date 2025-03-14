@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.constant.SubDirectory;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.utils.FileManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,9 +12,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@RequiredArgsConstructor
 public class FileChannelRepository implements ChannelRepository {
 
-    private final FileManager fileManager = new FileManager();
+    private final FileManager fileManager;
 
     @Override
     public Channel save(String channelName) {

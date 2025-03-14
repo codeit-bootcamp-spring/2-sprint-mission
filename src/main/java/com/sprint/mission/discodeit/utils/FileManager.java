@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.utils;
 
 import com.sprint.mission.discodeit.constant.SubDirectory;
 import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Component
 public class FileManager {
 
     private final String BASE_DIR = System.getProperty("user.dir") + "\\src\\main\\resources\\dir\\";

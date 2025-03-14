@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.constant.SubDirectory;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.utils.FileManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,9 +12,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@RequiredArgsConstructor
 public class FileUserRepository implements UserRepository {
 
-    private final FileManager fileManager = new FileManager();
+    private final FileManager fileManager;
 
     @Override
     public User save(String nickname, String password) {

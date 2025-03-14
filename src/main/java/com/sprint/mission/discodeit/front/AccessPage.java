@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.front;
 
 import com.sprint.mission.discodeit.controller.UserController;
+import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
 import java.util.UUID;
 
+@Component
 public class AccessPage {
 
-    UserController userController = new UserController();
+    UserController userController;
     Scanner sc = new Scanner(System.in);
 
     public UUID initPage() {

@@ -6,15 +6,17 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.utils.FileManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
 @Repository
+@RequiredArgsConstructor
 public class FileMessageRepository implements MessageRepository {
 
-    private final FileManager fileManager = new FileManager();
+    private final FileManager fileManager;
 
     @Override
     public Message save(UUID channelUUID, UUID userUUID, String content) {
