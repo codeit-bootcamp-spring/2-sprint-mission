@@ -105,7 +105,7 @@ public class FileUserRepository implements UserRepository {
             Files.deleteIfExists(userPath);
             Files.deleteIfExists(serverPath);
             registeredUsers = new ArrayList<>();
-            Map<UUID, List<Server>> serverList = new ConcurrentHashMap<>();
+            serverList = new ConcurrentHashMap<>();
         } catch (IOException e) {
             System.out.println("리스트 초기화 실패");
         }
