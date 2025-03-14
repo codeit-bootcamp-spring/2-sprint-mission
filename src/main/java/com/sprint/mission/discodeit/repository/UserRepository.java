@@ -10,4 +10,6 @@ public interface UserRepository extends Repository<User> {
     void updateProfileId(UUID userId, UUID newProfileId);
     boolean existsByUserName(String userName);
     boolean existsByEmail(String email);
+    User findByUserName(String userName);
+    User findByEmail(String email);
 }
