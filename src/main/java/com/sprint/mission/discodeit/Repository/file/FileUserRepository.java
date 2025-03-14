@@ -18,12 +18,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FileUserRepository implements UserRepository {
     private  List<User> registeredUsers = new ArrayList<>();
     private  Map<UUID, List<Server>> serverList = new ConcurrentHashMap<>();
+    private  Map<UUID, List<User>> serverUser = new ConcurrentHashMap<>();
+
     private final Path userPath =  Paths.get(System.getProperty("user.dir"), "data", "UserList.ser");
     private final Path serverPath =  Paths.get(System.getProperty("user.dir"), "data", "ServerList.ser");
+    private final Path serverUserPath =  Paths.get(System.getProperty("user.dir"), "data", "ServerUserList.ser");
 
     public FileUserRepository() {
         loadUserList();
         loadServerList();
+        loadServerUserList();
     }
 
     // 서버 리스트를 저장할 디렉토리가 있는지 확인
@@ -47,6 +51,20 @@ public class FileUserRepository implements UserRepository {
 
                 Map<UUID, List<Server>> list = (Map<UUID, List<Server>>) ois.readObject();
                 serverList = list;
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("서버 리스트 로드 실패");
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void loadServerUserList() {
+        if (Files.exists(serverUserPath)) {
+            try (FileInputStream fis = new FileInputStream(serverPath.toFile());
+                 ObjectInputStream ois = new ObjectInputStream(fis)) {
+
+                Map<UUID, List<User>> list = (Map<UUID, List<User>>) ois.readObject();
+                serverUser = list;
             } catch (IOException | ClassNotFoundException e) {
                 System.out.println("서버 리스트 로드 실패");
                 throw new RuntimeException(e);
@@ -99,13 +117,28 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
+    private void saveServerUserList() {
+        init();
+        try (FileOutputStream fos = new FileOutputStream(serverUserPath.toFile());
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+
+            oos.writeObject(serverUser);
+
+        } catch (IOException e) {
+            System.out.println("서버 리스트 저장 실패");
+            throw new RuntimeException(e);
+        }
+    }
+
     public void clear() {
         init();
         try {
             Files.deleteIfExists(userPath);
             Files.deleteIfExists(serverPath);
+            Files.deleteIfExists(serverUserPath);
             registeredUsers = new ArrayList<>();
             serverList = new ConcurrentHashMap<>();
+            serverUser = new ConcurrentHashMap<>();
         } catch (IOException e) {
             System.out.println("리스트 초기화 실패");
         }
@@ -135,6 +168,18 @@ public class FileUserRepository implements UserRepository {
         saveServerList();
 
         return server.getServerId();
+    }
+
+    @Override
+    public UUID joinServer(User user, User owner, Server server) {
+        List<User> users = serverUser.getOrDefault(user.getId(), new ArrayList<>());
+        users.add(user);
+        serverUser.put(server.getServerId(), users);
+
+        System.out.println("✅ joinServer 서버내 유저 저장됨: " + server);
+        System.out.println("✅ joinServer 현재 저장된 서버 목록: " + serverUser);
+        saveServerUserList();
+        return user.getId();
     }
 
     @Override
@@ -227,6 +272,16 @@ public class FileUserRepository implements UserRepository {
         saveServerList();
 
         return targetServer.getServerId();
+    }
+
+
+    @Override
+    public UUID quitServer(User user, Server server) {
+        List<User> users = serverUser.get(server.getServerId());
+        users.remove(user);
+        saveServerUserList();
+
+        return server.getServerId();
     }
 }
 

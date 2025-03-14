@@ -68,7 +68,8 @@ public class FileUserService implements UserService {
         User findUser = userRepository.findUserByUserId(UID);
         User ownerUser = userRepository.findUserByUserId(UOID);
         Server findServer = userRepository.findServerByServerId(ownerUser, SID);
-        UUID uuid = userRepository.saveServer(findUser, findServer);
+
+        UUID uuid = userRepository.joinServer(findUser,ownerUser,findServer );
 
         return uuid;
     }

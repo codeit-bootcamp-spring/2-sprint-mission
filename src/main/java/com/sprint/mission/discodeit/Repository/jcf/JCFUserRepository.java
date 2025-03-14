@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JCFUserRepository implements UserRepository {
     private  List<User> registeredUsers = new ArrayList<>();
     private  Map<UUID, List<Server>> serverList = new ConcurrentHashMap<>();
+    private  Map<UUID, List<User>> serverUser = new ConcurrentHashMap<>();
 
     @Override
     public UUID saveUser(User user) {
@@ -35,6 +36,18 @@ public class JCFUserRepository implements UserRepository {
         System.out.println("✅ saveServer 현재 저장된 서버 목록: " + serverList);
 
         return server.getServerId();
+    }
+
+    @Override
+    public UUID joinServer(User user, User owner, Server server) {
+        List<User> users = serverUser.getOrDefault(user.getId(), new ArrayList<>());
+        users.add(user);
+        serverUser.put(server.getServerId(), users);
+
+        System.out.println("✅ joinServer 서버내 유저 저장됨: " + server);
+        System.out.println("✅ joinServer 현재 저장된 서버 목록: " + serverUser);
+
+        return user.getId();
     }
 
     @Override
@@ -119,5 +132,13 @@ public class JCFUserRepository implements UserRepository {
         serverList.put(owner.getId(), serverListByOwner);
 
         return targetServer.getServerId();
+    }
+
+    @Override
+    public UUID quitServer(User user, Server server) {
+        List<User> users = serverUser.get(server.getServerId());
+        users.remove(user);
+
+        return server.getServerId();
     }
 }

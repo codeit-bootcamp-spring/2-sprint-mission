@@ -40,6 +40,17 @@ public interface UserRepository {
     UUID saveServer(User user, Server server);
 
     /**
+     * 사용자가 서버에 가입합니다.
+     *
+     * @param user 서버를 생성하는 사용자
+     * @param owner 저장할 서버의 주인장
+     * @param server 저장할 서버 객체
+     * @return 생성된 서버의 고유 식별자 (UUID)
+     * @throws IllegalArgumentException 유효하지 않은 서버 정보가 입력된 경우
+     */
+    UUID joinServer(User user, User owner, Server server);
+
+    /**
      * 특정 사용자를 조회합니다.
      *
      * @param user 조회할 사용자 객체
@@ -123,9 +134,19 @@ public interface UserRepository {
      *
      * @param owner  서버 소유자 (User)
      * @param server 삭제할 서버 객체
-     * @return 삭제된 서버의 UUID
+     * @return 나간 서버의 UUID
      * @throws ServerNotFoundException     해당 서버가 존재하지 않는 경우
      */
     UUID removeServer(User owner, Server server);
+
+    /**
+     * 특정 사용자가 서버에서 나갑니다.
+     *
+     * @param user  서버 사용자 (User)
+     * @param server 나갈 서버 객체
+     * @return 삭제된 서버의 UUID
+     * @throws ServerNotFoundException     해당 서버가 존재하지 않는 경우
+     */
+    UUID quitServer(User user, Server server);
 
 }
