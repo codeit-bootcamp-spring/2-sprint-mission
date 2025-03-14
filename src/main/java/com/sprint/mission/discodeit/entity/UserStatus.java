@@ -1,23 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@NoArgsConstructor
-@Entity
-@Table(name = "user_status")
-public class UserStatus extends BaseEntity {
+public class UserStatus {
+    private final UUID id;
     private UUID userId;
     private Instant lastSeenAt;
 
     public UserStatus(UUID id, UUID userId, Instant lastSeenAt) {
-        super(id);
+        this.id = UUID.randomUUID();
         this.userId = userId;
         this.lastSeenAt = lastSeenAt;
     }
