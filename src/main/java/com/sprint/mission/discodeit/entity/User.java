@@ -58,4 +58,8 @@ public class User implements Serializable {
             this.updatedAt = Instant.now();
         }
     }
+
+    public boolean hasProfile() {
+        return this.profileId != null;
+    }
 }

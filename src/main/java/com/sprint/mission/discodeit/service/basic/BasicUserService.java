@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.*;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -20,12 +19,14 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public UserCreateResponseDto create(UserCreateRequestDto userCreateRequestDto) {
         validateUserCreateRequestDto(userCreateRequestDto);
 
-        User user = new User(userCreateRequestDto.username(), userCreateRequestDto.email(), userCreateRequestDto.password(), userCreateRequestDto.profileId());
+        User user = new User(userCreateRequestDto.username(),
+                userCreateRequestDto.email(), userCreateRequestDto.password(), userCreateRequestDto.profileId());
         userRepository.save(user);
 
         UserStatus userStatus = new UserStatus(user.getId());
@@ -45,8 +46,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto find(UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
+        User user = getUserBy(userId);
 
         return UserResponseDto.fromEntity(user, isOnline(userId));
     }
@@ -65,18 +65,30 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword, UUID profileId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword, profileId);
-        return userRepository.save(user);
+    public UserUpdateResponseDto update(UserUpdateRequestDto userUpdateRequestDto) {
+        User user = getUserBy(userUpdateRequestDto.id());
+        user.update(userUpdateRequestDto.username(), userUpdateRequestDto.email(),
+                 userUpdateRequestDto.password(), userUpdateRequestDto.profileId());
+        userRepository.save(user);
+
+        return UserUpdateResponseDto.fromEntity(user);
     }
 
     @Override
     public void delete(UUID userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " not found");
+        User user = getUserBy(userId);
+
+        if(user.hasProfile()) {
+            binaryContentRepository.deleteById(user.getProfileId());
         }
+
+        userStatusRepository.deleteByUserId(userId);
+
         userRepository.deleteById(userId);
+    }
+
+    private User getUserBy(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
     }
 }
