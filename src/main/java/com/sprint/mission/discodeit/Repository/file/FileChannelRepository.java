@@ -66,6 +66,16 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
+    public void clear() {
+        init();
+        try {
+            Files.deleteIfExists(path);
+            messageList = new ConcurrentHashMap<>();
+        } catch (IOException e) {
+            System.out.println("리스트 초기화 실패");
+        }
+    }
+
     @Override
     public void saveMessage(Message message) {
         messageList.computeIfAbsent(message.getChannelId(), k -> new ArrayList<>()).add(message);

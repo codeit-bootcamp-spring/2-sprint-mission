@@ -25,6 +25,12 @@ public class FileChannelService implements ChannelService{
         this.channelRepository = channelRepository;
     }
 
+    public void clearMessage(boolean adminAuth) {
+        if (adminAuth == true) {
+            channelRepository.clear();
+        }
+    }
+
     @Override
     public Message write(String creatorId, String channelId, String text) {
         UUID UID = UUID.fromString(creatorId);
