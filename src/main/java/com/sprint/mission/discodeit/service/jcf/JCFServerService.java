@@ -6,20 +6,19 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ServerService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class JCFServerService implements ServerService {
     private final JCFUserRepository userRepository;
     private final JCFServerRepository serverRepository;
 
-    public JCFServerService(JCFUserRepository userRepository, JCFServerRepository serverRepository) {
-        this.userRepository = userRepository;
-        this.serverRepository = serverRepository;
-    }
+
     @Override
     public void reset(boolean adminAuth) {
         if (adminAuth == true) {

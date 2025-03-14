@@ -8,22 +8,19 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class FileChannelService implements ChannelService{
     private final FileUserRepository userRepository;
     private final FileServerRepository serverRepository;
     private final FileChannelRepository channelRepository;
 
-    public FileChannelService(FileUserRepository userRepository, FileServerRepository serverRepository, FileChannelRepository channelRepository) {
-        this.userRepository = userRepository;
-        this.serverRepository = serverRepository;
-        this.channelRepository = channelRepository;
-    }
 
     @Override
     public void reset(boolean adminAuth) {

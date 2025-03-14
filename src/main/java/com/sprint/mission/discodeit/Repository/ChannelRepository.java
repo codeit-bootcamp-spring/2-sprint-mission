@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.Repository;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public interface ChannelRepository {
     /**
      * 리스트를 초기화합니다.

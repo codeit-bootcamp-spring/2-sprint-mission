@@ -8,18 +8,17 @@ import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class FileUserService implements UserService {
     private final FileUserRepository userRepository;
 
-    public FileUserService(FileUserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public void reset(boolean adminAuth) {

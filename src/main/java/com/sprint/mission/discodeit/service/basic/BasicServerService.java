@@ -6,20 +6,17 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ServerService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BasicServerService implements ServerService {
     private final UserRepository userRepository;
     private final ServerRepository serverRepository;
-
-    public BasicServerService(UserRepository userRepository, ServerRepository serverRepository) {
-        this.userRepository = userRepository;
-        this.serverRepository = serverRepository;
-    }
 
     @Override
     public void reset(boolean adminAuth) {
