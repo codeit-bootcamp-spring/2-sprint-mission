@@ -9,6 +9,13 @@ import java.util.Optional;
 
 public class FileSerializationUtil {
 
+    public <T extends BaseEntity> void writeObjectToFile(T t, Path filePath) {
+        if (!Files.exists(filePath.getParent())) {
+            try {
+                Files.createDirectories(filePath.getParent());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
 
