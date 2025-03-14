@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 
-public class DiscodeitApplication {
+public class DiscodeitApplication {/*
 	static User setupUser(UserService userService) {
 		User user = userService.create("woody", "woody@codeit.com", "woody1234");
 		return user;
@@ -34,6 +34,6 @@ public class DiscodeitApplication {
 		UserService userService;
 		ChannelService channelService;
 		MessageService messageService;
-	}
+	}*/
 
 }

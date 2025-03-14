@@ -24,6 +24,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByUsername(String username) {
+        return Optional.ofNullable(this.data.get(username));
+    }
+
+    @Override
     public List<User> findAll() {
         return this.data.values().stream().toList();
     }
@@ -36,5 +41,11 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public void deleteById(UUID id) {
         this.data.remove(id);
+    }
+
+    public boolean existsByUsernameOrEmail(String username, String email) {
+        if(username.isEmpty() || email.isEmpty()) {
+            return false;
+        }else return true;
     }
 }
