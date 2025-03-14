@@ -4,7 +4,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
 
+@Getter
 public class Channel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -23,30 +25,6 @@ public class Channel implements Serializable {
         this.type = type;
         this.name = name;
         this.description = description;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public ChannelType getType() {
-        return type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public void update(String newName, String newDescription) {
