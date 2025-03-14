@@ -12,18 +12,27 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class JCFUserRepository implements UserRepository {
-    private final List<User> registeredUsers = new ArrayList<>();
-    private final Map<UUID, List<Server>> serverList = new ConcurrentHashMap<>();
+    private  List<User> registeredUsers = new ArrayList<>();
+    private  Map<UUID, List<Server>> serverList = new ConcurrentHashMap<>();
 
     @Override
     public UUID saveUser(User user) {
         registeredUsers.add(user);
+
+        System.out.println("🔍 saveUser: 요청된 userId: " + user.getId());
+        System.out.println("🔍 saveUser: 현재 저장된 유저 목록: " + registeredUsers);
+
         return user.getId();
     }
 
     @Override
     public UUID saveServer(User user, Server server) {
-        serverList.computeIfAbsent(user.getId(), k -> new ArrayList<>()).add(server);
+        List<Server> servers = serverList.getOrDefault(user.getId(), new ArrayList<>());
+        servers.add(server);
+        serverList.put(user.getId(), servers);
+
+        System.out.println("✅ saveServer 서버 저장됨: " + server);
+        System.out.println("✅ saveServer 현재 저장된 서버 목록: " + serverList);
 
         return server.getServerId();
     }
@@ -39,8 +48,8 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User findUserByUserId(UUID userId) {
-        System.out.println("🔍 요청된 userId: " + userId);
-        System.out.println("🔍 현재 저장된 유저 목록: " + registeredUsers);
+        System.out.println("🔍 findUserByUserId: 요청된 userId: " + userId);
+        System.out.println("🔍 findUserByUserId: 현재 저장된 유저 목록: " + registeredUsers);
 
         User user = registeredUsers.stream()
                 .filter(u -> u.getId().equals(userId))
@@ -56,6 +65,9 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public List<Server> findServerListByOwner(User owner) {
+        System.out.println("🔍 요청된 userId (서버 검색): " + owner.getId());
+        System.out.println("🔍 현재 저장된 서버 목록: " + serverList);
+
         List<Server> list = Optional.ofNullable(serverList.get(owner.getId())).orElseThrow(() -> new ServerNotFoundException("서버 리스트가 비어있습니다."));
         return list;
     }

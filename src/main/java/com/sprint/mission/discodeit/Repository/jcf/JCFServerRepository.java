@@ -5,24 +5,36 @@ import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class JCFServerRepository implements ServerRepository {
-    private Map<UUID, List<User>> channelUsers = new ConcurrentHashMap<>();
+    private Map<UUID, List<User>> channelUsers = new ConcurrentHashMap<>( );
     private Map<UUID, List<Channel>> channelList = new ConcurrentHashMap<>();
 
     @Override
     public UUID saveUser(Channel channel, User user) {
-        channelUsers.computeIfAbsent(channel.getChannelId(), k -> new ArrayList<>()).add(user);
+        List<User> users = channelUsers.get(channel.getChannelId());
+        if (users == null) {
+            users = new ArrayList<>();
+        }
+        users.add(user);
+        channelUsers.put(channel.getChannelId(), users);
 
         return user.getId();
     }
 
     @Override
     public UUID saveChannel(Server server, Channel channel) {
-        channelList.computeIfAbsent(server.getServerId(), k -> new ArrayList<>()).add(channel);
+        List<Channel> channels = channelList.get(server.getServerId());
+        if (channels == null) {
+            channels = new ArrayList<>();
+        }
+        channels.add(channel);
+        channelList.put(server.getServerId(), channels);
 
         return channel.getChannelId();
     }
@@ -63,15 +75,21 @@ public class JCFServerRepository implements ServerRepository {
 
     @Override
     public List<User> findUserListByChannelId(UUID channelId) {
-        List<User> users = Optional.ofNullable(channelUsers.get(channelId))
-                .orElseThrow(() -> new EmptyUserListException("유저 리스트가 비어있습니다."));
+
+        List<User> users = channelUsers.get(channelId);
+        if (users == null) {
+            throw  new EmptyUserListException("유저 리스트가 비어있습니다.");
+        }
+
         return users;
     }
 
     @Override
     public List<Channel> findChannelListByServerId(UUID serverId) {
-        List<Channel> channels = Optional.ofNullable(channelList.get(serverId))
-                .orElseThrow(() -> new EmptyChannelListException("채널 리스트가 비어있습니다."));
+        List<Channel> channels = channelList.get(serverId);
+        if (channels == null) {
+            throw new EmptyChannelListException("채널 리스트가 비어있습니다.");
+        }
         return channels;
     }
 

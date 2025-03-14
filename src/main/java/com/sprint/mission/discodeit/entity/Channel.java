@@ -7,17 +7,24 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 @Getter
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    @ToString.Include
     private final UUID channelId;
+    @ToString.Include
     private final UUID serverId;
+    @ToString.Include
     private final UUID creatorId;
+    @ToString.Include
+    private String name;
+
     public final Instant createdAt;
     public Instant updatedAt;
 
-    private String name;
+
 
 
     public Channel(UUID serverId, UUID creatorId, String name) {

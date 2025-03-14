@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.Exception.ServerNotFoundException;
 import com.sprint.mission.discodeit.Exception.UnauthorizedAccessException;
 import com.sprint.mission.discodeit.Exception.UserNotFoundException;
 import com.sprint.mission.discodeit.Repository.UserRepository;
-import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
@@ -18,8 +17,8 @@ import java.util.UUID;
 public class JCFUserService implements UserService {
     private final UserRepository userRepository;
 
-    public JCFUserService() {
-        userRepository = new JCFUserRepository();
+    public JCFUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -55,12 +54,14 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public UUID joinServer(String userId, String serverId) {
+    public UUID joinServer(String userId, String ownerId, String serverId) {
         UUID UID = UUID.fromString(userId);
+        UUID UOID = UUID.fromString(ownerId);
         UUID SID = UUID.fromString(serverId);
 
         User findUser = userRepository.findUserByUserId(UID);
-        Server findServer = userRepository.findServerByServerId(findUser, SID);
+        User ownerUser = userRepository.findUserByUserId(UOID);
+        Server findServer = userRepository.findServerByServerId(ownerUser, SID);
         UUID uuid = userRepository.saveServer(findUser, findServer);
 
         return uuid;

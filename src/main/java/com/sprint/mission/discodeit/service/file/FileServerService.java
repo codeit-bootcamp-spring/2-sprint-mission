@@ -8,17 +8,19 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ServerService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class FileServerService implements ServerService {
-    private UserRepository userRepository;
-    private ServerRepository serverRepository;
+    private final UserRepository userRepository;
+    private final ServerRepository serverRepository;
 
-    public FileServerService( ) {
-        this.userRepository = new FileUserRepository();
-        this.serverRepository = new FileServerRepository();
+    public FileServerService(UserRepository userRepository, ServerRepository serverRepository) {
+        this.userRepository = userRepository;
+        this.serverRepository = serverRepository;
     }
 
     @Override

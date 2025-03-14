@@ -54,7 +54,7 @@ public interface UserService {
      * @throws UserNotFoundException 해당 ID의 사용자가 존재하지 않는 경우
      * @throws ServerNotFoundException 해당 ID의 서버가 존재하지 않는 경우
      */
-    UUID joinServer(String userId, String serverId);
+    UUID joinServer(String userId, String ownerId, String serverId);
 
     /**
      * 특정 서버를 조회합니다.

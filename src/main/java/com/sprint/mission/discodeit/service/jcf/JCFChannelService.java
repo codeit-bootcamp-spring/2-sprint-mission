@@ -7,17 +7,19 @@ import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 
+@Service
 public class JCFChannelService implements ChannelService {
-    private ServerRepository serverRepository;
-    private ChannelRepository channelRepository;
+    private final ServerRepository serverRepository;
+    private final ChannelRepository channelRepository;
 
-    public JCFChannelService() {
-        serverRepository = new JCFServerRepository();
-        channelRepository = new JCFChannelRepository();
+    public JCFChannelService(ServerRepository serverRepository, ChannelRepository channelRepository) {
+        this.serverRepository = serverRepository;
+        this.channelRepository = channelRepository;
     }
 
     @Override

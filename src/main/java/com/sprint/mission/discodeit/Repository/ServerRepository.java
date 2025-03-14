@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.Repository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;

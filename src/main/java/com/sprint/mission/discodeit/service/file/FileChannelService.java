@@ -9,17 +9,19 @@ import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class FileChannelService implements ChannelService{
-    private ServerRepository serverRepository;
-    private ChannelRepository channelRepository;
+    private final ServerRepository serverRepository;
+    private final ChannelRepository channelRepository;
 
-    public FileChannelService() {
-        serverRepository = new FileServerRepository();
-        channelRepository = new FileChannelRepository();
+    public FileChannelService(ServerRepository serverRepository, ChannelRepository channelRepository) {
+        this.serverRepository = serverRepository;
+        this.channelRepository = channelRepository;
     }
 
     @Override

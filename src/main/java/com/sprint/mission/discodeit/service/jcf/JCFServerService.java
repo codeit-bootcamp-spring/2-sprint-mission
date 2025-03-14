@@ -15,12 +15,12 @@ import java.util.UUID;
 
 @Service
 public class JCFServerService implements ServerService {
-    private UserRepository userRepository;
-    private ServerRepository serverRepository;
+    private final UserRepository userRepository;
+    private final ServerRepository serverRepository;
 
-    public JCFServerService( ) {
-        this.userRepository = new JCFUserRepository();
-        this.serverRepository = new JCFServerRepository();
+    public JCFServerService(UserRepository userRepository, ServerRepository serverRepository) {
+        this.userRepository = userRepository;
+        this.serverRepository = serverRepository;
     }
 
     @Override
@@ -29,7 +29,9 @@ public class JCFServerService implements ServerService {
         UUID UID = UUID.fromString(creatorId);
 
         User user = userRepository.findUserByUserId(UID);
+        System.out.println(JCFUserRepository.class + " : " + "createChannel" + " : " + user.getId());
         Server findServer = userRepository.findServerByServerId(user, SID);
+        System.out.println(JCFUserRepository.class + " : " + "createChannel" + " : " + findServer.getServerId());
 
         Channel channel = new Channel(findServer.getServerId(), user.getId(), name);
         serverRepository.saveChannel(findServer, channel);

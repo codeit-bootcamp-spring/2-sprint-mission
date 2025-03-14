@@ -9,15 +9,17 @@ import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class FileUserService implements UserService {
     private final UserRepository userRepository;
 
-    public FileUserService() {
-        userRepository = new FileUserRepository();
+    public FileUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -50,7 +52,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public UUID joinServer(String userId, String serverId) {
+    public UUID joinServer(String userId, String ownerId, String serverId) {
         UUID UID = UUID.fromString(userId);
         UUID SID = UUID.fromString(serverId);
 

@@ -5,10 +5,12 @@ import com.sprint.mission.discodeit.Exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
     private Map<UUID, List<Message>> messageList = new ConcurrentHashMap<>();
 
