@@ -24,10 +24,10 @@ public class Message implements Serializable {
 
     public void updateContext(String context) {
         this.context = context;
-        updateTimestamp();
+        updateLastModified();
     }
 
-    private void updateTimestamp() {
+    private void updateLastModified() {
         this.updatedAt = Instant.now().toEpochMilli();
     }
 

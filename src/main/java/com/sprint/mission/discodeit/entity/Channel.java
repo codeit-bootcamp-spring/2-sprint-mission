@@ -25,15 +25,15 @@ public class Channel implements Serializable {
 
     public void addMember(UUID userId) {
         userIds.add(userId);
-        updateTimestamp();
+        updateLastModified();
     }
 
     public void updateName(String name) {
         this.name = name;
-        updateTimestamp();
+        updateLastModified();
     }
 
-    private void updateTimestamp() {
+    private void updateLastModified() {
         this.updatedAt = Instant.now().toEpochMilli();
     }
 
