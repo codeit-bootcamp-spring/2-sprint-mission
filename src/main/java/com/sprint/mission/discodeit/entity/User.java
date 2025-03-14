@@ -17,6 +17,7 @@ public class User implements Serializable {
 
     @ToString.Include
     private String name;
+    private String email;
     private String password;
 
     public UUID profileId;
@@ -25,20 +26,26 @@ public class User implements Serializable {
     public Instant updatedAt;
 
 
-    public User(String name, String password) {
-        this(UUID.randomUUID(), Instant.now(), name, password);
+    public User(String name, String email, String password) {
+        this(UUID.randomUUID(), Instant.now(), name, email, password);
     }
 
-    public User(UUID id, Instant createdAt, String name, String password) {
+    public User(UUID id, Instant createdAt, String name, String email, String password) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
         this.name = name;
+        this.email = email;
         this.password = password;
     }
 
     public void setName(String name) {
         this.name = name;
+        updatedAt = Instant.now();
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
         updatedAt = Instant.now();
     }
 }
