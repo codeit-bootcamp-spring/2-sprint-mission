@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserReadResponse;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
@@ -12,9 +13,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -65,17 +64,22 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateUserName(UUID userId, String newUserName) {
-        this.userRepository.updateUserName(userId, newUserName);
-    }
-
-    @Override
-    public void updatePassword(UUID userId, String newPassword) {
-        this.userRepository.updatePassword(userId, newPassword);
+    public void updateUser(UserUpdateRequest userUpdateRequest) {
+        User findUser = this.userRepository.findById(userUpdateRequest.userId());
+        if (!findUser.getUserName().equals(userUpdateRequest.userName())) {
+            this.userRepository.updateUserName(findUser.getId(), userUpdateRequest.userName());
+        }
+        if (!findUser.getPassword().equals(userUpdateRequest.password())) {
+            this.userRepository.updatePassword(findUser.getId(), userUpdateRequest.password());
+        }
+        if (!findUser.getProfileId().equals(userUpdateRequest.profileId())) {
+            this.userRepository.updateProfileId(findUser.getId(), userUpdateRequest.profileId());
+        }
     }
 
     @Override
     public void deleteUser(UUID userId) {
         this.userRepository.deleteById(userId);
+
     }
 }
