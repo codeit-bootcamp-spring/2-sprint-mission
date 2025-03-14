@@ -22,6 +22,19 @@ public class FileServerService implements ServerService {
         this.serverRepository = serverRepository;
     }
 
+    public void clearAll(boolean adminAuth) {
+        if (adminAuth == true) {
+            userRepository.clear();
+            serverRepository.clear();
+        }
+    }
+
+    public void clearServerRepository(boolean adminAuth) {
+        if (adminAuth == true) {
+            serverRepository.clear();
+        }
+    }
+
     @Override
     public UUID createChannel(String serverId, String creatorId, String name) {
         UUID SID = UUID.fromString(serverId);

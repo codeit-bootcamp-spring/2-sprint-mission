@@ -100,6 +100,20 @@ public class FileServerRepository implements ServerRepository {
             throw new RuntimeException(e);
         }
     }
+
+
+    public void clear() {
+        init();
+        try {
+            Files.deleteIfExists(channelPath);
+            Files.deleteIfExists(channelPath);
+            channelUsers = new ConcurrentHashMap<>();
+            channelList = new ConcurrentHashMap<>();
+        } catch (IOException e) {
+            System.out.println("리스트 초기화 실패");
+        }
+    }
+
     @Override
     public UUID saveUser(Channel channel, User user) {
         List<User> users = channelUsers.get(channel.getChannelId());
