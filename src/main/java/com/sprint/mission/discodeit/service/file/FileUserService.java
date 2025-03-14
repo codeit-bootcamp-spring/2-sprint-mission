@@ -21,6 +21,12 @@ public class FileUserService implements UserService {
         this.userRepository = userRepository;
     }
 
+    public void clear(boolean adminAuth) {
+        if (adminAuth == true) {
+            userRepository.clear();
+        }
+    }
+
     @Override
     public UUID registerUser(String userName, String password) {
         User user = new User(userName, password);

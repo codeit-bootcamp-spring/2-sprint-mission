@@ -62,6 +62,7 @@ public class FileUserRepository implements UserRepository {
                 List<User> list = (List<User>) ois.readObject();
                 for (User user : list) {
                     User u = new User(user.getId(), user.getCreatedAt(), user.getName(), user.getPassword());
+                    registeredUsers.add(u);
                 }
 
 
@@ -95,6 +96,18 @@ public class FileUserRepository implements UserRepository {
         } catch (IOException e) {
             System.out.println("서버 리스트 저장 실패");
             throw new RuntimeException(e);
+        }
+    }
+
+    public void clear() {
+        init();
+        try {
+            Files.deleteIfExists(userPath);
+            Files.deleteIfExists(serverPath);
+            registeredUsers = new ArrayList<>();
+            Map<UUID, List<Server>> serverList = new ConcurrentHashMap<>();
+        } catch (IOException e) {
+            System.out.println("리스트 초기화 실패");
         }
     }
 
