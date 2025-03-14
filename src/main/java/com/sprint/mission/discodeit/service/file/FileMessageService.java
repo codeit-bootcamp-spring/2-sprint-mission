@@ -20,7 +20,7 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void sendMessage(UUID channelUUID, UUID userUUID, String content) {
-        Message message = new Message(channelUUID, userUUID, content);
+        Message message = new Message(content, userUUID, channelUUID);
 
         try {
             String fileName = "message.ser";

@@ -20,7 +20,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message save(UUID channelUUID, UUID userUUID, String content) {
-        Message message = new Message(channelUUID, userUUID, content);
+        Message message = new Message(content, userUUID, channelUUID);
         fileManager.writeToFile(SubDirectory.MESSAGE, message, message.getId());
         return message;
     }

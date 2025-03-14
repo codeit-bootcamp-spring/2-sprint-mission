@@ -1,16 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends BaseEntity {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.io.Serializable;
+
+@Getter
+@AllArgsConstructor
+public class Channel extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private String channelName;
-
-    public Channel(String channelName) {
-        this.channelName = channelName;
-    }
-
-    public String getChannelName() {
-        return channelName;
-    }
 
     public void updateChannelName(String channelName) {
         super.updateTime();

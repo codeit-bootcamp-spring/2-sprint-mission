@@ -7,14 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-    ChannelRepository channelRepository;
+    private final ChannelRepository channelRepository;
 
     @Override
     public void createChannel(String channelName) {

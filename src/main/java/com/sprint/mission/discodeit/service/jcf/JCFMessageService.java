@@ -29,7 +29,7 @@ public class JCFMessageService implements MessageService {
             return;
         }
 
-        Message message = new Message(channelUUID, userUUID, content);
+        Message message = new Message(content, userUUID, channelUUID);
         messageList.add(message);
 
         System.out.println("메세지 전송 성공" + message);
