@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.Exception.UserNotFoundException;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -13,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class FileUserRepository implements UserRepository {
     private  List<User> registeredUsers = new ArrayList<>();
     private  Map<UUID, List<Server>> serverList = new ConcurrentHashMap<>();
@@ -100,21 +102,27 @@ public class FileUserRepository implements UserRepository {
     public UUID saveUser(User user) {
         registeredUsers.add(user);
 
+        System.out.println("🔍 saveUser: 요청된 userId: " + user.getId());
+        System.out.println("🔍 saveUser: 현재 저장된 유저 목록: " + registeredUsers);
+
         saveUserList();
 
         return user.getId();
     }
 
-
     @Override
     public UUID saveServer(User user, Server server) {
-        serverList.computeIfAbsent(user.getId(), k -> new ArrayList<>()).add(server);
+        List<Server> servers = serverList.getOrDefault(user.getId(), new ArrayList<>());
+        servers.add(server);
+        serverList.put(user.getId(), servers);
+
+        System.out.println("✅ saveServer 서버 저장됨: " + server);
+        System.out.println("✅ saveServer 현재 저장된 서버 목록: " + serverList);
 
         saveServerList();
 
         return server.getServerId();
     }
-
 
     @Override
     public User findUser(User targetUser) {
@@ -127,10 +135,13 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User findUserByUserId(UUID userId) {
+        System.out.println("🔍 findUserByUserId: 요청된 userId: " + userId);
+        System.out.println("🔍 findUserByUserId: 현재 저장된 유저 목록: " + registeredUsers);
+
         User user = registeredUsers.stream()
                 .filter(u -> u.getId().equals(userId))
                 .findFirst()
-                .orElseThrow(()->new UserNotFoundException("해당 유저는 존재하지 않습니다." + userId));
+                .orElseThrow(() -> new UserNotFoundException("해당 유저는 존재하지 않습니다." + userId));
         return user;
     }
 
@@ -141,6 +152,9 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<Server> findServerListByOwner(User owner) {
+        System.out.println("🔍 요청된 userId (서버 검색): " + owner.getId());
+        System.out.println("🔍 현재 저장된 서버 목록: " + serverList);
+
         List<Server> list = Optional.ofNullable(serverList.get(owner.getId())).orElseThrow(() -> new ServerNotFoundException("서버 리스트가 비어있습니다."));
         return list;
     }
@@ -162,6 +176,7 @@ public class FileUserRepository implements UserRepository {
     public UUID updateUserName(User user, String replaceName) {
         User targetUser = findUser(user);
         targetUser.setName(replaceName);
+
         saveUserList();
         return targetUser.getId();
     }
@@ -174,6 +189,7 @@ public class FileUserRepository implements UserRepository {
         targetServer.setName(replaceName);
         serverList.put(owner.getId(), serverListByOwner);
         saveServerList();
+
         return targetServer.getServerId();
     }
 
@@ -181,7 +197,9 @@ public class FileUserRepository implements UserRepository {
     public UUID removeUser(User user) {
         User targetUser = findUser(user);
         registeredUsers.remove(targetUser);
+
         saveUserList();
+
         return targetUser.getId();
     }
 
@@ -192,7 +210,9 @@ public class FileUserRepository implements UserRepository {
 
         serverListByOwner.remove(targetServer);
         serverList.put(owner.getId(), serverListByOwner);
+
         saveServerList();
+
         return targetServer.getServerId();
     }
 }

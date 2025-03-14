@@ -1,27 +1,26 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Exception.EmptyMessageListException;
-import com.sprint.mission.discodeit.Repository.ChannelRepository;
-import com.sprint.mission.discodeit.Repository.ServerRepository;
-import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
+import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 
 @Service
 public class JCFChannelService implements ChannelService {
-    private final UserRepository userRepository;
-    private final ServerRepository serverRepository;
-    private final ChannelRepository channelRepository;
+    private final JCFUserRepository userRepository;
+    private final JCFServerRepository serverRepository;
+    private final JCFChannelRepository channelRepository;
 
-    public JCFChannelService(UserRepository userRepository, ServerRepository serverRepository, ChannelRepository channelRepository) {
+    public JCFChannelService(JCFUserRepository userRepository, JCFServerRepository serverRepository, JCFChannelRepository channelRepository) {
         this.userRepository = userRepository;
         this.serverRepository = serverRepository;
         this.channelRepository = channelRepository;

@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.Repository.ServerRepository;
-import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.file.FileServerRepository;
 import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -15,10 +14,10 @@ import java.util.UUID;
 
 @Service
 public class FileServerService implements ServerService {
-    private final UserRepository userRepository;
-    private final ServerRepository serverRepository;
+    private final FileUserRepository userRepository;
+    private final FileServerRepository serverRepository;
 
-    public FileServerService(UserRepository userRepository, ServerRepository serverRepository) {
+    public FileServerService(FileUserRepository userRepository, FileServerRepository serverRepository) {
         this.userRepository = userRepository;
         this.serverRepository = serverRepository;
     }
@@ -29,7 +28,9 @@ public class FileServerService implements ServerService {
         UUID UID = UUID.fromString(creatorId);
 
         User user = userRepository.findUserByUserId(UID);
+        System.out.println(JCFUserRepository.class + " : " + "createChannel" + " : " + user.getId());
         Server findServer = userRepository.findServerByServerId(user, SID);
+        System.out.println(JCFUserRepository.class + " : " + "createChannel" + " : " + findServer.getServerId());
 
         Channel channel = new Channel(findServer.getServerId(), user.getId(), name);
         serverRepository.saveChannel(findServer, channel);
@@ -144,5 +145,4 @@ public class FileServerService implements ServerService {
             return false;
         }
     }
-
 }

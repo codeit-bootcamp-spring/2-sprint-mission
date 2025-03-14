@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.Repository.ServerRepository;
-import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -15,10 +13,10 @@ import java.util.UUID;
 
 @Service
 public class JCFServerService implements ServerService {
-    private final UserRepository userRepository;
-    private final ServerRepository serverRepository;
+    private final JCFUserRepository userRepository;
+    private final JCFServerRepository serverRepository;
 
-    public JCFServerService(UserRepository userRepository, ServerRepository serverRepository) {
+    public JCFServerService(JCFUserRepository userRepository, JCFServerRepository serverRepository) {
         this.userRepository = userRepository;
         this.serverRepository = serverRepository;
     }

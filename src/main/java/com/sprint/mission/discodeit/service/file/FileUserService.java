@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.Exception.InvalidPasswordException;
 import com.sprint.mission.discodeit.Exception.ServerNotFoundException;
 import com.sprint.mission.discodeit.Exception.UnauthorizedAccessException;
 import com.sprint.mission.discodeit.Exception.UserNotFoundException;
-import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -16,9 +15,9 @@ import java.util.UUID;
 
 @Service
 public class FileUserService implements UserService {
-    private final UserRepository userRepository;
+    private final FileUserRepository userRepository;
 
-    public FileUserService(UserRepository userRepository) {
+    public FileUserService(FileUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -26,6 +25,9 @@ public class FileUserService implements UserService {
     public UUID registerUser(String userName, String password) {
         User user = new User(userName, password);
         userRepository.saveUser(user);
+
+        System.out.println("✅ 새 유저 등록됨: " + user);
+
         return user.getId();
     }
 
@@ -42,10 +44,10 @@ public class FileUserService implements UserService {
 
     public UUID createServer(String userOwnerId, String name) {
         UUID UID = UUID.fromString(userOwnerId);
-        User owner= userRepository.findUserByUserId(UID);
+        User owner;
 
+        owner = userRepository.findUserByUserId(UID);
         Server server = new Server(UID, name);
-
         userRepository.saveServer(owner, server);
         return server.getServerId();
 
@@ -54,10 +56,12 @@ public class FileUserService implements UserService {
     @Override
     public UUID joinServer(String userId, String ownerId, String serverId) {
         UUID UID = UUID.fromString(userId);
+        UUID UOID = UUID.fromString(ownerId);
         UUID SID = UUID.fromString(serverId);
 
         User findUser = userRepository.findUserByUserId(UID);
-        Server findServer = userRepository.findServerByServerId(findUser, SID);
+        User ownerUser = userRepository.findUserByUserId(UOID);
+        Server findServer = userRepository.findServerByServerId(ownerUser, SID);
         UUID uuid = userRepository.saveServer(findUser, findServer);
 
         return uuid;

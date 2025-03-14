@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.Exception.InvalidPasswordException;
 import com.sprint.mission.discodeit.Exception.ServerNotFoundException;
 import com.sprint.mission.discodeit.Exception.UnauthorizedAccessException;
 import com.sprint.mission.discodeit.Exception.UserNotFoundException;
-import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
@@ -15,9 +15,9 @@ import java.util.UUID;
 
 @Service
 public class JCFUserService implements UserService {
-    private final UserRepository userRepository;
+    private final JCFUserRepository userRepository;
 
-    public JCFUserService(UserRepository userRepository) {
+    public JCFUserService(JCFUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

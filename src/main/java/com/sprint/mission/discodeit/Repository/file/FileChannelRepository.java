@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.Exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -13,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private Map<UUID, List<Message>> messageList = new ConcurrentHashMap<>();
     private final Path path = Paths.get(System.getProperty("user.dir"), "data", "MessageList.ser");
@@ -101,14 +103,14 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public UUID removeMessage(Channel channel, Message message) {
+    public UUID removeMessage(Channel channel,  Message message) {
         List<Message> messages = findMessageListByChannel(channel);
         Message findMessage = findMessageByChannel(channel, message.getMessageId());
 
         messages.remove(findMessage);
         messageList.put(channel.getChannelId(), messages);
+
         saveMessageList();
         return findMessage.getMessageId();
-
     }
 }
