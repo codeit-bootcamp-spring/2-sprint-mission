@@ -1,4 +1,4 @@
-package com.sprint.mission.config;
+package com.sprint.mission.discodeit.constants;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

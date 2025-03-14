@@ -1,24 +1,27 @@
 package com.sprint.mission.discodeit.service.file;
 
 import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
+import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
 
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.UserService;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
-    public FileChannelService(ChannelRepository channelRepository, UserService userService) {
+    public FileChannelService(ChannelRepository channelRepository, UserRepository userRepository) {
         this.channelRepository = channelRepository;
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -61,17 +64,22 @@ public class FileChannelService implements ChannelService {
         Channel channel = channelRepository.findById(chanelId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
-        UserDto friend = userService.findByEmail(friendEmail);
-        channel.addMember(friend.id());
+        User friend = userRepository.findByEmail(friendEmail)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
+
+        channel.addMember(friend.getId());
         channelRepository.save(channel);
 
         return toDto(channel);
     }
 
     private ChannelDto toDto(Channel channel) {
-        List<UserDto> users = userService.findAllByIds(channel.getUserIds())
+        List<UserDto> users = channel.getUserIds()
                 .stream()
-                .map(user -> new UserDto(user.id(), user.name(), user.email()))
+                .map(userRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(user -> new UserDto(user.getId(), user.getName(), user.getEmail()))
                 .toList();
 
         return new ChannelDto(channel.getId(), channel.getName(), users);

@@ -13,7 +13,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,7 @@ class ChannelServiceTest {
         User user = userRepository.save(
                 new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
 
-        channelService = new JCFChannelService(new JCFChannelRepository(), new JCFUserService(userRepository));
+        channelService = new JCFChannelService(new JCFChannelRepository(), userRepository);
         setUpChannel = channelService.create(CHANNEL_NAME,
                 new UserDto(user.getId(), LONGIN_USER.getName(), LONGIN_USER.getEmail()));
     }

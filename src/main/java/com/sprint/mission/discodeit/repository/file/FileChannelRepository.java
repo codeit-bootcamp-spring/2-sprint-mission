@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.config.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.discodeit.constants.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 

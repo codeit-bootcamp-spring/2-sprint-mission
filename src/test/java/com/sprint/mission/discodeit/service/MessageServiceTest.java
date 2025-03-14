@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,7 @@ class MessageServiceTest {
         User user = userRepository.save(
                 new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
 
-        messageService = new JCFMessageService(new JCFMessageRepository(), new JCFUserService(userRepository));
+        messageService = new JCFMessageService(new JCFMessageRepository(), userRepository);
         setUpMessage = messageService.create(MESSAGE_CONTENT, UUID.randomUUID(), user.getId());
     }
 

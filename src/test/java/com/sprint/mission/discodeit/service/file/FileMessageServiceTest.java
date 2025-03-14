@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
-import static com.sprint.mission.config.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.constants.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.discodeit.constants.MessageInfo.MESSAGE_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -10,6 +10,8 @@ import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -25,24 +27,44 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class FileMessageServiceTest {
-    private static final Path USER_TEST_PATH = STORAGE_DIRECTORY.getPath()
-            .resolve("messageTestUser.ser");
-    private static final Path MESSAGE_TEST_PATH = STORAGE_DIRECTORY.getPath()
-            .resolve("messageTest.ser");
-    private final UserService userService = new FileUserService(
-            new FileUserRepository(USER_TEST_PATH));
-    private final MessageService messageService = new FileMessageService(
-            new FileMessageRepository(MESSAGE_TEST_PATH), userService);
-    private MessageDto setUpMessage;
-    private UserDto loginUser;
+    private Path userFilePath;
+    private Path messageFilePath;
+    private UserService userService;
+    private MessageService messageService;
+    private MessageDto initializedMessage;
+    private UserDto initializedUser;
 
     @BeforeEach
-    void setUp() throws IOException {
-        initializeFiles();
-        loginUser = userService.register(
-                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
+    void setUp() {
+        setUpTestFilePath();
+        initializeService();
 
-        setUpMessage = messageService.create(MESSAGE_CONTENT, UUID.randomUUID(), loginUser.id());
+        setUpUser();
+        setUpMessage();
+    }
+
+    private void initializeService() {
+        UserRepository userRepository = new FileUserRepository(userFilePath);
+        MessageRepository messageRepository = new FileMessageRepository(messageFilePath);
+
+        userService = new FileUserService(userRepository);
+        messageService = new FileMessageService(messageRepository, userRepository);
+    }
+
+    private void setUpTestFilePath() {
+        userFilePath = STORAGE_DIRECTORY.getPath()
+                .resolve(UUID.randomUUID() + ".ser");
+        messageFilePath = STORAGE_DIRECTORY.getPath()
+                .resolve(UUID.randomUUID() + ".ser");
+    }
+
+    private void setUpMessage() {
+        initializedMessage = messageService.create(MESSAGE_CONTENT, UUID.randomUUID(), initializedUser.id());
+    }
+
+    private void setUpUser() {
+        initializedUser = userService.register(
+                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
     }
 
     @AfterEach
@@ -51,20 +73,20 @@ class FileMessageServiceTest {
     }
 
     private void initializeFiles() throws IOException {
-        Files.deleteIfExists(MESSAGE_TEST_PATH);
-        Files.deleteIfExists(USER_TEST_PATH);
+        Files.deleteIfExists(userFilePath);
+        Files.deleteIfExists(messageFilePath);
     }
 
     @DisplayName("메세지 생성")
     @Test
     void create() {
-        assertThat(setUpMessage.context()).isEqualTo(MESSAGE_CONTENT);
+        assertThat(initializedMessage.context()).isEqualTo(MESSAGE_CONTENT);
     }
 
     @DisplayName("단일 메세지ID로 조회")
     @Test
     void findById() {
-        MessageDto message = messageService.findById(setUpMessage.messageId());
+        MessageDto message = messageService.findById(initializedMessage.messageId());
 
         assertThat(message.context())
                 .isEqualTo(MESSAGE_CONTENT);
@@ -74,8 +96,8 @@ class FileMessageServiceTest {
     @Test
     void findByChannelId() {
         Channel channel = new Channel("test", UUID.randomUUID());
-        messageService.create(MESSAGE_CONTENT, channel.getId(), loginUser.id());
-        messageService.create(MESSAGE_CONTENT + "123", channel.getId(), loginUser.id());
+        messageService.create(MESSAGE_CONTENT, channel.getId(), initializedUser.id());
+        messageService.create(MESSAGE_CONTENT + "123", channel.getId(), initializedUser.id());
 
         List<MessageDto> messages = messageService.findByChannelId(channel.getId());
 
@@ -85,16 +107,16 @@ class FileMessageServiceTest {
     @DisplayName("메세지의 내용을 업데이트 합니다")
     @Test
     void updateContext() {
-        messageService.updateContext(setUpMessage.messageId(), MESSAGE_CONTENT + "123");
+        messageService.updateContext(initializedMessage.messageId(), MESSAGE_CONTENT + "123");
 
-        assertThat(messageService.findById(setUpMessage.messageId()).context())
+        assertThat(messageService.findById(initializedMessage.messageId()).context())
                 .isNotEqualTo(MESSAGE_CONTENT);
     }
 
     @DisplayName("메세지를 삭제합니다")
     @Test
     void delete() {
-        UUID initId = setUpMessage.messageId();
+        UUID initId = initializedMessage.messageId();
         messageService.delete(initId);
 
         assertThatThrownBy(() -> messageService.findById(initId))
