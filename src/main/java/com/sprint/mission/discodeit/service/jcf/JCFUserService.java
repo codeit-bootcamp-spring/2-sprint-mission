@@ -20,9 +20,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public UserDto register(UserRegisterDto userRegisterDto) {
-        User savedUser = userRepository.save(
-                new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password())
-        );
+        User requestUser = new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password());
+        validateDuplicateEmail(requestUser);
+        User savedUser = userRepository.save(requestUser);
 
         return toDto(savedUser);
     }
@@ -79,5 +79,15 @@ public class JCFUserService implements UserService {
 
     private UserDto toDto(User user) {
         return new UserDto(user.getId(), user.getName(), user.getEmail());
+    }
+
+    private void validateDuplicateEmail(User requestUser) {
+        boolean isDuplicate = userRepository.findAll()
+                .stream()
+                .anyMatch(existingUser -> existingUser.isSameEmail(requestUser.getEmail()));
+
+        if (isDuplicate) {
+            throw new IllegalArgumentException("이미 존재하는 유저입니다");
+        }
     }
 }

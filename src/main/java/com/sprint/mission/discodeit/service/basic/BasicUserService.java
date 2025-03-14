@@ -22,7 +22,6 @@ public class BasicUserService implements UserService {
     public UserDto register(UserRegisterDto userRegisterDto) {
         User requestUser = new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password());
         validateDuplicateEmail(requestUser);
-
         User savedUser = userRepository.save(requestUser);
 
         return toDto(savedUser);
@@ -83,12 +82,12 @@ public class BasicUserService implements UserService {
     }
 
     private void validateDuplicateEmail(User requestUser) {
-        userRepository.findAll()
+        boolean isDuplicate = userRepository.findAll()
                 .stream()
-                .filter(existingUser -> existingUser.isSameEmail(requestUser.getEmail()))
-                .findFirst()
-                .ifPresent(u -> {
-                    throw new IllegalArgumentException("이미 존재하는 유저입니다");
-                });
+                .anyMatch(existingUser -> existingUser.isSameEmail(requestUser.getEmail()));
+
+        if (isDuplicate) {
+            throw new IllegalArgumentException("이미 존재하는 유저입니다");
+        }
     }
 }

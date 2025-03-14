@@ -343,7 +343,7 @@
 - [x] updateTimeStamp메서드 이름 수정하기
 - [x] 순환참조 탐구하기 : 같은 서비스 레이어에서 필드에 서비스보다는 레포지토지 참조
 - [ ] 파일 서비스에서 파일 Path 주입받는 부분보단 테스트를 위해서 change로 변수 바꾸기
-- [ ] findFirst부분 anyMatch 사용하기
+- [x] 중복이메일 예외 처리로직 중 filter + findFirst부분 anyMatch로 수정하기
 - [ ] 페이징 처리에 대해 탐구해보기
 - [x] JCF 레포지토리 save이후 null 체크부분 수정하기
 - [ ] 테스트에 대해서 좀 더 탐구하기 : 

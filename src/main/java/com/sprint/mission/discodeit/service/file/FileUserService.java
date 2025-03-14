@@ -21,18 +21,10 @@ public class FileUserService implements UserService {
     @Override
     public UserDto register(UserRegisterDto userRegisterDto) {
         User requestUser = new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password());
+        validateDuplicateEmail(requestUser);
+        User savedUser = userRepository.save(requestUser);
 
-        userRepository.findAll()
-                .stream()
-                .filter(existingUser -> existingUser.isSameEmail(requestUser.getEmail()))
-                .findFirst()
-                .ifPresent(u -> {
-                    throw new IllegalArgumentException("이미 존재하는 유저입니다");
-                });
-
-        userRepository.save(requestUser);
-
-        return toDto(requestUser);
+        return toDto(savedUser);
     }
 
     @Override
@@ -87,5 +79,15 @@ public class FileUserService implements UserService {
 
     private UserDto toDto(User user) {
         return new UserDto(user.getId(), user.getName(), user.getEmail());
+    }
+
+    private void validateDuplicateEmail(User requestUser) {
+        boolean isDuplicate = userRepository.findAll()
+                .stream()
+                .anyMatch(existingUser -> existingUser.isSameEmail(requestUser.getEmail()));
+
+        if (isDuplicate) {
+            throw new IllegalArgumentException("이미 존재하는 유저입니다");
+        }
     }
 }
