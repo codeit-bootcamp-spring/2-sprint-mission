@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -20,6 +22,7 @@ public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public User create(UserCreateDto userCreateDto) {
@@ -90,7 +93,15 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        User user = findById(userId);
+        User user = userRepository.findById(userId);
         userRepository.delete(user.getId());
+
+        UserStatus userStatus = userStatusRepository.findById(user.getId());
+        userStatusRepository.delete(userStatus.getId());
+
+        if (user.getProfileId() != null) {
+            BinaryContent binaryContent = binaryContentRepository.findById(user.getProfileId());
+            binaryContentRepository.delete(binaryContent.getId());
+        }
     }
 }
