@@ -12,6 +12,7 @@ import java.util.UUID;
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID creatorId;
+    private final String creatorName;
     private final UUID channelId;
     private final UUID messageId;
     public final Instant createdAt;
@@ -19,12 +20,13 @@ public class Message implements Serializable {
 
     private String text;
 
-    public Message(UUID creatorId, UUID channelId, String text) {
-        this(creatorId, channelId, UUID.randomUUID(), Instant.now(), text);
+    public Message(UUID creatorId, String creatorName, UUID channelId, String text) {
+        this(creatorId, creatorName, channelId, UUID.randomUUID(), Instant.now(), text);
     }
 
-    public Message(UUID creatorId, UUID channelId, UUID messageId, Instant createdAt, String text) {
+    public Message(UUID creatorId, String creatorName, UUID channelId, UUID messageId, Instant createdAt, String text) {
         this.creatorId = creatorId;
+        this.creatorName = creatorName;
         this.channelId = channelId;
         this.messageId = messageId;
         this.createdAt = createdAt;

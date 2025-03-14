@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
+import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.Repository.file.FileServerRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +18,12 @@ import java.util.UUID;
 
 @Service
 public class FileChannelService implements ChannelService{
+    private final UserRepository userRepository;
     private final ServerRepository serverRepository;
     private final ChannelRepository channelRepository;
 
-    public FileChannelService(ServerRepository serverRepository, ChannelRepository channelRepository) {
+    public FileChannelService(UserRepository userRepository, ServerRepository serverRepository, ChannelRepository channelRepository) {
+        this.userRepository = userRepository;
         this.serverRepository = serverRepository;
         this.channelRepository = channelRepository;
     }
@@ -28,7 +32,8 @@ public class FileChannelService implements ChannelService{
     public Message write(String creatorId, String channelId, String text) {
         UUID UID = UUID.fromString(channelId);
         UUID CID = UUID.fromString(channelId);
-        Message message = new Message(UID, CID, text);
+        User user = userRepository.findUserByUserId(UID);
+        Message message = new Message(user.getId(), user.getName(), CID, text);
         channelRepository.saveMessage(message);
         return message;
     }
