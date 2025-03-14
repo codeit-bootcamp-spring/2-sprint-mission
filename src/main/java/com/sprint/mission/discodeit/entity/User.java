@@ -21,7 +21,7 @@ public class User extends BaseEntity implements Serializable {
         this.profileId = null;
     }
 
-    public void update(String newUsername, String newEmail, String newPassword) {
+    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
         boolean anyValueUpdated = false;
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
@@ -33,6 +33,10 @@ public class User extends BaseEntity implements Serializable {
         }
         if (newPassword != null && !newPassword.equals(this.password)) {
             this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
             anyValueUpdated = true;
         }
 

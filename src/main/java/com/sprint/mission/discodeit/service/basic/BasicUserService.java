@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -64,15 +65,25 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        boolean isExistUser = findAll().stream().anyMatch(user -> user.getEmail().equals(newEmail)); // 동일한 이메일 == 같은 유저
+    public User update(UserUpdateDto userUpdateDto) {
+        List<User> users = userRepository.findAll();
+        boolean isEmailExist = users.stream().anyMatch(
+                user -> user.getEmail().equals(userUpdateDto.newEmail()));
 
-        if (isExistUser) {
-            throw new RuntimeException(newEmail + " 이메일은 이미 가입되어 수정할 수 없습니다.");
+        if (isEmailExist) {
+            throw new RuntimeException(userUpdateDto.newEmail() + " 이메일은 이미 존재하여 수정할 수 없습니다.");
         }
 
-        User user = findById(userId);
-        user.update(newUsername, newEmail, newPassword);
+        boolean isNameExist = users.stream().anyMatch(
+                user -> user.getUsername().equals(userUpdateDto.newUsername()));
+
+        if (isNameExist) {
+            throw new RuntimeException(userUpdateDto.newEmail() + " 유저는 이미 존재하여 수정할 수 없습니다.");
+        }
+
+        User user = userRepository.findById(userUpdateDto.id());
+        user.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(),
+                userUpdateDto.newProfileId());
 
         return userRepository.save(user);
     }
