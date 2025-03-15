@@ -2,8 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.constant.UserStatusType;
 import com.sprint.mission.discodeit.dto.FindUserDto;
+import com.sprint.mission.discodeit.dto.UserSaveDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -12,10 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,28 +25,33 @@ public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public void save(String username, String password, String nickname, String email, String profile) {
-        if(userRepository.findUserByUsername(username).isPresent()){
+    public UserSaveDto save(String username, String password, String nickname, String email, byte[] profile) {
+        if (userRepository.findUserByUsername(username).isPresent()) {
             System.out.println("[실패] 회원아이디 중복");
-            return;
+            return null;
         }
 
-        if(userRepository.findUserByEmail(email).isPresent()){
+        if (userRepository.findUserByEmail(email).isPresent()) {
             System.out.println("[실패] 회원이메일 중복");
-            return;
+            return null;
         }
 
-        User user = userRepository.save(username, password, nickname, email, profile);
+        UUID profileId = (profile != null) ? binaryContentRepository.save(profile).getId() : null;
+
+        User user = userRepository.save(username, password, nickname, email, profileId);
         userStatusRepository.save(user.getId());
 
         if (user == null) {
             System.out.println("[실패] 저장 실패.");
-            return;
+            return null;
         }
 
         System.out.println("[성공] 회원가입 성공");
+        UserSaveDto userSaveDto = new UserSaveDto(user.getId(), user.getNickname(), user.getProfile(), user.getCreatedAt());
+        return userSaveDto;
     }
 
     @Override
@@ -63,7 +69,7 @@ public class BasicUserService implements UserService {
                     return null;
                 });
 
-        if(user == null || userStatus == null){
+        if (user == null || userStatus == null) {
             System.out.println("[실패] 잘못된 찾기");
             return null;
         }

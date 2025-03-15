@@ -14,7 +14,7 @@ public class User extends BaseEntity implements Serializable {
     private String password;
     private String nickname;
     private String email;
-    private String profile;
+    private UUID profile;
 
     public void updateNickname(String nickname) {
         super.updateTime();

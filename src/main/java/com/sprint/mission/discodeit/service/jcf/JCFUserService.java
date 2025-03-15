@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.dto.FindUserDto;
+import com.sprint.mission.discodeit.dto.UserSaveDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -11,10 +12,11 @@ public class JCFUserService implements UserService {
     private final List<User> userList = new ArrayList<>();
 
     @Override
-    public void save(String username, String password, String nickname, String email, String profile) {
-        User user = new User(username, password, nickname, email, profile);
+    public UserSaveDto save(String username, String password, String nickname, String email, byte[] profile) {
+        User user = new User(username, password, nickname, email, UUID.randomUUID());
         userList.add(user);
         System.out.println("유저 생성 완료" + user);
+        return new UserSaveDto(user.getId(), user.getNickname(), user.getProfile(), user.getCreatedAt());
     }
 
     @Override

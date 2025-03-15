@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.custom.AppendObjectOutputStream;
 import com.sprint.mission.discodeit.dto.FindUserDto;
+import com.sprint.mission.discodeit.dto.UserSaveDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
@@ -11,8 +13,9 @@ import java.util.*;
 public class FileUserService implements UserService {
 
     @Override
-    public void save(String username, String password, String nickname, String email, String profile) {
-        User user = new User(username, password, nickname, email, profile);
+    public UserSaveDto save(String username, String password, String nickname, String email, byte[] profile) {
+
+        User user = new User(username, password, nickname, email, UUID.randomUUID());
         try {
             String fileName = "user.ser";
             // 파일 존재 여부 확인
@@ -25,10 +28,12 @@ public class FileUserService implements UserService {
             oos.close();
             fos.close();
 
-            System.out.println("[회원가입 성공]" + user);
+            return new UserSaveDto(user.getId(), user.getNickname(), UUID.randomUUID(), user.getCreatedAt());
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 
     @Override

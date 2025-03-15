@@ -12,6 +12,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -162,18 +165,28 @@ public class DiscodeitApplication {
     }
 
     private static void registerPage(UserService userService) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("아이디 입력: ");
-        String useranme = sc.nextLine();
-        System.out.print("비밀번호 입력: ");
-        String password = sc.nextLine();
-        System.out.print("닉네임 입력: ");
-        String nickname = sc.nextLine();
-        System.out.print("이메일 입력: ");
-        String email = sc.nextLine();
-        System.out.print("이미지 경로: ");
-        String profile = sc.nextLine();
-        userService.save(useranme, password, nickname, email, profile);
+        try {
+            Scanner sc = new Scanner(System.in);
+            System.out.print("아이디 입력: ");
+            String username = sc.nextLine();
+            System.out.print("비밀번호 입력: ");
+            String password = sc.nextLine();
+            System.out.print("닉네임 입력: ");
+            String nickname = sc.nextLine();
+            System.out.print("이메일 입력: ");
+            String email = sc.nextLine();
+
+            System.out.print("이미지 경로 (넣고싶지 않다면 엔터): ");
+            String profilePath = sc.nextLine().trim();
+            byte[] profile = null;
+            if (!profilePath.isEmpty()) {
+                profile = Files.readAllBytes(Path.of(profilePath));
+            }
+            System.out.println(userService.save(username, password, nickname, email, profile));
+        } catch (IOException e) {
+            System.out.println("[오류] 이미지 파일을 읽을 수 없습니다.");
+            e.printStackTrace();
+        }
     }
 
     private static UUID selectChannel(ChannelService channelService, UUID channelUUID) {

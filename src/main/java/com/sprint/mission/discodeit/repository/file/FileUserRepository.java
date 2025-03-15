@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.constant.SubDirectory;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.utils.FileManager;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,8 @@ public class FileUserRepository implements UserRepository {
     private final FileManager fileManager;
 
     @Override
-    public User save(String username, String password, String nickname, String email, String profile) {
-        User user = new User(username, password, nickname, email, profile);
+    public User save(String username, String password, String nickname, String email, UUID profileId) {
+        User user = new User(username, password, nickname, email, profileId);
         fileManager.writeToFile(SubDirectory.USER, user, user.getId());
         return user;
     }
