@@ -146,7 +146,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public UUID saveUser(User user) {
+    public UUID save(User user) {
         registeredUsers.add(user);
 
 
@@ -252,7 +252,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public UUID removeUser(User user) {
+    public UUID remove(User user) {
         User targetUser = findUser(user);
         registeredUsers.remove(targetUser);
 

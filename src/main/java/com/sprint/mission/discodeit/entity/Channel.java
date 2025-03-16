@@ -6,6 +6,8 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @ToString
@@ -17,7 +19,10 @@ public class Channel implements Serializable {
     private UUID channelId;
     private final UUID serverId;
     private final UUID creatorId;
+
     private String name;
+    private List<User> userList = new ArrayList<>();
+
     private ChannelType type;
 
     public final Instant createdAt;

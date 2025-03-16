@@ -1,20 +1,30 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.DTO.Channel.ChannelCreateDTO;
+import com.sprint.mission.discodeit.DTO.Channel.ChannelIDDTO;
 import com.sprint.mission.discodeit.entity.Message;
+
+import java.util.UUID;
 
 
 public interface ChannelService {
 
     void reset(boolean adminAuth);
 
-    Message write(String creatorId, String channelId, String text);
+    UUID createChannel(ChannelCreateDTO channelCreateDTO);
 
-    Message getMessage(String serverId,String channelId, String messageId);
+    UUID joinChannel(ChannelIDDTO channelIDDTO, String ownerId);
 
-    void printMessage(String serverId, String channelId);
+    UUID quitChannel(ChannelIDDTO channelIDDTO);
 
-    boolean removeMessage(String serverId,String channelId, String messageId);
+    boolean printUsers(String serverId);
 
-    boolean updateMessage(String serverId,String channelId, String messageId, String replaceText);
+    boolean printChannels(String serverId);
+
+    boolean printUsersInChannel(String channelId);
+
+    boolean removeChannel(ChannelIDDTO channelIDDTO);
+
+    boolean updateChannelName(ChannelIDDTO channelIDDTO, String replaceName);
 
 }

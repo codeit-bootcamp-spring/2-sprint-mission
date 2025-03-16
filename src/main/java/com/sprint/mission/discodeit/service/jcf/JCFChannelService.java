@@ -1,11 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.Exception.EmptyMessageListException;
 import com.sprint.mission.discodeit.Repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.Repository.jcf.JCFServerRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -14,89 +12,143 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
-
 @Service
 @RequiredArgsConstructor
 public class JCFChannelService implements ChannelService {
     private final JCFUserRepository userRepository;
-    private final JCFServerRepository serverRepository;
-    private final JCFChannelRepository channelRepository;
+    private final JCFChannelRepository serverRepository;
+
 
     @Override
     public void reset(boolean adminAuth) {
         if (adminAuth == true) {
-            channelRepository.reset();
+            serverRepository.reset();
         }
     }
 
     @Override
-    public Message write(String creatorId, String channelId, String text) {
+    public UUID createChannel(String serverId, String creatorId, String name) {
+        UUID SID = UUID.fromString(serverId);
         UUID UID = UUID.fromString(creatorId);
-        UUID CID = UUID.fromString(channelId);
-        System.out.println("🔍 write: 요청된 creatorId: " + creatorId);
-        System.out.println("🔍 write: 요청된 channelId: " + channelId);
 
         User user = userRepository.findUserByUserId(UID);
-        System.out.println("🔍 write: 반환된 user: " + user.getId());
+        System.out.println(JCFUserRepository.class + " : " + "createChannel" + " : " + user.getId());
+        Server findServer = userRepository.findServerByServerId(user, SID);
+        System.out.println(JCFUserRepository.class + " : " + "createChannel" + " : " + findServer.getServerId());
 
-        Message message = new Message(UID,user.getName(), CID, text);
+        Channel channel = new Channel(findServer.getServerId(), user.getId(), name);
+        serverRepository.save(findServer, channel);
 
-        channelRepository.saveMessage(message);
-        return message;
+        return channel.getChannelId();
     }
 
+
     @Override
-    public Message getMessage(String serverId, String channelId, String messageId) {
+    public UUID joinChannel(String serverId, String userId, String ownerId,String channelId) {
         UUID SID = UUID.fromString(serverId);
+        UUID UID = UUID.fromString(userId);
+        UUID UOID = UUID.fromString(ownerId);
         UUID CID = UUID.fromString(channelId);
-        UUID MID = UUID.fromString(messageId);
 
-        Channel channel = serverRepository.findChannelByChanelId(SID, CID);
-        Message message = channelRepository.findMessageByChannel(channel, MID);
+        User user = userRepository.findUserByUserId(UID);
+        User owner = userRepository.findUserByUserId(UOID);
+        Server findServer = userRepository.findServerByServerId(owner, SID);
+        Channel findChannel = serverRepository.findChannelByChanelId(findServer, CID);
 
-        return message;
+        UUID uuid = serverRepository.join(findChannel, user);
+
+        return uuid;
     }
 
     @Override
-    public void printMessage(String serverId, String channelId) {
-        try {
-            UUID SID = UUID.fromString(serverId);
-            UUID CID = UUID.fromString(channelId);
+    public UUID quitChannel(String serverId, String userId, String channelId) {
+        UUID SID = UUID.fromString(serverId);
+        UUID UID = UUID.fromString(userId);
+        UUID CID = UUID.fromString(channelId);
 
-            Channel channel = serverRepository.findChannelByChanelId(SID, CID);
+        User user = userRepository.findUserByUserId(UID);
+        Server findServer = userRepository.findServerByServerId(user, SID);
+        Channel findChannel = serverRepository.findChannelByChanelId(findServer, CID);
+
+        UUID uuid = serverRepository.quit(findChannel, user);
+
+        return uuid;
+    }
+
+    @Override
+    public boolean printUsers(String serverId) {
+        UUID SID = UUID.fromString(serverId);
+
+        List<Channel> channels = serverRepository.findChannelListByServerId(SID);
+
+        for (Channel channel : channels) {
+            List<User> users = serverRepository.findUserListByChannelId(channel.getServerId());
             System.out.println(channel.getName());
-
-            List<Message> messages = channelRepository.findMessageListByChannel(channel);
-            for (Message message : messages) {
-                System.out.println(message.getCreatorName() + " : " + message.getText());
+            for (User user : users) {
+                System.out.println(user);
             }
-        } catch (EmptyMessageListException e) {
-            System.out.println("메시지 함이 비어있습니다.");
         }
 
-    }
-
-    @Override
-    public boolean removeMessage(String serverId,String channelId, String messageId) {
-        UUID SID = UUID.fromString(serverId);
-        UUID CID = UUID.fromString(channelId);
-        UUID MID = UUID.fromString(messageId);
-        Channel channel = serverRepository.findChannelByChanelId(SID, CID);
-        Message message = channelRepository.findMessageByChannel(channel, MID);
-
-        channelRepository.removeMessage(channel, message);
         return true;
     }
 
     @Override
-    public boolean updateMessage(String serverId,String channelId, String messageId, String replaceText) {
+    public boolean printChannels(String serverId) {
         UUID SID = UUID.fromString(serverId);
-        UUID CID = UUID.fromString(channelId);
-        UUID MID = UUID.fromString(messageId);
-        Channel channel = serverRepository.findChannelByChanelId(SID, CID);
-        Message message = channelRepository.findMessageByChannel(channel, MID);
 
-        channelRepository.updateMessage(channel, message, replaceText);
+        List<Channel> channels = serverRepository.findChannelListByServerId(SID);
+        for (Channel channel : channels) {
+            System.out.println(channel);
+        }
         return true;
+    }
+
+    @Override
+    public boolean printUsersInChannel(String channelId) {
+        UUID CID = UUID.fromString(channelId);
+
+        List<User> users = serverRepository.findUserListByChannelId(CID);
+        for (User user : users) {
+            System.out.println(user);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean removeChannel(String serverId, String creatorId, String channelId) {
+        UUID SID = UUID.fromString(serverId);
+        UUID UID = UUID.fromString(creatorId);
+        UUID CID = UUID.fromString(channelId);
+
+        User user = userRepository.findUserByUserId(UID);
+        Server findServer = userRepository.findServerByServerId(user, SID);
+        Channel findChannel = serverRepository.findChannelByChanelId(findServer, CID);
+
+        if (findChannel.getCreatorId().equals(UID)) {
+            serverRepository.remove(findServer, findChannel);
+            return true;
+        } else {
+            System.out.println("채널 삭제 권한 없음");
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updateChannelName(String serverId, String creatorId, String channelId, String replaceName) {
+        UUID SID = UUID.fromString(serverId);
+        UUID UID = UUID.fromString(creatorId);
+        UUID CID = UUID.fromString(channelId);
+
+        User user = userRepository.findUserByUserId(UID);
+        Server findServer = userRepository.findServerByServerId(user, SID);
+        Channel findChannel = serverRepository.findChannelByChanelId(findServer, CID);
+
+        if (findChannel.getCreatorId().equals(UID)) {
+            serverRepository.update(findServer, findChannel, replaceName);
+            return true;
+        } else {
+            System.out.println("채널 수정 권한 없음");
+            return false;
+        }
     }
 }

@@ -1,63 +1,130 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.Exception.EmptyMessageListException;
-import com.sprint.mission.discodeit.Exception.MessageNotFoundException;
+import com.sprint.mission.discodeit.Exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.Exception.EmptyChannelListException;
+import com.sprint.mission.discodeit.Exception.EmptyUserListException;
+import com.sprint.mission.discodeit.Exception.UserNotFoundException;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class JCFChannelRepository implements ChannelRepository {
-    private Map<UUID, List<Message>> messageList = new ConcurrentHashMap<>();
+    private Map<UUID, List<Channel>> channelList = new ConcurrentHashMap<>();
+
     @Override
     public void reset() {
-        messageList = new ConcurrentHashMap<>();
-    }
-    @Override
-    public void saveMessage(Message message) {
-        messageList.computeIfAbsent(message.getChannelId(), k -> new ArrayList<>()).add(message);
+        channelList = new ConcurrentHashMap<>();
     }
 
     @Override
-    public List<Message> findMessageListByChannel(Channel channel) {
-        return findMessageListByChannel(channel.getChannelId());
+    public UUID join(Channel channel, User user) {
+        List<User> list = channel.getUserList();
+        list.add(user);
+
+        return user.getId();
     }
 
     @Override
-    public List<Message> findMessageListByChannel(UUID channelId) {
-        List<Message> messages = Optional.ofNullable(messageList.get(channelId))
-                .orElseThrow(() -> new EmptyMessageListException("메시지함이 비어있습니다."));
-        return messages;
+    public UUID quit(Channel channel, User user) {
+        List<User> users = findUserListByChannelId(channel.getChannelId());
+        User findUser = findUser(channel, user);
+
+        users.remove(findUser);
+        channelUsers.put(channel.getChannelId(), users);
+
+        return findUser.getId();
     }
 
     @Override
-    public Message findMessageByChannel(Channel channel, UUID messageId) {
-        List<Message> messages = findMessageListByChannel(channel);
-        Message findMessage = messages.stream().filter(m -> m.getMessageId().equals(messageId))
-                .findFirst().orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
-        return findMessage;
+    public UUID save(Server server, Channel channel) {
+        List<Channel> channels = channelList.getOrDefault(server.getServerId(), new ArrayList<>());
+
+        channels.add(channel);
+
+        channelList.put(server.getServerId(), channels);
+
+        return channel.getChannelId();
     }
 
     @Override
-    public UUID updateMessage(Channel channel, Message message, String replaceText) {
-        Message findMessage = findMessageByChannel(channel, message.getMessageId());
-        findMessage.setText(replaceText);
-        return findMessage.getMessageId();
+    public User findUser(Channel channel, User user) {
+        List<User> users = findUserListByChannelId(channel.getChannelId());
+        User findUser = users.stream().filter(u -> u.getId().equals(user.getId()))
+                .findFirst()
+                .orElseThrow(() -> new UserNotFoundException("채널 내 해당 유저가 없습니다."));
+        return findUser;
     }
 
     @Override
-    public UUID removeMessage(Channel channel,  Message message) {
-        List<Message> messages = findMessageListByChannel(channel);
-        Message findMessage = findMessageByChannel(channel, message.getMessageId());
-
-        messages.remove(findMessage);
-        messageList.put(channel.getChannelId(), messages);
-
-        return findMessage.getMessageId();
-
+    public Channel findChannel(Server server, Channel channel) {
+        return findChannelByChanelId(server.getServerId(), channel.getChannelId());
     }
+
+    @Override
+    public Channel findChannelByChanelId(Server server, UUID channelId) {
+        return findChannelByChanelId(server.getServerId(), channelId);
+    }
+
+    @Override
+    public Channel findChannelByChanelId(UUID serverId, Channel channel) {
+        return findChannelByChanelId(serverId, channel.getChannelId());
+    }
+
+    @Override
+    public Channel findChannelByChanelId(UUID serverId, UUID channelId) {
+        List<Channel> channels = findChannelListByServerId(serverId);
+        Channel findChannel = channels.stream().filter(c -> c.getChannelId().equals(channelId))
+                .findFirst()
+                .orElseThrow(() -> new ChannelNotFoundException("채널이 존재하지 않습니다."));
+        return findChannel;
+    }
+
+
+    @Override
+    public List<User> findUserListByChannelId(UUID channelId) {
+
+        List<User> users = channelUsers.get(channelId);
+        if (users == null) {
+            throw new EmptyUserListException("유저 리스트가 비어있습니다.");
+        }
+
+        return users;
+    }
+
+    @Override
+    public List<Channel> findChannelListByServerId(UUID serverId) {
+        List<Channel> channels = channelList.get(serverId);
+        if (channels == null) {
+            throw new EmptyChannelListException("채널 리스트가 비어있습니다.");
+        }
+        return channels;
+    }
+
+    @Override
+    public UUID update(Server server, Channel channel, String replaceName) {
+        Channel findChannel = findChannel(server, channel);
+        findChannel.setName(replaceName);
+        return findChannel.getChannelId();
+    }
+
+    @Override
+    public UUID remove(Server server, Channel channel) {
+        List<Channel> channels = findChannelListByServerId(server.getServerId());
+        Channel findChannel = findChannel(server, channel);
+
+        channels.remove(findChannel);
+        channelList.put(server.getServerId(), channels);
+        return findChannel.getChannelId();
+    }
+
+
 }

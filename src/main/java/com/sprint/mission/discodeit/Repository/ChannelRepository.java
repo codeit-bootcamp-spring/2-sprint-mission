@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.Repository;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -9,19 +10,25 @@ import java.util.UUID;
 
 @Repository
 public interface ChannelRepository {
-    /**
-     * 리스트를 초기화합니다.
-     */
     void reset();
-    void saveMessage(Message message);
 
-    Message findMessageByChannel(Channel channel, UUID messageId);
+    UUID join(Channel channel, User user);
 
-    List<Message> findMessageListByChannel(Channel channel);
+    UUID quit(Channel channel, User user);
 
-    List<Message> findMessageListByChannel(UUID channelId);
+    UUID save(Server server, Channel channel);
 
-    UUID updateMessage(Channel channel, Message message, String replaceText);
+    User findUser(Channel channel, User user);
 
-    UUID removeMessage(Channel channel,  Message message);
+    Channel findChannel(Server server, Channel channel);
+
+    List<User> findUserListByChannelId(UUID channelId);
+
+    List<Channel> findChannelListByServerId(UUID serverId);
+
+    UUID update(Server server, Channel channel, String replaceName);
+
+    UUID remove(Server server, Channel channel);
+
+
 }

@@ -35,7 +35,7 @@ public class JCFUserService implements UserService {
     @Override
     public UUID registerUser(UserCreateDTO userCreateDTO) {
         User user = new User(userCreateDTO.userName(), userCreateDTO.email(), userCreateDTO.password());
-        userRepository.saveUser(user);
+        userRepository.save(user);
 
         System.out.println("✅ 새 유저 등록됨: " + user);
 
@@ -124,7 +124,7 @@ public class JCFUserService implements UserService {
         try {
             UUID UID = UUID.fromString(userDeleteDTO.userId());
             User findUser = userRepository.findUserByUserId(UID);
-            userRepository.removeUser(findUser);
+            userRepository.remove(findUser);
             return true;
         }catch (IllegalArgumentException e0) {
             System.out.println("잘못된 ID값을 받았습니다.");

@@ -7,6 +7,8 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @ToString
@@ -20,6 +22,7 @@ public class Server implements Serializable {
     private UUID userOwnerId;
 
     private String name;
+    private List<User> userList = new ArrayList<>();
 
     public final Instant createdAt;
     public Instant updatedAt;

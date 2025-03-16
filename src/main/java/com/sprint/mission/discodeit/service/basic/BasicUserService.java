@@ -63,7 +63,7 @@ public class BasicUserService implements UserService {
         }
 
         UserStatus userStatus = new UserStatus(user.getId());
-        userRepository.saveUser(user);
+        userRepository.save(user);
         userStatusRepository.save(userStatus);
         return user.getId();
     }
@@ -176,7 +176,7 @@ public class BasicUserService implements UserService {
         try {
             UUID UID = UUID.fromString(userDeleteDTO.userId());
             User findUser = userRepository.findUserByUserId(UID);
-            userRepository.removeUser(findUser);
+            userRepository.remove(findUser);
             userStatusRepository.delete(findUser.getId());
             binaryContentRepository.delete(findUser.getId());
 
@@ -216,7 +216,7 @@ public class BasicUserService implements UserService {
         try {
             UUID UID = UUID.fromString(userId);
             User findUser = userRepository.findUserByUserId(UID);
-            userRepository.updateUser(findUser, userUpdateDTO);
+            userRepository.update(findUser, userUpdateDTO);
             return true;
         } catch (IllegalArgumentException e0) {
             System.out.println("잘못된 ID값을 받았습니다.");
