@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.*;
 
 @Getter
@@ -10,6 +12,8 @@ public class Channel extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 2L;
     private String channelName;
     private Set<UUID> participantIds;     //중복X && 이름순으로 정렬
+    @Setter
+    private Instant lastMessageTime;
 
     public Channel(String channelName) {
         super();
