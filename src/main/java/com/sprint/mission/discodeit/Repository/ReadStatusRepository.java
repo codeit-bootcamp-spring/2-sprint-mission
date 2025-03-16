@@ -16,7 +16,7 @@ public interface ReadStatusRepository {
 
     List<ReadStatus> findAllByUserId(UUID userID);
 
-    void update(ReadStatusUpdateDTO readStatusUpdateDTO);
+    void update(ReadStatus readStatus,ReadStatusUpdateDTO readStatusUpdateDTO);
 
     void delete(UUID readStatusId);
 }

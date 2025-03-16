@@ -32,9 +32,11 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void update(ReadStatusUpdateDTO readStatusUpdateDTO) {
-        ReadStatus status = find(readStatusUpdateDTO.readStatusId());
-        status.setReadStatusId(readStatusUpdateDTO.replaceId());
+    public void update(ReadStatus readStatus,ReadStatusUpdateDTO readStatusUpdateDTO) {
+        if (readStatusUpdateDTO.replaceId() != null) {
+            readStatus.setReadStatusId(readStatusUpdateDTO.replaceId());
+        }
+
     }
 
     @Override
