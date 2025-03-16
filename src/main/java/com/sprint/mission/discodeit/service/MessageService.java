@@ -14,7 +14,7 @@ public interface MessageService {
     Message create(MessageCreateDTO messageCreateDTO);
 
 
-    Message find(MessageIDSDTO messageIDSDTO);
+    Message find(String messageId);
 
     List<Message> findAllByChannelId(String channelId);
 
@@ -25,6 +25,6 @@ public interface MessageService {
     boolean delete(MessageIDSDTO messageIDSDTO);
 
 
-    boolean update(MessageIDSDTO messageIDSDTO, MessageUpdateDTO messageUpdateDTO);
+    boolean update(String messageId, MessageUpdateDTO messageUpdateDTO);
 
 }

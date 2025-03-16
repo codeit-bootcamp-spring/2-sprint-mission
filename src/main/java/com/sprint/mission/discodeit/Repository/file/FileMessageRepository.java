@@ -81,7 +81,7 @@ public class FileMessageRepository implements MessageRepository {
     public void save(Channel channel, Message message) {
         List<Message> messages = messageList.getOrDefault(channel.getChannelId(), new ArrayList<>());
         messages.add(message);
-
+        saveMessageList();
     }
 
     @Override
@@ -104,6 +104,10 @@ public class FileMessageRepository implements MessageRepository {
         if (messageUpdateDTO.replaceText() != null) {
             message.setText(messageUpdateDTO.replaceText());
         }
+        if (messageUpdateDTO.replaceId() != null) {
+            message.setMessageId(messageUpdateDTO.replaceId());
+        }
+        saveMessageList();
         return message.getMessageId();
     }
 
@@ -111,6 +115,6 @@ public class FileMessageRepository implements MessageRepository {
     public void remove(Channel channel, Message message) {
         List<Message> messages = messageList.get(channel.getChannelId());
         messages.remove(message);
-
+        saveMessageList();
     }
 }

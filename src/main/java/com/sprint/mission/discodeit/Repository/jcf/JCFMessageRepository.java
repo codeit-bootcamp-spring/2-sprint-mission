@@ -49,6 +49,9 @@ public class JCFMessageRepository implements MessageRepository {
         if (messageUpdateDTO.replaceText() != null) {
             message.setText(messageUpdateDTO.replaceText());
         }
+        if (messageUpdateDTO.replaceId() != null) {
+            message.setMessageId(messageUpdateDTO.replaceId());
+        }
         return message.getMessageId();
     }
 

@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.DTO.Message.MessageIDSDTO;
 import com.sprint.mission.discodeit.DTO.Message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.Exception.EmptyMessageListException;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.Repository.MessageRepository;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
+import com.sprint.mission.discodeit.Repository.MessageRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -57,12 +57,10 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message find(MessageIDSDTO messageIDSDTO) {
-        UUID channelId = UUID.fromString(messageIDSDTO.channelId());
-        UUID messageId = UUID.fromString(messageIDSDTO.messageId());
+    public Message find(String messageId) {
+        UUID messageUUID = UUID.fromString(messageId);
 
-        Channel channel = channelRepository.find(channelId);
-        Message message = messageRepository.find(messageId);
+        Message message = messageRepository.find(messageUUID);
 
         return message;
     }
@@ -101,15 +99,20 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.find(messageId);
 
         messageRepository.remove(channel, message);
+        if (message.getAttachmentIds().isEmpty() == false) {
+            List<UUID> attachmentIds = message.getAttachmentIds();
+            for (UUID attachmentId : attachmentIds) {
+                binaryContentRepository.delete(attachmentId);
+            }
+        }
         return true;
     }
 
     @Override
-    public boolean update(MessageIDSDTO messageIDSDTO, MessageUpdateDTO messageUpdateDTO) {
-        UUID channelId = UUID.fromString(messageIDSDTO.channelId());
-        UUID messageId = UUID.fromString(messageIDSDTO.messageId());
-        Channel channel = channelRepository.find(channelId);
-        Message message = messageRepository.find(messageId);
+    public boolean update(String messageId, MessageUpdateDTO messageUpdateDTO) {
+        UUID messageUUID = UUID.fromString(messageId);
+
+        Message message = messageRepository.find(messageUUID);
 
         messageRepository.update(message, messageUpdateDTO);
         return true;
