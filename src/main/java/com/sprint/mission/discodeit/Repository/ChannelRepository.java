@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.Repository;
 
+import com.sprint.mission.discodeit.DTO.Channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -18,17 +19,11 @@ public interface ChannelRepository {
 
     UUID save(Server server, Channel channel);
 
-    User findUser(Channel channel, User user);
+    Channel find(UUID channelId);
 
-    Channel findChannel(Server server, Channel channel);
+    List<Channel> findAllByServerId(UUID serverId);
 
-    List<User> findUserListByChannelId(UUID channelId);
+    UUID update(Channel channel, ChannelUpdateDTO channelUpdateDTO);
 
-    List<Channel> findChannelListByServerId(UUID serverId);
-
-    UUID update(Server server, Channel channel, String replaceName);
-
-    UUID remove(Server server, Channel channel);
-
-
+    void remove(Server server, Channel channel);
 }
