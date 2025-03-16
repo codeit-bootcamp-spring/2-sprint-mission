@@ -1,23 +1,30 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.DTO.Message.MessageCreateDTO;
+import com.sprint.mission.discodeit.DTO.Message.MessageIDSDTO;
+import com.sprint.mission.discodeit.DTO.Message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
+
+import java.util.List;
 
 
 public interface MessageService {
     void reset(boolean adminAuth);
 
-    Message write(String creatorId, String channelId, String text);
+    Message create(MessageCreateDTO messageCreateDTO);
 
-    //단건 조회
-    Message getMessage(String serverId,String channelId, String messageId);
 
-    //출력
-    void printMessage(String serverId, String channelId);
+    Message find(MessageIDSDTO messageIDSDTO);
 
-    //삭제
-    boolean removeMessage(String serverId,String channelId, String messageId);
+    List<Message> findAllByChannelId(String channelId);
 
-    //업데이트
-    boolean updateMessage(String serverId,String channelId, String messageId, String replaceText);
+
+    void print(String channelId);
+
+
+    boolean delete(MessageIDSDTO messageIDSDTO);
+
+
+    boolean update(MessageIDSDTO messageIDSDTO, MessageUpdateDTO messageUpdateDTO);
 
 }

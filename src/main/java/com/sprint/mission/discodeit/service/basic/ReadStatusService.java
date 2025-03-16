@@ -23,7 +23,7 @@ public class ReadStatusService {
             UUID userId = UUID.fromString(readStatusCreateDTO.userId());
             UUID channelId = UUID.fromString(readStatusCreateDTO.channelID());
 
-            User user = userRepository.findUserByUserId(userId);
+            User user = userRepository.find(userId);
 
 
 

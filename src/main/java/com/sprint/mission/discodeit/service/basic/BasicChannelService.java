@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.Channel.ChannelCreateDTO;
-import com.sprint.mission.discodeit.DTO.Channel.ChannelIDDTO;
+import com.sprint.mission.discodeit.DTO.Channel.ChannelIDSDTO;
 import com.sprint.mission.discodeit.DTO.Channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
@@ -45,10 +45,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public UUID join(ChannelIDDTO channelIDDTO ) {
-        UUID userId = UUID.fromString(channelIDDTO.userId());
+    public UUID join(ChannelIDSDTO channelIDSDTO) {
+        UUID userId = UUID.fromString(channelIDSDTO.userId());
 
-        UUID channelId = UUID.fromString(channelIDDTO.channelId());
+        UUID channelId = UUID.fromString(channelIDSDTO.channelId());
 
         User user = userRepository.find(userId);
         Channel findChannel = channelRepository.find(channelId);
@@ -59,9 +59,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public UUID quit(ChannelIDDTO channelIDDTO) {
-        UUID userId = UUID.fromString(channelIDDTO.userId());
-        UUID channelId = UUID.fromString(channelIDDTO.channelId());
+    public UUID quit(ChannelIDSDTO channelIDSDTO) {
+        UUID userId = UUID.fromString(channelIDSDTO.userId());
+        UUID channelId = UUID.fromString(channelIDSDTO.channelId());
 
         User user = userRepository.find(userId);
         Channel findChannel = channelRepository.find(channelId);
@@ -72,10 +72,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public boolean delete(ChannelIDDTO channelIDDTO) {
-        UUID serverId = UUID.fromString(channelIDDTO.serverId());
-        UUID userId = UUID.fromString(channelIDDTO.userId());
-        UUID channelId = UUID.fromString(channelIDDTO.channelId());
+    public boolean delete(ChannelIDSDTO channelIDSDTO) {
+        UUID serverId = UUID.fromString(channelIDSDTO.serverId());
+        UUID userId = UUID.fromString(channelIDSDTO.userId());
+        UUID channelId = UUID.fromString(channelIDSDTO.channelId());
 
         Server findServer = serverRepository.find(serverId);
         Channel findChannel = channelRepository.find(channelId);
@@ -90,10 +90,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public boolean update(ChannelIDDTO channelIDDTO, ChannelUpdateDTO channelUpdateDTO) {
-        UUID serverId = UUID.fromString(channelIDDTO.serverId());
-        UUID userId = UUID.fromString(channelIDDTO.userId());
-        UUID channelId = UUID.fromString(channelIDDTO.channelId());
+    public boolean update(ChannelIDSDTO channelIDSDTO, ChannelUpdateDTO channelUpdateDTO) {
+        UUID serverId = UUID.fromString(channelIDSDTO.serverId());
+        UUID userId = UUID.fromString(channelIDSDTO.userId());
+        UUID channelId = UUID.fromString(channelIDSDTO.channelId());
 
         Channel findChannel = channelRepository.find(channelId);
 

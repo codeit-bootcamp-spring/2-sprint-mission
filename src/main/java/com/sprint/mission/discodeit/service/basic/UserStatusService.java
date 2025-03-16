@@ -22,9 +22,9 @@ public class UserStatusService {
 
     void create(String userId) {
         try {
-            UUID UID = UUID.fromString(userId);
-            User user = userRepository.findUserByUserId(UID);
-            UserStatus userStatus = userStatusRepository.find(UID);
+            UUID userUUID = UUID.fromString(userId);
+            User user = userRepository.find(userUUID);
+            UserStatus userStatus = userStatusRepository.find(userUUID);
 
             if (userStatus == null) {
                 userStatus = new UserStatus(user.getId());

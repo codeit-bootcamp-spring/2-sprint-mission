@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.MessageUpdateDTO;
+import com.sprint.mission.discodeit.DTO.Message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.Exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.Repository.MessageRepository;
 import com.sprint.mission.discodeit.entity.Channel;

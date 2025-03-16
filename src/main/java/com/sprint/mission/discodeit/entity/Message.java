@@ -6,6 +6,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,14 +16,15 @@ public class Message implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private  UUID messageId;
     private final UUID creatorId;
     private final String creatorName;
     private final UUID channelId;
-    private final UUID messageId;
     public final Instant createdAt;
+
     public Instant updatedAt;
 
-    public List<UUID> attachmentIds;
+    public List<UUID> attachmentIds = new ArrayList<>();
     public String text;
 
     public Message(UUID creatorId, String creatorName, UUID channelId, String text) {
@@ -39,8 +41,14 @@ public class Message implements Serializable {
         this.text = text;
     }
 
+    public void setMessageId(UUID messageId) {
+        this.messageId = messageId;
+        this.updatedAt = Instant.now();
+    }
+
     public void setText(String text) {
         this.text = text;
         this.updatedAt = Instant.now();
     }
+
 }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.DTO.Channel;
 
-public record ChannelIDDTO(
+public record ChannelIDSDTO(
         String serverId,
         String userId,
         String channelId

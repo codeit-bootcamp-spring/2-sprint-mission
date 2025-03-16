@@ -1,9 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.DTO.Message.MessageCreateDTO;
+import com.sprint.mission.discodeit.DTO.Message.MessageIDSDTO;
+import com.sprint.mission.discodeit.DTO.Message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.Exception.EmptyMessageListException;
+import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.MessageRepository;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -20,6 +25,7 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public void reset(boolean adminAuth) {
@@ -29,43 +35,54 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message write(String creatorId, String channelId, String text) {
-        UUID UID = UUID.fromString(creatorId);
-        UUID CID = UUID.fromString(channelId);
-        System.out.println("🔍 write: 요청된 creatorId: " + creatorId);
-        System.out.println("🔍 write: 요청된 channelId: " + channelId);
+    public Message create(MessageCreateDTO messageCreateDTO) {
+        UUID userId = UUID.fromString(messageCreateDTO.creatorId());
+        UUID channelUUID = UUID.fromString(messageCreateDTO.channelId());
 
-        User user = userRepository.findUserByUserId(UID);
-        System.out.println("🔍 write: 반환된 user: " + user.getId());
+        User user = userRepository.find(userId);
+        Channel channel = channelRepository.find(channelUUID);
 
-        Message message = new Message(UID,user.getName(), CID, text);
+        Message message = new Message(userId,user.getName(), channelUUID, messageCreateDTO.text());
 
-        messageRepository.save(message);
+        if (messageCreateDTO.binaryContent() != null) {
+            List<UUID> attachmentIds = message.getAttachmentIds();
+            List<BinaryContent> contentList = messageCreateDTO.binaryContent();
+            for (BinaryContent binaryContent : contentList) {
+                attachmentIds.add(binaryContent.getBinaryContentId());
+            }
+        }
+
+        messageRepository.save(channel, message);
         return message;
     }
 
     @Override
-    public Message getMessage(String serverId, String channelId, String messageId) {
-        UUID SID = UUID.fromString(serverId);
-        UUID CID = UUID.fromString(channelId);
-        UUID MID = UUID.fromString(messageId);
+    public Message find(MessageIDSDTO messageIDSDTO) {
+        UUID channelId = UUID.fromString(messageIDSDTO.channelId());
+        UUID messageId = UUID.fromString(messageIDSDTO.messageId());
 
-        Channel channel = channelRepository.findChannelByChanelId(SID, CID);
-        Message message = messageRepository.find(channel, MID);
+        Channel channel = channelRepository.find(channelId);
+        Message message = messageRepository.find(messageId);
 
         return message;
     }
 
     @Override
-    public void printMessage(String serverId, String channelId) {
+    public List<Message> findAllByChannelId(String channelId) {
+        UUID channelUUID = UUID.fromString(channelId);
+        List<Message> list = messageRepository.findAllByChannelId(channelUUID);
+        return list;
+    }
+
+    @Override
+    public void print(String channelId) {
         try {
-            UUID SID = UUID.fromString(serverId);
-            UUID CID = UUID.fromString(channelId);
+            UUID channelUUID = UUID.fromString(channelId);
 
-            Channel channel = channelRepository.findChannelByChanelId(SID, CID);
+            Channel channel = channelRepository.find(channelUUID);
             System.out.println(channel.getName());
 
-            List<Message> messages = messageRepository.findAllByChannelId(channel);
+            List<Message> messages = messageRepository.findAllByChannelId(channel.getChannelId());
             for (Message message : messages) {
                 System.out.println(message.getCreatorName() + " : " + message.getText());
             }
@@ -76,26 +93,25 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public boolean removeMessage(String serverId,String channelId, String messageId) {
-        UUID SID = UUID.fromString(serverId);
-        UUID CID = UUID.fromString(channelId);
-        UUID MID = UUID.fromString(messageId);
-        Channel channel = channelRepository.findChannelByChanelId(SID, CID);
-        Message message = messageRepository.find(channel, MID);
+    public boolean delete(MessageIDSDTO messageIDSDTO) {
+        UUID channelId = UUID.fromString(messageIDSDTO.channelId());
+        UUID messageId = UUID.fromString(messageIDSDTO.messageId());
+
+        Channel channel = channelRepository.find(channelId);
+        Message message = messageRepository.find(messageId);
 
         messageRepository.remove(channel, message);
         return true;
     }
 
     @Override
-    public boolean updateMessage(String serverId,String channelId, String messageId, String replaceText) {
-        UUID SID = UUID.fromString(serverId);
-        UUID CID = UUID.fromString(channelId);
-        UUID MID = UUID.fromString(messageId);
-        Channel channel = channelRepository.findChannelByChanelId(SID, CID);
-        Message message = messageRepository.find(channel, MID);
+    public boolean update(MessageIDSDTO messageIDSDTO, MessageUpdateDTO messageUpdateDTO) {
+        UUID channelId = UUID.fromString(messageIDSDTO.channelId());
+        UUID messageId = UUID.fromString(messageIDSDTO.messageId());
+        Channel channel = channelRepository.find(channelId);
+        Message message = messageRepository.find(messageId);
 
-        messageRepository.update(channel, message, replaceText);
+        messageRepository.update(message, messageUpdateDTO);
         return true;
     }
 }
