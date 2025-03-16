@@ -40,7 +40,7 @@ public class BasicMessageService implements MessageService {
 
         Message message = new Message(UID,user.getName(), CID, text);
 
-        messageRepository.saveMessage(message);
+        messageRepository.save(message);
         return message;
     }
 
@@ -51,7 +51,7 @@ public class BasicMessageService implements MessageService {
         UUID MID = UUID.fromString(messageId);
 
         Channel channel = channelRepository.findChannelByChanelId(SID, CID);
-        Message message = messageRepository.findMessageByChannel(channel, MID);
+        Message message = messageRepository.find(channel, MID);
 
         return message;
     }
@@ -65,7 +65,7 @@ public class BasicMessageService implements MessageService {
             Channel channel = channelRepository.findChannelByChanelId(SID, CID);
             System.out.println(channel.getName());
 
-            List<Message> messages = messageRepository.findMessageListByChannel(channel);
+            List<Message> messages = messageRepository.findAllByChannelId(channel);
             for (Message message : messages) {
                 System.out.println(message.getCreatorName() + " : " + message.getText());
             }
@@ -81,9 +81,9 @@ public class BasicMessageService implements MessageService {
         UUID CID = UUID.fromString(channelId);
         UUID MID = UUID.fromString(messageId);
         Channel channel = channelRepository.findChannelByChanelId(SID, CID);
-        Message message = messageRepository.findMessageByChannel(channel, MID);
+        Message message = messageRepository.find(channel, MID);
 
-        messageRepository.removeMessage(channel, message);
+        messageRepository.remove(channel, message);
         return true;
     }
 
@@ -93,9 +93,9 @@ public class BasicMessageService implements MessageService {
         UUID CID = UUID.fromString(channelId);
         UUID MID = UUID.fromString(messageId);
         Channel channel = channelRepository.findChannelByChanelId(SID, CID);
-        Message message = messageRepository.findMessageByChannel(channel, MID);
+        Message message = messageRepository.find(channel, MID);
 
-        messageRepository.updateMessage(channel, message, replaceText);
+        messageRepository.update(channel, message, replaceText);
         return true;
     }
 }

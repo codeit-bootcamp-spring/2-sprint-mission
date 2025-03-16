@@ -84,6 +84,4 @@ public class JCFChannelRepository implements ChannelRepository {
         List<Channel> list = findAllByServerId(server.getServerId());
         list.remove(channel);
     }
-
-
 }

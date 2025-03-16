@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.Repository.file;
 
+import com.sprint.mission.discodeit.DTO.MessageUpdateDTO;
 import com.sprint.mission.discodeit.Exception.EmptyMessageListException;
 import com.sprint.mission.discodeit.Exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.Repository.MessageRepository;
@@ -78,50 +79,39 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void saveMessage(Message message) {
-        messageList.computeIfAbsent(message.getChannelId(), k -> new ArrayList<>()).add(message);
+    public void save(Channel channel, Message message) {
+        List<Message> messages = messageList.getOrDefault(channel.getChannelId(), new ArrayList<>());
+        messages.add(message);
 
-        saveMessageList();
     }
 
     @Override
-    public List<Message> findMessageListByChannel(Channel channel) {
-        return findMessageListByChannel(channel.getChannelId());
+    public Message find(UUID messageId) {
+        Message message = messageList.values().stream().flatMap(List::stream)
+                .filter(s -> s.getMessageId().equals(messageId))
+                .findFirst()
+                .orElseThrow(() -> new MessageNotFoundException("해당 ID를 가지는 메시지를 찾을 수 없습니다."));
+        return message;
     }
 
     @Override
-    public List<Message> findMessageListByChannel(UUID channelId) {
-        List<Message> messages = Optional.ofNullable(messageList.get(channelId))
-                .orElseThrow(() -> new EmptyMessageListException("메시지함이 비어있습니다."));
+    public List<Message> findAllByChannelId(UUID channelId) {
+        List<Message> messages = messageList.get(channelId);
         return messages;
     }
 
     @Override
-    public Message findMessageByChannel(Channel channel, UUID messageId) {
-        List<Message> messages = findMessageListByChannel(channel);
-        Message findMessage = messages.stream().filter(m -> m.getMessageId().equals(messageId))
-                .findFirst().orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
-        return findMessage;
+    public UUID update(Message message, MessageUpdateDTO messageUpdateDTO) {
+        if (messageUpdateDTO.replaceText() != null) {
+            message.setText(messageUpdateDTO.replaceText());
+        }
+        return message.getMessageId();
     }
 
     @Override
-    public UUID updateMessage(Channel channel, Message message, String replaceText) {
-        Message findMessage = findMessageByChannel(channel, message.getMessageId());
-        findMessage.setText(replaceText);
+    public void remove(Channel channel, Message message) {
+        List<Message> messages = messageList.get(channel.getChannelId());
+        messages.remove(message);
 
-        saveMessageList();
-        return findMessage.getMessageId();
-    }
-
-    @Override
-    public UUID removeMessage(Channel channel,  Message message) {
-        List<Message> messages = findMessageListByChannel(channel);
-        Message findMessage = findMessageByChannel(channel, message.getMessageId());
-
-        messages.remove(findMessage);
-        messageList.put(channel.getChannelId(), messages);
-
-        saveMessageList();
-        return findMessage.getMessageId();
     }
 }

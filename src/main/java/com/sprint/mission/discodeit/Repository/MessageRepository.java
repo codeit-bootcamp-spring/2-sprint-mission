@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.Repository;
 
+import com.sprint.mission.discodeit.DTO.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.stereotype.Repository;
@@ -11,15 +12,13 @@ import java.util.UUID;
 public interface MessageRepository {
 
     void reset();
-    void saveMessage(Message message);
+    void save(Channel channel, Message message);
 
-    Message findMessageByChannel(Channel channel, UUID messageId);
+    Message find(UUID messageId);
 
-    List<Message> findMessageListByChannel(Channel channel);
+    List<Message> findAllByChannelId(UUID channelId);
 
-    List<Message> findMessageListByChannel(UUID channelId);
+    UUID update(Message message, MessageUpdateDTO messageUpdateDTO);
 
-    UUID updateMessage(Channel channel, Message message, String replaceText);
-
-    UUID removeMessage(Channel channel,  Message message);
+    void remove(Channel channel, Message message);
 }
