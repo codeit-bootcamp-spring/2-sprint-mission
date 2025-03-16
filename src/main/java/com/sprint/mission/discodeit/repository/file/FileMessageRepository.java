@@ -38,6 +38,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
         channelIdMessages.get(super.findById(messageId).getChannelId()).remove(super.findById(messageId));
     }
 
+    @Override
     public List<Message> findMessageListByChannelId(UUID channelId) {   //해당 channelID를 가진 message가 없을 때, 빈 리스트 반환
         if (channelId == null) {
             throw new IllegalArgumentException("input channelId is null!!!");
