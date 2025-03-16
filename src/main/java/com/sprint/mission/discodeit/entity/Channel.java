@@ -20,6 +20,7 @@ public class Channel extends BaseEntity implements Serializable {
         validateChannelName(channelName);
         this.channelName = channelName;
         this.participantIds = new HashSet<>();
+        this.lastMessageTime = null;        // 채널이 생성된 직후 lastMessageTime 값을 null로 초기화
     }
 
     public void updateChannelName(String newChannelName) {
