@@ -13,18 +13,18 @@ public interface ServerService {
 
     void reset(boolean adminAuth);
 
-    UUID createServer(ServerCreateDTO serverCreateDTO);
+    UUID create(ServerCreateDTO serverCreateDTO);
 
-    UUID joinServer(ServerJoinDTO serverJoinDTO);
+    UUID join(ServerJoinDTO serverJoinDTO);
 
-    Server findServer(String ownerId, String name);
+    Server find(String serverId);
 
     List<Server> findServerAll(String ownerId);
 
-    void printServer(String userId);
+    void print(String userId);
 
-    boolean deleteServer(ServerDeleteDTO serverDeleteDTO);
+    boolean delete(ServerDeleteDTO serverDeleteDTO);
 
-    boolean updateServer(ServerDeleteDTO serverDeleteDTO, ServerUpdateDTO serverUpdateDTO);
+    boolean update(String serverId, ServerUpdateDTO serverUpdateDTO);
 
 }

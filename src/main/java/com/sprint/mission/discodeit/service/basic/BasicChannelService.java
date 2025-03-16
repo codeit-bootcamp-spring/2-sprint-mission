@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.DTO.Channel.ChannelCreateDTO;
+import com.sprint.mission.discodeit.DTO.Channel.ChannelIDDTO;
+import com.sprint.mission.discodeit.DTO.Channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
+import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
@@ -16,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
+    private final ServerRepository serverRepository;
     private final ChannelRepository channelRepository;
 
     @Override
@@ -26,31 +31,27 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public UUID createChannel(String serverId, String creatorId, String name) {
-        UUID SID = UUID.fromString(serverId);
-        UUID UID = UUID.fromString(creatorId);
+    public UUID create(ChannelCreateDTO channelCreateDTO) {
+        UUID serverId = UUID.fromString(channelCreateDTO.serverId());
+        UUID creatorId = UUID.fromString(channelCreateDTO.creatorId());
 
-        User user = userRepository.findUserByUserId(UID);
-        Server findServer = userRepository.findServerByServerId(user, SID);
+        User user = userRepository.find(creatorId);
+        Server findServer = serverRepository.find(serverId);
 
-        Channel channel = new Channel(findServer.getServerId(), user.getId(), name);
+        Channel channel = new Channel(findServer.getServerId(), user.getId(), channelCreateDTO.name(), channelCreateDTO.type());
         channelRepository.save(findServer, channel);
 
         return channel.getChannelId();
     }
 
-
     @Override
-    public UUID joinChannel(String serverId, String userId, String ownerId,String channelId) {
-        UUID SID = UUID.fromString(serverId);
-        UUID UID = UUID.fromString(userId);
-        UUID UOID = UUID.fromString(ownerId);
-        UUID CID = UUID.fromString(channelId);
+    public UUID join(ChannelIDDTO channelIDDTO ) {
+        UUID userId = UUID.fromString(channelIDDTO.userId());
 
-        User user = userRepository.findUserByUserId(UID);
-        User owner = userRepository.findUserByUserId(UOID);
-        Server findServer = userRepository.findServerByServerId(owner, SID);
-        Channel findChannel = channelRepository.findChannelByChanelId(findServer, CID);
+        UUID channelId = UUID.fromString(channelIDDTO.channelId());
+
+        User user = userRepository.find(userId);
+        Channel findChannel = channelRepository.find(channelId);
 
         UUID uuid = channelRepository.join(findChannel, user);
 
@@ -58,14 +59,12 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public UUID quitChannel(String serverId, String userId, String channelId) {
-        UUID SID = UUID.fromString(serverId);
-        UUID UID = UUID.fromString(userId);
-        UUID CID = UUID.fromString(channelId);
+    public UUID quit(ChannelIDDTO channelIDDTO) {
+        UUID userId = UUID.fromString(channelIDDTO.userId());
+        UUID channelId = UUID.fromString(channelIDDTO.channelId());
 
-        User user = userRepository.findUserByUserId(UID);
-        Server findServer = userRepository.findServerByServerId(user, SID);
-        Channel findChannel = channelRepository.findChannelByChanelId(findServer, CID);
+        User user = userRepository.find(userId);
+        Channel findChannel = channelRepository.find(channelId);
 
         UUID uuid = channelRepository.quit(findChannel, user);
 
@@ -73,55 +72,15 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public boolean printUsers(String serverId) {
-        UUID SID = UUID.fromString(serverId);
+    public boolean delete(ChannelIDDTO channelIDDTO) {
+        UUID serverId = UUID.fromString(channelIDDTO.serverId());
+        UUID userId = UUID.fromString(channelIDDTO.userId());
+        UUID channelId = UUID.fromString(channelIDDTO.channelId());
 
-        List<Channel> channels = channelRepository.findChannelListByServerId(SID);
+        Server findServer = serverRepository.find(serverId);
+        Channel findChannel = channelRepository.find(channelId);
 
-        for (Channel channel : channels) {
-            List<User> users = channelRepository.findUserListByChannelId(channel.getServerId());
-            System.out.println(channel.getName());
-            for (User user : users) {
-                System.out.println(user);
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean printChannels(String serverId) {
-        UUID SID = UUID.fromString(serverId);
-
-        List<Channel> channels = channelRepository.findChannelListByServerId(SID);
-        for (Channel channel : channels) {
-            System.out.println(channel);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean printUsersInChannel(String channelId) {
-        UUID CID = UUID.fromString(channelId);
-
-        List<User> users = channelRepository.findUserListByChannelId(CID);
-        for (User user : users) {
-            System.out.println(user);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean removeChannel(String serverId, String creatorId, String channelId) {
-        UUID SID = UUID.fromString(serverId);
-        UUID UID = UUID.fromString(creatorId);
-        UUID CID = UUID.fromString(channelId);
-
-        User user = userRepository.findUserByUserId(UID);
-        Server findServer = userRepository.findServerByServerId(user, SID);
-        Channel findChannel = channelRepository.findChannelByChanelId(findServer, CID);
-
-        if (findChannel.getCreatorId().equals(UID)) {
+        if (findChannel.getCreatorId().equals(userId)) {
             channelRepository.remove(findServer, findChannel);
             return true;
         } else {
@@ -131,17 +90,15 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public boolean updateChannelName(String serverId, String creatorId, String channelId, String replaceName) {
-        UUID SID = UUID.fromString(serverId);
-        UUID UID = UUID.fromString(creatorId);
-        UUID CID = UUID.fromString(channelId);
+    public boolean update(ChannelIDDTO channelIDDTO, ChannelUpdateDTO channelUpdateDTO) {
+        UUID serverId = UUID.fromString(channelIDDTO.serverId());
+        UUID userId = UUID.fromString(channelIDDTO.userId());
+        UUID channelId = UUID.fromString(channelIDDTO.channelId());
 
-        User user = userRepository.findUserByUserId(UID);
-        Server findServer = userRepository.findServerByServerId(user, SID);
-        Channel findChannel = channelRepository.findChannelByChanelId(findServer, CID);
+        Channel findChannel = channelRepository.find(channelId);
 
-        if (findChannel.getCreatorId().equals(UID)) {
-            channelRepository.update(findServer, findChannel, replaceName);
+        if (findChannel.getCreatorId().equals(userId)) {
+            channelRepository.update(findChannel, channelUpdateDTO);
             return true;
         } else {
             System.out.println("채널 수정 권한 없음");
@@ -149,4 +106,21 @@ public class BasicChannelService implements ChannelService {
         }
     }
 
+    @Override
+    public boolean printChannels(String serverId) {
+        UUID serverUUID = UUID.fromString(serverId);
+
+        List<Channel> channels = channelRepository.findAllByServerId(serverUUID);
+        channels.forEach(System.out::println);
+        return true;
+    }
+
+    @Override
+    public boolean printUsersInChannel(String channelId) {
+        UUID channelUUID = UUID.fromString(channelId);
+        Channel channel = channelRepository.find(channelUUID);
+        List<User> list = channel.getUserList();
+        list.forEach(System.out::println);
+        return true;
+    }
 }

@@ -13,16 +13,16 @@ public interface UserService {
 
     void reset(boolean adminAuth);
 
-    UUID registerUser(UserCreateDTO userCreateDTO);
+    UUID register(UserCreateDTO userCreateDTO);
 
-    UserFindDTO findUser(String name);
+    UserFindDTO find(String name);
 
-    List<UserFindDTO> findUserAll();
+    List<UserFindDTO> findAll();
 
-    void printUser();
+    void print();
 
-    boolean deleteUser(UserDeleteDTO userDeleteDTO);
+    boolean delete(UserDeleteDTO userDeleteDTO);
 
-    boolean updateUser(String userId, UserUpdateDTO userUpdateDTO);
+    boolean update(String userId, UserUpdateDTO userUpdateDTO);
 
 }

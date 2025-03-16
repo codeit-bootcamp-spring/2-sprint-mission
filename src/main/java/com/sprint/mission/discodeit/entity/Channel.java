@@ -28,6 +28,10 @@ public class Channel implements Serializable {
     public final Instant createdAt;
     public Instant updatedAt;
 
+    public Channel(UUID serverId, UUID creatorId, String name ) {
+        this(UUID.randomUUID(), serverId, creatorId,Instant.now(), name, ChannelType.PUBLIC);
+    }
+
     public Channel(UUID serverId, UUID creatorId, String name, ChannelType type) {
         this(UUID.randomUUID(), serverId, creatorId,Instant.now(), name, type);
     }
