@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.DTO.Channel.ChannelCreateDTO;
+import com.sprint.mission.discodeit.DTO.Channel.ChannelIDDTO;
+import com.sprint.mission.discodeit.Repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.Repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ServerService;
@@ -18,6 +21,7 @@ import java.util.UUID;
 public class BasicServerService implements ServerService {
     private final UserRepository userRepository;
     private final ServerRepository serverRepository;
+    private final ReadStatusRepository readStatusRepository;
 
     @Override
     public void reset(boolean adminAuth) {
@@ -27,22 +31,28 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public UUID createChannel(String serverId, String creatorId, String name, ChannelType type) {
-        UUID SID = UUID.fromString(serverId);
-        UUID UID = UUID.fromString(creatorId);
+    public UUID createChannel(ChannelCreateDTO channelCreateDTO) {
+        UUID SID = UUID.fromString(channelCreateDTO.serverId());
+        UUID UID = UUID.fromString(channelCreateDTO.creatorId());
 
         User user = userRepository.findUserByUserId(UID);
         Server findServer = userRepository.findServerByServerId(user, SID);
 
-        Channel channel = new Channel(findServer.getServerId(), user.getId(), name, type);
+        Channel channel = new Channel(findServer.getServerId(), user.getId(), channelCreateDTO.name(), channelCreateDTO.type());
         serverRepository.saveChannel(findServer, channel);
 
         return channel.getChannelId();
     }
 
+    private UUID createChannelPrivate() {
+
+
+
+    }
+
 
     @Override
-    public UUID joinChannel(String serverId, String userId, String ownerId,String channelId) {
+    public UUID joinChannel(ChannelIDDTO channelIDDTO, String ownerId) {
         UUID SID = UUID.fromString(serverId);
         UUID UID = UUID.fromString(userId);
         UUID UOID = UUID.fromString(ownerId);
@@ -59,7 +69,7 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public UUID quitChannel(String serverId, String userId, String channelId) {
+    public UUID quitChannel(ChannelIDDTO channelIDDTO) {
         UUID SID = UUID.fromString(serverId);
         UUID UID = UUID.fromString(userId);
         UUID CID = UUID.fromString(channelId);
@@ -113,7 +123,7 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public boolean removeChannel(String serverId, String creatorId, String channelId) {
+    public boolean removeChannel(ChannelIDDTO channelIDDTO) {
         UUID SID = UUID.fromString(serverId);
         UUID UID = UUID.fromString(creatorId);
         UUID CID = UUID.fromString(channelId);
@@ -132,7 +142,7 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public boolean updateChannelName(String serverId, String creatorId, String channelId, String replaceName) {
+    public boolean updateChannelName(ChannelIDDTO channelIDDTO, String replaceName) {
         UUID SID = UUID.fromString(serverId);
         UUID UID = UUID.fromString(creatorId);
         UUID CID = UUID.fromString(channelId);

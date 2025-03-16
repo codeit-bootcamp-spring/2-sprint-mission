@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.DTO.Channel.ChannelCreateDTO;
+import com.sprint.mission.discodeit.DTO.Channel.ChannelIDDTO;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.UUID;
@@ -8,11 +10,11 @@ public interface ServerService {
 
     void reset(boolean adminAuth);
 
-    UUID createChannel(String serverId, String creatorId, String name, ChannelType type);
+    UUID createChannel(ChannelCreateDTO channelCreateDTO);
 
-    UUID joinChannel(String serverId, String userId, String ownerId,String channelId);
+    UUID joinChannel(ChannelIDDTO channelIDDTO, String ownerId);
 
-    UUID quitChannel(String serverId, String userId, String channelId);
+    UUID quitChannel(ChannelIDDTO channelIDDTO);
 
     boolean printUsers(String serverId);
 
@@ -20,7 +22,7 @@ public interface ServerService {
 
     boolean printUsersInChannel(String channelId);
 
-    boolean removeChannel(String serverId, String creatorId, String channelId);
+    boolean removeChannel(ChannelIDDTO channelIDDTO);
 
-    boolean updateChannelName(String serverId, String creatorId, String channelId, String replaceName);
+    boolean updateChannelName(ChannelIDDTO channelIDDTO, String replaceName);
 }

@@ -31,8 +31,7 @@ public class UserStatusService {
             } else {
                 throw new DuplicateUserStatusException("해당 유저 상태는 이미 존재합니다.");
             }
-            UserStatusCreateDTO userStatusCreateDTO = new UserStatusCreateDTO(user.getId(), userStatus);
-            userStatusRepository.save(userStatusCreateDTO);
+            userStatusRepository.save(userStatus);
         } catch (UserNotFoundException e) {
             System.out.println("해당 유저는 존재하지 않습니다.");
         } catch (DuplicateUserStatusException e) {

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface UserStatusRepository {
-    void save(UserStatusCreateDTO userStatusCreateDTO);
+    void save(UserStatus userStatus);
 
     UserStatus find(UUID userId);
 

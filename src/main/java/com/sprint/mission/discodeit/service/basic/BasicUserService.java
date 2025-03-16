@@ -76,7 +76,6 @@ public class BasicUserService implements UserService {
         Server server = new Server(UID, serverCreateDTO.name());
         userRepository.saveServer(owner, server);
         return server.getServerId();
-
     }
 
     @Override
