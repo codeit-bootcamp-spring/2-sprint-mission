@@ -32,6 +32,13 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        List<ReadStatus> list = readStatusList.stream().filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .toList();
+        return list;
+    }
+
+    @Override
     public void update(ReadStatus readStatus,ReadStatusUpdateDTO readStatusUpdateDTO) {
         if (readStatusUpdateDTO.replaceId() != null) {
             readStatus.setReadStatusId(readStatusUpdateDTO.replaceId());

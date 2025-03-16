@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.Channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.Exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.Exception.UserNotFoundException;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
@@ -64,6 +65,7 @@ public class JCFChannelRepository implements ChannelRepository {
         List<Channel> channels = channelList.get(serverId);
         return channels;
     }
+
 
     @Override
     public UUID update(Channel targetChannel, ChannelUpdateDTO channelUpdateDTO) {

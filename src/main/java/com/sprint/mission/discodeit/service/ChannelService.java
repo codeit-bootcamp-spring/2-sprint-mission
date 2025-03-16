@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.Channel.ChannelCreateDTO;
-import com.sprint.mission.discodeit.DTO.Channel.ChannelIDSDTO;
-import com.sprint.mission.discodeit.DTO.Channel.ChannelUpdateDTO;
+import com.sprint.mission.discodeit.DTO.Channel.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -13,9 +12,13 @@ public interface ChannelService {
 
     UUID create(ChannelCreateDTO channelCreateDTO);
 
-    UUID join(ChannelIDSDTO channelIDSDTO);
+    UUID join(ChannelJoinDTO channelJoinDTO);
 
-    UUID quit(ChannelIDSDTO channelIDSDTO);
+    UUID quit(ChannelJoinDTO channelJoinDTO);
+
+    ChannelFindDTO find(String channelId);
+
+    List<ChannelFindDTO> findAllByServerAndUser(String serverId );
 
     boolean printChannels(String serverId);
 
