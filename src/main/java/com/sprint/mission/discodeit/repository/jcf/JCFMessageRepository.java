@@ -32,14 +32,14 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findByChannelId(UUID channelId) {
+    public List<Message> findAllByChannelId(UUID channelId) {
         return data.values().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .toList();
     }
 
     @Override
-    public List<Message> findByAuthorId(UUID authorId) {
+    public List<Message> findAllByAuthorId(UUID authorId) {
         return data.values().stream()
                 .filter(message -> message.getAuthorId().equals(authorId))
                 .toList();

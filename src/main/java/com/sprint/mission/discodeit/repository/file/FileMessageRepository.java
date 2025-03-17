@@ -44,8 +44,8 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
 
-    private Path getFilePath(UUID userId) {
-        return DIRECTORY_PATH.resolve(userId + ".ser");
+    private Path getFilePath(UUID messageId) {
+        return DIRECTORY_PATH.resolve(messageId + ".ser");
     }
 
     @Override
@@ -67,24 +67,41 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message findById(UUID messageId) {
-        return findAll().stream()
-                .filter(message -> message.getId().equals(messageId))
-                .findFirst()
-                .orElse(null);
+        Path filePath = getFilePath(messageId);
+
+        if (!Files.exists(filePath)) {
+            throw new RuntimeException("Message ID " + messageId + "에 해당하는 파일을 찾을 수 없습니다.");
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
+            return (Message) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(filePath.getFileName() + " Message 로드를 실패했습니다: " + e.getMessage());
+        }
     }
 
     @Override
-    public List<Message> findByChannelId(UUID channelId) {
-        return findAll().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
-                .toList();
+    public List<Message> findAllByChannelId(UUID channelId) {
+        try (Stream<Path> paths = Files.list(DIRECTORY_PATH)) {
+            return paths
+                    .map(this::readUserFromFile)
+                    .filter(message -> message.getChannelId().equals(channelId))
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException("Messages 데이터 로드를 실패했습니다: " + e.getMessage());
+        }
     }
 
     @Override
-    public List<Message> findByAuthorId(UUID authorId) {
-        return findAll().stream()
-                .filter(message -> message.getAuthorId().equals(authorId))
-                .toList();
+    public List<Message> findAllByAuthorId(UUID authorId) {
+        try (Stream<Path> paths = Files.list(DIRECTORY_PATH)) {
+            return paths
+                    .map(this::readUserFromFile)
+                    .filter(message -> message.getAuthorId().equals(authorId))
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException("Messages 데이터 로드를 실패했습니다: " + e.getMessage());
+        }
     }
 
     @Override

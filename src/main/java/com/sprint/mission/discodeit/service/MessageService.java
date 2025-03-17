@@ -10,11 +10,9 @@ public interface MessageService {
 
     Message findById(UUID messageId);
 
-    List<Message> findByChannelId(UUID channelId);
+    List<Message> findAllByChannelId(UUID channelId);
 
-    List<Message> findByAuthorId(UUID authorId);
-
-    List<Message> findAll();
+    List<Message> findAllByAuthorId(UUID authorId);
 
     Message update(UUID messageId, String newContent);
 

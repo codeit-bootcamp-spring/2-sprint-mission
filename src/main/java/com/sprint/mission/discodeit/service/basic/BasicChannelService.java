@@ -66,7 +66,7 @@ public class BasicChannelService implements ChannelService {
             throw new NoSuchElementException(channelId + " 채널을 찾을 수 없습니다.");
         }
 
-        Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
+        Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId())
                 .stream().max(Comparator.comparing(Message::getCreatedAt)).map(Message::getCreatedAt)
                 .orElse(null);
 
@@ -95,7 +95,7 @@ public class BasicChannelService implements ChannelService {
                                 joinedChannelIds.contains(channel.getId())
                 )
                 .map(channel -> {
-                    Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
+                    Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId())
                             .stream().max(Comparator.comparing(Message::getCreatedAt)).map(Message::getCreatedAt)
                             .orElse(null);
 
@@ -135,7 +135,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId);
         channelRepository.delete(channel.getId());
 
-        messageRepository.findByChannelId(channel.getId())
+        messageRepository.findAllByChannelId(channel.getId())
                 .forEach(message -> messageRepository.delete(message.getId()));
 
         readStatusRepository.findAllByChannelId(channel.getId())

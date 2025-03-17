@@ -47,18 +47,13 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findByChannelId(UUID channelId) {
-        return messageRepository.findByChannelId(channelId);
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.findAllByChannelId(channelId);
     }
 
     @Override
-    public List<Message> findByAuthorId(UUID authorId) {
-        return messageRepository.findByAuthorId(authorId);
-    }
-
-    @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll();
+    public List<Message> findAllByAuthorId(UUID authorId) {
+        return messageRepository.findAllByAuthorId(authorId);
     }
 
     @Override
