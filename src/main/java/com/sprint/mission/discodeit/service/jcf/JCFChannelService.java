@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -23,8 +24,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(String channelName) {
-        Channel channel = new Channel(channelName);
+    public Channel createChannel(ChannelType type, String channelName, String description) {
+        Channel channel = new Channel(type, description, channelName);
         channels.put(channel.getId(), channel);
         return channel;
     }
@@ -50,6 +51,16 @@ public class JCFChannelService implements ChannelService {
     public void updateChannelName(UUID channelId, String newChannelName) {
         Channel channel = findChannelById(channelId);
         channel.updateChannelName(newChannelName);
+    }
+
+    @Override
+    public void updateChannelDescription(UUID channelId, String newChannelDescription) {
+
+    }
+
+    @Override
+    public void updateChannelType(UUID channelId, ChannelType newChannelType) {
+
     }
 
     @Override
