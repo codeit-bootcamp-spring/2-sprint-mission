@@ -50,6 +50,14 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    public List<ReadStatusDTO> findAllByChannelId(UUID channelId) {
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
+        return readStatuses.stream()
+                .map(rs -> readStatusEntityToDTO(rs))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public UUID update(UpdateReadStatusParam updateReadStatusParam) {
         ReadStatus readStatus = readStatusRepository.findById(updateReadStatusParam.id())
                 .orElseThrow(() -> new NoSuchElementException(updateReadStatusParam.id() + " ReadStatus가 존재하지 않습니다."));
@@ -63,6 +71,10 @@ public class BasicReadStatusService implements ReadStatusService {
         readStatusRepository.deleteById(id);
     }
 
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        readStatusRepository.deleteByChannelId(channelId);
+    }
 
     private void checkUserExists(CreateReadStatusParam createReadStatusParam) {
         userRepository.findById(createReadStatusParam.userId())
@@ -75,10 +87,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     private void checkDuplicateReadStatus(CreateReadStatusParam createReadStatusParam) {
-        List<ReadStatus> readStatuses = readStatusRepository.findAll();
-        if (readStatuses.stream()
-                .anyMatch(rs -> rs.getUserId().equals(createReadStatusParam.userId())
-                        && rs.getChannelId().equals(createReadStatusParam.channelId()))) {
+        if (readStatusRepository.existsByUserIdAndChannelId(createReadStatusParam.userId(), createReadStatusParam.channelId())) {
             throw new IllegalStateException("이미 ReadStatus가 존재하는 userId와 channelId 입니다.");
         }
     }
