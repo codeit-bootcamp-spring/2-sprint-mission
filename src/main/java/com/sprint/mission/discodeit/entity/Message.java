@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.service.TimeFormatter;
 import lombok.Getter;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -20,7 +21,7 @@ public class Message extends BaseEntity implements Serializable {
         this.text = text;
     }
 
-    public void update(String text, long updatedAt) {
+    public void update(String text, Instant updatedAt) {
         this.text = text;
         this.updatedAt = updatedAt;
     }
