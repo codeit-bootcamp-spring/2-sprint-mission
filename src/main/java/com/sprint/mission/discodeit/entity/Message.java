@@ -14,11 +14,12 @@ public class Message extends BaseEntity implements Serializable {
 
     private List<UUID> attachmentIds;
 
-    public Message(UUID authorId, UUID channelId, String content) {
+    public Message(UUID authorId, UUID channelId, String content, List<UUID> attachmentIds) {
         super();
         this.authorId = authorId;
         this.channelId = channelId;
         this.content = content;
+        this.attachmentIds = attachmentIds;
     }
 
     public void update(String newContent) {

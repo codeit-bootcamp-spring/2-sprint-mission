@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -20,15 +21,16 @@ public class BasicMessageService implements MessageService {
     private final ChannelService channelService;
 
     @Override
-    public Message create(UUID authorId, UUID channelId, String content) {
+    public Message create(MessageCreateDto messageCreateDto) {
         try {
-            userService.findById(authorId);
-            channelService.findById(channelId);
+            userService.findById(messageCreateDto.authorId());
+            channelService.findById(messageCreateDto.channelId());
         } catch (NoSuchElementException e) {
             throw new RuntimeException("Message 생성 실패: " + e.getMessage());
         }
 
-        Message newMessage = new Message(authorId, channelId, content);
+        Message newMessage = new Message(messageCreateDto.authorId(), messageCreateDto.channelId(),
+                messageCreateDto.content(), messageCreateDto.attachmentIds());
 
         return messageRepository.save(newMessage);
     }
