@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.util.UUID;
 
+@Getter
 public class Channel extends BaseEntity {
     private String name;
     private String description;
@@ -10,14 +13,6 @@ public class Channel extends BaseEntity {
         super(id, createdAt);
         this.name = name;
         this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public void setName(String name) {

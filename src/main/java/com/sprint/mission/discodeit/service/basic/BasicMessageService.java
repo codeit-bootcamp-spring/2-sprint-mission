@@ -5,26 +5,19 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private static BasicMessageService messageService;
     private final UserService userService;
     private final ChannelService channelService;
     private final MessageRepository messageRepository;
-
-    private final HashMap<UUID, Message> messages = new HashMap<>();
-
-    public BasicMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
-        this.userService = userService;
-        this.channelService = channelService;
-        this.messageRepository = messageRepository;
-    }
-
 
     @Override
     public void create(Message message, UUID channelId, UUID authorId) {
