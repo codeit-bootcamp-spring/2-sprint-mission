@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.Util;
 
+import com.sprint.mission.discodeit.Exception.CommonExceptions;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,5 +18,9 @@ public class CommonUtils {
 
     public static <T> List<T> findAllById(List<T> list, UUID id, Function<T, UUID> function) {
         return list.stream().filter(t -> function.apply(t).equals(id)).toList();
+    }
+
+    public static <T> void checkUserDuplicate(List<T> list, String data, Function<T, String> function) {
+        list.stream().filter(t->function.apply(t).equals(data)).findFirst().ifPresent(t -> {throw CommonExceptions.DUPLICATE_USER;});
     }
 }

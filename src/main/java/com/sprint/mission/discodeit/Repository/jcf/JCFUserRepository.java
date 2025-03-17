@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.EmptyUserListException;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.User;
@@ -38,7 +39,7 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public List<User> findUserList() {
         if (userList.isEmpty()) {
-            throw CommonExceptions.EMPTY_USER_LIST;
+            throw new EmptyUserListException("유저 리스트가 비어있습니다.");
         }
         return userList;
     }
@@ -65,7 +66,7 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public UUID remove(User user) {
         if (userList.isEmpty()) {
-            throw CommonExceptions.EMPTY_USER_LIST;
+            throw new EmptyUserListException("유저 리스트가 비어있습니다.");
         }
         userList.remove(user);
         return user.getId();

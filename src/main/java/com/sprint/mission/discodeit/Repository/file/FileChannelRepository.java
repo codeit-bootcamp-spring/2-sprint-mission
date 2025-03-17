@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.EmptyUserListException;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Util.CommonUtils;
@@ -55,7 +56,7 @@ public class FileChannelRepository implements ChannelRepository {
     public UUID quit(Channel channel, User user) {
         List<User> list = channel.getUserList();
         if (list.isEmpty()) {
-            throw CommonExceptions.EMPTY_USER_LIST;
+            throw new EmptyUserListException("채널 내 유저 리스트가 비어있습니다.");
         }
         list.remove(user);
 

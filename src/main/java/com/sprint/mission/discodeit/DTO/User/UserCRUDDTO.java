@@ -28,11 +28,13 @@ public record UserCRUDDTO(
 
     public static UserCRUDDTO create(String userName,
                                      String email,
-                                     String password) {
+                                     String password,
+                                     BinaryContent binaryContent) {
         return UserCRUDDTO.builder()
                 .userName(userName)
                 .email(email)
-                .password(password).build();
+                .password(password)
+                .binaryContent(binaryContent).build();
     }
 
     public static UserCRUDDTO delete(UUID userId) {

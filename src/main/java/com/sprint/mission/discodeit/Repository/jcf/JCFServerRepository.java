@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.Server.ServerDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.EmptyUserListException;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.Server;
@@ -43,7 +44,7 @@ public class JCFServerRepository implements ServerRepository {
     public UUID quit(User user, Server server) {
         List<User> users = server.getUserList();
         if (users.isEmpty()) {
-            throw CommonExceptions.EMPTY_USER_LIST;
+            throw new EmptyUserListException("서버 내 유저 리스트가 비어있습니다.");
         }
         users.remove(user);
 

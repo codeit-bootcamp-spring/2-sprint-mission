@@ -2,13 +2,14 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
-import com.sprint.mission.discodeit.DTO.User.UserDTO;
 import com.sprint.mission.discodeit.DTO.User.UserFindDTO;
 import com.sprint.mission.discodeit.Exception.CommonException;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.EmptyUserListException;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
+import com.sprint.mission.discodeit.Util.CommonUtils;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,12 +28,12 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     private void checkDuplicate(UserCRUDDTO userCRUDDTO) {
-        List<User> list = userRepository.findUserList();
-        Optional<User> duplicateUser = list.stream()
-                .filter(u -> u.getName().equals(userCRUDDTO.userName()) || u.getEmail().equals(userCRUDDTO.email())).findFirst();
-        duplicateUser.ifPresent(u -> {
-            throw CommonExceptions.DUPLICATE_USER;
-        });
+        try {
+            List<User> list = userRepository.findUserList();
+            CommonUtils.checkUserDuplicate(list, userCRUDDTO.userName(), User::getName);
+            CommonUtils.checkUserDuplicate(list, userCRUDDTO.email(), User::getEmail);
+        } catch (EmptyUserListException e) {
+        }
     }
 
     @Override
@@ -44,20 +44,26 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UUID register(UserDTO userDTO) {
-        UserCRUDDTO userCRUDDTO = UserCRUDDTO.create(userDTO.userName(), userDTO.email(), userDTO.email());
-
+    public UUID register(UserCRUDDTO userCRUDDTO) {
         UserCRUDDTO checkDuplicate = UserCRUDDTO.checkDuplicate(userCRUDDTO.userName(), userCRUDDTO.email());
-        checkDuplicate(checkDuplicate);
+
+        try {
+            checkDuplicate(checkDuplicate);
+        } catch (CommonException e) {
+            System.out.println("중복된 유저가 존재합니다.");
+            return null;
+        }
 
         User user = new User(userCRUDDTO.userName(), userCRUDDTO.email(), userCRUDDTO.password());
 
         if (userCRUDDTO.binaryContent() != null) {
             user.setProfileId(userCRUDDTO.binaryContent().getBinaryContentId());
-
-            BinaryContentDTO binaryContentDTO = BinaryContentDTO.create(userCRUDDTO.binaryContent());
-
-            binaryContentRepository.save(binaryContentDTO);
+            try {
+                BinaryContent content = binaryContentRepository.find(userCRUDDTO.binaryContent().getBinaryContentId());
+            } catch (CommonException e) {
+                BinaryContentDTO binaryContentDTO = BinaryContentDTO.create(userCRUDDTO.binaryContent());
+                binaryContentRepository.save(binaryContentDTO);
+            }
         }
 
         UserStatus userStatus = new UserStatus(user.getId());
@@ -81,7 +87,7 @@ public class BasicUserService implements UserService {
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 userStatus
-                );
+        );
 
         return userFindDTO;
     }
@@ -118,14 +124,13 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public boolean delete(UserDTO userDTO) {
-        UserCRUDDTO userCRUDDTO = UserCRUDDTO.delete(userDTO.userId());
+    public boolean delete(UserCRUDDTO userCRUDDTO) {
         try {
             User findUser = userRepository.find(userCRUDDTO.userId());
 
             userRepository.remove(findUser);
             userStatusRepository.delete(findUser.getId());
-            binaryContentRepository.delete(findUser.getId());
+            binaryContentRepository.delete(findUser.profileId);
 
             return true;
         } catch (IllegalArgumentException e0) {
@@ -139,8 +144,7 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public boolean update(String userId, UserDTO userDTO) {
-        UserCRUDDTO userCRUDDTO = UserCRUDDTO.update(userDTO.userId(),userDTO.profileId(),userDTO.userName(),userDTO.email());
+    public boolean update(String userId, UserCRUDDTO userCRUDDTO) {
         try {
             UUID userUUID = UUID.fromString(userId);
             User findUser = userRepository.find(userUUID);

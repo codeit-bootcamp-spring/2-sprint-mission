@@ -10,7 +10,6 @@ public class CommonExceptions {
     public static CommonException USER_STATUS_NOT_FOUND = new CommonException(CommonCode.USER_STATUS_NOT_FOUND);
     public static CommonException READ_STATUS_NOT_FOUND = new CommonException(CommonCode.READ_STATUS_NOT_FOUND);
 
-    public static CommonException EMPTY_USER_LIST = new CommonException(CommonCode.EMPTY_USER_LIST);
     public static CommonException EMPTY_SERVER_LIST = new CommonException(CommonCode.EMPTY_SERVER_LIST);
     public static CommonException EMPTY_CHANNEL_LIST = new CommonException(CommonCode.EMPTY_CHANNEL_LIST);
     public static CommonException EMPTY_MESSAGE_LIST = new CommonException(CommonCode.EMPTY_MESSAGE_LIST);
