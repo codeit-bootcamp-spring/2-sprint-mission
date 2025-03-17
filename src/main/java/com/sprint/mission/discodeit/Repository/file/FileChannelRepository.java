@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.Channel.ChannelUpdateDTO;
-import com.sprint.mission.discodeit.Exception.*;
+import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,61 +20,21 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class FileChannelRepository implements ChannelRepository {
+    private final FileRepositoryImpl<Map<UUID, List<Channel>>> fileRepository;
     private Map<UUID, List<Channel>> channelList = new ConcurrentHashMap<>();
-    private final Path channelPath = Paths.get(System.getProperty("user.dir"), "data", "ChannelList.ser");
+
+    private final Path path = Paths.get(System.getProperty("user.dir"), "data", "ChannelList.ser");
 
     public FileChannelRepository() {
-        loadChannelList();
-    }
-
-    // 채널 리스트를 저장할 디렉토리가 있는지 확인
-    private void init() {
-        Path directory = channelPath.getParent();
-        if (Files.exists(directory) == false) {
-            try {
-                Files.createDirectories(directory);
-                System.out.println("디렉토리 생성 완료: " + directory);
-            } catch (IOException e) {
-                System.out.println("디렉토리 생성 실패");
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void loadChannelList() {
-        if (Files.exists(channelPath) == true) {
-            try (FileInputStream fis = new FileInputStream(channelPath.toFile());
-                 ObjectInputStream ois = new ObjectInputStream(fis)) {
-
-                Map<UUID, List<Channel>> list = (Map<UUID, List<Channel>>) ois.readObject();
-                channelList = list;
-
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println("채널 리스트 로드 실패");
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-
-    private void saveChannelList() {
-        init();
-        try (FileOutputStream fos = new FileOutputStream(channelPath.toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-
-            oos.writeObject(channelList);
-
-        } catch (IOException e) {
-            System.out.println("채널 리스트 저장 실패");
-            throw new RuntimeException(e);
-        }
+        this.fileRepository = new FileRepositoryImpl<>(path);
+        this.fileRepository.load();
     }
 
     @Override
     public void reset() {
-        init();
+        fileRepository.init();
         try {
-            Files.deleteIfExists(channelPath);
+            Files.deleteIfExists(path);
             channelList = new ConcurrentHashMap<>();
         } catch (IOException e) {
             System.out.println("리스트 초기화 실패");
@@ -86,7 +46,7 @@ public class FileChannelRepository implements ChannelRepository {
         List<User> list = channel.getUserList();
         list.add(user);
 
-        saveChannelList();
+
         return user.getId();
     }
 
@@ -98,7 +58,7 @@ public class FileChannelRepository implements ChannelRepository {
         }
         list.remove(user);
 
-        saveChannelList();
+        fileRepository.save(channelList);
         return user.getId();
     }
 
@@ -108,7 +68,7 @@ public class FileChannelRepository implements ChannelRepository {
         channels.add(channel);
         channelList.put(server.getServerId(), channels);
 
-        saveChannelList();
+        fileRepository.save(channelList);
         return channel.getChannelId();
     }
 
@@ -145,7 +105,7 @@ public class FileChannelRepository implements ChannelRepository {
         if (channelUpdateDTO.replaceType() != null) {
             targetChannel.setType(channelUpdateDTO.replaceType());
         }
-        saveChannelList();
+        fileRepository.save(channelList);
         return targetChannel.getChannelId();
     }
 
@@ -153,6 +113,6 @@ public class FileChannelRepository implements ChannelRepository {
     public void remove(Server server, Channel channel) {
         List<Channel> list = findAllByServerId(server.getServerId());
         list.remove(channel);
-        saveChannelList();
+        fileRepository.save(channelList);
     }
 }

@@ -3,10 +3,11 @@ package com.sprint.mission.discodeit.Repository.file;
 import com.sprint.mission.discodeit.DTO.User.UserUpdateDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,67 +17,23 @@ import java.util.UUID;
 
 @Repository
 public class FileUserRepository implements UserRepository {
+    private final FileRepositoryImpl<List<User>> fileRepository;
     private  List<User> userList = new ArrayList<>();
 
-    private final Path userPath =  Paths.get(System.getProperty("user.dir"), "data", "UserList.ser");
+    private final Path path =  Paths.get(System.getProperty("user.dir"), "data", "UserList.ser");
 
 
     public FileUserRepository() {
-        loadUserList();
+        this.fileRepository = new FileRepositoryImpl<>(path);
+        fileRepository.load();
 
-    }
-
-
-    private void init() {
-        Path directory = userPath.getParent();
-        if (Files.exists(directory) == false) {
-            try {
-                Files.createDirectories(directory);
-                System.out.println("디렉토리 생성 완료: " + directory);
-            } catch (IOException e) {
-                System.out.println("디렉토리 생성 실패");
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void loadUserList() {
-        if (Files.exists(userPath) == true) {
-            try (FileInputStream fis = new FileInputStream(userPath.toFile());
-                 ObjectInputStream ois = new ObjectInputStream(fis)) {
-
-                List<User> list = (List<User>) ois.readObject();
-                for (User user : list) {
-                    User u = new User(user.getId(),user.getProfileId() ,user.getCreatedAt(), user.getName(), user.getEmail(), user.getPassword());
-                    userList.add(u);
-                }
-
-
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println("서버 리스트 로드 실패");
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void saveUserList() {
-        init();
-        try (FileOutputStream fos = new FileOutputStream(userPath.toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-
-            oos.writeObject(userList);
-
-        } catch (IOException e) {
-            System.out.println("서버 리스트 저장 실패");
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
     public void reset() {
-        init();
+        fileRepository.init();
         try {
-            Files.deleteIfExists(userPath);
+            Files.deleteIfExists(path);
             userList = new ArrayList<>();
 
         } catch (IOException e) {
@@ -88,14 +45,16 @@ public class FileUserRepository implements UserRepository {
     public UUID save(User user) {
 
         userList.add(user);
-        saveUserList();
+        fileRepository.save(userList);
         return user.getId();
     }
 
     @Override
     public User find(UUID userId) {
-        User user = userList.stream().filter(u -> u.getId().equals(userId)).findFirst()
+        User user = CommonUtils.filterById(userList, userId, User::getId)
+                .findFirst()
                 .orElseThrow(() -> CommonExceptions.USER_NOT_FOUND);
+
         return user;
     }
 
@@ -122,7 +81,7 @@ public class FileUserRepository implements UserRepository {
         if (userUpdateDTO.binaryContentId() != null) {
             user.setProfileId(userUpdateDTO.binaryContentId());
         }
-        saveUserList();
+        fileRepository.save(userList);
         return user.getId();
     }
 
@@ -133,7 +92,7 @@ public class FileUserRepository implements UserRepository {
             throw CommonExceptions.EMPTY_USER_LIST;
         }
         userList.remove(user);
-        saveUserList();
+        fileRepository.save(userList);
         return user.getId();
     }
 }

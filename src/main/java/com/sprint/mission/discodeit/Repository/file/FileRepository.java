@@ -1,13 +1,10 @@
 package com.sprint.mission.discodeit.Repository.file;
 
-import java.util.List;
-import java.util.Map;
-
-public interface FileRepository <T>{
+public interface FileRepository<T>{
     void init();
 
-    void load(Map<String, T> data);
+    T load();
 
-    void save(String id);
+    void save(T list);
 
 }

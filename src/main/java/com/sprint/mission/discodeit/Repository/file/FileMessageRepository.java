@@ -7,68 +7,32 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.stereotype.Repository;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class FileMessageRepository implements MessageRepository {
+    private final FileRepositoryImpl<Map<UUID, List<Message>>> fileRepository;
     private Map<UUID, List<Message>> messageList = new ConcurrentHashMap<>();
+
     private final Path path = Paths.get(System.getProperty("user.dir"), "data", "MessageList.ser");
 
     public FileMessageRepository() {
-        loadMessageList();
+        this.fileRepository = new FileRepositoryImpl<>(path);
+        fileRepository.load();
     }
 
-    private void init() {
-        Path directory = path.getParent();
-        if (!Files.exists(directory)) {
-            try {
-                Files.createDirectories(directory);
-                System.out.println("디렉토리 생성 완료: " + directory);
-            } catch (IOException e) {
-                System.out.println("디렉토리 생성 실패");
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void loadMessageList() {
-        if (Files.exists(path)) {
-            try (FileInputStream fis = new FileInputStream(path.toFile());
-                 ObjectInputStream ois = new ObjectInputStream(fis)) {
-
-                Map<UUID, List<Message>> list = (Map<UUID, List<Message>>) ois.readObject();
-                messageList = list;
-
-                System.out.println("메시지 리스트 로드 완료: " + path);
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println("메시지 리스트 로드 실패");
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void saveMessageList() {
-        init();
-
-        try (FileOutputStream fos = new FileOutputStream(path.toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-
-            oos.writeObject(messageList);
-
-        } catch (IOException e) {
-            System.out.println("메시지 리스트 저장 실패");
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public void reset() {
-        init();
+        fileRepository.init();
         try {
             Files.deleteIfExists(path);
             messageList = new ConcurrentHashMap<>();
@@ -81,7 +45,7 @@ public class FileMessageRepository implements MessageRepository {
     public void save(Channel channel, Message message) {
         List<Message> messages = messageList.getOrDefault(channel.getChannelId(), new ArrayList<>());
         messages.add(message);
-        saveMessageList();
+        fileRepository.save(messageList);
     }
 
     @Override
@@ -114,7 +78,7 @@ public class FileMessageRepository implements MessageRepository {
         if (messageUpdateDTO.replaceId() != null) {
             message.setMessageId(messageUpdateDTO.replaceId());
         }
-        saveMessageList();
+        fileRepository.save(messageList);
         return message.getMessageId();
     }
 
@@ -122,6 +86,6 @@ public class FileMessageRepository implements MessageRepository {
     public void remove(Channel channel, Message message) {
         List<Message> messages = messageList.get(channel.getChannelId());
         messages.remove(message);
-        saveMessageList();
+        fileRepository.save(messageList);
     }
 }

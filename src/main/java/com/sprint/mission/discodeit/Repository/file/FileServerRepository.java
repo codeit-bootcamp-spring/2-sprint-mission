@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,60 +19,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class FileServerRepository implements ServerRepository {
+    private final FileRepositoryImpl<Map<UUID, List<Server>>> fileRepository;
     private Map<UUID, List<Server>> serverList = new ConcurrentHashMap<>();
-    private final Path serverPath =  Paths.get(System.getProperty("user.dir"), "data", "ServerList.ser");
+    private final Path path =  Paths.get(System.getProperty("user.dir"), "data", "ServerList.ser");
 
     public FileServerRepository() {
-        loadServerList();
+        this.fileRepository = new FileRepositoryImpl<>(path);
+        fileRepository.load();
     }
-
-    private void init() {
-        Path directory = serverPath.getParent();
-        if (Files.exists(directory) == false) {
-            try {
-                Files.createDirectories(directory);
-                System.out.println("디렉토리 생성 완료: " + directory);
-            } catch (IOException e) {
-                System.out.println("디렉토리 생성 실패");
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void loadServerList() {
-        init();
-        if (Files.exists(serverPath) == true) {
-            try (FileInputStream fis = new FileInputStream(serverPath.toFile());
-                 ObjectInputStream ois = new ObjectInputStream(fis)) {
-
-                Map<UUID, List<Server>> list = (Map<UUID, List<Server>>) ois.readObject();
-                serverList = list;
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println("서버 리스트 로드 실패");
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void saveServerList() {
-        init();
-        try (FileOutputStream fos = new FileOutputStream(serverPath.toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-
-            oos.writeObject(serverList);
-
-        } catch (IOException e) {
-            System.out.println("서버 리스트 저장 실패");
-            throw new RuntimeException(e);
-        }
-    }
-
 
     @Override
     public void reset() {
-        init();
+        fileRepository.init();
         try {
-            Files.deleteIfExists(serverPath);
+            Files.deleteIfExists(path);
 
             serverList = new ConcurrentHashMap<>();
 
@@ -87,7 +47,7 @@ public class FileServerRepository implements ServerRepository {
         servers.add(server);
         serverList.put(user.getId(), servers);
 
-        saveServerList();
+        fileRepository.save(serverList);
         return server.getServerId();
     }
 
@@ -95,7 +55,7 @@ public class FileServerRepository implements ServerRepository {
     public UUID join(User user , Server server) {
         List<User> users = server.getUserList();
         users.add(user);
-        saveServerList();
+        fileRepository.save(serverList);
         return user.getId();
     }
 
@@ -107,7 +67,7 @@ public class FileServerRepository implements ServerRepository {
             throw CommonExceptions.EMPTY_USER_LIST;
         }
         users.remove(user);
-        saveServerList();
+        fileRepository.save(serverList);
         return server.getServerId();
     }
 
@@ -152,7 +112,7 @@ public class FileServerRepository implements ServerRepository {
     public void remove(User owner, Server server) {
         List<Server> list = findAllByUserId(owner.getId());
 
-        saveServerList();
+        fileRepository.save(serverList);
         list.remove(server);
     }
 }

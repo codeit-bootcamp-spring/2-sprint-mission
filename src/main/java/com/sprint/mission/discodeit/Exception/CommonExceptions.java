@@ -24,5 +24,7 @@ public class CommonExceptions {
 
     public static CommonException INVALID_PASSWORD = new CommonException(CommonCode.INVALID_PASSWORD);
 
+    public static CommonException File_NOT_FOUND = new CommonException(CommonCode.File_NOT_FOUND);
+
 }
 

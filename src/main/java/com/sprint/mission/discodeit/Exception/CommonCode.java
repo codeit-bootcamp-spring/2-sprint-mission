@@ -23,8 +23,8 @@ public enum CommonCode implements Code{
     DUPLICATE_READ_STATUS("중복된 읽기 정보가 있습니다."),
 
 
-    INVALID_PASSWORD("비밀번호가 틀립니다");
-
+    INVALID_PASSWORD("비밀번호가 틀립니다"),
+    File_NOT_FOUND("해당 파일을 찾을 수 없습니다.");
 
 
 
