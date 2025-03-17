@@ -2,12 +2,17 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -20,6 +25,8 @@ public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final MessageRepository messageRepository;
+
     @Override
     public Channel createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
 
@@ -51,19 +58,58 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel findById(UUID channelId) {
+    public ChannelResponseDto findById(UUID channelId) {
         Channel channel = channelRepository.findById(channelId);
 
         if (channel == null) {
             throw new NoSuchElementException(channelId + " 채널을 찾을 수 없습니다.");
         }
 
-        return channel;
+        Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
+                .stream().max(Comparator.comparing(Message::getCreatedAt)).map(Message::getCreatedAt)
+                .orElse(null);
+
+        boolean isPrivate = channel.getType().equals(ChannelType.PRIVATE);
+
+        List<UUID> userIds = isPrivate ?
+                readStatusRepository.findAll().stream()
+                        .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                        .map(ReadStatus::getUserId)
+                        .toList()
+                : null;
+
+        return new ChannelResponseDto(channel, lastMessageAt, userIds);
     }
 
     @Override
-    public List<Channel> findAll() {
-        return channelRepository.findAll();
+    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
+        List<Channel> channels = channelRepository.findAll();
+        List<UUID> joinedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+                .map(ReadStatus::getChannelId)
+                .toList();
+
+        return channels.stream()
+                .filter(channel ->
+                        channel.getType().equals(ChannelType.PRIVATE) ||
+                                joinedChannelIds.contains(channel.getId())
+                )
+                .map(channel -> {
+                    Instant lastMessageAt = messageRepository.findByChannelId(channel.getId())
+                            .stream().max(Comparator.comparing(Message::getCreatedAt)).map(Message::getCreatedAt)
+                            .orElse(null);
+
+                    boolean isPrivate = channel.getType().equals(ChannelType.PRIVATE);
+
+                    List<UUID> userIds = isPrivate ?
+                            readStatusRepository.findAll().stream()
+                                    .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
+                                    .map(ReadStatus::getUserId)
+                                    .toList()
+                            : null;
+
+                    return new ChannelResponseDto(channel, lastMessageAt, userIds);
+                })
+                .toList();
     }
 
     @Override
