@@ -29,14 +29,6 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public UUID isProfileId(UUID profileId) {
-        if (profileId == null) {
-            this.profileId = UUID.fromString("0000");
-        }
-        return this.profileId;
-    }
-
-
     public void update(String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
         if (newUsername != null && !newUsername.equals(this.username)) {

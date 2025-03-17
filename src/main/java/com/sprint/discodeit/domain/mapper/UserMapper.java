@@ -11,7 +11,6 @@ public class UserMapper {
                 .email(userRequestDto.email())
                 .password(userRequestDto.password())
                 .username(userRequestDto.username())
-                .profileId(userRequestDto.ImgUrl())
                 .build();
     }
 
