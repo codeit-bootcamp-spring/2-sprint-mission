@@ -11,15 +11,15 @@ public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private UUID id;
-    private Long createdAtSeconds;
-    private Long updatedAtSeconds;
+    private Instant createdAtSeconds;
+    private Instant updatedAtSeconds;
     private String content;
     private UUID channelId;
     private UUID authorId;
 
     public Message(String content, UUID channelId, UUID authorId) {
         this.id = UUID.randomUUID();
-        this.createdAtSeconds = Instant.now().getEpochSecond();
+        this.createdAtSeconds = Instant.now();
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
@@ -33,7 +33,7 @@ public class Message implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.updatedAtSeconds = Instant.now().getEpochSecond();
+            this.updatedAtSeconds = Instant.now();
         }
     }
 }

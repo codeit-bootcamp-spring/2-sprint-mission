@@ -16,12 +16,15 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.dto.CreateDefinition;
+import com.sprint.mission.discodeit.dto.UpdateDefinition;
 
 public class JavaApplication {
     static User setupUser(UserService userService) {
-        User user = userService.create("woody", "woody@codeit.com", "woody1234");
-        return user;
+        CreateDefinition createDefinition = new CreateDefinition("woody", "woody@codeit.com", "woody1234");
+        return userService.create(createDefinition);
     }
+
 
     static Channel setupChannel(ChannelService channelService) {
         Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
