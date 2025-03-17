@@ -15,10 +15,9 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
-    public BinaryContent create() {
-        BinaryContent binaryContent = new BinaryContent();
-        BinaryContentDTO binaryContentDTO = BinaryContentDTO.create(binaryContent);
-        binaryContentRepository.save(binaryContentDTO);
+    public BinaryContent create(BinaryContentDTO binaryContentDTO) {
+        BinaryContent binaryContent = new BinaryContent(binaryContentDTO.fileName(),binaryContentDTO.binaryContent().getSize(), binaryContentDTO.contentType(),binaryContentDTO.bytes());
+        binaryContentRepository.save(binaryContent);
         return binaryContent;
     }
 

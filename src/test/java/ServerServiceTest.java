@@ -1,3 +1,4 @@
+import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.DTO.Server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
@@ -31,7 +32,8 @@ public class ServerServiceTest {
         UserService userService = new BasicUserService(userRepository, binaryContentRepository, userStatusRepository);
         ServerService serverService = new BasicServerService(userRepository, serverRepository);
 
-        BinaryContent content1 = binaryContentService.create();
+        BinaryContentDTO binaryContentDTO = BinaryContentDTO.create("test1", null, null);
+        BinaryContent content1 = binaryContentService.create(binaryContentDTO);
         UserCRUDDTO userDTO1 = UserCRUDDTO.create("test1", "test1", "123",content1);
         UUID test1 = userService.register(userDTO1);
         System.out.println("create----------------------------------------");

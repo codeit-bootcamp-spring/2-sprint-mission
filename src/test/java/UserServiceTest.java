@@ -1,3 +1,4 @@
+import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.DTO.User.UserFindDTO;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
@@ -24,8 +25,11 @@ public class UserServiceTest {
         BinaryContentService binaryContentService = new BasicBinaryContentService(binaryContentRepository);
         UserService userService = new BasicUserService(userRepository, binaryContentRepository, userStatusRepository);
 
-        BinaryContent content1 = binaryContentService.create();
-        BinaryContent content2 = binaryContentService.create();
+        BinaryContentDTO binaryContentDTO1 = BinaryContentDTO.create("test1", null, null);
+        BinaryContentDTO binaryContentDTO2 = BinaryContentDTO.create("test2", null, null);
+        BinaryContent content1 = binaryContentService.create(binaryContentDTO1);
+        BinaryContent content2 = binaryContentService.create(binaryContentDTO2);
+
         UserCRUDDTO userDTO1 = UserCRUDDTO.create("test1", "test1", "123",content1);
         UserCRUDDTO userDTO2 = UserCRUDDTO.create("test2", "test2", "123",content2);
         UserCRUDDTO userDTO3 = UserCRUDDTO.create("test1", "test1", "123",null);
@@ -63,8 +67,11 @@ public class UserServiceTest {
         for (UserFindDTO userFindDTO : userFindDTOS2) {
             System.out.println(userFindDTO);
         }
+
         System.out.println("update----------------------------------------");
-        BinaryContent content3 = binaryContentService.create();
+        BinaryContentDTO binaryContentDTO3 = BinaryContentDTO.create("test3", null, null);
+        BinaryContent content3 = binaryContentService.create(binaryContentDTO3);
+
         UserCRUDDTO update = UserCRUDDTO.update(null, content3.getBinaryContentId(), null, null);
         userService.update(test1.toString(), update);
 

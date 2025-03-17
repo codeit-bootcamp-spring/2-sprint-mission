@@ -19,7 +19,7 @@ public interface UserRepository {
 
     List<User> findUserList( );
 
-    UUID update(User user, UserCRUDDTO userCRUDDTO);
+    User update(User user, UserCRUDDTO userCRUDDTO);
 
     UUID remove(User user);
 

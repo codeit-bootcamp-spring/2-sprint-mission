@@ -11,20 +11,19 @@ import java.util.UUID;
  */
 @Builder
 public record BinaryContentDTO(
+        String fileName,
+        String contentType,
+        byte[] bytes,
         BinaryContent binaryContent,
         UUID binaryContentId,
         Instant createdAt
 ) {
-    /**
-     * 새로운 바이너리 콘텐츠 DTO 객체를 생성합니다.
-     *
-     * @param binaryContent 저장할 바이너리 콘텐츠 객체
-     * @return 바이너리 콘텐츠 정보를 포함한 {@link BinaryContentDTO} 객체
-     */
-    public static BinaryContentDTO create(BinaryContent binaryContent) {
+
+    public static BinaryContentDTO create(String fileName, String contentType, byte[] bytes) {
         return BinaryContentDTO.builder()
-                .binaryContent(binaryContent)
-                .binaryContentId(binaryContent.getBinaryContentId())
-                .createdAt(binaryContent.getCreatedAt()).build();
+                .fileName(fileName)
+                .contentType(contentType)
+                .bytes(bytes).build();
     }
+
 }

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +15,10 @@ import java.util.UUID;
 public interface BinaryContentService {
     /**
      * 새로운 바이너리 콘텐츠를 생성하고 반환합니다.
-     *
+     * @param binaryContentDTO 조회할 바이너리 콘텐츠의 ID
      * @return 생성된 {@link BinaryContent} 객체
      */
-    BinaryContent create();
+    BinaryContent create(BinaryContentDTO binaryContentDTO);
     /**
      * 특정 바이너리 콘텐츠 ID를 기반으로 바이너리 콘텐츠를 조회합니다.
      *

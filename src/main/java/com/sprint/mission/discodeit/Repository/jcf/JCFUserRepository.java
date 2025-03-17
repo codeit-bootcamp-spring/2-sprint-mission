@@ -48,7 +48,7 @@ public class JCFUserRepository implements UserRepository {
 
 
     @Override
-    public UUID update(User user, UserCRUDDTO userUpdateDTO) {
+    public User update(User user, UserCRUDDTO userUpdateDTO) {
         if (userUpdateDTO.userId() != null) {
             user.setId(userUpdateDTO.userId());
         }
@@ -61,7 +61,7 @@ public class JCFUserRepository implements UserRepository {
         if (userUpdateDTO.profileId() != null) {
             user.setProfileId(userUpdateDTO.profileId());
         }
-        return user.getId();
+        return user;
     }
 
 

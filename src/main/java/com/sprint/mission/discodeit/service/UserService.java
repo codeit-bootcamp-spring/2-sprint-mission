@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.DTO.User.*;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,14 +23,14 @@ public interface UserService {
      * @param userCRUDDTO 등록할 사용자 정보 DTO
      * @return 생성된 사용자의 고유 ID(UUID)
      */
-    UUID register(UserCRUDDTO userCRUDDTO);
+    User register(UserCRUDDTO userCRUDDTO);
     /**
      * 특정 사용자 ID에 대한 정보를 조회합니다.
      *
      * @param userId 조회할 사용자의 ID
      * @return 사용자 정보를 포함한 {@link UserFindDTO} 객체
      */
-    UserFindDTO find(String userId);
+    UserFindDTO find(UUID userId);
     /**
      * 모든 사용자 정보를 조회합니다.
      *
@@ -53,8 +54,8 @@ public interface UserService {
      *
      * @param userId      업데이트할 사용자의 ID
      * @param userCRUDDTO 업데이트할 사용자 정보 DTO
-     * @return 업데이트 성공 여부, 성공하면 {@code true}, 실패하면 {@code false}
+     * @return 업데이트 성공 여부, 성공하면 {@code User}, 실패하면 {@code null}
      */
-    boolean update(String userId, UserCRUDDTO userCRUDDTO);
+    User update(UUID userId, UserCRUDDTO userCRUDDTO);
 
 }

@@ -17,8 +17,19 @@ public class BinaryContent implements Serializable {
     private final UUID binaryContentId;
     public final Instant createdAt;
 
-    public BinaryContent() {
+    private String fileName;
+    private Long size;
+    private String contentType;
+    private byte[] bytes;
+
+
+    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
         binaryContentId = UUID.randomUUID();
         createdAt = Instant.now();
+
+        this.fileName = fileName;
+        this.size = size;
+        this.contentType = contentType;
+        this.bytes = bytes;
     }
 }

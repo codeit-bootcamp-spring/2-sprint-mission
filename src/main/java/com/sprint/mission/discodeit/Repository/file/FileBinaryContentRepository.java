@@ -29,8 +29,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public void save(BinaryContentDTO binaryContentDTO) {
-        binaryContentList.add(binaryContentDTO.binaryContent());
+    public void save(BinaryContent binaryContent) {
+        binaryContentList.add(binaryContent);
         fileRepository.save(binaryContentList);
     }
 

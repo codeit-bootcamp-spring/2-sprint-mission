@@ -44,7 +44,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UUID register(UserCRUDDTO userCRUDDTO) {
+    public User register(UserCRUDDTO userCRUDDTO) {
         UserCRUDDTO checkDuplicate = UserCRUDDTO.checkDuplicate(userCRUDDTO.userName(), userCRUDDTO.email());
 
         try {
@@ -69,15 +69,14 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = new UserStatus(user.getId());
         userRepository.save(user);
         userStatusRepository.save(userStatus);
-        return user.getId();
+        return user;
     }
 
 
     @Override
-    public UserFindDTO find(String userId) {
-        UUID userUUID = UUID.fromString(userId);
-        User user = userRepository.find(userUUID);
-        UserStatus userStatus = userStatusRepository.find(userUUID);
+    public UserFindDTO find(UUID userId) {
+        User user = userRepository.find(userId);
+        UserStatus userStatus = userStatusRepository.find(userId);
 
         UserFindDTO userFindDTO = UserFindDTO.find(
                 user.getId(),
@@ -144,18 +143,17 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public boolean update(String userId, UserCRUDDTO userCRUDDTO) {
+    public User update(UUID userId, UserCRUDDTO userCRUDDTO) {
         try {
-            UUID userUUID = UUID.fromString(userId);
-            User findUser = userRepository.find(userUUID);
-            userRepository.update(findUser, userCRUDDTO);
-            return true;
+            User findUser = userRepository.find(userId);
+            User update = userRepository.update(findUser, userCRUDDTO);
+            return update;
         } catch (IllegalArgumentException e0) {
             System.out.println("잘못된 ID값을 받았습니다.");
-            return false;
+            return null;
         } catch (CommonException e1) {
             System.out.println("업데이트할 유저가 존재하지 않습니다.");
-            return false;
+            return null;
         }
     }
 
