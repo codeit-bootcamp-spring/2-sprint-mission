@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -20,6 +21,7 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserService userService;
     private final ChannelService channelService;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public Message create(MessageCreateDto messageCreateDto) {
@@ -68,6 +70,9 @@ public class BasicMessageService implements MessageService {
     @Override
     public void delete(UUID messageId) {
         Message message = findById(messageId);
+        message.getAttachmentIds().forEach(binaryContentRepository::delete);
         messageRepository.delete(message.getId());
+
+
     }
 }
