@@ -1,4 +1,5 @@
 import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
+import com.sprint.mission.discodeit.DTO.Channel.ChannelDTO;
 import com.sprint.mission.discodeit.DTO.Server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.Repository.*;
@@ -14,6 +15,7 @@ import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicServerService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
+import java.util.List;
 import java.util.UUID;
 
 public class ChannelServiceTest {
@@ -26,8 +28,6 @@ public class ChannelServiceTest {
         BinaryContentRepository binaryContentRepository = new JCFBinaryContentRepository();
         UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
         ReadStatusRepository readStatusRepository = new JCFReadStatusRepository();
-
-
 
         UserService userService = new BasicUserService(userRepository, binaryContentRepository, userStatusRepository);
         ServerService serverService = new BasicServerService(userRepository, serverRepository);
@@ -45,7 +45,47 @@ public class ChannelServiceTest {
         ChannelCRUDDTO publicChannel2 = ChannelCRUDDTO.create(serverId1, userId1, "test2", ChannelType.PUBLIC);
         ChannelCRUDDTO privateChannel1 = ChannelCRUDDTO.create(serverId1, userId1, "test2", ChannelType.PRIVATE);
         ChannelCRUDDTO privateChannel2 = ChannelCRUDDTO.create(serverId1, userId1, "test2", ChannelType.PRIVATE);
-        channelService.create(publicChannel1);
-        channelService.create(publicChannel2);
+        UUID publicId1 = channelService.create(publicChannel1);
+        UUID publicId2 = channelService.create(publicChannel2);
+        UUID privateId1 = channelService.create(privateChannel1);
+        UUID privateId2 = channelService.create(privateChannel2);
+        System.out.println("find All----------------------------------------");
+        List<ChannelDTO> channelDTOList = channelService.findAllByServerAndUser(serverId1.toString());
+        for (ChannelDTO channelDTO : channelDTOList) {
+            System.out.println(channelDTO);
+        }
+
+        System.out.println("find----------------------------------------");
+        ChannelDTO channelDTO1 = channelService.find(publicId1.toString());
+        ChannelDTO channelDTO2 = channelService.find(privateId1.toString());
+        System.out.println("public = " + channelDTO1);
+        System.out.println("private = " + channelDTO2);
+
+        System.out.println("delete----------------------------------------");
+        ChannelCRUDDTO publicDelete = ChannelCRUDDTO.delete(serverId1, userId1, publicId2);
+        ChannelCRUDDTO privateDelete = ChannelCRUDDTO.delete(serverId1, userId1, privateId2);
+        channelService.delete(publicDelete);
+        channelService.delete(privateDelete);
+
+        System.out.println("find All----------------------------------------");
+        List<ChannelDTO> channelDTOList2 = channelService.findAllByServerAndUser(serverId1.toString());
+        for (ChannelDTO channelDTO : channelDTOList2) {
+            System.out.println(channelDTO);
+        }
+
+        System.out.println("update----------------------------------------");
+        ChannelCRUDDTO publicUpdateKey1 = ChannelCRUDDTO.updateKey(serverId1, userId1, publicId1);
+        ChannelCRUDDTO privateUpdateKey2 = ChannelCRUDDTO.updateKey(serverId1, userId1, privateId1);
+        ChannelCRUDDTO publicUpdate = ChannelCRUDDTO.update(null, "hello", ChannelType.PRIVATE);
+        ChannelCRUDDTO privateUpdate = ChannelCRUDDTO.update(null, "good", ChannelType.PUBLIC);
+
+        channelService.update(publicUpdateKey1, publicUpdate);
+        channelService.update(privateUpdateKey2, privateUpdate);
+
+        System.out.println("find All----------------------------------------");
+        List<ChannelDTO> channelDTOList3 = channelService.findAllByServerAndUser(serverId1.toString());
+        for (ChannelDTO channelDTO : channelDTOList3) {
+            System.out.println(channelDTO);
+        }
     }
 }

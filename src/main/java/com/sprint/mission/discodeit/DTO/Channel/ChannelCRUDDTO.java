@@ -45,6 +45,14 @@ public record ChannelCRUDDTO(
                 .creatorId(userId)
                 .channelId(channelId).build();
     }
+    public static ChannelCRUDDTO updateKey(UUID serverId,
+                                        UUID userId,
+                                        UUID channelId) {
+        return ChannelCRUDDTO.builder()
+                .serverId(serverId)
+                .creatorId(userId)
+                .channelId(channelId).build();
+    }
 
     public static ChannelCRUDDTO update(UUID replaceChannelId,
                                         String replaceName,

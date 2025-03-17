@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
 import com.sprint.mission.discodeit.DTO.Channel.ChannelDTO;
+import com.sprint.mission.discodeit.Exception.CommonException;
 import com.sprint.mission.discodeit.Repository.*;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,8 +31,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public UUID create(ChannelDTO channelDTO) {
-        ChannelCRUDDTO channelCRUDDTO = ChannelCRUDDTO.create(channelDTO.serverId(), channelDTO.creatorId(), channelDTO.name(), channelDTO.type());
+    public UUID create(ChannelCRUDDTO channelCRUDDTO) {
         UUID serverId = channelCRUDDTO.serverId();
         UUID creatorId = channelCRUDDTO.creatorId();
 
@@ -58,8 +59,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public UUID join(ChannelDTO channelDTO) {
-        ChannelCRUDDTO channelCRUDDTO = ChannelCRUDDTO.join(channelDTO.creatorId(), channelDTO.channelId(), channelDTO.type());
+    public UUID join(ChannelCRUDDTO channelCRUDDTO) {
 
         UUID userId = channelCRUDDTO.creatorId();
         UUID channelId = channelCRUDDTO.channelId();
@@ -76,8 +76,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public UUID quit(ChannelDTO channelDTO) {
-        ChannelCRUDDTO channelCRUDDTO = ChannelCRUDDTO.join(channelDTO.creatorId(), channelDTO.channelId(), channelDTO.type());
+    public UUID quit(ChannelCRUDDTO channelCRUDDTO) {
 
         UUID userId = channelCRUDDTO.creatorId();
         UUID channelId = channelCRUDDTO.channelId();
@@ -94,16 +93,23 @@ public class BasicChannelService implements ChannelService {
     public ChannelDTO find(String channelId) {
         UUID channelUUID = UUID.fromString(channelId);
         Channel channel = channelRepository.find(channelUUID);
-        List<Message> messageList = messageRepository.findAllByChannelId(channelUUID);
-        Message message = messageList.get(messageList.size()-1);
-
+        List<Message> messageList;
+        Message message;
+        Instant lastMessageTime = null;
+        try {
+            messageList= messageRepository.findAllByChannelId(channelUUID);
+            message= messageList.get(messageList.size() - 1);
+            lastMessageTime = message.createdAt;
+        } catch (CommonException e) {
+//            System.out.println("메시지 함이 비어있습니다.");
+        }
         if (channel.getType() == ChannelType.PUBLIC) {
-            ChannelDTO channelDTO = ChannelDTO.find(channel.getChannelId(), channel.getName(), null, message.createdAt);
+            ChannelDTO channelDTO = ChannelDTO.find(channel.getChannelId(), channel.getName(), null, lastMessageTime);
             return channelDTO;
         } else {
             List<User> userList = channel.getUserList();
             List<UUID> userIdList = userList.stream().map(User::getId).toList();
-            ChannelDTO channelDTO = ChannelDTO.find(channel.getChannelId(), channel.getName(), userIdList, message.createdAt);
+            ChannelDTO channelDTO = ChannelDTO.find(channel.getChannelId(), channel.getName(), userIdList, lastMessageTime);
             return channelDTO;
         }
     }
@@ -122,8 +128,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public boolean delete(ChannelDTO channelDTO) {
-        ChannelCRUDDTO channelCRUDDTO = ChannelCRUDDTO.delete(channelDTO.serverId(), channelDTO.creatorId(), channelDTO.channelId());
+    public boolean delete(ChannelCRUDDTO channelCRUDDTO) {
 
         UUID serverId = channelCRUDDTO.serverId();
         UUID userId = channelCRUDDTO.creatorId();
@@ -134,17 +139,19 @@ public class BasicChannelService implements ChannelService {
 
         if (findChannel.getCreatorId().equals(userId)) {
             channelRepository.remove(findServer, findChannel);
+            try {
+                List<Message> list = messageRepository.findAllByChannelId(findChannel.getChannelId());
+                for (Message message : list) {
+                    messageRepository.remove(findChannel, message);
+                }
 
-            List<Message> list = messageRepository.findAllByChannelId(findChannel.getChannelId());
-            for (Message message : list) {
-                messageRepository.remove(findChannel, message);
+                List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channelId);
+                for (ReadStatus status : readStatusList) {
+                    readStatusRepository.delete(status.getReadStatusId());
+                }
+            } catch (CommonException e) {
+                System.out.println("삭제 중 메시지 함이 없습니다.");
             }
-
-            List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channelId);
-            for (ReadStatus status : readStatusList) {
-                readStatusRepository.delete(status.getReadStatusId());
-            }
-
             return true;
         } else {
             System.out.println("채널 삭제 권한 없음");
@@ -153,13 +160,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public boolean update(ChannelDTO channelDTO, ChannelDTO replaceDTO) {
-        ChannelCRUDDTO channelIDSDTO = ChannelCRUDDTO.delete(channelDTO.serverId(), channelDTO.creatorId(), channelDTO.channelId());
-        ChannelCRUDDTO channelUpdateDTO = ChannelCRUDDTO.update(replaceDTO.channelId(), replaceDTO.name(), replaceDTO.type());
-
-        UUID serverId = channelIDSDTO.serverId();
-        UUID userId = channelIDSDTO.creatorId();
-        UUID channelId = channelIDSDTO.channelId();
+    public boolean update(ChannelCRUDDTO channelCRUDDTO, ChannelCRUDDTO channelUpdateDTO) {
+        UUID serverId = channelCRUDDTO.serverId();
+        UUID userId = channelCRUDDTO.creatorId();
+        UUID channelId = channelCRUDDTO.channelId();
 
         Channel findChannel = channelRepository.find(channelId);
         if (findChannel.getType() == ChannelType.PRIVATE) {

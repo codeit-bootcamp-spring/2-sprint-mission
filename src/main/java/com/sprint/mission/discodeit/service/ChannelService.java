@@ -10,11 +10,11 @@ public interface ChannelService {
 
     void reset(boolean adminAuth);
 
-    UUID create(ChannelDTO channelDTO);
+    UUID create(ChannelCRUDDTO channelCRUDDTO);
 
-    UUID join(ChannelDTO channelDTO);
+    UUID join(ChannelCRUDDTO channelCRUDDTO);
 
-    UUID quit(ChannelDTO channelDTO);
+    UUID quit(ChannelCRUDDTO channelCRUDDTO);
 
     ChannelDTO find(String channelId);
 
@@ -24,9 +24,9 @@ public interface ChannelService {
 
     boolean printUsersInChannel(String channelId);
 
-    boolean delete(ChannelDTO channelDTO);
+    boolean delete(ChannelCRUDDTO channelCRUDDTO);
 
-    boolean update(ChannelDTO channelDTO, ChannelDTO replaceDTO);
+    boolean update(ChannelCRUDDTO channelCRUDDTO, ChannelCRUDDTO channelUpdateDTO);
 
 
 }
