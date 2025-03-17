@@ -12,7 +12,7 @@ public interface ChannelService {
     Channel createPrivateChannel(PrivateChannelCreateRequest privateChannelCreateRequest);
     Channel createPublicChannel(String channelName);
     ChannelReadResponse readChannel(UUID channelId);
-    Map<UUID, Channel> readAllChannels();
+    List<ChannelReadResponse> findAllByUserId(UUID userId);
     List<Message> readMessageListByChannelId(UUID channelId);
     void updateChannelName(UUID channelId, String newChannelName);
     void addChannelParticipant(UUID channelId, UUID newParticipantId);
