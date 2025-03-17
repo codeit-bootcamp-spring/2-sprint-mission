@@ -1,10 +1,12 @@
-package com.sprint.discodeit.entity;
+package com.sprint.discodeit.domain.entity;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 
+@Builder
 @Getter
 public class User implements Serializable {
 
@@ -27,6 +29,13 @@ public class User implements Serializable {
         this.password = password;
     }
 
+    public UUID isProfileId(UUID profileId) {
+        if (profileId == null) {
+            this.profileId = UUID.fromString("0000");
+        }
+        return this.profileId;
+    }
+
 
     public void update(String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
@@ -47,4 +56,6 @@ public class User implements Serializable {
             this.updatedAt = Instant.now();
         }
     }
+
+
 }
