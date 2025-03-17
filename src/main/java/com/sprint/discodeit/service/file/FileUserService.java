@@ -2,12 +2,14 @@ package com.sprint.discodeit.service.file;
 
 import com.sprint.discodeit.domain.dto.UserProfileImgResponseDto;
 import com.sprint.discodeit.domain.dto.UserNameResponse;
+import com.sprint.discodeit.domain.entity.BinaryContent;
 import com.sprint.discodeit.domain.mapper.UserMapper;
 import com.sprint.discodeit.domain.dto.UserRequestDto;
 import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.repository.UserRepository;
 import com.sprint.discodeit.repository.file.FileUserRepository;
 import com.sprint.discodeit.service.UserServiceV1;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class FileUserService implements UserServiceV1 {
 
     private final FileUserRepository fileUserRepository;
+    private final BinaryServiceImpl binaryServiceImpl;
 
     public UserNameResponse create(UserRequestDto userRequestDto, UserProfileImgResponseDto userProfileImgResponseDto) {
         // 중복된 유저 확인
@@ -26,16 +29,14 @@ public class FileUserService implements UserServiceV1 {
         }
 
         // 이메일과 닉네임이 동일한지 확인
-        if (userRequestDto.username().equals(userRequestDto.email())) {
-            throw new IllegalArgumentException("이메일과 닉네임이 동일합니다. 수정해주세요.");
+        if (fileUserRepository.findByEmail(userRequestDto.email()).isPresent()) {
+            throw new IllegalArgumentException("닉네임은 존재 하는 이메일 입니다. 확인 해주새요. ");
         }
-
-        //  User 객체 생성
-        User user = new User(userRequestDto.username(), userRequestDto.email(), userRequestDto.password());
-        fileUserRepository.save(user);
+        BinaryContent profileImage = binaryServiceImpl.createProfileImage(userProfileImgResponseDto.imgUrl());
+        User userMapper = UserMapper.toUserMapper(userRequestDto,profileImage.getId());
 
         // User -> UserNameResponse 변환
-        return UserMapper.toUserNameResponse(user.getUsername());
+        return UserMapper.toUserNameResponse(userMapper.getUsername());
     }
 
 
