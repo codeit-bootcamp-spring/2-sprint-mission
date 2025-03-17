@@ -14,6 +14,9 @@ public class CommonExceptions {
     public static CommonException EMPTY_SERVER_LIST = new CommonException(CommonCode.EMPTY_SERVER_LIST);
     public static CommonException EMPTY_CHANNEL_LIST = new CommonException(CommonCode.EMPTY_CHANNEL_LIST);
     public static CommonException EMPTY_MESSAGE_LIST = new CommonException(CommonCode.EMPTY_MESSAGE_LIST);
+    public static CommonException EMPTY_USER_STATUS_LIST = new CommonException(CommonCode.EMPTY_USER_STATUS_LIST);
+    public static CommonException EMPTY_READ_STATUS_LIST = new CommonException(CommonCode.EMPTY_READ_STATUS_LIST);
+    public static CommonException EMPTY_BINARY_CONTENT_LIST = new CommonException(CommonCode.EMPTY_BINARY_CONTENT_LIST);
 
     public static CommonException DUPLICATE_USER = new CommonException(CommonCode.DUPLICATE_USER);
     public static CommonException DUPLICATE_USER_STATUS = new CommonException(CommonCode.DUPLICATE_USER_STATUS);

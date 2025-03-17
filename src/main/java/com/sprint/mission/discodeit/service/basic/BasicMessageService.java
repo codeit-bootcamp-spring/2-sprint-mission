@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.DTO.Message.MessageCreateDTO;
 import com.sprint.mission.discodeit.DTO.Message.MessageIDSDTO;
 import com.sprint.mission.discodeit.DTO.Message.MessageUpdateDTO;
-import com.sprint.mission.discodeit.Exception.EmptyMessageListException;
+import com.sprint.mission.discodeit.Exception.CommonException;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.MessageRepository;
@@ -84,7 +84,7 @@ public class BasicMessageService implements MessageService {
             for (Message message : messages) {
                 System.out.println(message.getCreatorName() + " : " + message.getText());
             }
-        } catch (EmptyMessageListException e) {
+        } catch (CommonException e) {
             System.out.println("메시지 함이 비어있습니다.");
         }
 

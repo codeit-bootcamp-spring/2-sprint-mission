@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.Channel.ChannelUpdateDTO;
-import com.sprint.mission.discodeit.Exception.ChannelNotFoundException;
-import com.sprint.mission.discodeit.Exception.UserNotFoundException;
+import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
@@ -35,6 +34,9 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public UUID quit(Channel channel, User user) {
         List<User> list = channel.getUserList();
+        if (list.isEmpty()) {
+            throw CommonExceptions.EMPTY_USER_LIST;
+        }
         list.remove(user);
 
         return user.getId();
@@ -56,13 +58,20 @@ public class JCFChannelRepository implements ChannelRepository {
         Channel channel = channelList.values().stream().flatMap(List::stream)
                 .filter(c -> c.getChannelId().equals(channelId))
                 .findFirst()
-                .orElseThrow(() -> new ChannelNotFoundException("해당 ID를 가지는 채널을 찾을 수 없습니다."));
+                .orElseThrow(() -> CommonExceptions.CHANNEL_NOF_FOUND);
         return channel;
     }
 
     @Override
     public List<Channel> findAllByServerId(UUID serverId) {
+        if (channelList.isEmpty()) {
+            throw CommonExceptions.EMPTY_CHANNEL_LIST;
+        }
         List<Channel> channels = channelList.get(serverId);
+
+        if (channels.isEmpty()) {
+            throw CommonExceptions.EMPTY_CHANNEL_LIST;
+        }
         return channels;
     }
 

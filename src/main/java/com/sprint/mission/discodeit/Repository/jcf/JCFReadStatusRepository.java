@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.ReadStatusUpdateDTO;
-import com.sprint.mission.discodeit.Exception.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
@@ -20,21 +20,36 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     @Override
     public ReadStatus find(UUID readStatusId) {
         ReadStatus status = readStatusList.stream().filter(readStatus -> readStatus.getReadStatusId().equals(readStatusId))
-                .findFirst().orElseThrow(() -> new ReadStatusNotFoundException("해당 ID를 가지는 read Status 를 찾을 수 없습니다."));
+                .findFirst().orElseThrow(() -> CommonExceptions.READ_STATUS_NOT_FOUND);
         return status;
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userID) {
+        if (readStatusList.isEmpty()) {
+            throw CommonExceptions.EMPTY_READ_STATUS_LIST;
+        }
+
         List<ReadStatus> list = readStatusList.stream().filter(readStatus -> readStatus.getUserId().equals(userID))
                 .toList();
+
+        if (list.isEmpty()) {
+            throw CommonExceptions.EMPTY_READ_STATUS_LIST;
+        }
         return list;
     }
 
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        if (readStatusList.isEmpty()) {
+            throw CommonExceptions.EMPTY_READ_STATUS_LIST;
+        }
         List<ReadStatus> list = readStatusList.stream().filter(readStatus -> readStatus.getChannelId().equals(channelId))
                 .toList();
+
+        if (list.isEmpty()) {
+            throw CommonExceptions.EMPTY_READ_STATUS_LIST;
+        }
         return list;
     }
 
@@ -43,7 +58,6 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
         if (readStatusUpdateDTO.replaceId() != null) {
             readStatus.setReadStatusId(readStatusUpdateDTO.replaceId());
         }
-
     }
 
     @Override

@@ -2,12 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.ReadStatusCreateDTO;
 import com.sprint.mission.discodeit.DTO.ReadStatusUpdateDTO;
-import com.sprint.mission.discodeit.Exception.ChannelNotFoundException;
-import com.sprint.mission.discodeit.Exception.DuplicateReadStatusException;
-import com.sprint.mission.discodeit.Exception.UserNotFoundException;
+import com.sprint.mission.discodeit.Exception.CommonException;
+import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -38,14 +36,12 @@ public class ReadStatusService {
             if (status == null) {
                 status = new ReadStatus(userId, channelId);
             } else {
-                throw new DuplicateReadStatusException("해당 Read Status 는 존재합니다.");
+                throw CommonExceptions.DUPLICATE_READ_STATUS;
             }
             readStatusRepository.save(status);
 
-        } catch (UserNotFoundException e) {
-            System.out.println("Read Status: 해당 유저는 존재하지 않습니다.");
-        } catch (ChannelNotFoundException e) {
-            System.out.println("Read Status: 해당 채널은 존재하지 않습니다.");
+        } catch (CommonException e) {
+            System.out.println("에러가 발생하였습니다");
         }
     }
 

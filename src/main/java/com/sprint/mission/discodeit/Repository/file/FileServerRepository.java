@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.Server.ServerUpdateDTO;
-import com.sprint.mission.discodeit.Exception.ServerNotFoundException;
+import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -103,6 +103,9 @@ public class FileServerRepository implements ServerRepository {
     @Override
     public UUID quit(User user, Server server) {
         List<User> users = server.getUserList();
+        if (users.isEmpty()) {
+            throw CommonExceptions.EMPTY_USER_LIST;
+        }
         users.remove(user);
         saveServerList();
         return server.getServerId();
@@ -113,13 +116,20 @@ public class FileServerRepository implements ServerRepository {
         Server server = serverList.values().stream().flatMap(List::stream)
                 .filter(s -> s.getServerId().equals(serverId))
                 .findFirst()
-                .orElseThrow(() -> new ServerNotFoundException("해당 ID를 가지는 서버를 찾을 수 없습니다."));
+                .orElseThrow(() -> CommonExceptions.SERVER_NOT_FOUND);
         return server;
     }
 
     @Override
     public List<Server> findAllByUserId(UUID userId) {
+        if (serverList.isEmpty()) {
+            throw CommonExceptions.EMPTY_SERVER_LIST;
+        }
         List<Server> list = serverList.get(userId);
+
+        if (list.isEmpty()) {
+            throw CommonExceptions.EMPTY_SERVER_LIST;
+        }
         return list;
     }
 
@@ -140,7 +150,8 @@ public class FileServerRepository implements ServerRepository {
 
     @Override
     public void remove(User owner, Server server) {
-        List<Server> list = serverList.get(owner.getId());
+        List<Server> list = findAllByUserId(owner.getId());
+
         saveServerList();
         list.remove(server);
     }

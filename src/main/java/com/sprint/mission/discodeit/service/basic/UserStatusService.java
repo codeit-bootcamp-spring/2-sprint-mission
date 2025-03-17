@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.UserStatusCreateDTO;
 import com.sprint.mission.discodeit.DTO.UserStatusUpdateDTO;
-import com.sprint.mission.discodeit.Exception.DuplicateUserStatusException;
-import com.sprint.mission.discodeit.Exception.UserNotFoundException;
+import com.sprint.mission.discodeit.Exception.CommonException;
+import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.User;
@@ -29,13 +28,11 @@ public class UserStatusService {
             if (userStatus == null) {
                 userStatus = new UserStatus(user.getId());
             } else {
-                throw new DuplicateUserStatusException("해당 유저 상태는 이미 존재합니다.");
+                throw CommonExceptions.DUPLICATE_USER_STATUS;
             }
             userStatusRepository.save(userStatus);
-        } catch (UserNotFoundException e) {
-            System.out.println("해당 유저는 존재하지 않습니다.");
-        } catch (DuplicateUserStatusException e) {
-            System.out.println("해당 유저 상태는 이미 존재합니다.");
+        } catch (CommonException e) {
+            System.out.println("에러 발생");
         }
     }
 
@@ -53,8 +50,11 @@ public class UserStatusService {
     void update(String userId, String replaceId) {
         UUID userUUID = UUID.fromString(userId);
         UUID replaceUUID = UUID.fromString(replaceId);
-        UserStatusUpdateDTO userStatusUpdateDTO = new UserStatusUpdateDTO(userUUID, replaceUUID);
-        userStatusRepository.update(userStatusUpdateDTO);
+
+        UserStatus userStatus = userStatusRepository.find(userUUID);
+        UserStatusUpdateDTO userStatusUpdateDTO = new UserStatusUpdateDTO(replaceUUID);
+
+        userStatusRepository.update(userStatus, userStatusUpdateDTO);
     }
 
     void delete(String userId) {

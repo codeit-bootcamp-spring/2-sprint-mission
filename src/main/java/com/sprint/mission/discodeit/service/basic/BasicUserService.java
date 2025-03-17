@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.DTO.User.UserCreateDTO;
 import com.sprint.mission.discodeit.DTO.User.UserDeleteDTO;
 import com.sprint.mission.discodeit.DTO.User.UserFindDTO;
 import com.sprint.mission.discodeit.DTO.User.UserUpdateDTO;
-import com.sprint.mission.discodeit.Exception.DuplicateUserException;
-import com.sprint.mission.discodeit.Exception.UserNotFoundException;
+import com.sprint.mission.discodeit.Exception.CommonException;
+import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
@@ -33,7 +33,7 @@ public class BasicUserService implements UserService {
         Optional<User> duplicateUser = list.stream()
                 .filter(u -> u.getName().equals(userName) || u.getEmail().equals(email)).findFirst();
         duplicateUser.ifPresent(u -> {
-            throw new DuplicateUserException("해당 이름, 이메일을 가진 유저가 존재합니다.");
+            throw CommonExceptions.DUPLICATE_USER;
         });
     }
 
@@ -128,7 +128,7 @@ public class BasicUserService implements UserService {
         } catch (IllegalArgumentException e0) {
             System.out.println("잘못된 ID값을 받았습니다.");
             return false;
-        } catch (UserNotFoundException e) {
+        } catch (CommonException e) {
             System.out.println("유저를 찾지 못했습니다.");
             return false;
         }
@@ -145,7 +145,7 @@ public class BasicUserService implements UserService {
         } catch (IllegalArgumentException e0) {
             System.out.println("잘못된 ID값을 받았습니다.");
             return false;
-        } catch (UserNotFoundException e1) {
+        } catch (CommonException e1) {
             System.out.println("업데이트할 유저가 존재하지 않습니다.");
             return false;
         }

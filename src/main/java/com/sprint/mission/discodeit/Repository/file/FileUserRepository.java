@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.User.UserUpdateDTO;
-import com.sprint.mission.discodeit.Exception.ServerNotFoundException;
-import com.sprint.mission.discodeit.Exception.UserNotFoundException;
+import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.UserRepository;
-import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;
 
@@ -12,8 +10,9 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class FileUserRepository implements UserRepository {
@@ -96,12 +95,15 @@ public class FileUserRepository implements UserRepository {
     @Override
     public User find(UUID userId) {
         User user = userList.stream().filter(u -> u.getId().equals(userId)).findFirst()
-                .orElseThrow(() -> new UserNotFoundException("해당 ID를 가지는 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> CommonExceptions.USER_NOT_FOUND);
         return user;
     }
 
     @Override
     public List<User> findUserList() {
+        if (userList.isEmpty()) {
+            throw CommonExceptions.EMPTY_USER_LIST;
+        }
         return userList;
     }
 
@@ -127,6 +129,9 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public UUID remove(User user) {
+        if (userList.isEmpty()) {
+            throw CommonExceptions.EMPTY_USER_LIST;
+        }
         userList.remove(user);
         saveUserList();
         return user.getId();

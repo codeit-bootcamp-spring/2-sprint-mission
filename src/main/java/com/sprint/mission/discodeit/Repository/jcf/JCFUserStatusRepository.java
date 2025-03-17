@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.UserStatusUpdateDTO;
-import com.sprint.mission.discodeit.Exception.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
@@ -20,19 +20,23 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public UserStatus find(UUID userId) {
         UserStatus status = userStatusList.stream().filter(userStatus -> userStatus.getUserId().equals(userId))
-                .findFirst().orElseThrow(() -> new UserStatusNotFoundException("해당 ID를 가지는 User Status 를 찾을 수 없습니다."));
+                .findFirst().orElseThrow(() -> CommonExceptions.USER_STATUS_NOT_FOUND);
         return status;
     }
 
     @Override
     public List<UserStatus> findAll() {
+        if (userStatusList.isEmpty()) {
+            throw CommonExceptions.EMPTY_USER_STATUS_LIST;
+        }
         return userStatusList;
     }
 
     @Override
-    public void update(UserStatusUpdateDTO userStatusUpdateDTO) {
-        UserStatus userStatus = find(userStatusUpdateDTO.userId());
-        userStatus.setUserStatusId(userStatusUpdateDTO.replaceId());
+    public void update(UserStatus userStatus, UserStatusUpdateDTO userStatusUpdateDTO) {
+        if (userStatusUpdateDTO.replaceId() != null) {
+            userStatus.setUserStatusId(userStatusUpdateDTO.replaceId());
+        }
     }
 
     @Override

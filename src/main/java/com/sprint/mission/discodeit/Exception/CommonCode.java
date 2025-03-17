@@ -14,6 +14,9 @@ public enum CommonCode implements Code{
     EMPTY_SERVER_LIST("서버 리스트가 비어있습니다"),
     EMPTY_CHANNEL_LIST("채널 리스트가 비어있습니다"),
     EMPTY_MESSAGE_LIST("메시지 리스트가 비어있습니다."),
+    EMPTY_USER_STATUS_LIST("유저 상태 정보 리스트가 비어있습니다"),
+    EMPTY_READ_STATUS_LIST("읽기 정보 리스트가 비어있습니다"),
+    EMPTY_BINARY_CONTENT_LIST("바이너리 정보 리스트가 비어있습니다"),
 
     DUPLICATE_USER("중복된 유저가 있습니다."),
     DUPLICATE_USER_STATUS("중복된 유저 상태 정보가 있습니다."),
