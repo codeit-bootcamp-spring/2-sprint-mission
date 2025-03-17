@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.DTO.User.*;
+import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
+import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
+import com.sprint.mission.discodeit.DTO.User.UserDTO;
+import com.sprint.mission.discodeit.DTO.User.UserFindDTO;
 import com.sprint.mission.discodeit.Exception.CommonException;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
@@ -53,9 +55,9 @@ public class BasicUserService implements UserService {
         if (userCRUDDTO.binaryContent() != null) {
             user.setProfileId(userCRUDDTO.binaryContent().getBinaryContentId());
 
-            BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(userCRUDDTO.binaryContent());
+            BinaryContentDTO binaryContentDTO = BinaryContentDTO.create(userCRUDDTO.binaryContent());
 
-            binaryContentRepository.save(binaryContentCreateDTO);
+            binaryContentRepository.save(binaryContentDTO);
         }
 
         UserStatus userStatus = new UserStatus(user.getId());

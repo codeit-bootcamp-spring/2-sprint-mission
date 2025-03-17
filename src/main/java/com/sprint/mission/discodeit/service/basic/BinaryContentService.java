@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +16,8 @@ public class BinaryContentService {
 
     BinaryContent create() {
         BinaryContent binaryContent = new BinaryContent();
-        BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(binaryContent);
-        binaryContentRepository.save(binaryContentCreateDTO);
+        BinaryContentDTO binaryContentDTO = BinaryContentDTO.create(binaryContent);
+        binaryContentRepository.save(binaryContentDTO);
         return binaryContent;
     }
 

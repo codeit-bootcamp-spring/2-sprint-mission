@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.Exception.CommonException;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
@@ -15,8 +15,8 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     private List<BinaryContent> binaryContentList = new LinkedList<>();
 
     @Override
-    public void save(BinaryContentCreateDTO binaryContentCreateDTO) {
-        binaryContentList.add(binaryContentCreateDTO.binaryContent());
+    public void save(BinaryContentDTO binaryContentDTO) {
+        binaryContentList.add(binaryContentDTO.binaryContent());
     }
 
     @Override
