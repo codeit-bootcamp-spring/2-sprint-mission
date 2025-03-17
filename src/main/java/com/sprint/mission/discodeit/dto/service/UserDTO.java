@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.dto.service;
 
-import com.sprint.mission.discodeit.entity.UserStatus;
-
+import lombok.Builder;
 import java.time.Instant;
 import java.util.UUID;
 
+
+@Builder
 public record UserDTO(
         UUID id,
         UUID profileId,
@@ -12,6 +13,6 @@ public record UserDTO(
         Instant updatedAt,
         String username,
         String email,
-        boolean isLogin
+        Boolean isLogin
 ) {
 }
