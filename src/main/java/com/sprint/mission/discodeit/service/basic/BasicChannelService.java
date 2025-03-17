@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelReadResponse;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserReadResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.model.ChannelType;
+import com.sprint.mission.discodeit.provider.ChannelReadStrategyProvider;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -25,29 +28,34 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final ChannelReadStrategyProvider strategyProvider;
 
     @Override
     public Channel createPrivateChannel(PrivateChannelCreateRequest privateChannelCreateRequest) {
-        Channel newChannel = new Channel("private");      // name과 description 속성은 생략을 어떤식으로 할까???????????
+        Channel newChannel = new Channel(ChannelType.PRIVATE);      // private channel 생성자 호출
         this.channelRepository.add(newChannel);
 
         // for 문이 transaction 처리가 간편하다 하여 stream 사용X
         for(UserReadResponse user : privateChannelCreateRequest.users()) {
             this.readStatusRepository.add(new ReadStatus(user.userId(), newChannel.getId()));
         }
+
+        this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
         return newChannel;
     }
 
     @Override
     public Channel createPublicChannel(String channelName) {
-        Channel newChannel = new Channel(channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
+        Channel newChannel = new Channel(ChannelType.PUBLIC, channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
         this.channelRepository.add(newChannel);
+        this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
         return newChannel;
     }
 
     @Override
-    public Channel readChannel(UUID channelId) {
-        return this.channelRepository.findById(channelId);
+    public ChannelReadResponse readChannel(UUID channelId) {
+        Channel findChannel = this.channelRepository.findById(channelId);
+        return strategyProvider.getChannelReadStrategy(findChannel.getChannelType()).toDto(findChannel);
     }
 
     @Override
