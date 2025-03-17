@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileUserStatusRepository implements UserStatusRepository {
     private final FileRepositoryImpl<List<UserStatus>> fileRepository;
     private final Path path = Paths.get(System.getProperty("user.dir"), "data", "UserStatusList.ser");

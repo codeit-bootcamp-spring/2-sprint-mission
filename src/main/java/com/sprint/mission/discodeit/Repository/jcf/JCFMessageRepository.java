@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.Repository.MessageRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFMessageRepository implements MessageRepository {
     private Map<UUID, List<Message>> messageList = new ConcurrentHashMap<>();

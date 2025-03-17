@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileServerRepository implements ServerRepository {
     private final FileRepositoryImpl<Map<UUID, List<Server>>> fileRepository;

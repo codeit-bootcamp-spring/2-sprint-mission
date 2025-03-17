@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.Repository.MessageRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileMessageRepository implements MessageRepository {
     private final FileRepositoryImpl<Map<UUID, List<Message>>> fileRepository;

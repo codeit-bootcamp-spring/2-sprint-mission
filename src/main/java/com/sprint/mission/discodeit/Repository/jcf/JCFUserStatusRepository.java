@@ -4,11 +4,15 @@ import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusCRUDDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+@Repository
 public class JCFUserStatusRepository implements UserStatusRepository {
     List<UserStatus> userStatusList = new ArrayList<>();
 

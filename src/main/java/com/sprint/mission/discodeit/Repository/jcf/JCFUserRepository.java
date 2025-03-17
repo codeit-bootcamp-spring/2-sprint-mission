@@ -6,12 +6,14 @@ import com.sprint.mission.discodeit.Exception.EmptyUserListException;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFUserRepository implements UserRepository {
     private List<User> userList = new ArrayList<>();

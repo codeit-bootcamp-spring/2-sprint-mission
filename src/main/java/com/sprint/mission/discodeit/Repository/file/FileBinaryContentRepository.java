@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +16,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
     private final FileRepositoryImpl<List<BinaryContent>> fileRepository;
     private final Path path = Paths.get(System.getProperty("user.dir"), "data", "BinaryContentList.ser");
