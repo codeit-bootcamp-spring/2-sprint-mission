@@ -16,11 +16,23 @@ public class Channel extends BaseEntity implements Serializable {
     private String description;
     private ChannelType type;
 
-    public Channel(String channelName) {
+    public Channel(ChannelType type, String channelName, String description) {
         super();
+        this.type = type;
         this.channelName = channelName;
+        this.description = description;
         this.members = new HashSet<>();
         this.messages = new HashSet<>();
+    }
+
+    public void updateChannelType(ChannelType type) {
+        this.type = type;
+        updateTimestamp();
+    }
+
+    public void updateDescription(String description) {
+        this.description = description;
+        updateTimestamp();
     }
 
     public void updateChannelName(String channelName) {
@@ -60,7 +72,9 @@ public class Channel extends BaseEntity implements Serializable {
     public String toString() {
         return "Channel{" +
                 "channelId='" + getId() + '\'' +
-                "channelName='" + channelName + '\'' +  // 오타 수정
+                "channelName='" + channelName + '\'' +
+                ", description='" + description + '\'' +
+                ", channelType=" + type + '\'' +
                 ", members=" + members +
                 ", lastUpdateTime= " + getUpdatedAt() +
                 '}';

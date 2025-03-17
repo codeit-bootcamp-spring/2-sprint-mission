@@ -59,7 +59,7 @@ public class User extends BaseEntity implements Serializable {
                 "userId=" + getId() +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", joinedChannels=" + joinedChannels +
+                ", joinedChannels=" + joinedChannels + '\'' +
                 ", lastUpdateTime= " + getUpdatedAt() +
                 '}';
     }
