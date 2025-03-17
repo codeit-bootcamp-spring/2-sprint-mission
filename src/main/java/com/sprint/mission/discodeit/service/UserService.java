@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserCreateResponseDto create(UserCreateRequestDto userCreateRequestDto);
+    UserCreateResponseDto create(UserCreateRequestDto requestDto);
     UserResponseDto find(UUID userId);
     List<UserResponseDto> findAll();
-    UserUpdateResponseDto update(UserUpdateRequestDto userUpdateRequestDto);
+    UserUpdateResponseDto update(UserUpdateRequestDto requestDto);
     void delete(UUID userId);
 }
