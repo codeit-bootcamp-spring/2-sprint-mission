@@ -3,12 +3,9 @@ package com.sprint.mission.discodeit.service.fileTest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import java.nio.file.Path;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -19,11 +16,11 @@ class FileUserServiceTest {
     private FileUserService userService;
     private FileChannelService channelService;
 
-    @BeforeEach
-    void setUp(@TempDir Path tempDir) {
-        userService = FileUserService.getInstance();
-        channelService = FileChannelService.getInstance(userService);
-    }
+//    @BeforeEach
+//    void setUp(@TempDir Path tempDir) {
+//        userService = FileUserService.getInstance();
+//        channelService = FileChannelService.getInstance(userService);
+//    }
 
     @Test
     @DisplayName("FileUserService: 정상적인 유저 생성 확인")

@@ -29,8 +29,8 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User createUser(String username) {
-        User user = new User(username);
+    public User createUser(String username, String email, String password) {
+        User user = new User(username, email, password);
         fileUserRepository.addUser(user);
         return user;
     }
@@ -62,6 +62,20 @@ public class FileUserService implements UserService {
         User user = getUserById(userID);
         user.updateUsername(newUsername);
         saveUserData();
+    }
+
+    @Override
+    public void updatePassword(UUID userId, String newPassword) {
+        validateUserExists(userId);
+        User user = getUserById(userId);
+        user.updatePassword(newPassword);
+    }
+
+    @Override
+    public void updateEmail(UUID userId, String newEmail) {
+        validateUserExists(userId);
+        User user = getUserById(userId);
+        user.updateEmail(newEmail);
     }
 
     @Override

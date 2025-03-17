@@ -22,8 +22,8 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User createUser(String username) {
-        User user = new User(username);
+    public User createUser(String username, String email, String password) {
+        User user = new User(username, email, password);
         userRepository.addUser(user);
         return user;
     }
@@ -50,8 +50,25 @@ public class BasicUserService implements UserService {
 
     @Override
     public void updateUsername(UUID userId, String newUsername) {
+        validateUserExists(userId);
         User user = userRepository.findUserById(userId);
         user.updateUsername(newUsername);
+        saveUser();
+    }
+
+    @Override
+    public void updatePassword(UUID userId, String newPassword) {
+        validateUserExists(userId);
+        User user = userRepository.findUserById(userId);
+        user.updatePassword(newPassword);
+        saveUser();
+    }
+
+    @Override
+    public void updateEmail(UUID userId, String newEmail) {
+        validateUserExists(userId);
+        User user = userRepository.findUserById(userId);
+        user.updateEmail(newEmail);
         saveUser();
     }
 

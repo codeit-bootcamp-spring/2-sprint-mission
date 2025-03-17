@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -19,9 +20,9 @@ public class FileChannelService implements ChannelService {
         this.userService = userService;
     }
 
-    public static synchronized FileChannelService getInstance(UserService userService, FileChannelRepository fileChannelRepository){
-        if(INSTANCE == null){
-            INSTANCE = new FileChannelService(userService,fileChannelRepository);
+    public static synchronized FileChannelService getInstance(UserService userService, FileChannelRepository fileChannelRepository) {
+        if (INSTANCE == null) {
+            INSTANCE = new FileChannelService(userService, fileChannelRepository);
         }
         return INSTANCE;
     }
@@ -31,8 +32,8 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(String channelName) {
-        Channel channel = new Channel(channelName);
+    public Channel createChannel(ChannelType channelType, String channelName, String description) {
+        Channel channel = new Channel(channelType, channelName, description);
         fileChannelRepository.addChannel(channel);
         return channel;
     }
@@ -58,6 +59,22 @@ public class FileChannelService implements ChannelService {
     public void updateChannelName(UUID channelId, String newChannelName) {
         Channel channel = findChannelById(channelId);
         channel.updateChannelName(newChannelName);
+        saveChannelData();
+    }
+
+    @Override
+    public void updateChannelDescription(UUID channelId, String newChannelDescription) {
+        validateChannelExists(channelId);
+        Channel channel = findChannelById(channelId);
+        channel.updateDescription(newChannelDescription);
+        saveChannelData();
+    }
+
+    @Override
+    public void updateChannelType(UUID channelId, ChannelType newChannelType) {
+        validateChannelExists(channelId);
+        Channel channel = findChannelById(channelId);
+        channel.updateChannelType(newChannelType);
         saveChannelData();
     }
 

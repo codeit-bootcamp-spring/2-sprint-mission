@@ -5,12 +5,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -25,12 +22,12 @@ class FileMessageServiceTest {
     private FileUserService userService;
     private FileChannelService channelService;
 
-    @BeforeEach
-    void setUp(@TempDir Path tempDir) {
-        userService = FileUserService.getInstance();
-        channelService = FileChannelService.getInstance(userService);
-        messageService = FileMessageService.getInstance(userService, channelService);
-    }
+//    @BeforeEach
+//    void setUp(@TempDir Path tempDir) {
+//        userService = FileUserService.getInstance();
+//        channelService = FileChannelService.getInstance(userService);
+//        messageService = FileMessageService.getInstance(userService, channelService);
+//    }
 
     @Test
     @DisplayName("FileMessageService: 여러 개의 메세지 추가 확인")
