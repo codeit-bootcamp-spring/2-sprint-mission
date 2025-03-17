@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelReadResponse;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserReadResponse;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -38,6 +39,7 @@ public class BasicChannelService implements ChannelService {
         // for 문이 transaction 처리가 간편하다 하여 stream 사용X
         for(UserReadResponse user : privateChannelCreateRequest.users()) {
             this.readStatusRepository.add(new ReadStatus(user.userId(), newChannel.getId()));
+            newChannel.addParticipant(user.userId());
         }
 
         this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
@@ -75,6 +77,7 @@ public class BasicChannelService implements ChannelService {
         this.channelRepository.updateChannelName(channelId, newChannelName);
     }
 
+    // 삭제해야 될지도? 추후 필요할지도 모르니 일단 남겨두겠음 (스프린트미션3 기준 public은 참여자 정보가 필요없고, private은 참여자 정보가 필요함. 하지만 private은 생성 후 수정 불가능)
     @Override
     public void addChannelParticipant(UUID channelId, UUID newParticipantId) {        // channelId 검증은 channelRepository 에서 수행
         UserService.validateUserId(newParticipantId, this.userRepository);
