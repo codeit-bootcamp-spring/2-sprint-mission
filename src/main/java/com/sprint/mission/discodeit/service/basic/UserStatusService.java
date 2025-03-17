@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.UserStatusUpdateDTO;
+import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusCRUDDTO;
 import com.sprint.mission.discodeit.Exception.CommonException;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.UserRepository;
@@ -52,7 +52,7 @@ public class UserStatusService {
         UUID replaceUUID = UUID.fromString(replaceId);
 
         UserStatus userStatus = userStatusRepository.find(userUUID);
-        UserStatusUpdateDTO userStatusUpdateDTO = new UserStatusUpdateDTO(replaceUUID);
+        UserStatusCRUDDTO userStatusUpdateDTO = UserStatusCRUDDTO.update(replaceUUID);
 
         userStatusRepository.update(userStatus, userStatusUpdateDTO);
     }

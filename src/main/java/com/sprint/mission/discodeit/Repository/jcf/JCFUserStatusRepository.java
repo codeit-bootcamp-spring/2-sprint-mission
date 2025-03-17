@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.UserStatusUpdateDTO;
+import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusCRUDDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -33,9 +33,9 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void update(UserStatus userStatus, UserStatusUpdateDTO userStatusUpdateDTO) {
-        if (userStatusUpdateDTO.replaceId() != null) {
-            userStatus.setUserStatusId(userStatusUpdateDTO.replaceId());
+    public void update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO) {
+        if (userStatusUpdateDTO.userStatusId() != null) {
+            userStatus.setUserStatusId(userStatusUpdateDTO.userStatusId());
         }
     }
 

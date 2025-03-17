@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.ReadStatusUpdateDTO;
+import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusCRUDDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
@@ -53,9 +53,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void update(ReadStatus readStatus,ReadStatusUpdateDTO readStatusUpdateDTO) {
-        if (readStatusUpdateDTO.replaceId() != null) {
-            readStatus.setReadStatusId(readStatusUpdateDTO.replaceId());
+    public void update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO) {
+        if (readStatusCRUDDTO.readStatusId() != null) {
+            readStatus.setReadStatusId(readStatusCRUDDTO.readStatusId());
         }
     }
 

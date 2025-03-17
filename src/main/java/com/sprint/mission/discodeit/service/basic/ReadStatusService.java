@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.ReadStatusCreateDTO;
-import com.sprint.mission.discodeit.DTO.ReadStatusUpdateDTO;
+import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusCRUDDTO;
+import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusDTO;
 import com.sprint.mission.discodeit.Exception.CommonException;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
@@ -23,10 +23,11 @@ public class ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final ChannelRepository channelRepository;
 
-    void create(ReadStatusCreateDTO readStatusCreateDTO) {
+    void create(ReadStatusDTO readStatusDTO) {
         try {
-            UUID userId = UUID.fromString(readStatusCreateDTO.userId());
-            UUID channelId = UUID.fromString(readStatusCreateDTO.channelID());
+            ReadStatusCRUDDTO readStatusCRUDDTO = ReadStatusCRUDDTO.create(readStatusDTO.userId(), readStatusDTO.channelId());
+            UUID userId = readStatusDTO.userId();
+            UUID channelId = readStatusDTO.channelId();
 
             User user = userRepository.find(userId);
             Channel channel = channelRepository.find(channelId);
@@ -57,9 +58,10 @@ public class ReadStatusService {
         return list;
     }
 
-    void update(String readStatusId, ReadStatusUpdateDTO readStatusUpdateDTO) {
+    void update(String readStatusId, ReadStatusDTO readStatusDTO) {
+        ReadStatusCRUDDTO readStatusCRUDDTO = ReadStatusCRUDDTO.update(readStatusDTO.readStatusId());
         ReadStatus readStatus = find(readStatusId);
-        readStatusRepository.update(readStatus, readStatusUpdateDTO);
+        readStatusRepository.update(readStatus, readStatusCRUDDTO);
     }
 
     void delete(String readStatusId){
