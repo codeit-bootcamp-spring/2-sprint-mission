@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -113,15 +114,18 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(UUID channelId, String newName, String newDescription) {
-        boolean isExistChannel = findAll().stream().anyMatch(channel -> channel.getName().equals(newName));
+    public Channel update(ChannelUpdateDto channelUpdateDto) {
+        Channel channel = channelRepository.findById(channelUpdateDto.id());
 
-        if (isExistChannel) {
-            throw new RuntimeException(channelId + " 채널이 이미 존재해 수정할 수 없습니다.");
+        if (channel == null) {
+            throw new RuntimeException(channelUpdateDto.id() + " 채널은 존재하지 않아 수정할 수 없습니다.");
         }
 
-        Channel channel = findById(channelId);
-        channel.update(newName, newDescription);
+        if (channel.getType().equals(ChannelType.PRIVATE)) {
+            throw new IllegalArgumentException("Private 채널은 수정할 수 없습니다.");
+        }
+
+        channel.update(channelUpdateDto.newName(), channelUpdateDto.newDescription());
 
         return channelRepository.save(channel);
     }
