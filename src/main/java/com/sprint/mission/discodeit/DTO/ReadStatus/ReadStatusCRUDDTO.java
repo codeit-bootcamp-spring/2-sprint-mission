@@ -8,7 +8,7 @@ import java.util.UUID;
 public record ReadStatusCRUDDTO(
         UUID readStatusId,
         UUID userId,
-        UUID channelID
+        UUID channelId
 ) {
     public static ReadStatusCRUDDTO create(
             UUID userId,
@@ -16,7 +16,7 @@ public record ReadStatusCRUDDTO(
     ) {
         return ReadStatusCRUDDTO.builder()
                 .userId(userId)
-                .channelID(channelID).build();
+                .channelId(channelID).build();
     }
 
     public static ReadStatusCRUDDTO update(UUID readStatusId) {
