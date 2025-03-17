@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository.file;
 
-import com.sprint.mission.discodeit.DTO.Message.MessageUpdateDTO;
+import com.sprint.mission.discodeit.DTO.Message.MessageCRUDDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Repository.MessageRepository;
@@ -72,12 +72,12 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public UUID update(Message message, MessageUpdateDTO messageUpdateDTO) {
-        if (messageUpdateDTO.replaceText() != null) {
-            message.setText(messageUpdateDTO.replaceText());
+    public UUID update(Message message, MessageCRUDDTO messageUpdateDTO) {
+        if (messageUpdateDTO.text() != null) {
+            message.setText(messageUpdateDTO.text());
         }
-        if (messageUpdateDTO.replaceId() != null) {
-            message.setMessageId(messageUpdateDTO.replaceId());
+        if (messageUpdateDTO.messageId() != null) {
+            message.setMessageId(messageUpdateDTO.messageId());
         }
         fileRepository.save(messageList);
         return message.getMessageId();

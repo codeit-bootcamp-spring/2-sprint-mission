@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.Message.MessageUpdateDTO;
+import com.sprint.mission.discodeit.DTO.Message.MessageCRUDDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.MessageRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
@@ -52,12 +52,12 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public UUID update(Message message, MessageUpdateDTO messageUpdateDTO) {
-        if (messageUpdateDTO.replaceText() != null) {
-            message.setText(messageUpdateDTO.replaceText());
+    public UUID update(Message message, MessageCRUDDTO messageUpdateDTO) {
+        if (messageUpdateDTO.text() != null) {
+            message.setText(messageUpdateDTO.text());
         }
-        if (messageUpdateDTO.replaceId() != null) {
-            message.setMessageId(messageUpdateDTO.replaceId());
+        if (messageUpdateDTO.messageId() != null) {
+            message.setMessageId(messageUpdateDTO.messageId());
         }
         return message.getMessageId();
     }

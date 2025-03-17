@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.Message.MessageCreateDTO;
-import com.sprint.mission.discodeit.DTO.Message.MessageIDSDTO;
-import com.sprint.mission.discodeit.DTO.Message.MessageUpdateDTO;
+import com.sprint.mission.discodeit.DTO.Message.MessageCRUDDTO;
+import com.sprint.mission.discodeit.DTO.Message.MessageDTO;
 import com.sprint.mission.discodeit.Exception.CommonException;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
@@ -35,18 +34,19 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message create(MessageCreateDTO messageCreateDTO) {
-        UUID userId = UUID.fromString(messageCreateDTO.creatorId());
-        UUID channelUUID = UUID.fromString(messageCreateDTO.channelId());
+    public Message create(MessageDTO messageDTO) {
+        MessageCRUDDTO messageCRUDDTO = MessageCRUDDTO.create(messageDTO.creatorId(), messageDTO.creatorId(), messageDTO.creatorName(), messageDTO.binaryContent());
+        UUID userId = messageCRUDDTO.creatorId();
+        UUID channelUUID = messageCRUDDTO.channelId();
 
         User user = userRepository.find(userId);
         Channel channel = channelRepository.find(channelUUID);
 
-        Message message = new Message(userId,user.getName(), channelUUID, messageCreateDTO.text());
+        Message message = new Message(userId,user.getName(), channelUUID, messageCRUDDTO.text());
 
-        if (messageCreateDTO.binaryContent() != null) {
+        if (messageCRUDDTO.binaryContent() != null) {
             List<UUID> attachmentIds = message.getAttachmentIds();
-            List<BinaryContent> contentList = messageCreateDTO.binaryContent();
+            List<BinaryContent> contentList = messageCRUDDTO.binaryContent();
             for (BinaryContent binaryContent : contentList) {
                 attachmentIds.add(binaryContent.getBinaryContentId());
             }
@@ -91,9 +91,11 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public boolean delete(MessageIDSDTO messageIDSDTO) {
-        UUID channelId = UUID.fromString(messageIDSDTO.channelId());
-        UUID messageId = UUID.fromString(messageIDSDTO.messageId());
+    public boolean delete(MessageDTO messageDTO) {
+        MessageCRUDDTO messageCRUDDTO = MessageCRUDDTO.delete(messageDTO.serverId(), messageDTO.channelId(), messageDTO.messageId());
+
+        UUID channelId = messageCRUDDTO.channelId();
+        UUID messageId = messageCRUDDTO.messageId();
 
         Channel channel = channelRepository.find(channelId);
         Message message = messageRepository.find(messageId);
@@ -109,12 +111,14 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public boolean update(String messageId, MessageUpdateDTO messageUpdateDTO) {
+    public boolean update(String messageId, MessageDTO messageDTO) {
+        MessageCRUDDTO messageCRUDDTO = MessageCRUDDTO.update(messageDTO.messageId(), messageDTO.text());
+
         UUID messageUUID = UUID.fromString(messageId);
 
         Message message = messageRepository.find(messageUUID);
 
-        messageRepository.update(message, messageUpdateDTO);
+        messageRepository.update(message, messageCRUDDTO);
         return true;
     }
 }

@@ -20,8 +20,8 @@ public class Message implements Serializable {
     private final UUID creatorId;
     private final String creatorName;
     private final UUID channelId;
-    public final Instant createdAt;
 
+    public final Instant createdAt;
     public Instant updatedAt;
 
     public List<UUID> attachmentIds = new ArrayList<>();
