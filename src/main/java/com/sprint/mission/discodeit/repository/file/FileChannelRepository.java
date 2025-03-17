@@ -57,6 +57,19 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
+    public Channel update(Channel channel, String newName, String newDescription){
+        channel.update(newName, newDescription);
+
+        dataSave();
+        return channel;
+    }
+
+    @Override
+    public Map<UUID, Channel> getChannelData(){
+        return channelData;
+    }
+
+    @Override
     public List<Channel> findAll(){
         return this.channelData.values().stream().toList();
     }

@@ -23,6 +23,18 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public User update(User user, String newUsername, String newEmail, String newPassword){
+        user.update(newUsername, newEmail, newPassword);
+
+        return user;
+    }
+
+    @Override
+    public Map<UUID, User> getUserData(){
+        return data;
+    }
+
+    @Override
     public List<User> findAll(){
         return this.data.values().stream().toList();
     }

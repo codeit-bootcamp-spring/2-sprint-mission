@@ -53,7 +53,7 @@ public class FileChannelService implements ChannelService {
     public Channel create(ChannelType type, String name, String description) {
         if(channelData.values().stream()
                 .anyMatch(channel -> channel.getName().equals(name))){
-            throw new RuntimeException("같은 이름을 가진 채널이 있습니다.");
+            throw new IllegalArgumentException("같은 이름을 가진 채널이 있습니다.");
         }
         Channel channel = new Channel(type, name, description);
         this.channelData.put(channel.getId(), channel);

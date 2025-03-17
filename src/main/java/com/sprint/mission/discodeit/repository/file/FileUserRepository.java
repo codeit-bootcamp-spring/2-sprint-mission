@@ -23,7 +23,7 @@ public class FileUserRepository implements UserRepository {
         dataLoad();
     }
 
-    private void dataLoad() {
+    public void dataLoad() {
         File file = new File(USER_FILE_PATH);
         if (!file.exists()) {
             userData = new HashMap<>();
@@ -39,7 +39,7 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
-    private void dataSave() {
+    public void dataSave() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_FILE_PATH))) {
             oos.writeObject(userData);
         } catch (IOException e) {
@@ -48,10 +48,21 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
+    public Map<UUID, User> getUserData() {
+        return userData;
+    }
+
     public User save(User user){
         this.userData.put(user.getId(), user);
         dataSave();
 
+        return user;
+    }
+
+    public User update(User user, String newUsername, String newEmail, String newPassword){
+        user.update(newUsername, newEmail, newPassword);
+
+        dataSave();
         return user;
     }
 
