@@ -1,60 +1,126 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.service.CreateUserParam;
+import com.sprint.mission.discodeit.dto.service.UpdateUserParam;
+import com.sprint.mission.discodeit.dto.service.UserDTO;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
 
     @Override
-    public User create(String username, String email, String password) {
-        validateUserField(username, email, password);
-        User user = new User(username, email, password);
+    public UserDTO create(CreateUserParam createUserParam) {
+        validateUserField(createUserParam);
+        checkDuplicateUsername(createUserParam);
+        checkDuplicateEmail(createUserParam);
+        User user = createUserEntity(createUserParam);
         userRepository.save(user);
-        return user;
+        UserStatus userStatus = new UserStatus(user.getId());
+        userStatusRepository.save(userStatus);
+        return userEntityToDTO(user, userStatus);
     }
 
     @Override
-    public User find(UUID userId) {
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
+    public UserDTO find(UUID userId) {
+        User findUser = findUserById(userId);
+        UserStatus findUserStatus = userStatusRepository.findByUserId(userId);
+        return userEntityToDTO(findUser, findUserStatus);
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserDTO> findAll() {
+        List<User> users = userRepository.findAll();
+        Map<UUID, UserStatus> userStatusMap = userStatusRepository.findAll().stream()
+                .collect(Collectors.toMap(userStatus -> userStatus.getUserId(),userStatus -> userStatus));
+        return users.stream()
+                .map(user -> userEntityToDTO(user, userStatusMap.get(user.getId())))
+                .toList();
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User user = find(userId);
-        user.updateUserInfo(newUsername, newEmail, newPassword);
-        userRepository.save(user);
-        return user;
+    public UUID update(UUID userId, UpdateUserParam updateUserParam) {
+        User findUser = findUserById(userId);
+        findUser.updateUserInfo(updateUserParam.username(), updateUserParam.email(), updateUserParam.password());
+        findUser.updateProfile(updateUserParam.profileId());
+        userRepository.save(findUser);
+        return userId;
     }
 
     @Override
     public void delete(UUID userId) {
-        find(userId); // 유저가 존재하는지 확인
+        User user = findUserById(userId);
         userRepository.deleteById(userId);
+        binaryContentRepository.deleteById(user.getProfileId());
+        userStatusRepository.deleteByUserId(userId);
     }
 
-    private void validateUserField(String username, String email, String password) {
-        if (username == null || username.isBlank() || email == null || email.isBlank() || password == null || password.isBlank()) {
+    private void validateUserField(CreateUserParam createUserParam) {
+        if (Stream.of(createUserParam.username(), createUserParam.email(), createUserParam.password())
+                .anyMatch(field -> field == null || field.isBlank())) {
             throw new IllegalArgumentException("username, email, password는 필수 입력값입니다.");
         }
     }
+
+    private void checkDuplicateUsername(CreateUserParam createUserParam) {
+        List<UserDTO> users = findAll();
+        if (users.stream().anyMatch(userDTO -> userDTO.username().equals(createUserParam.username()))
+        ) {
+            throw new IllegalStateException("중복된 username입니다.");
+        }
+    }
+
+    private void checkDuplicateEmail(CreateUserParam createUserParam) {
+        List<UserDTO> users = findAll();
+        if (users.stream().anyMatch(userDTO -> userDTO.email().equals(createUserParam.email()))
+        ) {
+            throw new IllegalStateException("중복된 email입니다.");
+        }
+    }
+
+
+    private User createUserEntity(CreateUserParam createUserParam) {
+        return new User(
+                createUserParam.username(),
+                createUserParam.email(),
+                createUserParam.password(),
+                createUserParam.profileId());
+    }
+
+    private UserDTO userEntityToDTO(User user, UserStatus userStatus) {
+        return new UserDTO(
+                user.getId(),
+                user.getProfileId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getUsername(),
+                user.getEmail(),
+                userStatus.isLoginUser());
+    }
+
+    private User findUserById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
+    }
+
 
 }
