@@ -13,6 +13,8 @@ public class Channel extends BaseEntity implements Serializable {
     private final Set<UUID> members;
     private final Set<UUID> messages;
     private String channelName;
+    private String description;
+    private ChannelType type;
 
     public Channel(String channelName) {
         super();
