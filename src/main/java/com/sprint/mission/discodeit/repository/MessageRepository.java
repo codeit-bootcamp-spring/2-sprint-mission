@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageRepository extends Repository<Message> {
+    void addChannelIdToChannelIdMessage(UUID channelId);
     List<Message> findMessageListByChannelId(UUID channelId);
     void updateMessageContent(UUID messageId, String newContent);
 }
