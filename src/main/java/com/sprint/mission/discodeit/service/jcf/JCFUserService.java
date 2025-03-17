@@ -49,6 +49,4 @@ public class JCFUserService implements UserService {
         userData.remove(userId);
     }
 
-
-
 }

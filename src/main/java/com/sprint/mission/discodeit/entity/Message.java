@@ -42,8 +42,9 @@ public class Message extends MainDomain {
 
     @Override
     public String toString() {
-        return "Message{" +
-                "message=" + message + "\n" +
+        return "Message{" + "\n" +
+                "messageID=" + getId() + "\n" +
+                ", message=" + message + "\n" +
                 ", userId=" + userId +
                 ", channelId=" + channelId +
                 '}';

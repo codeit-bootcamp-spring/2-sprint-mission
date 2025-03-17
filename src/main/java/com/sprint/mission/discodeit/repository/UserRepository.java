@@ -8,6 +8,7 @@ import java.util.UUID;
 public interface UserRepository {
     User save(User user);
     User findById(UUID id);
-    List<User> findAll(String name);
+    List<User> findAll();
+    User update(UUID id, String newUsername, String newEmail, String newPassword);
     void delete(UUID id);
 }

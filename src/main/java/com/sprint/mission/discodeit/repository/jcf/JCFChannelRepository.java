@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
@@ -26,7 +27,21 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
+    public Channel update(UUID id, String newName, ChannelType channelType) {
+        Channel channelNullable = channelData.get(id);
+        Channel channel = Optional.ofNullable(channelNullable).orElseThrow(() -> new NoSuchElementException("채널 " + id + "가 존재하지 않습니다."));
+        channel.updateChannel(newName);
+        channel.updateChannelType(channelType);
+
+        return channel;
+    }
+
+    @Override
     public void delete(UUID id) {
+        if(!channelData.containsKey(id)){
+            throw new NoSuchElementException("채널 " + id + "가 존재하지 않습니다.");
+        }
         channelData.remove(id);
+
     }
 }

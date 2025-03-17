@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.enums;
+package com.sprint.mission.discodeit.menus;
 
 public enum MainMenu {
     USER("1", "유저 관리"),

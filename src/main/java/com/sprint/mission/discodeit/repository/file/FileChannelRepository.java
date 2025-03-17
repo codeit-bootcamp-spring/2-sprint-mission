@@ -1,50 +1,26 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class FileChannelRepository implements ChannelRepository {
     private final String CHANNEL_FILE = "channels.ser";
-    private final Map<UUID, Channel> channelData;
+    private final Map<UUID,Channel> channelData;
+    private final SaveLoadHandler saveLoadHandler;
 
     public FileChannelRepository() {
-        channelData = loadData();
-    }
-
-
-    private Map<UUID, Channel> loadData(){
-        File file = new File(CHANNEL_FILE);
-        if(!file.exists()){
-            return new HashMap<>();
-        }
-        try (FileInputStream fis = new FileInputStream(file);
-             ObjectInputStream ois = new ObjectInputStream(fis)){
-            return (Map<UUID, Channel>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void saveData(){
-        try(FileOutputStream fos = new FileOutputStream(CHANNEL_FILE);
-            ObjectOutputStream oos = new ObjectOutputStream(fos)){
-            oos.writeObject(this.channelData);
-        }catch (IOException e){
-            throw new RuntimeException(e);
-        }
+        saveLoadHandler = new SaveLoadHandler<>(CHANNEL_FILE);
+        channelData = saveLoadHandler.loadData();
     }
 
 
     @Override
     public Channel save(Channel channel) {
         channelData.put(channel.getId(), channel);
-        saveData();
+        saveLoadHandler.saveData(channelData);
         return channel;
     }
 
@@ -59,8 +35,22 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
+    public Channel update(UUID id, String newName, ChannelType channelType) {
+        Channel channelNullable = channelData.get(id);
+        Channel channel = Optional.ofNullable(channelNullable).orElseThrow(() -> new NoSuchElementException("채널 " + id + "가 존재하지 않습니다."));
+        channel.updateChannel(newName);
+        channel.updateChannelType(channelType);
+        saveLoadHandler.saveData(channelData);
+
+        return channel;
+    }
+
+    @Override
     public void delete(UUID id) {
+        if(!channelData.containsKey(id)){
+            throw new NoSuchElementException("채널 " + id + "가 존재하지 않습니다.");
+        }
         channelData.remove(id);
-        saveData();
+        saveLoadHandler.saveData(channelData);
     }
 }

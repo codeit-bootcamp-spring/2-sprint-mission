@@ -1,20 +1,21 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.enums.UserMenu;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.menus.UserMenu;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.UUID;
 
 public class UserMenuController {
-    private final JCFUserService userService;
+    private final UserService userService;
     private final Scanner scanner;
 
-    public UserMenuController(JCFUserService userService, Scanner scanner) {
+    public UserMenuController(UserService userService, Scanner scanner) {
         this.userService = userService;
         this.scanner = scanner;
     }
+
 
     public void handleUserMenu() {
         boolean run = true;
@@ -32,7 +33,12 @@ public class UserMenuController {
                 continue;
             }
 
-            run = execute(selectedMenu);
+            try {
+                run = execute(selectedMenu);
+            }
+            catch(NoSuchElementException | IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -66,9 +72,8 @@ public class UserMenuController {
             System.out.print(description);
             return UUID.fromString(scanner.nextLine());
         }catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException("잘못된 입력입니다.");
         }
-        return null;
     }
 
     private String getUserInput(String description) {
@@ -76,9 +81,8 @@ public class UserMenuController {
             System.out.print(description);
             return scanner.nextLine();
         }catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException("잘못된 입력입니다.");
         }
-        return null;
     }
 
     private void createUser() {
@@ -88,21 +92,12 @@ public class UserMenuController {
         String email = getUserInput("이메일: ");
         String password = getUserInput("비밀번호: ");
 
-        try {
-            System.out.println("유저 생성 완료: \n" +
-                    userService.create(userName, email, password));
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
-        }
+        System.out.println("유저 생성 완료: \n" + userService.create(userName, email, password));
     }
 
     private void findUser() {
         UUID id = getUserIdFromInput("조회할 유저 ID를 입력해주세요: ");
-        try {
-            System.out.println("조회된 유저: " + userService.find(id));
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
-        }
+        System.out.println("조회된 유저: " + userService.find(id));
     }
     private void findAllUsers() {
         System.out.println(userService.findAll());
@@ -114,20 +109,11 @@ public class UserMenuController {
         String userName = getUserInput("유저명: ");
         String email = getUserInput("이메일: ");
         String password = getUserInput("비밀번호: ");
-        try {
-            System.out.println("업데이트 완료: \n"
-                    + userService.update(id, userName, email, password));
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
-        }
+        System.out.println("업데이트 완료: \n" + userService.update(id, userName, email, password));
     }
 
     private void deleteUser() {
         UUID id = getUserIdFromInput("삭제할 유저ID를 입력하세요: ");
-        try {
-            userService.delete(id);
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
-        }
+        userService.delete(id);
     }
 }

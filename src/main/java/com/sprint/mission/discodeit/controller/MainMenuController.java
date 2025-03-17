@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.enums.MainMenu;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.menus.MainMenu;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.Scanner;
 
@@ -11,13 +11,13 @@ public class MainMenuController {
     private final Scanner scanner;
     private final UserMenuController userMenuController;
     private final ChannelMenuController channelMenuController;
-    private final MassegeMenuController massegeMenuController;
+    private final MessageMenuController messageMenuController;
 
-    public MainMenuController(Scanner scanner, JCFUserService jcfUserService, JCFChannelService jcfChannelService, JCFMessageService jcfMessageService) {
+    public MainMenuController(Scanner scanner, UserService jcfUserService, ChannelService jcfChannelService, MessageService jcfMessageService) {
         this.scanner = scanner;
         this.userMenuController = new UserMenuController(jcfUserService,scanner);
         this.channelMenuController = new ChannelMenuController(jcfChannelService, scanner);
-        this.massegeMenuController = new MassegeMenuController(jcfUserService,jcfChannelService,jcfMessageService, scanner);
+        this.messageMenuController = new MessageMenuController(jcfUserService,jcfChannelService,jcfMessageService, scanner);
     }
 
     public void run(){
@@ -47,7 +47,7 @@ public class MainMenuController {
                 channelMenuController.handleChannelMenu();
                 return true;
             case MESSAGE:
-                massegeMenuController.handleMessageMenu();
+                messageMenuController.handleMessageMenu();
                 return true;
             case EXIT:
                 return false;

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.enums;
+package com.sprint.mission.discodeit.menus;
 
 public enum MessageMenu {
     CREATE("1", "메세지 작성"),

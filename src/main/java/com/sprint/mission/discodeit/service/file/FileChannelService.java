@@ -38,8 +38,8 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(ChannelType type, String name) {
-        Channel channel = new Channel(type, name);
+    public Channel create(ChannelType type, String channelName) {
+        Channel channel = new Channel(type, channelName);
         this.channelData.put(channel.getId(), channel);
         saveData();
 
