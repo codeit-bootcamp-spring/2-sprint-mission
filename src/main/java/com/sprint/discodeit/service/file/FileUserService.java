@@ -21,7 +21,7 @@ public class FileUserService implements UserServiceV1 {
     public User create(UserRequestDto userRequestDto) {
         User userMapper = UserMapper.toUserMapper(userRequestDto);
         fileUserRepository.save(userMapper);
-        return userMapper;
+        return UserMapper.toUserNameResponse(userMapper.getUsername());
     }
 
     @Override
