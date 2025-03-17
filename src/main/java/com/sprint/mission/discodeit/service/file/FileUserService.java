@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,7 +71,7 @@ public class FileUserService implements UserService {
     public void updateUser(UUID userId, String newName) {
         User user = data.get(userId);
         if (user != null) {
-            long updatedTime = System.currentTimeMillis();
+            Instant updatedTime = Instant.now();
             user.update(newName, updatedTime);
             saveData();
         }

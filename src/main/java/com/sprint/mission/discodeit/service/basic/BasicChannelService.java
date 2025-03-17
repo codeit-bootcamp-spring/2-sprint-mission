@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,7 +44,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void updateChannel(UUID channelId, String newName) {
         channelRepository.getChannelById(channelId).ifPresent(channel -> {
-            long updatedTime = System.currentTimeMillis();
+            Instant updatedTime = Instant.now();
             channel.update(newName, updatedTime);
             channelRepository.save(channel);
         });

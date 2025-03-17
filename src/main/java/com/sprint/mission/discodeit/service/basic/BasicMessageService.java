@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,7 +52,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public void updateMessage(UUID messageId, String newText) {
         messageRepository.getMessageById(messageId).ifPresent(message -> {
-            long updatedTime = System.currentTimeMillis();
+            Instant updatedTime = Instant.now();
             message.update(newText, updatedTime);
             messageRepository.save(message);
         });

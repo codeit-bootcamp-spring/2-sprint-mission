@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.io.*;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,7 +71,7 @@ public class FileChannelService implements ChannelService {
     public void updateChannel(UUID channelId, String newName) {
         Channel channel = data.get(channelId);
         if (channel != null) {
-            long updateTime = System.currentTimeMillis();
+            Instant updateTime = Instant.now();
             channel.update(newName, updateTime);
             saveData();
         }

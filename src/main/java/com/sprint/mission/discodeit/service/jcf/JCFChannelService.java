@@ -4,6 +4,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,7 @@ public class JCFChannelService implements ChannelService {
     public void updateChannel(UUID channelId, String newName) {
         Channel channel = data.get(channelId);
         if (channel != null) {
-            long currentTime = System.currentTimeMillis();
+            Instant currentTime = Instant.now();
             channel.update(newName, currentTime);
         }
     }

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,7 +44,7 @@ public class BasicUserService implements UserService {
     @Override
     public void updateUser(UUID userId, String newName) {
         userRepository.getUserById(userId).ifPresent(user -> {
-            long updatedTime = System.currentTimeMillis();
+            Instant updatedTime = Instant.now();
             user.update(newName, updatedTime);
             userRepository.save(user);
         });

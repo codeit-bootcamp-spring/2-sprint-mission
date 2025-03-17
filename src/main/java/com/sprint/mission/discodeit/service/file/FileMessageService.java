@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,7 @@ public class FileMessageService implements MessageService {
     public void updateMessage(UUID messageId, String newText) {
         Message message = data.get(messageId);
         if (message != null) {
-            long currentTime = System.currentTimeMillis();
+            Instant currentTime = Instant.now();
             message.update(newText, currentTime);
             saveData();
         }
