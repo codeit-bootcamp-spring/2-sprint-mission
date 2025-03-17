@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +16,11 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class UserStatusService {
+public class BasicUserStatusService implements UserStatusService {
     private UserRepository userRepository;
     private UserStatusRepository userStatusRepository;
 
-    void create(String userId) {
+    public void create(String userId) {
         try {
             UUID userUUID = UUID.fromString(userId);
             User user = userRepository.find(userUUID);
@@ -36,18 +37,18 @@ public class UserStatusService {
         }
     }
 
-    UserStatus find(String userId) {
+    public UserStatus find(String userId) {
         UUID userUUID = UUID.fromString(userId);
         UserStatus userStatus = userStatusRepository.find(userUUID);
         return userStatus;
     }
 
-    List<UserStatus> findAll() {
+    public List<UserStatus> findAll() {
         List<UserStatus> all = userStatusRepository.findAll();
         return all;
     }
 
-    void update(String userId, String replaceId) {
+    public void update(String userId, String replaceId) {
         UUID userUUID = UUID.fromString(userId);
         UUID replaceUUID = UUID.fromString(replaceId);
 
@@ -57,7 +58,7 @@ public class UserStatusService {
         userStatusRepository.update(userStatus, userStatusUpdateDTO);
     }
 
-    void delete(String userId) {
+    public void delete(String userId) {
         UUID userUUID = UUID.fromString(userId);
         userStatusRepository.delete(userUUID);
     }

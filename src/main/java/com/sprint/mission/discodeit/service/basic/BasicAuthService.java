@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
 
     public User loginUser(UserCRUDDTO userLoginDTO) {

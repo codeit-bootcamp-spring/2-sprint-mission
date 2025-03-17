@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +19,12 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ReadStatusService {
+public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
     private final ChannelRepository channelRepository;
 
-    void create(ReadStatusDTO readStatusDTO) {
+    public void create(ReadStatusDTO readStatusDTO) {
         try {
             ReadStatusCRUDDTO readStatusCRUDDTO = ReadStatusCRUDDTO.create(readStatusDTO.userId(), readStatusDTO.channelId());
             UUID userId = readStatusDTO.userId();
@@ -46,25 +47,25 @@ public class ReadStatusService {
         }
     }
 
-    ReadStatus find(String readStatusId) {
+    public ReadStatus find(String readStatusId) {
         UUID readStatusUUID = UUID.fromString(readStatusId);
         ReadStatus readStatus = readStatusRepository.find(readStatusUUID);
         return readStatus;
     }
 
-    List<ReadStatus> findAllByUserId(String userId){
+    public List<ReadStatus> findAllByUserId(String userId) {
         UUID userUUID = UUID.fromString(userId);
         List<ReadStatus> list = readStatusRepository.findAllByUserId(userUUID);
         return list;
     }
 
-    void update(String readStatusId, ReadStatusDTO readStatusDTO) {
+    public void update(String readStatusId, ReadStatusDTO readStatusDTO) {
         ReadStatusCRUDDTO readStatusCRUDDTO = ReadStatusCRUDDTO.update(readStatusDTO.readStatusId());
         ReadStatus readStatus = find(readStatusId);
         readStatusRepository.update(readStatus, readStatusCRUDDTO);
     }
 
-    void delete(String readStatusId){
+    public void delete(String readStatusId) {
         UUID readStatusUUID = UUID.fromString(readStatusId);
         readStatusRepository.delete(readStatusUUID);
     }
