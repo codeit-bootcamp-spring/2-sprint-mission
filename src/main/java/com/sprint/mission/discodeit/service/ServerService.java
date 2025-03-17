@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.Server.ServerCreateDTO;
-import com.sprint.mission.discodeit.DTO.Server.ServerDeleteDTO;
-import com.sprint.mission.discodeit.DTO.Server.ServerJoinDTO;
-import com.sprint.mission.discodeit.DTO.Server.ServerUpdateDTO;
+import com.sprint.mission.discodeit.DTO.Server.*;
 import com.sprint.mission.discodeit.entity.Server;
 
 import java.util.List;
@@ -13,9 +10,9 @@ public interface ServerService {
 
     void reset(boolean adminAuth);
 
-    UUID create(ServerCreateDTO serverCreateDTO);
+    UUID create(ServerDTO serverDTO);
 
-    UUID join(ServerJoinDTO serverJoinDTO);
+    UUID join(ServerDTO serverDTO);
 
     Server find(String serverId);
 
@@ -23,8 +20,8 @@ public interface ServerService {
 
     void print(String userId);
 
-    boolean delete(ServerDeleteDTO serverDeleteDTO);
+    boolean delete(ServerDTO serverDTO);
 
-    boolean update(String serverId, ServerUpdateDTO serverUpdateDTO);
+    boolean update(String serverId, ServerDTO serverDTO);
 
 }

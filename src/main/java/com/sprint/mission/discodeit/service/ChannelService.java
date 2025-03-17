@@ -10,23 +10,23 @@ public interface ChannelService {
 
     void reset(boolean adminAuth);
 
-    UUID create(ChannelCreateDTO channelCreateDTO);
+    UUID create(ChannelDTO channelDTO);
 
-    UUID join(ChannelJoinDTO channelJoinDTO);
+    UUID join(ChannelDTO channelDTO);
 
-    UUID quit(ChannelJoinDTO channelJoinDTO);
+    UUID quit(ChannelDTO channelDTO);
 
-    ChannelFindDTO find(String channelId);
+    ChannelDTO find(String channelId);
 
-    List<ChannelFindDTO> findAllByServerAndUser(String serverId );
+    List<ChannelDTO> findAllByServerAndUser(String serverId );
 
     boolean printChannels(String serverId);
 
     boolean printUsersInChannel(String channelId);
 
-    boolean delete(ChannelIDSDTO channelIDSDTO);
+    boolean delete(ChannelDTO channelDTO);
 
-    boolean update(ChannelIDSDTO channelIDSDTO, ChannelUpdateDTO channelUpdateDTO);
+    boolean update(ChannelDTO channelDTO, ChannelDTO replaceDTO);
 
 
 }

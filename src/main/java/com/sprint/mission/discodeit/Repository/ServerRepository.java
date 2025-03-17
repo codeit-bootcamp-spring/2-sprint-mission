@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository;
 
-import com.sprint.mission.discodeit.DTO.Server.ServerUpdateDTO;
+import com.sprint.mission.discodeit.DTO.Server.ServerDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 
@@ -20,7 +20,7 @@ public interface ServerRepository {
 
     List<Server> findAllByUserId(UUID userId);
 
-    UUID update(Server targetServer, ServerUpdateDTO serverUpdateDTO);
+    UUID update(Server targetServer, ServerDTO serverDTO);
 
     void remove(User owner, Server server);
 }

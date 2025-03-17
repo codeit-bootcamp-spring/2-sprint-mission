@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.User.UserUpdateDTO;
+import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;
 
@@ -29,7 +30,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User find(UUID userId) {
-        User user = userList.stream().filter(u -> u.getId().equals(userId)).findFirst()
+        User user = CommonUtils.findById(userList, userId, User::getId)
                 .orElseThrow(() -> CommonExceptions.USER_NOT_FOUND);
         return user;
     }
@@ -44,18 +45,18 @@ public class JCFUserRepository implements UserRepository {
 
 
     @Override
-    public UUID update(User user, UserUpdateDTO userUpdateDTO) {
-        if (userUpdateDTO.replaceId() != null) {
-            user.setId(userUpdateDTO.replaceId());
+    public UUID update(User user, UserCRUDDTO userUpdateDTO) {
+        if (userUpdateDTO.userId() != null) {
+            user.setId(userUpdateDTO.userId());
         }
-        if (userUpdateDTO.replaceName() != null) {
-            user.setName(userUpdateDTO.replaceName());
+        if (userUpdateDTO.userName() != null) {
+            user.setName(userUpdateDTO.userName());
         }
-        if (userUpdateDTO.replaceEmail() != null) {
-            user.setEmail(userUpdateDTO.replaceEmail());
+        if (userUpdateDTO.email() != null) {
+            user.setEmail(userUpdateDTO.email());
         }
-        if (userUpdateDTO.binaryContentId() != null) {
-            user.setProfileId(userUpdateDTO.binaryContentId());
+        if (userUpdateDTO.profileId() != null) {
+            user.setProfileId(userUpdateDTO.profileId());
         }
         return user.getId();
     }

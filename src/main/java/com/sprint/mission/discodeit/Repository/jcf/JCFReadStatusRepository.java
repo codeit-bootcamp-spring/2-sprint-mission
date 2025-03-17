@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.Repository.jcf;
 import com.sprint.mission.discodeit.DTO.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
 import java.util.ArrayList;
@@ -19,8 +20,8 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus find(UUID readStatusId) {
-        ReadStatus status = readStatusList.stream().filter(readStatus -> readStatus.getReadStatusId().equals(readStatusId))
-                .findFirst().orElseThrow(() -> CommonExceptions.READ_STATUS_NOT_FOUND);
+        ReadStatus status = CommonUtils.findById(readStatusList, readStatusId, ReadStatus::getReadStatusId)
+                .orElseThrow(() -> CommonExceptions.READ_STATUS_NOT_FOUND);
         return status;
     }
 
@@ -29,9 +30,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
         if (readStatusList.isEmpty()) {
             throw CommonExceptions.EMPTY_READ_STATUS_LIST;
         }
-
-        List<ReadStatus> list = readStatusList.stream().filter(readStatus -> readStatus.getUserId().equals(userID))
-                .toList();
+        List<ReadStatus> list = CommonUtils.findAllById(readStatusList, userID, ReadStatus::getUserId);
 
         if (list.isEmpty()) {
             throw CommonExceptions.EMPTY_READ_STATUS_LIST;
@@ -44,8 +43,8 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
         if (readStatusList.isEmpty()) {
             throw CommonExceptions.EMPTY_READ_STATUS_LIST;
         }
-        List<ReadStatus> list = readStatusList.stream().filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .toList();
+
+        List<ReadStatus> list = CommonUtils.findAllById(readStatusList, channelId, ReadStatus::getChannelId);
 
         if (list.isEmpty()) {
             throw CommonExceptions.EMPTY_READ_STATUS_LIST;

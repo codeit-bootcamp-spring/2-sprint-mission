@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.Repository.file;
+package com.sprint.mission.discodeit.Repository;
 
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 
@@ -6,7 +6,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class FileRepositoryImpl<T> implements FileRepository<T>{
+public class FileRepositoryImpl<T> implements FileRepository<T> {
     private final Path path;
 
     public FileRepositoryImpl(Path path) {

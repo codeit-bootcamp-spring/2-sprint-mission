@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.Server.ServerCreateDTO;
-import com.sprint.mission.discodeit.DTO.Server.ServerDeleteDTO;
-import com.sprint.mission.discodeit.DTO.Server.ServerJoinDTO;
-import com.sprint.mission.discodeit.DTO.Server.ServerUpdateDTO;
+import com.sprint.mission.discodeit.DTO.Server.*;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.entity.Server;
@@ -27,8 +24,9 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public UUID create(ServerCreateDTO serverCreateDTO) {
-        UUID userId = UUID.fromString(serverCreateDTO.ownerId());
+    public UUID create(ServerDTO serverDTO) {
+        ServerDTO serverCreateDTO = ServerDTO.create(serverDTO.userId(), serverDTO.name());
+        UUID userId = serverCreateDTO.userId();
         User owner;
 
         owner = userRepository.find(userId);
@@ -40,9 +38,12 @@ public class BasicServerService implements ServerService {
 
 
     @Override
-    public UUID join(ServerJoinDTO serverJoinDTO) {
-        UUID userId = UUID.fromString(serverJoinDTO.userId());
-        UUID serverId = UUID.fromString(serverJoinDTO.serverId());
+    public UUID join(ServerDTO serverDTO) {
+        ServerDTO serverJoinDTO = ServerDTO.join(serverDTO.serverId(), serverDTO.userId());
+
+        UUID serverId = serverJoinDTO.serverId();
+        UUID userId = serverJoinDTO.userId();
+
         User user = userRepository.find(userId);
         Server server = serverRepository.find(serverId);
         serverRepository.join(user, server);
@@ -71,9 +72,13 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public boolean delete(ServerDeleteDTO serverDeleteDTO) {
-        UUID userId = UUID.fromString(serverDeleteDTO.ownerId());
-        UUID serverId = UUID.fromString(serverDeleteDTO.serverId());
+    public boolean delete(ServerDTO serverDTO) {
+        ServerDTO serverDeleteDTO = ServerDTO.delete(serverDTO.serverId(), serverDTO.userId());
+
+        UUID serverId = serverDeleteDTO.serverId();
+        UUID userId = serverDeleteDTO.userId();
+
+
         User user = userRepository.find(userId);
         Server server = serverRepository.find(serverId);
         serverRepository.remove(user, server);
@@ -81,8 +86,10 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public boolean update(String serverId, ServerUpdateDTO serverUpdateDTO) {
-        UUID targetServerId = UUID.fromString(serverId);
+    public boolean update(String serverId, ServerDTO serverDTO) {
+        ServerDTO serverUpdateDTO = ServerDTO.update(serverDTO.serverId(), serverDTO.userId(), serverDTO.name());
+        UUID targetServerId = serverUpdateDTO.serverId();
+
         Server server = serverRepository.find(targetServerId);
         serverRepository.update(server, serverUpdateDTO);
         return true;

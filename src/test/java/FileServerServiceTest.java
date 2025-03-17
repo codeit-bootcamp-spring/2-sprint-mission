@@ -15,7 +15,7 @@ public class FileServerServiceTest {
 //        //초기 설정
 ////        User(id=a86064f9-e05f-4186-a8d3-5b389a76bdd6, name=test2)
 ////        User(id=bee340eb-5682-4d4a-86dc-2bfe87de2306, name=test1)
-////        a86064f9-e05f-4186-a8d3-5b389a76bdd6=[Server(serverId=63944f9e-8001-4833-ab9a-3aabbe76c07e, userOwnerId=a86064f9-e05f-4186-a8d3-5b389a76bdd6, name=testServer2)
+////        a86064f9-e05f-4186-a8d3-5b389a76bdd6=[Server(serverId=63944f9e-8001-4833-ab9a-3aabbe76c07e, userId=a86064f9-e05f-4186-a8d3-5b389a76bdd6, name=testServer2)
 //        String testServer = "63944f9e-8001-4833-ab9a-3aabbe76c07e";
 //        String owner = "a86064f9-e05f-4186-a8d3-5b389a76bdd6";
 //        String testUser = "bee340eb-5682-4d4a-86dc-2bfe87de2306";

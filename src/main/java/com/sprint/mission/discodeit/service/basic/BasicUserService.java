@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.DTO.User.UserCreateDTO;
-import com.sprint.mission.discodeit.DTO.User.UserDeleteDTO;
-import com.sprint.mission.discodeit.DTO.User.UserFindDTO;
-import com.sprint.mission.discodeit.DTO.User.UserUpdateDTO;
+import com.sprint.mission.discodeit.DTO.User.*;
 import com.sprint.mission.discodeit.Exception.CommonException;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
@@ -28,10 +25,10 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
 
-    private void checkDuplicate(String userName, String email) {
+    private void checkDuplicate(UserCRUDDTO userCRUDDTO) {
         List<User> list = userRepository.findUserList();
         Optional<User> duplicateUser = list.stream()
-                .filter(u -> u.getName().equals(userName) || u.getEmail().equals(email)).findFirst();
+                .filter(u -> u.getName().equals(userCRUDDTO.userName()) || u.getEmail().equals(userCRUDDTO.email())).findFirst();
         duplicateUser.ifPresent(u -> {
             throw CommonExceptions.DUPLICATE_USER;
         });
@@ -45,13 +42,19 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UUID register(UserCreateDTO userCreateDTO) {
-        checkDuplicate(userCreateDTO.userName(), userCreateDTO.email());
-        User user = new User(userCreateDTO.userName(), userCreateDTO.email(), userCreateDTO.password());
+    public UUID register(UserDTO userDTO) {
+        UserCRUDDTO userCRUDDTO = UserCRUDDTO.create(userDTO.userName(), userDTO.email(), userDTO.email());
 
-        if (userCreateDTO.binaryContent() != null) {
-            user.setProfileId(userCreateDTO.binaryContent().getBinaryContentId());
-            BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(userCreateDTO.binaryContent());
+        UserCRUDDTO checkDuplicate = UserCRUDDTO.checkDuplicate(userCRUDDTO.userName(), userCRUDDTO.email());
+        checkDuplicate(checkDuplicate);
+
+        User user = new User(userCRUDDTO.userName(), userCRUDDTO.email(), userCRUDDTO.password());
+
+        if (userCRUDDTO.binaryContent() != null) {
+            user.setProfileId(userCRUDDTO.binaryContent().getBinaryContentId());
+
+            BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(userCRUDDTO.binaryContent());
+
             binaryContentRepository.save(binaryContentCreateDTO);
         }
 
@@ -68,7 +71,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.find(userUUID);
         UserStatus userStatus = userStatusRepository.find(userUUID);
 
-        UserFindDTO userFindDTO = new UserFindDTO(
+        UserFindDTO userFindDTO = UserFindDTO.find(
                 user.getId(),
                 user.getProfileId(),
                 user.getName(),
@@ -81,8 +84,6 @@ public class BasicUserService implements UserService {
         return userFindDTO;
     }
 
-    //이게 맞나?
-    //일일이 넣는 것이?
     @Override
     public List<UserFindDTO> findAll() {
         List<UserFindDTO> findList = new ArrayList<>();
@@ -90,7 +91,7 @@ public class BasicUserService implements UserService {
         List<User> userList = userRepository.findUserList();
         for (User user : userList) {
             UserStatus userStatus = userStatusRepository.find(user.getId());
-            UserFindDTO userFindDTO = new UserFindDTO(
+            UserFindDTO userFindDTO = UserFindDTO.find(
                     user.getId(),
                     user.getProfileId(),
                     user.getName(),
@@ -115,10 +116,10 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public boolean delete(UserDeleteDTO userDeleteDTO) {
+    public boolean delete(UserDTO userDTO) {
+        UserCRUDDTO userCRUDDTO = UserCRUDDTO.delete(userDTO.userId());
         try {
-            UUID userUUID = UUID.fromString(userDeleteDTO.userId());
-            User findUser = userRepository.find(userUUID);
+            User findUser = userRepository.find(userCRUDDTO.userId());
 
             userRepository.remove(findUser);
             userStatusRepository.delete(findUser.getId());
@@ -136,11 +137,12 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public boolean update(String userId, UserUpdateDTO userUpdateDTO) {
+    public boolean update(String userId, UserDTO userDTO) {
+        UserCRUDDTO userCRUDDTO = UserCRUDDTO.update(userDTO.userId(),userDTO.profileId(),userDTO.userName(),userDTO.email());
         try {
             UUID userUUID = UUID.fromString(userId);
             User findUser = userRepository.find(userUUID);
-            userRepository.update(findUser, userUpdateDTO);
+            userRepository.update(findUser, userCRUDDTO);
             return true;
         } catch (IllegalArgumentException e0) {
             System.out.println("잘못된 ID값을 받았습니다.");

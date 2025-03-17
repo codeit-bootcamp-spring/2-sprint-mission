@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.Repository.file;
 
-import com.sprint.mission.discodeit.DTO.User.UserUpdateDTO;
+import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.User;
@@ -51,8 +52,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User find(UUID userId) {
-        User user = CommonUtils.filterById(userList, userId, User::getId)
-                .findFirst()
+        User user = CommonUtils.findById(userList, userId, User::getId)
                 .orElseThrow(() -> CommonExceptions.USER_NOT_FOUND);
 
         return user;
@@ -68,18 +68,18 @@ public class FileUserRepository implements UserRepository {
 
 
     @Override
-    public UUID update(User user, UserUpdateDTO userUpdateDTO) {
-        if (userUpdateDTO.replaceId() != null) {
-            user.setId(userUpdateDTO.replaceId());
+    public UUID update(User user, UserCRUDDTO userUpdateDTO) {
+        if (userUpdateDTO.userId() != null) {
+            user.setId(userUpdateDTO.userId());
         }
-        if (userUpdateDTO.replaceName() != null) {
-            user.setName(userUpdateDTO.replaceName());
+        if (userUpdateDTO.userName() != null) {
+            user.setName(userUpdateDTO.userName());
         }
-        if (userUpdateDTO.replaceEmail() != null) {
-            user.setEmail(userUpdateDTO.replaceEmail());
+        if (userUpdateDTO.email() != null) {
+            user.setEmail(userUpdateDTO.email());
         }
-        if (userUpdateDTO.binaryContentId() != null) {
-            user.setProfileId(userUpdateDTO.binaryContentId());
+        if (userUpdateDTO.profileId() != null) {
+            user.setProfileId(userUpdateDTO.profileId());
         }
         fileRepository.save(userList);
         return user.getId();

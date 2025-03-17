@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.Repository.file;
+package com.sprint.mission.discodeit.Repository;
 
 public interface FileRepository<T>{
     void init();

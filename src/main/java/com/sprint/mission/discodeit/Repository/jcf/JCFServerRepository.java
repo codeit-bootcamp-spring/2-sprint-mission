@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.Server.ServerUpdateDTO;
+import com.sprint.mission.discodeit.DTO.Server.ServerDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
+import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 
@@ -51,9 +52,8 @@ public class JCFServerRepository implements ServerRepository {
 
     @Override
     public Server find(UUID serverId) {
-        Server server = serverList.values().stream().flatMap(List::stream)
-                .filter(s -> s.getServerId().equals(serverId))
-                .findFirst()
+        List<Server> list = serverList.values().stream().flatMap(List::stream).toList();
+        Server server = CommonUtils.findById(list, serverId, Server::getServerId)
                 .orElseThrow(() -> CommonExceptions.SERVER_NOT_FOUND);
         return server;
     }
@@ -71,15 +71,15 @@ public class JCFServerRepository implements ServerRepository {
     }
 
     @Override
-    public UUID update(Server targetServer, ServerUpdateDTO serverUpdateDTO) {
-        if (serverUpdateDTO.replaceServerId() != null) {
-            targetServer.setServerId(serverUpdateDTO.replaceServerId());
+    public UUID update(Server targetServer, ServerDTO serverDTO) {
+        if (serverDTO.serverId() != null) {
+            targetServer.setServerId(serverDTO.serverId());
         }
-        if (serverUpdateDTO.replaceOwnerId() != null) {
-            targetServer.setUserOwnerId(serverUpdateDTO.replaceOwnerId());
+        if (serverDTO.userId() != null) {
+            targetServer.setOwnerId(serverDTO.userId());
         }
-        if (serverUpdateDTO.replaceName() != null) {
-            targetServer.setName(serverUpdateDTO.replaceName());
+        if (serverDTO.name() != null) {
+            targetServer.setName(serverDTO.name());
         }
         return targetServer.getServerId();
     }

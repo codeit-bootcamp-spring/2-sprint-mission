@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.Repository.jcf;
 import com.sprint.mission.discodeit.DTO.Message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.MessageRepository;
+import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.stereotype.Repository;
@@ -31,9 +32,8 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Message find(UUID messageId) {
-        Message message = messageList.values().stream().flatMap(List::stream)
-                .filter(s -> s.getMessageId().equals(messageId))
-                .findFirst()
+        List<Message> list = messageList.values().stream().flatMap(List::stream).toList();
+        Message message = CommonUtils.findById(list, messageId, Message::getMessageId)
                 .orElseThrow(() -> CommonExceptions.MESSAGE_NOT_FOUND);
         return message;
     }

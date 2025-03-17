@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.DTO.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.Exception.CommonException;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 
 import java.util.LinkedList;
@@ -20,8 +21,8 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent find(UUID binaryId) {
-        BinaryContent content = binaryContentList.stream().filter(binaryContent -> binaryContent.getBinaryContentId().equals(binaryId))
-                .findFirst().orElseThrow(() -> CommonExceptions.BINARY_CONTENT_NOT_FOUND);
+        BinaryContent content = CommonUtils.findById(binaryContentList, binaryId, BinaryContent::getBinaryContentId)
+                .orElseThrow(() -> CommonExceptions.BINARY_CONTENT_NOT_FOUND);
         return content;
     }
 

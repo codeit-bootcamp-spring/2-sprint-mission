@@ -5,7 +5,6 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ public class Server implements Serializable {
 
     private UUID serverId;
 
-    private UUID userOwnerId;
+    private UUID ownerId;
 
     private String name;
     private List<User> userList = new ArrayList<>();
@@ -27,13 +26,13 @@ public class Server implements Serializable {
     public final Instant createdAt;
     public Instant updatedAt;
 
-    public Server(UUID userOwnerId, String name) {
-        this(UUID.randomUUID(), userOwnerId, Instant.now(), name);
+    public Server(UUID ownerId, String name) {
+        this(UUID.randomUUID(), ownerId, Instant.now(), name);
     }
 
-    public Server(UUID serverId, UUID userOwnerId, Instant createdAt, String name) {
+    public Server(UUID serverId, UUID ownerId, Instant createdAt, String name) {
         this.serverId = serverId;
-        this.userOwnerId = userOwnerId;
+        this.ownerId = ownerId;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
         this.name = name;
@@ -44,8 +43,8 @@ public class Server implements Serializable {
         updatedAt = Instant.now();
     }
 
-    public void setUserOwnerId(UUID userOwnerId) {
-        this.userOwnerId = userOwnerId;
+    public void setOwnerId(UUID ownerId) {
+        this.ownerId = ownerId;
         updatedAt = Instant.now();
     }
 

@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.User.UserCreateDTO;
-import com.sprint.mission.discodeit.DTO.User.UserDeleteDTO;
-import com.sprint.mission.discodeit.DTO.User.UserFindDTO;
-import com.sprint.mission.discodeit.DTO.User.UserUpdateDTO;
+import com.sprint.mission.discodeit.DTO.User.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,7 +10,7 @@ public interface UserService {
 
     void reset(boolean adminAuth);
 
-    UUID register(UserCreateDTO userCreateDTO);
+    UUID register(UserDTO userDTO);
 
     UserFindDTO find(String name);
 
@@ -21,8 +18,8 @@ public interface UserService {
 
     void print();
 
-    boolean delete(UserDeleteDTO userDeleteDTO);
+    boolean delete(UserDTO userDTO);
 
-    boolean update(String userId, UserUpdateDTO userUpdateDTO);
+    boolean update(String userId, UserDTO userDTO);
 
 }

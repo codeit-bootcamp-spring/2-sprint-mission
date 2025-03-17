@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.Repository.file;
 
-import com.sprint.mission.discodeit.DTO.Channel.ChannelUpdateDTO;
+import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
+import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
+import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -46,7 +48,6 @@ public class FileChannelRepository implements ChannelRepository {
         List<User> list = channel.getUserList();
         list.add(user);
 
-
         return user.getId();
     }
 
@@ -74,10 +75,10 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel find(UUID channelId) {
-        Channel channel = channelList.values().stream().flatMap(List::stream)
-                .filter(c -> c.getChannelId().equals(channelId))
-                .findFirst()
+        List<Channel> list = channelList.values().stream().flatMap(List::stream).toList();
+        Channel channel = CommonUtils.findById(list, channelId, Channel::getChannelId)
                 .orElseThrow(() -> CommonExceptions.CHANNEL_NOF_FOUND);
+
         return channel;
     }
 
@@ -95,15 +96,15 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public UUID update(Channel targetChannel, ChannelUpdateDTO channelUpdateDTO) {
-        if (channelUpdateDTO.replaceChannelId() != null) {
-            targetChannel.setChannelId(channelUpdateDTO.replaceChannelId());
+    public UUID update(Channel targetChannel, ChannelCRUDDTO channelUpdateDTO) {
+        if (channelUpdateDTO.channelId() != null) {
+            targetChannel.setChannelId(channelUpdateDTO.channelId());
         }
-        if (channelUpdateDTO.replaceName() != null) {
-            targetChannel.setName(channelUpdateDTO.replaceName());
+        if (channelUpdateDTO.name() != null) {
+            targetChannel.setName(channelUpdateDTO.name());
         }
-        if (channelUpdateDTO.replaceType() != null) {
-            targetChannel.setType(channelUpdateDTO.replaceType());
+        if (channelUpdateDTO.type() != null) {
+            targetChannel.setType(channelUpdateDTO.type());
         }
         fileRepository.save(channelList);
         return targetChannel.getChannelId();
