@@ -132,7 +132,13 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void delete(UUID channelId) {
-        Channel channel = findById(channelId);
+        Channel channel = channelRepository.findById(channelId);
         channelRepository.delete(channel.getId());
+
+        messageRepository.findByChannelId(channel.getId())
+                .forEach(message -> messageRepository.delete(message.getId()));
+
+        readStatusRepository.findAllByChannelId(channel.getId())
+                .forEach(readStatus -> readStatusRepository.delete(readStatus.getId()));
     }
 }
