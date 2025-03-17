@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.service;
+package com.sprint.mission.discodeit.dto.service.user;
 
 import lombok.Builder;
 import java.time.Instant;

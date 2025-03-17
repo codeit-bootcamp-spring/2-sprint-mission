@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.dto.service;
+package com.sprint.mission.discodeit.dto.service.user;
 
 import java.util.UUID;
 
-public record CreateUserParam(
+public record UpdateUserParam(
         String username,
         String email,
         String password,
