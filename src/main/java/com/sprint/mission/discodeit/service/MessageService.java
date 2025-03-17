@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.Message.MessageDTO;
+import com.sprint.mission.discodeit.DTO.Message.MessageCRUDDTO;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 public interface MessageService {
     void reset(boolean adminAuth);
 
-    Message create(MessageDTO messageDTO);
+    Message create(MessageCRUDDTO messageCRUDDTO);
 
     Message find(String messageId);
 
@@ -17,8 +17,8 @@ public interface MessageService {
 
     void print(String channelId);
 
-    boolean delete(MessageDTO messageDTO);
+    boolean delete(MessageCRUDDTO messageCRUDDTO);
 
-    boolean update(String messageId, MessageDTO messageDTO);
+    boolean update(String messageId, MessageCRUDDTO messageCRUDDTO);
 
 }

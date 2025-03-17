@@ -27,6 +27,7 @@ public class JCFMessageRepository implements MessageRepository {
     public void save(Channel channel, Message message) {
         List<Message> messages = messageList.getOrDefault(channel.getChannelId(), new ArrayList<>());
         messages.add(message);
+        messageList.put(channel.getChannelId(), messages);
 
     }
 

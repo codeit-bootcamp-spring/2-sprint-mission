@@ -34,8 +34,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message create(MessageDTO messageDTO) {
-        MessageCRUDDTO messageCRUDDTO = MessageCRUDDTO.create(messageDTO.creatorId(), messageDTO.creatorId(), messageDTO.creatorName(), messageDTO.binaryContent());
+    public Message create(MessageCRUDDTO messageCRUDDTO) {
         UUID userId = messageCRUDDTO.creatorId();
         UUID channelUUID = messageCRUDDTO.channelId();
 
@@ -91,9 +90,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public boolean delete(MessageDTO messageDTO) {
-        MessageCRUDDTO messageCRUDDTO = MessageCRUDDTO.delete(messageDTO.serverId(), messageDTO.channelId(), messageDTO.messageId());
-
+    public boolean delete(MessageCRUDDTO messageCRUDDTO) {
         UUID channelId = messageCRUDDTO.channelId();
         UUID messageId = messageCRUDDTO.messageId();
 
@@ -111,9 +108,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public boolean update(String messageId, MessageDTO messageDTO) {
-        MessageCRUDDTO messageCRUDDTO = MessageCRUDDTO.update(messageDTO.messageId(), messageDTO.text());
-
+    public boolean update(String messageId, MessageCRUDDTO messageCRUDDTO) {
         UUID messageUUID = UUID.fromString(messageId);
 
         Message message = messageRepository.find(messageUUID);
