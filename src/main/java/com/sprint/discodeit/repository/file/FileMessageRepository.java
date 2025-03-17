@@ -1,6 +1,6 @@
 package com.sprint.discodeit.repository.file;
 
-import com.sprint.discodeit.entity.Message;
+import com.sprint.discodeit.domain.entity.Message;
 import com.sprint.discodeit.repository.util.AbstractFileRepository;
 import com.sprint.discodeit.repository.MessageRepository;
 import com.sprint.discodeit.repository.util.FilePathUtil;

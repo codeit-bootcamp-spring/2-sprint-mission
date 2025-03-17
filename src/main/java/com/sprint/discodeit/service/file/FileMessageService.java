@@ -1,6 +1,6 @@
 package com.sprint.discodeit.service.file;
 
-import com.sprint.discodeit.entity.Message;
+import com.sprint.discodeit.domain.entity.Message;
 import com.sprint.discodeit.repository.file.FileMessageRepository;
 import com.sprint.discodeit.service.MessageService;
 import java.util.List;

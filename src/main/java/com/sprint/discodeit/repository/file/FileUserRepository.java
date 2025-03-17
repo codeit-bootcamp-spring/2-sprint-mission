@@ -1,6 +1,6 @@
 package com.sprint.discodeit.repository.file;
 
-import com.sprint.discodeit.entity.User;
+import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.repository.util.AbstractFileRepository;
 import com.sprint.discodeit.repository.UserRepository;
 import com.sprint.discodeit.repository.util.FilePathUtil;

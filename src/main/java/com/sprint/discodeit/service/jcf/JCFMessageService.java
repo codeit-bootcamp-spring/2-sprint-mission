@@ -1,6 +1,6 @@
 package com.sprint.discodeit.service.jcf;
 
-import com.sprint.discodeit.entity.Message;
+import com.sprint.discodeit.domain.entity.Message;
 import com.sprint.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.discodeit.service.MessageService;

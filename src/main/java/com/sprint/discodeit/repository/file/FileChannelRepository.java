@@ -1,6 +1,6 @@
 package com.sprint.discodeit.repository.file;
 
-import com.sprint.discodeit.entity.Channel;
+import com.sprint.discodeit.domain.entity.Channel;
 import com.sprint.discodeit.repository.util.AbstractFileRepository;
 import com.sprint.discodeit.repository.ChannelRepository;
 import com.sprint.discodeit.repository.util.FilePathUtil;

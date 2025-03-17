@@ -1,4 +1,4 @@
-package com.sprint.discodeit.entity;
+package com.sprint.discodeit.domain.entity;
 
 import java.io.Serializable;
 import java.time.Instant;

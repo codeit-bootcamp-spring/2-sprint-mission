@@ -1,8 +1,11 @@
 package com.sprint.discodeit.service.file;
 
-import com.sprint.discodeit.entity.User;
+import com.sprint.discodeit.domain.mapper.UserMapper;
+import com.sprint.discodeit.domain.dto.UserRequestDto;
+import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.repository.file.FileUserRepository;
 import com.sprint.discodeit.service.UserService;
+import com.sprint.discodeit.service.UserServiceV1;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -10,15 +13,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class FileUserService implements UserService {
+public class FileUserService implements UserServiceV1 {
 
     private final FileUserRepository fileUserRepository;
 
     @Override
-    public User create(String username, String email, String password) {
-        User user = new User(username, email, password);
-        fileUserRepository.save(user);
-        return user;
+    public User create(UserRequestDto userRequestDto) {
+        User userMapper = UserMapper.toUserMapper(userRequestDto);
+        fileUserRepository.save(userMapper);
+        return userMapper;
     }
 
     @Override

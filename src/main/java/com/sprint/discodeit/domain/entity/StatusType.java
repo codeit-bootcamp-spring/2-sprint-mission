@@ -1,4 +1,4 @@
-package com.sprint.discodeit.entity;
+package com.sprint.discodeit.domain.entity;
 
 public enum StatusType {
 

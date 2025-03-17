@@ -1,6 +1,6 @@
 package com.sprint.discodeit.repository.jcf;
 
-import com.sprint.discodeit.entity.User;
+import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.repository.UserRepository;
 import java.util.List;
 import java.util.Map;

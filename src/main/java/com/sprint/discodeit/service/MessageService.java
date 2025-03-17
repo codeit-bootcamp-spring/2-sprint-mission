@@ -1,6 +1,6 @@
 package com.sprint.discodeit.service;
 
-import com.sprint.discodeit.entity.Message;
+import com.sprint.discodeit.domain.entity.Message;
 
 import java.util.List;
 import java.util.UUID;

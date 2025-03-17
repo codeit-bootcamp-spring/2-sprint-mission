@@ -1,7 +1,7 @@
 package com.sprint.discodeit.service.jcf;
 
-import com.sprint.discodeit.entity.Channel;
-import com.sprint.discodeit.entity.ChannelType;
+import com.sprint.discodeit.domain.entity.Channel;
+import com.sprint.discodeit.domain.entity.ChannelType;
 import com.sprint.discodeit.repository.ChannelRepository;
 import com.sprint.discodeit.service.ChannelService;
 import java.util.*;

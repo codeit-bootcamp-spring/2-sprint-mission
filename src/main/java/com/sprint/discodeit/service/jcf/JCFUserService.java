@@ -1,6 +1,6 @@
 package com.sprint.discodeit.service.jcf;
 
-import com.sprint.discodeit.entity.User;
+import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.discodeit.service.UserService;
 

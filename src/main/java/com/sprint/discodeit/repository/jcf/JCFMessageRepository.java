@@ -1,6 +1,6 @@
 package com.sprint.discodeit.repository.jcf;
 
-import com.sprint.discodeit.entity.Message;
+import com.sprint.discodeit.domain.entity.Message;
 import com.sprint.discodeit.repository.MessageRepository;
 import java.util.List;
 import java.util.Map;

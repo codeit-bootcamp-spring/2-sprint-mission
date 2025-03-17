@@ -1,4 +1,4 @@
-package com.sprint.discodeit.entity;
+package com.sprint.discodeit.domain.entity;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -7,13 +7,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class BinaryContent {
+@AllArgsConstructor
+public class ReadStatus {
 
     private UUID id;
-    private String filename;
-    private String imgUrl;
-    private Instant creatAt;
+    private UUID userId;
+    private UUID channelId;
+    private Instant lastReadMessageTime;
 
 }
