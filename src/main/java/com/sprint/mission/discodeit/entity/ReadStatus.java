@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -13,6 +14,7 @@ public class ReadStatus {
     private final Instant createdAt;
     private Instant updatedAt; // 마지막으로 메시지를 읽은 시간
 
+    @Builder
     public ReadStatus(UUID userId, UUID channelId) {
         this.id = UUID.randomUUID();
         this.userId = userId;
