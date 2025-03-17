@@ -21,15 +21,15 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserStatus create(UserStatusCreateRequestDto userStatusCreateRequestDto) {
-        User user = userRepository.findById(userStatusCreateRequestDto.userId())
+    public UserStatus create(UserStatusCreateRequestDto requestDto) {
+        User user = userRepository.findById(requestDto.userId())
                     .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
 
-        if (userStatusRepository.findByUserId(userStatusCreateRequestDto.userId()).isPresent()) {
+        if (userStatusRepository.findByUserId(requestDto.userId()).isPresent()) {
             throw new IllegalArgumentException("해당 유저의 userStatus 이미 존재");
         }
 
-        UserStatus userStatus = new UserStatus(userStatusCreateRequestDto.userId());
+        UserStatus userStatus = new UserStatus(requestDto.userId());
         return userStatusRepository.save(userStatus);
     }
 
@@ -45,8 +45,8 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus update(UserStatusUpdateRequestDto userStatusUpdateRequestDto) {
-        UserStatus userStatus = userStatusRepository.findById(userStatusUpdateRequestDto.id())
+    public UserStatus update(UserStatusUpdateRequestDto requestDto) {
+        UserStatus userStatus = userStatusRepository.findById(requestDto.id())
                 .orElseThrow(() -> new NoSuchElementException("해당 유저 상태 없음"));
 
         userStatus.updateLastLoginAt();

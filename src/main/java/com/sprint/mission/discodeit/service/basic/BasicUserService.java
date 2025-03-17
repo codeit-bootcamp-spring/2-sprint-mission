@@ -24,11 +24,11 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public UserCreateResponseDto create(UserCreateRequestDto userCreateRequestDto) {
-        validateUserCreateRequestDto(userCreateRequestDto);
+    public UserCreateResponseDto create(UserCreateRequestDto requestDto) {
+        validateUserCreateRequestDto(requestDto);
 
-        User user = new User(userCreateRequestDto.username(),
-                userCreateRequestDto.email(), userCreateRequestDto.password(), userCreateRequestDto.profileId());
+        User user = new User(requestDto.username(),
+                requestDto.email(), requestDto.password(), requestDto.profileId());
         userRepository.save(user);
 
         userStatusService.create(new UserStatusCreateRequestDto(user.getId()));
@@ -36,11 +36,11 @@ public class BasicUserService implements UserService {
         return UserCreateResponseDto.fromEntity(user);
     }
 
-    private void validateUserCreateRequestDto(UserCreateRequestDto userCreateRequestDto) {
-        if (userRepository.existsByUsername(userCreateRequestDto.username())) {
+    private void validateUserCreateRequestDto(UserCreateRequestDto requestDto) {
+        if (userRepository.existsByUsername(requestDto.username())) {
             throw new IllegalArgumentException("동일 username 이미 존재함");
         }
-        if (userRepository.existsByEmail(userCreateRequestDto.email())) {
+        if (userRepository.existsByEmail(requestDto.email())) {
             throw new IllegalArgumentException("동일 email 이미 존재함");
         }
     }
@@ -64,10 +64,10 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserUpdateResponseDto update(UserUpdateRequestDto userUpdateRequestDto) {
-        User user = getUserBy(userUpdateRequestDto.id());
-        user.update(userUpdateRequestDto.username(), userUpdateRequestDto.email(),
-                 userUpdateRequestDto.password(), userUpdateRequestDto.profileId());
+    public UserUpdateResponseDto update(UserUpdateRequestDto requestDto) {
+        User user = getUserBy(requestDto.id());
+        user.update(requestDto.username(), requestDto.email(),
+                 requestDto.password(), requestDto.profileId());
         userRepository.save(user);
 
         return UserUpdateResponseDto.fromEntity(user);
