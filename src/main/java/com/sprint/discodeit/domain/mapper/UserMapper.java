@@ -1,6 +1,6 @@
 package com.sprint.discodeit.domain.mapper;
 
-import com.sprint.discodeit.domain.dto.UserNameResponse;
+import com.sprint.discodeit.domain.dto.UserNameStatusResponse;
 import com.sprint.discodeit.domain.dto.UserRequestDto;
 import com.sprint.discodeit.domain.entity.User;
 import java.util.UUID;
@@ -15,9 +15,4 @@ public class UserMapper {
                 .profileId(profileId)
                 .build();
     }
-
-    public static UserNameResponse toUserNameResponse(String username) {
-        return new UserNameResponse(username);
-    }
-
 }
