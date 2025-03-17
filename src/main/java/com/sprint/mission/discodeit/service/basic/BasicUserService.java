@@ -7,10 +7,12 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.DuplicateUserNameException;
+import com.sprint.mission.discodeit.provider.UserUpdaterProvider;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.updater.UserUpdater;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final UserUpdaterProvider userUpdaterProvider;
 
     @Override
     public User createUser(UserCreateRequest userCreateRequest) {
@@ -70,15 +73,8 @@ public class BasicUserService implements UserService {
     @Override
     public void updateUser(UserUpdateRequest userUpdateRequest) {
         User findUser = this.userRepository.findById(userUpdateRequest.userId());
-        if (!findUser.getUserName().equals(userUpdateRequest.userName())) {
-            this.userRepository.updateUserName(findUser.getId(), userUpdateRequest.userName());
-        }
-        if (!findUser.getPassword().equals(userUpdateRequest.password())) {
-            this.userRepository.updatePassword(findUser.getId(), userUpdateRequest.password());
-        }
-        if (!findUser.getProfileId().equals(userUpdateRequest.profileId())) {
-            this.userRepository.updateProfileId(findUser.getId(), userUpdateRequest.profileId());
-        }
+        List<UserUpdater> applicableUpdaters = userUpdaterProvider.getApplicableUpdaters(findUser, userUpdateRequest);
+        applicableUpdaters.forEach(updater -> updater.update(findUser, userUpdateRequest, this.userRepository));
     }
 
     @Override
