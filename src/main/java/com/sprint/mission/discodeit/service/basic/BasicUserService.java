@@ -83,17 +83,13 @@ public class BasicUserService implements UserService {
     }
 
     private void checkDuplicateUsername(CreateUserParam createUserParam) {
-        List<UserDTO> users = findAll();
-        if (users.stream().anyMatch(userDTO -> userDTO.username().equals(createUserParam.username()))
-        ) {
+        if (userRepository.existsByUsername(createUserParam.username())) {
             throw new IllegalStateException("중복된 username입니다.");
         }
     }
 
     private void checkDuplicateEmail(CreateUserParam createUserParam) {
-        List<UserDTO> users = findAll();
-        if (users.stream().anyMatch(userDTO -> userDTO.email().equals(createUserParam.email()))
-        ) {
+        if(userRepository.existsByEmail(createUserParam.email())) {
             throw new IllegalStateException("중복된 email입니다.");
         }
     }
