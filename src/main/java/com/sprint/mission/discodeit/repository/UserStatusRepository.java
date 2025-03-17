@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.service.dto.UserResponse;
+import com.sprint.mission.discodeit.service.userDto.UserResponse;
 
 import java.util.List;
 import java.util.UUID;

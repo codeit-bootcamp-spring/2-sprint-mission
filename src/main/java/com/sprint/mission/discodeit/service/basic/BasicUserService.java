@@ -6,10 +6,10 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.BinaryContentRepository;
-import com.sprint.mission.discodeit.service.dto.UserRequest;
-import com.sprint.mission.discodeit.service.dto.UserResponse;
+import com.sprint.mission.discodeit.service.userDto.UserRequest;
+import com.sprint.mission.discodeit.service.userDto.UserResponse;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.dto.UserUpdateRequest;
+import com.sprint.mission.discodeit.service.userDto.UserUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

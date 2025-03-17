@@ -35,19 +35,19 @@ public class JavaApplication {
 
     public static void main(String[] args) {
         // 레포지토리 초기화
-        UserRepository userRepository = new FileUserRepository();
+        /*UserRepository userRepository = new FileUserRepository();
         ChannelRepository channelRepository = new FileChannelRepository();
         MessageRepository messageRepository = new FileMessageRepository();
 
-        // 서비스 초기화
-        //UserService userService = new BasicUserService(userRepository,);
+
+        UserService userService = new BasicUserService(userRepository,);
         ChannelService channelService = new BasicChannelService(channelRepository);
         MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
 
-        // 셋업
-        //User user = setupUser(userService);
+
+        User user = setupUser(userService);
         Channel channel = setupChannel(channelService);
-        // 테스트
-        //messageCreateTest(messageService, channel, user);
+
+        messageCreateTest(messageService, channel, user);*/
     }
 }

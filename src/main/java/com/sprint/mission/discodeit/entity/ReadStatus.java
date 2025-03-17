@@ -9,4 +9,11 @@ public class ReadStatus {
     private UUID userId;
     private UUID channelId;
     private Instant lastReadAt;
+
+    public ReadStatus(UUID id, UUID userId) {
+        this.id = id;
+        this.userId = userId;
+        this.createdAt = Instant.now();
+
+    }
 }
