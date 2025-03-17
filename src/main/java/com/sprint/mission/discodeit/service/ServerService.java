@@ -10,9 +10,9 @@ public interface ServerService {
 
     void reset(boolean adminAuth);
 
-    UUID create(ServerDTO serverDTO);
+    UUID create(ServerCRUDDTO serverCRUDDTO);
 
-    UUID join(ServerDTO serverDTO);
+    UUID join(ServerCRUDDTO serverCRUDDTO);
 
     Server find(String serverId);
 
@@ -20,8 +20,8 @@ public interface ServerService {
 
     void print(String userId);
 
-    boolean delete(ServerDTO serverDTO);
+    boolean delete(ServerCRUDDTO serverCRUDDTO);
 
-    boolean update(String serverId, ServerDTO serverDTO);
+    boolean update(String serverId, ServerCRUDDTO serverCRUDDTO);
 
 }

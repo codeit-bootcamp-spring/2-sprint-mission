@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
+import com.sprint.mission.discodeit.DTO.Server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.DTO.Server.ServerDTO;
 import com.sprint.mission.discodeit.Exception.CommonExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyUserListException;
@@ -72,15 +73,15 @@ public class JCFServerRepository implements ServerRepository {
     }
 
     @Override
-    public UUID update(Server targetServer, ServerDTO serverDTO) {
-        if (serverDTO.serverId() != null) {
-            targetServer.setServerId(serverDTO.serverId());
+    public UUID update(Server targetServer, ServerCRUDDTO serverCRUDDTO) {
+        if (serverCRUDDTO.serverId() != null) {
+            targetServer.setServerId(serverCRUDDTO.serverId());
         }
-        if (serverDTO.userId() != null) {
-            targetServer.setOwnerId(serverDTO.userId());
+        if (serverCRUDDTO.userId() != null) {
+            targetServer.setOwnerId(serverCRUDDTO.userId());
         }
-        if (serverDTO.name() != null) {
-            targetServer.setName(serverDTO.name());
+        if (serverCRUDDTO.name() != null) {
+            targetServer.setName(serverCRUDDTO.name());
         }
         return targetServer.getServerId();
     }

@@ -24,25 +24,24 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public UUID create(ServerDTO serverDTO) {
-        ServerDTO serverCreateDTO = ServerDTO.create(serverDTO.userId(), serverDTO.name());
-        UUID userId = serverCreateDTO.userId();
+    public UUID create(ServerCRUDDTO serverCRUDDTO) {
+        UUID userId = serverCRUDDTO.userId();
         User owner;
 
         owner = userRepository.find(userId);
-        Server server = new Server(userId, serverCreateDTO.name());
+        Server server = new Server(userId, serverCRUDDTO.name());
         serverRepository.save(owner, server);
+        serverRepository.join(owner, server);
 
         return server.getServerId();
     }
 
 
     @Override
-    public UUID join(ServerDTO serverDTO) {
-        ServerDTO serverJoinDTO = ServerDTO.join(serverDTO.serverId(), serverDTO.userId());
+    public UUID join(ServerCRUDDTO serverCRUDDTO) {
 
-        UUID serverId = serverJoinDTO.serverId();
-        UUID userId = serverJoinDTO.userId();
+        UUID serverId = serverCRUDDTO.serverId();
+        UUID userId = serverCRUDDTO.userId();
 
         User user = userRepository.find(userId);
         Server server = serverRepository.find(serverId);
@@ -72,11 +71,10 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public boolean delete(ServerDTO serverDTO) {
-        ServerDTO serverDeleteDTO = ServerDTO.delete(serverDTO.serverId(), serverDTO.userId());
+    public boolean delete(ServerCRUDDTO serverCRUDDTO) {
 
-        UUID serverId = serverDeleteDTO.serverId();
-        UUID userId = serverDeleteDTO.userId();
+        UUID serverId = serverCRUDDTO.serverId();
+        UUID userId = serverCRUDDTO.userId();
 
 
         User user = userRepository.find(userId);
@@ -86,12 +84,11 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public boolean update(String serverId, ServerDTO serverDTO) {
-        ServerDTO serverUpdateDTO = ServerDTO.update(serverDTO.serverId(), serverDTO.userId(), serverDTO.name());
-        UUID targetServerId = serverUpdateDTO.serverId();
+    public boolean update(String serverId, ServerCRUDDTO serverCRUDDTO) {
+        UUID targetServerId = UUID.fromString(serverId);
 
         Server server = serverRepository.find(targetServerId);
-        serverRepository.update(server, serverUpdateDTO);
+        serverRepository.update(server, serverCRUDDTO);
         return true;
     }
 

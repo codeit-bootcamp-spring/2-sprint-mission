@@ -16,41 +16,5 @@ public record ServerDTO(
         Instant updatedAt,
         List<User> userList
 ) {
-    public static ServerDTO join(
-            UUID serverId,
-            UUID userId
-    ) {
-        return ServerDTO.builder()
-                .serverId(serverId)
-                .userId(userId).build();
-    }
-
-    public static ServerDTO create(
-            UUID ownerId,
-            String name) {
-        return ServerDTO.builder()
-                .userId(ownerId)
-                .name(name).build();
-    }
-
-    public static ServerDTO delete(
-            UUID serverId,
-            UUID ownerId
-    ) {
-        return ServerDTO.builder()
-                .serverId(serverId)
-                .userId(ownerId).build();
-    }
-
-    public static ServerDTO update(
-            UUID replaceServerId,
-            UUID replaceOwnerId,
-            String replaceName
-    ) {
-        return ServerDTO.builder()
-                .serverId(replaceServerId)
-                .userId(replaceOwnerId)
-                .name(replaceName).build();
-    }
 
 }
