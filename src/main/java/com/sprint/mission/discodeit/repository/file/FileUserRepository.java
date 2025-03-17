@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -17,6 +18,8 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
 
     public FileUserRepository() {
         super(User.class, Paths.get(System.getProperty("user.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\userdata"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
+        usernames = new HashMap<>();
+        emails = new HashMap<>();
     }
 
     @Override
