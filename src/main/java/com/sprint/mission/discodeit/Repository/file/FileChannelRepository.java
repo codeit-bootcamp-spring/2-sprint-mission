@@ -23,9 +23,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 public class FileChannelRepository implements ChannelRepository {
     private final FileRepositoryImpl<Map<UUID, List<Channel>>> fileRepository;
-    private Map<UUID, List<Channel>> channelList = new ConcurrentHashMap<>();
-
     private final Path path = Paths.get(System.getProperty("user.dir"), "data", "ChannelList.ser");
+
+    private Map<UUID, List<Channel>> channelList = new ConcurrentHashMap<>();
 
     public FileChannelRepository() {
         this.fileRepository = new FileRepositoryImpl<>(path);
