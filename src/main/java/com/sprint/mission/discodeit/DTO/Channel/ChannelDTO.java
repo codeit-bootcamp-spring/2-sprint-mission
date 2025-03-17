@@ -17,8 +17,10 @@ public record ChannelDTO(
         List<UUID> usersIds,
         Instant lastlyMessageAt
 ) {
-
-    public static ChannelDTO create(UUID serverId, UUID creatorId, String name, ChannelType type) {
+    public static ChannelDTO create(UUID serverId,
+                                    UUID creatorId,
+                                    String name,
+                                    ChannelType type) {
         return ChannelDTO.builder()
                 .serverId(serverId)
                 .creatorId(creatorId)
