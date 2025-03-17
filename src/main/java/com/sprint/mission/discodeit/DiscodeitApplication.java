@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 public class DiscodeitApplication {
@@ -29,11 +30,13 @@ public class DiscodeitApplication {
 
 	private static User setupUser(UserService userService) {
 		User user = userService.create("woody", "woody@codeit.com", "woody1234");
+		System.out.println("유저 생성됨: " + user.getId() + " / 이메일: " + user.getEmail() + " / 패스워드: " + user.getPassword());
 		return user;
 	}
 
 	private static Channel setUpChannel(ChannelService channelService) {
 		Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+		System.out.println("채널 생성됨: " + channel.getId() + " / 이름: " + channel.getName());
 		return channel;
 	}
 

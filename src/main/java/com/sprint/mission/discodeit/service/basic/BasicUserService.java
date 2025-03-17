@@ -19,7 +19,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(String username, String email, String password) {
-        User user = new User(username, email, password);
+        User user = new User(username, email, password,null);
         return userRepository.save(user);
     }
 
@@ -38,7 +38,7 @@ public class BasicUserService implements UserService {
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword);
+        user.update(newUsername, newEmail, newPassword, null);
         return userRepository.save(user);
     }
 
