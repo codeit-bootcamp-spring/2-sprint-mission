@@ -17,7 +17,7 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Optional<Message> findById(String uuId) {
-        return Optional.ofNullable(data.get(UUID.fromString(uuId))).orElseThrow(() -> new NullPointerException("없는 메세지 입니다. "));
+        return Optional.ofNullable(data.get(UUID.fromString(uuId)));
     }
 
     @Override

@@ -18,7 +18,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findById(String uuId) {
-        return Optional.ofNullable(data.get(UUID.fromString(uuId))).orElseThrow(() -> new NullPointerException(uuId.toString() + "없는 화원 입니다"));
+        return Optional.ofNullable(data.get(UUID.fromString(uuId)));
     }
 
     @Override

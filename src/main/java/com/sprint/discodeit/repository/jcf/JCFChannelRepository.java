@@ -30,7 +30,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Optional<Channel> findById(String uuID) {
-        return Optional.ofNullable(data.get(UUID.fromString(uuID))).orElseThrow(() -> new NullPointerException(data.get(UUID.fromString(uuID)) + " 님을 찾을 수 없습니다. "));
+        return Optional.ofNullable(data.get(UUID.fromString(uuID)));
 
     }
 
