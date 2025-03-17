@@ -25,7 +25,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public UserResponseDto create(UserCreateDto userCreateDto) {
+    public User create(UserCreateDto userCreateDto) {
         List<User> users = userRepository.findAll();
 
         boolean isEmailExist = users.stream().anyMatch(user -> user.getEmail().equals(userCreateDto.email()));
@@ -41,10 +41,10 @@ public class BasicUserService implements UserService {
         User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password());
         UserStatus newUserStatus = new UserStatus(newUser.getId());
 
-        userStatusRepository.save(newUserStatus);
         userRepository.save(newUser);
+        userStatusRepository.save(newUserStatus);
 
-        return new UserResponseDto(newUser, newUserStatus.isActive());
+        return newUser;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto update(UserUpdateDto userUpdateDto) {
+    public User update(UserUpdateDto userUpdateDto) {
         List<User> users = userRepository.findAll();
         boolean isEmailExist = users.stream().anyMatch(
                 user -> user.getEmail().equals(userUpdateDto.newEmail()));
@@ -90,9 +90,7 @@ public class BasicUserService implements UserService {
                 userUpdateDto.newProfileId());
         userRepository.save(user);
 
-        UserStatus userStatues = userStatusRepository.findById(user.getId());
-
-        return new UserResponseDto(user, userStatues.isActive());
+        return user;
     }
 
     @Override
