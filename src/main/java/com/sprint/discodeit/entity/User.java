@@ -11,9 +11,9 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private UUID id;
+    private UUID profileId;
     private Instant createdAt;
     private Instant updatedAt;
-    //
     private String username;
     private String email;
     private String password;
@@ -26,6 +26,7 @@ public class User implements Serializable {
         this.email = email;
         this.password = password;
     }
+
 
     public void update(String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
