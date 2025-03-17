@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private final String CHANNEL_FILE = "channels.ser";
     private final Map<UUID,Channel> channelData;

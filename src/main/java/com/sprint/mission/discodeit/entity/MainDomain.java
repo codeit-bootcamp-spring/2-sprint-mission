@@ -1,10 +1,16 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+
+@Getter
 public class MainDomain implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;
@@ -13,18 +19,6 @@ public class MainDomain implements Serializable {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
         update();
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     protected void update() {

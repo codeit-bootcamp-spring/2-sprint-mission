@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends MainDomain {
+import lombok.Getter;
+
+import java.io.Serializable;
+
+@Getter
+public class Channel extends MainDomain implements Serializable {
     private String channelName;
     private ChannelType type;
 
@@ -10,16 +15,6 @@ public class Channel extends MainDomain {
         this.type = type;
         this.channelName = channelName;
     }
-
-    public String getChannelName() {
-        return channelName;
-    }
-    
-    public ChannelType getType(){
-        return type;
-    }
-
-
 
     public void updateChannel(String newName) {
         boolean anyValueUpdated = false;

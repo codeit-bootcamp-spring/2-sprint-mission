@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.util.UUID;
 
+
+@Getter
 public class Message extends MainDomain {
     private String message;
     private final UUID userId;
@@ -15,19 +19,7 @@ public class Message extends MainDomain {
         this.userId = userId;
         this.channelId = channelId;
     }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
+    
 
     public void updateMessage(String newMessage) {
         boolean anyValueUpdated = false;
