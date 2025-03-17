@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository {
 
 

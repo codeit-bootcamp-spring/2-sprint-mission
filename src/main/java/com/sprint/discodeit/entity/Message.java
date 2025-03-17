@@ -2,7 +2,9 @@ package com.sprint.discodeit.entity;
 
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
 
+@Getter
 public class Message {
     private UUID id;
     private Long createdAt;
@@ -20,31 +22,6 @@ public class Message {
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
-    }
-
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public UUID getAuthorId() {
-        return authorId;
     }
 
     public void update(String newContent) {

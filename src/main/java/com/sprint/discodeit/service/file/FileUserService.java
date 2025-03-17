@@ -5,15 +5,14 @@ import com.sprint.discodeit.repository.file.FileUserRepository;
 import com.sprint.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class FileUserService implements UserService {
 
     private final FileUserRepository fileUserRepository;
-
-    public FileUserService(FileUserRepository fileUserRepository) {
-        this.fileUserRepository = fileUserRepository;
-    }
-
 
     @Override
     public User create(String username, String email, String password) {

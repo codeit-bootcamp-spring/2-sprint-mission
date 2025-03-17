@@ -6,15 +6,14 @@ import com.sprint.discodeit.repository.ChannelRepository;
 import com.sprint.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-
+@Service
+@RequiredArgsConstructor
 public class FileChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
-
-    public FileChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
-    }
 
     @Override
     public Channel create(ChannelType type, String name, String description) {

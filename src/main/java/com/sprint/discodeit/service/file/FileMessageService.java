@@ -5,14 +5,14 @@ import com.sprint.discodeit.repository.file.FileMessageRepository;
 import com.sprint.discodeit.service.MessageService;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class FileMessageService implements MessageService {
 
     private final FileMessageRepository fileMessageRepository;
-
-    public FileMessageService(FileMessageRepository fileMessageRepository) {
-        this.fileMessageRepository = fileMessageRepository;
-    }
 
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {

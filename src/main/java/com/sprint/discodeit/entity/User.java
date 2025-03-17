@@ -3,8 +3,9 @@ package com.sprint.discodeit.entity;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
 
-
+@Getter
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -24,30 +25,6 @@ public class User implements Serializable {
         this.username = username;
         this.email = email;
         this.password = password;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void update(String newUsername, String newEmail, String newPassword) {
