@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 public class FileChannelRepository extends AbstractFileRepository<Channel> implements ChannelRepository {
@@ -20,6 +23,12 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
     }
 
     // existsById(),findById(), getAll()  굳이 file을 탐색할 필요 없다고 생각해 storage를 통해 정보 확인, -> 상속 받은걸 사용
+    @Override
+    public List<Channel> findAllByUserId(UUID userId) {
+        return super.storage.values().stream()
+                .filter(channel -> channel.getChannelType() == ChannelType.PUBLIC || (channel.getParticipantIds().contains(userId)))
+                .collect(Collectors.toList());
+    }
 
     @Override
     public void deleteById(UUID channelId) {
