@@ -14,7 +14,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
     private Map<UUID, Message> messageData;
     private static final String MESSAGE_FILE_PATH = "messages.ser";

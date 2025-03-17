@@ -28,7 +28,7 @@ import java.util.UUID;
 
 public class JavaApplication {
     static User setupUser(UserService userService) {
-        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        User user = userService.create("woody1", "woody1@codeit.com", "woody11234");
         return user;
     }
 

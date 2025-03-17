@@ -14,7 +14,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private Map<UUID, Channel> channelData;
     private static final String CHANNEL_FILE_PATH = "channels.ser";
