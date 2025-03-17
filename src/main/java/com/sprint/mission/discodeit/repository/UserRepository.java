@@ -12,6 +12,6 @@ public interface UserRepository {
     Optional<User> findUserByUsername(String username);
     Optional<User> findUserByEmail(String email);
     List<User> findAllUser();
-    User updateUserNickname(UUID userUUID, String nickname);
+    User update(UUID userUUID, String nickname, UUID profileId);
     boolean deleteUserById(UUID userUUID);
 }

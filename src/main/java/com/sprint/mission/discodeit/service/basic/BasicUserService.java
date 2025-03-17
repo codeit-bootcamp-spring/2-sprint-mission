@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.constant.UserStatusType;
 import com.sprint.mission.discodeit.dto.FindUserDto;
+import com.sprint.mission.discodeit.dto.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.UserSaveDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -16,8 +17,11 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -80,40 +84,41 @@ public class BasicUserService implements UserService {
             userStatusType = UserStatusType.NOTCONNECTIED;
         }
 
-        FindUserDto findUserDto = new FindUserDto(user.getId(), user.getNickname(), userStatus.getUpdatedAt(), userStatusType);
+        FindUserDto findUserDto = new FindUserDto(user.getId(), user.getNickname(), user.getProfile(), user.getCreatedAt(), user.getUpdatedAt(), userStatus.getUpdatedAt(), userStatusType);
 
         return findUserDto;
     }
 
     @Override
-    public List<User> findAllUser() {
+    public List<FindUserDto> findAllUser() {
         List<User> userList = userRepository.findAllUser();
 
-        if (userList.isEmpty()) {
-            System.out.println("회원이 존재하지 않습니다");
-        }
-        return userList;
+        return userList.stream()
+                .map(user -> findByUser(user.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void update(UUID userUUID, String nickname) {
-        User user = userRepository.updateUserNickname(userUUID, nickname);
-        if (user == null) {
-            System.out.println("[실패] 닉네임 변경을 실패하였습니다.");
-            return;
-        }
-        System.out.println("[성공]" + user);
+    public void update(UpdateUserDto updateUserDto) {
+        User user = userRepository.findUserById(updateUserDto.userUUID()).
+                orElseThrow(() -> new NullPointerException("사용자가 존재하지 않습니다."));
 
+        UUID profileId = user.getProfile();
+        if(updateUserDto.imageFile().length > 0){
+            profileId = binaryContentRepository.save(updateUserDto.imageFile()).getId();
+        }
+        userRepository.update(updateUserDto.userUUID(), updateUserDto.nickname(), profileId);
     }
 
     @Override
     public void delete(UUID userUUID) {
+        binaryContentRepository.deleteProfileId(userUUID);
+        userStatusRepository.delete(userUUID);
         boolean isDeleted = userRepository.deleteUserById(userUUID);
         if (!isDeleted) {
             System.out.println("삭제 실패");
             return;
         }
-        userStatusRepository.delete(userUUID);
         System.out.println("[성공]");
     }
 }

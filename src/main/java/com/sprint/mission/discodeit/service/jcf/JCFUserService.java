@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.dto.FindUserDto;
+import com.sprint.mission.discodeit.dto.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.UserSaveDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
@@ -31,23 +32,23 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public List<User> findAllUser() {
+    public List<FindUserDto> findAllUser() {
         if (userList.isEmpty()) {
             System.out.println("아이디가 존재하지 않습니다");
         }
-        return userList;
+        return Collections.EMPTY_LIST;
     }
 
     @Override
-    public void update(UUID uuid, String nickname) {
-        if (userList.stream().noneMatch(data -> data.getId().equals(uuid))) {
+    public void update(UpdateUserDto updateUserDto) {
+        if (userList.stream().noneMatch(data -> data.getId().equals(updateUserDto.userUUID()))) {
             System.out.println("[실패]수정하려는 아이디가 존재하지 않습니다.");
             return;
         }
 
         for (User u : userList) {
-            if (u.getId().equals(uuid)) {
-                u.updateNickname(nickname);
+            if (u.getId().equals(updateUserDto.userUUID())) {
+                u.updateNickname(updateUserDto.nickname());
                 System.out.println("[성공]사용자 변경 완료[사용자 아이디: " + u.getId() +
                         ", 닉네임: " + u.getNickname() +
                         ", 변경 시간: " + u.getUpdatedAt() +

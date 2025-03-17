@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.dto.FindChannelDto;
+import com.sprint.mission.discodeit.dto.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -218,7 +219,7 @@ public class DiscodeitApplication {
                         System.out.println(userService.findByUser(UserUUID));
                         break;
                     case 2:
-                        userService.findAllUser().forEach((user -> System.out.println(user.getId().toString())));
+                        userService.findAllUser().forEach(System.out::println);
                         break;
                 }
                 break;
@@ -268,11 +269,24 @@ public class DiscodeitApplication {
         Scanner sc = new Scanner(System.in);
         switch (updateNum) {
             case 1:
-                System.out.print("변경할 사용자 아이디 입력: ");
-                UUID userUUID = UUID.fromString(sc.nextLine());
-                System.out.print("원하는 닉네임 입력: ");
-                String nickname = sc.nextLine();
-                userService.update(userUUID, nickname);
+                try{
+                    System.out.print("변경할 사용자 아이디 입력: ");
+                    UUID userUUID = UUID.fromString(sc.nextLine());
+                    System.out.print("원하는 닉네임 입력: ");
+                    String nickname = sc.nextLine();
+                    System.out.print("이미지 경로 (넣고싶지 않다면 엔터): ");
+                    String profilePath = sc.nextLine();
+
+                    byte[] profile = new byte[0];
+                    if (!profilePath.isEmpty()) {
+                        profile = Files.readAllBytes(Path.of(profilePath));
+                    }
+
+                    UpdateUserDto updateUserDto = new UpdateUserDto(userUUID, nickname, profile);
+                    userService.update(updateUserDto);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return;
             case 2:
                 System.out.print("변경할 채널 아이디 입력: ");

@@ -20,4 +20,9 @@ public class User extends BaseEntity implements Serializable {
         super.updateTime();
         this.nickname = nickname;
     }
+
+    public void updateProfile(UUID profile) {
+        super.updateTime();
+        this.profile = profile;
+    }
 }

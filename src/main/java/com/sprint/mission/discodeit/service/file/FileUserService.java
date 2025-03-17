@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.custom.AppendObjectOutputStream;
 import com.sprint.mission.discodeit.dto.FindUserDto;
+import com.sprint.mission.discodeit.dto.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.UserSaveDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -9,6 +10,7 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FileUserService implements UserService {
 
@@ -60,7 +62,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public List<User> findAllUser() {
+    public List<FindUserDto> findAllUser() {
         List<User> userList = new ArrayList<>();
         try (FileInputStream fis = new FileInputStream("user.ser");
              ObjectInputStream ois = new ObjectInputStream(fis);
@@ -79,19 +81,21 @@ public class FileUserService implements UserService {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        return userList;
+        return userList.stream()
+                .map(user -> findByUser(user.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void update(UUID userUUID, String nickname) {
-        List<User> userList = findAllUser();
+    public void update(UpdateUserDto updateUserDto) {
+        List<User> userList = Collections.EMPTY_LIST;
 
         userList.stream()
-                .filter(user -> user.getId().equals(userUUID))
+                .filter(user -> user.getId().equals(updateUserDto.userUUID()))
                 .findAny()
                 .ifPresentOrElse(
                         user -> {
-                            user.updateNickname(nickname);
+                            user.updateNickname(updateUserDto.nickname());
                             System.out.println("[성공]닉네임 변경 완료" + user);
                         },
                         () -> System.out.println("[실패]수정하려는 아이디가 존재하지 않습니다"));
@@ -110,7 +114,7 @@ public class FileUserService implements UserService {
 
     @Override
     public void delete(UUID uuid) {
-        List<User> users = findAllUser();
+        List<User> users = Collections.EMPTY_LIST;
 
         boolean removed = users.removeIf(user -> user.getId().equals(uuid));
 

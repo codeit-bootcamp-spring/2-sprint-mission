@@ -48,12 +48,13 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User updateUserNickname(UUID userUUID, String nickname) {
+    public User update(UUID userUUID, String nickname, UUID profileId) {
         return userList.stream()
                 .filter(user -> user.getId().equals(userUUID))
                 .findFirst()
                 .map(user -> {
                     user.updateNickname(nickname);
+                    user.updateProfile(profileId);
                     return user;
                 })
                 .orElse(null);

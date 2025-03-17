@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.constant.SubDirectory;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.utils.FileManager;
 import lombok.RequiredArgsConstructor;
@@ -51,11 +49,14 @@ public class FileUserRepository implements UserRepository {
         return userList;
     }
 
+
+
     @Override
-    public User updateUserNickname(UUID userUUID, String nickname) {
+    public User update(UUID userUUID, String nickname, UUID profileId) {
         User user = findUserById(userUUID)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다.: " + userUUID));
         user.updateNickname(nickname);
+        user.updateProfile(profileId);
         fileManager.writeToFile(SubDirectory.USER, user, user.getId());
         return user;
     }
