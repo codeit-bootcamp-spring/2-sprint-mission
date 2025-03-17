@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.*;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
+    private final UserStatusService userStatusService;
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
@@ -29,8 +31,7 @@ public class BasicUserService implements UserService {
                 userCreateRequestDto.email(), userCreateRequestDto.password(), userCreateRequestDto.profileId());
         userRepository.save(user);
 
-        UserStatus userStatus = new UserStatus(user.getId());
-        userStatusRepository.save(userStatus);
+        userStatusService.create(new UserStatusCreateRequestDto(user.getId()));
 
         return UserCreateResponseDto.fromEntity(user);
     }
@@ -59,9 +60,7 @@ public class BasicUserService implements UserService {
     }
 
     private boolean isOnline(UUID userId) {
-        return userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 userId의 userStatus가 없음"))
-                .isOnline();
+        return userStatusService.find(userId).isOnline();
     }
 
     @Override
@@ -82,7 +81,7 @@ public class BasicUserService implements UserService {
             binaryContentRepository.deleteById(user.getProfileId());
         }
 
-        userStatusRepository.deleteByUserId(userId);
+        userStatusService.deleteByUserId(userId);
 
         userRepository.deleteById(userId);
     }
