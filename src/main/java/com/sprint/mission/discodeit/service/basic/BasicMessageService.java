@@ -7,17 +7,15 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.BinaryContentRepository;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.messageDto.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.messageDto.MessageResponse;
+import com.sprint.mission.discodeit.service.messageDto.MessageUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -50,26 +48,26 @@ public class BasicMessageService {
         return message;
     }
 
-    public List<MessageResponse> findAllByChannelId(Long channelId) {
-        List<Message> messages = messageRepository.findAll(channelId);
+    public List<MessageResponse> findAllByChannelId(UUID channelId) {
+        List<Message> messages = messageRepository.findAllByChannelId(channelId);
         return messages.stream()
                 .map(message -> {
-                    List<String> attachments = binaryContentRepository.findFilePathsByMessageId(message.getId());
+                    List<String> attachments = binaryContentRepository.findFileByMessageId(message.getId());
                     return new MessageResponse(message, attachments);
                 })
                 .collect(Collectors.toList());
     }
 
     public void updateMessage(MessageUpdateRequest request) {
-        Message message = messageRepository.findById(request.getMessageId())
-                .orElseThrow(() -> new EntityNotFoundException("Message not found"));
+        Message message = messageRepository.findById(request.messageId())
+                .orElseThrow(() -> new RuntimeException("Message not found"));
 
-        message.updateContent(request.getContent());
+        message.update(request.content());
         messageRepository.save(message);
     }
 
-    public void deleteMessage(Long messageId) {
-        binaryContentRepository.deleteByMessageId(messageId);
+    public void deleteMessage(UUID messageId) {
+        binaryContentRepository.deleteById(messageId);
         messageRepository.deleteById(messageId);
     }
 }

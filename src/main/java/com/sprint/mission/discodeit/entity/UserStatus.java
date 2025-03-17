@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+
+import com.sprint.mission.discodeit.service.userDto.UserUpdateRequest;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -12,11 +14,17 @@ public class UserStatus {
     protected UUID id;
     protected Instant createdAt;
 
-    public UserStatus(User user, Instant lastActiveAt) {
-        this.userId = user.getId();
+    public UserStatus(UUID userId, Instant lastActiveAt) {
+        this.userId = userId;
         this.lastActiveAt = lastActiveAt;
+        this.id = UUID.randomUUID();
     }
     public boolean isOnline() {
+
         return lastActiveAt.isAfter(Instant.now().minusSeconds(300));
+    }
+
+    public void update(Instant newLastActiveAt) {
+        lastActiveAt = newLastActiveAt;
     }
 }

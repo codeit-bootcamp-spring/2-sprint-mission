@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.repository.jcf.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.userDto.UserRequest;
 import com.sprint.mission.discodeit.service.userDto.UserResponse;
 import com.sprint.mission.discodeit.service.UserService;
