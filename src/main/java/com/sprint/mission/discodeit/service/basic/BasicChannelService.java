@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -15,19 +19,35 @@ import org.springframework.stereotype.Service;
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
+    private final ReadStatusRepository readStatusRepository;
+    @Override
+    public Channel createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
+
+        Channel newChannel = new Channel(ChannelType.PRIVATE, null, null);
+        channelRepository.save(newChannel);
+
+        channelCreatePrivateDto.users().forEach(user -> {
+            ReadStatus readStatus = new ReadStatus(user.getId(), newChannel.getId());
+            readStatusRepository.save(readStatus);
+        });
+
+        return newChannel;
+    }
 
     @Override
-    public Channel create(ChannelType type, String name, String description) {
-        boolean isExistChannel = findAll().stream()
-                .anyMatch(channel -> channel.getName().equals(name)); // 같은 이름 == 같은 채널
+    public Channel createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
+        boolean isExistChannel = channelRepository.findAll().stream()
+                .anyMatch(channel -> channel.getName().equals(channelCreatePublicDto.name()));
 
         if (isExistChannel) {
-            throw new RuntimeException(name + " 채널은 이미 존재합니다.");
+            throw new RuntimeException(channelCreatePublicDto.name() + " 채널은 이미 존재합니다.");
         }
 
-        Channel newChannel = new Channel(type, name, description);
+        Channel newChannel = new Channel(ChannelType.PUBLIC, channelCreatePublicDto.name(),
+                channelCreatePublicDto.description());
+        channelRepository.save(newChannel);
 
-        return channelRepository.save(newChannel);
+        return newChannel;
     }
 
     @Override
