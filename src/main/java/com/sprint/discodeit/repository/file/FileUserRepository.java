@@ -53,4 +53,9 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
         Map<UUID, User> users = loadAll();
         return Optional.ofNullable(users.get(UUID.fromString(username)));
     }
+
+    public Optional<User> findByEmail(String email) {
+        Map<UUID, User> users = loadAll();
+        return Optional.ofNullable(users.get(UUID.fromString(email)));
+    }
 }
