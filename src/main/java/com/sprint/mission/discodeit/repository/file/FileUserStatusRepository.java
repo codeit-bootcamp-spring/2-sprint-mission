@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.stereotype.Repository;
@@ -28,5 +27,12 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
     @Override
     public UUID findUserStatusIDByUserId(UUID userId) {
         return userIdMap.get(userId).getId();
+    }
+
+    @Override
+    public void deleteById(UUID userStatusId) {
+        super.deleteById(userStatusId);
+        super.deleteFile(userStatusId);
+        userIdMap.remove(userStatusId);
     }
 }
