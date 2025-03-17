@@ -11,12 +11,14 @@ public class ReadStatus {
     private final UUID userId;
     private final UUID channelId;
     private Instant lastReadAt;
+    private boolean isRead;
 
-    public ReadStatus(UUID userId, UUID channelId) {
+    public ReadStatus(UUID userId, UUID channelId, boolean isRead) {
         this.id = UUID.randomUUID();
         this.userId = userId;
         this.channelId = channelId;
         this.lastReadAt = Instant.now();
+        this.isRead = isRead;
     }
 
     public void updateLastReadAt() {

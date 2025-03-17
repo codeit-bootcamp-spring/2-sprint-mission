@@ -37,4 +37,11 @@ public class JCFUserRepository implements UserRepository {
     public void deleteById(UUID id) {
         this.data.remove(id);
     }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return this.data.values().stream()
+                .filter(user -> user.getUsername().equals(username)) // username이 같은 유저 찾기
+                .findFirst();
+    }
 }
