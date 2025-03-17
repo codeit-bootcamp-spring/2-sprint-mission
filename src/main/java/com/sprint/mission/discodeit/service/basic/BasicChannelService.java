@@ -9,12 +9,14 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.provider.ChannelReadStrategyProvider;
+import com.sprint.mission.discodeit.provider.ChannelUpdaterProvider;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.updater.ChannelUpdater;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,7 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
     private final ChannelReadStrategyProvider strategyProvider;
+    private final ChannelUpdaterProvider updaterProvider;
 
     @Override
     public Channel createPrivateChannel(PrivateChannelCreateRequest privateChannelCreateRequest) {
@@ -73,8 +76,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannelName(UUID channelId, String newChannelName) {
-        this.channelRepository.updateChannelName(channelId, newChannelName);
+    public void updateChannel(ChannelUpdateRequest channelUpdateRequest) {
+        Channel findChannel = this.channelRepository.findById(channelUpdateRequest.channelId());
+        List<ChannelUpdater> applicableUpdaters = updaterProvider.getApplicableUpdaters(findChannel, channelUpdateRequest);
+        applicableUpdaters.forEach(updater -> updater.update(findChannel, channelUpdateRequest, this.channelRepository));
     }
 
     // 삭제해야 될지도? 추후 필요할지도 모르니 일단 남겨두겠음 (스프린트미션3 기준 public은 참여자 정보가 필요없고, private은 참여자 정보가 필요함. 하지만 private은 생성 후 수정 불가능)
