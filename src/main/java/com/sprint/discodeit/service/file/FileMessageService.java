@@ -4,6 +4,7 @@ import com.sprint.discodeit.domain.entity.Message;
 import com.sprint.discodeit.repository.file.FileMessageRepository;
 import com.sprint.discodeit.service.MessageService;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class FileMessageService implements MessageService {
 
     @Override
     public Message find(UUID messageId) {
-        Message message = fileMessageRepository.findById(messageId.toString());
+        Message message = fileMessageRepository.findById(messageId.toString()).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));;
         return message;
     }
 
@@ -34,7 +35,7 @@ public class FileMessageService implements MessageService {
 
     @Override
     public Message update(UUID messageId, String newContent) {
-        Message message = fileMessageRepository.findById(messageId.toString());
+        Message message = fileMessageRepository.findById(messageId.toString()).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));;
         message.update(newContent);
         return message;
     }

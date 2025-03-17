@@ -6,7 +6,6 @@ import com.sprint.discodeit.repository.UserRepository;
 import com.sprint.discodeit.repository.util.FilePathUtil;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
@@ -20,10 +19,9 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     }
 
     @Override
-    public User findById(String userId) {
+    public Optional<User> findById(String userId) {
         Map<UUID, User> users = loadAll();
-        return  Optional.ofNullable(users.get(UUID.fromString(userId.toString())))
-                .orElseThrow(() -> new NoSuchElementException(userId + " 없는 회원 입니다"));
+        return Optional.ofNullable(users.get(UUID.fromString(userId)));
     }
 
 
@@ -49,5 +47,10 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
         Map<UUID, User> users = loadAll();
         users.remove(userId);
         writeToFile(users);
+    }
+
+    public Optional<User> findByUsername(String username) {
+        Map<UUID, User> users = loadAll();
+        return Optional.ofNullable(users.get(UUID.fromString(username)));
     }
 }

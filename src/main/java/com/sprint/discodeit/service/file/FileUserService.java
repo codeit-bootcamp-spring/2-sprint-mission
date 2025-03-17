@@ -41,7 +41,7 @@ public class FileUserService implements UserServiceV1 {
 
     @Override
     public User find(UUID userId) {
-        User byId = fileUserRepository.findById(userId.toString());
+        User byId = fileUserRepository.findById(userId.toString()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
         return byId;
     }
 
@@ -52,7 +52,7 @@ public class FileUserService implements UserServiceV1 {
 
     @Override
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User user = fileUserRepository.findById(userId.toString());
+        User user = fileUserRepository.findById(userId.toString()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
         user.update(newUsername, newEmail, newPassword);
         fileUserRepository.save(user);
         return user;

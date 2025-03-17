@@ -19,10 +19,9 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
     }
 
     @Override
-    public Message findById(String messageId) {
+    public Optional<Message> findById(String messageId) {
         Map<UUID, Message> users = loadAll();
-        return  Optional.ofNullable(users.get(UUID.fromString(messageId.toString())))
-                .orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));
+        return  Optional.ofNullable(users.get(UUID.fromString(messageId.toString())));
     }
 
 

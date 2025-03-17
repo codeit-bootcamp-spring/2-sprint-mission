@@ -24,7 +24,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel find(UUID channelId) {
-        return  channelRepository.findById(channelId.toString());
+        return  channelRepository.findById(channelId.toString()).orElseThrow(() -> new NullPointerException(channelId.toString() + " 는  없는 채널 입니다"));
     }
 
     @Override
@@ -34,7 +34,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel update(UUID channelId, String newName, String newDescription) {
-        Channel channel = channelRepository.findById(channelId.toString());
+        Channel channel = channelRepository.findById(channelId.toString()).orElseThrow(() -> new NullPointerException(channelId.toString() + " 는  없는 채널 입니다"));
         channel.update(newName, newDescription);
         return channel;
     }

@@ -1,9 +1,10 @@
 package com.sprint.discodeit.repository.util;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FindRepository<T> {
 
-    T findById(String uuId);
+    Optional<T> findById(String uuId);
     List<T> findByAll();
 }
