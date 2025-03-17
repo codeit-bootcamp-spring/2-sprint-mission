@@ -31,7 +31,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message find(UUID messageId) {
-        return jcfMessageRepository.findById(messageId.toString());
+        return jcfMessageRepository.findById(messageId.toString()).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message update(UUID messageId, String newContent) {
-        Message message = jcfMessageRepository.findById(messageId.toString());
+        Message message = jcfMessageRepository.findById(messageId.toString()).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));
         message.update(newContent);
         return message;
     }

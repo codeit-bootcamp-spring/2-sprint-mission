@@ -23,7 +23,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User find(UUID userId) {
-      return jcfUserRepository.findById(userId.toString());
+      return jcfUserRepository.findById(userId.toString()).orElseThrow(() -> new NoSuchElementException(userId.toString() + " 없는 회원 입니다"));
     }
 
     @Override
@@ -33,7 +33,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User user = jcfUserRepository.findById(userId.toString());
+        User user = jcfUserRepository.findById(userId.toString()).orElseThrow(() -> new NoSuchElementException(userId.toString() + " 없는 회원 입니다"));
         user.update(newUsername, newEmail, newPassword);
         return user;
     }
