@@ -51,6 +51,10 @@ public class Message extends BaseEntity implements Serializable {
         this.attachmentIds = new ArrayList<>(attachmentIds); // new ArrayList로 생성해야 파라미터로 들어온 attachmentIds의 외부에서로부터의 변경이 Message entity의 attachmentIds에 영향을 미치지 않음.
     }
 
+    public void deleteAttachment(UUID attachmentId) {
+        this.attachmentIds.remove(attachmentId);
+    }
+
     @Override
     public String toString() {
         return "\nMessage\n"
