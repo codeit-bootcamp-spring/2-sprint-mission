@@ -43,7 +43,7 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(channelMap.values());
+        return channelMap.values().stream().toList();
     }
 
     @Override
