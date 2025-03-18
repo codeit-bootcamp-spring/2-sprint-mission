@@ -1,13 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
-import com.sprint.mission.discodeit.DTO.Channel.ChannelDTO;
+import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelDTO;
 import com.sprint.mission.discodeit.Exception.Empty.EmptyMessageListException;
 import com.sprint.mission.discodeit.Exception.NotFound.ChannelNotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFound.MessageNotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFound.ServerNotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFound.UserNotFoundException;
-import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.Repository.*;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.logging.CustomLogging;

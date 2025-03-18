@@ -1,0 +1,22 @@
+### 회원가입 요청 (POST)
+POST http://localhost:8080/users/register
+Content-Type: application/json
+
+{
+  "userCreateDTO": {
+    "userName": "test3",
+    "email": "test3",
+    "password": "test"
+  },
+  "binaryContentCreateDTO": {
+    "fileName": "test",
+    "contentType": "test",
+    "bytes": [0,0,1]
+  }
+}
+### 사용자 전체 조회(GET)
+GET http://localhost:8080/users
+Content-Type: application/json
+
+### 사용자 삭제 (DELETE)
+DELETE http://localhost:8080/users/8f7f2ec6-3b96-4de6-b2bb-cc3b12e67899

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.ReadStatus.ReadStatusCRUDDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import org.springframework.stereotype.Service;
 

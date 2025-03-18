@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTO.Channel;
+package com.sprint.mission.discodeit.DTO.legacy.Channel;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
 import lombok.Builder;

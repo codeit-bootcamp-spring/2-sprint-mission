@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository.file;
 
-import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.UserStatus.UserStatusCRUDDTO;
 import com.sprint.mission.discodeit.Exception.Empty.EmptyUserStatusListException;
 import com.sprint.mission.discodeit.Exception.NotFound.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFound.UserStatusNotFoundException;

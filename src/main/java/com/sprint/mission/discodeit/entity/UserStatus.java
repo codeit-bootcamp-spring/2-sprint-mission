@@ -47,7 +47,7 @@ public class UserStatus implements Serializable {
         this.updatedAt = Instant.now();
     }
 
-    public boolean isOnline() {
+    private boolean isOnline() {
         return Duration.between(updatedAt, Instant.now()).getSeconds() <= 300;
     }
 

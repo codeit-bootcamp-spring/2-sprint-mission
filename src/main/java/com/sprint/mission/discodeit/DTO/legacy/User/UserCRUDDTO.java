@@ -1,6 +1,5 @@
-package com.sprint.mission.discodeit.DTO.User;
+package com.sprint.mission.discodeit.DTO.legacy.User;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import lombok.Builder;
 
 import java.util.UUID;
@@ -49,7 +48,6 @@ public record UserCRUDDTO(
      * @param userName 생성할 사용자 이름
      * @param email 생성할 사용자 이메일
      * @param password 생성할 사용자 비밀번호
-     * @param binaryContent 사용자와 연결된 바이너리 콘텐츠 (예: 프로필 이미지)
      * @return 생성 요청을 위한 {@link UserCRUDDTO} 객체
      */
     public static UserCRUDDTO create(String userName,

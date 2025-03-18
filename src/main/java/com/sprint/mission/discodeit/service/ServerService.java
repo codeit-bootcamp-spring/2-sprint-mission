@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.Server.ServerCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.Server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 

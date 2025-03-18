@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.ReadStatus.ReadStatusCRUDDTO;
 import com.sprint.mission.discodeit.Exception.Valid.DuplicateReadStatusException;
 import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final ChannelRepository channelRepository;
 
+    @CustomLogging
+    @Override
     public UUID create(ReadStatusCRUDDTO readStatusCRUDDTO) {
         try {
             UUID userId = readStatusCRUDDTO.userId();
@@ -47,24 +50,28 @@ public class BasicReadStatusService implements ReadStatusService {
             return null;
         }
     }
-
+    @Override
     public ReadStatus find(String readStatusId) {
         UUID readStatusUUID = UUID.fromString(readStatusId);
         ReadStatus readStatus = readStatusRepository.find(readStatusUUID);
         return readStatus;
     }
-
+    @Override
     public List<ReadStatus> findAllByUserId(String userId) {
         UUID userUUID = UUID.fromString(userId);
         List<ReadStatus> list = readStatusRepository.findAllByUserId(userUUID);
         return list;
     }
 
+    @CustomLogging
+    @Override
     public void update(String readStatusId, ReadStatusCRUDDTO readStatusCRUDDTO) {
         ReadStatus readStatus = find(readStatusId);
         readStatusRepository.update(readStatus, readStatusCRUDDTO);
     }
 
+    @CustomLogging
+    @Override
     public void delete(String readStatusId) {
         UUID readStatusUUID = UUID.fromString(readStatusId);
         readStatusRepository.delete(readStatusUUID);

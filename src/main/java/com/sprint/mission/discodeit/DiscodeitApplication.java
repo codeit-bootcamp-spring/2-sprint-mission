@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
-import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
-import com.sprint.mission.discodeit.DTO.Message.MessageCRUDDTO;
-import com.sprint.mission.discodeit.DTO.Server.ServerCRUDDTO;
-import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
+import com.sprint.mission.discodeit.DTO.RequestToService.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.DTO.RequestToService.UserCreateDTO;
+import com.sprint.mission.discodeit.DTO.legacy.BinaryContent.BinaryContentDTO;
+import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.Message.MessageCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.Server.ServerCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Server;
@@ -23,12 +25,10 @@ import java.util.Optional;
 public class DiscodeitApplication {
 	static User userEngine(UserService userService) {
 		byte[] test = {0, 0, 1};
-		BinaryContentDTO binaryContentDTO = BinaryContentDTO.create("test1", "test", test);
-		Optional<BinaryContentDTO> optional = Optional.of(binaryContentDTO);
+		UserCreateDTO userCreateDTO = new UserCreateDTO("test1", "test1", "123");
+		BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO("test1", "test1", test);
 
-		UserCRUDDTO userDTO = UserCRUDDTO.create("test1", "test1", "123");
-
-		User user = userService.create(userDTO, optional);
+		User user = userService.create(userCreateDTO, Optional.ofNullable(binaryContentCreateDTO));
 		return user;
 	}
 
@@ -53,16 +53,16 @@ public class DiscodeitApplication {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
-		UserService userService = context.getBean(UserService.class);
-		ServerService serverService = context.getBean(ServerService.class);
-		ChannelService channelService = context.getBean(ChannelService.class);
-		MessageService messageService = context.getBean(MessageService.class);
-
-		User testUser = userEngine(userService);
-		Server testServer = serverEngine(serverService, testUser);
-		Channel testChannel = channelEngine(channelService, testServer, testUser);
-		Message message = messageEngine(messageService, testChannel, testUser);
-		System.out.println(message);
+//		UserService userService = context.getBean(UserService.class);
+//		ServerService serverService = context.getBean(ServerService.class);
+//		ChannelService channelService = context.getBean(ChannelService.class);
+//		MessageService messageService = context.getBean(MessageService.class);
+//
+//		User testUser = userEngine(userService);
+//		Server testServer = serverEngine(serverService, testUser);
+//		Channel testChannel = channelEngine(channelService, testServer, testUser);
+//		Message message = messageEngine(messageService, testChannel, testUser);
+//		System.out.println(message);
 	}
 
 }

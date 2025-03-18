@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTO.Server;
+package com.sprint.mission.discodeit.DTO.legacy.Server;
 
 import lombok.Builder;
 

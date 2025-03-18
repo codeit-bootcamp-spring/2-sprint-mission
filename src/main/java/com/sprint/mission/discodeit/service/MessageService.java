@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.Message.MessageCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.Message.MessageCRUDDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.stereotype.Service;
 

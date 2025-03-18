@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTO.ReadStatus;
+package com.sprint.mission.discodeit.DTO.legacy.ReadStatus;
 
 import lombok.Builder;
 

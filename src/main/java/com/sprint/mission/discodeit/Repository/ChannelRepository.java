@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository;
 
-import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelCRUDDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;

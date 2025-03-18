@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTO.User;
+package com.sprint.mission.discodeit.DTO.legacy.User;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.UserStatus;

@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
-import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
-import com.sprint.mission.discodeit.DTO.User.UserFindDTO;
+import com.sprint.mission.discodeit.DTO.RequestToService.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.DTO.RequestToService.UserCreateDTO;
+import com.sprint.mission.discodeit.DTO.RequestToService.UserUpdateDTO;
+import com.sprint.mission.discodeit.DTO.legacy.User.UserCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.User.UserFindDTO;
 import com.sprint.mission.discodeit.Exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.Exception.NotFound.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFound.UserNotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFound.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.Exception.Valid.DuplicateUserException;
-import com.sprint.mission.discodeit.Exception.legacy.EmptyException;
-import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
@@ -43,11 +43,11 @@ public class BasicUserService implements UserService {
 
     @CustomLogging
     @Override
-    public User create(UserCRUDDTO userCRUDDTO, Optional<BinaryContentDTO> binaryContentDTO) {
-        UserCRUDDTO checkDuplicate = UserCRUDDTO.checkDuplicate(userCRUDDTO.userName(), userCRUDDTO.email());
+    public User create(UserCreateDTO userCreateDTO, Optional<BinaryContentCreateDTO> binaryContentDTO) {
+        UserCRUDDTO checkDuplicate = UserCRUDDTO.checkDuplicate(userCreateDTO.userName(), userCreateDTO.email());
         try {
             checkDuplicate(checkDuplicate);
-            User user = new User(userCRUDDTO.userName(), userCRUDDTO.email(), userCRUDDTO.password());
+            User user = new User(userCreateDTO.userName(), userCreateDTO.email(), userCreateDTO.password());
             UUID profileId = makeBinaryContent(binaryContentDTO);
             user.setProfileId(profileId);
             userRepository.save(user);
@@ -115,10 +115,14 @@ public class BasicUserService implements UserService {
 
     @CustomLogging
     @Override
-    public User update(UUID userId, UserCRUDDTO userCRUDDTO) {
+    public User update(String userId, UserUpdateDTO userUpdateDTO, Optional<BinaryContentCreateDTO>binaryContentDTO) {
+        UUID userUUID = UUID.fromString(userId);
         try {
-            User findUser = userRepository.find(userId);
-            User update = userRepository.update(findUser, userCRUDDTO);
+            User findUser = userRepository.find(userUUID);
+            UUID newProfileId = makeBinaryContent(binaryContentDTO);
+
+            User update = userRepository.update(findUser, userUpdateDTO, newProfileId);
+
             return update;
         } catch (UserNotFoundException e) {
             System.out.println("update: 해당 유저가 존재하지 않습니다.");
@@ -128,18 +132,16 @@ public class BasicUserService implements UserService {
 
     @CustomLogging
     @Override
-    public boolean delete(UserCRUDDTO userCRUDDTO) {
+    public boolean delete(String userId) {
+        UUID userUUID = UUID.fromString(userId);
         try {
-            User findUser = userRepository.find(userCRUDDTO.userId());
+            User findUser = userRepository.find(userUUID);
 
             userRepository.remove(findUser);
             userStatusRepository.delete(findUser.getId());
 
-            UUID profileId = findUser.profileId;
-
-            if (profileId != null) {
-                binaryContentRepository.delete(profileId);
-            }
+            Optional.ofNullable(findUser.getProfileId())
+                    .ifPresent(binaryContentRepository::delete);
 
             return true;
         } catch (UserNotFoundException e) {
@@ -157,12 +159,12 @@ public class BasicUserService implements UserService {
         }
     }
 
-    private UUID makeBinaryContent(Optional<BinaryContentDTO> binaryContentDTO) {
+    private UUID makeBinaryContent(Optional<BinaryContentCreateDTO> binaryContentDTO) {
         UUID profileId = binaryContentDTO.map(contentDTO -> {
             String fileName = contentDTO.fileName();
             String contentType = contentDTO.contentType();
             byte[] bytes = contentDTO.bytes();
-            int size = bytes.length;
+            long size = (long) bytes.length;
 
             BinaryContent content = new BinaryContent(fileName, size, contentType, bytes);
             binaryContentRepository.save(content);

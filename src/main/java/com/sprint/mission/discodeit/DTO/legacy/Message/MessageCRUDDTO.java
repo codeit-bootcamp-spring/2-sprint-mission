@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTO.Message;
+package com.sprint.mission.discodeit.DTO.legacy.Message;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import lombok.Builder;

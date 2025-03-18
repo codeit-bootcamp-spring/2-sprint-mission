@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository.file;
 
-import com.sprint.mission.discodeit.DTO.Server.ServerCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.Server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.Exception.Empty.EmptyServerListException;
 import com.sprint.mission.discodeit.Exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.Exception.NotFound.SaveFileNotFoundException;

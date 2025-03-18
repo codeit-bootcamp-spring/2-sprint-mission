@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.Repository;
 
-import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
+import com.sprint.mission.discodeit.DTO.RequestToService.UserUpdateDTO;
+import com.sprint.mission.discodeit.DTO.legacy.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;
 
@@ -19,7 +20,7 @@ public interface UserRepository {
 
     List<User> findUserList( );
 
-    User update(User user, UserCRUDDTO userCRUDDTO);
+    User update(User user, UserUpdateDTO userCRUDDTO,UUID replaceProfileId);
 
     UUID remove(User user);
 

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
+import com.sprint.mission.discodeit.DTO.RequestToService.UserUpdateDTO;
+import com.sprint.mission.discodeit.DTO.legacy.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.Exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.Exception.NotFound.UserNotFoundException;
 import com.sprint.mission.discodeit.Repository.UserRepository;
@@ -46,18 +47,15 @@ public class JCFUserRepository implements UserRepository {
 
 
     @Override
-    public User update(User user, UserCRUDDTO userUpdateDTO) {
-        if (userUpdateDTO.userId() != null) {
-            user.setId(userUpdateDTO.userId());
+    public User update(User user, UserUpdateDTO userUpdateDTO,UUID replaceProfileId) {
+        if (userUpdateDTO.replaceName() != null) {
+            user.setName(userUpdateDTO.replaceName());
         }
-        if (userUpdateDTO.userName() != null) {
-            user.setName(userUpdateDTO.userName());
+        if (userUpdateDTO.replaceEmail() != null) {
+            user.setEmail(userUpdateDTO.replaceEmail());
         }
-        if (userUpdateDTO.email() != null) {
-            user.setEmail(userUpdateDTO.email());
-        }
-        if (userUpdateDTO.profileId() != null) {
-            user.setProfileId(userUpdateDTO.profileId());
+        if (replaceProfileId != null) {
+            user.setProfileId(replaceProfileId);
         }
         return user;
     }

@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.Channel.*;
+import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 채널(Channel)을 관리하는 서비스 인터페이스입니다.

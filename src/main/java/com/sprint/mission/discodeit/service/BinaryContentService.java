@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
+import com.sprint.mission.discodeit.DTO.legacy.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.Message.MessageCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.Message.MessageCRUDDTO;
 import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class BasicMessageService implements MessageService {
         }
     }
 
+    @CustomLogging
     @Override
     public Message create(MessageCRUDDTO messageCRUDDTO) {
         UUID userId = messageCRUDDTO.creatorId();
@@ -87,7 +89,7 @@ public class BasicMessageService implements MessageService {
         }
 
     }
-
+    @CustomLogging
     @Override
     public boolean delete(MessageCRUDDTO messageCRUDDTO) {
         UUID channelId = messageCRUDDTO.channelId();
@@ -106,6 +108,7 @@ public class BasicMessageService implements MessageService {
         return true;
     }
 
+    @CustomLogging
     @Override
     public boolean update(String messageId, MessageCRUDDTO messageCRUDDTO) {
         UUID messageUUID = UUID.fromString(messageId);

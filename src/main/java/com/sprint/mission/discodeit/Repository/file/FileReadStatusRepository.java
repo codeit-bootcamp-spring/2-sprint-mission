@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository.file;
 
-import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusCRUDDTO;
+import com.sprint.mission.discodeit.DTO.legacy.ReadStatus.ReadStatusCRUDDTO;
 import com.sprint.mission.discodeit.Exception.Empty.EmptyReadStatusListException;
 import com.sprint.mission.discodeit.Exception.NotFound.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFound.SaveFileNotFoundException;
