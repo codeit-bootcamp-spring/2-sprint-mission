@@ -52,6 +52,9 @@ public class BasicChannelService implements ChannelService {
         return channelEntityToFindDTO(channel, latestMessageTime, userIds);
     }
 
+    // PRIVATE의 경우, 참여한 User의 id정보를 포함해야함
+    // 요구사항에선 Channel이 userId를 가지지 않으므로, channelId로 ReadStatus를 조회하고,
+    // ReadStatus에서 userId를 뽑아내어 사용
     @Override
     public List<FindChannelDTO> findAllByUserId(UUID userId) {
         List<Channel> channels = channelRepository.findAll();
