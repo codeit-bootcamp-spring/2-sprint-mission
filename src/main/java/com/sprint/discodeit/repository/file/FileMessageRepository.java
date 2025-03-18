@@ -6,7 +6,6 @@ import com.sprint.discodeit.repository.MessageRepository;
 import com.sprint.discodeit.repository.util.FilePathUtil;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
@@ -19,7 +18,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
     }
 
     @Override
-    public Optional<Message> findById(String messageId) {
+    public Optional<Message> findById(UUID messageId) {
         Map<UUID, Message> users = loadAll();
         return  Optional.ofNullable(users.get(UUID.fromString(messageId.toString())));
     }

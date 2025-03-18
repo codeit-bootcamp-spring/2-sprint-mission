@@ -22,7 +22,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {
-        jcfChannelRepository.findById(channelId.toString());
+        jcfChannelRepository.findById(channelId);
         userService.find(authorId);
         Message message = new Message(content, channelId, authorId);
         jcfMessageRepository.save(message);
@@ -31,7 +31,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message find(UUID messageId) {
-        return jcfMessageRepository.findById(messageId.toString()).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));
+        return jcfMessageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message update(UUID messageId, String newContent) {
-        Message message = jcfMessageRepository.findById(messageId.toString()).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));
+        Message message = jcfMessageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));
         message.update(newContent);
         return message;
     }

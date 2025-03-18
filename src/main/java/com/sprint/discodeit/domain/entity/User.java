@@ -6,7 +6,7 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
-@Builder
+
 @Getter
 public class User implements Serializable {
 
@@ -22,7 +22,7 @@ public class User implements Serializable {
     private UUID userStatusId;
     private boolean deleted; // 삭제 여부 필드 추가
 
-
+    @Builder
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();

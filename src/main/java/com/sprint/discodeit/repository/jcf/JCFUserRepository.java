@@ -17,8 +17,8 @@ public class JCFUserRepository implements UserRepository {
 
 
     @Override
-    public Optional<User> findById(String uuId) {
-        return Optional.ofNullable(data.get(UUID.fromString(uuId)));
+    public Optional<User> findById(UUID uuId) {
+        return Optional.ofNullable(data.get(uuId));
     }
 
     @Override

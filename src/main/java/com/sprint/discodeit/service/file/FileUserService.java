@@ -49,12 +49,13 @@ public class FileUserService implements UserServiceV1 {
         BinaryContent profileImage = binaryUtil.createProfileImage(userProfileImgResponseDto.imgUrl());
 
         //dto를 엔티티로 변환
-        User userMapper = UserMapper.toUserMapper(userRequestDto,profileImage.getId());
+        User userMapper = UserMapper.toUserMapper(userRequestDto);
 
         UserStatus userStatus = new UserStatus(userMapper.getCreatedAt(), StatusType.Active.getExplanation());
 
         //연관관계 메소드로 상태 정보 주입
         userMapper.associateStatus(userStatus);
+        userMapper.associateProfileId(profileImage);
 
         // 저장
         baseUserStatusRepository.save(userStatus);
@@ -63,14 +64,14 @@ public class FileUserService implements UserServiceV1 {
 
 
         // User -> UserNameResponse 변환
-        return new UserNameStatusResponse(userMapper.getUsername(), userStatus.getStatusType());
+        return new UserNameStatusResponse(userMapper.getUsername(), userStatus.getStatusType(), userMapper.getId());
     }
 
 
     @Override
     public UserResponse find(UUID userId) {
-        User user = fileUserRepository.findById(userId.toString()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
-        UserStatus userStatus = baseUserStatusRepository.findById(user.getUserStatusId().toString())
+        User user = fileUserRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
+        UserStatus userStatus = baseUserStatusRepository.findById(user.getUserStatusId())
                         .orElseThrow(() -> new IllegalArgumentException("사용자에 상태를 찾을 수 없습니다. "));
         String status = userStatusEvaluator.determineUserStatus(userStatus.getLastLoginTime());
         return new UserResponse(user.getProfileId(), user.getUsername(), user.getEmail(), status);
@@ -95,7 +96,7 @@ public class FileUserService implements UserServiceV1 {
     @Override
     public UserResponse update(UserUpdateRequest userUpdateRequest) {
         //조회
-        User user = fileUserRepository.findById(userUpdateRequest.userId().toString()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
+        User user = fileUserRepository.findById(userUpdateRequest.userId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
 
         //가공
         BinaryContent profileImage = binaryUtil.createProfileImage(userUpdateRequest.profileImg());
@@ -111,7 +112,7 @@ public class FileUserService implements UserServiceV1 {
 
     @Override
     public void delete(UUID userId) {
-        Optional<User> user = fileUserRepository.findById(userId.toString());
+        Optional<User> user = fileUserRepository.findById(userId);
         if (user.isPresent()) {
             user.get().isDeleted();
             UserStatus userStatus = new UserStatus(Instant.now(), StatusType.Inactive.getExplanation());

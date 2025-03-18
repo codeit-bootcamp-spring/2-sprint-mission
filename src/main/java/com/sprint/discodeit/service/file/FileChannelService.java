@@ -25,7 +25,7 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public Channel find(UUID channelId) {
-        Channel channel = channelRepository.findById(channelId.toString()).orElseThrow(() -> new NoSuchElementException(channelId.toString() + " 없는 체널 입니다"));;
+        Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException(channelId.toString() + " 없는 체널 입니다"));;
         return channel;
     }
 
@@ -36,7 +36,7 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public Channel update(UUID channelId, String newName, String newDescription) {
-        Channel channel = channelRepository.findById(channelId.toString()).orElseThrow(() -> new NoSuchElementException(channelId.toString()+ " 없는 회원 입니다"));;
+        Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException(channelId.toString()+ " 없는 회원 입니다"));;
         channel.update(newName, newDescription);
         return channel;
     }

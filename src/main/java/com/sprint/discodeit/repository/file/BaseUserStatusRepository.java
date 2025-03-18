@@ -1,6 +1,5 @@
 package com.sprint.discodeit.repository.file;
 
-import com.sprint.discodeit.domain.entity.Channel;
 import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.domain.entity.UserStatus;
 import com.sprint.discodeit.repository.UserStatusRepository;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
@@ -23,9 +21,9 @@ public class BaseUserStatusRepository extends AbstractFileRepository<UserStatus>
 
 
     @Override
-    public Optional<UserStatus> findById(String uuId) {
+    public Optional<UserStatus> findById(UUID uuId) {
         Map<UUID, UserStatus> statusMap = loadAll();
-        return Optional.ofNullable(statusMap.get(UUID.fromString(uuId)));
+        return Optional.ofNullable(statusMap.get(uuId));
     }
 
     @Override

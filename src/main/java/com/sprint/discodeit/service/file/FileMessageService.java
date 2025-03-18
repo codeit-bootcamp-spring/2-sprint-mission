@@ -24,7 +24,7 @@ public class FileMessageService implements MessageService {
 
     @Override
     public Message find(UUID messageId) {
-        Message message = fileMessageRepository.findById(messageId.toString()).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));;
+        Message message = fileMessageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));;
         return message;
     }
 
@@ -35,7 +35,7 @@ public class FileMessageService implements MessageService {
 
     @Override
     public Message update(UUID messageId, String newContent) {
-        Message message = fileMessageRepository.findById(messageId.toString()).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));;
+        Message message = fileMessageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));;
         message.update(newContent);
         return message;
     }
