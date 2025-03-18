@@ -1,7 +1,9 @@
 package com.sprint.discodeit.service.file.chnnel;
 
+import com.sprint.discodeit.domain.ChannelType;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelCreateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelResponseDto;
+import com.sprint.discodeit.domain.dto.channelDto.ChannelUpdateRequestDto;
 import com.sprint.discodeit.domain.entity.Channel;
 import com.sprint.discodeit.domain.entity.ReadStatus;
 import com.sprint.discodeit.domain.mapper.ChannelMapper;
@@ -25,6 +27,7 @@ public class FileChannelService implements ChannelServiceV1 {
 
     @Override
     public ChannelResponseDto create(ChannelCreateRequestDto channelCreateRequestDto) {
+
         Channel channelMapper = ChannelMapper.toChannelMapper(channelCreateRequestDto);
         ReadStatus readStatus = readStatusService.dispatchChannelCreation(channelMapper.getName(),
                 channelCreateRequestDto.userId(), channelMapper.getId());
@@ -41,14 +44,20 @@ public class FileChannelService implements ChannelServiceV1 {
 
 
     @Override
-    public Channel update(UUID channelId, String newName, String newDescription, UUID userId) {
-        Channel channel = channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException(channelId.toString()+ " 없는 회원 입니다"));;
-        channel.update(newName, newDescription);
+    public Channel update(ChannelUpdateRequestDto channelUpdateRequestDto) {
+        Channel channel = channelRepository.findById(channelUpdateRequestDto.channelId()).orElseThrow(() -> new NoSuchElementException(channelUpdateRequestDto.channelId() + " 없는 채널 입니다"));
+        if (channel.getType() == ChannelType.PUBLIC) {
+            channel.update(channelUpdateRequestDto.newName(), channelUpdateRequestDto.newDescription());
+        }else{
+            throw new IllegalArgumentException("private 방은 수정이 불가능 합니다.");
+        }
         return channel;
     }
 
+
     @Override
     public void delete(UUID channelId) {
+        readStatusRepository.delete(channelId);
         channelRepository.delete(channelId);
     }
 }

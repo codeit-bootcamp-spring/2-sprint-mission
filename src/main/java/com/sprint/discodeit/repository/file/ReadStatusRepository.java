@@ -7,6 +7,7 @@ import com.sprint.discodeit.repository.util.FilePathUtil;
 import com.sprint.discodeit.repository.util.SaveRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
@@ -31,7 +32,12 @@ public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> imp
 
     @Override
     public void delete(UUID uuId) {
-
+        Map<UUID, ReadStatus> readStatusMap = loadAll();
+        Optional<ReadStatus> readStatusOptional = readStatusMap.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(uuId))
+                .findFirst();
+        readStatusMap.remove(readStatusOptional.get().getId());
+        writeToFile(readStatusMap);
     }
 
     public List<UUID> findByUserIdAndChannelId(UUID channelId) {
