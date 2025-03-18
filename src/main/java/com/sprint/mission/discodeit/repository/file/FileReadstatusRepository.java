@@ -5,14 +5,12 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public class FileReadstatusRepository extends AbstractFileRepository<ReadStatus> implements ReadStatusRepository {
-    private final Map<UUID, UUID> userIdMap;
-    private final Map<UUID, UUID> channelIdMap;
+    private final Map<UUID, List<ReadStatus>> userIdMap;
+    private final Map<UUID, List<ReadStatus>> channelIdMap;
 
     public FileReadstatusRepository() {
         super(ReadStatus.class, Paths.get(System.getProperty("userStatus.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\readStatusdata"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
@@ -21,27 +19,28 @@ public class FileReadstatusRepository extends AbstractFileRepository<ReadStatus>
     }
 
     @Override
-    public void add (ReadStatus readStatus) {
-        super.add(readStatus);
-        this.userIdMap.put(readStatus.getUserId(), readStatus.getId());
-        this.channelIdMap.put(readStatus.getChannelId(), readStatus.getId());
+    public void add (ReadStatus newReadStatus) {
+        super.add(newReadStatus);
+        this.userIdMap.computeIfAbsent(newReadStatus.getUserId(), userId -> new ArrayList<>()).add(newReadStatus);
+        this.channelIdMap.computeIfAbsent(newReadStatus.getChannelId(), channelId -> new ArrayList<>()).add(newReadStatus);
     }
 
     @Override
-    public ReadStatus findByUserId(UUID userId) {
-        return super.findById(userIdMap.get(userId));
+    public List<ReadStatus> findByUserId(UUID userId) {
+        return this.userIdMap.get(userId);
     }
 
     @Override
-    public ReadStatus findByChannelId(UUID channelId) {
-        return super.findById(channelIdMap.get(channelId));
+    public List<ReadStatus> findByChannelId(UUID channelId) {
+        return this.channelIdMap.get(channelId);
     }
 
     @Override
     public void deleteById(UUID readStatusId) {
+        ReadStatus target = super.findById(readStatusId);
+        this.userIdMap.get(super.findById(readStatusId).getUserId()).remove(target);
+        this.channelIdMap.get(super.findById(readStatusId).getChannelId()).remove(target);
         super.deleteById(readStatusId);
         super.deleteFile(readStatusId);
-        this.userIdMap.remove(readStatusId);
-        this.channelIdMap.remove(readStatusId);
     }
 }
