@@ -93,6 +93,6 @@ public class BasicChannelService implements ChannelService {
     public void deleteChannel(UUID channelId) {
         this.channelRepository.deleteById(channelId);
         this.messageRepository.findMessageListByChannelId(channelId).forEach(message -> this.messageRepository.deleteById(message.getId()));
-        readStatusRepository.findByChannelId(channelId).forEach(readStatus -> this.readStatusRepository.deleteById(readStatus.getId()));
+        this.readStatusRepository.deleteByChannelId(channelId);
     }
 }
