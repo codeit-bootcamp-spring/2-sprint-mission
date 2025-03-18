@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository;
+package com.sprint.mission.discodeit.repository.file;
 
 import org.springframework.stereotype.Component;
 
