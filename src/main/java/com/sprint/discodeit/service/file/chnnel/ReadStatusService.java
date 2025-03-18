@@ -1,12 +1,11 @@
-package com.sprint.discodeit.service.file;
-
-import static java.lang.Boolean.TRUE;
+package com.sprint.discodeit.service.file.chnnel;
 
 import com.sprint.discodeit.domain.entity.ReadStatus;
 import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.domain.entity.UserStatus;
 import com.sprint.discodeit.repository.file.BaseUserStatusRepository;
 import com.sprint.discodeit.repository.file.FileUserRepository;
+import com.sprint.discodeit.repository.file.ReadStatusRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +19,7 @@ public class ReadStatusService {
 
     private final FileUserRepository fileUserRepository;
     private final BaseUserStatusRepository baseUserStatusRepository;
+    private final ReadStatusRepository readStatusRepository;
 
     public ReadStatus dispatchChannelCreation(String channelName, List<UUID> userUUid, UUID channelId) {
         for(UUID u : userUUid) {
@@ -40,5 +40,9 @@ public class ReadStatusService {
 
         // ReadStatus 객체 생성
         return new ReadStatus(user.getId(), Instant.now(), isActive, channelId);
+    }
+
+    public List<UUID> getUserIdsByChannel(UUID channelId) {
+        return readStatusRepository.findByUserIdAndChannelId(channelId);
     }
 }
