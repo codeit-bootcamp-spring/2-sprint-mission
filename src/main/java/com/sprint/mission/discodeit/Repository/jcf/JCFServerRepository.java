@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.DTO.legacy.Server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.Exception.Empty.EmptyServerListException;
 import com.sprint.mission.discodeit.Exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.Exception.NotFound.ServerNotFoundException;
+import com.sprint.mission.discodeit.Exception.NotFound.UserNotFoundException;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.Server;
@@ -64,6 +65,16 @@ public class JCFServerRepository implements ServerRepository {
     }
 
     @Override
+    public Server findByOwnerId(UUID userId) {
+        List<Server> servers = findAllByUserId(userId);
+        Server server = servers.stream().filter(s -> s.getOwnerId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new UserNotFoundException("서버장을 찾을 수 없습니다."));
+
+        return server;
+    }
+
+    @Override
     public List<Server> findAllByUserId(UUID userId) {
         if (serverList.isEmpty()) {
             throw new EmptyServerListException("Repository 에 저장된 서버 리스트가 없습니다.");
@@ -91,8 +102,9 @@ public class JCFServerRepository implements ServerRepository {
 
 
     @Override
-    public void remove(Server server, User user) {
-        List<Server> list = findAllByUserId(user.getId());
+    public void remove(UUID userId) {
+        List<Server> list = findAllByUserId(userId);
+        Server server = findByOwnerId(userId);
         list.remove(server);
     }
 

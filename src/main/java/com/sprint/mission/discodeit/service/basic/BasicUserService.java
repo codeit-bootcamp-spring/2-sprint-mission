@@ -65,8 +65,8 @@ public class BasicUserService implements UserService {
     public UserFindDTO find(UUID userId) {
         try {
             User user = userRepository.find(userId);
-            UserStatus userStatus = userStatusRepository.find(userId);
-            userStatus.isOnline();
+            UserStatus userStatus = userStatusRepository.findByUserId(userId);
+            userStatus.updateStatus();
 
             UserFindDTO userFindDTO = UserFindDTO.find(
                     user.getId(),
@@ -93,7 +93,7 @@ public class BasicUserService implements UserService {
         try {
             List<User> userList = userRepository.findUserList();
             for (User user : userList) {
-                UserStatus userStatus = userStatusRepository.find(user.getId());
+                UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
                 UserFindDTO userFindDTO = UserFindDTO.find(
                         user.getId(),
                         user.getProfileId(),

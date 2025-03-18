@@ -42,8 +42,15 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus find(UUID userId) {
+    public UserStatus findByUserId(UUID userId) {
         UserStatus status = userStatusList.stream().filter(userStatus -> userStatus.getUserId().equals(userId))
+                .findFirst().orElseThrow(() -> new UserStatusNotFoundException("유저 상태를 찾지 못했습니다."));
+        return status;
+    }
+
+    @Override
+    public UserStatus findByStatusId(UUID userStatusId) {
+        UserStatus status = userStatusList.stream().filter(userStatus -> userStatus.getUserStatusId().equals(userStatusId))
                 .findFirst().orElseThrow(() -> new UserStatusNotFoundException("유저 상태를 찾지 못했습니다."));
         return status;
     }
@@ -66,9 +73,15 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void delete(UUID userId) {
-        UserStatus userStatus = find(userId);
-        userStatusList.remove(userStatus);
-        fileRepository.save(userStatusList);
+    public void delete(UUID id) {
+        try {
+            UserStatus userStatus = findByUserId(id);
+            userStatusList.remove(userStatus);
+            fileRepository.save(userStatusList);
+        } catch (UserStatusNotFoundException e) {
+            UserStatus userStatus = findByStatusId(id);
+            userStatusList.remove(userStatus);
+            fileRepository.save(userStatusList);
+        }
     }
 }

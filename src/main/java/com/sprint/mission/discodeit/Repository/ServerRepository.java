@@ -20,9 +20,11 @@ public interface ServerRepository {
 
     Server find(UUID serverId);
 
+    Server findByOwnerId(UUID userId);
+
     List<Server> findAllByUserId(UUID userId);
 
     Server update(Server targetServer, ServerCRUDDTO serverCRUDDTO);
 
-    void remove(Server server, User user);
+    void remove(UUID userId);
 }

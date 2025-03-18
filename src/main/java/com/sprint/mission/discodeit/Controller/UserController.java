@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.Controller;
 
 import com.sprint.mission.discodeit.DTO.Request.UserRegisterRequestDTO;
+import com.sprint.mission.discodeit.DTO.Request.UserStatusDTO;
 import com.sprint.mission.discodeit.DTO.Request.UserUpdateRequestDTO;
 import com.sprint.mission.discodeit.DTO.RequestToService.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.DTO.RequestToService.UserCreateDTO;
-import com.sprint.mission.discodeit.DTO.RequestToService.UserLoginDTO;
+import com.sprint.mission.discodeit.DTO.Request.UserLoginDTO;
 import com.sprint.mission.discodeit.DTO.RequestToService.UserUpdateDTO;
 import com.sprint.mission.discodeit.DTO.legacy.User.UserFindDTO;
 import com.sprint.mission.discodeit.entity.User;
@@ -52,12 +53,12 @@ public class UserController {
         return ResponseEntity.ok(all);
     }
 
-    @PutMapping("/online/{userId}")
-    public ResponseEntity<UserStatus> online(@PathVariable String userId) {
-        UserStatus userStatus = userStatusService.find(userId);
-        userStatus.updateStatus();
-        return ResponseEntity.ok(userStatus);
-    }
+//    @PutMapping("/online/{userId}")
+//    public ResponseEntity<UserStatus> online(@PathVariable String userId, @RequestBody UserStatusDTO UserstatusDTO) {
+//        UserStatus userStatus = userStatusService.findByUserId(userId);
+//
+//        return ResponseEntity.ok(userStatus);
+//    }
 
     @PutMapping("/update/{userId}")
     public ResponseEntity<User> update(@PathVariable String userId, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {

@@ -27,7 +27,7 @@ public class BasicUserStatusService implements UserStatusService {
         try {
             UUID userUUID = UUID.fromString(userId);
             User user = userRepository.find(userUUID);
-            UserStatus userStatus = userStatusRepository.find(userUUID);
+            UserStatus userStatus = userStatusRepository.findByUserId(userUUID);
 
             if (userStatus == null) {
                 userStatus = new UserStatus(user.getId());
@@ -42,9 +42,16 @@ public class BasicUserStatusService implements UserStatusService {
 
 
     @Override
-    public UserStatus find(String userId) {
+    public UserStatus findByUserId(String userId) {
         UUID userUUID = UUID.fromString(userId);
-        UserStatus userStatus = userStatusRepository.find(userUUID);
+        UserStatus userStatus = userStatusRepository.findByUserId(userUUID);
+        return userStatus;
+    }
+
+    @Override
+    public UserStatus findByStatusId(String userStatusId) {
+        UUID userStatusUUID = UUID.fromString(userStatusId);
+        UserStatus userStatus = userStatusRepository.findByStatusId(userStatusUUID);
         return userStatus;
     }
 
@@ -61,7 +68,7 @@ public class BasicUserStatusService implements UserStatusService {
         UUID userUUID = UUID.fromString(userId);
         UUID replaceUUID = UUID.fromString(replaceId);
 
-        UserStatus userStatus = userStatusRepository.find(userUUID);
+        UserStatus userStatus = userStatusRepository.findByUserId(userUUID);
         UserStatusCRUDDTO userStatusUpdateDTO = UserStatusCRUDDTO.update(replaceUUID);
 
         userStatusRepository.update(userStatus, userStatusUpdateDTO);
@@ -69,8 +76,8 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @CustomLogging
-    public void delete(String userId) {
-        UUID userUUID = UUID.fromString(userId);
-        userStatusRepository.delete(userUUID);
+    public void delete(String id) {
+        UUID uuid = UUID.fromString(id);
+        userStatusRepository.delete(uuid);
     }
 }
