@@ -111,6 +111,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public void deleteUser(UUID userId) {
+        binaryContentRepository.deleteById(userId);
+        userStatusRepository.deleteById(userId);
         userRepository.deleteUser(userId);
     }
 }
