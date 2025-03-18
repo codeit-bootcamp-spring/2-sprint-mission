@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyUserListException;
@@ -33,7 +34,11 @@ public class FileChannelRepository implements ChannelRepository {
 
     public FileChannelRepository() {
         this.fileRepository = new FileRepositoryImpl<>(path);
-        this.fileRepository.load();
+        try {
+            this.channelList = fileRepository.load();
+        } catch (NotFoundException e) {
+            System.out.println("FileChannelRepository init");
+        }
     }
 
     @Override

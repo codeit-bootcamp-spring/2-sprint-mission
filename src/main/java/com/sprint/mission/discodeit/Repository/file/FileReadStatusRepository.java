@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusCRUDDTO;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
@@ -22,11 +23,15 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     private final FileRepositoryImpl<List<ReadStatus>> fileRepository;
     private final Path path = Paths.get(System.getProperty("user.dir"), "data", "ReadStatusList.ser");
 
-    private final List<ReadStatus> readStatusList = new ArrayList<>();
+    private List<ReadStatus> readStatusList = new ArrayList<>();
 
     public FileReadStatusRepository() {
         this.fileRepository = new FileRepositoryImpl<>(path);
-        this.fileRepository.load();
+        try {
+            this.readStatusList = fileRepository.load();
+        } catch (NotFoundException e) {
+            System.out.println("FileReadStatusRepository init");
+        }
     }
 
     @Override

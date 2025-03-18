@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyUserListException;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
@@ -29,8 +30,11 @@ public class FileUserRepository implements UserRepository {
 
     public FileUserRepository() {
         this.fileRepository = new FileRepositoryImpl<>(path);
-        fileRepository.load();
-
+        try {
+            this.userList = fileRepository.load();
+        } catch (NotFoundException e) {
+            System.out.println("FileUserRepository init");
+        }
     }
 
     @Override

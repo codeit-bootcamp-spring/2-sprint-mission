@@ -25,7 +25,11 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     public FileBinaryContentRepository() {
         this.fileRepository = new FileRepositoryImpl<>(path);
-        this.fileRepository.load();
+        try {
+            this.binaryContentList = fileRepository.load();
+        } catch (NotFoundException e) {
+            System.out.println("FileBinaryContentRepository init");
+        }
     }
 
     @Override

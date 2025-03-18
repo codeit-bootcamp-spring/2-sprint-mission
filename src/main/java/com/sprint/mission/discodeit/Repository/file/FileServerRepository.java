@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.Server.ServerCRUDDTO;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyUserListException;
@@ -31,7 +32,11 @@ public class FileServerRepository implements ServerRepository {
 
     public FileServerRepository() {
         this.fileRepository = new FileRepositoryImpl<>(path);
-        fileRepository.load();
+        try {
+            this.serverList = fileRepository.load();
+        } catch (NotFoundException e) {
+            System.out.println("FileServerRepository init");
+        }
     }
 
     @Override

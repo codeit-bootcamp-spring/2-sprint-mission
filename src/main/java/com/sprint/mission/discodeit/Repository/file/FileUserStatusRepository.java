@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusCRUDDTO;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
@@ -25,7 +26,12 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     public FileUserStatusRepository() {
         this.fileRepository = new FileRepositoryImpl<>(path);
-        this.fileRepository.load();
+
+        try {
+            this.userStatusList = fileRepository.load();
+        } catch (NotFoundException e) {
+            System.out.println("FileUserStatusRepository init");
+        }
     }
 
     @Override

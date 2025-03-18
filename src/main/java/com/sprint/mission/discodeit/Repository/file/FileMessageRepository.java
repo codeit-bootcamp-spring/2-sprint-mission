@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.Message.MessageCRUDDTO;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
@@ -31,7 +32,11 @@ public class FileMessageRepository implements MessageRepository {
 
     public FileMessageRepository() {
         this.fileRepository = new FileRepositoryImpl<>(path);
-        fileRepository.load();
+        try {
+            this.messageList = fileRepository.load();
+        } catch (NotFoundException e) {
+            System.out.println("FileMessageRepository init");
+        }
     }
 
     @Override
