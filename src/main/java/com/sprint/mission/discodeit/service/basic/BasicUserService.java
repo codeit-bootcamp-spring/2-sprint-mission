@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -50,20 +51,43 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public Optional<User> getUserById(UUID userId) {
-        return userRepository.getUserById(userId);
+    public Optional<UserResponse> getUserById(UUID userId) {
+        return userRepository.getUserById(userId)
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        userStatusRepository.getById(userId)
+                                .map(UserStatus::isOnline)
+                                .orElse(false)
+                ));
     }
 
     @Override
-    public List<User> getUsersByName(String name) {
+    public List<UserResponse> getUsersByName(String name) {
         return userRepository.getAllUsers().stream()
                 .filter(user -> user.getName().equals(name))
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        userStatusRepository.getById(user.getId())
+                                .map(UserStatus::isOnline).orElse(false)
+                ))
                 .toList();
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.getAllUsers();
+    public List<UserResponse> getAllUsers() {
+        return userRepository.getAllUsers().stream()
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        userStatusRepository.getById(user.getId())
+                                .map(UserStatus::isOnline).orElse(false)
+                ))
+                .toList();
     }
 
     @Override
