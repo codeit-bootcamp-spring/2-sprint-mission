@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.custom.AppendObjectOutputStream;
 import com.sprint.mission.discodeit.dto.ChannelSaveDto;
+import com.sprint.mission.discodeit.dto.ChannelUpdateParamDto;
 import com.sprint.mission.discodeit.dto.FindChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -85,7 +86,7 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UUID channelUUID, String channelName) {
+    public void updateChannel(ChannelUpdateParamDto channelUpdateParamDto) {
         //List<Channel> channelList = findAllChannel();
         //
         //channelList.stream()
@@ -111,7 +112,7 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void deleteChannel(UUID channelUUId) {
+    public void deleteChannel(UUID channelUUID) {
         //List<Channel> channels = findAllChannel();
         //
         //boolean removed = channels.removeIf(channel -> channel.getId().equals(channelUUId));

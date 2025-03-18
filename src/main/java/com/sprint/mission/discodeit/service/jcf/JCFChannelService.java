@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.dto.ChannelSaveDto;
+import com.sprint.mission.discodeit.dto.ChannelUpdateParamDto;
 import com.sprint.mission.discodeit.dto.FindChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
@@ -46,15 +46,15 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UUID uuid, String channelName) {
-        if (channelList.stream().noneMatch(data -> data.getId().equals(uuid))) {
+    public void updateChannel(ChannelUpdateParamDto channelUpdateParamDto) {
+        if (channelList.stream().noneMatch(data -> data.getId().equals(channelUpdateParamDto.channelUUID()))) {
             System.out.println("[실패]수정하려는 채널이 존재하지 않습니다.");
             return;
         }
 
         for (Channel channel : channelList) {
-            if (channel.getId().equals(uuid)) {
-                channel.updateChannelName(channelName);
+            if (channel.getId().equals(channelUpdateParamDto.channelUUID())) {
+                channel.updateChannelName(channelUpdateParamDto.channelName());
                 System.out.println("[성공]채널 변경 완료[채널 아이디: " + channel.getId() +
                         ", 채널명: " + channel.getChannelName() +
                         ", 변경 시간: " + channel.getUpdatedAt() + "]");
@@ -63,8 +63,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void deleteChannel(UUID uuid) {
-        boolean isremove = channelList.removeIf(data -> data.getId().equals(uuid));
+    public void deleteChannel(UUID channelUUID) {
+        boolean isremove = channelList.removeIf(data -> data.getId().equals(channelUUID));
 
         if (!isremove) {
             System.out.println("[실패]삭제하려는 채널이 존재하지 않습니다.");

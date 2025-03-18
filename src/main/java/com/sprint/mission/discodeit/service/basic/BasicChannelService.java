@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.dto.ChannelSaveDto;
+import com.sprint.mission.discodeit.dto.ChannelUpdateParamDto;
 import com.sprint.mission.discodeit.dto.FindChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -83,25 +84,36 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UUID channelUUID, String channelName) {
-        Channel channel = channelRepository.findChannelById(channelUUID)
+    public void updateChannel(ChannelUpdateParamDto channelUpdateParamDto) {
+        Channel channel = channelRepository.findChannelById(channelUpdateParamDto.channelUUID())
                 .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다."));
 
         if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
             throw new IllegalArgumentException("비공개 채널은 수정할 수 없습니다.");
         }
 
-        channel = channelRepository.updateChannelChannelName(channelUUID, channelName);
+        channel = channelRepository.updateChannelChannelName(channelUpdateParamDto.channelUUID(), channelUpdateParamDto.channelName());
         System.out.println("[성공]" + channel);
     }
 
     @Override
-    public void deleteChannel(UUID id) {
-        boolean isDeleted = channelRepository.deleteChannelById(id);
-        if (!isDeleted) {
-            System.out.println("[실패] 채널 삭제 실패");
-            return;
-        }
+    public void deleteChannel(UUID channelUUID) {
+
+        messageRepository.findMessageByChannel(channelUUID)
+                .forEach(message -> {
+                    messageRepository.deleteMessageById(message.getId());
+                });
+
+        readStatusRepository.findByChannelId(channelUUID)
+                        .forEach(readStatus -> {
+                            readStatusRepository.delete(readStatus.getChannelId());
+                        });
+
+        messageRepository.deleteMessageById(channelUUID);
+
+        boolean isDeleted = channelRepository.deleteChannelById(channelUUID);
+
+
         System.out.println("[성공] 채널 삭제 완료");
     }
 }

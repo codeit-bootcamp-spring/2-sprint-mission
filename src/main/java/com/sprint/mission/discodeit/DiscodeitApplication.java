@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.constant.ChannelType;
+import com.sprint.mission.discodeit.dto.ChannelUpdateParamDto;
 import com.sprint.mission.discodeit.dto.FindChannelDto;
 import com.sprint.mission.discodeit.dto.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.User;
@@ -298,7 +299,8 @@ public class DiscodeitApplication {
                 UUID channelUUID = UUID.fromString(sc.nextLine());
                 System.out.print("원하는 채널명 입력: ");
                 String channelName = sc.nextLine();
-                channelService.updateChannel(channelUUID, channelName);
+                ChannelUpdateParamDto channelUpdateParamDto = new ChannelUpdateParamDto(channelUUID, channelName);
+                channelService.updateChannel(channelUpdateParamDto);
                 return;
             case 3:
                 System.out.print("수정할 메세지 아이디 입력: ");
