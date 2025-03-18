@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.service.message.CreateMessageParam;
+import com.sprint.mission.discodeit.dto.service.message.MessageDTO;
+import com.sprint.mission.discodeit.dto.service.message.UpdateMessageParam;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -19,51 +24,84 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId) {
-        validateMessageInput(content, channelId, authorId);
-        Message message = new Message(content, channelId, authorId, null);
+    public MessageDTO create(CreateMessageParam createMessageParam) {
+        validateMessageInput(createMessageParam);
+        Message message = createMessageEntity(createMessageParam);
         messageRepository.save(message);
-        return message;
+        return messageEntityToDTO(message);
     }
 
     @Override
-    public Message find(UUID messageId) {
-        return messageRepository
-                .findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("메시지가 존재하지 않습니다."));
+    public MessageDTO find(UUID messageId) {
+        Message message = findMessageById(messageId);
+        return messageEntityToDTO(message);
     }
 
     @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll();
+    public List<MessageDTO> findAllByChannelId(UUID channelId) {
+        List<Message> messages = messageRepository.findAllByChannelId(channelId);
+        return messages.stream()
+                .map(message -> messageEntityToDTO(message))
+                .toList();
     }
 
     @Override
-    public Message update(UUID messageId, String newContent) {
-        Message message = find(messageId);
-        message.updateMessageInfo(newContent);
+    public UUID update(UpdateMessageParam updateMessageParam) {
+        Message message = findMessageById(updateMessageParam.id());
+        message.updateMessageInfo(updateMessageParam.content());
         messageRepository.save(message);
-        return message;
+        return message.getId();
     }
 
     @Override
     public void delete(UUID messageId) {
-        find(messageId);
+        Message message = findMessageById(messageId);
+        if(message.getAttachmentIds() != null && !message.getAttachmentIds().isEmpty()) {
+            message.getAttachmentIds().stream()
+                    .forEach(id -> binaryContentRepository.deleteById(id));
+        }
         messageRepository.deleteById(messageId);
     }
 
-    private void validateMessageInput(String content, UUID channelId, UUID authorId) {
-        if (content == null || content.isBlank()) {
+    private void validateMessageInput(CreateMessageParam createMessageParam) {
+        if (createMessageParam.content() == null || createMessageParam.content().isBlank()) {
             throw new IllegalArgumentException("content는 필수 입력값입니다.");
         }
-        if (userRepository.findById(authorId).isEmpty()) {
-            throw new NoSuchElementException("유저가 존재하지 않습니다. id : " + authorId);
+        if (userRepository.findById(createMessageParam.authorId()).isEmpty()) {
+            throw new NoSuchElementException("유저가 존재하지 않습니다. id : " + createMessageParam.authorId());
         }
-        if(channelRepository.findById(channelId).isEmpty()) {
-            throw new NoSuchElementException("채널이 존재하지 않습니다. id : " + channelId);
+        if(channelRepository.findById(createMessageParam.channelId()).isEmpty()) {
+            throw new NoSuchElementException("채널이 존재하지 않습니다. id : " + createMessageParam.channelId());
         }
+    }
+
+    private Message createMessageEntity(CreateMessageParam createMessageParam) {
+        return Message.builder()
+                .attachmentIds(createMessageParam.attachmentsId())
+                .authorId(createMessageParam.authorId())
+                .channelId(createMessageParam.channelId())
+                .content(createMessageParam.content())
+                .build();
+    }
+
+    private MessageDTO messageEntityToDTO(Message message) {
+        return MessageDTO.builder()
+                .id(message.getId())
+                .updatedAt(message.getUpdatedAt())
+                .createdAt(message.getCreatedAt())
+                .attachmentIds(message.getAttachmentIds())
+                .authorId(message.getAuthorId())
+                .channelId(message.getChannelId())
+                .content(message.getContent())
+                .build();
+    }
+
+    private Message findMessageById(UUID id) {
+        return messageRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(id + "메시지가 존재하지 않습니다."));
     }
 }

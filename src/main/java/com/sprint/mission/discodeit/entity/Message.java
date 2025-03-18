@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
 
 @Getter
 public class Message implements Serializable {
@@ -18,6 +20,7 @@ public class Message implements Serializable {
     private final UUID channelId;
     private final UUID authorId;
 
+    @Builder
     public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         this.id = UUID.randomUUID();
         this.attachmentIds = attachmentIds; // 첨부파일과 함께 생성
