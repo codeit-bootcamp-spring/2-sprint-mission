@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.*;
 
 @Repository
@@ -36,11 +37,32 @@ public class FileReadstatusRepository extends AbstractFileRepository<ReadStatus>
     }
 
     @Override
+    public void updateReadTime(UUID readStatusId, Instant readTime) {
+        super.findById(readStatusId).updateReadTime(readTime);
+    }
+
+    @Override
     public void deleteById(UUID readStatusId) {
         ReadStatus target = super.findById(readStatusId);
         this.userIdMap.get(super.findById(readStatusId).getUserId()).remove(target);
         this.channelIdMap.get(super.findById(readStatusId).getChannelId()).remove(target);
         super.deleteById(readStatusId);
         super.deleteFile(readStatusId);
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        this.userIdMap.remove(userId);
+        List<ReadStatus> readStatusList = this.findByUserId(userId);
+        readStatusList.forEach(readStatus -> channelIdMap.get(readStatus.getChannelId()).remove(readStatus));
+        readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        List<ReadStatus> readStatusList = this.findByChannelId(channelId);
+        this.channelIdMap.remove(channelId);
+        readStatusList.forEach(readStatus -> userIdMap.get(readStatus.getUserId()).remove(readStatus));
+        readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
     }
 }
