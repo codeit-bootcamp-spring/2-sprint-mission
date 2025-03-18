@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,7 +15,7 @@ public class MessageContentUpdater implements MessageUpdater {
     }
 
     @Override
-    public void update(Message message, MessageUpdateRequest request, MessageRepository messageRepository) {
+    public void update(Message message, MessageUpdateRequest request, MessageRepository messageRepository, BinaryContentService binaryContentService) {
         messageRepository.updateMessageContent(message.getId(), request.content());
     }
 }
