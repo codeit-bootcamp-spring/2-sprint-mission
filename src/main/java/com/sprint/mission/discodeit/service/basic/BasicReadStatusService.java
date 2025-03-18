@@ -7,7 +7,9 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +27,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public UUID createReadStatus(ReadStatusCreateRequest readStatusCreateRequest) {
-        if (!userRepository.existsById(readStatusCreateRequest.userId())) {
-            throw new NoSuchElementException("해당 id를 가진 user가 존재하지 않습니다 : " + readStatusCreateRequest.userId());
-        }
-        if (!channelRepository.existsById(readStatusCreateRequest.channelId())) {
-            throw new NoSuchElementException("해당 id를 가진 channel이 존재하지 않습니다 : " + readStatusCreateRequest.channelId());
-        }
+        UserService.validateUserId(readStatusCreateRequest.userId(), this.userRepository);
+        ChannelService.validateChannelId(readStatusCreateRequest.channelId(), this.channelRepository);
         ReadStatus newReadStatus = new ReadStatus(readStatusCreateRequest.userId(), readStatusCreateRequest.channelId());
         readStatusRepository.add(newReadStatus);
         return newReadStatus.getId();
@@ -44,6 +42,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public List<ReadStatusFindResponse> findAllReadStatusByUserId(UUID userId) {
+        UserService.validateUserId(userId, this.userRepository);
         List<ReadStatus> readStatuses = this.readStatusRepository.findByUserId(userId);
         List<ReadStatusFindResponse> readStatusFindResponses = new ArrayList<>();
         for (ReadStatus readStatus : readStatuses) {
