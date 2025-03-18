@@ -2,29 +2,22 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+@Repository
 public class JCFMessageRepository implements MessageRepository {
-    private static volatile JCFMessageRepository instance;
     private final Map<UUID, Message> data = new HashMap<>();
 
-    private JCFMessageRepository() {}
-
-    public static JCFMessageRepository getInstance() {
-        if (instance == null) {
-            synchronized (JCFMessageRepository.class) {
-                if (instance == null) {
-                    instance = new JCFMessageRepository();
-                }
-            }
-        }
-        return instance;
-    }
+    public JCFMessageRepository() {}
 
     @Override
-    public void save(Message message) {
+    public Message save(Message message) {
         data.put(message.getId(), message);
+        return message;
     }
 
     @Override
@@ -33,20 +26,25 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(data.values());
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
-    public void delete(UUID messageId) {
+    public boolean existsById(UUID messageId) {
+        return data.containsKey(messageId);
+    }
+
+    @Override
+    public void deleteById(UUID messageId) {
         data.remove(messageId);
     }
 
     @Override
-    public void update(UUID messageId, String content) {
-        findById(messageId).ifPresent(message -> {
-            message.update(content, System.currentTimeMillis());
-            save(message);
-        });
+    public void deleteAllByChannelId(UUID channelId) {
+        findAllByChannelId(channelId)
+                .forEach(message -> deleteById(message.getId()));
     }
 }
