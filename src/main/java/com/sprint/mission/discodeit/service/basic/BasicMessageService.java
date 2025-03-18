@@ -5,10 +5,10 @@ import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.provider.MessageUpdaterProvider;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -27,7 +26,7 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
-    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentService binaryContentService;
     private final MessageUpdaterProvider messageUpdaterProvider;
 
     @Override
@@ -42,7 +41,7 @@ public class BasicMessageService implements MessageService {
         Message newMessage = new Message(messageCreateRequest.senderId(), messageCreateRequest.content(), messageCreateRequest.channelId());     // content에 대한 유효성 검증은 Message 생성자에게 맡긴다.
         if (messageCreateRequest.attachmentIds() != null && !messageCreateRequest.attachmentIds().isEmpty()) {
             for (UUID attachmentId : messageCreateRequest.attachmentIds()) {
-                if (binaryContentRepository.existsById(attachmentId)) {
+                if (binaryContentService.existsById(attachmentId)) {
                     newMessage.addAttachment(attachmentId);
                 }
             }
@@ -66,7 +65,7 @@ public class BasicMessageService implements MessageService {
     public void updateMessage(MessageUpdateRequest messageUpdateRequest) {
         Message findMessage = this.messageRepository.findById(messageUpdateRequest.messageId());
         for(UUID attachmentId : messageUpdateRequest.attachmentIds()) {
-            if (!binaryContentRepository.existsById(attachmentId)) {
+            if (!binaryContentService.existsById(attachmentId)) {
                 throw new NoSuchElementException("해당 Id가 binaryContentRepository에 존재하지 않습니다 : " + attachmentId);
             }
         }
@@ -75,7 +74,17 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
+    public void deleteBinaryContentInMessage(UUID messageId, UUID binaryContentId) {
+        this.binaryContentService.deleteByID(binaryContentId);
+        this.messageRepository.deleteAttachment(messageId, binaryContentId);
+    }
+
+    @Override
     public void deleteMessage(UUID messageId) {
+        List<UUID> attachmentIds = this.messageRepository.findById(messageId).getAttachmentIds();
+        for(UUID id : attachmentIds) {
+            this.binaryContentService.deleteByID(id);
+        }
         this.messageRepository.deleteById(messageId);
     }
 }
