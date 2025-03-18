@@ -11,13 +11,36 @@ public class BinaryContentRepositoryImpl implements BinaryContentRepository {
     private final Map<UUID, BinaryContent> storage = new HashMap<>();
 
     @Override
-    public BinaryContent findById(UUID id) {
-        return storage.get(id);
+    public Optional<BinaryContent> findById(UUID id) {
+        return Optional.ofNullable(storage.get(id));
     }
 
     @Override
-    public void save(BinaryContent binaryContent) {
+    public boolean existsById(UUID id) {
+        return storage.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        storage.remove(id);
+
+    }
+
+    @Override
+    public List<BinaryContent> findAllById(List<UUID> ids) {
+        List<BinaryContent> result = new ArrayList<>();
+        for (UUID id : ids) {
+            if (storage.containsKey(id)) {
+                result.add(storage.get(id));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public BinaryContent save(BinaryContent binaryContent) {
         storage.put(binaryContent.getId(), binaryContent);
+        return binaryContent;
     }
 
     @Override
