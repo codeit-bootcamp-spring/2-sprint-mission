@@ -63,6 +63,10 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus updateByUserId(UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto) {
         UserStatus userStatus = userStatusRepository.findByUserId(userStatusUpdateByUserIdDto.userId());
+
+        if (userStatus == null) {
+            throw new NoSuchElementException(userStatusUpdateByUserIdDto.userId() + " 유저 상태를 찾을 수 없습니다.");
+        }
         userStatus.update(userStatusUpdateByUserIdDto.newLastActiveAt());
 
         return userStatusRepository.save(userStatus);
