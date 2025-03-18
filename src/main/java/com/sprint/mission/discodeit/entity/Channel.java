@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,12 +18,16 @@ public class Channel implements Serializable {
     private Instant updatedAt;
 
     private ChannelType type;
-    private String name;
-    private String description;
+
+    @Nullable
+    private String name; //PUBLIC 전용
+    @Nullable
+    private String description; //PUBLIC 전용
+
 
     //Private Channel 만들때 호출
     public Channel(ChannelType type) {
-        this(type, "", "");
+        this(type, null, null);
     }
 
     //Public Channel 만들때 호출
@@ -29,8 +35,10 @@ public class Channel implements Serializable {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
-        //
+
         this.type = type;
+
+        //PUBLIC 전용
         this.name = name;
         this.description = description;
     }
