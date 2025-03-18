@@ -9,9 +9,12 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Repository
 @Primary
@@ -88,8 +91,10 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        try {
-            return Files.list(DIRECTORY)
+        List<Message> messages = new ArrayList<>();
+
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            messages = paths
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
                         try (
@@ -99,14 +104,16 @@ public class FileMessageRepository implements MessageRepository {
                             Message message = (Message) ois.readObject();
                             return message.getChannelId().equals(channelId) ? message : null;
                         } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
+                            throw new RuntimeException("Failed to read message file: " + path, e);
                         }
                     })
-                    .filter(message -> message != null)
+                    .filter(Objects::nonNull)
                     .toList();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to list message files", e);
         }
+
+        return messages;
     }
 
     @Override

@@ -2,11 +2,13 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
+@Qualifier("jcfMessageRepository")
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data;
 
