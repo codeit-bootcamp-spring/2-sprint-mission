@@ -14,9 +14,7 @@ public class UserStatusEvaluator {
 
         if (duration.toMinutes() <= 5) {
             return StatusType.Active.getExplanation();
-        } else if (duration.toMinutes() <= 15) {
-            return StatusType.Away.getExplanation();
         }
-        return StatusType.Inactive.getExplanation();
+            return StatusType.Away.getExplanation();
     }
 }
