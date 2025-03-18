@@ -102,11 +102,11 @@ public class Application {
         handlers.put(CHANNEL_CHANGE, new ChannelChangeHandler(channelController, inputView));
     }
 
-    private static ChannelDto setupChannel(ChannelController channelController, UserDto loginUser) {
+    public static ChannelDto setupChannel(ChannelController channelController, UserDto loginUser) {
         return channelController.create(SETUP_CHANNEL_NAME, loginUser);
     }
 
-    private static UserDto setupUser(UserController userController) {
+    public static UserDto setupUser(UserController userController) {
         UserDto loginUser = userController.register(
                 new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword())
         );

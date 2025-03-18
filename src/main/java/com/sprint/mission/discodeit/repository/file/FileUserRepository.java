@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class FileUserRepository implements UserRepository {
     private Path userPath = STORAGE_DIRECTORY.resolve(USER_FILE);
 

@@ -12,7 +12,9 @@ import com.sprint.mission.discodeit.service.MessageService;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
+@Service
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;

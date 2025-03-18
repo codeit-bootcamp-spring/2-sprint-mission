@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
+import org.springframework.stereotype.Controller;
 
+@Controller
 public class ChannelController {
     private final ChannelService channelService;
 

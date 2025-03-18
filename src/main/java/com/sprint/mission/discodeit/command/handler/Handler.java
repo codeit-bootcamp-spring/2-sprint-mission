@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.view.InputView;
 
+// TODO: 3/18/25 인터페이스로 변경예정
 public abstract class Handler {
     protected final ChannelController channelController;
     protected final InputView inputView;
