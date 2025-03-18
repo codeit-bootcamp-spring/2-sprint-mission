@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class ChannelQueryService {
 
     private final FileChannelRepository filechannelRepository;
-    //private final UserChannelService userChannelService;
     private final ReadStatusService readStatusService;
 
     public ChannelFindResponseDto find(UUID channelId) {
