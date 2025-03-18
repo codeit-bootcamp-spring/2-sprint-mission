@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.constant.ChannelType;
+import com.sprint.mission.discodeit.dto.ChannelSaveDto;
 import com.sprint.mission.discodeit.dto.FindChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -12,15 +13,16 @@ public class JCFChannelService implements ChannelService {
     private final List<Channel> channelList = new ArrayList<>();
 
     @Override
-    public void createPublicChannel(String channelName, ChannelType channelType) {
+    public ChannelSaveDto createPublicChannel(String channelName, ChannelType channelType) {
         Channel channel = new Channel(channelName, channelType);
         channelList.add(channel);
         System.out.println("채널 개설 성공" + channel);
+        return null;
     }
 
     @Override
-    public void createPrivateChannel(String channelName, ChannelType channelType, List<UUID> userList) {
-
+    public ChannelSaveDto createPrivateChannel(String channelName, ChannelType channelType, List<UUID> userList) {
+        return null;
     }
 
     @Override
@@ -35,11 +37,12 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> findAllChannel() {
-        if (channelList.isEmpty()) {
-            System.out.println("개설된 채널이 없습니다.");
-        }
-        return channelList;
+    public List<FindChannelDto> findAllByUserId(UUID userUUID) {
+        //if (channelList.isEmpty()) {
+        //    System.out.println("개설된 채널이 없습니다.");
+        //}
+        //return channelList;
+        return null;
     }
 
     @Override

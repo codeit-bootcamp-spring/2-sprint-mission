@@ -12,24 +12,46 @@ import java.util.UUID;
 @Repository
 public class JCFReadStatusRepository implements ReadStatusRepository {
 
-    private final List<ReadStatus> ReadStatusList = new ArrayList<>();
+    private final List<ReadStatus> readStatusList = new ArrayList<>();
 
     @Override
     public ReadStatus save(UUID userUUID, UUID ChannelId) {
         ReadStatus readStatus = new ReadStatus(userUUID, ChannelId);
-        ReadStatusList.add(readStatus);
+        readStatusList.add(readStatus);
         return readStatus;
     }
 
     @Override
-    public Optional<ReadStatus> find(UUID userUUID, UUID channelUUID) {
-        return ReadStatusList.stream()
-                .filter(readStatus -> readStatus.getUserId().equals(userUUID) && readStatus.getChannelId().equals(channelUUID))
-                .findAny();
+    public Optional<ReadStatus> find(UUID readStatusUUID) {
+        return readStatusList.stream()
+                .filter(readStatus -> readStatus.getId().equals(readStatusUUID))
+                .findFirst();
+    }
+
+    @Override
+    public List<ReadStatus> findByUserId(UUID userUUID) {
+        return readStatusList.stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userUUID))
+                .toList();
+    }
+
+    @Override
+    public List<ReadStatus> findByChannelId(UUID channelUUID) {
+        return readStatusList.stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelUUID))
+                .toList();
     }
 
     @Override
     public void update(UUID userUUID, UUID channelUUID) {
-        find(userUUID, channelUUID).ifPresent(ReadStatus::updateTime);
+        findByUserId(userUUID).stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelUUID))
+                .findAny()
+                .ifPresent(ReadStatus::updateTime);
+    }
+
+    @Override
+    public void delete(UUID readStatusUUID) {
+        readStatusList.removeIf(readStatus -> readStatus.getId().equals(readStatusUUID));
     }
 }

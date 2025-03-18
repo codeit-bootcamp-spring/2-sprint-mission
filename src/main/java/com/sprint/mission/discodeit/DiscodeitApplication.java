@@ -61,18 +61,21 @@ public class DiscodeitApplication {
                     switch (createNum) {
                         case 1:
                             System.out.println("======== 채널 타입 ========");
-                            System.out.println("1. public(공개 채널)\n2. private(비공개 채널");
+                            System.out.print("1. public(공개 채널)\n2. private(비공개 채널) : ");
                             int typeChoice = sc.nextInt();
+                            sc.nextLine();
                             System.out.print("채널명 입력: ");
                             String channelName = sc.nextLine();
-                            sc.nextLine();
                             switch (typeChoice) {
                                 case 1:
-                                    channelService.createPublicChannel(channelName, ChannelType.PUBLIC);
+                                    System.out.println(channelService.createPublicChannel(channelName, ChannelType.PUBLIC));
                                     break;
                                 case 2:
                                     List<UUID> userList = new ArrayList<>();
+                                    userList.add(userToken);
                                     while (true) {
+                                        System.out.println();
+                                        System.out.print("추가할 사용자 아이디\n입력란:");
                                         String appendUser = sc.nextLine();
                                         if (appendUser.equalsIgnoreCase("EXIT")) break;
                                         UUID userUUID = UUID.fromString(appendUser);
@@ -80,7 +83,7 @@ public class DiscodeitApplication {
                                             userList.add(userUUID);
                                         }
                                     }
-                                    channelService.createPrivateChannel(channelName, ChannelType.PUBLIC, userList);
+                                    System.out.println(channelService.createPrivateChannel(channelName, ChannelType.PRIVATE, userList));
                                     break;
                                 default:
                                     break;
@@ -98,7 +101,7 @@ public class DiscodeitApplication {
                             sendMessageByChannel(messageService, channelToken, userToken, content);
                             break;
                         case 3:
-                            System.out.println(channelService.findAllChannel());
+                            System.out.println(channelService.findAllByUserId(userToken));
                         case 4:
                             break;
                     }
@@ -236,7 +239,9 @@ public class DiscodeitApplication {
                         System.out.println(channelService.findChannel(chennelUUID));
                         break;
                     case 2:
-                        channelService.findAllChannel().forEach(System.out::println);
+                        System.out.print("조회할 사용자 아이디: ");
+                        UUID userUUID = UUID.fromString(sc.nextLine());
+                        channelService.findAllByUserId(userUUID).forEach(System.out::println);
                 }
                 break;
             case 3:
