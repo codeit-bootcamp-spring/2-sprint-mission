@@ -16,9 +16,10 @@ import java.util.stream.Collectors;
 
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
-    private final Path storagePath = Paths.get("binary_content");
+    private final Path storagePath;
 
-    public FileBinaryContentRepository() throws IOException {
+    public FileBinaryContentRepository(String path) throws IOException {
+        this.storagePath = Paths.get(path);
         Files.createDirectories(storagePath);
     }
 
@@ -44,7 +45,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         }
         try {
             byte[] data = Files.readAllBytes(filePath);
-            return Optional.of(new BinaryContent(id, data, "unknown"));
+            return Optional.of(new BinaryContent(id, data));
         } catch (IOException e) {
             throw new RuntimeException("Failed to read binary content", e);
         }

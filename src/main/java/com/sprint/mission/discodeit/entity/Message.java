@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +29,7 @@ public class Message implements Serializable {
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
+
     }
 
 

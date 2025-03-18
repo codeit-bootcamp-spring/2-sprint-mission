@@ -56,8 +56,8 @@ public class BasicChannelService implements ChannelService {
         return new ChannelResponse(channel, latestMessage, userIds);
     }
 
-    public List<ChannelResponse> findAll(UUID userId) {
-        List<Channel> channels = channelRepository.findAllByUserId(userId);
+    public List<ChannelResponse> findAll() {
+        List<Channel> channels = channelRepository.findAll();
         return channels.stream()
                 .map(channel -> {
                     Message latestMessage = messageRepository.findById(channel.getId()).orElseThrow();

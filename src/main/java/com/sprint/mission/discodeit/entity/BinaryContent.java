@@ -16,9 +16,9 @@ public final class BinaryContent {
     private byte[] content;
     private String fileName;
 
-    public BinaryContent(UUID id, byte[] content, String fileName) {
+    public BinaryContent(UUID id, byte[] content) {
         this.id = id;
         this.content = content;
-        this.fileName = fileName;
+
     }
 }

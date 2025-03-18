@@ -1,5 +1,9 @@
 package com.sprint.mission.discodeit.service.userDto;
 
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+
+import java.time.Instant;
 import java.util.UUID;
 
 public record UserResponse (
@@ -7,5 +11,7 @@ public record UserResponse (
         String username,
         String email,
         boolean isOnline
-){}
+){
+
+}
 

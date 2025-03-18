@@ -15,11 +15,12 @@ import java.util.stream.Collectors;
 
 
 public class FileReadStatusRepository implements ReadStatusRepository {
-    private final Path storagePath = Paths.get("read_status.json");
+    private final Path storagePath;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Map<UUID, ReadStatus> storage = new ConcurrentHashMap<>();
 
-    public FileReadStatusRepository() {
+    public FileReadStatusRepository(String fileDirectory) {
+        this.storagePath = Paths.get(fileDirectory, "file-data-map", ReadStatus.class.getSimpleName());
         loadFromFile();
     }
 

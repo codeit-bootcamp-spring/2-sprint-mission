@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
 
-    public UserResponse create(UserRequest request) {
+    public User create(UserRequest request) {
 
         if (userRepository.existsByUsernameOrEmail(request.username(), request.email())) {
             throw new IllegalArgumentException("Username or Email already exists");
@@ -37,7 +38,7 @@ public class BasicUserService implements UserService {
 
 
         User user = new User(request.username(), request.email(), request.password());
-        UserStatus status = new UserStatus(user, Instant.now());
+        UserStatus status = new UserStatus(user.getId(), Instant.now());
         userStatusRepository.save(status);
 
         try{
@@ -52,14 +53,13 @@ public class BasicUserService implements UserService {
         }
 
 
-        return new UserResponse(user.getId(),request.username(),request.email(),
-                status.isOnline());
+        return user;
     }
 
     @Override
     public UserResponse find(UUID userId) {
 
-        UserStatus status = userStatusRepository.findByUserId(userId);
+        UserStatus status = userStatusRepository.findByUserId(userId).orElseThrow();
         if(status.isOnline()){
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
@@ -74,8 +74,16 @@ public class BasicUserService implements UserService {
     }
 
     public List<UserResponse> findAll() {
-        return userStatusRepository.findAll();
+        List<UserResponse> ress = new ArrayList<>();
+        for (User user : userRepository.findAll()) {
+            UserStatus status = userStatusRepository.findByUserId(user.getId()).orElseThrow();
+            ress.add(new UserResponse(user.getId(),user.getUsername(), user.getEmail(),
+                    status.isOnline()));
+        }
+
+        return ress;
     }
+
 
     public void delete(UUID userId) {
         // 유저 존재 확인
@@ -115,6 +123,7 @@ public class BasicUserService implements UserService {
                 BinaryContent newProfileImage = new BinaryContent(
                         user.getId(),
                         request.profileImage().getBytes()
+
                 );
                 binaryContentRepository.save(newProfileImage);
             } catch (IOException e) {
@@ -123,7 +132,7 @@ public class BasicUserService implements UserService {
 
         }
 
-        UserStatus status = userStatusRepository.findByUserId(user.getId());
+        UserStatus status = userStatusRepository.findByUserId(user.getId()).orElseThrow();
 
         return new UserResponse(user.getId(), user.getUsername(), user.getEmail(),
                 status.isOnline());

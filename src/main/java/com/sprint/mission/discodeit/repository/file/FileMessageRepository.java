@@ -17,8 +17,8 @@ public class FileMessageRepository implements MessageRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileMessageRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
+    public FileMessageRepository(String fileDirectory) {
+        this.DIRECTORY = Paths.get(fileDirectory, "file-data-map", Message.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
@@ -64,7 +64,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<Message> findAllByChannelId(UUID channelId) {
         try {
             return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
@@ -78,6 +78,7 @@ public class FileMessageRepository implements MessageRepository {
                             throw new RuntimeException(e);
                         }
                     })
+                    .filter(message -> message.getChannelId().equals(channelId))
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);

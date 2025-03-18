@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record BinaryContentCreateRequest(
         UUID contentId,
-        byte[] data
+        byte[] data,
+        String fileName
         ) {
 }

@@ -16,11 +16,12 @@ import java.util.stream.Collectors;
 
 @Repository
 public class FileUserStatusRepository implements UserStatusRepository {
-    private final Path storagePath = Paths.get("user_status.json");
+    private final Path storagePath;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private Map<UUID, UserStatus> storage = new ConcurrentHashMap<>();
 
-    public FileUserStatusRepository() {
+    public FileUserStatusRepository(String filePath) {
+        this.storagePath = Paths.get(filePath);
         loadFromFile();
     }
 
