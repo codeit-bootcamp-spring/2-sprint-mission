@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    User create(String username, String password);
-    User findById(UUID userId);
+    User create(String username, String email, String password);
+    User find(UUID userId);
     List<User> findAll();
-    User updateName(UUID userId, String newUsername);
-    User updatePassword(UUID userId, String newPassword);
+    User update(UUID userId, String newUsername, String newEmail, String newPassword);
     void delete(UUID userId);
 }

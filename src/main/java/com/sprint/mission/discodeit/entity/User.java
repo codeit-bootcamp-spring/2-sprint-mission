@@ -1,23 +1,28 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 public class User implements Serializable {
-    private static final long serialVersionUID = 2L; // 클래스마다 고유 번호 -> 채널 1, 유저 2, 메세지 3
+    private static final long serialVersionUID = 1L;
+
     private UUID id;
     private Long createdAt;
     private Long updatedAt;
     //
     private String username;
-    private transient String password; // transient 직렬화 제외 키워드
+    private String email;
+    private String password;
 
-    public User(String username, String password) {
+    public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
-        this.updatedAt = Instant.now().getEpochSecond();
+        //
         this.username = username;
+        this.email = email;
         this.password = password;
     }
 
@@ -37,27 +42,29 @@ public class User implements Serializable {
         return username;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public String getPassword() {
         return password;
     }
 
-    public void updateName(String newUsername) {
+    public void update(String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
             anyValueUpdated = true;
         }
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
         }
-    }
-
-    public void updatePassword(String newPassword) {
-        boolean anyValueUpdated = false;
         if (newPassword != null && !newPassword.equals(this.password)) {
             this.password = newPassword;
             anyValueUpdated = true;
         }
+
         if (anyValueUpdated) {
             this.updatedAt = Instant.now().getEpochSecond();
         }
@@ -70,6 +77,7 @@ public class User implements Serializable {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 '}';
     }

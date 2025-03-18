@@ -4,57 +4,60 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelServiceImp;
 
 public class JavaApplication {
     static User setupUser(UserService userService) {
-        User user = userService.create("김현호", "12345");
-        System.out.println("이름: " + user.getUsername());
+        User user = userService.create("woody", "woody@codeit.com", "woody1234");
         return user;
     }
 
     static Channel setupChannel(ChannelService channelService) {
         Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
-        System.out.println("채널 이름: " + channel.getName() + ", 채널 설명: " + channel.getDescription());
         return channel;
     }
 
-
     static void messageCreateTest(MessageService messageService, Channel channel, User author) {
         Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
-        System.out.println("내용: " + message.getContent());
+        System.out.println("메시지 생성: " + message.getId());
     }
 
     public static void main(String[] args) {
-        // JCF 기반 테스트
-        UserService userService = new BasicUserService(new JCFUserRepository());
-        ChannelService channelService = new BasicChannelService(new JCFChannelRepository());
-        MessageService messageService = new BasicMessageService(new JCFMessageRepository(), channelService, userService);
+//        // 레포지토리 초기화
+//        UserRepository userRepository = new FileUserRepository();
+//        ChannelRepository channelRepository = new FileChannelRepository();
+//        MessageRepository messageRepository = new FileMessageRepository();
+//
+//        // 서비스 초기화
+//        UserService userService = new BasicUserService(userRepository);
+//        ChannelService channelService = new BasicChannelService(channelRepository);
+//        MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
+//
+//        // 셋업
+//        User user = setupUser(userService);
+//        Channel channel = setupChannel(channelService);
+//        // 테스트
+//        messageCreateTest(messageService, channel, user);
 
-        //파일 기반 테스트
-        UserService userService2 = new BasicUserService(new FileUserRepository("users.ser"));
-        ChannelService channelService2 = new BasicChannelService(new FileChannelRepository("channels.ser"));
-        MessageService messageService2 = new BasicMessageService(new FileMessageRepository("messages.ser"), channelService2, userService2);
+        Channel channel = Channel.builder()
+                .type(ChannelType.PRIVATE)
+                .name("My Channel")
+                .description("This is a sample channel")
+                .build();
 
-        User user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
-        messageCreateTest(messageService, channel, user);
+        System.out.println("채널 생성 :" + channel);
 
-        System.out.println("---------------");
+        ChannelRepository channelRepository = new FileChannelRepository();
+        ChannelService channelService = new BasicChannelServiceImp(channelRepository);
 
-        User user2 = setupUser(userService2);
-        Channel channel2 = setupChannel(channelService2);
-        messageCreateTest(messageService2, channel2, user2);
+        Channel c1 = channelService.create(ChannelType.PUBLIC, "톡방이름", "톡방설명");
+
+        System.out.println("c1 :" + c1);
+
     }
 }
