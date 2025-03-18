@@ -3,6 +3,7 @@ package com.sprint.discodeit.repository.file;
 import com.sprint.discodeit.domain.entity.ReadStatus;
 import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.repository.util.AbstractFileRepository;
+import com.sprint.discodeit.repository.util.FilePathUtil;
 import com.sprint.discodeit.repository.util.SaveRepository;
 import java.util.Map;
 import java.util.UUID;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> implements SaveRepository<ReadStatus> {
 
     protected ReadStatusRepository() {
-        super();
+        super(FilePathUtil.READSTATUS.getPath());
     }
 
     @Override

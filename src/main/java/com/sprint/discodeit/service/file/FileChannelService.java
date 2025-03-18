@@ -26,7 +26,7 @@ public class FileChannelService implements ChannelServiceV1 {
     public ChannelResponseDto create(ChannelCreateRequestDto channelCreateRequestDto) {
         Channel channelMapper = ChannelMapper.toChannelMapper(channelCreateRequestDto);
         ReadStatus readStatus = readStatusService.dispatchChannelCreation(channelMapper.getName(),
-                channelCreateRequestDto.userId(), channelCreateRequestDto.check(), channelMapper.getId());
+                channelCreateRequestDto.userId(), channelMapper.getId());
         // 저장
         channelRepository.save(channelMapper);
         if(readStatus != null){
