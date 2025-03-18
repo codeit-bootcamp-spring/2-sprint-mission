@@ -48,7 +48,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
         }
         NavigableSet<Message> messages = channelIdMessages.get(channelId);
         if (messages == null) {
-            throw new NullPointerException("해당 ");
+            throw new NullPointerException("해당 channelId를 가진 채널이 아직 생성되지 않았습니다. " + channelId);
         }
         return new ArrayList<>(channelIdMessages.get(channelId));
     }
@@ -57,6 +57,13 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
     public void updateMessageContent(UUID messageId, String newContent) {
         if (existsById(messageId)) {
             super.storage.get(messageId).updateContent(newContent);
+        }
+    }
+
+    @Override
+    public void updateAttachmentIds(UUID messageId, List<UUID> attachmentIds) {
+        if (existsById(messageId)) {
+            super.storage.get(messageId).updateAttachmentIds(attachmentIds);
         }
     }
 }
