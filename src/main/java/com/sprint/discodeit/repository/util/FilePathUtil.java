@@ -6,7 +6,8 @@ public enum FilePathUtil {
     USERS("users.dat"),
     Message("message.dat"),
     STATUS("status.dat"),
-    BINARY("binary.dat");
+    BINARY("binary.dat"),
+    READSTATUS("reads.dat");
 
     private final String path;
 

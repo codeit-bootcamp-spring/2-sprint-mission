@@ -4,7 +4,9 @@ import com.sprint.discodeit.domain.ChannelType;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
+
 
 @Getter
 public class Channel implements Serializable {
@@ -19,6 +21,7 @@ public class Channel implements Serializable {
     private String name;
     private String description;
 
+    @Builder
     public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
