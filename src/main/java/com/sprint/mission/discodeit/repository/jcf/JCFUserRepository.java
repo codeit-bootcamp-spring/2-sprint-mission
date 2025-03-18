@@ -11,7 +11,8 @@ public class JCFUserRepository implements UserRepository {
     private static final Map<UUID, User> users = new HashMap<>();
 
     @Override
-    public void save() { }
+    public void save() {
+    }
 
     @Override
     public void addUser(User user) {
@@ -28,6 +29,14 @@ public class JCFUserRepository implements UserRepository {
         return users.values().stream()
                 .filter(user -> userIds.contains(user.getId()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public User findUserByName(String username) {
+        return users.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override

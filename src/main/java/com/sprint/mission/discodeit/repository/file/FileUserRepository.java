@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.FileStorageManager;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -44,6 +43,14 @@ public class FileUserRepository implements UserRepository {
         return users.values().stream()
                 .filter(user -> userIds.contains(user.getId()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public User findUserByName(String username) {
+        return users.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
