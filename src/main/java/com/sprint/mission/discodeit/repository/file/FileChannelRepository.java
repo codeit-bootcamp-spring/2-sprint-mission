@@ -37,11 +37,14 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public Channel save(Channel channel) {
         Path path = resolvePath(channel.getId());
+
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
             oos.writeObject(channel);
+            oos.flush(); // 즉시 파일에 기록하도록 강제 실행 (프로그램이 끝나야 실행되는 close()를 바로 실행하는 것. 실시간 기록)
+            System.out.println("[DEBUG] 파일 저장 완료: " + path.toAbsolutePath());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

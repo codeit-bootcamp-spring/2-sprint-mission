@@ -11,10 +11,11 @@ import java.util.UUID;
 /*
 @Builder를 사용하면 자동으로 빌더 패턴이 적용된 생성자가 생성됨! // 아예 생성자를 작성할 필요가 없음.
 // 기존 방식은 생성자 호출 생성, 빌더 패턴은 객체 직접 생, 높은 가독성과 많은 매개변수로 인한 실수 가능성이 낮아짐.
-@Getter 추가해서 getId(), getName() 등 Getter 메서드 자동 생성
+@Getter 추가해서 getId(), getName() 등 Getter 메서드 자동 생성, 코드로 작성할 필요 없어짐.
 id, createdAt은 final로 선언해서 불변 객체 유지
  */
 
+@Getter
 @Builder
 public class Channel implements Serializable {
     @Serial
@@ -37,31 +38,31 @@ public class Channel implements Serializable {
 //        this.description = description;
 //    }
 
-    public UUID getId() {
-        return id;
-    }
+//    public UUID getId() {
+//        return id;
+//    }
+//
+//    public Long getCreatedAt() {
+//        return createdAt;
+//    }
+//
+//    public Long getUpdatedAt() {
+//        return updatedAt;
+//    }
+//
+//    public ChannelType getType() {
+//        return type;
+//    }
+//
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public String getDescription() {
+//        return description;
+//    }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public ChannelType getType() {
-        return type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void update(String newName, String newDescription) {
+    public void updateChannelInfo(String newName, String newDescription) {
         boolean anyValueUpdated = false;
         if (newName != null && !newName.equals(this.name)) {
             this.name = newName;

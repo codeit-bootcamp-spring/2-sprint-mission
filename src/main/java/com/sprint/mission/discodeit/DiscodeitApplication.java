@@ -25,9 +25,13 @@ public class DiscodeitApplication {
 
 	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
 		Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
+		Message message2 = messageService.create("헬로.", channel.getId(), author.getId());
+		Message message3 = messageService.create("하이.", channel.getId(), author.getId());
 		System.out.println("테스트 메시지 생성");
 		System.out.println("메세지 id: " + message.getId());
 		System.out.println("메세지 내용: " + message.getContent());
+		System.out.println("메세지 내용: " + message2.getContent());
+		System.out.println("메세지 내용: " + message3.getContent());
 	}
 
 	public static void main(String[] args) {

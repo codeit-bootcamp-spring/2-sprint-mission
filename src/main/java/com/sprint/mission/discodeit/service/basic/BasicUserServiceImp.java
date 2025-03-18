@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,12 +11,13 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 //@Service
+@RequiredArgsConstructor
 public class BasicUserServiceImp implements UserService {
     private final UserRepository userRepository;
 
-    public BasicUserServiceImp(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+//    public BasicUserServiceImp(UserRepository userRepository) {
+//        this.userRepository = userRepository;
+//    }
 
     @Override
     public User create(String username, String email, String password) {
@@ -38,7 +40,7 @@ public class BasicUserServiceImp implements UserService {
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword);
+        user.updateUserInfo(newUsername, newEmail, newPassword);
         return userRepository.save(user);
     }
 
