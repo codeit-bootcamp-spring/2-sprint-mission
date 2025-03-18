@@ -75,7 +75,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus update(ReadStatusUpdateDto readStatusUpdateDto) {
         ReadStatus readStatus = findById(readStatusUpdateDto.id());
-        readStatus.updateLastReadAt(readStatusUpdateDto.newLastReadAt());
+        readStatus.update(readStatusUpdateDto.newLastReadAt());
 
         return readStatus;
     }
