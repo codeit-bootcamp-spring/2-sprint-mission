@@ -13,6 +13,7 @@ import com.sprint.discodeit.repository.UserStatusRepository;
 import com.sprint.discodeit.repository.file.BaseUserStatusRepository;
 import com.sprint.discodeit.repository.file.FileUserRepository;
 import com.sprint.discodeit.service.UserServiceV1;
+import com.sprint.discodeit.service.util.UserStatusEvaluator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +26,7 @@ public class FileUserService implements UserServiceV1 {
 
     private final FileUserRepository fileUserRepository;
     private final BinaryServiceImpl binaryServiceImpl;
-    private final UserStatusService userStatusService;
+    private final UserStatusEvaluator userStatusEvaluator;
     private final BaseUserStatusRepository baseUserStatusRepository;
 
     public UserNameStatusResponse create(UserRequestDto userRequestDto, UserProfileImgResponseDto userProfileImgResponseDto) {
@@ -37,7 +38,7 @@ public class FileUserService implements UserServiceV1 {
         if (fileUserRepository.findByEmail(userRequestDto.email()).isPresent()) {
             throw new IllegalArgumentException("닉네임은 존재 하는 이메일 입니다. 확인 해주새요. ");
         }
-        // 상태 정보 시간에 따라 구분
+        // 이미지 기본 또는 사용자 지정 이미지 처리 하는 서비스
         BinaryContent profileImage = binaryServiceImpl.createProfileImage(userProfileImgResponseDto.imgUrl());
 
         //dto를 엔티티로 변환
@@ -57,18 +58,15 @@ public class FileUserService implements UserServiceV1 {
     @Override
     public UserResponse find(UUID userId) {
         User user = fileUserRepository.findById(userId.toString()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
-        UserStatus userStatus = baseUserStatusRepository.findUserId(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("상태를 찾지 못 하였습니다."));
-        return new UserResponse(user.getProfileId(), user.getUsername(), user.getEmail(), userStatus.getStatusType());
+        UserStatus userStatus = baseUserStatusRepository.findById(user.getUserStatus().toString())
+                        .orElseThrow(() -> new IllegalArgumentException("사용자에 상태를 찾을 수 없습니다. "));
+        String status = userStatusEvaluator.determineUserStatus(userStatus.getLastLoginTime());
+        return new UserResponse(user.getProfileId(), user.getUsername(), user.getEmail(), status);
     }
 
     @Override
     public List<User> findAll() {
         List<User> userAll = fileUserRepository.findByAll();
-        for(User user : userAll) {
-            Optional<UserStatus> userId = baseUserStatusRepository.findUserId(user.getId());
-            userId.orElseThrow(() -> new IllegalArgumentException("상태를 찾지 못 하였습니다."));
-        }
         return fileUserRepository.findByAll();
     }
 
