@@ -5,8 +5,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class Message implements Serializable {
 
 

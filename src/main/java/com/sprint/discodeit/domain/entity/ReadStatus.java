@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class ReadStatus implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -23,5 +25,10 @@ public class ReadStatus implements Serializable {
         this.lastReadMessageTime = lastReadMessageTime;
         this.readCheck = readCheck;
         this.channelId = channelId;
+    }
+
+    public void markAsRead(Instant newReadTime) {
+        this.lastReadMessageTime = newReadTime;
+        this.readCheck = true;
     }
 }
