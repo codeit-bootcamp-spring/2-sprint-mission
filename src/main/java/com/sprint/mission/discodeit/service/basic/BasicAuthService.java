@@ -9,7 +9,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.util.UserMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -34,7 +34,7 @@ public class BasicAuthService implements AuthService {
     }
 
     private void checkPassword(User user, LoginParam loginParam) {
-        if (!user.getPassword().equals(loginParam.password())) {
+        if (!StringUtils.equals(user.getPassword(), loginParam.password())) {
             throw new IllegalStateException("비밀번호가 틀립니다.");
         }
     }
