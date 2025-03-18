@@ -4,32 +4,28 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.UUID;
 
 @Getter
-public abstract class BaseEntity implements Serializable {
+public class BinaryContent implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
+    private UUID id;
     private final Instant createdAt;
-    private Instant updatedAt;
+    private byte[] fileData;
 
-    protected BaseEntity() {
-        this.id = UUID.randomUUID();
+    public BinaryContent(byte[] fileData) {
         this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-    }
-
-    protected void updateUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
+        this.fileData = fileData;
     }
 
     @Override
     public String toString() {
-        return "BaseEntity{" +
+        return "BinaryContent{" +
                 "id=" + id +
                 ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
+                ", fileData=" + Arrays.toString(fileData) +
                 '}';
     }
 }
