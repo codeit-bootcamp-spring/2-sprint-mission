@@ -13,8 +13,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -49,8 +47,11 @@ class FileChannelServiceTest {
     }
 
     private void setUpService() {
-        UserRepository userRepository = new FileUserRepository(userTestFilePath);
-        ChannelRepository channelRepository = new FileChannelRepository(channelTestFilePath);
+        FileUserRepository userRepository = new FileUserRepository();
+        userRepository.changePath(userTestFilePath);
+
+        FileChannelRepository channelRepository = new FileChannelRepository();
+        channelRepository.changePath(channelTestFilePath);
 
         userService = new FileUserService(userRepository);
         channelService = new FileChannelService(channelRepository, userRepository);

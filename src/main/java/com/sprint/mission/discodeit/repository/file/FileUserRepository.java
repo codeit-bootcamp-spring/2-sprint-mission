@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.discodeit.constant.FilePath.USER_FILE;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 
@@ -13,16 +14,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileUserRepository implements UserRepository {
-    private final Path userPath;
+    private Path userPath = STORAGE_DIRECTORY.resolve(USER_FILE);
 
-    public FileUserRepository(Path userPath) {
-        this.userPath = userPath;
+    public void changePath(Path path) {
+        this.userPath = path;
     }
 
     @Override
     public User save(User requestUser) {
         Map<UUID, User> users = loadObjectsFromFile(userPath);
-
         users.put(requestUser.getId(), requestUser);
 
         saveObjectsToFile(STORAGE_DIRECTORY, userPath, users);

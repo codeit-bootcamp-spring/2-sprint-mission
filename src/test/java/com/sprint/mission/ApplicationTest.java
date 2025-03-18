@@ -17,6 +17,7 @@ import testmethod.ConsoleTestTemplate;
 class ApplicationTest extends ConsoleTestTemplate {
     @AfterEach
     void tearDown() throws IOException {
+        // TODO: 3/18/25 나중에 빈 설정에서 Path 변수 수정 필요
         Files.deleteIfExists(STORAGE_DIRECTORY.resolve(USER_FILE));
         Files.deleteIfExists(STORAGE_DIRECTORY.resolve(CHANNEL_FILE));
         Files.deleteIfExists(STORAGE_DIRECTORY.resolve(MESSAGE_FILE));
@@ -27,11 +28,18 @@ class ApplicationTest extends ConsoleTestTemplate {
     void 초기_채널_생성_테스트() {
         run("6");
         assertThat(output()).contains("안녕하세요 코드잇2기 서버입니다.",
-                "—---------------------------------------------------------", " 코드잇 2기  | general",
+                "—---------------------------------------------------------",
+                " 코드잇 2기  | general",
                 "—---------------------------------------------------------",
                 "# general |                                      | # 황지환",
-                "—---------------------------------------------------------", "# 하고 싶은 기능 선택", "- 다른 채널 생성 : 1번",
-                "- 현재 채널에 친구 추가 : 2번", "- 현재 채널 이름변경 : 3번", "- 현재 채널에 메세지 입력 : 4번", "- 다른 채널 이동 : 5번", "- 종료 : 6번");
+                "—---------------------------------------------------------",
+                "# 하고 싶은 기능 선택",
+                "- 다른 채널 생성 : 1번",
+                "- 현재 채널에 친구 추가 : 2번",
+                "- 현재 채널 이름변경 : 3번",
+                "- 현재 채널에 메세지 입력 : 4번",
+                "- 다른 채널 이동 : 5번",
+                "- 종료 : 6번");
     }
 
     @DisplayName("변경된 채널명을 출력한다")

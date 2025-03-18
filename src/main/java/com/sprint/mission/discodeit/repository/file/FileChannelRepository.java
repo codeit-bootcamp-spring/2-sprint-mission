@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_FILE;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
@@ -13,10 +14,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository {
-    private final Path channelPath;
+    private Path channelPath = STORAGE_DIRECTORY.resolve(CHANNEL_FILE);
 
-    public FileChannelRepository(Path channelPath) {
-        this.channelPath = channelPath;
+    public void changePath(Path path) {
+        this.channelPath = path;
     }
 
     @Override

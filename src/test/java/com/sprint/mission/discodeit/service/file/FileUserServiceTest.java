@@ -34,7 +34,9 @@ class FileUserServiceTest {
     }
 
     private void setUpService() {
-        userService = new FileUserService(new FileUserRepository(userPath));
+        FileUserRepository userRepository = new FileUserRepository();
+        userRepository.changePath(userPath);
+        userService = new FileUserService(userRepository);
     }
 
     private void setUpTestPath() {

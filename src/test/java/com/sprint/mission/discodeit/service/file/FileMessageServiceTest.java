@@ -12,8 +12,6 @@ import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -51,8 +49,10 @@ class FileMessageServiceTest {
     }
 
     private void setUpService() {
-        UserRepository userRepository = new FileUserRepository(userTestFilePath);
-        MessageRepository messageRepository = new FileMessageRepository(messageTestFilePath);
+        FileUserRepository userRepository = new FileUserRepository();
+        userRepository.changePath(userTestFilePath);
+        FileMessageRepository messageRepository = new FileMessageRepository();
+        messageRepository.changePath(messageTestFilePath);
 
         userService = new FileUserService(userRepository);
         messageService = new FileMessageService(messageRepository, userRepository);

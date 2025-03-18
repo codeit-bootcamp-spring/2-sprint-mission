@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_FILE;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
@@ -13,10 +14,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
-    private final Path messagePath;
+    private Path messagePath = STORAGE_DIRECTORY.resolve(MESSAGE_FILE);
 
-    public FileMessageRepository(Path messagePath) {
-        this.messagePath = messagePath;
+    public void changePath(Path path) {
+        this.messagePath = path;
     }
 
     @Override
