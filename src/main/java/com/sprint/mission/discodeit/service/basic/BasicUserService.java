@@ -43,9 +43,8 @@ public class BasicUserService implements UserService {
 
     @CustomLogging
     @Override
-    public User register(UserCRUDDTO userCRUDDTO, Optional<BinaryContentDTO> binaryContentDTO) {
+    public User create(UserCRUDDTO userCRUDDTO, Optional<BinaryContentDTO> binaryContentDTO) {
         UserCRUDDTO checkDuplicate = UserCRUDDTO.checkDuplicate(userCRUDDTO.userName(), userCRUDDTO.email());
-
         try {
             checkDuplicate(checkDuplicate);
             User user = new User(userCRUDDTO.userName(), userCRUDDTO.email(), userCRUDDTO.password());
@@ -58,36 +57,17 @@ public class BasicUserService implements UserService {
 
             return user;
         } catch (DuplicateUserException e) {
-            throw new DuplicateUserException("중복된 유저가 존재합니다.");
+            throw new DuplicateUserException("register: 중복된 유저가 존재합니다.");
         }
     }
 
     @Override
     public UserFindDTO find(UUID userId) {
-        User user = userRepository.find(userId);
-        UserStatus userStatus = userStatusRepository.find(userId);
-        userStatus.isOnline();
+        try {
+            User user = userRepository.find(userId);
+            UserStatus userStatus = userStatusRepository.find(userId);
+            userStatus.isOnline();
 
-        UserFindDTO userFindDTO = UserFindDTO.find(
-                user.getId(),
-                user.getProfileId(),
-                user.getName(),
-                user.getEmail(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                userStatus
-        );
-
-        return userFindDTO;
-    }
-
-    @Override
-    public List<UserFindDTO> findAll() {
-        List<UserFindDTO> findList = new ArrayList<>();
-
-        List<User> userList = userRepository.findUserList();
-        for (User user : userList) {
-            UserStatus userStatus = userStatusRepository.find(user.getId());
             UserFindDTO userFindDTO = UserFindDTO.find(
                     user.getId(),
                     user.getProfileId(),
@@ -97,17 +77,39 @@ public class BasicUserService implements UserService {
                     user.getUpdatedAt(),
                     userStatus
             );
-            findList.add(userFindDTO);
+
+            return userFindDTO;
+        } catch (UserNotFoundException e) {
+            throw new UserNotFoundException("find: 유저를 찾을 수 없습니다.");
+        } catch (UserStatusNotFoundException e) {
+            throw new UserStatusNotFoundException("find: 유저 상태를 찾을 수 없습니다.");
         }
-        return findList;
+
     }
 
-
     @Override
-    public void print() {
-        List<User> list = userRepository.findUserList();
-        for (User user : list) {
-            System.out.println(user);
+    public List<UserFindDTO> findAll() {
+        List<UserFindDTO> findList = new ArrayList<>();
+        try {
+            List<User> userList = userRepository.findUserList();
+            for (User user : userList) {
+                UserStatus userStatus = userStatusRepository.find(user.getId());
+                UserFindDTO userFindDTO = UserFindDTO.find(
+                        user.getId(),
+                        user.getProfileId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getCreatedAt(),
+                        user.getUpdatedAt(),
+                        userStatus
+                );
+                findList.add(userFindDTO);
+            }
+            return findList;
+        } catch (EmptyUserListException e) {
+            throw new EmptyUserListException("findAll: 유저 리스트가 비어있습니다.");
+        } catch (UserStatusNotFoundException e) {
+            throw new UserStatusNotFoundException(("findAll: 유저 상태를 찾을 수 없습니다."));
         }
     }
 
@@ -118,11 +120,8 @@ public class BasicUserService implements UserService {
             User findUser = userRepository.find(userId);
             User update = userRepository.update(findUser, userCRUDDTO);
             return update;
-        } catch (EmptyException e) {
-            System.out.println("업데이트할 리스트가 존재하지 않습니다.");
-            return null;
-        } catch (NotFoundException e) {
-            System.out.println("업데이트할 유저가 존재하지 않습니다.");
+        } catch (UserNotFoundException e) {
+            System.out.println("update: 해당 유저가 존재하지 않습니다.");
             return null;
         }
     }
@@ -144,16 +143,16 @@ public class BasicUserService implements UserService {
 
             return true;
         } catch (UserNotFoundException e) {
-            System.out.println("유저를 찾지 못했습니다.");
+            System.out.println("delete: 유저를 찾지 못했습니다.");
             return false;
         } catch (UserStatusNotFoundException e) {
-            System.out.println("유저 상태를 찾지 못했습니다.");
+            System.out.println("delete: 유저 상태를 찾지 못했습니다.");
             return false;
         } catch (BinaryContentNotFoundException e) {
-            System.out.println("바이너리 정보를 찾지 못했습니다.");
+            System.out.println("delete: 바이너리 정보를 찾지 못했습니다.");
             return false;
         } catch (EmptyUserListException e) {
-            System.out.println("유저 리스트가 비어있습니다.");
+            System.out.println("delete: 유저 리스트가 비어있습니다.");
             return false;
         }
     }

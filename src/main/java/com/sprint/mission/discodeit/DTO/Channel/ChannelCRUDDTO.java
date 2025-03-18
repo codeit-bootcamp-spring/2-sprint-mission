@@ -92,16 +92,13 @@ public record ChannelCRUDDTO(
     /**
      * 특정 채널의 키(식별자)를 업데이트하기 위한 DTO를 생성합니다.
      *
-     * @param serverId 채널이 속한 서버의 ID
      * @param userId 업데이트를 요청하는 사용자의 ID
      * @param channelId 업데이트할 채널의 ID
      * @return 채널 키 업데이트 요청을 위한 {@link ChannelCRUDDTO} 객체
      */
-    public static ChannelCRUDDTO updateKey(UUID serverId,
-                                        UUID userId,
+    public static ChannelCRUDDTO updateKey(UUID userId,
                                         UUID channelId) {
         return ChannelCRUDDTO.builder()
-                .serverId(serverId)
                 .creatorId(userId)
                 .channelId(channelId).build();
     }

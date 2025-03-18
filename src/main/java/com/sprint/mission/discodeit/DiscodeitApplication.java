@@ -28,7 +28,7 @@ public class DiscodeitApplication {
 
 		UserCRUDDTO userDTO = UserCRUDDTO.create("test1", "test1", "123");
 
-		User user = userService.register(userDTO, optional);
+		User user = userService.create(userDTO, optional);
 		return user;
 	}
 

@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.UUID;
+
 /**
  * 서버 관리를 위한 서비스 인터페이스입니다.
  * 서버의 생성, 조회, 수정, 삭제 및 기타 관련 기능을 제공합니다.
@@ -43,22 +45,14 @@ public interface ServerService {
      * @param serverId 조회할 서버의 ID
      * @return 조회된 서버 객체
      */
-    Server find(String serverId);
+    Server find(UUID serverId);
     /**
      * 특정 소유자가 보유한 모든 서버 정보를 조회합니다.
      *
      * @param ownerId 서버 소유자의 ID
      * @return 소유자가 가진 서버 목록
      */
-    List<Server> findServerAll(String ownerId);
-
-    /**
-     * 특정 사용자의 서버 관련 정보를 출력합니다.
-     * 출력 방식은 구현 클래스에서 정의됩니다.
-     *
-     * @param userId 출력할 대상 사용자의 ID
-     */
-    void print(String userId);
+    List<Server> findServerAll(UUID ownerId);
 
     /**
      * 특정 서버를 삭제합니다.
@@ -74,6 +68,6 @@ public interface ServerService {
      * @param serverCRUDDTO 업데이트할 서버 정보 DTO
      * @return 서버 객체
      */
-    Server update(String serverId, ServerCRUDDTO serverCRUDDTO);
+    Server update(UUID serverId, ServerCRUDDTO serverCRUDDTO);
 
 }

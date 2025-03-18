@@ -25,7 +25,7 @@ public interface UserService {
      * @param userCRUDDTO 등록할 사용자 정보 DTO
      * @return 생성된 사용자의 고유 ID(UUID)
      */
-    User register(UserCRUDDTO userCRUDDTO, Optional<BinaryContentDTO> binaryContentDTO);
+    User create(UserCRUDDTO userCRUDDTO, Optional<BinaryContentDTO> binaryContentDTO);
     /**
      * 특정 사용자 ID에 대한 정보를 조회합니다.
      *
@@ -39,11 +39,7 @@ public interface UserService {
      * @return 모든 사용자의 정보를 포함한 리스트
      */
     List<UserFindDTO> findAll();
-    /**
-     * 현재 시스템의 사용자 정보를 출력합니다.
-     * 구체적인 출력 방식은 구현 클래스에서 정의됩니다.
-     */
-    void print();
+
     /**
      * 특정 사용자를 삭제합니다.
      *
