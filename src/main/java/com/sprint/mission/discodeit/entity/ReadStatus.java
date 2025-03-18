@@ -24,4 +24,8 @@ public class ReadStatus {
     public void updateLastReadAt() {
         this.lastReadAt = Instant.now();
     }
+
+    public void setRead(boolean isRead) {
+        this.isRead = isRead;
+    }
 }
