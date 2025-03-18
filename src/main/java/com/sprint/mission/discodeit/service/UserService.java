@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
 
@@ -13,6 +14,6 @@ public interface UserService {
     Optional<UserResponse> getUserById(UUID userId);
     List<UserResponse> getUsersByName(String name);
     List<UserResponse> getAllUsers();
-    void updateUser(UUID userId, String newName, String newEmail);
+    void updateUser(UpdateUserRequest request);
     void deleteUser(UUID userId);
 }

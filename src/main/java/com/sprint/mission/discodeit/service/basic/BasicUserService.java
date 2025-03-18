@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -91,11 +92,20 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateUser(UUID userId, String newName, String newEmail) {
-        userRepository.getUserById(userId).ifPresent(user -> {
+    public void updateUser(UpdateUserRequest request) {
+        userRepository.getUserById(request.userId()).ifPresent(user -> {
             Instant updatedTime = Instant.now();
-            user.update(newName, newEmail, updatedTime);
+            user.update(request.newName(), request.newEmail(), updatedTime);
             userRepository.save(user);
+
+            if(request.profileImageFileName() != null && request.profileImageFilePath() != null) {
+                BinaryContent profileImage = new BinaryContent(
+                        user.getId(),
+                        request.profileImageFileName(),
+                        request.profileImageFilePath()
+                );
+                binaryContentRepository.save(profileImage);
+            }
         });
     }
 
