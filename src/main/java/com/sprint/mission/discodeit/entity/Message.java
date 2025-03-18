@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Getter;
 
@@ -9,15 +10,15 @@ import lombok.Getter;
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private final UUID channelId;
     private final UUID userId;
     private String context;
 
     public Message(String context, UUID channelId, UUID userId) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().toEpochMilli();
+        this.createdAt = ZonedDateTime.now().toInstant();
         this.updatedAt = createdAt;
         this.userId = userId;
         this.channelId = channelId;
@@ -30,6 +31,6 @@ public class Message implements Serializable {
     }
 
     private void updateLastModified() {
-        this.updatedAt = Instant.now().toEpochMilli();
+        this.updatedAt = ZonedDateTime.now().toInstant();
     }
 }
