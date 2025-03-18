@@ -4,14 +4,15 @@ import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final ReadStatusRepository readStatusRepository;
+    private final ReadStatusService readStatusService;
     private final MessageRepository messageRepository;
 
     @Override
@@ -35,8 +36,8 @@ public class BasicChannelService implements ChannelService {
         channelRepository.save(newChannel);
 
         channelCreatePrivateDto.users().forEach(user -> {
-            ReadStatus readStatus = new ReadStatus(user.getId(), newChannel.getId());
-            readStatusRepository.save(readStatus);
+            ReadStatusCreateDto readStatusCreateDto = new ReadStatusCreateDto(user.getId(), newChannel.getId(), null);
+            readStatusService.create(readStatusCreateDto);
         });
 
         return newChannel;
@@ -73,7 +74,7 @@ public class BasicChannelService implements ChannelService {
         boolean isPrivate = channel.getType().equals(ChannelType.PRIVATE);
 
         List<UUID> userIds = isPrivate ?
-                readStatusRepository.findAll().stream()
+                readStatusService.findAll().stream()
                         .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                         .map(ReadStatus::getUserId)
                         .toList()
@@ -85,7 +86,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public List<ChannelResponseDto> findAllByUserId(UUID userId) {
         List<Channel> channels = channelRepository.findAll();
-        List<UUID> joinedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+        List<UUID> joinedChannelIds = readStatusService.findAllByUserId(userId).stream()
                 .map(ReadStatus::getChannelId)
                 .toList();
 
@@ -102,7 +103,7 @@ public class BasicChannelService implements ChannelService {
                     boolean isPrivate = channel.getType().equals(ChannelType.PRIVATE);
 
                     List<UUID> userIds = isPrivate ?
-                            readStatusRepository.findAll().stream()
+                            readStatusService.findAll().stream()
                                     .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
                                     .map(ReadStatus::getUserId)
                                     .toList()
@@ -138,7 +139,7 @@ public class BasicChannelService implements ChannelService {
         messageRepository.findAllByChannelId(channel.getId())
                 .forEach(message -> messageRepository.delete(message.getId()));
 
-        readStatusRepository.findAllByChannelId(channel.getId())
-                .forEach(readStatus -> readStatusRepository.delete(readStatus.getId()));
+        readStatusService.findAllByChannelId(channel.getId())
+                .forEach(readStatus -> readStatusService.delete(readStatus.getId()));
     }
 }
