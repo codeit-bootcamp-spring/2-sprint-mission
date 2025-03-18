@@ -9,15 +9,15 @@ import java.util.UUID;
 public interface ReadStatusService {
     ReadStatus create(ReadStatusCreateDto readStatusCreateDto);
 
-    ReadStatus findById(UUID id);
+    ReadStatus findById(UUID readStatusId);
 
     List<ReadStatus> findAll();
 
     List<ReadStatus> findAllByUserId(UUID userId);
 
     List<ReadStatus> findAllByChannelId(UUID channelId);
-    
+
     ReadStatus update(ReadStatusUpdateDto readStatusUpdateDto);
 
-    void delete(UUID id);
+    void delete(UUID readStatusId);
 }
