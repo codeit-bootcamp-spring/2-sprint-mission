@@ -18,7 +18,9 @@ public interface MessageRepository {
 
     List<Message> findAllByChannelId(UUID channelId);
 
+    List<Message> findAllByMessageId(UUID messageId);
+
     Message update(Message message, MessageCRUDDTO messageCRUDDTO);
 
-    void remove(Channel channel, Message message);
+    void remove(UUID messageId);
 }

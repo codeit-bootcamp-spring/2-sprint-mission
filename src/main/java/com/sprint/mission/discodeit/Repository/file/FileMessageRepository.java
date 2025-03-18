@@ -82,6 +82,21 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
+    public List<Message> findAllByMessageId(UUID messageId) {
+        if (messageList.isEmpty()) {
+            throw new EmptyMessageListException("Repository 에 저장된 메시지 리스트가 없습니다.");
+        }
+        List<Message> messages = messageList.values().stream().flatMap(List::stream)
+                .filter(message -> message.getMessageId().equals(messageId))
+                .toList();
+
+        if (messages.isEmpty()) {
+            throw new EmptyMessageListException("해당 채널에 저장된 메시지 리스트가 없습니다.");
+        }
+        return messages;
+    }
+
+    @Override
     public Message update(Message message, MessageCRUDDTO messageUpdateDTO) {
         if (messageUpdateDTO.text() != null) {
             message.setText(messageUpdateDTO.text());
@@ -94,8 +109,9 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void remove(Channel channel, Message message) {
-        List<Message> messages = messageList.get(channel.getChannelId());
+    public void remove(UUID messageId) {
+        List<Message> messages = findAllByMessageId(messageId);
+        Message message = find(messageId);
         messages.remove(message);
         fileRepository.save(messageList);
     }

@@ -79,6 +79,21 @@ public class JCFChannelRepository implements ChannelRepository {
         return channels;
     }
 
+    @Override
+    public List<Channel> findAllByChannelId(UUID channelId) {
+        if (channelList.isEmpty()) {
+            throw new EmptyChannelListException("Repository 에 저장된 채널 리스트가 없습니다.");
+        }
+        List<Channel> channels = channelList.values().stream()
+                .flatMap(List::stream)
+                .filter(channel -> channel.getChannelId().equals(channelId)).toList();
+        if (channels.isEmpty()) {
+            throw new EmptyChannelListException("해당 서버에 저장된 채널 리스트가 없습니다.");
+        }
+
+        return channels;
+    }
+
 
     @Override
     public Channel update(Channel targetChannel, ChannelCRUDDTO channelUpdateDTO) {
@@ -95,8 +110,9 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void remove(Server server, Channel channel) {
-        List<Channel> list = findAllByServerId(server.getServerId());
+    public void remove(UUID channelId) {
+        List<Channel> list = findAllByChannelId(channelId);
+        Channel channel = find(channelId);
         list.remove(channel);
     }
 }

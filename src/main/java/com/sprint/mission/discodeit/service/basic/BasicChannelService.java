@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.DTO.Request.ChannelCreateDTO;
+import com.sprint.mission.discodeit.DTO.RequestToService.ChannelJoinQuitDTO;
 import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelCRUDDTO;
 import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelDTO;
 import com.sprint.mission.discodeit.Exception.Empty.EmptyMessageListException;
@@ -37,19 +39,19 @@ public class BasicChannelService implements ChannelService {
 
     @CustomLogging
     @Override
-    public Channel create(ChannelCRUDDTO channelCRUDDTO) {
-        UUID serverId = channelCRUDDTO.serverId();
-        UUID creatorId = channelCRUDDTO.creatorId();
+    public Channel create(ChannelCreateDTO channelCreateDTO) {
+        UUID serverId = channelCreateDTO.serverId();
+        UUID creatorId = channelCreateDTO.creatorId();
         try {
             User user = userRepository.find(creatorId);
             Server findServer = serverRepository.find(serverId);
             Channel channel;
 
-            if (channelCRUDDTO.type() == ChannelType.PRIVATE) {
+            if (channelCreateDTO.type() == ChannelType.PRIVATE) {
                 channel = new Channel(findServer.getServerId(), user.getId(), null, ChannelType.PRIVATE);
                 createReadStatus(user, channel);
             } else {
-                channel = new Channel(findServer.getServerId(), user.getId(), channelCRUDDTO.name());
+                channel = new Channel(findServer.getServerId(), user.getId(), channelCreateDTO.name());
             }
 
             channelRepository.save(findServer, channel);
@@ -64,15 +66,12 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public User join(ChannelCRUDDTO channelCRUDDTO) {
-        UUID userId = channelCRUDDTO.creatorId();
-        UUID channelId = channelCRUDDTO.channelId();
-
-        User user = userRepository.find(userId);
-        Channel findChannel = channelRepository.find(channelId);
+    public User join(ChannelJoinQuitDTO channelJoinQuitDTO) {
+        Channel findChannel = channelRepository.find(channelJoinQuitDTO.channelId());
+        User user = userRepository.find(channelJoinQuitDTO.userId());
         User join = channelRepository.join(findChannel, user);
 
-        if (channelCRUDDTO.type() == ChannelType.PRIVATE) {
+        if (channelJoinQuitDTO.type() == ChannelType.PRIVATE) {
             createReadStatus(user, findChannel);
         }
 
@@ -81,13 +80,10 @@ public class BasicChannelService implements ChannelService {
 
     @CustomLogging
     @Override
-    public User quit(ChannelCRUDDTO channelCRUDDTO) {
+    public User quit(ChannelJoinQuitDTO channelJoinQuitDTO) {
 
-        UUID userId = channelCRUDDTO.creatorId();
-        UUID channelId = channelCRUDDTO.channelId();
-
-        User user = userRepository.find(userId);
-        Channel findChannel = channelRepository.find(channelId);
+        Channel findChannel = channelRepository.find(channelJoinQuitDTO.channelId());
+        User user = userRepository.find(channelJoinQuitDTO.userId());
 
         User quit = channelRepository.quit(findChannel, user);
 
@@ -136,24 +132,15 @@ public class BasicChannelService implements ChannelService {
 
     @CustomLogging
     @Override
-    public boolean delete(ChannelCRUDDTO channelCRUDDTO) {
-        UUID serverId = channelCRUDDTO.serverId();
-        UUID userId = channelCRUDDTO.creatorId();
-        UUID channelId = channelCRUDDTO.channelId();
+    public boolean delete(String channelId) {
+        UUID channelUUID = UUID.fromString(channelId);
 
         try {
-            Server findServer = serverRepository.find(serverId);
-            Channel findChannel = channelRepository.find(channelId);
+            channelRepository.remove(channelUUID);
+            deleteAllMessage(channelUUID);
+            deleteAllReadStatus(channelUUID);
+            return true;
 
-            if (findChannel.getCreatorId().equals(userId)) {
-                channelRepository.remove(findServer, findChannel);
-                deleteAllMessage(findChannel);
-                deleteAllReadStatus(findChannel);
-                return true;
-            } else {
-                System.out.println("채널 삭제 권한 없음");
-                return false;
-            }
         } catch (MessageNotFoundException e) {
             System.out.println("삭제 중 메시지 함이 없습니다.");
             return false;
@@ -211,15 +198,15 @@ public class BasicChannelService implements ChannelService {
         readStatusRepository.save(readStatus);
     }
 
-    private void deleteAllMessage(Channel channel) {
-        List<Message> list = messageRepository.findAllByChannelId(channel.getChannelId());
+    private void deleteAllMessage(UUID channelId) {
+        List<Message> list = messageRepository.findAllByChannelId(channelId);
         for (Message message : list) {
-            messageRepository.remove(channel, message);
+            messageRepository.remove(message.getMessageId());
         }
     }
 
-    private void deleteAllReadStatus(Channel channel) {
-        List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channel.getChannelId());
+    private void deleteAllReadStatus(UUID channelId) {
+        List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channelId);
         for (ReadStatus status : readStatusList) {
             readStatusRepository.delete(status.getReadStatusId());
         }

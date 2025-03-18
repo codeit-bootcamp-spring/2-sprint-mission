@@ -21,9 +21,11 @@ public interface ChannelRepository {
 
     Channel find(UUID channelId);
 
+    List<Channel> findAllByChannelId(UUID channelId);
+
     List<Channel> findAllByServerId(UUID serverId);
 
     Channel update(Channel channel, ChannelCRUDDTO channelUpdateDTO);
 
-    void remove(Server server, Channel channel);
+    void remove(UUID channelId);
 }

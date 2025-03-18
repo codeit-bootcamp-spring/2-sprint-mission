@@ -1,15 +1,13 @@
 package com.sprint.mission.discodeit.Controller;
 
+import com.sprint.mission.discodeit.DTO.Request.UserLoginDTO;
 import com.sprint.mission.discodeit.DTO.Request.UserRegisterRequestDTO;
-import com.sprint.mission.discodeit.DTO.Request.UserStatusDTO;
 import com.sprint.mission.discodeit.DTO.Request.UserUpdateRequestDTO;
 import com.sprint.mission.discodeit.DTO.RequestToService.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.DTO.RequestToService.UserCreateDTO;
-import com.sprint.mission.discodeit.DTO.Request.UserLoginDTO;
 import com.sprint.mission.discodeit.DTO.RequestToService.UserUpdateDTO;
 import com.sprint.mission.discodeit.DTO.legacy.User.UserFindDTO;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
