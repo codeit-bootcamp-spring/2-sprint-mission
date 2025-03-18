@@ -9,9 +9,9 @@ public interface UserStatusRepository {
 
     List<UserStatus> findAll();
 
-    UserStatus findById(UUID userId);
+    UserStatus findById(UUID userStatusId);
 
     UserStatus findByUserId(UUID userId);
 
-    void delete(UUID userId);
+    void delete(UUID userStatusId);
 }
