@@ -1,6 +1,6 @@
 package com.sprint.discodeit.service.util;
 
-import com.sprint.discodeit.domain.entity.StatusType;
+import com.sprint.discodeit.domain.StatusType;
 import java.time.Duration;
 import java.time.Instant;
 import org.springframework.stereotype.Component;

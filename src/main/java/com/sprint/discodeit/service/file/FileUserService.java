@@ -5,7 +5,7 @@ import com.sprint.discodeit.domain.dto.UserProfileImgResponseDto;
 import com.sprint.discodeit.domain.dto.UserResponse;
 import com.sprint.discodeit.domain.dto.UserUpdateRequest;
 import com.sprint.discodeit.domain.entity.BinaryContent;
-import com.sprint.discodeit.domain.entity.StatusType;
+import com.sprint.discodeit.domain.StatusType;
 import com.sprint.discodeit.domain.entity.UserStatus;
 import com.sprint.discodeit.domain.mapper.UserMapper;
 import com.sprint.discodeit.domain.dto.UserRequestDto;

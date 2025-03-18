@@ -3,7 +3,7 @@ package com.sprint.discodeit.service;
 
 
 import com.sprint.discodeit.domain.entity.Channel;
-import com.sprint.discodeit.domain.entity.ChannelType;
+import com.sprint.discodeit.domain.ChannelType;
 import java.util.List;
 import java.util.UUID;
 

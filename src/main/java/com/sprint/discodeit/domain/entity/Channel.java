@@ -1,5 +1,6 @@
 package com.sprint.discodeit.domain.entity;
 
+import com.sprint.discodeit.domain.ChannelType;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
