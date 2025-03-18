@@ -13,11 +13,11 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 @Repository
 public class FileUserRepository implements FileRepository<User>, UserRepository {
     private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "users");
     private final Map<UUID, User> userMap;
-
 
     public FileUserRepository() {
         SerializationUtil.init(directory);
@@ -39,7 +39,26 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(userMap.values());
+        return userMap.values().stream().toList();
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return userMap.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userMap.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userMap.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
     }
 
     @Override

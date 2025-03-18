@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.util.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -21,9 +22,20 @@ public class BasicAuthService implements AuthService {
 
     @Override
     public UserDTO login(LoginParam loginParam) {
-        User user = userRepository.findByUsernameAndPassword(loginParam.username(), loginParam.password())
-                .orElseThrow(() -> new NoSuchElementException("해당 username과 password와 일치하는 유저가 없습니다."));
+        User user = findUserByUsername(loginParam);
+        checkPassword(user, loginParam);
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
         return UserMapper.userEntityToDTO(user, userStatus);
+    }
+
+    private User findUserByUsername(LoginParam loginParam) {
+        return userRepository.findByUsername(loginParam.username())
+                .orElseThrow(() -> new NoSuchElementException("해당 username과 일치하는 유저가 없습니다."));
+    }
+
+    private void checkPassword(User user, LoginParam loginParam) {
+        if (!user.getPassword().equals(loginParam.password())) {
+            throw new IllegalStateException("비밀번호가 틀립니다.");
+        }
     }
 }

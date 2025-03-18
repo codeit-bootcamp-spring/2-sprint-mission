@@ -2,26 +2,17 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class JCFUserRepository implements UserRepository {
-    private static volatile JCFUserRepository instance;
     private final Map<UUID, User> data;
 
-    public static JCFUserRepository getInstance() {
-        if (instance == null) {
-            synchronized (JCFUserRepository.class) {
-                if (instance == null) {
-                    instance = new JCFUserRepository();
-                }
-            }
-        }
-        return instance;
-    }
-
     private JCFUserRepository() {
-        this.data = new HashMap<>();
+        this.data = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -40,6 +31,24 @@ public class JCFUserRepository implements UserRepository {
         return data.values().stream().toList();
     }
 
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return data.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return data.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return data.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+    }
 
     @Override
     public void deleteById(UUID userId) {
