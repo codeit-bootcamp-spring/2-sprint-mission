@@ -4,6 +4,7 @@ import com.sprint.discodeit.domain.dto.UserNameStatusResponse;
 import com.sprint.discodeit.domain.dto.UserProfileImgResponseDto;
 import com.sprint.discodeit.domain.dto.UserResponse;
 import com.sprint.discodeit.domain.entity.BinaryContent;
+import com.sprint.discodeit.domain.entity.StatusType;
 import com.sprint.discodeit.domain.entity.UserStatus;
 import com.sprint.discodeit.domain.mapper.UserMapper;
 import com.sprint.discodeit.domain.dto.UserRequestDto;
@@ -32,18 +33,24 @@ public class FileUserService implements UserServiceV1 {
         if (fileUserRepository.findByUsername(userRequestDto.username()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 회원입니다. 확인 해주세요.");
         }
-
         // 이메일과 닉네임이 동일한지 확인
         if (fileUserRepository.findByEmail(userRequestDto.email()).isPresent()) {
             throw new IllegalArgumentException("닉네임은 존재 하는 이메일 입니다. 확인 해주새요. ");
         }
+        // 상태 정보 시간에 따라 구분
         BinaryContent profileImage = binaryServiceImpl.createProfileImage(userProfileImgResponseDto.imgUrl());
+
+        //dto를 엔티티로 변환
         User userMapper = UserMapper.toUserMapper(userRequestDto,profileImage.getId());
-        String status = userStatusService.getUserStatus(userMapper.getCreatedAt());
-        UserStatus userStatus = new UserStatus(userMapper.getId(), userMapper.getCreatedAt(), status);
+
+        UserStatus userStatus = new UserStatus(userMapper.getCreatedAt(), StatusType.Active.getExplanation());
+
+        // 저장
+        baseUserStatusRepository.save(userStatus);
+        fileUserRepository.save(userMapper);
 
         // User -> UserNameResponse 변환
-        return new UserNameStatusResponse(userMapper.getUsername(), status);
+        return new UserNameStatusResponse(userMapper.getUsername(), userStatus.getStatusType());
     }
 
 
@@ -57,6 +64,11 @@ public class FileUserService implements UserServiceV1 {
 
     @Override
     public List<User> findAll() {
+        List<User> userAll = fileUserRepository.findByAll();
+        for(User user : userAll) {
+            Optional<UserStatus> userId = baseUserStatusRepository.findUserId(user.getId());
+            userId.orElseThrow(() -> new IllegalArgumentException("상태를 찾지 못 하였습니다."));
+        }
         return fileUserRepository.findByAll();
     }
 

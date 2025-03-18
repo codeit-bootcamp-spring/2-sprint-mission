@@ -1,5 +1,6 @@
 package com.sprint.discodeit.repository.file;
 
+import com.sprint.discodeit.domain.entity.Channel;
 import com.sprint.discodeit.domain.entity.UserStatus;
 import com.sprint.discodeit.repository.UserStatusRepository;
 import com.sprint.discodeit.repository.util.AbstractFileRepository;
@@ -39,4 +40,19 @@ public class BaseUserStatusRepository extends AbstractFileRepository<UserStatus>
 
     }
 
+
+    @Override
+    public void save(UserStatus userStatus) {
+        Map<UUID, UserStatus> userStatusMap = loadAll();
+        if (userStatusMap.containsKey(userStatus.getId())) {
+            System.out.println("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + userStatus.getId());
+        }
+        userStatusMap.put(userStatus.getId(), userStatus);
+        writeToFile(userStatusMap);
+    }
+
+
+    @Override
+    public void delete(UUID uuId) {
+    }
 }

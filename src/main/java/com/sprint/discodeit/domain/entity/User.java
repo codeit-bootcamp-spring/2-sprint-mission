@@ -19,6 +19,7 @@ public class User implements Serializable {
     private String username;
     private String email;
     private String password;
+    private UUID userStatus;
 
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
@@ -27,6 +28,10 @@ public class User implements Serializable {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    public void associateStatus(UserStatus userStatus) {
+        this.userStatus = userStatus.getId();
     }
 
     public void update(String newUsername, String newEmail, String newPassword) {
