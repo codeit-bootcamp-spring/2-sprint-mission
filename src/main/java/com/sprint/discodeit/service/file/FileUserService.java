@@ -35,7 +35,6 @@ public class FileUserService implements UserServiceV1 {
     private final BaseUserStatusRepository baseUserStatusRepository;
     private final BaseBinaryContentRepository baseBinaryContentRepository;
 
-
     public UserNameStatusResponse create(UserRequestDto userRequestDto, UserProfileImgResponseDto userProfileImgResponseDto) {
         // 중복된 유저 확인
         if (fileUserRepository.findByUsername(userRequestDto.username()).isPresent()) {

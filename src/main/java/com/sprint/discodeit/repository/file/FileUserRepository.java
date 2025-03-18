@@ -64,4 +64,10 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
         Map<UUID, User> users = loadAll();
         return users.values().stream().filter(user -> user.getEmail().equals(email)).findFirst();
     }
+
+    public Optional<User> findByPassword(String password) {
+        Map<UUID, User> users = loadAll();
+        return users.values().stream().filter(user -> user.getPassword().equals(password)).findFirst();
+    }
+
 }
