@@ -41,7 +41,7 @@ public class UserManagementService {
             binaryContentRepository.save(new BinaryContent(request.getProfileId(), user.getId(), null, new byte[0]));
         }
 
-        UserStatus userStatus = new UserStatus(UUID.randomUUID(), user.getId(), Instant.now());
+        UserStatus userStatus = new UserStatus(UUID.randomUUID(), user.getId(), "ONLINE", Instant.now());
         userStatusRepository.save(userStatus);
     }
 
