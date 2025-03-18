@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
 import com.sprint.mission.discodeit.DTO.Channel.ChannelDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundException;
+import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.Repository.*;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -31,7 +31,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public UUID create(ChannelCRUDDTO channelCRUDDTO) {
+    public Channel create(ChannelCRUDDTO channelCRUDDTO) {
         UUID serverId = channelCRUDDTO.serverId();
         UUID creatorId = channelCRUDDTO.creatorId();
 
@@ -49,7 +49,7 @@ public class BasicChannelService implements ChannelService {
         channelRepository.save(findServer, channel);
         channelRepository.join(channel, user);
 
-        return channel.getChannelId();
+        return channel;
     }
 
     private void createReadStatus(User user, Channel channel) {
@@ -59,7 +59,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public UUID join(ChannelCRUDDTO channelCRUDDTO) {
+    public User join(ChannelCRUDDTO channelCRUDDTO) {
 
         UUID userId = channelCRUDDTO.creatorId();
         UUID channelId = channelCRUDDTO.channelId();
@@ -72,11 +72,11 @@ public class BasicChannelService implements ChannelService {
             createReadStatus(user, findChannel);
         }
 
-        return uuid;
+        return join;
     }
 
     @Override
-    public UUID quit(ChannelCRUDDTO channelCRUDDTO) {
+    public User quit(ChannelCRUDDTO channelCRUDDTO) {
 
         UUID userId = channelCRUDDTO.creatorId();
         UUID channelId = channelCRUDDTO.channelId();
@@ -86,7 +86,7 @@ public class BasicChannelService implements ChannelService {
 
         User quit = channelRepository.quit(findChannel, user);
 
-        return quit.getId();
+        return quit;
     }
 
     @Override

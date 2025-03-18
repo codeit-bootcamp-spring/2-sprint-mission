@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.Message.MessageCRUDDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
-import com.sprint.mission.discodeit.Exception.EmptyExceptions;
+import com.sprint.mission.discodeit.Exception.Empty.EmptyMessageListException;
+import com.sprint.mission.discodeit.Exception.NotFound.MessageNotFoundException;
 import com.sprint.mission.discodeit.Repository.MessageRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -38,19 +38,19 @@ public class JCFMessageRepository implements MessageRepository {
     public Message find(UUID messageId) {
         List<Message> list = messageList.values().stream().flatMap(List::stream).toList();
         Message message = CommonUtils.findById(list, messageId, Message::getMessageId)
-                .orElseThrow(() -> NotFoundExceptions.MESSAGE_NOT_FOUND);
+                .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
         return message;
     }
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         if (messageList.isEmpty()) {
-            throw EmptyExceptions.EMPTY_MESSAGE_LIST;
+            throw new EmptyMessageListException("Repository 에 저장된 메시지 리스트가 없습니다.");
         }
         List<Message> messages = messageList.get(channelId);
 
         if (messages.isEmpty()) {
-            throw EmptyExceptions.EMPTY_MESSAGE_LIST;
+            throw new EmptyMessageListException("해당 채널에 저장된 메시지 리스트가 없습니다.");
         }
         return messages;
     }

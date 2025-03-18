@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.DTO.Channel.*;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,23 +24,23 @@ public interface ChannelService {
      * 새로운 채널을 생성하고 고유한 채널 ID(UUID)를 반환합니다.
      *
      * @param channelCRUDDTO 생성할 채널 정보 DTO
-     * @return 생성된 채널의 고유 ID(UUID)
+     * @return 생성된 채널 객체
      */
-    UUID create(ChannelCRUDDTO channelCRUDDTO);
+    Channel create(ChannelCRUDDTO channelCRUDDTO);
     /**
      * 기존 채널에 참가하고 참가한 채널의 고유 ID(UUID)를 반환합니다.
      *
      * @param channelCRUDDTO 참가할 채널 정보 DTO
-     * @return 참가한 채널의 고유 ID(UUID)
+     * @return 참가한 유저
      */
-    UUID join(ChannelCRUDDTO channelCRUDDTO);
+    User join(ChannelCRUDDTO channelCRUDDTO);
     /**
      * 특정 채널에서 사용자를 탈퇴시키고 탈퇴한 채널의 고유 ID(UUID)를 반환합니다.
      *
      * @param channelCRUDDTO 탈퇴할 채널 정보 DTO
-     * @return 탈퇴한 채널의 고유 ID(UUID)
+     * @return 탈퇴한 유저 객체
      */
-    UUID quit(ChannelCRUDDTO channelCRUDDTO);
+    User quit(ChannelCRUDDTO channelCRUDDTO);
     /**
      * 특정 채널 ID를 기반으로 채널 정보를 조회합니다.
      *

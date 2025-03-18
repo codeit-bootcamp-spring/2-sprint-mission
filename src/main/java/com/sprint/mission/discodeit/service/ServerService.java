@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.Server.*;
+import com.sprint.mission.discodeit.DTO.Server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
-import java.util.UUID;
 /**
  * 서버 관리를 위한 서비스 인터페이스입니다.
  * 서버의 생성, 조회, 수정, 삭제 및 기타 관련 기능을 제공합니다.
@@ -20,16 +20,23 @@ public interface ServerService {
      * 새로운 서버를 생성하고 고유한 서버 ID(UUID)를 반환합니다.
      *
      * @param serverCRUDDTO 생성할 서버 정보 DTO
-     * @return 생성된 서버의 고유 ID(UUID)
+     * @return 생성된 서버 객체
      */
-    UUID create(ServerCRUDDTO serverCRUDDTO);
+    Server create(ServerCRUDDTO serverCRUDDTO);
     /**
-     * 기존 서버에 참여하고 참여한 서버의 고유 ID(UUID)를 반환합니다.
+     * 기존 서버에 참여하고 참여한 유저 객체를 반환합니다.
      *
      * @param serverCRUDDTO 참여할 서버 정보 DTO
-     * @return 참여한 서버의 고유 ID(UUID)
+     * @return 참여한 유저 객체
      */
-    UUID join(ServerCRUDDTO serverCRUDDTO);
+    User join(ServerCRUDDTO serverCRUDDTO);
+    /**
+     * 기존 서버에 탈퇴하고 참여한 유저를 반환합니다.
+     *
+     * @param serverCRUDDTO 탈퇴할 서버 정보 DTO
+     * @return 탈퇴한 유저 객체
+     */
+    User quit(ServerCRUDDTO serverCRUDDTO);
     /**
      * 특정 서버 ID를 기반으로 서버 정보를 조회합니다.
      *
@@ -65,8 +72,8 @@ public interface ServerService {
      *
      * @param serverId      업데이트할 서버의 ID
      * @param serverCRUDDTO 업데이트할 서버 정보 DTO
-     * @return 업데이트 성공 여부, 성공하면 {@code true}, 실패하면 {@code false}
+     * @return 서버 객체
      */
-    boolean update(String serverId, ServerCRUDDTO serverCRUDDTO);
+    Server update(String serverId, ServerCRUDDTO serverCRUDDTO);
 
 }

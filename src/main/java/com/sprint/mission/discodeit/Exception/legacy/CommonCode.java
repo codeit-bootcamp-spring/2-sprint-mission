@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.Exception;
+package com.sprint.mission.discodeit.Exception.legacy;
 
 public enum CommonCode implements Code{
     USER_NOT_FOUND("유저를 찾을 수 없습니다."),

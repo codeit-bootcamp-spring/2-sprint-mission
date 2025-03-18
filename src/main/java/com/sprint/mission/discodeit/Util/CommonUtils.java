@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Util;
 
-import com.sprint.mission.discodeit.Exception.ValidExceptions;
+import com.sprint.mission.discodeit.Exception.Valid.DuplicateUserException;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +21,7 @@ public class CommonUtils {
     }
 
     public static <T> void checkUserDuplicate(List<T> list, String data, Function<T, String> function) {
-        list.stream().filter(t->function.apply(t).equals(data)).findFirst().ifPresent(t -> {throw ValidExceptions.DUPLICATE_USER;});
+        list.stream().filter(t->function.apply(t).equals(data)).findFirst().ifPresent(t -> {throw new DuplicateUserException("중복된 유저가 존재합니다.");});
     }
 
 }

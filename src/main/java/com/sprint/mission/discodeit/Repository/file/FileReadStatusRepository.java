@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusCRUDDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundException;
-import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
-import com.sprint.mission.discodeit.Exception.EmptyExceptions;
+import com.sprint.mission.discodeit.Exception.Empty.EmptyReadStatusListException;
+import com.sprint.mission.discodeit.Exception.NotFound.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.Exception.NotFound.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
@@ -29,7 +29,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         this.fileRepository = new FileRepositoryImpl<>(path);
         try {
             this.readStatusList = fileRepository.load();
-        } catch (NotFoundException e) {
+        } catch (SaveFileNotFoundException e) {
             System.out.println("FileReadStatusRepository init");
         }
     }
@@ -44,19 +44,19 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public ReadStatus find(UUID readStatusId) {
         ReadStatus status = CommonUtils.findById(readStatusList, readStatusId, ReadStatus::getReadStatusId)
-                .orElseThrow(() -> NotFoundExceptions.READ_STATUS_NOT_FOUND);
+                .orElseThrow(() -> new ReadStatusNotFoundException("읽기 상태를 찾을 수 없습니다."));
         return status;
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userID) {
         if (readStatusList.isEmpty()) {
-            throw EmptyExceptions.EMPTY_READ_STATUS_LIST;
+            throw new EmptyReadStatusListException("Repository 에 저장된 읽기 상태 리스트가 없습니다.");
         }
         List<ReadStatus> list = CommonUtils.findAllById(readStatusList, userID, ReadStatus::getUserId);
 
         if (list.isEmpty()) {
-            throw EmptyExceptions.EMPTY_READ_STATUS_LIST;
+            throw new EmptyReadStatusListException("해당 서버에 저장된 읽기 상태 리스트가 없습니다.");
         }
         return list;
     }
@@ -64,13 +64,13 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
         if (readStatusList.isEmpty()) {
-            throw EmptyExceptions.EMPTY_READ_STATUS_LIST;
+            throw new EmptyReadStatusListException("Repository 에 저장된 읽기 상태 리스트가 없습니다.");
         }
 
         List<ReadStatus> list = CommonUtils.findAllById(readStatusList, channelId, ReadStatus::getChannelId);
 
         if (list.isEmpty()) {
-            throw EmptyExceptions.EMPTY_READ_STATUS_LIST;
+            throw new EmptyReadStatusListException("해당 서버에 저장된 읽기 상태 리스트가 없습니다.");
         }
         return list;
     }

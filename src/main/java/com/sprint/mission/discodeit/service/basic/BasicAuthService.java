@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
-import com.sprint.mission.discodeit.Exception.ValidExceptions;
+import com.sprint.mission.discodeit.Exception.NotFound.UserNotFoundException;
+import com.sprint.mission.discodeit.Exception.Valid.InvalidPasswordException;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.User;
@@ -20,10 +20,10 @@ public class BasicAuthService implements AuthService {
     public User loginUser(UserCRUDDTO userLoginDTO) {
         List<User> list = userRepository.findUserList();
         User user = CommonUtils.findByName(list, userLoginDTO.userName(), User::getName)
-                .orElseThrow(() -> NotFoundExceptions.USER_NOT_FOUND);
+                .orElseThrow(() -> new UserNotFoundException("로그인 실패: 해당 유저를 찾지 못했습니다."));
         boolean login = user.getPassword().equals(userLoginDTO.password());
         if (login == false) {
-            throw ValidExceptions.INVALID_PASSWORD;
+            throw new InvalidPasswordException("로그인 실패: 비밀번호가 틀립니다.");
         }
         return user;
     }

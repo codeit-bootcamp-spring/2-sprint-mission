@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusCRUDDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundException;
-import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
-import com.sprint.mission.discodeit.Exception.EmptyExceptions;
+import com.sprint.mission.discodeit.Exception.Empty.EmptyUserStatusListException;
+import com.sprint.mission.discodeit.Exception.NotFound.SaveFileNotFoundException;
+import com.sprint.mission.discodeit.Exception.NotFound.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -29,7 +29,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
         try {
             this.userStatusList = fileRepository.load();
-        } catch (NotFoundException e) {
+        } catch (SaveFileNotFoundException e) {
             System.out.println("FileUserStatusRepository init");
         }
     }
@@ -44,14 +44,14 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public UserStatus find(UUID userId) {
         UserStatus status = userStatusList.stream().filter(userStatus -> userStatus.getUserId().equals(userId))
-                .findFirst().orElseThrow(() -> NotFoundExceptions.USER_STATUS_NOT_FOUND);
+                .findFirst().orElseThrow(() -> new UserStatusNotFoundException("유저 상태를 찾지 못했습니다."));
         return status;
     }
 
     @Override
     public List<UserStatus> findAll() {
         if (userStatusList.isEmpty()) {
-            throw EmptyExceptions.EMPTY_USER_STATUS_LIST;
+            throw new EmptyUserStatusListException("Repository 내 유저 상태 리스트가 비어있습니다.");
         }
         return userStatusList;
     }

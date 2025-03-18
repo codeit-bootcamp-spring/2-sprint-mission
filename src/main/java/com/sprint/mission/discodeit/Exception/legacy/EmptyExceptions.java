@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.Exception;
+package com.sprint.mission.discodeit.Exception.legacy;
 
 public class EmptyExceptions {
     public static EmptyException EMPTY_SERVER_LIST = new EmptyException(CommonCode.EMPTY_SERVER_LIST);

@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.Repository;
 
-import com.sprint.mission.discodeit.Exception.EmptyException;
-import com.sprint.mission.discodeit.Exception.NotFoundException;
-import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
+import com.sprint.mission.discodeit.Exception.NotFound.SaveFileNotFoundException;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -43,7 +41,7 @@ public class FileRepositoryImpl<T> implements FileRepository<T> {
                 throw new RuntimeException(e);
             }
         }
-        throw NotFoundExceptions.File_NOT_FOUND;
+        throw new SaveFileNotFoundException("해당 파일을 찾을 수 없습니다.");
     }
 
     @Override

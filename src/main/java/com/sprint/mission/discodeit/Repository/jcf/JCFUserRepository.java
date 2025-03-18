@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
-import com.sprint.mission.discodeit.Exception.EmptyUserListException;
+import com.sprint.mission.discodeit.Exception.Empty.EmptyUserListException;
+import com.sprint.mission.discodeit.Exception.NotFound.UserNotFoundException;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.User;
@@ -34,7 +34,7 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public User find(UUID userId) {
         User user = CommonUtils.findById(userList, userId, User::getId)
-                .orElseThrow(() -> NotFoundExceptions.USER_NOT_FOUND);
+                .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
         return user;
     }
 

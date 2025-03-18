@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.Exception;
+package com.sprint.mission.discodeit.Exception.Empty;
 
 public class EmptyUserListException extends RuntimeException {
     public EmptyUserListException(String message) {

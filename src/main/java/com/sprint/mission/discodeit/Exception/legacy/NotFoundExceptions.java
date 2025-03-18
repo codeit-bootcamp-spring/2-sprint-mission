@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.Exception;
+package com.sprint.mission.discodeit.Exception.legacy;
 
 public class NotFoundExceptions {
     public static NotFoundException USER_NOT_FOUND = new NotFoundException(CommonCode.USER_NOT_FOUND);

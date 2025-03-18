@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusCRUDDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
-import com.sprint.mission.discodeit.Exception.EmptyExceptions;
+import com.sprint.mission.discodeit.Exception.Empty.EmptyUserStatusListException;
+import com.sprint.mission.discodeit.Exception.NotFound.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,14 +26,14 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public UserStatus find(UUID userId) {
         UserStatus status = userStatusList.stream().filter(userStatus -> userStatus.getUserId().equals(userId))
-                .findFirst().orElseThrow(() -> NotFoundExceptions.USER_STATUS_NOT_FOUND);
+                .findFirst().orElseThrow(() -> new UserStatusNotFoundException("유저 상태를 찾지 못했습니다."));
         return status;
     }
 
     @Override
     public List<UserStatus> findAll() {
         if (userStatusList.isEmpty()) {
-            throw EmptyExceptions.EMPTY_USER_STATUS_LIST;
+            throw new EmptyUserStatusListException("Repository 내 유저 상태 리스트가 비어있습니다.");
         }
         return userStatusList;
     }

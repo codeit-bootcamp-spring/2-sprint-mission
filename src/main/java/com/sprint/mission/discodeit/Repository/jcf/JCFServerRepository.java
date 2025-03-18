@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.Server.ServerCRUDDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
-import com.sprint.mission.discodeit.Exception.EmptyExceptions;
-import com.sprint.mission.discodeit.Exception.EmptyUserListException;
+import com.sprint.mission.discodeit.Exception.Empty.EmptyServerListException;
+import com.sprint.mission.discodeit.Exception.Empty.EmptyUserListException;
+import com.sprint.mission.discodeit.Exception.NotFound.ServerNotFoundException;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.Server;
@@ -59,18 +59,18 @@ public class JCFServerRepository implements ServerRepository {
     public Server find(UUID serverId) {
         List<Server> list = serverList.values().stream().flatMap(List::stream).toList();
         Server server = CommonUtils.findById(list, serverId, Server::getServerId)
-                .orElseThrow(() -> NotFoundExceptions.SERVER_NOT_FOUND);
+                .orElseThrow(() -> new ServerNotFoundException("서버를 찾을 수 없습니다."));
         return server;
     }
 
     @Override
     public List<Server> findAllByUserId(UUID userId) {
         if (serverList.isEmpty()) {
-            throw EmptyExceptions.EMPTY_SERVER_LIST;
+            throw new EmptyServerListException("Repository 에 저장된 서버 리스트가 없습니다.");
         }
         List<Server> list = serverList.get(userId);
         if (list.isEmpty()) {
-            throw EmptyExceptions.EMPTY_SERVER_LIST;
+            throw new EmptyServerListException("해당 서버에 저장된 채널 리스트가 없습니다.");
         }
         return list;
     }

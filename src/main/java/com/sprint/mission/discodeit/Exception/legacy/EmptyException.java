@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.Exception;
+package com.sprint.mission.discodeit.Exception.legacy;
 
 public class EmptyException extends RuntimeException {
     public EmptyException(CommonCode commonCode) {

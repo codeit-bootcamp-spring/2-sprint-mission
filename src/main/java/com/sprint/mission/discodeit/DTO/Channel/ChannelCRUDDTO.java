@@ -18,25 +18,42 @@ public record ChannelCRUDDTO(
         ChannelType type
 ) {
     /**
-     * 새로운 채널을 생성하기 위한 DTO를 생성합니다.
+     * 새로운 공개 채널을 생성하기 위한 DTO를 생성합니다.
      *
      * @param serverId 채널이 속한 서버의 ID
      * @param creatorId 채널을 생성한 사용자의 ID
      * @param name 생성할 채널의 이름
-     * @param type 생성할 채널의 유형
      * @return 채널 생성 요청을 위한 {@link ChannelCRUDDTO} 객체
      */
     public static ChannelCRUDDTO create(
             UUID serverId,
             UUID creatorId,
-            String name,
-            ChannelType type
+            String name
     ) {
         return ChannelCRUDDTO.builder()
                 .serverId(serverId)
                 .creatorId(creatorId)
                 .name(name)
-                .type(type).build();
+                .type(ChannelType.PUBLIC).build();
+    }
+    /**
+     * 새로운 비밀 채널을 생성하기 위한 DTO를 생성합니다.
+     *
+     * @param serverId 채널이 속한 서버의 ID
+     * @param creatorId 채널을 생성한 사용자의 ID
+     * @param name 생성할 채널의 이름
+     * @return 채널 생성 요청을 위한 {@link ChannelCRUDDTO} 객체
+     */
+    public static ChannelCRUDDTO createPrivate(
+            UUID serverId,
+            UUID creatorId,
+            String name
+    ) {
+        return ChannelCRUDDTO.builder()
+                .serverId(serverId)
+                .creatorId(creatorId)
+                .name(name)
+                .type(ChannelType.PRIVATE).build();
     }
     /**
      * 특정 사용자가 채널에 참가하기 위한 DTO를 생성합니다.

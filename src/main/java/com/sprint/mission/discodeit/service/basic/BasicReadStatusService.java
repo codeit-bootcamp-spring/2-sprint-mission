@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusCRUDDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundException;
-import com.sprint.mission.discodeit.Exception.ValidExceptions;
+import com.sprint.mission.discodeit.Exception.Valid.DuplicateReadStatusException;
+import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
@@ -36,7 +36,7 @@ public class BasicReadStatusService implements ReadStatusService {
             if (status == null) {
                 status = new ReadStatus(userId, channelId);
             } else {
-                throw ValidExceptions.DUPLICATE_READ_STATUS;
+                throw new DuplicateReadStatusException("중복된 읽기 상태 정보가 있습니다.");
             }
             readStatusRepository.save(status);
 

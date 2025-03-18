@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.Message.MessageCRUDDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundException;
-import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
-import com.sprint.mission.discodeit.Exception.EmptyExceptions;
+import com.sprint.mission.discodeit.Exception.Empty.EmptyMessageListException;
+import com.sprint.mission.discodeit.Exception.NotFound.MessageNotFoundException;
+import com.sprint.mission.discodeit.Exception.NotFound.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Repository.MessageRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
@@ -34,7 +34,7 @@ public class FileMessageRepository implements MessageRepository {
         this.fileRepository = new FileRepositoryImpl<>(path);
         try {
             this.messageList = fileRepository.load();
-        } catch (NotFoundException e) {
+        } catch (SaveFileNotFoundException e) {
             System.out.println("FileMessageRepository init");
         }
     }
@@ -63,7 +63,7 @@ public class FileMessageRepository implements MessageRepository {
     public Message find(UUID messageId) {
         List<Message> list = messageList.values().stream().flatMap(List::stream).toList();
         Message message = CommonUtils.findById(list, messageId, Message::getMessageId)
-                .orElseThrow(() -> NotFoundExceptions.MESSAGE_NOT_FOUND);
+                .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
 
         return message;
     }
@@ -71,12 +71,12 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         if (messageList.isEmpty()) {
-            throw EmptyExceptions.EMPTY_MESSAGE_LIST;
+            throw new EmptyMessageListException("Repository 에 저장된 메시지 리스트가 없습니다.");
         }
         List<Message> messages = messageList.get(channelId);
 
         if (messages.isEmpty()) {
-            throw EmptyExceptions.EMPTY_MESSAGE_LIST;
+            throw new EmptyMessageListException("해당 채널에 저장된 메시지 리스트가 없습니다.");
         }
         return messages;
     }

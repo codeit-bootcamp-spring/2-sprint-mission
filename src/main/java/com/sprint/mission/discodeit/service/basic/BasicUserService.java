@@ -3,7 +3,13 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.DTO.User.UserFindDTO;
-import com.sprint.mission.discodeit.Exception.*;
+import com.sprint.mission.discodeit.Exception.Empty.EmptyUserListException;
+import com.sprint.mission.discodeit.Exception.NotFound.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.Exception.NotFound.UserNotFoundException;
+import com.sprint.mission.discodeit.Exception.NotFound.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.Exception.Valid.DuplicateUserException;
+import com.sprint.mission.discodeit.Exception.legacy.EmptyException;
+import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
@@ -11,6 +17,7 @@ import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,28 +41,26 @@ public class BasicUserService implements UserService {
         }
     }
 
+    @CustomLogging
     @Override
     public User register(UserCRUDDTO userCRUDDTO, Optional<BinaryContentDTO> binaryContentDTO) {
         UserCRUDDTO checkDuplicate = UserCRUDDTO.checkDuplicate(userCRUDDTO.userName(), userCRUDDTO.email());
 
         try {
             checkDuplicate(checkDuplicate);
-        } catch (ValidException e) {
-            System.out.println("중복된 유저가 존재합니다.");
-            return null;
+            User user = new User(userCRUDDTO.userName(), userCRUDDTO.email(), userCRUDDTO.password());
+            UUID profileId = makeBinaryContent(binaryContentDTO);
+            user.setProfileId(profileId);
+            userRepository.save(user);
+
+            UserStatus userStatus = new UserStatus(user.getId());
+            userStatusRepository.save(userStatus);
+
+            return user;
+        } catch (DuplicateUserException e) {
+            throw new DuplicateUserException("중복된 유저가 존재합니다.");
         }
-
-        User user = new User(userCRUDDTO.userName(), userCRUDDTO.email(), userCRUDDTO.password());
-        UUID profileId = makeBinaryContent(binaryContentDTO);
-        user.setProfileId(profileId);
-        userRepository.save(user);
-
-        UserStatus userStatus = new UserStatus(user.getId());
-        userStatusRepository.save(userStatus);
-
-        return user;
     }
-
 
     @Override
     public UserFindDTO find(UUID userId) {
@@ -106,7 +111,23 @@ public class BasicUserService implements UserService {
         }
     }
 
+    @CustomLogging
+    @Override
+    public User update(UUID userId, UserCRUDDTO userCRUDDTO) {
+        try {
+            User findUser = userRepository.find(userId);
+            User update = userRepository.update(findUser, userCRUDDTO);
+            return update;
+        } catch (EmptyException e) {
+            System.out.println("업데이트할 리스트가 존재하지 않습니다.");
+            return null;
+        } catch (NotFoundException e) {
+            System.out.println("업데이트할 유저가 존재하지 않습니다.");
+            return null;
+        }
+    }
 
+    @CustomLogging
     @Override
     public boolean delete(UserCRUDDTO userCRUDDTO) {
         try {
@@ -122,25 +143,18 @@ public class BasicUserService implements UserService {
             }
 
             return true;
-        } catch (NotFoundException e) {
+        } catch (UserNotFoundException e) {
             System.out.println("유저를 찾지 못했습니다.");
             return false;
-        }
-    }
-
-
-    @Override
-    public User update(UUID userId, UserCRUDDTO userCRUDDTO) {
-        try {
-            User findUser = userRepository.find(userId);
-            User update = userRepository.update(findUser, userCRUDDTO);
-            return update;
-        } catch (EmptyException e) {
-            System.out.println("업데이트할 리스트가 존재하지 않습니다.");
-            return null;
-        } catch (NotFoundException e) {
-            System.out.println("업데이트할 유저가 존재하지 않습니다.");
-            return null;
+        } catch (UserStatusNotFoundException e) {
+            System.out.println("유저 상태를 찾지 못했습니다.");
+            return false;
+        } catch (BinaryContentNotFoundException e) {
+            System.out.println("바이너리 정보를 찾지 못했습니다.");
+            return false;
+        } catch (EmptyUserListException e) {
+            System.out.println("유저 리스트가 비어있습니다.");
+            return false;
         }
     }
 

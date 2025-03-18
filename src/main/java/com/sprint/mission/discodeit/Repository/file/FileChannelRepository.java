@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundException;
-import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
-import com.sprint.mission.discodeit.Exception.EmptyExceptions;
-import com.sprint.mission.discodeit.Exception.EmptyUserListException;
+import com.sprint.mission.discodeit.Exception.Empty.EmptyChannelListException;
+import com.sprint.mission.discodeit.Exception.Empty.EmptyUserListException;
+import com.sprint.mission.discodeit.Exception.NotFound.ChannelNotFoundException;
+import com.sprint.mission.discodeit.Exception.NotFound.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Util.CommonUtils;
@@ -36,7 +36,7 @@ public class FileChannelRepository implements ChannelRepository {
         this.fileRepository = new FileRepositoryImpl<>(path);
         try {
             this.channelList = fileRepository.load();
-        } catch (NotFoundException e) {
+        } catch (SaveFileNotFoundException e) {
             System.out.println("FileChannelRepository init");
         }
     }
@@ -87,7 +87,7 @@ public class FileChannelRepository implements ChannelRepository {
     public Channel find(UUID channelId) {
         List<Channel> list = channelList.values().stream().flatMap(List::stream).toList();
         Channel channel = CommonUtils.findById(list, channelId, Channel::getChannelId)
-                .orElseThrow(() -> NotFoundExceptions.CHANNEL_NOF_FOUND);
+                .orElseThrow(() -> new ChannelNotFoundException("채널을 찾을 수 없습니다."));
 
         return channel;
     }
@@ -95,12 +95,12 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public List<Channel> findAllByServerId(UUID serverId) {
         if (channelList.isEmpty()) {
-            throw EmptyExceptions.EMPTY_CHANNEL_LIST;
+            throw new EmptyChannelListException("Repository 에 저장된 채널 리스트가 없습니다.");
         }
         List<Channel> channels = channelList.get(serverId);
 
         if (channels.isEmpty()) {
-            throw EmptyExceptions.EMPTY_CHANNEL_LIST;
+            throw new EmptyChannelListException("해당 서버에 저장된 채널 리스트가 없습니다.");
         }
         return channels;
     }

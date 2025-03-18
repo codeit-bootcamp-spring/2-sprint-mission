@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.Exception;
+package com.sprint.mission.discodeit.Exception.legacy;
 
 public class ValidExceptions {
     public static ValidException DUPLICATE_USER = new ValidException(CommonCode.DUPLICATE_USER);
