@@ -18,8 +18,9 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     List<UserStatus> userStatusList = new ArrayList<>();
 
     @Override
-    public void save(UserStatus userStatus) {
+    public UserStatus save(UserStatus userStatus) {
         userStatusList.add(userStatus);
+        return userStatus;
     }
 
     @Override
@@ -38,10 +39,11 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO) {
+    public UserStatus update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO) {
         if (userStatusUpdateDTO.userStatusId() != null) {
             userStatus.setUserStatusId(userStatusUpdateDTO.userStatusId());
         }
+        return userStatus;
     }
 
     @Override

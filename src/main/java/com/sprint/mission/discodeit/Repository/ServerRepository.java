@@ -1,27 +1,28 @@
 package com.sprint.mission.discodeit.Repository;
 
 import com.sprint.mission.discodeit.DTO.Server.ServerCRUDDTO;
-import com.sprint.mission.discodeit.DTO.Server.ServerDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public interface ServerRepository {
     void reset();
 
-    UUID save(User user, Server server);
+    Server save(Server server, User user);
 
-    UUID join(User user, Server server);
+    User join(Server server, User user);
 
-    UUID quit(User user, Server server);
+    User quit(Server server, User user);
 
     Server find(UUID serverId);
 
     List<Server> findAllByUserId(UUID userId);
 
-    UUID update(Server targetServer, ServerCRUDDTO serverCRUDDTO);
+    Server update(Server targetServer, ServerCRUDDTO serverCRUDDTO);
 
-    void remove(User owner, Server server);
+    void remove(Server server, User user);
 }

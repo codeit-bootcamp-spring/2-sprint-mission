@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.Repository.*;
 import com.sprint.mission.discodeit.Repository.jcf.*;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ServerService;
@@ -17,6 +18,7 @@ import com.sprint.mission.discodeit.service.basic.BasicServerService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class ChannelServiceTest {
@@ -36,10 +38,9 @@ public class ChannelServiceTest {
         BinaryContentService binaryContentService = new BasicBinaryContentService(binaryContentRepository);
 
         BinaryContentDTO binaryContentDTO = BinaryContentDTO.create("test1", null, null);
-        BinaryContent content1 = binaryContentService.create(binaryContentDTO);
-
-        UserCRUDDTO userDTO1 = UserCRUDDTO.create("test1", "test1", "123",content1);
-        UUID userId1 = userService.register(userDTO1);
+        UserCRUDDTO userDTO1 = UserCRUDDTO.create("test1", "test1", "123");
+        User user = userService.register(userDTO1, Optional.of(binaryContentDTO));
+        UUID userId1 = user.getId();
         ServerCRUDDTO serverTest1 = ServerCRUDDTO.create(userId1, "test1");
         UUID serverId1 = serverService.create(serverTest1);
 

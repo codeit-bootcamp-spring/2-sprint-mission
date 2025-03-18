@@ -9,13 +9,13 @@ import java.util.UUID;
 
 @Repository
 public interface UserStatusRepository {
-    void save(UserStatus userStatus);
+    UserStatus save(UserStatus userStatus);
 
     UserStatus find(UUID userId);
 
     List<UserStatus> findAll();
 
-    void update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO);
+    UserStatus update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO);
 
     void delete(UUID userId);
 }

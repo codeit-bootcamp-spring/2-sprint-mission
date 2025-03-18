@@ -40,8 +40,8 @@ public class BasicChannelService implements ChannelService {
         Channel channel;
 
         if (channelCRUDDTO.type() == ChannelType.PRIVATE) {
-            channel = new Channel(findServer.getServerId(), user.getId(),null,ChannelType.PRIVATE);
-            createReadStatus(user,channel);
+            channel = new Channel(findServer.getServerId(), user.getId(), null, ChannelType.PRIVATE);
+            createReadStatus(user, channel);
         } else {
             channel = new Channel(findServer.getServerId(), user.getId(), channelCRUDDTO.name());
         }
@@ -66,8 +66,8 @@ public class BasicChannelService implements ChannelService {
 
         User user = userRepository.find(userId);
         Channel findChannel = channelRepository.find(channelId);
-
-        UUID uuid = channelRepository.join(findChannel, user);
+        User join = channelRepository.join(findChannel, user);
+        UUID uuid = join.getId();
         if (channelCRUDDTO.type() == ChannelType.PRIVATE) {
             createReadStatus(user, findChannel);
         }
@@ -84,9 +84,9 @@ public class BasicChannelService implements ChannelService {
         User user = userRepository.find(userId);
         Channel findChannel = channelRepository.find(channelId);
 
-        UUID uuid = channelRepository.quit(findChannel, user);
+        User quit = channelRepository.quit(findChannel, user);
 
-        return uuid;
+        return quit.getId();
     }
 
     @Override
@@ -97,8 +97,8 @@ public class BasicChannelService implements ChannelService {
         Message message;
         Instant lastMessageTime = null;
         try {
-            messageList= messageRepository.findAllByChannelId(channelUUID);
-            message= messageList.get(messageList.size() - 1);
+            messageList = messageRepository.findAllByChannelId(channelUUID);
+            message = messageList.get(messageList.size() - 1);
             lastMessageTime = message.createdAt;
         } catch (NotFoundException e) {
 //            System.out.println("메시지 함이 비어있습니다.");

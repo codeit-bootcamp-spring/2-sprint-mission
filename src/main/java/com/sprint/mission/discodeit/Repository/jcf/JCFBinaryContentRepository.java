@@ -19,8 +19,9 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     private List<BinaryContent> binaryContentList = new LinkedList<>();
 
     @Override
-    public void save(BinaryContent binaryContent) {
+    public BinaryContent save(BinaryContent binaryContent) {
         binaryContentList.add(binaryContent);
+        return binaryContent;
     }
 
     @Override

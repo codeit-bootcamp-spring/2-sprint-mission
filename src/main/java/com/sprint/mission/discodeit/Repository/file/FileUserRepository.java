@@ -46,11 +46,11 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public UUID save(User user) {
+    public User save(User user) {
 
         userList.add(user);
         fileRepository.save(userList);
-        return user.getId();
+        return user;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class FileUserRepository implements UserRepository {
 
 
     @Override
-    public UUID update(User user, UserCRUDDTO userUpdateDTO) {
+    public User update(User user, UserCRUDDTO userUpdateDTO) {
         if (userUpdateDTO.userId() != null) {
             user.setId(userUpdateDTO.userId());
         }
@@ -85,7 +85,7 @@ public class FileUserRepository implements UserRepository {
             user.setProfileId(userUpdateDTO.profileId());
         }
         fileRepository.save(userList);
-        return user.getId();
+        return user;
     }
 
 

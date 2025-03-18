@@ -13,7 +13,7 @@ public interface UserRepository {
 
     void reset();
 
-    UUID save(User user);
+    User save(User user);
 
     User find(UUID userId);
 

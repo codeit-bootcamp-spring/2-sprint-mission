@@ -24,11 +24,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public UUID save(User user) {
+    public User save(User user) {
 
         userList.add(user);
 
-        return user.getId();
+        return user;
     }
 
     @Override

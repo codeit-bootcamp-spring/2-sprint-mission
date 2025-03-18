@@ -29,10 +29,10 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void save(UserStatus userStatus) {
+    public UserStatus save(UserStatus userStatus) {
         userStatusList.add(userStatus);
         fileRepository.save(userStatusList);
-
+        return userStatus;
     }
 
     @Override
@@ -51,11 +51,12 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO) {
+    public UserStatus update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO) {
         if (userStatusUpdateDTO.userStatusId() != null) {
             userStatus.setUserStatusId(userStatusUpdateDTO.userStatusId());
         }
         fileRepository.save(userStatusList);
+        return userStatus;
     }
 
     @Override

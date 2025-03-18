@@ -3,9 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.DTO.User.UserFindDTO;
-import com.sprint.mission.discodeit.Exception.NotFoundException;
-import com.sprint.mission.discodeit.Exception.EmptyException;
-import com.sprint.mission.discodeit.Exception.EmptyUserListException;
+import com.sprint.mission.discodeit.Exception.*;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
@@ -29,15 +27,6 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
 
-    private void checkDuplicate(UserCRUDDTO userCRUDDTO) {
-        try {
-            List<User> list = userRepository.findUserList();
-            CommonUtils.checkUserDuplicate(list, userCRUDDTO.userName(), User::getName);
-            CommonUtils.checkUserDuplicate(list, userCRUDDTO.email(), User::getEmail);
-        } catch (EmptyUserListException e) {
-        }
-    }
-
     @Override
     public void reset(boolean adminAuth) {
         if (adminAuth == true) {
@@ -51,28 +40,17 @@ public class BasicUserService implements UserService {
 
         try {
             checkDuplicate(checkDuplicate);
-        } catch (NotFoundException e) {
+        } catch (ValidException e) {
             System.out.println("중복된 유저가 존재합니다.");
             return null;
         }
 
         User user = new User(userCRUDDTO.userName(), userCRUDDTO.email(), userCRUDDTO.password());
-
-        UUID profileId = binaryContentDTO.map(contentDTO -> {
-            String fileName = contentDTO.fileName();
-            String contentType = contentDTO.contentType();
-            byte[] bytes = contentDTO.bytes();
-            int size = bytes.length;
-            BinaryContent content = new BinaryContent(fileName, size, contentType, bytes);
-            binaryContentRepository.save(content);
-            return content.getBinaryContentId();
-        }).orElse(null);
-
+        UUID profileId = makeBinaryContent(binaryContentDTO);
         user.setProfileId(profileId);
+        userRepository.save(user);
 
         UserStatus userStatus = new UserStatus(user.getId());
-
-        userRepository.save(user);
         userStatusRepository.save(userStatus);
 
         return user;
@@ -166,4 +144,27 @@ public class BasicUserService implements UserService {
         }
     }
 
+    private UUID makeBinaryContent(Optional<BinaryContentDTO> binaryContentDTO) {
+        UUID profileId = binaryContentDTO.map(contentDTO -> {
+            String fileName = contentDTO.fileName();
+            String contentType = contentDTO.contentType();
+            byte[] bytes = contentDTO.bytes();
+            int size = bytes.length;
+
+            BinaryContent content = new BinaryContent(fileName, size, contentType, bytes);
+            binaryContentRepository.save(content);
+            return content.getBinaryContentId();
+        }).orElse(null);
+
+        return profileId;
+    }
+
+    private void checkDuplicate(UserCRUDDTO userCRUDDTO) {
+        try {
+            List<User> list = userRepository.findUserList();
+            CommonUtils.checkUserDuplicate(list, userCRUDDTO.userName(), User::getName);
+            CommonUtils.checkUserDuplicate(list, userCRUDDTO.email(), User::getEmail);
+        } catch (EmptyUserListException e) {
+        }
+    }
 }

@@ -30,8 +30,8 @@ public class BasicServerService implements ServerService {
 
         owner = userRepository.find(userId);
         Server server = new Server(userId, serverCRUDDTO.name());
-        serverRepository.save(owner, server);
-        serverRepository.join(owner, server);
+        serverRepository.save(server, owner);
+        serverRepository.join(server, owner);
 
         return server.getServerId();
     }
@@ -45,7 +45,7 @@ public class BasicServerService implements ServerService {
 
         User user = userRepository.find(userId);
         Server server = serverRepository.find(serverId);
-        serverRepository.join(user, server);
+        serverRepository.join(server, user);
 
         return server.getServerId();
     }
@@ -79,7 +79,7 @@ public class BasicServerService implements ServerService {
 
         User user = userRepository.find(userId);
         Server server = serverRepository.find(serverId);
-        serverRepository.remove(user, server);
+        serverRepository.remove(server,user);
         return true;
     }
 

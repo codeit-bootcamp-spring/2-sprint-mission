@@ -12,13 +12,13 @@ import java.util.UUID;
 public interface MessageRepository {
 
     void reset();
-    void save(Channel channel, Message message);
+    Message save(Channel channel, Message message);
 
     Message find(UUID messageId);
 
     List<Message> findAllByChannelId(UUID channelId);
 
-    UUID update(Message message, MessageCRUDDTO messageCRUDDTO);
+    Message update(Message message, MessageCRUDDTO messageCRUDDTO);
 
     void remove(Channel channel, Message message);
 }

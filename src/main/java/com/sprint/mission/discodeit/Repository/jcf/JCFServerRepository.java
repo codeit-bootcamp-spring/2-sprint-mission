@@ -28,32 +28,31 @@ public class JCFServerRepository implements ServerRepository {
     }
 
     @Override
-    public UUID save(User user, Server server) {
+    public Server save(Server server, User user) {
         List<Server> servers = serverList.getOrDefault(user.getId(), new ArrayList<>());
         servers.add(server);
         serverList.put(user.getId(), servers);
 
-        return server.getServerId();
+        return server;
     }
 
     @Override
-    public UUID join(User user , Server server) {
+    public User join(Server server, User user) {
         List<User> users = server.getUserList();
         users.add(user);
 
-        return user.getId();
+        return user;
     }
 
 
     @Override
-    public UUID quit(User user, Server server) {
+    public User quit(Server server, User user) {
         List<User> users = server.getUserList();
         if (users.isEmpty()) {
             throw new EmptyUserListException("서버 내 유저 리스트가 비어있습니다.");
         }
         users.remove(user);
-
-        return server.getServerId();
+        return user;
     }
 
     @Override
@@ -77,7 +76,7 @@ public class JCFServerRepository implements ServerRepository {
     }
 
     @Override
-    public UUID update(Server targetServer, ServerCRUDDTO serverCRUDDTO) {
+    public Server update(Server targetServer, ServerCRUDDTO serverCRUDDTO) {
         if (serverCRUDDTO.serverId() != null) {
             targetServer.setServerId(serverCRUDDTO.serverId());
         }
@@ -87,13 +86,13 @@ public class JCFServerRepository implements ServerRepository {
         if (serverCRUDDTO.name() != null) {
             targetServer.setName(serverCRUDDTO.name());
         }
-        return targetServer.getServerId();
+        return targetServer;
     }
 
 
     @Override
-    public void remove(User owner, Server server) {
-        List<Server> list = findAllByUserId(owner.getId());
+    public void remove(Server server, User user) {
+        List<Server> list = findAllByUserId(user.getId());
         list.remove(server);
     }
 

@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Repository
 public interface ReadStatusRepository {
-    void save(ReadStatus readStatus);
+    ReadStatus save(ReadStatus readStatus);
 
     ReadStatus find(UUID readStatusId);
 
@@ -17,7 +17,7 @@ public interface ReadStatusRepository {
 
     List<ReadStatus> findAllByChannelId(UUID channelId);
 
-    void update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO);
+    ReadStatus update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO);
 
     void delete(UUID readStatusId);
 }

@@ -15,8 +15,11 @@ public class UserStatus implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @ToString.Include
     private UUID userStatusId;
+    @ToString.Include
     private final UUID userId;
+
     public final Instant createdAt;
     public Instant updatedAt;
 

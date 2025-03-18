@@ -30,9 +30,10 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void save(ReadStatus readStatus) {
+    public ReadStatus save(ReadStatus readStatus) {
         readStatusList.add(readStatus);
         fileRepository.save(readStatusList);
+        return readStatus;
     }
 
     @Override
@@ -70,11 +71,12 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO) {
+    public ReadStatus update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO) {
         if (readStatusCRUDDTO.readStatusId() != null) {
             readStatus.setReadStatusId(readStatusCRUDDTO.readStatusId());
         }
         fileRepository.save(readStatusList);
+        return readStatus;
     }
 
     @Override

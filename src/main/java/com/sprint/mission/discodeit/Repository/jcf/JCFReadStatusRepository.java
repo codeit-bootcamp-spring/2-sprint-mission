@@ -19,8 +19,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     private final List<ReadStatus> readStatusList = new ArrayList<>();
 
     @Override
-    public void save(ReadStatus readStatus) {
+    public ReadStatus save(ReadStatus readStatus) {
         readStatusList.add(readStatus);
+        return readStatus;
     }
 
     @Override
@@ -58,10 +59,11 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO) {
+    public ReadStatus update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO) {
         if (readStatusCRUDDTO.readStatusId() != null) {
             readStatus.setReadStatusId(readStatusCRUDDTO.readStatusId());
         }
+        return readStatus;
     }
 
     @Override

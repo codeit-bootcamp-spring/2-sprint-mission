@@ -8,10 +8,12 @@ import com.sprint.mission.discodeit.Repository.jcf.*;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.service.basic.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class MessageServiceTest {
@@ -27,18 +29,18 @@ public class MessageServiceTest {
 
         UserService userService = new BasicUserService(userRepository, binaryContentRepository, userStatusRepository);
         ServerService serverService = new BasicServerService(userRepository, serverRepository);
-        ChannelService channelService = new BasicChannelService(userRepository,serverRepository,channelRepository,messageRepository,readStatusRepository);
+        ChannelService channelService = new BasicChannelService(userRepository, serverRepository, channelRepository, messageRepository, readStatusRepository);
         MessageService messageService = new BasicMessageService(userRepository, channelRepository, messageRepository, binaryContentRepository);
         BinaryContentService binaryContentService = new BasicBinaryContentService(binaryContentRepository);
 
         BinaryContentDTO binaryContentDTO = BinaryContentDTO.create("test1", null, null);
-        BinaryContent content1 = binaryContentService.create(binaryContentDTO);
+        UserCRUDDTO userDTO1 = UserCRUDDTO.create("test1", "test1", "123");
+        User user = userService.register(userDTO1, Optional.of(binaryContentDTO));
+        UUID userId1 = user.getId();
 
-        UserCRUDDTO userDTO1 = UserCRUDDTO.create("test1", "test1", "123",content1);
-        UUID userId1 = userService.register(userDTO1);
-
-        UserCRUDDTO userDTO2 = UserCRUDDTO.create("test2", "test2", "123",null);
-        UUID userId2 = userService.register(userDTO2);
+        UserCRUDDTO userDTO2 = UserCRUDDTO.create("test2", "test2", "123");
+        User user1 = userService.register(userDTO2, Optional.empty());
+        UUID userId2 = user1.getId();
 
         ServerCRUDDTO serverTest1 = ServerCRUDDTO.create(userId1, "test1");
         UUID serverId1 = serverService.create(serverTest1);

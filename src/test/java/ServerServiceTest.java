@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.Repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.Repository.jcf.JCFUserStatusRepository;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ServerService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -19,6 +20,7 @@ import com.sprint.mission.discodeit.service.basic.BasicServerService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class ServerServiceTest {
@@ -33,9 +35,11 @@ public class ServerServiceTest {
         ServerService serverService = new BasicServerService(userRepository, serverRepository);
 
         BinaryContentDTO binaryContentDTO = BinaryContentDTO.create("test1", null, null);
-        BinaryContent content1 = binaryContentService.create(binaryContentDTO);
-        UserCRUDDTO userDTO1 = UserCRUDDTO.create("test1", "test1", "123",content1);
-        UUID test1 = userService.register(userDTO1);
+
+        UserCRUDDTO userDTO1 = UserCRUDDTO.create("test1", "test1", "123");
+
+        User user = userService.register(userDTO1, Optional.of(binaryContentDTO));
+        UUID test1 = user.getId();
         System.out.println("create----------------------------------------");
         ServerCRUDDTO serverTest1 = ServerCRUDDTO.create(test1, "test1");
         ServerCRUDDTO serverTest2 = ServerCRUDDTO.create(test1, "test2");

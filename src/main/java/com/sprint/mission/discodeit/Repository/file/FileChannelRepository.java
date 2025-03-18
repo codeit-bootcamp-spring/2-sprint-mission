@@ -48,15 +48,25 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public UUID join(Channel channel, User user) {
-        List<User> list = channel.getUserList();
-        list.add(user);
+    public Channel save(Server server, Channel channel) {
+        List<Channel> channels = channelList.getOrDefault(server.getServerId(), new ArrayList<>());
+        channels.add(channel);
+        channelList.put(server.getServerId(), channels);
 
-        return user.getId();
+        fileRepository.save(channelList);
+        return channel;
     }
 
     @Override
-    public UUID quit(Channel channel, User user) {
+    public User join(Channel channel, User user) {
+        List<User> list = channel.getUserList();
+        list.add(user);
+
+        return user;
+    }
+
+    @Override
+    public User quit(Channel channel, User user) {
         List<User> list = channel.getUserList();
         if (list.isEmpty()) {
             throw new EmptyUserListException("채널 내 유저 리스트가 비어있습니다.");
@@ -64,18 +74,9 @@ public class FileChannelRepository implements ChannelRepository {
         list.remove(user);
 
         fileRepository.save(channelList);
-        return user.getId();
+        return user;
     }
 
-    @Override
-    public UUID save(Server server, Channel channel) {
-        List<Channel> channels = channelList.getOrDefault(server.getServerId(), new ArrayList<>());
-        channels.add(channel);
-        channelList.put(server.getServerId(), channels);
-
-        fileRepository.save(channelList);
-        return channel.getChannelId();
-    }
 
     @Override
     public Channel find(UUID channelId) {
@@ -100,7 +101,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public UUID update(Channel targetChannel, ChannelCRUDDTO channelUpdateDTO) {
+    public Channel update(Channel targetChannel, ChannelCRUDDTO channelUpdateDTO) {
         if (channelUpdateDTO.channelId() != null) {
             targetChannel.setChannelId(channelUpdateDTO.channelId());
         }
@@ -111,7 +112,7 @@ public class FileChannelRepository implements ChannelRepository {
             targetChannel.setType(channelUpdateDTO.type());
         }
         fileRepository.save(channelList);
-        return targetChannel.getChannelId();
+        return targetChannel;
     }
 
     @Override

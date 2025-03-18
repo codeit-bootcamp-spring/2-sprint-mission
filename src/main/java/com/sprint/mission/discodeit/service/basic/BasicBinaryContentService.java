@@ -16,7 +16,8 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     public BinaryContent create(BinaryContentDTO binaryContentDTO) {
-        BinaryContent binaryContent = new BinaryContent(binaryContentDTO.fileName(),binaryContentDTO.binaryContent().getSize(), binaryContentDTO.contentType(),binaryContentDTO.bytes());
+        int size = binaryContentDTO.bytes().length;
+        BinaryContent binaryContent = new BinaryContent(binaryContentDTO.fileName(), size, binaryContentDTO.contentType(),binaryContentDTO.bytes());
         binaryContentRepository.save(binaryContent);
         return binaryContent;
     }

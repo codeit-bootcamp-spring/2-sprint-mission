@@ -27,11 +27,11 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void save(Channel channel, Message message) {
+    public Message save(Channel channel, Message message) {
         List<Message> messages = messageList.getOrDefault(channel.getChannelId(), new ArrayList<>());
         messages.add(message);
         messageList.put(channel.getChannelId(), messages);
-
+        return message;
     }
 
     @Override
@@ -56,14 +56,14 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public UUID update(Message message, MessageCRUDDTO messageUpdateDTO) {
+    public Message update(Message message, MessageCRUDDTO messageUpdateDTO) {
         if (messageUpdateDTO.text() != null) {
             message.setText(messageUpdateDTO.text());
         }
         if (messageUpdateDTO.messageId() != null) {
             message.setMessageId(messageUpdateDTO.messageId());
         }
-        return message.getMessageId();
+        return message;
     }
 
     @Override

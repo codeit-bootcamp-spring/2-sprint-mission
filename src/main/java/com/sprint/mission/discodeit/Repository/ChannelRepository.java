@@ -13,17 +13,17 @@ import java.util.UUID;
 public interface ChannelRepository {
     void reset();
 
-    UUID join(Channel channel, User user);
+    Channel save(Server server, Channel channel);
 
-    UUID quit(Channel channel, User user);
+    User join(Channel channel, User user);
 
-    UUID save(Server server, Channel channel);
+    User quit(Channel channel, User user);
 
     Channel find(UUID channelId);
 
     List<Channel> findAllByServerId(UUID serverId);
 
-    UUID update(Channel channel, ChannelCRUDDTO channelUpdateDTO);
+    Channel update(Channel channel, ChannelCRUDDTO channelUpdateDTO);
 
     void remove(Server server, Channel channel);
 }

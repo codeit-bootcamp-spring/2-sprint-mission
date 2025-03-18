@@ -13,7 +13,6 @@ public record UserFindDTO(
         UUID profileId,
         String userName,
         String email,
-        BinaryContent binaryContent,
         Instant createdAt,
         Instant updatedAt,
         UserStatus userStatus
