@@ -14,6 +14,7 @@ public interface MessageService {
     Message readMessage(UUID messageId);
     List<Message> findAllByChannelId(UUID channelId);
     void updateMessage(MessageUpdateRequest messageUpdateRequest);
+    void deleteBinaryContentInMessage(UUID messageId, UUID binaryContentId);
     void deleteMessage(UUID messageId);
     static void validateMessageId(UUID messageId, MessageRepository jcfMessageRepository) {
         if (!jcfMessageRepository.existsById(messageId)) {
