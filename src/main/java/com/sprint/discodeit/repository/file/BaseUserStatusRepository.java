@@ -31,16 +31,6 @@ public class BaseUserStatusRepository extends AbstractFileRepository<UserStatus>
         return statusMap.values().stream().toList();
     }
 
-    public Optional<UserStatus> findUserId(UUID userId) {
-        Map<UUID, UserStatus> statusMap = loadAll();
-        Optional<UserStatus> status = statusMap.values().stream()
-                .filter(userStatus -> userStatus.getUserId().equals(userId))
-                .findFirst();
-        return Optional.ofNullable(status.get());
-
-    }
-
-
     @Override
     public void save(UserStatus userStatus) {
         Map<UUID, UserStatus> userStatusMap = loadAll();
