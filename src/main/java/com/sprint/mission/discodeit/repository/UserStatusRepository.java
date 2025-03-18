@@ -13,5 +13,6 @@ public interface UserStatusRepository {
     List<UserStatus> findAll();
     void deleteById(UUID id);
     void deleteByUserId(UUID userId); // 유저 삭제시 함께 삭제하기 위함
+    boolean existsByUserId(UUID userId);
 
 }

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.Duration;
@@ -13,6 +14,7 @@ public class UserStatus {
     private final Instant createdAt;
     private Instant updatedAt; // 유저의 마지막 접속시간
 
+    @Builder
     public UserStatus(UUID userId) {
         this.id = UUID.randomUUID();
         this.userId = userId;
