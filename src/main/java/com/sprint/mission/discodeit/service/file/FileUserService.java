@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.CreateUserRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -43,8 +44,8 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User createUser(String name, String email) {
-        User user = new User(name, email);
+    public User createUser(CreateUserRequest request) {
+        User user = new User(request.name(), request.email());
         data.put(user.getId(), user);
         saveData();
         return user;

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.CreateUserRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -83,7 +84,8 @@ public class JavaApplication {
                                 String userName = sc.nextLine();
                                 System.out.println("사용자 이메일 입력: ");
                                 String userEmail = sc.nextLine();
-                                User user = userService.createUser(userName, userEmail);
+                                CreateUserRequest request = new CreateUserRequest(userName, userEmail, null, null);
+                                User user = userService.createUser(request);
                                 System.out.println("사용자 생성 완료: " + user);
                                 break;
 
