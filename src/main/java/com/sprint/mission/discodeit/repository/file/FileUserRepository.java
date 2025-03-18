@@ -22,9 +22,9 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID userId) {
+    public Optional<User> findById(UUID userId) {
         Map<UUID, User> users = loadUsers();
-        return users.get(userId);
+        return Optional.ofNullable(users.get(userId));
     }
 
     @Override
@@ -38,7 +38,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(UUID userId) {
+    public void delete(User userId) {
         Map<UUID, User> users = loadUsers();
         users.remove(userId);
         saveUsers(users);
@@ -48,6 +48,28 @@ public class FileUserRepository implements UserRepository {
     public boolean exists(UUID userId) {
         Map<UUID, User> users = loadUsers();
         return users.containsKey(userId);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        Map<UUID, User> users = loadUsers();
+        for (User user : users.values()) {
+            if (user.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        Map<UUID, User> users = loadUsers();
+        for (User user : users.values()) {
+            if (user.getEmail().equals(email)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Map<UUID, User> loadUsers() {
@@ -73,5 +95,16 @@ public class FileUserRepository implements UserRepository {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean existsByUsernameOrEmail(String username, String email) {
+        Map<UUID, User> users = loadUsers();
+        for (User user : users.values()) {
+            if ((user.getUsername().equals(username)) || (user.getEmail().equals(email))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

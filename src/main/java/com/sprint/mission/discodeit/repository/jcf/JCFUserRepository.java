@@ -40,7 +40,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(UUID userId) {
+    public void delete(User userId) {
         if (!this.data.containsKey(userId)) {
             throw new NoSuchElementException("User with id " + userId + " not found");
         }
@@ -51,4 +51,15 @@ public class JCFUserRepository implements UserRepository {
     public boolean exists(UUID userId) {
         return this.data.containsKey(userId);
     }
+
+    @Override
+    public boolean existsByUsernameOrEmail(String username, String email) {
+        for (User user : this.data.values()) {
+            if ((user.getUsername().equals(username)) || (user.getEmail().equals(email))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

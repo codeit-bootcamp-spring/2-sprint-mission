@@ -9,26 +9,27 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@ToString(exclude = "password")
 public class User implements Serializable{
     @Serial
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     //
+    private UUID profileId;
     private String username;
     private String email;
     private String password;
 
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
+        this.createdAt = Instant.now();
         //
         this.username = username;
         this.email = email;
         this.password = password;
+        this.profileId = null;
     }
 
     public void update(String newUsername, String newEmail, String newPassword) {
@@ -47,7 +48,15 @@ public class User implements Serializable{
         }
 
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
+            this.updatedAt = Instant.now();
         }
     }
+
+    public void setProfileImage(UUID profileId) {
+        if(profileId != null && !profileId.equals(this.profileId)) {
+            this.profileId = profileId;
+            this.updatedAt = Instant.now();
+        }
+    }
+
 }

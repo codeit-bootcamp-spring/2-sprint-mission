@@ -1,50 +1,117 @@
 package com.sprint.mission.discodeit.service.basic;
 
+
+import com.sprint.mission.discodeit.DTO.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.DTO.UserCreateRequest;
+import com.sprint.mission.discodeit.DTO.UserDto;
+import com.sprint.mission.discodeit.DTO.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Status;
 import com.sprint.mission.discodeit.entity.User;
+
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
+
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(String username, String email, String password) {
-        User newUser = new User(username, email, password);
+    public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest) {
+        // username과 email이 중복되지 않도록 검사
+        if (userRepository.existsByUsernameOrEmail(userCreateRequest.username(), userCreateRequest.email())) {
+            throw new RuntimeException("Username or email already exists");
+        }
+
+        User newUser = new User(userCreateRequest.username(), userCreateRequest.email(), userCreateRequest.password());
+
+        // 프로필 이미지를 등록할 경우
+        profileCreateRequest.ifPresent(request -> {
+            BinaryContent profileContent = new BinaryContent(request.fileName(), request.contentType(), request.data());
+            binaryContentRepository.save(profileContent);
+            newUser.setProfileImage(profileContent.getId());
+        });
+
+        // UserStatus 생성
+        UserStatus userStatus = new UserStatus(newUser.getId(), Status.ONLINE);
+        userStatusRepository.save(userStatus);
+
         return userRepository.save(newUser);
     }
 
     @Override
-    public User find(UUID userId) {
-        return userRepository.findById(userId);
+    public UserDto find(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("User status not found for user ID: " + userId));
+        return UserDto.fromUser(user, userStatus);
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserDto> findAll() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> {
+                    UserStatus userStatus = userStatusRepository.findByUserId(user.getId()).orElseThrow();
+                    return UserDto.fromUser(user, userStatus);
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User existingUser = userRepository.findById(userId);
-        existingUser.update(newUsername, newEmail, newPassword);
-        return userRepository.update(existingUser);
+    public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest) {
+        User existingUser = userRepository.findById(userId).orElseThrow();
+
+        // username과 email이 중복되지 않도록 검사
+        if (userUpdateRequest.newUsername() != null && !userUpdateRequest.newUsername().equals(existingUser.getUsername())) {
+            if (userRepository.existsByUsername(userUpdateRequest.newUsername())) {
+                throw new RuntimeException("Username already exists");
+            }
+        }
+        if (userUpdateRequest.newEmail() != null && !userUpdateRequest.newEmail().equals(existingUser.getEmail())) {
+            if (userRepository.existsByEmail(userUpdateRequest.newEmail())) {
+                throw new RuntimeException("Email already exists");
+            }
+        }
+
+        existingUser.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword());
+
+        // 프로필 이미지를 대체할 경우
+        profileCreateRequest.ifPresent(request -> {
+            BinaryContent newProfileContent = new BinaryContent(request.fileName(), request.contentType(), request.data());
+            binaryContentRepository.save(newProfileContent);
+            existingUser.setProfileImage(newProfileContent.getId());
+        });
+
+        return userRepository.save(existingUser);
     }
 
     @Override
     public void delete(UUID userId) {
-        userRepository.delete(userId);
-    }
+        User user = userRepository.findById(userId).orElseThrow();
+        userRepository.delete(user);
 
-    @Override
-    public boolean exists(UUID authorId) {
-        return false;
+        // 관련된 도메인 삭제
+        if (user.getProfileId() != null) {
+            binaryContentRepository.deleteById(user.getProfileId());
+        }
+        userStatusRepository.deleteByUserId(userId);
     }
-
 }
+
