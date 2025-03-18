@@ -11,5 +11,7 @@ public interface UserStatusRepository {
 
     UserStatus findById(UUID userId);
 
+    UserStatus findByUserId(UUID userId);
+
     void delete(UUID userId);
 }

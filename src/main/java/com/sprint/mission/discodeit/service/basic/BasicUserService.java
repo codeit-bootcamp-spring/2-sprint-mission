@@ -3,13 +3,15 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -21,7 +23,7 @@ import org.springframework.stereotype.Service;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
+    private final UserStatusService userStatusService;
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
@@ -39,10 +41,9 @@ public class BasicUserService implements UserService {
         }
 
         User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password());
-        UserStatus newUserStatus = new UserStatus(newUser.getId());
+        userStatusService.create(new UserStatusCreateDto(newUser.getId(), Instant.MIN));
 
         userRepository.save(newUser);
-        userStatusRepository.save(newUserStatus);
 
         return newUser;
     }
@@ -55,7 +56,7 @@ public class BasicUserService implements UserService {
             throw new NoSuchElementException(userId + " 유저를 찾을 수 없습니다.");
         }
 
-        UserStatus userStatus = new UserStatus(user.getId());
+        UserStatus userStatus = userStatusService.findById(user.getId());
 
         return new UserResponseDto(user, userStatus.isActive());
     }
@@ -63,7 +64,7 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserResponseDto> findAll() {
         return userRepository.findAll().stream().map(user -> {
-            UserStatus userStatus = userStatusRepository.findById(user.getId());
+            UserStatus userStatus = userStatusService.findById(user.getId());
             return new UserResponseDto(user, userStatus.isActive());
         }).toList();
     }
@@ -98,8 +99,8 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId);
         userRepository.delete(user.getId());
 
-        UserStatus userStatus = userStatusRepository.findById(user.getId());
-        userStatusRepository.delete(userStatus.getId());
+        UserStatus userStatus = userStatusService.findById(user.getId());
+        userStatusService.delete(userStatus.getId());
 
         if (user.getProfileId() != null) {
             BinaryContent binaryContent = binaryContentRepository.findById(user.getProfileId());
