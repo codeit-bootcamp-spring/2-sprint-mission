@@ -5,5 +5,5 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import java.util.UUID;
 
 public interface UserStatusRepository extends Repository<UserStatus> {
-    UUID findUserStatusIDByUserId(UUID userId);
+    UserStatus findUserStatusIDByUserId(UUID userId);
 }

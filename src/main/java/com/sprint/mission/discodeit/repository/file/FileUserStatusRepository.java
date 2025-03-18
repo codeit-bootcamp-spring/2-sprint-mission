@@ -25,8 +25,8 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
     }
 
     @Override
-    public UUID findUserStatusIDByUserId(UUID userId) {
-        return userIdMap.get(userId).getId();
+    public UserStatus findUserStatusIDByUserId(UUID userId) {
+        return userIdMap.get(userId);
     }
 
     @Override
