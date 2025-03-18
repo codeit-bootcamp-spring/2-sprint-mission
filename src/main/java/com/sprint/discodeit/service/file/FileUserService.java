@@ -1,14 +1,14 @@
 package com.sprint.discodeit.service.file;
 
-import com.sprint.discodeit.domain.dto.UserNameStatusResponse;
-import com.sprint.discodeit.domain.dto.UserProfileImgResponseDto;
-import com.sprint.discodeit.domain.dto.UserResponse;
-import com.sprint.discodeit.domain.dto.UserUpdateRequest;
+import com.sprint.discodeit.domain.dto.userDto.UserNameStatusResponseDto;
+import com.sprint.discodeit.domain.dto.userDto.UserProfileImgResponseDto;
+import com.sprint.discodeit.domain.dto.userDto.UserResponseDto;
+import com.sprint.discodeit.domain.dto.userDto.UserUpdateRequestDto;
 import com.sprint.discodeit.domain.entity.BinaryContent;
 import com.sprint.discodeit.domain.StatusType;
 import com.sprint.discodeit.domain.entity.UserStatus;
 import com.sprint.discodeit.domain.mapper.UserMapper;
-import com.sprint.discodeit.domain.dto.UserRequestDto;
+import com.sprint.discodeit.domain.dto.userDto.UserRequestDto;
 import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.repository.file.BaseBinaryContentRepository;
 import com.sprint.discodeit.repository.file.BaseUserStatusRepository;
@@ -35,7 +35,7 @@ public class FileUserService implements UserServiceV1 {
     private final BaseUserStatusRepository baseUserStatusRepository;
     private final BaseBinaryContentRepository baseBinaryContentRepository;
 
-    public UserNameStatusResponse create(UserRequestDto userRequestDto, UserProfileImgResponseDto userProfileImgResponseDto) {
+    public UserNameStatusResponseDto create(UserRequestDto userRequestDto, UserProfileImgResponseDto userProfileImgResponseDto) {
         // 중복된 유저 확인
         if (fileUserRepository.findByUsername(userRequestDto.username()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 회원입니다. 확인 해주세요.");
@@ -63,17 +63,17 @@ public class FileUserService implements UserServiceV1 {
 
 
         // User -> UserNameResponse 변환
-        return new UserNameStatusResponse(userMapper.getUsername(), userStatus.getStatusType(), userMapper.getId());
+        return new UserNameStatusResponseDto(userMapper.getUsername(), userStatus.getStatusType(), userMapper.getId());
     }
 
 
     @Override
-    public UserResponse find(UUID userId) {
+    public UserResponseDto find(UUID userId) {
         User user = fileUserRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
         UserStatus userStatus = baseUserStatusRepository.findById(user.getUserStatusId())
                         .orElseThrow(() -> new IllegalArgumentException("사용자에 상태를 찾을 수 없습니다. "));
         String status = userStatusEvaluator.determineUserStatus(userStatus.getLastLoginTime());
-        return new UserResponse(user.getProfileId(), user.getUsername(), user.getEmail(), status);
+        return new UserResponseDto(user.getProfileId(), user.getUsername(), user.getEmail(), status);
     }
 
     @Override
@@ -93,20 +93,20 @@ public class FileUserService implements UserServiceV1 {
     }
 
     @Override
-    public UserResponse update(UserUpdateRequest userUpdateRequest) {
+    public UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto) {
         //조회
-        User user = fileUserRepository.findById(userUpdateRequest.userId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
+        User user = fileUserRepository.findById(userUpdateRequestDto.userId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
 
         //가공
-        BinaryContent profileImage = binaryUtil.createProfileImage(userUpdateRequest.profileImg());
+        BinaryContent profileImage = binaryUtil.createProfileImage(userUpdateRequestDto.profileImg());
 
         //저장
         user.associateProfileId(profileImage);
         baseBinaryContentRepository.save(profileImage);
-        user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword());
+        user.update(userUpdateRequestDto.newUsername(), userUpdateRequestDto.newEmail(), userUpdateRequestDto.newPassword());
         fileUserRepository.save(user);
 
-        return new UserResponse(user.getProfileId(), userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), StatusType.Active.toString());
+        return new UserResponseDto(user.getProfileId(), userUpdateRequestDto.newUsername(), userUpdateRequestDto.newEmail(), StatusType.Active.toString());
     }
 
     @Override

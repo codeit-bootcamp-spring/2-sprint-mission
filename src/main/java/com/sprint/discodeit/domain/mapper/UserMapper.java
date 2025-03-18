@@ -1,6 +1,6 @@
 package com.sprint.discodeit.domain.mapper;
 
-import com.sprint.discodeit.domain.dto.UserRequestDto;
+import com.sprint.discodeit.domain.dto.userDto.UserRequestDto;
 import com.sprint.discodeit.domain.entity.User;
 
 public class UserMapper {

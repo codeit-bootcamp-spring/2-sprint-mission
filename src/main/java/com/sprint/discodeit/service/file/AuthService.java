@@ -1,7 +1,6 @@
 package com.sprint.discodeit.service.file;
 
-import com.sprint.discodeit.domain.dto.UserLoginRequestDto;
-import com.sprint.discodeit.repository.UserRepository;
+import com.sprint.discodeit.domain.dto.userDto.UserLoginRequestDto;
 import com.sprint.discodeit.repository.file.FileUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

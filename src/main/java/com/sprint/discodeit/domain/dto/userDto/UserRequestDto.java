@@ -1,6 +1,4 @@
-package com.sprint.discodeit.domain.dto;
-
-import java.util.UUID;
+package com.sprint.discodeit.domain.dto.userDto;
 
 public record UserRequestDto( String username, String email, String password) {
 }
