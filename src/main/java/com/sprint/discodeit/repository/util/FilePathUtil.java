@@ -4,7 +4,8 @@ public enum FilePathUtil {
 
     CHANNELS("channels.dat"),
     USERS("users.dat"),
-    Message("message.dat");
+    Message("message.dat"),
+    STATUS("status.dat");
 
     private final String path;
 
