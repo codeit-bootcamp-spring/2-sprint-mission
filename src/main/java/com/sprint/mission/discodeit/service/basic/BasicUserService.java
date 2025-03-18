@@ -3,7 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
 import com.sprint.mission.discodeit.DTO.User.UserFindDTO;
-import com.sprint.mission.discodeit.Exception.CommonException;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
+import com.sprint.mission.discodeit.Exception.EmptyException;
 import com.sprint.mission.discodeit.Exception.EmptyUserListException;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -44,31 +46,35 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User register(UserCRUDDTO userCRUDDTO) {
+    public User register(UserCRUDDTO userCRUDDTO, Optional<BinaryContentDTO> binaryContentDTO) {
         UserCRUDDTO checkDuplicate = UserCRUDDTO.checkDuplicate(userCRUDDTO.userName(), userCRUDDTO.email());
 
         try {
             checkDuplicate(checkDuplicate);
-        } catch (CommonException e) {
+        } catch (NotFoundException e) {
             System.out.println("중복된 유저가 존재합니다.");
             return null;
         }
 
         User user = new User(userCRUDDTO.userName(), userCRUDDTO.email(), userCRUDDTO.password());
 
-        if (userCRUDDTO.binaryContent() != null) {
-            user.setProfileId(userCRUDDTO.binaryContent().getBinaryContentId());
-            try {
-                BinaryContent content = binaryContentRepository.find(userCRUDDTO.binaryContent().getBinaryContentId());
-            } catch (CommonException e) {
-                BinaryContentDTO binaryContentDTO = BinaryContentDTO.create(userCRUDDTO.binaryContent());
-                binaryContentRepository.save(binaryContentDTO);
-            }
-        }
+        UUID profileId = binaryContentDTO.map(contentDTO -> {
+            String fileName = contentDTO.fileName();
+            String contentType = contentDTO.contentType();
+            byte[] bytes = contentDTO.bytes();
+            int size = bytes.length;
+            BinaryContent content = new BinaryContent(fileName, size, contentType, bytes);
+            binaryContentRepository.save(content);
+            return content.getBinaryContentId();
+        }).orElse(null);
+
+        user.setProfileId(profileId);
 
         UserStatus userStatus = new UserStatus(user.getId());
+
         userRepository.save(user);
         userStatusRepository.save(userStatus);
+
         return user;
     }
 
@@ -77,6 +83,7 @@ public class BasicUserService implements UserService {
     public UserFindDTO find(UUID userId) {
         User user = userRepository.find(userId);
         UserStatus userStatus = userStatusRepository.find(userId);
+        userStatus.isOnline();
 
         UserFindDTO userFindDTO = UserFindDTO.find(
                 user.getId(),
@@ -129,13 +136,15 @@ public class BasicUserService implements UserService {
 
             userRepository.remove(findUser);
             userStatusRepository.delete(findUser.getId());
-            binaryContentRepository.delete(findUser.profileId);
+
+            UUID profileId = findUser.profileId;
+
+            if (profileId != null) {
+                binaryContentRepository.delete(profileId);
+            }
 
             return true;
-        } catch (IllegalArgumentException e0) {
-            System.out.println("잘못된 ID값을 받았습니다.");
-            return false;
-        } catch (CommonException e) {
+        } catch (NotFoundException e) {
             System.out.println("유저를 찾지 못했습니다.");
             return false;
         }
@@ -148,10 +157,10 @@ public class BasicUserService implements UserService {
             User findUser = userRepository.find(userId);
             User update = userRepository.update(findUser, userCRUDDTO);
             return update;
-        } catch (IllegalArgumentException e0) {
-            System.out.println("잘못된 ID값을 받았습니다.");
+        } catch (EmptyException e) {
+            System.out.println("업데이트할 리스트가 존재하지 않습니다.");
             return null;
-        } catch (CommonException e1) {
+        } catch (NotFoundException e) {
             System.out.println("업데이트할 유저가 존재하지 않습니다.");
             return null;
         }

@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.DTO.User.*;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -23,7 +25,7 @@ public interface UserService {
      * @param userCRUDDTO 등록할 사용자 정보 DTO
      * @return 생성된 사용자의 고유 ID(UUID)
      */
-    User register(UserCRUDDTO userCRUDDTO);
+    User register(UserCRUDDTO userCRUDDTO, Optional<BinaryContentDTO> binaryContentDTO);
     /**
      * 특정 사용자 ID에 대한 정보를 조회합니다.
      *

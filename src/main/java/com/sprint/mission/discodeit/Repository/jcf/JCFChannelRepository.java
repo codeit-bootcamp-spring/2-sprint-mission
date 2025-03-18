@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
+import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyUserListException;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
@@ -61,19 +62,19 @@ public class JCFChannelRepository implements ChannelRepository {
     public Channel find(UUID channelId) {
         List<Channel> list = channelList.values().stream().flatMap(List::stream).toList();
         Channel channel = CommonUtils.findById(list, channelId, Channel::getChannelId)
-                .orElseThrow(() -> CommonExceptions.CHANNEL_NOF_FOUND);
+                .orElseThrow(() -> NotFoundExceptions.CHANNEL_NOF_FOUND);
         return channel;
     }
 
     @Override
     public List<Channel> findAllByServerId(UUID serverId) {
         if (channelList.isEmpty()) {
-            throw CommonExceptions.EMPTY_CHANNEL_LIST;
+            throw EmptyExceptions.EMPTY_CHANNEL_LIST;
         }
         List<Channel> channels = channelList.get(serverId);
 
         if (channels.isEmpty()) {
-            throw CommonExceptions.EMPTY_CHANNEL_LIST;
+            throw EmptyExceptions.EMPTY_CHANNEL_LIST;
         }
         return channels;
     }

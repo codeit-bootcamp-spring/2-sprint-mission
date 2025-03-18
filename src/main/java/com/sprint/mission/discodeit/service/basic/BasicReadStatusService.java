@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusCRUDDTO;
-import com.sprint.mission.discodeit.Exception.CommonException;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
+import com.sprint.mission.discodeit.Exception.ValidExceptions;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.Repository.UserRepository;
@@ -36,13 +36,13 @@ public class BasicReadStatusService implements ReadStatusService {
             if (status == null) {
                 status = new ReadStatus(userId, channelId);
             } else {
-                throw CommonExceptions.DUPLICATE_READ_STATUS;
+                throw ValidExceptions.DUPLICATE_READ_STATUS;
             }
             readStatusRepository.save(status);
 
             return status.getReadStatusId();
 
-        } catch (CommonException e) {
+        } catch (NotFoundException e) {
             System.out.println("에러가 발생하였습니다");
             return null;
         }

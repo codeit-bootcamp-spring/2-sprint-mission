@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyUserListException;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Repository.UserRepository;
@@ -56,7 +56,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public User find(UUID userId) {
         User user = CommonUtils.findById(userList, userId, User::getId)
-                .orElseThrow(() -> CommonExceptions.USER_NOT_FOUND);
+                .orElseThrow(() -> NotFoundExceptions.USER_NOT_FOUND);
 
         return user;
     }

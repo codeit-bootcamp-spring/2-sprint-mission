@@ -15,8 +15,7 @@ public record UserCRUDDTO(
         UUID profileId,
         String userName,
         String email,
-        String password,
-        BinaryContent binaryContent
+        String password
 ) {
     /**
      * 주어진 사용자 이름과 이메일을 기반으로 중복 체크용 DTO를 생성합니다.
@@ -55,13 +54,11 @@ public record UserCRUDDTO(
      */
     public static UserCRUDDTO create(String userName,
                                      String email,
-                                     String password,
-                                     BinaryContent binaryContent) {
+                                     String password) {
         return UserCRUDDTO.builder()
                 .userName(userName)
                 .email(email)
-                .password(password)
-                .binaryContent(binaryContent).build();
+                .password(password).build();
     }
 
     /**

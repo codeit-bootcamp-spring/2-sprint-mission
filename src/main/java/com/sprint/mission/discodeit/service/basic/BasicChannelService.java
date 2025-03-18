@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.Channel.ChannelCRUDDTO;
 import com.sprint.mission.discodeit.DTO.Channel.ChannelDTO;
-import com.sprint.mission.discodeit.Exception.CommonException;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.Repository.*;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -100,7 +100,7 @@ public class BasicChannelService implements ChannelService {
             messageList= messageRepository.findAllByChannelId(channelUUID);
             message= messageList.get(messageList.size() - 1);
             lastMessageTime = message.createdAt;
-        } catch (CommonException e) {
+        } catch (NotFoundException e) {
 //            System.out.println("메시지 함이 비어있습니다.");
         }
         if (channel.getType() == ChannelType.PUBLIC) {
@@ -149,7 +149,7 @@ public class BasicChannelService implements ChannelService {
                 for (ReadStatus status : readStatusList) {
                     readStatusRepository.delete(status.getReadStatusId());
                 }
-            } catch (CommonException e) {
+            } catch (NotFoundException e) {
                 System.out.println("삭제 중 메시지 함이 없습니다.");
             }
             return true;

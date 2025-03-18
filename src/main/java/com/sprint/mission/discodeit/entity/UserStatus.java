@@ -9,7 +9,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 @Getter
 public class UserStatus implements Serializable {
     @Serial
@@ -19,6 +19,8 @@ public class UserStatus implements Serializable {
     private final UUID userId;
     public final Instant createdAt;
     public Instant updatedAt;
+
+    @ToString.Include
     public UserStatusType status;
 
     public UserStatus(UUID userId) {

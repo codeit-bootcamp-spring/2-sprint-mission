@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.User.UserCRUDDTO;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
+import com.sprint.mission.discodeit.Exception.ValidExceptions;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.User;
@@ -19,10 +20,10 @@ public class BasicAuthService implements AuthService {
     public User loginUser(UserCRUDDTO userLoginDTO) {
         List<User> list = userRepository.findUserList();
         User user = CommonUtils.findByName(list, userLoginDTO.userName(), User::getName)
-                .orElseThrow(() -> CommonExceptions.USER_NOT_FOUND);
+                .orElseThrow(() -> NotFoundExceptions.USER_NOT_FOUND);
         boolean login = user.getPassword().equals(userLoginDTO.password());
         if (login == false) {
-            throw CommonExceptions.INVALID_PASSWORD;
+            throw ValidExceptions.INVALID_PASSWORD;
         }
         return user;
     }

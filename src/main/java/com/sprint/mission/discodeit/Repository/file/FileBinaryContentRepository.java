@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.Repository.file;
 
-import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDTO;
-import com.sprint.mission.discodeit.Exception.CommonException;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
+import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
+import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Util.CommonUtils;
@@ -37,14 +37,14 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public BinaryContent find(UUID binaryId) {
         BinaryContent content = CommonUtils.findById(binaryContentList, binaryId, BinaryContent::getBinaryContentId)
-                .orElseThrow(() -> CommonExceptions.BINARY_CONTENT_NOT_FOUND);
+                .orElseThrow(() -> NotFoundExceptions.BINARY_CONTENT_NOT_FOUND);
         return content;
     }
 
     @Override
     public List<BinaryContent> findAllByIdIn() {
         if (binaryContentList.isEmpty()) {
-            throw CommonExceptions.EMPTY_BINARY_CONTENT_LIST;
+            throw EmptyExceptions.EMPTY_BINARY_CONTENT_LIST;
         }
         return binaryContentList;
     }
@@ -56,7 +56,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
             binaryContentList.remove(content);
             fileRepository.save(binaryContentList);
             return true;
-        } catch (CommonException e) {
+        } catch (NotFoundException e) {
             System.out.println("해당 바이너리 데이터는 존재하지 않습니다.");
             return false;
         }

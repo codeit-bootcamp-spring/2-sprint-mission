@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusCRUDDTO;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
+import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
@@ -37,19 +38,19 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public ReadStatus find(UUID readStatusId) {
         ReadStatus status = CommonUtils.findById(readStatusList, readStatusId, ReadStatus::getReadStatusId)
-                .orElseThrow(() -> CommonExceptions.READ_STATUS_NOT_FOUND);
+                .orElseThrow(() -> NotFoundExceptions.READ_STATUS_NOT_FOUND);
         return status;
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userID) {
         if (readStatusList.isEmpty()) {
-            throw CommonExceptions.EMPTY_READ_STATUS_LIST;
+            throw EmptyExceptions.EMPTY_READ_STATUS_LIST;
         }
         List<ReadStatus> list = CommonUtils.findAllById(readStatusList, userID, ReadStatus::getUserId);
 
         if (list.isEmpty()) {
-            throw CommonExceptions.EMPTY_READ_STATUS_LIST;
+            throw EmptyExceptions.EMPTY_READ_STATUS_LIST;
         }
         return list;
     }
@@ -57,13 +58,13 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
         if (readStatusList.isEmpty()) {
-            throw CommonExceptions.EMPTY_READ_STATUS_LIST;
+            throw EmptyExceptions.EMPTY_READ_STATUS_LIST;
         }
 
         List<ReadStatus> list = CommonUtils.findAllById(readStatusList, channelId, ReadStatus::getChannelId);
 
         if (list.isEmpty()) {
-            throw CommonExceptions.EMPTY_READ_STATUS_LIST;
+            throw EmptyExceptions.EMPTY_READ_STATUS_LIST;
         }
         return list;
     }

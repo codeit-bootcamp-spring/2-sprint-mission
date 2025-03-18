@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Util;
 
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.ValidExceptions;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +21,7 @@ public class CommonUtils {
     }
 
     public static <T> void checkUserDuplicate(List<T> list, String data, Function<T, String> function) {
-        list.stream().filter(t->function.apply(t).equals(data)).findFirst().ifPresent(t -> {throw CommonExceptions.DUPLICATE_USER;});
+        list.stream().filter(t->function.apply(t).equals(data)).findFirst().ifPresent(t -> {throw ValidExceptions.DUPLICATE_USER;});
     }
+
 }

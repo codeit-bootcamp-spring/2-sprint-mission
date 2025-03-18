@@ -18,12 +18,12 @@ public class BinaryContent implements Serializable {
     public final Instant createdAt;
 
     private String fileName;
-    private Long size;
+    private int size;
     private String contentType;
     private byte[] bytes;
 
 
-    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
+    public BinaryContent(String fileName, int size, String contentType, byte[] bytes) {
         binaryContentId = UUID.randomUUID();
         createdAt = Instant.now();
 

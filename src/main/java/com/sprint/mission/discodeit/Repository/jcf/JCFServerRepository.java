@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.Server.ServerCRUDDTO;
-import com.sprint.mission.discodeit.DTO.Server.ServerDTO;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
+import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Exception.EmptyUserListException;
 import com.sprint.mission.discodeit.Repository.ServerRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
@@ -60,18 +60,18 @@ public class JCFServerRepository implements ServerRepository {
     public Server find(UUID serverId) {
         List<Server> list = serverList.values().stream().flatMap(List::stream).toList();
         Server server = CommonUtils.findById(list, serverId, Server::getServerId)
-                .orElseThrow(() -> CommonExceptions.SERVER_NOT_FOUND);
+                .orElseThrow(() -> NotFoundExceptions.SERVER_NOT_FOUND);
         return server;
     }
 
     @Override
     public List<Server> findAllByUserId(UUID userId) {
         if (serverList.isEmpty()) {
-            throw CommonExceptions.EMPTY_SERVER_LIST;
+            throw EmptyExceptions.EMPTY_SERVER_LIST;
         }
         List<Server> list = serverList.get(userId);
         if (list.isEmpty()) {
-            throw CommonExceptions.EMPTY_SERVER_LIST;
+            throw EmptyExceptions.EMPTY_SERVER_LIST;
         }
         return list;
     }

@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.Repository.file;
 
 import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusCRUDDTO;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
+import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -37,14 +38,14 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public UserStatus find(UUID userId) {
         UserStatus status = userStatusList.stream().filter(userStatus -> userStatus.getUserId().equals(userId))
-                .findFirst().orElseThrow(() -> CommonExceptions.USER_STATUS_NOT_FOUND);
+                .findFirst().orElseThrow(() -> NotFoundExceptions.USER_STATUS_NOT_FOUND);
         return status;
     }
 
     @Override
     public List<UserStatus> findAll() {
         if (userStatusList.isEmpty()) {
-            throw CommonExceptions.EMPTY_USER_STATUS_LIST;
+            throw EmptyExceptions.EMPTY_USER_STATUS_LIST;
         }
         return userStatusList;
     }

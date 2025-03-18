@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
-import com.sprint.mission.discodeit.Exception.CommonException;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
+import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
+import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -25,14 +26,14 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     @Override
     public BinaryContent find(UUID binaryId) {
         BinaryContent content = CommonUtils.findById(binaryContentList, binaryId, BinaryContent::getBinaryContentId)
-                .orElseThrow(() -> CommonExceptions.BINARY_CONTENT_NOT_FOUND);
+                .orElseThrow(() -> NotFoundExceptions.BINARY_CONTENT_NOT_FOUND);
         return content;
     }
 
     @Override
     public List<BinaryContent> findAllByIdIn() {
         if (binaryContentList.isEmpty()) {
-            throw CommonExceptions.EMPTY_BINARY_CONTENT_LIST;
+            throw EmptyExceptions.EMPTY_BINARY_CONTENT_LIST;
         }
         return binaryContentList;
     }
@@ -43,7 +44,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
             BinaryContent content = find(binaryId);
             binaryContentList.remove(content);
             return true;
-        } catch (CommonException e) {
+        } catch (NotFoundException e) {
             System.out.println("해당 바이너리 데이터는 존재하지 않습니다.");
             return false;
         }

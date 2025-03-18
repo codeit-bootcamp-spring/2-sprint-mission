@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Repository;
 
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -41,7 +41,7 @@ public class FileRepositoryImpl<T> implements FileRepository<T> {
                 throw new RuntimeException(e);
             }
         }
-        throw CommonExceptions.File_NOT_FOUND;
+        throw NotFoundExceptions.File_NOT_FOUND;
     }
 
     @Override

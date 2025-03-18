@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusCRUDDTO;
-import com.sprint.mission.discodeit.Exception.CommonException;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundException;
+import com.sprint.mission.discodeit.Exception.ValidExceptions;
 import com.sprint.mission.discodeit.Repository.UserRepository;
 import com.sprint.mission.discodeit.Repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.User;
@@ -29,10 +29,10 @@ public class BasicUserStatusService implements UserStatusService {
             if (userStatus == null) {
                 userStatus = new UserStatus(user.getId());
             } else {
-                throw CommonExceptions.DUPLICATE_USER_STATUS;
+                throw ValidExceptions.DUPLICATE_USER_STATUS;
             }
             userStatusRepository.save(userStatus);
-        } catch (CommonException e) {
+        } catch (NotFoundException e) {
             System.out.println("에러 발생");
         }
     }

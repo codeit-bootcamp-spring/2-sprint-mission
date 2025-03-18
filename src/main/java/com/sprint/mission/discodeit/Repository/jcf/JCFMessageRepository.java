@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.Repository.jcf;
 
 import com.sprint.mission.discodeit.DTO.Message.MessageCRUDDTO;
-import com.sprint.mission.discodeit.Exception.CommonExceptions;
+import com.sprint.mission.discodeit.Exception.NotFoundExceptions;
+import com.sprint.mission.discodeit.Exception.EmptyExceptions;
 import com.sprint.mission.discodeit.Repository.MessageRepository;
 import com.sprint.mission.discodeit.Util.CommonUtils;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -37,19 +38,19 @@ public class JCFMessageRepository implements MessageRepository {
     public Message find(UUID messageId) {
         List<Message> list = messageList.values().stream().flatMap(List::stream).toList();
         Message message = CommonUtils.findById(list, messageId, Message::getMessageId)
-                .orElseThrow(() -> CommonExceptions.MESSAGE_NOT_FOUND);
+                .orElseThrow(() -> NotFoundExceptions.MESSAGE_NOT_FOUND);
         return message;
     }
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         if (messageList.isEmpty()) {
-            throw CommonExceptions.EMPTY_MESSAGE_LIST;
+            throw EmptyExceptions.EMPTY_MESSAGE_LIST;
         }
         List<Message> messages = messageList.get(channelId);
 
         if (messages.isEmpty()) {
-            throw CommonExceptions.EMPTY_MESSAGE_LIST;
+            throw EmptyExceptions.EMPTY_MESSAGE_LIST;
         }
         return messages;
     }
