@@ -20,6 +20,8 @@ public class User implements Serializable {
     private String email;
     private String password;
     private UUID userStatusId;
+    private boolean deleted; // 삭제 여부 필드 추가
+
 
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
@@ -56,6 +58,14 @@ public class User implements Serializable {
         if (anyValueUpdated) {
             this.updatedAt = Instant.now();
         }
+    }
+
+    public void softDelete() {
+        this.deleted = true;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
     }
 
 

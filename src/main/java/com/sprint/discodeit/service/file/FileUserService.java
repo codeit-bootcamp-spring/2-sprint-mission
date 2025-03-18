@@ -16,8 +16,10 @@ import com.sprint.discodeit.repository.file.FileUserRepository;
 import com.sprint.discodeit.service.UserServiceV1;
 import com.sprint.discodeit.service.util.BinaryUtil;
 import com.sprint.discodeit.service.util.UserStatusEvaluator;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -109,8 +111,14 @@ public class FileUserService implements UserServiceV1 {
 
     @Override
     public void delete(UUID userId) {
-        fileUserRepository.delete(userId);
-        baseUserStatusRepository.delete(userId);
-        baseBinaryContentRepository.delete(userId);
+        Optional<User> user = fileUserRepository.findById(userId.toString());
+        if (user.isPresent()) {
+            user.get().isDeleted();
+            UserStatus userStatus = new UserStatus(Instant.now(), StatusType.Inactive.getExplanation());
+            baseUserStatusRepository.save(userStatus);
+            fileUserRepository.save(user.get());
+        }else{
+            throw new IllegalArgumentException("삭제된 회원 입니다");
+        }
     }
 }

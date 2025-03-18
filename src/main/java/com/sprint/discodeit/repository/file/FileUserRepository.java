@@ -4,10 +4,12 @@ import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.repository.util.AbstractFileRepository;
 import com.sprint.discodeit.repository.UserRepository;
 import com.sprint.discodeit.repository.util.FilePathUtil;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -28,7 +30,9 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     @Override
     public List<User> findByAll() {
         Map<UUID, User> users = loadAll();
-        return users.values().stream().toList();
+        return users.values().stream()
+                .filter(user -> !user.isDeleted())
+                .collect(Collectors.toList());
     }
 
     @Override
