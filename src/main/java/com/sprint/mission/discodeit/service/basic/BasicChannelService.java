@@ -65,6 +65,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelReadResponse> findAllByUserId(UUID userId) {
+        UserService.validateUserId(userId, this.userRepository);
         return channelRepository.findAllByUserId(userId).stream()
                 .map(channel -> strategyProvider.getChannelReadStrategy(channel.getChannelType()).toDto(channel))
                 .collect(Collectors.toList());
