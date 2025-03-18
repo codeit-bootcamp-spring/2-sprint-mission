@@ -57,6 +57,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
     public void updateMessageContent(UUID messageId, String newContent) {
         if (existsById(messageId)) {
             super.storage.get(messageId).updateContent(newContent);
+            super.saveToFile(super.directory.resolve(messageId.toString() + ".ser"), super.findById(messageId));
         }
     }
 
@@ -64,6 +65,15 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
     public void updateAttachmentIds(UUID messageId, List<UUID> attachmentIds) {
         if (existsById(messageId)) {
             super.storage.get(messageId).updateAttachmentIds(attachmentIds);
+            super.saveToFile(super.directory.resolve(messageId.toString() + ".ser"), super.findById(messageId));
+        }
+    }
+
+    @Override
+    public void deleteAttachment(UUID messageId, UUID attachmentId) {
+        if (existsById(messageId)) {
+            super.storage.get(messageId).deleteAttachment(attachmentId);
+            super.saveToFile(super.directory.resolve(messageId.toString() + ".ser"), super.findById(messageId));
         }
     }
 }

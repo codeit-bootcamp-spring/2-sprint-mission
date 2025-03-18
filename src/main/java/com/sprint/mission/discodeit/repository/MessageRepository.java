@@ -10,4 +10,5 @@ public interface MessageRepository extends Repository<Message> {
     List<Message> findMessageListByChannelId(UUID channelId);
     void updateMessageContent(UUID messageId, String newContent);
     void updateAttachmentIds(UUID messageId, List<UUID> attachmentIds);
+    void deleteAttachment(UUID messageId, UUID attachmentId);
 }
