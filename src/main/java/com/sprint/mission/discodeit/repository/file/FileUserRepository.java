@@ -67,10 +67,13 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User findById(UUID userId) {
-        return findAll().stream()
-                .filter(user -> user.getId().equals(userId))
-                .findFirst()
-                .orElse(null);
+        Path filePath = getFilePath(userId);
+
+        if (!Files.exists(filePath)) {
+            throw new RuntimeException("User ID " + userId + "에 해당하는 파일을 찾을 수 없습니다.");
+        }
+
+        return readUserFromFile(filePath);
     }
 
     @Override

@@ -73,11 +73,7 @@ public class FileMessageRepository implements MessageRepository {
             throw new RuntimeException("Message ID " + messageId + "에 해당하는 파일을 찾을 수 없습니다.");
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
-            return (Message) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(filePath.getFileName() + " Message 로드를 실패했습니다: " + e.getMessage());
-        }
+        return readUserFromFile(filePath);
     }
 
     @Override

@@ -67,10 +67,13 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel findById(UUID channelId) {
-        return findAll().stream()
-                .filter(channel -> channel.getId().equals(channelId))
-                .findFirst()
-                .orElse(null);
+        Path filePath = getFilePath(channelId);
+
+        if (!Files.exists(filePath)) {
+            throw new RuntimeException("Channel ID " + channelId + "에 해당하는 파일을 찾을 수 없습니다.");
+        }
+
+        return readUserFromFile(filePath);
     }
 
     @Override
