@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Repository
@@ -25,7 +26,15 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
     }
 
     @Override
+    public boolean existsByUserId(UUID userId) {
+        return userIdMap.containsKey(userId);
+    }
+
+    @Override
     public UserStatus findUserStatusIDByUserId(UUID userId) {
+        if (!existsByUserId(userId)) {
+            throw new NoSuchElementException("해당 userId를 가진 userStatus를 찾을 수 없습니다 : " + userId);
+        }
         return userIdMap.get(userId);
     }
 
