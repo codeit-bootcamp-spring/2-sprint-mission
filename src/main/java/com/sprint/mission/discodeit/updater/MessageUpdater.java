@@ -7,5 +7,5 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 
 public interface MessageUpdater {
     boolean supports(Message message, MessageUpdateRequest messageUpdateRequest);
-    void update(Message message, MessageUpdateRequest request, MessageRepository messageRepository, BinaryContentService binaryContentService);
+    void update(Message message, MessageUpdateRequest request, MessageRepository messageRepository);
 }

@@ -15,7 +15,7 @@ public class MessageContentUpdater implements MessageUpdater {
     }
 
     @Override
-    public void update(Message message, MessageUpdateRequest request, MessageRepository messageRepository, BinaryContentService binaryContentService) {
+    public void update(Message message, MessageUpdateRequest request, MessageRepository messageRepository) {
         messageRepository.updateMessageContent(message.getId(), request.content());
     }
 }
