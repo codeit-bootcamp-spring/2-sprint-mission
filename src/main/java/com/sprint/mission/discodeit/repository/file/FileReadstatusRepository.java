@@ -28,11 +28,17 @@ public class FileReadstatusRepository extends AbstractFileRepository<ReadStatus>
 
     @Override
     public List<ReadStatus> findByUserId(UUID userId) {
+        if (!userIdMap.containsKey(userId)) {
+            throw new NoSuchElementException("해당 userId를 가진 readStatus를 찾을 수 없습니다 : " + userId);
+        }
         return this.userIdMap.get(userId);
     }
 
     @Override
     public List<ReadStatus> findByChannelId(UUID channelId) {
+        if (!channelIdMap.containsKey(channelId)) {
+            throw new NoSuchElementException("해당 channelId를 가진 readStatus를 찾을 수 없습니다 : " + channelId);
+        }
         return this.channelIdMap.get(channelId);
     }
 
