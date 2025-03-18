@@ -81,7 +81,9 @@ public class JavaApplication {
                             case CREATE_USER:
                                 System.out.print("사용자 이름 입력: ");
                                 String userName = sc.nextLine();
-                                User user = userService.createUser(userName);
+                                System.out.println("사용자 이메일 입력: ");
+                                String userEmail = sc.nextLine();
+                                User user = userService.createUser(userName, userEmail);
                                 System.out.println("사용자 생성 완료: " + user);
                                 break;
 

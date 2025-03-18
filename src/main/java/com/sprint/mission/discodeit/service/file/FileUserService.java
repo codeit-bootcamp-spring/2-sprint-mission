@@ -43,8 +43,8 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User createUser(String name) {
-        User user = new User(name);
+    public User createUser(String name, String email) {
+        User user = new User(name, email);
         data.put(user.getId(), user);
         saveData();
         return user;
@@ -68,11 +68,11 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void updateUser(UUID userId, String newName) {
+    public void updateUser(UUID userId, String newName, String newEmail) {
         User user = data.get(userId);
         if (user != null) {
             Instant updatedTime = Instant.now();
-            user.update(newName, updatedTime);
+            user.update(newName, newEmail, updatedTime);
             saveData();
         }
     }

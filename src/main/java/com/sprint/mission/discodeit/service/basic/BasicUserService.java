@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.naming.factory.SendMailFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -18,8 +19,8 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User createUser(String name) {
-        User user = new User(name);
+    public User createUser(String name, String email) {
+        User user = new User(name, email);
         userRepository.save(user);
         return user;
     }
@@ -42,10 +43,10 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateUser(UUID userId, String newName) {
+    public void updateUser(UUID userId, String newName, String newEmail) {
         userRepository.getUserById(userId).ifPresent(user -> {
             Instant updatedTime = Instant.now();
-            user.update(newName, updatedTime);
+            user.update(newName, newEmail, updatedTime);
             userRepository.save(user);
         });
     }
