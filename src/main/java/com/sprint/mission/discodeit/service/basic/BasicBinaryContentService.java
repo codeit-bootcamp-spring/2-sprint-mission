@@ -21,6 +21,11 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
+    public boolean existsById(UUID id) {
+        return binaryContentRepository.existsById(id);
+    }
+
+    @Override
     public BinaryContentFindResponse findById(UUID id) {
         return null;
     }
