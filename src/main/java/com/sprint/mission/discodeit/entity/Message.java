@@ -51,4 +51,8 @@ public class Message implements Serializable {
         this.updatedAt = Instant.now();
     }
 
+    public void setAttachmentIds(List<UUID> attachmentIds) {
+        this.attachmentIds = attachmentIds;
+        this.updatedAt = Instant.now();
+    }
 }

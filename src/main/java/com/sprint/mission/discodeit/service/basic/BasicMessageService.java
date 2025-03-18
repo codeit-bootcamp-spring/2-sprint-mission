@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.DTO.Request.MessageWriteDTO;
+import com.sprint.mission.discodeit.DTO.RequestToService.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.DTO.legacy.Message.MessageCRUDDTO;
 import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
@@ -15,7 +17,9 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -35,22 +39,17 @@ public class BasicMessageService implements MessageService {
 
     @CustomLogging
     @Override
-    public Message create(MessageCRUDDTO messageCRUDDTO) {
-        UUID userId = messageCRUDDTO.creatorId();
-        UUID channelUUID = messageCRUDDTO.channelId();
+    public Message create(MessageWriteDTO messageWriteDTO,List<Optional<BinaryContentCreateDTO>> binaryContentDTOs) {
+        UUID userId = UUID.fromString(messageWriteDTO.creatorId());
+        UUID channelUUID = UUID.fromString(messageWriteDTO.channelId());
 
         User user = userRepository.find(userId);
         Channel channel = channelRepository.find(channelUUID);
 
-        Message message = new Message(userId,user.getName(), channelUUID, messageCRUDDTO.text());
+        Message message = new Message(userId,user.getName(), channelUUID, messageWriteDTO.text());
 
-        if (messageCRUDDTO.binaryContent() != null) {
-            List<UUID> attachmentIds = message.getAttachmentIds();
-            List<BinaryContent> contentList = messageCRUDDTO.binaryContent();
-            for (BinaryContent binaryContent : contentList) {
-                attachmentIds.add(binaryContent.getBinaryContentId());
-            }
-        }
+        List<UUID> binaryContentIdList = makeBinaryContent(binaryContentDTOs);
+        message.setAttachmentIds(binaryContentIdList);
 
         messageRepository.save(channel, message);
         return message;
@@ -91,14 +90,12 @@ public class BasicMessageService implements MessageService {
     }
     @CustomLogging
     @Override
-    public boolean delete(MessageCRUDDTO messageCRUDDTO) {
-        UUID channelId = messageCRUDDTO.channelId();
-        UUID messageId = messageCRUDDTO.messageId();
+    public boolean delete(String messageId) {
+        UUID messageUUID = UUID.fromString(messageId);
 
-        Channel channel = channelRepository.find(channelId);
-        Message message = messageRepository.find(messageId);
+        Message message = messageRepository.find(messageUUID);
 
-        messageRepository.remove(channel, message);
+        messageRepository.remove(messageUUID);
         if (message.getAttachmentIds().isEmpty() == false) {
             List<UUID> attachmentIds = message.getAttachmentIds();
             for (UUID attachmentId : attachmentIds) {
@@ -117,5 +114,23 @@ public class BasicMessageService implements MessageService {
 
         messageRepository.update(message, messageCRUDDTO);
         return true;
+    }
+
+    private List<UUID> makeBinaryContent(List<Optional<BinaryContentCreateDTO>> binaryContentDTOs) {
+        List<UUID> attachmentIds = new ArrayList<>();
+        for (Optional<BinaryContentCreateDTO> binaryContentDTO : binaryContentDTOs) {
+            UUID profileId = binaryContentDTO.map(contentDTO -> {
+                String fileName = contentDTO.fileName();
+                String contentType = contentDTO.contentType();
+                byte[] bytes = contentDTO.bytes();
+                long size = (long) bytes.length;
+
+                BinaryContent content = new BinaryContent(fileName, size, contentType, bytes);
+                binaryContentRepository.save(content);
+                return content.getBinaryContentId();
+            }).orElse(null);
+            attachmentIds.add(profileId);
+        }
+        return attachmentIds;
     }
 }
