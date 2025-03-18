@@ -1,15 +1,13 @@
-package com.sprint.discodeit.service.file;
+package com.sprint.discodeit.service.util;
 
 import com.sprint.discodeit.domain.entity.BinaryContent;
-import com.sprint.discodeit.service.BinaryService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class BinaryServiceImpl implements BinaryService {
+public class BinaryUtil {
 
     private static final String DEFAULT_PROFILE_IMAGE_URL = "https://your-storage.com/default-profile.png";
 
-    @Override
     public BinaryContent createProfileImage(String imgUrl) {
         if (imgUrl == null || imgUrl.isBlank()) {
             return new BinaryContent("이미지", DEFAULT_PROFILE_IMAGE_URL); // 기본 이미지 설정
