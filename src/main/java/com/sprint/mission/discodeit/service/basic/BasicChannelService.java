@@ -15,17 +15,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
-
-    public BasicChannelService(ChannelRepository channelRepository, UserRepository userRepository) {
-        this.channelRepository = channelRepository;
-        this.userRepository = userRepository;
-    }
 
     @Override
     public ChannelDto create(String name, UserDto owner) {

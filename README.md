@@ -66,15 +66,15 @@
   }
   ~~~
 
-4. Spring 핵심 개념 이해하기
+4. Spring 핵심 개념 이해하기[다음주 월요일 예정]
 - [ ] JavaApplication과 DiscodeitApplication에서 Service를 초기화하는 방식의 차이에 대해 다음의 키워드를 중심으로 정리해보세요.
   - IoC Container
   - Dependency Injection
   - Bean
 
 5. Lombok 적용
-- [ ] 도메인 모델의 getter 메소드를 @Getter로 대체해보세요.
-- [ ] Basic*Service의 생성자를 @RequiredArgsConstructor로 대체해보세요.
+- [x] 도메인 모델의 getter 메소드를 @Getter로 대체해보세요.
+- [x] Basic*Service의 생성자를 @RequiredArgsConstructor로 대체해보세요.
 
 ## 기능 요구사항
 ### 대표적인 기능 구현 흐름 정리
