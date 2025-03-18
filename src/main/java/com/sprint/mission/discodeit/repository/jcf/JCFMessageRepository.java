@@ -14,40 +14,40 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Message save(Message message) {
-        this.data.put(message.getId(), message);
+        data.put(message.getId(), message);
         return message;
     }
 
     @Override
     public Optional<Message> findById(UUID id) {
-        return Optional.ofNullable(this.data.get(id));
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
     public List<Message> findAll() {
-        return this.data.values().stream().toList();
+        return data.values().stream().toList();
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return this.data.containsKey(id);
+        return data.containsKey(id);
     }
 
     @Override
     public void deleteById(UUID id) {
-        this.data.remove(id);
+        data.remove(id);
     }
 
     @Override
     public Optional<Message> findLatestMessageByChannelId(UUID channelId) {
-        return this.data.values().stream()
+        return data.values().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .max(Comparator.comparing(Message::getCreatedAt));
     }
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        return this.data.values().stream()
+        return data.values().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .toList();
     }
