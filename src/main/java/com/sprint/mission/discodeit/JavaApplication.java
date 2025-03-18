@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
@@ -16,13 +18,21 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.dto.CreateDefinition;
-import com.sprint.mission.discodeit.dto.UpdateDefinition;
+import com.sprint.mission.discodeit.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.ProfileImageRequest;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class JavaApplication {
-    static User setupUser(UserService userService) {
-        CreateDefinition createDefinition = new CreateDefinition("woody", "woody@codeit.com", "woody1234");
-        return userService.create(createDefinition);
+    static User setupUser(UserService userService, boolean withProfileImage) {
+        UserCreateRequest userCreateRequest = new UserCreateRequest("woody", "woody@codeit.com", "woody1234");
+
+        ProfileImageRequest profileImageRequest = null;
+        if (withProfileImage) {
+            profileImageRequest = new ProfileImageRequest(new byte[]{1,2,3,4});
+        }
+        return userService.create(userCreateRequest, profileImageRequest);
     }
 
 
@@ -36,21 +46,17 @@ public class JavaApplication {
         System.out.println("메시지 생성: " + message.getId());
     }
 
-    public static void main(String[] args) {
-        // 레포지토리 초기화
-        UserRepository userRepository = new FileUserRepository();
-        ChannelRepository channelRepository = new FileChannelRepository();
-        MessageRepository messageRepository = new FileMessageRepository();
-
-        // 서비스 초기화
-        UserService userService = new BasicUserService(userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository);
-        MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
-
-        // 셋업
-        User user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
-        // 테스트
-        messageCreateTest(messageService, channel, user);
-    }
+//    public static void main(String[] args) {
+//        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+//
+//        UserService userService = context.getBean(UserService.class);
+//
+//        //프로필 이미지 제외
+//        User user1 = setupUser(userService, false);
+//        System.out.println("User1 ID: " + user1.getId());
+//
+//        //프로필 이미지 포함
+//        User user2 = setupUser(userService, true);
+//        System.out.println("User2 ID: " + user2.getId());
+//    }
 }

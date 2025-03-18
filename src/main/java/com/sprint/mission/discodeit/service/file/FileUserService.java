@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.dto.CreateDefinition;
+import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.UpdateDefinition;
 
 
@@ -35,11 +35,11 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User create(CreateDefinition createDefinition) {
+    public User create(UserCreateRequest userCreateRequest) {
         User user = new User(
-                createDefinition.getUsername(),
-                createDefinition.getEmail(),
-                createDefinition.getPassword()
+                userCreateRequest.getUsername(),
+                userCreateRequest.getEmail(),
+                userCreateRequest.getPassword()
         );
         Path path = resolvePath(user.getId());
         try (
@@ -95,7 +95,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, UpdateDefinition updateDefinition) { // ✅ 인터페이스와 일치하도록 수정
+    public User update(UUID userId, UpdateDefinition updateDefinition, UUID newProfileId) { // ✅ 인터페이스와 일치하도록 수정
         User userNullable = null;
         Path path = resolvePath(userId);
         if (Files.exists(path)) {

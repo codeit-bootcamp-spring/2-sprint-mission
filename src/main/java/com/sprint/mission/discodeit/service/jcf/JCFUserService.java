@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.dto.CreateDefinition;
+import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.UpdateDefinition;
 
 import java.util.*;
@@ -15,7 +15,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User create(CreateDefinition createDefintion) {
+    public User create(UserCreateRequest createDefintion, UUID newProfileId) {
         User user = new User(createDefintion.getUsername(), createDefintion.getEmail(), createDefintion.getPassword());
         this.data.put(user.getId(), user);
 

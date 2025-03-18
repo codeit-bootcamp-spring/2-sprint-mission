@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.CreateDefinition;
+import com.sprint.mission.discodeit.dto.ProfileImageRequest;
+import com.sprint.mission.discodeit.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -8,7 +9,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -23,16 +23,25 @@ public class DiscodeitApplication {
 		ChannelService channelService = context.getBean(ChannelService.class);
 		MessageService messageService = context.getBean(MessageService.class);
 
-		User user = setupUser(userService);
-		Channel channel = setupChannel(channelService);
-		messageCreateTest(messageService, channel, user);
+		User user1 = setupUser(userService, false);
+		System.out.println("User1 ID: " + user1.getId());
 
+		User user2 = setupUser(userService, true);
+		System.out.println("User2 ID: " + user2.getId());
+
+		Channel channel = setupChannel(channelService);
+		messageCreateTest(messageService, channel, user1);
 	}
 
 
-	static User setupUser(UserService userService) {
-		CreateDefinition createDefinition = new CreateDefinition("woody", "woody@codeit.com","woody1234");
-		return userService.create(createDefinition);
+	static User setupUser(UserService userService, boolean withProfileImage) {
+		UserCreateRequest userCreateRequest = new UserCreateRequest("woody", "woody@codeit.com","woody1234");
+
+		ProfileImageRequest profileImageRequest = null;
+		if (withProfileImage){
+			profileImageRequest = new ProfileImageRequest(new byte[] {1,2,3,4});
+		}
+		return userService.create(userCreateRequest, profileImageRequest);
 		}
 
 	static Channel setupChannel(ChannelService channelService) {

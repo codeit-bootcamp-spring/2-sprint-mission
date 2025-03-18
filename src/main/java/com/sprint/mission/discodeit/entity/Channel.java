@@ -9,8 +9,8 @@ import lombok.Getter;
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private UUID id;
-    private Instant createdAtSeconds;
+    private final UUID id;
+    private final Instant createdAtSeconds;
     private Instant updatedAtSeconds;
     private ChannelType type;
     private String name;
