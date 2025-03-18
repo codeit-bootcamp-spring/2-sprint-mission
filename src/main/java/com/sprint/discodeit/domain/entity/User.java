@@ -19,7 +19,7 @@ public class User implements Serializable {
     private String username;
     private String email;
     private String password;
-    private UUID userStatus;
+    private UUID userStatusId;
 
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
@@ -31,7 +31,11 @@ public class User implements Serializable {
     }
 
     public void associateStatus(UserStatus userStatus) {
-        this.userStatus = userStatus.getId();
+        this.userStatusId = userStatus.getId();
+    }
+
+    public void associateProfileId(BinaryContent binaryContent) {
+        this.profileId = binaryContent.getId();
     }
 
     public void update(String newUsername, String newEmail, String newPassword) {
