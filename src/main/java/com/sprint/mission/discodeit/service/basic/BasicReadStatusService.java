@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -37,12 +38,18 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatusFindResponse findReadStatus(UUID readStatusId) {
-        return null;
+        ReadStatus readStatus = this.readStatusRepository.findById(readStatusId);
+        return new ReadStatusFindResponse(readStatus.getId());
     }
 
     @Override
     public List<ReadStatusFindResponse> findAllReadStatusByUserId(UUID userId) {
-        return List.of();
+        List<ReadStatus> readStatuses = this.readStatusRepository.findByUserId(userId);
+        List<ReadStatusFindResponse> readStatusFindResponses = new ArrayList<>();
+        for (ReadStatus readStatus : readStatuses) {
+            readStatusFindResponses.add(new ReadStatusFindResponse(readStatus.getId()));
+        }
+        return readStatusFindResponses;
     }
 
     @Override
