@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -18,17 +21,17 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId) {
-        if (!channelRepository.existsById(channelId)) {
-            throw new NoSuchElementException("Channel not found with id " + channelId);
-        }
-        if (!userRepository.existsById(authorId)) {
-            throw new NoSuchElementException("Author not found with id " + authorId);
-        }
+    public Message create(MessageCreateRequestDto requestDto) {
+        validateChannelExistence(requestDto.channelId());
+        validateUserExistence(requestDto.authorId());
 
-        Message message = new Message(content, channelId, authorId);
+        List<UUID> attachmentIds = requestDto.attachmentIds() != null ? requestDto.attachmentIds() : List.of();
+
+        Message message = new Message(requestDto.content(), requestDto.channelId(), requestDto.authorId(), attachmentIds);
+
         return messageRepository.save(message);
     }
 
@@ -39,23 +42,50 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll();
+    public List<Message> findAllByChannelId(UUID channelId) {
+        validateChannelExistence(channelId);
+        return messageRepository.findAllByChannelId(channelId);
     }
 
     @Override
-    public Message update(UUID messageId, String newContent) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
-        message.update(newContent);
+    public Message update(MessageUpdateRequestDto requestDto) {
+        Message message = getMessage(requestDto.id());
+        message.update(requestDto.content());
         return messageRepository.save(message);
     }
 
     @Override
     public void delete(UUID messageId) {
-        if (!messageRepository.existsById(messageId)) {
-            throw new NoSuchElementException("Message with id " + messageId + " not found");
+        Message message = getMessage(messageId);
+
+        if (message.getAttachmentIds().isEmpty()) {
+            messageRepository.deleteById(messageId);
+            return;
         }
+
+        message.getAttachmentIds()
+                .forEach(attachmentId -> {
+                    if (binaryContentRepository.existsById(attachmentId)) {
+                        binaryContentRepository.deleteById(attachmentId);
+                    }
+                });
         messageRepository.deleteById(messageId);
+    }
+
+    private Message getMessage(UUID messageId) {
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("해당 메세지 없음"));
+    }
+
+    private void validateUserExistence(UUID authorId) {
+        if (!userRepository.existsById(authorId)) {
+            throw new NoSuchElementException("해당 유저 없음");
+        }
+    }
+
+    private void validateChannelExistence(UUID channelId) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("해당 채널 없음");
+        }
     }
 }

@@ -36,15 +36,6 @@ public class BasicUserService implements UserService {
         return UserCreateResponseDto.fromEntity(user);
     }
 
-    private void validateUserCreateRequestDto(UserCreateRequestDto requestDto) {
-        if (userRepository.existsByUsername(requestDto.username())) {
-            throw new IllegalArgumentException("동일 username 이미 존재함");
-        }
-        if (userRepository.existsByEmail(requestDto.email())) {
-            throw new IllegalArgumentException("동일 email 이미 존재함");
-        }
-    }
-
     @Override
     public UserResponseDto find(UUID userId) {
         User user = getUserBy(userId);
@@ -57,10 +48,6 @@ public class BasicUserService implements UserService {
         return userRepository.findAll().stream()
                 .map(user -> UserResponseDto.fromEntity(user, isOnline(user.getId())))
                 .toList();
-    }
-
-    private boolean isOnline(UUID userId) {
-        return userStatusService.find(userId).isOnline();
     }
 
     @Override
@@ -89,5 +76,18 @@ public class BasicUserService implements UserService {
     private User getUserBy(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
+    }
+
+    private void validateUserCreateRequestDto(UserCreateRequestDto requestDto) {
+        if (userRepository.existsByUsername(requestDto.username())) {
+            throw new IllegalArgumentException("동일 username 이미 존재함");
+        }
+        if (userRepository.existsByEmail(requestDto.email())) {
+            throw new IllegalArgumentException("동일 email 이미 존재함");
+        }
+    }
+
+    private boolean isOnline(UUID userId) {
+        return userStatusService.find(userId).isOnline();
     }
 }

@@ -50,16 +50,6 @@ public class BasicChannelService implements ChannelService {
         return channel;
     }
 
-    private void createParticipantReadStatuses(List<UUID> participantIds, UUID channelId) {
-        participantIds.forEach(userId ->
-                readStatusRepository.save(new ReadStatus(userId, channelId)));
-    }
-
-    private void validateParticipantExistence(List<UUID> participantIds) {
-        participantIds.forEach(userId -> userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("유저가 없습니다")));
-    }
-
     @Override
     public ChannelFindResponseDto find(UUID channelId) {
         Channel channel = getChannel(channelId);
@@ -69,25 +59,6 @@ public class BasicChannelService implements ChannelService {
         List<UUID> participantIds = getParticipantIds(channel);
 
         return ChannelFindResponseDto.fromEntity(channel, latestMessageAt, participantIds);
-    }
-
-    private Channel getChannel(UUID channelId) {
-        return channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("해당 채널 없음"));
-    }
-
-    private Instant getLatestMessageAt(Channel channel) {
-        return messageRepository.findLatestMessageByChannelId(channel.getId())
-                .map(Message::getCreatedAt)
-                .orElse(null);
-    }
-
-    private List<UUID> getParticipantIds(Channel channel) {
-        return channel.getType() == ChannelType.PRIVATE
-                ? readStatusRepository.findAllByChannelId(channel.getId()).stream()
-                .map(ReadStatus::getUserId)
-                .toList()
-                : List.of();
     }
 
     @Override
@@ -108,19 +79,6 @@ public class BasicChannelService implements ChannelService {
         List<ChannelFindResponseDto> privateChannelDtoList = getDtoList(privateChannels);
 
         return Stream.concat(publicChannelDtoList.stream(), privateChannelDtoList.stream()).toList();
-    }
-
-    private List<ChannelFindResponseDto> getDtoList(List<Channel> publicChannels) {
-        return publicChannels.stream()
-                .map(channel
-                        -> ChannelFindResponseDto.fromEntity(channel, getLatestMessageAt(channel), getParticipantIds(channel)))
-                .toList();
-    }
-
-    private void validateUserExistence(UUID userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NoSuchElementException("해당 유저 없음");
-        }
     }
 
     @Override
@@ -148,4 +106,47 @@ public class BasicChannelService implements ChannelService {
 
         channelRepository.deleteById(channelId);
     }
+
+    private List<ChannelFindResponseDto> getDtoList(List<Channel> publicChannels) {
+        return publicChannels.stream()
+                .map(channel
+                        -> ChannelFindResponseDto.fromEntity(channel, getLatestMessageAt(channel), getParticipantIds(channel)))
+                .toList();
+    }
+
+    private void validateUserExistence(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException("해당 유저 없음");
+        }
+    }
+
+    private Channel getChannel(UUID channelId) {
+        return channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("해당 채널 없음"));
+    }
+
+    private Instant getLatestMessageAt(Channel channel) {
+        return messageRepository.findLatestMessageByChannelId(channel.getId())
+                .map(Message::getCreatedAt)
+                .orElse(null);
+    }
+
+    private void createParticipantReadStatuses(List<UUID> participantIds, UUID channelId) {
+        participantIds.forEach(userId ->
+                readStatusRepository.save(new ReadStatus(userId, channelId)));
+    }
+
+    private List<UUID> getParticipantIds(Channel channel) {
+        return channel.getType() == ChannelType.PRIVATE
+                ? readStatusRepository.findAllByChannelId(channel.getId()).stream()
+                .map(ReadStatus::getUserId)
+                .toList()
+                : List.of();
+    }
+
+    private void validateParticipantExistence(List<UUID> participantIds) {
+        participantIds.forEach(userId -> userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("유저가 없습니다")));
+    }
+
 }
