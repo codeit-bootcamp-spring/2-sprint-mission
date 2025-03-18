@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.exception.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.DuplicateUserNameException;
 import com.sprint.mission.discodeit.provider.UserUpdaterProvider;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    private final ReadStatusRepository readStatusRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentService binaryContentService;
     private final UserUpdaterProvider userUpdaterProvider;
@@ -83,6 +85,7 @@ public class BasicUserService implements UserService {
     public void deleteUser(UUID userId) {
         User deleteUser = this.userRepository.findById(userId);
         this.userStatusRepository.deleteById(userStatusRepository.findUserStatusIDByUserId(deleteUser.getId()));
+        this.readStatusRepository.findByUserId(deleteUser.getId()).forEach(readStatus -> this.readStatusRepository.deleteById(readStatus.getId()));
         this.binaryContentService.deleteByID(deleteUser.getProfileId());
         this.userRepository.deleteById(userId);
     }
