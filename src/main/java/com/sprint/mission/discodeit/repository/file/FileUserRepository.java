@@ -27,8 +27,8 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
 
     @Override
     public User save(User user) {
-        userMap.put(user.getId(), user);
         saveToFile(user);
+        userMap.put(user.getId(), user);
         return user;
     }
 
@@ -63,8 +63,8 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
 
     @Override
     public void deleteById(UUID userId) {
-        userMap.remove(userId);
         deleteFileById(userId);
+        userMap.remove(userId);
     }
 
     @Override

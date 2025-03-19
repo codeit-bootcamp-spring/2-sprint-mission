@@ -28,8 +28,8 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
 
     @Override
     public Message save(Message message) {
-        messageMap.put(message.getId(), message);
         saveToFile(message);
+        messageMap.put(message.getId(), message);
         return message;
     }
 
@@ -62,8 +62,8 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
 
     @Override
     public void deleteById(UUID messageId) {
-        messageMap.remove(messageId);
         deleteFileById(messageId);
+        messageMap.remove(messageId);
     }
 
     @Override

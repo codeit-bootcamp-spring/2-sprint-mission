@@ -31,8 +31,8 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
 
     @Override
     public Channel save(Channel channel) {
-        channelMap.put(channel.getId(), channel); // 메모리에 업데이트
         saveToFile(channel);
+        channelMap.put(channel.getId(), channel); // 메모리에 업데이트
         return channel;
     }
 
@@ -48,8 +48,8 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
 
     @Override
     public void deleteById(UUID channelId) {
-        channelMap.remove(channelId);
         deleteFileById(channelId);
+        channelMap.remove(channelId);
     }
 
     @Override
