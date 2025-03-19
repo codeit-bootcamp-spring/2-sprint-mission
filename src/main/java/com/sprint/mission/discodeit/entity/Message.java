@@ -3,20 +3,24 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 public class Message extends BaseEntity {
-    private String message; // 메시지 내용
-    private UUID channelId;
-    private UUID senderId; // 메시지를 받는 사람
+    private String message;
+    private final UUID channelId;
+    private final UUID senderId;
+    private final List<UUID> attachmentIds;
 
 
     public Message(String message, UUID channelId, UUID senderId) {
         this.message = message;
         this.channelId = channelId;
         this.senderId = senderId;
+        this.attachmentIds = new ArrayList<>();
     }
 
     public void updateMessage(String newMessage) {

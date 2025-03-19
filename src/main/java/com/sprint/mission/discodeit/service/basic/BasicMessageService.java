@@ -3,10 +3,12 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.dto.messagedto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,61 +21,70 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message create(String message, UUID channelId, UUID senderId) {
+    public Message create(MessageCreateDto messageCreateDto) {
         List<User> userList = userRepository.load();
         List<Channel> channelList = channelRepository.load();
         Optional<User> user = userList.stream()
-                .filter(u -> u.getId().equals(senderId))
+                .filter(u -> u.getId().equals(messageCreateDto.senderId()))
                 .findAny();
         Optional<Channel> channel = channelList.stream()
-                .filter(c -> c.getId().equals(channelId))
+                .filter(c -> c.getId().equals(messageCreateDto.channelId()))
                 .findAny();
         if (user.isEmpty()) {
-            throw new IllegalArgumentException("등록된 사용자가 없습니다.");
+            throw new IllegalArgumentException("User not found.");
         }
         if (channel.isEmpty()) {
-            throw new IllegalArgumentException("등록된 채널이 없습니다.");
+            throw new IllegalArgumentException("Channel not found.");
         }
-        Message messages = new Message(message, channelId, senderId);
+        Message messages = new Message(messageCreateDto.message(), messageCreateDto.channelId(), messageCreateDto.senderId());
         messageRepository.save(messages);
+
+        // 첨부파일을 등록할수 있도록 binarycontent 로직 구현 필요
+
         return messages;
     }
 
 
     @Override
-    public Message getMessage(UUID messageId) {
-        Optional<Message> message = messageRepository.load().stream()
-                .filter(m -> m.getId().equals(messageId))
-                .findAny();
-        return message.orElseThrow(() -> new NoSuchElementException("메시지가 존재하지 않습니다."));
+    public MessageFindResponseDto find(MessageFindRequestDto messageFindRequestDto) {
+        Message message = messageRepository.load().stream()
+                .filter(m -> m.getId().equals(messageFindRequestDto.messageId()))
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("Message does not exist."));
+        return MessageFindResponseDto.fromMessage(message);
     }
 
 
     @Override
-    public List<Message> getAllMessage() {
-        List<Message> messageList = messageRepository.load();
-        if (messageList.isEmpty()) {
-            System.out.println("전체 조회 결과가 없습니다.");
-            return Collections.emptyList();
-        }
-        return messageList;
+    public List<MessageFindAllByChannelIdResponseDto> findallByChannelId(MessageFindAllByChannelIdRequestDto messageFindAllByChannelIdRequestDto) {
+        List<Message> messageList = messageRepository.load().stream()
+                .filter(m -> m.getChannelId().equals(messageFindAllByChannelIdRequestDto.channelId()))
+                .toList();
+        return MessageFindAllByChannelIdResponseDto.fromChannel(messageList);
     }
 
 
     @Override
-    public Message update(UUID messageId, String changeMessage) {
-        Message message = getMessage(messageId);
-        message.updateMessage(changeMessage);
-        messageRepository.save(message);
-        return message;
+    public Message update(MessageUpdateDto messageUpdateDto) {
+        Message message = messageRepository.load().stream()
+                .filter(m -> m.getId().equals(messageUpdateDto.messageId()))
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("Message does not exist."));
+        message.updateMessage(messageUpdateDto.changeMessage());
+        return messageRepository.save(message);
     }
 
 
     @Override
-    public void delete(UUID messageId) {
-        Message message = getMessage(messageId);
+    public void delete(MessageDeleteDto messageDeleteDto) {
+        Message message = messageRepository.load().stream()
+                .filter(m -> m.getId().equals(messageDeleteDto.messageId()))
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("Message does not exist."));
         messageRepository.remove(message);
+        // 첨부파일인 binaryContent 삭제하는 로지 구현 필요
     }
 }

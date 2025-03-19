@@ -17,13 +17,13 @@ public class BaseEntity implements Serializable {
 
 
     protected final UUID id;
-    protected final Long createdAt;
-    protected Long updatedAt;
+    protected final Instant createdAt;
+    protected Instant updatedAt;
 
 
     public BaseEntity() {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
+        this.createdAt = Instant.now();
         this.updatedAt = createdAt;
     }
 
@@ -38,7 +38,7 @@ public class BaseEntity implements Serializable {
 
     // 업데이트 메소드
     public void update() {
-        this.updatedAt = Instant.now().getEpochSecond();
+        this.updatedAt = Instant.now();
     }
 
 }

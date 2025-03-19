@@ -26,10 +26,11 @@ public class FileChannelRepository implements ChannelRepository {
 
 
     @Override
-    public void save(Channel channel) {
+    public Channel save(Channel channel) {
         channelData.add(channel);
         Path path = DIRECTORY.resolve(channel.getId() + ".ser");
         saveToFile(path, channel);
+        return channel;
     }
 
     private void init() {

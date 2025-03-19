@@ -28,10 +28,11 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void save(Message message) {
+    public Message save(Message message) {
         messagesData.add(message);
         Path path = DIRECTORY.resolve(message.getId() + ".ser");
         saveToFile(path, message);
+        return message;
     }
 
     private void init() {

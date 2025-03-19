@@ -1,8 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.dto.userdto.UserCreateDto;
+import com.sprint.mission.discodeit.service.dto.userdto.UserDeleteDto;
+import com.sprint.mission.discodeit.service.dto.userdto.UserFindDto;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.dto.userdto.UserUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,29 +20,38 @@ import java.util.*;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User create(String name, String email, String password) {
-        User user = new User(name, email, password);
-        Optional<User> userList = userRepository.load().stream()
-                .filter(u -> u.getName().equals(name))
+    public User create(UserCreateDto userCreateDto) {
+        List<User> userList = userRepository.load();
+        Optional<User> validateName = userList.stream()
+                .filter(u -> u.getName().equals(userCreateDto.name()))
                 .findAny();
-        if (userList.isPresent()) {
-            throw new IllegalArgumentException("등록된 사용자가 존재합니다.");
-        } else{
-            userRepository.save(user);
-            System.out.println(user);
-            return user;
+        Optional<User> validateEmail = userList.stream()
+                .filter(u -> u.getEmail().equals(userCreateDto.email()))
+                .findAny();
+        if (validateName.isPresent()) {
+            throw new IllegalArgumentException("User already exists.");
         }
+        if (validateEmail.isPresent()) {
+            throw new IllegalArgumentException("Email already exists.");
+        }
+
+        User user = new User(userCreateDto.name(), userCreateDto.email(), userCreateDto.password());
+        User createdUser = userRepository.save(user);
+        System.out.println(createdUser);
+        return user;
     }
 
 
     @Override
-    public User getUser(UUID userId) {
+    public User getUser(UserFindDto userFindDto) {
         Optional<User> user = userRepository.load().stream()
-                .filter(u -> u.getId().equals(userId))
+                .filter(u -> u.getId().equals(userFindDto.userId()))
                 .findAny();
-        return user.orElseThrow(() -> new NoSuchElementException("사용자가 존재하지 않습니다."));
+        return user.orElseThrow(() -> new NoSuchElementException("User does not exist."));
     }
 
 
@@ -43,23 +59,34 @@ public class BasicUserService implements UserService {
     public List<User> getAllUser() {
         List<User> userList = userRepository.load();
         if (userList.isEmpty()) {
-            System.out.println("전체 조회 결과가 없습니다.");
-            return Collections.emptyList();
+            throw new NoSuchElementException("Profile not found.");
         }
         return userList;
     }
 
     @Override
-    public User update(UUID userId, String changeName, String changeEmail, String changePassword) {
-        User user = getUser(userId);
-        user.update(changeName, changeEmail, changePassword);
+    public User update(UserUpdateDto userUpdateDto) {
+        Optional<User> matchingUser = userRepository.load().stream()
+                .filter(u -> u.getId().equals(userUpdateDto.userId()))
+                .findAny();
+        if (matchingUser.isEmpty()) {
+            throw new NoSuchElementException("User does not exist.");
+        }
+        User user = matchingUser.get();
+        user.update(userUpdateDto.changeName(), userUpdateDto.changeEmail(), userUpdateDto.changePassword());
         userRepository.save(user);
         return user;
     }
 
     @Override
-    public void delete(UUID userId) {
-        User user = getUser(userId);
+    public void delete(UserDeleteDto userDeleteDto) {
+        Optional<User> matchingUser = userRepository.load().stream()
+                .filter(u -> u.getId().equals(userDeleteDto.userId()))
+                .findAny();
+        if (matchingUser.isEmpty()) {
+            throw new NoSuchElementException("User does not exist.");
+        }
+        User user = matchingUser.get();
         userRepository.remove(user);
     }
 }

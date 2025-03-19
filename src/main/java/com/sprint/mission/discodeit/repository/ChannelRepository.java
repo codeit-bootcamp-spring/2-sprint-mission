@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ChannelRepository {
 
-    void save(Channel channel);
+    Channel save(Channel channel);
     List<Channel> load();
     void remove(Channel channel);
 

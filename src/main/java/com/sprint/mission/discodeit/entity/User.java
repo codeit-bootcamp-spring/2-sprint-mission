@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 public class User extends BaseEntity {
@@ -10,12 +11,14 @@ public class User extends BaseEntity {
     private String name;
     private String email;
     private String password;
+    private UUID profileId;
 
     public User(String name, String email, String password) {
         super();
         this.name = name;
         this.email = email;
         this.password = password;
+        this.profileId = new UUID(0, 0);
     }
 
 
@@ -24,6 +27,7 @@ public class User extends BaseEntity {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.profileId = new UUID(0, 0);
         super.update();
         System.out.printf("[ %s ], [ %s ], [ %s ] 로 변경되었습니다.", this.name, this.email, this.password);
     }

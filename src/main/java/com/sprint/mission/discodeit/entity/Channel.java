@@ -8,11 +8,13 @@ import java.util.Objects;
 public class Channel extends BaseEntity {
 
     // 필드 선언
+    private final ChannelType type;
     private String channelName;
     private String description;
 
     // 생선자 선언
-    public Channel(String channelName, String description) {
+    public Channel(ChannelType type, String channelName, String description) {
+        this.type = type;
         this.channelName = channelName;
         this.description = description;
     }
@@ -40,8 +42,9 @@ public class Channel extends BaseEntity {
 
     @Override
     public String toString() {
-        return "\nChannelName: " + channelName + "\nDescription: " + description +
-                "\nUUID: " + this.getId() +
+        return "\nChannel Type: " + type +
+                "\nChannelName: " + channelName + "\nDescription: " + description +
+                "\nChannel ID: " + this.getId() +
                 "\nCreatedAt: " + this.getCreatedAtFormatted() +
                 "\nUpdatedAt: " + this.getUpdatedAttFormatted();
     }
