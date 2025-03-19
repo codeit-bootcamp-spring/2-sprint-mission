@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
@@ -11,6 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository {
     // userName과 email의 빠른 중복 확인을 위한 필드
     private Map<String, User> usernames;
