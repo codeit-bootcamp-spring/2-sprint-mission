@@ -8,6 +8,7 @@ import com.sprint.discodeit.repository.UserStatusRepository;
 import com.sprint.discodeit.repository.file.BaseUserStatusRepository;
 import com.sprint.discodeit.repository.file.FileUserRepository;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,19 @@ public class UserStatusService {
         user.associateStatus(userStatus);
         return user;
     }
+
+
+    public UserStatus find(UUID statusId){
+        UserStatus userStatus = baseuserStatusRepository.findById(statusId)
+                .orElseThrow(() -> new IllegalArgumentException("찾을 수 없는 상태 정보 입니다."));
+        return userStatus;
+    }
+
+    public List<UserStatus> findAll(){
+        List<UserStatus> userStatus = baseuserStatusRepository.findByAll();
+        return userStatus;
+    }
+
 
 
 }
