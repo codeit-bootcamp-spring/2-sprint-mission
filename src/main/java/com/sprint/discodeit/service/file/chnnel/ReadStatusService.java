@@ -49,6 +49,10 @@ public class ReadStatusService {
         return readStatus;
     }
 
+    public void delete(UUID id){
+        readStatusRepository.delete(id);
+    }
+
 
 
 
