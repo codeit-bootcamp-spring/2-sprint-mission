@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.constant.ChannelType;
-import com.sprint.mission.discodeit.dto.ChannelUpdateParamDto;
-import com.sprint.mission.discodeit.dto.FindChannelDto;
-import com.sprint.mission.discodeit.dto.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -97,9 +95,7 @@ public class DiscodeitApplication {
                             if (channelToken == null) break;
                             messageService.findMessageByChannelId(channelToken)
                                     .forEach(System.out::println);
-                            System.out.println("------ 메세지 보내기 ------");
-                            String content = sc.nextLine();
-                            sendMessageByChannel(messageService, channelToken, userToken, content);
+                            sendMessageByChannel(messageService, channelToken, userToken);
                             break;
                         case 3:
                             System.out.println(channelService.findAllByUserId(userToken));
@@ -200,10 +196,49 @@ public class DiscodeitApplication {
         return findChannelDto.channelUUID();
     }
 
-    private static void sendMessageByChannel(MessageService messageService, UUID channelUUID, UUID userUUID, String content) {
-        while (true) {
-            if (content.equalsIgnoreCase("EXIT")) return;
-            messageService.sendMessage(channelUUID, userUUID, content);
+    private static void sendMessageByChannel(MessageService messageService, UUID channelUUID, UUID userUUID) {
+        try {
+            Scanner sc = new Scanner(System.in);
+            while (true) {
+                System.out.println("------ 메세지 보내기 ------");
+                System.out.println("1. 이미지 넣기\n2. 문자열 입력\n3. 채널 나가기");
+                int commentType = sc.nextInt();
+                sc.nextLine();
+
+                String content;
+                List<byte[]> imageList = new ArrayList<>();
+
+                switch (commentType) {
+                    case 1:
+                        while (true) {
+                            System.out.print("첨부할 파일 경로 입력 (종료: EXIT): ");
+                            String imagePath = sc.nextLine().trim();
+                            if (imagePath.equalsIgnoreCase("EXIT")) break;
+                            try {
+                                byte[] file = Files.readAllBytes(Path.of(imagePath));
+                                imageList.add(file);
+                            } catch (IOException e) {
+                                System.out.println("파일 읽기 실패: " + e.getMessage());
+                            }
+                        }
+                        System.out.print("전송할 내용 입력: ");
+                        content = sc.nextLine();
+                        break;
+                    case 2:
+                        System.out.print("전송할 내용 입력: ");
+                        content = sc.nextLine();
+                        break;
+                    case 3:
+                        return;
+                    default:
+                        System.out.println("잘못된 입력");
+                        continue;
+                }
+                SaveMessageParamDto saveMessageParamDto = new SaveMessageParamDto(channelUUID, userUUID, content, imageList);
+                messageService.sendMessage(saveMessageParamDto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -307,7 +342,8 @@ public class DiscodeitApplication {
                 UUID messageUUID = UUID.fromString(sc.nextLine());
                 System.out.print("수정 메시지 입력: ");
                 String message = sc.nextLine();
-                messageService.updateMessage(messageUUID, message);
+                UpdateMessageParamDto updateMessageParamDto = new UpdateMessageParamDto(messageUUID, message);
+                messageService.updateMessage(updateMessageParamDto);
                 return;
             default:
                 System.out.println("잘못된 입력값");

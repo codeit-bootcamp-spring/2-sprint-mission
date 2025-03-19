@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.SaveMessageParamDto;
+import com.sprint.mission.discodeit.dto.UpdateMessageParamDto;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -20,23 +23,28 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserService userService;
     private final ChannelService channelService;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public void sendMessage(UUID channelUUID, UUID userUUID, String content) {
-        if (userService.findByUser(userUUID) ==  null) {
+    public void sendMessage(SaveMessageParamDto saveMessageParamDto) {
+        if (userService.findByUser(saveMessageParamDto.UserId()) == null) {
             return;
         }
 
-        if (channelService.findChannel(channelUUID) == null) {
+        if (channelService.findChannel(saveMessageParamDto.channelId()) == null) {
             return;
         }
 
-        Message message = messageRepository.save(channelUUID, userUUID, content);
+        List<UUID> attachmentList = saveMessageParamDto.imageList().stream()
+                .map(image -> binaryContentRepository.save(image).getId())
+                .toList();
+
+        Message message = messageRepository.save(saveMessageParamDto.channelId(), saveMessageParamDto.UserId(), saveMessageParamDto.content(), attachmentList);
         if (message == null) {
             System.out.println("[실패] 메세지 저장 실패");
             return;
         }
-        System.out.println("[성공]" + message);
+        System.out.println("[성공]" + saveMessageParamDto.toString());
     }
 
     @Override
@@ -67,8 +75,8 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(UUID messageUUID, String content) {
-        Message message = messageRepository.updateMessage(messageUUID, content);
+    public void updateMessage(UpdateMessageParamDto updateMessageParamDto) {
+        Message message = messageRepository.updateMessage(updateMessageParamDto.messageUUID(), updateMessageParamDto.content());
         if (message == null) {
             System.out.println("[실패] 메세지 수정 실패");
         }
@@ -76,7 +84,10 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void deleteMessageById(UUID messageUUID) {
-        boolean isDelete = messageRepository.deleteMessageById(messageUUID);
+        Message message = messageRepository.findMessageById(messageUUID)
+                        .orElseThrow(NullPointerException::new);
+        message.getAttachmentList().forEach(binaryContentRepository::delete);
+        boolean isDelete = messageRepository.deleteMessageById(message.getId());
         if (!isDelete) {
             System.out.println("[실패] 메세지 삭제 실패");
             return;

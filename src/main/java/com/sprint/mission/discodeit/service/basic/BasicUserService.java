@@ -104,7 +104,7 @@ public class BasicUserService implements UserService {
                 orElseThrow(() -> new NullPointerException("사용자가 존재하지 않습니다."));
 
         UUID profileId = user.getProfile();
-        if(updateUserDto.imageFile().length > 0){
+        if (updateUserDto.imageFile().length > 0) {
             profileId = binaryContentRepository.save(updateUserDto.imageFile()).getId();
         }
         userRepository.update(updateUserDto.userUUID(), updateUserDto.nickname(), profileId);
@@ -112,9 +112,11 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID userUUID) {
-        binaryContentRepository.deleteProfileId(userUUID);
-        userStatusRepository.delete(userUUID);
-        boolean isDeleted = userRepository.deleteUserById(userUUID);
+        User user = userRepository.findUserById(userUUID)
+                .orElseThrow(NullPointerException::new);
+        binaryContentRepository.delete(user.getProfile());
+        userStatusRepository.delete(user.getId());
+        boolean isDeleted = userRepository.deleteUserById(user.getId());
         if (!isDeleted) {
             System.out.println("삭제 실패");
             return;

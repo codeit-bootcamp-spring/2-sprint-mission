@@ -16,8 +16,8 @@ public class JCFMessageRepository implements MessageRepository {
     List<Message> messageList = new ArrayList<>();
 
     @Override
-    public Message save(UUID userUUID ,UUID channelUUID, String content) {
-        Message message = new Message(content, userUUID, channelUUID);
+    public Message save(UUID userUUID ,UUID channelUUID, String content, List<UUID> attachmentList) {
+        Message message = new Message(content, userUUID, channelUUID, attachmentList);
         messageList.add(message);
         return message;
     }

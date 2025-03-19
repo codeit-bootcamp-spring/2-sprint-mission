@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.SaveMessageParamDto;
+import com.sprint.mission.discodeit.dto.UpdateMessageParamDto;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
@@ -7,10 +9,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    void sendMessage(UUID channelId,UUID UserId, String content);
+    void sendMessage(SaveMessageParamDto saveMessageParamDto);
     Message findMessageById(UUID id);
     List<Message> findAllMessages();
     List<Message> findMessageByChannelId(UUID id);
-    void updateMessage(UUID id, String content);
+    void updateMessage(UpdateMessageParamDto updateMessageParamDto);
     void deleteMessageById(UUID id);
 }

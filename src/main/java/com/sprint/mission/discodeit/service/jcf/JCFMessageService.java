@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.SaveMessageParamDto;
+import com.sprint.mission.discodeit.dto.UpdateMessageParamDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -19,20 +21,19 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void sendMessage(UUID channelUUID, UUID userUUID, String content) {
-
-        if (channelService.findChannel(channelUUID) == null) {
-            return;
-        }
-
-        if (userService.findByUser(userUUID) == null) {
-            return;
-        }
-
-        Message message = new Message(content, userUUID, channelUUID);
-        messageList.add(message);
-
-        System.out.println("메세지 전송 성공" + message);
+    public void sendMessage(SaveMessageParamDto saveMessageParamDto) {
+        //if (channelService.findChannel(channelUUID) == null) {
+        //    return;
+        //}
+        //
+        //if (userService.findByUser(userUUID) == null) {
+        //    return;
+        //}
+        //
+        //Message message = new Message(content, userUUID, channelUUID);
+        //messageList.add(message);
+        //
+        //System.out.println("메세지 전송 성공" + message);
     }
 
     @Override
@@ -57,15 +58,15 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(UUID id, String content) {
-        if (messageList.stream().noneMatch(data -> data.getId().equals(id))) {
+    public void updateMessage(UpdateMessageParamDto updateMessageParamDto) {
+        if (messageList.stream().noneMatch(data -> data.getId().equals(updateMessageParamDto.messageUUID()))) {
             System.out.println("[실패]수정하려는 메세지가 존재하지 않습니다.");
             return;
         }
 
         for (Message message : messageList) {
-            if (message.getId().equals(id)) {
-                message.updateContent(content);
+            if (message.getId().equals(updateMessageParamDto.messageUUID())) {
+                message.updateContent(updateMessageParamDto.content());
                 System.out.println("[성공]메시지 변경 완료[메시지 아이디: " + message.getId() +
                         ", 변경 시간: " + message.getUpdatedAt() +
                         "]");

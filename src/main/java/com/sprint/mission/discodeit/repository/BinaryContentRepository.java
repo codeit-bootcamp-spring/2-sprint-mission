@@ -10,8 +10,7 @@ import java.util.UUID;
 
 public interface BinaryContentRepository {
     BinaryContent save(byte[] imageFile);
-    Optional<BinaryContent> findByProfileId(UUID profileId);
-    List<BinaryContent> findAllByMessage(List<UUID> attachmentId);
-    void deleteProfileId(UUID profileId);
-    void deleteAttachmentId(List<UUID> attachmentId);
+    Optional<BinaryContent> findById(UUID binaryContentUUID);
+    List<BinaryContent> findAll();
+    void delete(UUID profileId);
 }

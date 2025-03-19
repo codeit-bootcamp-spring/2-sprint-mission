@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Repository
 public class JCFBinaryContentRepository implements BinaryContentRepository {
@@ -22,26 +21,19 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public Optional<BinaryContent> findByProfileId(UUID profileId) {
+    public Optional<BinaryContent> findById(UUID binaryContentUUID) {
         return binaryContentList.stream()
-                .filter(binaryContent -> binaryContent.getId().equals(profileId))
+                .filter(binaryContent -> binaryContent.getId().equals(binaryContentUUID))
                 .findAny();
     }
 
     @Override
-    public List<BinaryContent> findAllByMessage(List<UUID> attachmentId) {
-        return binaryContentList.stream()
-                .filter(binaryContent -> attachmentId.contains(binaryContent.getId()))
-                .collect(Collectors.toList());
+    public List<BinaryContent> findAll() {
+        return binaryContentList;
     }
 
     @Override
-    public void deleteProfileId(UUID profileId) {
-        binaryContentList.removeIf(binaryContent -> binaryContent.getId().equals(profileId));
-    }
-
-    @Override
-    public void deleteAttachmentId(List<UUID> attachmentId) {
-        binaryContentList.removeIf(binaryContent -> attachmentId.contains(binaryContent.getId()));
+    public void delete(UUID binaryContentUUID) {
+        binaryContentList.removeIf(binaryContent -> binaryContent.getId().equals(binaryContentUUID));
     }
 }

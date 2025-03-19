@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -13,21 +14,10 @@ public class Message extends BaseEntity implements Serializable {
     private String content;
     private final UUID userUUID;
     private final UUID channelUUID;
+    private List<UUID> attachmentList;
 
     public void updateContent(String content) {
         super.updateTime();
         this.content = content;
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "UUID= " + getId() +
-                ", channelUUID=" + channelUUID +
-                ", userUUID=" + userUUID +
-                ", content='" + content +
-                ", createdAt=" + getCreatedAt() +
-                ", updatedAt=" + getUpdatedAt() +
-                '}';
     }
 }

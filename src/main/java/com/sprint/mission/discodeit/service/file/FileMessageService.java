@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.custom.AppendObjectOutputStream;
+import com.sprint.mission.discodeit.dto.SaveMessageParamDto;
+import com.sprint.mission.discodeit.dto.UpdateMessageParamDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -19,25 +21,30 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void sendMessage(UUID channelUUID, UUID userUUID, String content) {
-        Message message = new Message(content, userUUID, channelUUID);
-
-        try {
-            String fileName = "message.ser";
-            // 파일 존재 여부 확인
-            boolean append = new File(fileName).exists();
-
-            FileOutputStream fos = new FileOutputStream(fileName, true);
-            ObjectOutputStream oos = append ? new AppendObjectOutputStream(fos) : new ObjectOutputStream(fos);
-            oos.writeObject(message);
-
-            oos.close();
-            fos.close();
-
-            System.out.println("[성공]" + message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void sendMessage(SaveMessageParamDto saveMessageParamDto) {
+        //Message message = new Message(
+        //        saveMessageParamDto.content(),
+        //        saveMessageParamDto.UserId(),
+        //        saveMessageParamDto.channelId(),
+        //
+        //);
+        //
+        //try {
+        //    String fileName = "message.ser";
+        //    // 파일 존재 여부 확인
+        //    boolean append = new File(fileName).exists();
+        //
+        //    FileOutputStream fos = new FileOutputStream(fileName, true);
+        //    ObjectOutputStream oos = append ? new AppendObjectOutputStream(fos) : new ObjectOutputStream(fos);
+        //    oos.writeObject(message);
+        //
+        //    oos.close();
+        //    fos.close();
+        //
+        //    System.out.println("[성공]" + message);
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //}
     }
 
     @Override
@@ -107,7 +114,7 @@ public class FileMessageService implements MessageService {
             while (true) {
                 try {
                     Message message = (Message) ois.readObject();
-                    if(message.getChannelUUID().equals(channelUUID)) messageList.add(message);
+                    if (message.getChannelUUID().equals(channelUUID)) messageList.add(message);
                 } catch (EOFException e) {
                     // 파일의 끝 도달 시 브레이크
                     break;
@@ -122,15 +129,15 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(UUID messageUUID, String content) {
+    public void updateMessage(UpdateMessageParamDto updateMessageParamDto) {
         List<Message> messageList = findAllMessages();
 
         messageList.stream()
-                .filter(message -> message.getId().equals(messageUUID))
+                .filter(message -> message.getId().equals(updateMessageParamDto.messageUUID()))
                 .findAny()
                 .ifPresentOrElse(
                         message -> {
-                            message.updateContent(content);
+                            message.updateContent(updateMessageParamDto.content());
                             System.out.println("[성공]메세지 변경 완료" + message);
                         },
                         () -> System.out.println("[실패]수정하려는 메세지가 존재하지 않습니다"));
