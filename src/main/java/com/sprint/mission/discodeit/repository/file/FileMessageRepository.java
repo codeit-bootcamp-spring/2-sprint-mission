@@ -11,7 +11,7 @@ import java.util.*;
 public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository {
     private Map<UUID, NavigableSet<Message>> channelIdMessages;       // channelId를 Key로 가지는 TreeSet<Message> / List가 아니라 NavigatbaleSet을 사용하는 이유는 구간조회가 빠르기 때문
 
-    public FileMessageRepository() {
+    public FileMessageRepository(FileChannelRepository fileChannelRepository) {
         super(Message.class, Paths.get(System.getProperty("user.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\messagedata"));
         channelIdMessages = new HashMap<>();
     }
@@ -35,19 +35,8 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
     // existsById(),findById(), getAll()  굳이 file을 탐색할 필요 없다고 생각해 storage를 통해 정보 확인, -> 상속 받은걸 사용
 
     @Override
-    public void deleteById(UUID messageId) {
-        super.deleteById(messageId);
-        super.deleteFile(messageId);
-        channelIdMessages.get(super.findById(messageId).getChannelId()).remove(super.findById(messageId));
-    }
-
-    @Override
     public List<Message> findMessageListByChannelId(UUID channelId) {   //해당 channelID를 가진 message가 없을 때, 빈 리스트 반환
-        if (channelId == null) {
-            throw new IllegalArgumentException("input channelId is null!!!");
-        }
-        NavigableSet<Message> messages = channelIdMessages.get(channelId);
-        if (messages == null) {
+        if (channelIdMessages.get(channelId) == null) {         // channelService에서 createChannel을 할때 항상 addChannelIdToChannelIdMessage가 호출되어 확인할 필요 없지만 자체적인 검증로직 필요?
             throw new NullPointerException("해당 channelId를 가진 채널이 아직 생성되지 않았습니다. " + channelId);
         }
         return new ArrayList<>(channelIdMessages.get(channelId));
@@ -75,5 +64,12 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
             super.storage.get(messageId).deleteAttachment(attachmentId);
             super.saveToFile(super.directory.resolve(messageId.toString() + ".ser"), super.findById(messageId));
         }
+    }
+
+    @Override
+    public void deleteById(UUID messageId) {
+        super.deleteById(messageId);
+        super.deleteFile(messageId);
+        channelIdMessages.get(super.findById(messageId).getChannelId()).remove(super.findById(messageId));
     }
 }
