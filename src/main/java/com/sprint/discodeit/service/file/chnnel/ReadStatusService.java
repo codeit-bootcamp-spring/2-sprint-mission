@@ -42,6 +42,13 @@ public class ReadStatusService {
 
     }
 
+    public ReadStatus update(ReadStatusRequestDto readStatusRequestDto){
+        ReadStatus readStatus = readStatusRepository.findAllByUserId(readStatusRequestDto.userId())
+                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다"));
+        readStatus.readUpdate(readStatusRequestDto.channelId(), readStatusRequestDto.check(), readStatusRequestDto.userId());
+        return readStatus;
+    }
+
 
 
 

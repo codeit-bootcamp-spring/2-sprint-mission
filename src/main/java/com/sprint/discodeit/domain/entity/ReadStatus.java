@@ -31,4 +31,14 @@ public class ReadStatus implements Serializable {
         this.lastReadMessageTime = newReadTime;
         this.readCheck = true;
     }
+
+    public void readUpdate(UUID channelId, Boolean readCheck, UUID userId) {
+        if(channelId != null || readCheck != null || userId != null) {
+            this.channelId = channelId;
+            this.readCheck = readCheck;
+            this.userId = userId;
+            this.lastReadMessageTime = Instant.now();
+        }
+    }
+
 }
