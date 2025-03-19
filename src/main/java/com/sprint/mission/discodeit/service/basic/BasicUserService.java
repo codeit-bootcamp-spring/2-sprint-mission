@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ProfileImageRequest;
-import com.sprint.mission.discodeit.dto.UserResponseDto;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -9,8 +8,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.sprint.mission.discodeit.dto.UpdateDefinition;
-import com.sprint.mission.discodeit.dto.UserCreateRequest;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -72,13 +70,14 @@ public class BasicUserService implements UserService {
                 .map(userStatus -> userStatus.isUserOnline())
                 .orElse(false);
 
-        return UserResponseDto.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .profileId(user.getProfileId())
-                .isOnline(isOnline)
-                .build();
+        return new UserResponseDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getProfileId(),
+                isOnline
+        );
+
     }
 
     @Override
@@ -89,22 +88,33 @@ public class BasicUserService implements UserService {
                             .map(userStatus -> userStatus.isUserOnline())
                             .orElse(false);
 
-                    return UserResponseDto.builder()
-                            .id(user.getId())
-                            .username(user.getUsername())
-                            .email(user.getEmail())
-                            .profileId(user.getProfileId())
-                            .isOnline(isOnline)
-                            .build();
+                    return new UserResponseDto(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getEmail(),
+                            user.getProfileId(),
+                            isOnline
+                    );
                 })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public User update(UUID userId, UpdateDefinition updateDefinition, UUID newProfileId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(updateDefinition, newProfileId);
+    public User update(UserUpdateRequest updateRequest) {
+        User user = userRepository.findById(updateRequest.getUserId())
+                .orElseThrow(() -> new NoSuchElementException("User with id " + updateRequest.getUserId() + " not found"));
+
+        if (updateRequest.getUpdateDefinition() != null) {
+        user.update(updateRequest.getUpdateDefinition(), updateRequest.getNewProfileId());
+        }
+
+
+        if (updateRequest.getNewProfileId() != null) {
+            binaryContentRepository.findById(updateRequest.getNewProfileId())
+                    .orElseThrow(()-> new NoSuchElementException("Profile image with id" + updateRequest.getNewProfileId() + "not found"));
+            user.updateProfileImage(updateRequest.getNewProfileId());
+        }
+
         return userRepository.save(user);
     }
 
