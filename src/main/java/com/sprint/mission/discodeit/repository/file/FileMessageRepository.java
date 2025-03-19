@@ -57,7 +57,10 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
     @Override
     public void deleteByChannelId(UUID channelId) {
         List<Message> messages = findAllByChannelId(channelId);
-        messages.forEach(message -> messageMap.remove(message.getId()));
+        messages.forEach(message -> {
+            deleteById(message.getId());
+            messageMap.remove(message.getId());
+        });
     }
 
     @Override
