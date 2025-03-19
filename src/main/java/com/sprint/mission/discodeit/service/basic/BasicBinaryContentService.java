@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentFindResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,9 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public UUID create(BinaryContentCreateRequest binaryContentCreateRequest) {
-        return null;
+        BinaryContent newBinaryContent = new BinaryContent(binaryContentCreateRequest.filePath(), binaryContentCreateRequest.fileName(), binaryContentCreateRequest.fileType(), binaryContentCreateRequest.fileSize());
+        this.binaryContentRepository.add(newBinaryContent);
+        return newBinaryContent.getId();
     }
 
     @Override
@@ -27,16 +30,30 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContentFindResponse findById(UUID id) {
-        return null;
+        BinaryContent findBinaryContent = this.binaryContentRepository.findById(id);
+        return new BinaryContentFindResponse(
+                findBinaryContent.getId(),
+                findBinaryContent.getFilePath(),
+                findBinaryContent.getFileName(),
+                findBinaryContent.getFileType(),
+                findBinaryContent.getFileSize()
+        );
     }
 
     @Override
     public List<BinaryContentFindResponse> findAllByIdIn(List<UUID> ids) {
-        return List.of();
+        return this.binaryContentRepository.findAllByIdIn(ids).stream()
+                .map(binaryContent -> new BinaryContentFindResponse(
+                        binaryContent.getId(),
+                        binaryContent.getFilePath(),
+                        binaryContent.getFileName(),
+                        binaryContent.getFileType(),
+                        binaryContent.getFileSize()
+                )).toList();
     }
 
     @Override
     public void deleteByID(UUID id) {
-
+        this.binaryContentRepository.deleteById(id);
     }
 }
