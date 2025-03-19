@@ -1,6 +1,8 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.message;
 
+import com.sprint.mission.discodeit.entity.base.UpdatableEntity;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -9,13 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Message implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-
+public class Message extends UpdatableEntity {
     private String content;
 
     private UUID channelId;
@@ -27,9 +23,7 @@ public class Message implements Serializable {
     }
 
     public Message(String content,UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
+        super();
 
         this.content = content;
         this.channelId = channelId;
@@ -61,5 +55,18 @@ public class Message implements Serializable {
         if (this.attachmentIds.remove(attachmentId)) {
             this.updatedAt = Instant.now();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "content='" + content + '\'' +
+                ", channelId=" + channelId +
+                ", authorId=" + authorId +
+                ", attachmentIds=" + attachmentIds +
+                ", updatedAt=" + updatedAt +
+                ", id=" + id +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }

@@ -1,23 +1,17 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.channel;
 
+import com.sprint.mission.discodeit.entity.base.UpdatableEntity;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Channel implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-
-    private ChannelType type;
+public class Channel extends UpdatableEntity {
+    private final ChannelType type;
 
     @Nullable
     private String name; //PUBLIC 전용
@@ -32,10 +26,7 @@ public class Channel implements Serializable {
 
     //Public Channel 만들때 호출
     public Channel(ChannelType type, String name, String description) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-
+        super();
         this.type = type;
 
         //PUBLIC 전용
@@ -57,5 +48,17 @@ public class Channel implements Serializable {
         if (anyValueUpdated) {
             this.updatedAt = Instant.now();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "type=" + type +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", updatedAt=" + updatedAt +
+                ", id=" + id +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
