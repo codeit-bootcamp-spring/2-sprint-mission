@@ -15,10 +15,8 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     private final List<ReadStatus> readStatusList = new ArrayList<>();
 
     @Override
-    public ReadStatus save(UUID userUUID, UUID ChannelId) {
-        ReadStatus readStatus = new ReadStatus(userUUID, ChannelId);
+    public void save(ReadStatus readStatus) {
         readStatusList.add(readStatus);
-        return readStatus;
     }
 
     @Override

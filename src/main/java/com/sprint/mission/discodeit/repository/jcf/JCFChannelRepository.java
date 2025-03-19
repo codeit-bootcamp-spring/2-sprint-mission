@@ -14,8 +14,7 @@ public class JCFChannelRepository implements ChannelRepository {
     private final List<Channel> channelList = new ArrayList<>();
 
     @Override
-    public Channel save(String channelName, ChannelType channelType) {
-        Channel channel = new Channel(channelName, channelType);
+    public Channel save(Channel channel) {
         channelList.add(channel);
         return channel;
     }

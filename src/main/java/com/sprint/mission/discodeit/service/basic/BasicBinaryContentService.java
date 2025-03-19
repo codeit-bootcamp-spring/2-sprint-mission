@@ -18,7 +18,8 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public void save(SaveBinaryContentParamDto saveBinaryContentParamDto) {
-        binaryContentRepository.save(saveBinaryContentParamDto.image());
+        BinaryContent binaryContent = new BinaryContent(saveBinaryContentParamDto.image());
+        binaryContentRepository.save(binaryContent);
     }
 
     @Override

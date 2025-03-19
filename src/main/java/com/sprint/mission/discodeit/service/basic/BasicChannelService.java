@@ -27,14 +27,19 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelSaveDto createPublicChannel(String channelName, ChannelType channelType) {
-        Channel channel = channelRepository.save(channelName, channelType);
+        Channel channel = new Channel(channelName, channelType);
+        channelRepository.save(channel);
         return new ChannelSaveDto(channel.getId(), channelName, channel.getChannelType(), channel.getCreatedAt());
     }
 
     @Override
     public ChannelSaveDto createPrivateChannel(String channelName, ChannelType channelType, List<UUID> userList) {
-        Channel channel = channelRepository.save(channelName, channelType);
-        userList.forEach(userUUID -> readStatusRepository.save(userUUID, channel.getId()));
+        Channel channel = new Channel(channelName, channelType);
+        channelRepository.save(channel);
+        userList.forEach(userUUID -> {
+            ReadStatus readStatus = new ReadStatus(userUUID, channel.getId());
+            readStatusRepository.save(readStatus);
+        });
         return new ChannelSaveDto(channel.getId(), channelName, channel.getChannelType(), channel.getCreatedAt());
     }
 

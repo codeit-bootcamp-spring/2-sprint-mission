@@ -43,10 +43,10 @@ public class BasicUserService implements UserService {
             System.out.println("[실패] 회원이메일 중복");
             return null;
         }
-
-        UUID profileId = (profile != null) ? binaryContentRepository.save(profile).getId() : null;
-
-        User user = userRepository.save(username, password, nickname, email, profileId);
+        BinaryContent binaryContent = new BinaryContent(profile);
+        UUID profileId = (profile != null) ? binaryContentRepository.save(binaryContent).getId() : null;
+        User user = new  User(username, password, nickname, email, profileId);
+        userRepository.save(user);
         UserStatus userStatus = UserStatus.builder()
                 .userUUID(user.getId())
                 .build();
@@ -98,7 +98,8 @@ public class BasicUserService implements UserService {
 
         UUID profileId = user.getProfile();
         if (updateUserDto.imageFile().length > 0) {
-            profileId = binaryContentRepository.save(updateUserDto.imageFile()).getId();
+            BinaryContent binaryContent = new BinaryContent(updateUserDto.imageFile());
+            profileId = binaryContentRepository.save(binaryContent).getId();
         }
         userRepository.update(updateUserDto.userUUID(), updateUserDto.nickname(), profileId);
     }

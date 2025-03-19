@@ -15,8 +15,7 @@ public class JCFUserRepository implements UserRepository {
     private final List<User> userList = new ArrayList<>();
 
     @Override
-    public User save(String username, String password, String nickname, String email, UUID profileId) {
-        User user = new User(username, password, nickname, email, profileId);
+    public User save(User user) {
         userList.add(user);
         return user;
     }

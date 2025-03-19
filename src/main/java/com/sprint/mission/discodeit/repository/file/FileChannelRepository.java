@@ -19,8 +19,7 @@ public class FileChannelRepository implements ChannelRepository {
     private final FileManager fileManager;
 
     @Override
-    public Channel save(String channelName, ChannelType channelType) {
-        Channel channel = new Channel(channelName, channelType);
+    public Channel save(Channel channel) {
         fileManager.writeToFile(SubDirectory.CHANNEL, channel, channel.getId());
         return channel;
     }

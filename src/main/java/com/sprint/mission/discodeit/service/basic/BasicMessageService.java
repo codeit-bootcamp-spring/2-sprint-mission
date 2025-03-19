@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.SaveMessageParamDto;
 import com.sprint.mission.discodeit.dto.UpdateMessageParamDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -36,12 +37,15 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(NullPointerException::new);
 
         List<UUID> attachmentList = saveMessageParamDto.imageList().stream()
-                .map(image -> binaryContentRepository.save(image).getId())
+                .map(image -> {
+                    BinaryContent binaryContent = new BinaryContent(image);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
                 .toList();
+        Message message = new Message(saveMessageParamDto.content(), saveMessageParamDto.UserId(), saveMessageParamDto.channelId(), attachmentList);
+        messageRepository.save(message);
 
-        messageRepository.save(saveMessageParamDto.channelId(), saveMessageParamDto.UserId(), saveMessageParamDto.content(), attachmentList);
-
-        System.out.println("[성공]" + saveMessageParamDto.toString());
+        System.out.println("[성공]" + saveMessageParamDto);
     }
 
     @Override

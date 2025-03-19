@@ -31,7 +31,9 @@ public class BasicReadStatusService implements ReadStatusService {
         Channel channel = channelRepository.findChannelById(saveReadStatusParamDto.channelUUID())
                         .orElseThrow(NullPointerException::new);
 
-        readStatusRepository.save(user.getId(), channel.getId());
+        ReadStatus readStatus = new ReadStatus(user.getId(), channel.getId());
+
+        readStatusRepository.save(readStatus);
     }
 
     @Override

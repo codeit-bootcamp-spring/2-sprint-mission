@@ -14,8 +14,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     List<BinaryContent> binaryContentList = new ArrayList<>();
 
     @Override
-    public BinaryContent save(byte[] imageFile) {
-        BinaryContent binaryContent = new BinaryContent(imageFile);
+    public BinaryContent save(BinaryContent binaryContent) {
         binaryContentList.add(binaryContent);
         return binaryContent;
     }

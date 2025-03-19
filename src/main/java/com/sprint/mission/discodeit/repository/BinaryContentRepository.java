@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BinaryContentRepository {
-    BinaryContent save(byte[] imageFile);
+    BinaryContent save(BinaryContent binaryContent);
     Optional<BinaryContent> findById(UUID binaryContentUUID);
     List<BinaryContent> findAll();
     void delete(UUID profileId);

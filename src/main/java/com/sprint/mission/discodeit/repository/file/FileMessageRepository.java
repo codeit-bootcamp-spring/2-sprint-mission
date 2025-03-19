@@ -19,8 +19,7 @@ public class FileMessageRepository implements MessageRepository {
     private final FileManager fileManager;
 
     @Override
-    public Message save(UUID channelUUID, UUID userUUID, String content, List<UUID> attachmentList) {
-        Message message = new Message(content, userUUID, channelUUID, attachmentList);
+    public Message save(Message message) {
         fileManager.writeToFile(SubDirectory.MESSAGE, message, message.getId());
         return message;
     }

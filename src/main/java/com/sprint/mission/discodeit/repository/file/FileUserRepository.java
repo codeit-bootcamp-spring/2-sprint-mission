@@ -17,8 +17,7 @@ public class FileUserRepository implements UserRepository {
     private final FileManager fileManager;
 
     @Override
-    public User save(String username, String password, String nickname, String email, UUID profileId) {
-        User user = new User(username, password, nickname, email, profileId);
+    public User save(User user) {
         fileManager.writeToFile(SubDirectory.USER, user, user.getId());
         return user;
     }
