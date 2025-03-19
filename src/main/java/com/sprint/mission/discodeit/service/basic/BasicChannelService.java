@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.ChannelResponse;
 import com.sprint.mission.discodeit.dto.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final MessageRepository messageRepository;
 
     @Override
     public Channel createPrivateChannel(PrivateChannelCreateRequest request) {
@@ -42,8 +46,26 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<Channel> getChannelById(UUID channelId) {
-        return channelRepository.getChannelById(channelId);
+    public Optional<ChannelResponse> getChannelById(UUID channelId) {
+        return channelRepository.getChannelById(channelId)
+                .map(channel -> {
+                    Instant latestMessageTime = messageRepository.getAllMessagesByChannel(channelId).stream()
+                            .map(Message::getCreatedAt)
+                            .max(Instant::compareTo)
+                            .orElse(null);
+
+                    List<UUID> participantUserIds = readStatusRepository.getAll().stream()
+                            .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                            .map(ReadStatus::getUserId)
+                            .collect(Collectors.toList());
+
+                    return new ChannelResponse(
+                            channel.getId(),
+                            channel.getName(),
+                            latestMessageTime,
+                            participantUserIds
+                    );
+                });
     }
 
     @Override
