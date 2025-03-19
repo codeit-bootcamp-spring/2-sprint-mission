@@ -25,7 +25,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserCreateResponseDto create(UserCreateRequestDto requestDto) {
-        validateUserCreateRequestDto(requestDto);
+        validateUsernameDuplicate(requestDto.username());
+        validateEmailDuplicate(requestDto.email());
 
         User user = new User(requestDto.username(),
                 requestDto.email(), requestDto.password(), requestDto.profileId());
@@ -53,6 +54,15 @@ public class BasicUserService implements UserService {
     @Override
     public UserUpdateResponseDto update(UserUpdateRequestDto requestDto) {
         User user = getUserBy(requestDto.id());
+
+        if (!user.getUsername().equals(requestDto.username())) {
+            validateUsernameDuplicate(requestDto.username());
+        }
+
+        if (!user.getEmail().equals(requestDto.email())) {
+            validateEmailDuplicate(requestDto.email());
+        }
+
         user.update(requestDto.username(), requestDto.email(),
                  requestDto.password(), requestDto.profileId());
         userRepository.save(user);
@@ -78,16 +88,20 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
     }
 
-    private void validateUserCreateRequestDto(UserCreateRequestDto requestDto) {
-        if (userRepository.existsByUsername(requestDto.username())) {
-            throw new IllegalArgumentException("동일 username 이미 존재함");
-        }
-        if (userRepository.existsByEmail(requestDto.email())) {
+
+    private void validateEmailDuplicate(String email) {
+        if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("동일 email 이미 존재함");
         }
     }
 
+    private void validateUsernameDuplicate(String username) {
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("동일 username 이미 존재함");
+        }
+    }
+
     private boolean isOnline(UUID userId) {
-        return userStatusService.find(userId).isOnline();
+        return userStatusService.findByUserId(userId).isOnline();
     }
 }

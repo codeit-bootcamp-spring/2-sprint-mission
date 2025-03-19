@@ -40,6 +40,12 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    public UserStatus findByUserId(UUID userId) {
+        return userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
+    }
+
+    @Override
     public List<UserStatus> findAll() {
         return userStatusRepository.findAll();
     }

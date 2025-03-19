@@ -64,6 +64,21 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
+    public void deleteByChannelId(UUID channelId) {
+
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return List.of();
+    }
+
+    @Override
+    public Optional<Message> findLatestMessageByChannelId(UUID channelId) {
+        return Optional.empty();
+    }
+
+    @Override
     public List<Message> findAll() {
         try {
             return Files.list(DIRECTORY)
