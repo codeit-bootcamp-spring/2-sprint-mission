@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.constant.UserStatusType;
 import com.sprint.mission.discodeit.dto.FindUserDto;
+import com.sprint.mission.discodeit.dto.SaveUserStatusParamDto;
 import com.sprint.mission.discodeit.dto.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.UserSaveDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -46,7 +47,10 @@ public class BasicUserService implements UserService {
         UUID profileId = (profile != null) ? binaryContentRepository.save(profile).getId() : null;
 
         User user = userRepository.save(username, password, nickname, email, profileId);
-        userStatusRepository.save(user.getId());
+        UserStatus userStatus = UserStatus.builder()
+                .userUUID(user.getId())
+                .build();
+        userStatusRepository.save(userStatus);
 
         if (user == null) {
             System.out.println("[실패] 저장 실패.");
@@ -60,31 +64,20 @@ public class BasicUserService implements UserService {
 
     @Override
     public FindUserDto findByUser(UUID userUUID) {
-        UserStatusType userStatusType = UserStatusType.CONNECTING;
         User user = userRepository.findUserById(userUUID)
-                .orElseGet(() -> {
-                    System.out.println("[실패] 사용자가 존재하지 않습니다.");
-                    return null;
-                });
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원"));
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .map(data -> {
+                    userStatusRepository.update(data.getId());
+                    return data;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("사용자 상태 확인 불가"));
 
-        UserStatus userStatus = userStatusRepository.findByUser(userUUID)
-                .orElseGet(() -> {
-                    System.out.println("[실패] 접속 상태 오류");
-                    return null;
-                });
-
-        if (user == null || userStatus == null) {
-            System.out.println("[실패] 잘못된 찾기");
-            return null;
-        }
-
-        if (userStatus.getUpdatedAt() == null ||
-                Duration.between(userStatus.getUpdatedAt().atZone(ZoneId.systemDefault()).toInstant(),
-                        Instant.now()).toMinutes() >= 5) {
-            userStatusType = UserStatusType.NOTCONNECTIED;
-        }
-
-        FindUserDto findUserDto = new FindUserDto(user.getId(), user.getNickname(), user.getProfile(), user.getCreatedAt(), user.getUpdatedAt(), userStatus.getUpdatedAt(), userStatusType);
+        FindUserDto findUserDto = new FindUserDto(
+                user.getId(), user.getNickname(),
+                user.getProfile(), user.getCreatedAt(),
+                user.getUpdatedAt(), userStatus.getUpdatedAt(),
+                userStatus.getUserStatusType());
 
         return findUserDto;
     }

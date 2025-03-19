@@ -1,9 +1,13 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.constant.UserStatusType;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,15 +18,22 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     List<UserStatus> userStatusList = new ArrayList<>();
 
     @Override
-    public void save(UUID userUUID) {
-        UserStatus userStatus = new UserStatus(userUUID);
+    public void save(UserStatus userStatus) {
         userStatusList.add(userStatus);
     }
 
     @Override
-    public Optional<UserStatus> findByUser(UUID userUUID) {
+    public Optional<UserStatus> findById(UUID userStatusUUID) {
         return userStatusList.stream()
-                .filter(userStatus -> userStatus.getUserUUID().equals(userUUID)).findFirst();
+                .filter(userStatus -> userStatus.getId().equals(userStatusUUID))
+                .findAny();
+    }
+
+    @Override
+    public Optional<UserStatus> findByUserId(UUID userUUID) {
+        return userStatusList.stream()
+                .filter(userStatus -> userStatus.getUserUUID().equals(userUUID))
+                .findAny();
     }
 
     @Override
@@ -31,15 +42,23 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void update(UUID userUUID) {
+    public void update(UUID userStatusUUID) {
         userStatusList.stream()
-                .filter(userStatus -> userStatus.getUserUUID().equals(userUUID))
+                .filter(userStatus -> userStatus.getId().equals(userStatusUUID))
                 .findAny()
-                .ifPresent(UserStatus::updateLastStatus);
+                .ifPresent((userStatus) -> {
+                    if (userStatus.getLastLoginTime() == null ||
+                            Duration.between(userStatus.getLastLoginTime().atZone(ZoneId.systemDefault()).toInstant(), Instant.now())
+                                    .toMinutes() >= 5) {
+                        userStatus.updateLastStatus(UserStatusType.NOTCONNECTIED);
+                        return;
+                    }
+                    userStatus.updateLastStatus(UserStatusType.CONNECTING);
+                });
     }
 
     @Override
-    public void delete(UUID userUUID) {
-        userStatusList.removeIf(userStatus -> userStatus.getUserUUID().equals(userUUID));
+    public void delete(UUID statusUUID) {
+        userStatusList.removeIf(userStatus -> userStatus.getId().equals(statusUUID));
     }
 }

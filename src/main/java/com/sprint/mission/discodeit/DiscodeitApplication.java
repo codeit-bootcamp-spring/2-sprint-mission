@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.service.basic.BasicAuthService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -31,6 +28,7 @@ public class DiscodeitApplication {
         final AuthService authService = context.getBean(BasicAuthService.class);
         final ChannelService channelService = context.getBean(ChannelService.class);
         final MessageService messageService = context.getBean(MessageService.class);
+        final UserStatusService userStatusService = context.getBean(UserStatusService.class);
 
         Scanner sc = new Scanner(System.in);
 
@@ -42,7 +40,7 @@ public class DiscodeitApplication {
                 userToken = initPage(userService, authService);
             }
             if (userToken == null) continue;
-
+            userStatusService.updateByUserId(userToken);
             System.out.println(" ======== 메뉴 ======== ");
             System.out.println("1. 채널 이용\n2. 조회\n3. 수정\n4. 삭제\n5. 로그아웃\n6. 나가기");
             System.out.print("입력란: ");
