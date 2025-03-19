@@ -29,7 +29,13 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void addReadStatus(ReadStatus readStatus) {
-        readStatusMap.put(readStatus.getId(), readStatus);
+        readStatusMap.put(readStatus.getChannelId(), readStatus);
+        save();
+    }
+
+    @Override
+    public void addUser(UUID channelId, UUID userId) {
+        readStatusMap.get(channelId).addUser(userId);
         save();
     }
 
@@ -46,6 +52,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public void deleteReadStatusById(UUID id) {
         readStatusMap.remove(id);
+        save();
     }
 
     @Override
