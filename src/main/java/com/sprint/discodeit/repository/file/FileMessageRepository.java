@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -46,5 +47,12 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
         Map<UUID, Message> messageMap = loadAll();
         messageMap.remove(messageId);
         writeToFile(messageMap);
+    }
+
+    public List<Message> findByChannelAndMessageContext(UUID channelId){
+        Map<UUID, Message> messageMap = loadAll();
+        return messageMap.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .collect(Collectors.toList());
     }
 }
