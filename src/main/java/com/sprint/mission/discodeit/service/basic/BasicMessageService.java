@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.dto.SaveMessageParamDto;
 import com.sprint.mission.discodeit.dto.UpdateMessageParamDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -21,29 +23,24 @@ import java.util.stream.Collectors;
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
-    private final UserService userService;
-    private final ChannelService channelService;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public void sendMessage(SaveMessageParamDto saveMessageParamDto) {
-        if (userService.findByUser(saveMessageParamDto.UserId()) == null) {
-            return;
-        }
+        userRepository.findUserById(saveMessageParamDto.UserId())
+                .orElseThrow(NullPointerException::new);
 
-        if (channelService.findChannel(saveMessageParamDto.channelId()) == null) {
-            return;
-        }
+        channelRepository.findChannelById(saveMessageParamDto.channelId())
+                .orElseThrow(NullPointerException::new);
 
         List<UUID> attachmentList = saveMessageParamDto.imageList().stream()
                 .map(image -> binaryContentRepository.save(image).getId())
                 .toList();
 
-        Message message = messageRepository.save(saveMessageParamDto.channelId(), saveMessageParamDto.UserId(), saveMessageParamDto.content(), attachmentList);
-        if (message == null) {
-            System.out.println("[실패] 메세지 저장 실패");
-            return;
-        }
+        messageRepository.save(saveMessageParamDto.channelId(), saveMessageParamDto.UserId(), saveMessageParamDto.content(), attachmentList);
+
         System.out.println("[성공]" + saveMessageParamDto.toString());
     }
 
