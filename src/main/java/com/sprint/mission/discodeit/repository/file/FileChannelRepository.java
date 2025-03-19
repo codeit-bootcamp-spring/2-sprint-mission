@@ -38,12 +38,14 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
 
     @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
-        if (existsById(channelId)) {
-            super.storage.get(channelId).updateChannelName(newChannelName);
-        }
+        Channel findChannel = super.findById(channelId);
+        findChannel.updateChannelName(newChannelName);
+        super.saveToFile(super.directory.resolve(channelId.toString() + ".ser"), findChannel);
     }
 
     public void addParticipant(UUID channelId, UUID newParticipantId) {
-        super.findById(channelId).addParticipant(newParticipantId);       // 뒤의 addParticpant는 Channel 의 메서드
+        Channel findChannel = super.findById(channelId);
+        findChannel.addParticipant(newParticipantId);
+        super.saveToFile(super.directory.resolve(channelId.toString() + ".ser"), findChannel);
     }
 }
