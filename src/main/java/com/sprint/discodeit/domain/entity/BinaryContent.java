@@ -21,4 +21,11 @@ public class BinaryContent implements Serializable {
         this.filePath = filePath;
         this.creatAt = Instant.now();
     }
+
+    public void update(String fileType, String filePath) {
+        if(fileType == null || filePath == null) {
+            this.filePath = filePath;
+            this.fileType = fileType;
+        }
+    }
 }

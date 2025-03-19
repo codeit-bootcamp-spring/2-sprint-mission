@@ -1,6 +1,7 @@
 package com.sprint.discodeit.service.file;
 
 import com.sprint.discodeit.domain.dto.binaryContentDto.BinaryContentRequestDto;
+import com.sprint.discodeit.domain.dto.binaryContentDto.BinaryContentUpdateRequestDto;
 import com.sprint.discodeit.domain.entity.BinaryContent;
 import com.sprint.discodeit.repository.file.BaseBinaryContentRepository;
 import java.util.ArrayList;
@@ -28,6 +29,15 @@ public class BinaryContentService {
 
     public List<BinaryContent> findAll(){
         return baseBinaryContentRepository.findByAll();
+    }
+
+    public void update(BinaryContentUpdateRequestDto binaryContentRequestDto){
+        BinaryContent binaryContent = baseBinaryContentRepository.findById(binaryContentRequestDto.binaryContentId()).orElseThrow(() -> new IllegalArgumentException("찾을 수 없는 파일 입니다. "));
+        binaryContent.update(binaryContentRequestDto.fileType(), binaryContentRequestDto.filePath());
+    }
+
+    public void delete(UUID binaryContentId){
+        baseBinaryContentRepository.delete(binaryContentId);
     }
 
 
