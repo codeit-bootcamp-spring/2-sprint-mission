@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -14,8 +15,8 @@ import java.util.stream.Collectors;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository extends AbstractFileRepository<Channel> implements ChannelRepository {
-    public FileChannelRepository() {
-        super(Channel.class, Paths.get(System.getProperty("user.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\channeldata"));   // 현재 프로그램이 실행되고 있는 디렉토리로 설정
+    public FileChannelRepository(RepositoryProperties repositoryProperties) {
+        super(Channel.class, Paths.get(repositoryProperties.getFileDirectory()).resolve("ChannelData"));   // 현재 프로그램이 실행되고 있는 디렉토리로 설정
     }
 
     @Override

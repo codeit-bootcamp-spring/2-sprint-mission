@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,8 +16,8 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
     private final Map<UUID, List<ReadStatus>> userIdMap;
     private final Map<UUID, List<ReadStatus>> channelIdMap;
 
-    public FileReadStatusRepository() {
-        super(ReadStatus.class, Paths.get(System.getProperty("userStatus.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\readStatusdata"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
+    public FileReadStatusRepository(RepositoryProperties repositoryProperties) {
+        super(ReadStatus.class, Paths.get(repositoryProperties.getFileDirectory()).resolve("readStatusdata"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
         this.userIdMap = new HashMap<>();
         this.channelIdMap = new HashMap<>();
     }

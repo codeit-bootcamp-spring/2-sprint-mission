@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,8 +19,8 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     private Map<String, User> usernames;
     private Map<String, User> emails;
 
-    public FileUserRepository() {
-        super(User.class, Paths.get(System.getProperty("user.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\userdata"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
+    public FileUserRepository(RepositoryProperties repositoryProperties) {
+        super(User.class, Paths.get(repositoryProperties.getFileDirectory()).resolve("UserData"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
         usernames = new HashMap<>();
         emails = new HashMap<>();
     }

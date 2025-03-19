@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,8 +14,8 @@ import java.util.UUID;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileBinaryContentRepository extends AbstractFileRepository<BinaryContent> implements BinaryContentRepository {
-    public FileBinaryContentRepository() {
-        super(BinaryContent.class, Paths.get(System.getProperty("BinaryContent.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\BinaryContentData"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
+    public FileBinaryContentRepository(RepositoryProperties repositoryProperties) {
+        super(BinaryContent.class, Paths.get(repositoryProperties.getFileDirectory()).resolve("BinaryContentData"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
     }
 
     @Override
