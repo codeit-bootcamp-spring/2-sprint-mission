@@ -42,6 +42,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public List<Message> readMessageListByChannelId(UUID channelId) {
+        ChannelService.validateChannelId(channelId, this.jcfChannelRepository);
         return jcfMessageRepository.findMessageListByChannelId(channelId);
     }
 
