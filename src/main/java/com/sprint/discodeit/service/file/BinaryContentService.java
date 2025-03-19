@@ -5,6 +5,7 @@ import com.sprint.discodeit.domain.entity.BinaryContent;
 import com.sprint.discodeit.repository.file.BaseBinaryContentRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,13 @@ public class BinaryContentService {
         return binaryContent;
     }
 
-    public void find(){
+    public BinaryContent find(UUID binaryContentId){
+        BinaryContent binaryContent = baseBinaryContentRepository.findById(binaryContentId).orElseThrow(() -> new IllegalArgumentException("찾을 수 없는 파일 입니다. "));
+        return binaryContent;
+    }
 
+    public List<BinaryContent> findAll(){
+        return baseBinaryContentRepository.findByAll();
     }
 
 
