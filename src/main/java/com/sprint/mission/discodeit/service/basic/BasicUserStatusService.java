@@ -34,12 +34,15 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusFindResponse findUserStatus(UUID id) {
-        return null;
+        UserStatus findUserStatus = this.userStatusRepository.findById(id);
+        return new UserStatusFindResponse(findUserStatus.getId(), findUserStatus.getUserId());
     }
 
     @Override
     public List<UserStatusFindResponse> findAllUserStatus() {
-        return List.of();
+        return this.userStatusRepository.getAll().values().stream()
+                .map(userStatus -> new UserStatusFindResponse(userStatus.getId(), userStatus.getUserId()))
+                .toList();
     }
 
     @Override
