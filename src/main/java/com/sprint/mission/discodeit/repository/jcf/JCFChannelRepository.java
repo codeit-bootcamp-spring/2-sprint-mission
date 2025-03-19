@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.repository.AbstractRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class JCFChannelRepository extends AbstractRepository<Channel> implements ChannelRepository {
     private static volatile JCFChannelRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
@@ -27,10 +29,15 @@ public class JCFChannelRepository extends AbstractRepository<Channel> implements
     }
 
     @Override
+    public List<Channel> findAllByUserId(UUID userId) {
+        return super.storage.values().stream()
+                .filter(channel -> channel.getChannelType() == ChannelType.PUBLIC || (channel.getParticipantIds().contains(userId)))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
-        if (existsById(channelId)) {
-            super.storage.get(channelId).updateChannelName(newChannelName);
-        }
+        super.findById(channelId).updateChannelName(newChannelName);
     }
 
     @Override
