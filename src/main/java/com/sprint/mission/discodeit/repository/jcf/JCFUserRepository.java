@@ -19,10 +19,10 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID userId) {
+    public Optional<User> findById(UUID userId) {
         User userNullable = this.data.get(userId);
-        return Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        return Optional.ofNullable(Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found")));
     }
 
     @Override
@@ -50,6 +50,26 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public boolean exists(UUID userId) {
         return this.data.containsKey(userId);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        for (User user : this.data.values()) {
+            if ((user.getUsername().equals(username))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        for (User user : this.data.values()) {
+            if ((user.getEmail().equals(email))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

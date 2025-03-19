@@ -34,7 +34,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest) {
+    public UserDto create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest) {
         // username과 email이 중복되지 않도록 검사
         if (userRepository.existsByUsernameOrEmail(userCreateRequest.username(), userCreateRequest.email())) {
             throw new RuntimeException("Username or email already exists");
@@ -49,11 +49,15 @@ public class BasicUserService implements UserService {
             newUser.setProfileImage(profileContent.getId());
         });
 
-        // UserStatus 생성
+        // UserStatus 생성 및 저장
         UserStatus userStatus = new UserStatus(newUser.getId(), Status.ONLINE);
-        userStatusRepository.save(userStatus);
+        UserStatus savedUserStatus = userStatusRepository.save(userStatus);
 
-        return userRepository.save(newUser);
+        // User 저장
+        User savedUser = userRepository.save(newUser);
+
+        // UserDto로 변환하여 반환
+        return UserDto.fromUser(savedUser, savedUserStatus);
     }
 
     @Override
@@ -113,5 +117,11 @@ public class BasicUserService implements UserService {
         }
         userStatusRepository.deleteByUserId(userId);
     }
+
+    @Override
+    public boolean exists(UUID authorId) {
+        return userRepository.findById(authorId).isPresent();
+    }
+
 }
 
