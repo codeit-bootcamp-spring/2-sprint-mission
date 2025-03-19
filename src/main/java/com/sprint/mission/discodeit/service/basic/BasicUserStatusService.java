@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusFindResponse;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.DuplicateUserIdException;
@@ -47,12 +48,12 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void updateUserStatus(UserStatusUpdateRequest userStatusUpdateRequest) {
-
+        this.userStatusRepository.updateTimeByUserId(userStatusUpdateRequest.readStatusId(), userStatusUpdateRequest.updateTime());
     }
 
     @Override
-    public void updateUserStatusByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest) {
-
+    public void updateUserStatusByUserId(UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
+        this.userStatusRepository.updateTimeByUserId(userStatusUpdateByUserIdRequest.userId(), userStatusUpdateByUserIdRequest.updateTime());
     }
 
     @Override
