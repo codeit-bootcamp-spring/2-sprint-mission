@@ -36,8 +36,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatusDTO find(UUID id) {
-        ReadStatus readStatus = readStatusRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(id + " ReadStatus가 존재하지 않습니다."));
+        ReadStatus readStatus = findReadStatusById(id);
         return readStatusEntityToDTO(readStatus);
     }
 
@@ -59,8 +58,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public UUID update(UpdateReadStatusParam updateReadStatusParam) {
-        ReadStatus readStatus = readStatusRepository.findById(updateReadStatusParam.id())
-                .orElseThrow(() -> new NoSuchElementException(updateReadStatusParam.id() + " ReadStatus가 존재하지 않습니다."));
+        ReadStatus readStatus = findReadStatusById(updateReadStatusParam.id());
         readStatus.updateReadStatus();
         readStatusRepository.save(readStatus);
         return readStatus.getId();
@@ -68,6 +66,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void delete(UUID id) {
+        // remove의 경우 id가 없는 경우에는 예외를 던지지 않고 그냥 무시됨
+        // 굳이 find해서 있는지 확인하고 지울 필요 없다!
         readStatusRepository.deleteById(id);
     }
 
@@ -90,6 +90,11 @@ public class BasicReadStatusService implements ReadStatusService {
         if (readStatusRepository.existsByUserIdAndChannelId(createReadStatusParam.userId(), createReadStatusParam.channelId())) {
             throw new IllegalStateException("이미 ReadStatus가 존재하는 userId와 channelId 입니다.");
         }
+    }
+
+    private ReadStatus findReadStatusById(UUID id) {
+        return readStatusRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(id + " ReadStatus가 존재하지 않습니다."));
     }
 
     private ReadStatus createReadStatusEntity(CreateReadStatusParam createReadStatusParam) {

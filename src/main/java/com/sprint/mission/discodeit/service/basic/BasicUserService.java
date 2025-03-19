@@ -44,7 +44,8 @@ public class BasicUserService implements UserService {
     @Override
     public UserDTO find(UUID userId) {
         User findUser = findUserById(userId);
-        UserStatus findUserStatus = userStatusRepository.findByUserId(userId);
+        UserStatus findUserStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException(userId + "유저의 UserStatus가 존재하지 않습니다."));
         return UserMapper.userEntityToDTO(findUser, findUserStatus);
     }
 
@@ -102,7 +103,6 @@ public class BasicUserService implements UserService {
                 .profileId(createUserParam.profileId())
                 .build();
     }
-
 
     private User findUserById(UUID userId) {
         return userRepository.findById(userId)

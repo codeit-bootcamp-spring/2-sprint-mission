@@ -53,14 +53,13 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UUID updateByUserId(UUID userId, UpdateUserStatusParam updateUserStatusParam) {
-        UserStatus userStatus = userStatusRepository.findByUserId(userId);
+        UserStatus userStatus = findUserStatusById(updateUserStatusParam.id());
         userStatus.updateUserStatus();
         return userStatus.getId();
     }
 
     @Override
     public void delete(UUID id) {
-        userStatusRepository.findById(id);
         userStatusRepository.deleteById(id);
     }
 
