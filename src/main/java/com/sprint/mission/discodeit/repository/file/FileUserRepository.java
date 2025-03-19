@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -20,16 +21,16 @@ import org.springframework.stereotype.Repository;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
 public class FileUserRepository implements UserRepository {
 
-    private static final Path DIRECTORY_PATH = Paths.get(System.getProperty("user.dir"), "data",
-            "users");
+    private final Path directoryPath;
 
-    public FileUserRepository() {
+    public FileUserRepository(@Value("${discodeit.repository.file-directory}") String directoryPath) {
+        this.directoryPath = Paths.get(System.getProperty("user.dir"), directoryPath, "users");
         init();
     }
 
     private void init() {
         try {
-            Files.createDirectories(DIRECTORY_PATH);
+            Files.createDirectories(directoryPath);
         } catch (IOException e) {
             throw new RuntimeException("User 디렉토리 생성을 실패했습니다: " + e.getMessage());
         }
@@ -47,12 +48,12 @@ public class FileUserRepository implements UserRepository {
     }
 
     private Path getFilePath(UUID userId) {
-        return DIRECTORY_PATH.resolve(userId + ".ser");
+        return directoryPath.resolve(userId + ".ser");
     }
 
     @Override
     public List<User> findAll() {
-        try (Stream<Path> paths = Files.list(DIRECTORY_PATH)) {
+        try (Stream<Path> paths = Files.list(directoryPath)) {
             return paths.map(this::readUserFromFile).toList();
         } catch (IOException e) {
             throw new RuntimeException("Users 데이터 로드를 실패했습니다: " + e.getMessage());

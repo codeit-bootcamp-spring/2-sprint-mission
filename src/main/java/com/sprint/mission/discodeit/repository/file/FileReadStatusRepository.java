@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -20,16 +21,16 @@ import org.springframework.stereotype.Repository;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
 public class FileReadStatusRepository implements ReadStatusRepository {
 
-    private static final Path DIRECTORY_PATH = Paths.get(System.getProperty("user.dir"), "data",
-            "readStatuses");
+    private final Path directoryPath;
 
-    public FileReadStatusRepository() {
+    public FileReadStatusRepository(@Value("${discodeit.repository.file-directory}") String directoryPath) {
+        this.directoryPath = Paths.get(System.getProperty("user.dir"), directoryPath, "readStatuses");
         init();
     }
 
     private void init() {
         try {
-            Files.createDirectories(DIRECTORY_PATH);
+            Files.createDirectories(directoryPath);
         } catch (IOException e) {
             throw new RuntimeException("ReadStatus 디렉토리 생성을 실패했습니다: " + e.getMessage());
         }
@@ -47,12 +48,12 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     private Path getFilePath(UUID readStatusId) {
-        return DIRECTORY_PATH.resolve(readStatusId + ".ser");
+        return directoryPath.resolve(readStatusId + ".ser");
     }
 
     @Override
     public List<ReadStatus> findAll() {
-        try (Stream<Path> paths = Files.list(DIRECTORY_PATH)) {
+        try (Stream<Path> paths = Files.list(directoryPath)) {
             return paths.map(this::readUserFromFile).toList();
         } catch (IOException e) {
             throw new RuntimeException("ReadStatuses 데이터 로드를 실패했습니다: " + e.getMessage());
@@ -69,7 +70,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        try (Stream<Path> paths = Files.list(DIRECTORY_PATH)) {
+        try (Stream<Path> paths = Files.list(directoryPath)) {
             return paths.map(this::readUserFromFile)
                     .filter(readStatus -> readStatus.getUserId().equals(userId))
                     .toList();
@@ -80,7 +81,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        try (Stream<Path> paths = Files.list(DIRECTORY_PATH)) {
+        try (Stream<Path> paths = Files.list(directoryPath)) {
             return paths.map(this::readUserFromFile)
                     .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                     .toList();
