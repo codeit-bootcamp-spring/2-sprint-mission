@@ -9,11 +9,11 @@ import java.time.Instant;
 import java.util.*;
 
 @Repository
-public class FileReadstatusRepository extends AbstractFileRepository<ReadStatus> implements ReadStatusRepository {
+public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus> implements ReadStatusRepository {
     private final Map<UUID, List<ReadStatus>> userIdMap;
     private final Map<UUID, List<ReadStatus>> channelIdMap;
 
-    public FileReadstatusRepository() {
+    public FileReadStatusRepository() {
         super(ReadStatus.class, Paths.get(System.getProperty("userStatus.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\readStatusdata"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
         this.userIdMap = new HashMap<>();
         this.channelIdMap = new HashMap<>();
