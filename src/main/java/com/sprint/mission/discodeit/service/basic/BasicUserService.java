@@ -84,7 +84,7 @@ public class BasicUserService implements UserService {
     @Override
     public void deleteUser(UUID userId) {
         User deleteUser = this.userRepository.findById(userId);
-        this.userStatusRepository.deleteById(userStatusRepository.findUserStatusIDByUserId(deleteUser.getId()).getId());
+        this.userStatusRepository.deleteById(userStatusRepository.findUserStatusByUserId(deleteUser.getId()).getId());
         this.readStatusRepository.deleteByUserId(userId);
         this.binaryContentService.deleteByID(deleteUser.getProfileId());
         this.userRepository.deleteById(userId);

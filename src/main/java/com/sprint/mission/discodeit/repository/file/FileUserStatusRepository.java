@@ -31,7 +31,7 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
     }
 
     @Override
-    public UserStatus findUserStatusIDByUserId(UUID userId) {
+    public UserStatus findUserStatusByUserId(UUID userId) {
         if (!existsByUserId(userId)) {
             throw new NoSuchElementException("해당 userId를 가진 userStatus를 찾을 수 없습니다 : " + userId);
         }
