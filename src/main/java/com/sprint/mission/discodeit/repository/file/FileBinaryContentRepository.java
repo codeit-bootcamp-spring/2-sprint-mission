@@ -16,6 +16,12 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
     }
 
     @Override
+    public void add(BinaryContent newBinaryContent) {
+        super.add(newBinaryContent);
+        super.saveToFile(directory.resolve(newBinaryContent.getId().toString() + ".ser"), newBinaryContent);
+    }
+
+    @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
         List<BinaryContent> responses = new ArrayList<>();
         for(UUID id : ids) {
@@ -23,5 +29,11 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
             responses.add(binaryContent);
         }
         return responses;
+    }
+
+    @Override
+    public void deleteById(UUID binaryContentId) {
+        super.deleteById(binaryContentId);
+        super.deleteFile(binaryContentId);
     }
 }
