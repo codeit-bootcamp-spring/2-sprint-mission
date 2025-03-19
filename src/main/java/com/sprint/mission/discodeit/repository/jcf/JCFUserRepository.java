@@ -7,7 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
 
+@Repository
+@Qualifier("jcfUserRepository")
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;
 
@@ -34,6 +38,16 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public boolean existsById(UUID id) {
         return this.data.containsKey(id);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return findAll().stream().anyMatch(u -> u.getUsername().equals(username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return findAll().stream().anyMatch(u -> u.getEmail().equals(email));
     }
 
     @Override

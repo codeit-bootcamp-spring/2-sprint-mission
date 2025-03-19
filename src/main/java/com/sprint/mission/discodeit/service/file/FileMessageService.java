@@ -4,8 +4,11 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,7 +43,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId) {
+    public Message create(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         try {
             channelService.find(channelId);
             userService.find(authorId);
@@ -48,7 +51,7 @@ public class FileMessageService implements MessageService {
             throw e;
         }
 
-        Message message = new Message(content, channelId, authorId);
+        Message message = new Message(content, channelId, authorId, attachmentIds);
         Path path = resolvePath(message.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());

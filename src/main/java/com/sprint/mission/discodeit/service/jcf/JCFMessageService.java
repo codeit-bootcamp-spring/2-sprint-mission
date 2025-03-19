@@ -4,8 +4,12 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data;
@@ -20,7 +24,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId) {
+    public Message create(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         try {
             channelService.find(channelId);
             userService.find(authorId);
@@ -28,7 +32,7 @@ public class JCFMessageService implements MessageService {
             throw e;
         }
 
-        Message message = new Message(content, channelId, authorId);
+        Message message = new Message(content, channelId, authorId, attachmentIds);
         this.data.put(message.getId(), message);
 
         return message;
