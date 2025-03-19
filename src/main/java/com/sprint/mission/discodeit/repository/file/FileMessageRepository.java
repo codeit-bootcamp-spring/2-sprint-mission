@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,8 +39,25 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
     }
 
     @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(messageMap.values());
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageMap.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
+    public Optional<Instant> findLatestMessageTimeByChannelId(UUID channelId) {
+        Optional<Instant> latestMessageTime = messageMap.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .max(Comparator.comparing(Message::getUpdatedAt))
+                .map(Message::getUpdatedAt);
+        return latestMessageTime;
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        List<Message> messages = findAllByChannelId(channelId);
+        messages.forEach(message -> messageMap.remove(message.getId()));
     }
 
     @Override
@@ -54,7 +72,6 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
         SerializationUtil.init(directory);
         SerializationUtil.serialization(filePath, message);
     }
-
 
     @Override
     public List<Message> loadAllFromFile() {

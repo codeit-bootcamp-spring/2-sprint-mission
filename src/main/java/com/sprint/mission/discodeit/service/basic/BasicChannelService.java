@@ -47,7 +47,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public FindChannelDTO find(UUID channelId) {
         Channel channel = findChannelById(channelId);
-        Instant latestMessageTime = messageRepository.findLatestMessageTimeByChannelId(channelId);
+        Instant latestMessageTime = findMessageLatestTimeInChannel(channelId);
         List<UUID> userIds = getUserIdsFromChannel(channel);
         return channelEntityToFindDTO(channel, latestMessageTime, userIds);
     }
@@ -61,7 +61,7 @@ public class BasicChannelService implements ChannelService {
         return channels.stream()
                 .filter(ch -> ch.getType() == ChannelType.PUBLIC || getUserIdsFromChannel(ch).contains(userId))
                 .map(ch -> channelEntityToFindDTO(ch,
-                        messageRepository.findLatestMessageTimeByChannelId(ch.getId()),
+                        findMessageLatestTimeInChannel(ch.getId()),
                         getUserIdsFromChannel(ch)))
                 .toList();
     }
@@ -117,13 +117,13 @@ public class BasicChannelService implements ChannelService {
     }
 
     private void createReadStatusesForUsers(List<UUID> userIds, UUID channelId) {
-        List<CreateReadStatusParam> createReadStatusParams =
-                userIds.stream()
+        List<CreateReadStatusParam> createReadStatusParams = userIds.stream()
                         .map(userId -> CreateReadStatusParam.builder()
                                 .userId(userId)
-                                .channelId(channelId)
+                                .channelId(channelId) // userId와 channelId를 사용하여 createReadStatus DTO 생성
                                 .build())
                         .toList();
+        // DTO를 이용해 readStatus 생성
         createReadStatusParams.forEach(cr -> readStatusService.create(cr));
     }
 
@@ -139,6 +139,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     // PRIVATE 채널일때만 userId 가져오고 아닐떈 빈리스트 반환
+    // 요구사항에선 Channel이 userId를 가지지 않으므로, channelId로 ReadStatus를 조회하고,
+    // ReadStatus에서 userId를 뽑아내어 사용
     private List<UUID> getUserIdsFromChannel(Channel channel) {
         return channel.getType() == ChannelType.PRIVATE ?
                 readStatusService.findAllByChannelId(channel.getId())
@@ -150,6 +152,11 @@ public class BasicChannelService implements ChannelService {
     private Channel findChannelById(UUID id) {
         return channelRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(id + "채널이 존재하지 않습니다."));
+    }
+
+    private Instant findMessageLatestTimeInChannel(UUID channelId) {
+        return messageRepository.findLatestMessageTimeByChannelId(channelId)
+                .orElseThrow(() -> new NoSuchElementException(channelId + " 채널에는 메시지가 없습니다."));
     }
 
 

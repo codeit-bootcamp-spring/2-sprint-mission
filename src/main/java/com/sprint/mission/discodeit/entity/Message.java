@@ -25,6 +25,7 @@ public class Message implements Serializable {
         this.id = UUID.randomUUID();
         this.attachmentIds = attachmentIds; // 첨부파일과 함께 생성
         this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
