@@ -73,6 +73,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<Message> readMessageListByChannelId(UUID channelId) {
+        ChannelService.validateChannelId(channelId, this.channelRepository);
         return this.messageRepository.findMessageListByChannelId(channelId);
     }
 
