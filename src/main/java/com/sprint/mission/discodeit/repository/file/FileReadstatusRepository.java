@@ -22,6 +22,7 @@ public class FileReadstatusRepository extends AbstractFileRepository<ReadStatus>
     @Override
     public void add (ReadStatus newReadStatus) {
         super.add(newReadStatus);
+        super.saveToFile(super.directory.resolve(newReadStatus.getId().toString() + ".ser"), newReadStatus);
         this.userIdMap.computeIfAbsent(newReadStatus.getUserId(), userId -> new ArrayList<>()).add(newReadStatus);
         this.channelIdMap.computeIfAbsent(newReadStatus.getChannelId(), channelId -> new ArrayList<>()).add(newReadStatus);
     }
@@ -44,7 +45,9 @@ public class FileReadstatusRepository extends AbstractFileRepository<ReadStatus>
 
     @Override
     public void updateReadTime(UUID readStatusId, Instant readTime) {
-        super.findById(readStatusId).updateReadTime(readTime);
+        ReadStatus findReadStatus = this.findById(readStatusId);
+        findReadStatus.updateReadTime(readTime);
+        super.saveToFile(super.directory.resolve(readStatusId.toString() + ".ser"), findReadStatus);
     }
 
     @Override
@@ -62,6 +65,7 @@ public class FileReadstatusRepository extends AbstractFileRepository<ReadStatus>
         List<ReadStatus> readStatusList = this.findByUserId(userId);
         readStatusList.forEach(readStatus -> channelIdMap.get(readStatus.getChannelId()).remove(readStatus));
         readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
+        readStatusList.forEach(readStatus -> super.deleteFile(readStatus.getId()));
     }
 
     @Override
@@ -70,5 +74,6 @@ public class FileReadstatusRepository extends AbstractFileRepository<ReadStatus>
         this.channelIdMap.remove(channelId);
         readStatusList.forEach(readStatus -> userIdMap.get(readStatus.getUserId()).remove(readStatus));
         readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
+        readStatusList.forEach(readStatus -> super.deleteFile(readStatus.getId()));
     }
 }
