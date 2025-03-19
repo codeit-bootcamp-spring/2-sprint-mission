@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.MessageCreateDto;
+import com.sprint.mission.discodeit.dto.MessageUpdateDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -21,17 +24,22 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelService channelService;
     private final UserService userService;
+    private final BinaryContentRepository binaryContentRepository;
 
     private void saveMessageData() {
         messageRepository.save();
     }
 
     @Override
-    public Message createMessage(UUID senderId, UUID channelId, String content) {
-        Message message = new Message(senderId, channelId, content);
-        Channel channel = channelService.findChannelById(channelId);
+    public Message createMessage(MessageCreateDto dto) {
+        UUID channelId = dto.getChannelId();
+        Message message = new Message(dto.getUserId(), channelId, dto.getContent());
 
-        channel.addMessages(message.getId());
+        channelService.addMessage(channelId, message.getId());
+
+        dto.getFilePath().forEach(filePath ->
+                binaryContentRepository.addBinaryContent(
+                        new BinaryContent(channelId, extractFileName(filePath), determineFileType(filePath), filePath)));
 
         messageRepository.addMessage(message);
         return message;
@@ -54,7 +62,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findChannelMessages(UUID channelId) {
+    public List<Message> findallByChannelId(UUID channelId) {
         channelService.validateChannelExists(channelId);
         return messageRepository.findMessageAll().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
@@ -62,7 +70,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findUserMessages(UUID senderId) {
+    public List<Message> findallByUserId(UUID senderId) {
         userService.validateUserExists(senderId);
         return messageRepository.findMessageAll().stream()
                 .filter(message -> message.getSenderId().equals(senderId))
@@ -70,9 +78,9 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(UUID messageId, String newContent) {
-        Message message = messageRepository.findMessageById(messageId);
-        message.updateContent(newContent);
+    public void updateMessage(MessageUpdateDto dto) {
+        Message message = messageRepository.findMessageById(dto.getMessageId());
+        message.updateContent(dto.getContent());
         saveMessageData();
     }
 
@@ -81,6 +89,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findMessageById(messageId);
 
         channelService.removeMessage(message.getChannelId(), messageId);
+        binaryContentRepository.deleteBinaryContent(messageId);
 
         messageRepository.deleteMessageById(messageId);
     }
@@ -90,5 +99,13 @@ public class BasicMessageService implements MessageService {
         if (!messageRepository.existsById(messageId)) {
             throw new IllegalArgumentException("존재하지 않는 메세지입니다.");
         }
+    }
+
+    private String extractFileName(String filePath) {
+        return filePath.substring(filePath.lastIndexOf("/") + 1);
+    }
+
+    private String determineFileType(String filePath) {
+        return filePath.substring(filePath.lastIndexOf(".") + 1);
     }
 }

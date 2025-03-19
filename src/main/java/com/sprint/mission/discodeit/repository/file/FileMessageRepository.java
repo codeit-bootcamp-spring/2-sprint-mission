@@ -5,10 +5,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
@@ -32,7 +29,7 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void addMessage(Message message) {
         messages.put(message.getId(), message);
-        fileStorageManager.saveFile(FILE_PATH, messages);
+        save();
     }
 
     @Override
@@ -48,11 +45,25 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void deleteMessageById(UUID messageId) {
         messages.remove(messageId);
-        fileStorageManager.saveFile(FILE_PATH, messages);
+        save();
+    }
+
+    @Override
+    public void deleteMessageByChannelId(UUID channelId) {
+        messages.values().removeIf(message -> message.getChannelId().equals(channelId));
+        save();
     }
 
     @Override
     public boolean existsById(UUID messageId) {
         return messages.containsKey(messageId);
+    }
+
+    @Override
+    public Message findLatestMessageByChannelId(UUID channelId) {
+        return messages.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt))
+                .orElse(null);
     }
 }
