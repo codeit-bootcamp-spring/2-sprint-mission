@@ -19,4 +19,11 @@ public class UserStatus implements Serializable {
         this.lastLoginTime = lastLoginTime;
         this.statusType = statusType;
     }
+
+    public void updateStatus(Instant lastLoginTime, String statusType) {
+        if(statusType != null) {
+            this.statusType = statusType;
+            this.lastLoginTime = lastLoginTime;
+        }
+    }
 }

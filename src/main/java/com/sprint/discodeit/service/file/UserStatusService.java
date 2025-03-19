@@ -30,6 +30,10 @@ public class UserStatusService {
                 });
         UserStatus userStatus = new UserStatus(Instant.now(), statusType.toString());
         user.associateStatus(userStatus);
+
+        fileuserRepository.save(user);
+        baseuserStatusRepository.save(userStatus);
+
         return user;
     }
 
@@ -45,6 +49,16 @@ public class UserStatusService {
         return userStatus;
     }
 
+    public void update(UUID statusId, StatusType statusType){
+        UserStatus userStatus = baseuserStatusRepository.findById(statusId)
+                .orElseThrow(() -> new IllegalArgumentException("찾을 수 없는 상태 정보 입니다."));
+        userStatus.updateStatus(Instant.now(), statusType.toString());
+        baseuserStatusRepository.save(userStatus);
+    }
 
-
+    public void delete(UUID userId){
+        UUID byUserIdAndStatusId = fileuserRepository.findByUserIdAndStatusId(userId);
+        fileuserRepository.delete(userId);
+        baseuserStatusRepository.delete(byUserIdAndStatusId);
+    }
 }

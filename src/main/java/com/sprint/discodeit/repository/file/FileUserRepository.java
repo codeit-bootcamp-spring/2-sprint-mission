@@ -73,4 +73,11 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
         return users.values().stream().filter(user -> user.getUserStatusId().equals(statusId)).findFirst();
     }
 
+    public UUID findByUserIdAndStatusId(UUID userId) {
+        Map<UUID, User> users = loadAll();
+        Optional<User> userById = users.values().stream()
+                .filter(user -> user.getUserStatusId().equals(userId))
+                .findFirst();
+        return userById.get().getUserStatusId();
+    }
 }
