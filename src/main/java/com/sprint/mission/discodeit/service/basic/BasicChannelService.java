@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,10 +20,23 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
+    private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public Channel createChannel(String name) {
-        Channel channel = new Channel(name);
+    public Channel createPrivateChannel(PrivateChannelCreateRequest request) {
+        Channel channel = new Channel("PRIVATE CHANNEL");
+        channelRepository.save(channel);
+
+        request.userIds().forEach(userId -> {
+            ReadStatus readStatus = new ReadStatus(userId, channel.getId());
+            readStatusRepository.save(readStatus);
+        });
+        return channel;
+    }
+
+    @Override
+    public Channel createPublicChannel(PublicChannelCreateRequest request) {
+        Channel channel = new Channel(request.name());
         channelRepository.save(channel);
         return channel;
     }

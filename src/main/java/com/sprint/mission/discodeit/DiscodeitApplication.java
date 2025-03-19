@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -121,7 +122,8 @@ public class DiscodeitApplication {
                             case CREATE_CHANNEL:
                                 System.out.println("채널 이름 입력: ");
                                 String channelName = sc.nextLine();
-                                Channel channel = channelService.createChannel(channelName);
+                                PublicChannelCreateRequest request = new PublicChannelCreateRequest(channelName);
+                                Channel channel = channelService.createPublicChannel(request);
                                 System.out.println("채널 생성 완료: " + channel);
                                 break;
 
