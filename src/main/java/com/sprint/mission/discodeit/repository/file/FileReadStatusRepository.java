@@ -4,7 +4,8 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.FileRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
-import org.springframework.core.Ordered;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -18,11 +19,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileReadStatusRepository implements ReadStatusRepository, FileRepository<ReadStatus> {
-    private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "readstatuses");
+    private final Path directory;
     private final Map<UUID, ReadStatus> readStatusMap;
 
-    public FileReadStatusRepository() {
+    public FileReadStatusRepository(@Value("${discodeit.repository.file-directory}") String fileDir) {
+        this.directory = Paths.get(System.getProperty("user.dir"), fileDir, "readstatuses");
         SerializationUtil.init(directory);
         this.readStatusMap = new ConcurrentHashMap<>();
         loadCacheFromFile();

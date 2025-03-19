@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.FileRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -16,11 +18,13 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository, FileRepository<Message> {
-    private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "messages");
+    private final Path directory;
     private final Map<UUID, Message> messageMap;
 
-    public FileMessageRepository() {
+    public FileMessageRepository(@Value("${discodeit.repository.file-directory}") String fileDir) {
+        this.directory = Paths.get(System.getProperty("user.dir"), fileDir, "messages");
         SerializationUtil.init(directory);
         messageMap = new ConcurrentHashMap<>();
         loadCacheFromFile();

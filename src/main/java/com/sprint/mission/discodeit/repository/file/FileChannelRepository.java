@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.FileRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -15,14 +17,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository, FileRepository<Channel> {
-    private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "channels");
-
-
+    private final Path directory;
     private final Map<UUID, Channel> channelMap;
 
     // Map을 ConcurrentHashMap으로 초기화해주고싶으므로 @RequiredArgsConstructor는 안쓰고 직접 생성자 만듦
-    public FileChannelRepository() {
+    public FileChannelRepository(@Value("${discodeit.repository.file-directory}") String fileDir) {
+        this.directory = Paths.get(System.getProperty("user.dir"), fileDir, "channels");
         SerializationUtil.init(directory);
         channelMap = new ConcurrentHashMap<>(); // 멀티쓰레드 환경 고려
         loadCacheFromFile(); // 서버 메모리와 파일 동기화
