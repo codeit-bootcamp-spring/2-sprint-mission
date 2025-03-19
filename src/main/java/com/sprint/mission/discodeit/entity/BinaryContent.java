@@ -1,37 +1,25 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
-public final class BinaryContent {
-    private final UUID id;
-    private final Instant createTime;
-    private final UUID referenceId;
-    private final String fileName;
-    private final String fileType;
-    private final String filePath;
-
+public record BinaryContent(
+        UUID id,
+        Instant createTime,
+        UUID referenceId,
+        String fileName,
+        String fileType,
+        Path filePath
+) {
+    // 주 생성자 (UUID 자동 생성)
     public BinaryContent(UUID referenceId, String fileName, String fileType, String filePath) {
-        this.id = UUID.randomUUID();
-        this.createTime = Instant.now();
-        this.referenceId = referenceId;
-        this.fileName = fileName;
-        this.fileType = fileType;
-        this.filePath = filePath;
+        this(UUID.randomUUID(), Instant.now(), referenceId, fileName, fileType, Paths.get(filePath));
     }
 
-    @Override
-    public String toString() {
-        return "BinaryContent{" +
-                "id=" + id +
-                ", createTime=" + createTime +
-                ", referenceId=" + referenceId +
-                ", fileName='" + fileName + '\'' +
-                ", fileType='" + fileType + '\'' +
-                ", filePath='" + filePath + '\'' +
-                '}';
+    // ID를 외부에서 주입하는 보조 생성자
+    public BinaryContent(UUID id, UUID referenceId, String fileName, String fileType, String filePath) {
+        this(id, Instant.now(), referenceId, fileName, fileType, Paths.get(filePath));
     }
 }

@@ -29,12 +29,13 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void addBinaryContent(BinaryContent content) {
-        binaryContentMap.put(content.id(), content);
+        binaryContentMap.put(content.referenceId(), content);
+        save();
     }
 
     @Override
-    public BinaryContent findBinaryContent(UUID binaryContentId) {
-        return binaryContentMap.get(binaryContentId);
+    public BinaryContent findBinaryContent(UUID referenceId) {
+        return binaryContentMap.get(referenceId);
     }
 
     @Override
@@ -43,12 +44,13 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public void deleteBinaryContent(UUID binaryContentId) {
-        binaryContentMap.remove(binaryContentId);
+    public void deleteBinaryContent(UUID referenceId) {
+        binaryContentMap.remove(referenceId);
+        save();
     }
 
     @Override
-    public boolean existsBinaryContent(UUID binaryContentId) {
-        return binaryContentMap.containsKey(binaryContentId);
+    public boolean existsBinaryContent(UUID referenceId) {
+        return binaryContentMap.containsKey(referenceId);
     }
 }
