@@ -42,6 +42,7 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public List<Message> readMessageListByChannelId(UUID channelId) {
+        ChannelService.validateChannelId(channelId, this.fileChannelRepository);
         return fileMessageRepository.findMessageListByChannelId(channelId);
     }
 
