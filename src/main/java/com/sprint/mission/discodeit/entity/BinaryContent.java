@@ -10,5 +10,5 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class BinaryContent extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    private byte[] imagePath;
+    private byte[] image;
 }
