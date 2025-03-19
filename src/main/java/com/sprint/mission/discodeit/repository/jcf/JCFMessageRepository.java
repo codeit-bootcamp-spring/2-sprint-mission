@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Repository
 public class JCFMessageRepository extends AbstractRepository<Message> implements MessageRepository {
@@ -34,18 +33,30 @@ public class JCFMessageRepository extends AbstractRepository<Message> implements
 
     @Override
     public List<Message> findMessageListByChannelId(UUID channelId) {   //해당 channelID를 가진 message가 없을 때, 빈 리스트 반환
-        if (channelId == null) {
-            throw new NullPointerException("channelId is null");
+        if (channelIdMessages.get(channelId) == null) {         // channelService에서 createChannel을 할때 항상 addChannelIdToChannelIdMessage가 호출되어 확인할 필요 없지만 자체적인 검증로직 필요?
+            throw new NullPointerException("해당 channelId를 가진 채널이 아직 생성되지 않았습니다. " + channelId);
         }
-        return super.storage.values().stream()
-                .filter((m) -> Objects.equals(channelId, m.getChannelId()))
-                .collect(Collectors.toList());
+        return new ArrayList<>(channelIdMessages.get(channelId));
     }
 
     @Override
     public void updateMessageContent(UUID messageId, String newContent) {
         if (existsById(messageId)) {
             super.storage.get(messageId).updateContent(newContent);
+        }
+    }
+
+    @Override
+    public void updateAttachmentIds(UUID messageId, List<UUID> attachmentIds) {
+        if (existsById(messageId)) {
+            super.storage.get(messageId).updateAttachmentIds(attachmentIds);
+        }
+    }
+
+    @Override
+    public void deleteAttachment(UUID messageId, UUID attachmentId) {
+        if (existsById(messageId)) {
+            super.storage.get(messageId).deleteAttachment(attachmentId);
         }
     }
 
