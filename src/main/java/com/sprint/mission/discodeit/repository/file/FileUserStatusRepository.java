@@ -41,12 +41,16 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
 
     @Override
     public void updateTimeById(UUID readStatusId, Instant updateTime) {
-        super.storage.get(readStatusId).updateUpdatedAt(updateTime);
+        UserStatus findUserStatus = findUserStatusByUserId(readStatusId);
+        findUserStatus.updateUpdatedAt(updateTime);
+        super.saveToFile(directory.resolve(findUserStatus.getId().toString() + ".ser"), findUserStatus);    // file에 반영
     }
 
     @Override
     public void updateTimeByUserId(UUID userId, Instant updateTime) {
-        findUserStatusByUserId(userId).updateUpdatedAt(updateTime);
+        UserStatus findUserStatus = findUserStatusByUserId(userId);
+        findUserStatus.updateUpdatedAt(updateTime);
+        super.saveToFile(directory.resolve(findUserStatus.getId().toString() + ".ser"), findUserStatus);    // file에 반영
     }
 
     @Override
