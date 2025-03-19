@@ -1,5 +1,6 @@
 package com.sprint.discodeit.service.file;
 
+import com.sprint.discodeit.domain.dto.binaryContentDto.BinaryContentRequestDto;
 import com.sprint.discodeit.domain.entity.BinaryContent;
 import com.sprint.discodeit.repository.file.BaseBinaryContentRepository;
 import java.util.ArrayList;
@@ -13,6 +14,19 @@ import org.springframework.stereotype.Service;
 public class BinaryContentService {
 
     private final BaseBinaryContentRepository baseBinaryContentRepository;
+
+    public BinaryContent creat(BinaryContentRequestDto binaryContentRequestDto){
+        BinaryContent binaryContent = new BinaryContent(binaryContentRequestDto.fileType(), binaryContentRequestDto.filePath());
+        return binaryContent;
+    }
+
+    public void find(){
+
+    }
+
+
+
+
 
     public List<BinaryContent> convertToBinaryContents(List<BinaryContent> binaryContent) {
         List<BinaryContent> binaryContentList = new ArrayList<>();
