@@ -41,9 +41,8 @@ public class BasicUserService implements UserService {
         }
 
         User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password());
-        userStatusService.create(new UserStatusCreateDto(newUser.getId(), Instant.MIN));
-
         userRepository.save(newUser);
+        userStatusService.create(new UserStatusCreateDto(newUser.getId(), Instant.MIN));
 
         return newUser;
     }
