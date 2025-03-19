@@ -20,7 +20,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public UserDto register(UserRegisterDto userRegisterDto) {
-        User requestUser = new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password());
+        User requestUser = new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password(), null);
         validateDuplicateEmail(requestUser);
         User savedUser = userRepository.save(requestUser);
 

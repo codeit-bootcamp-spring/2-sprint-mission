@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.file;
 import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
 import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.discodeit.constant.FilePath.USER_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.USER_TEST_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -41,12 +41,12 @@ class FileUserServiceTest {
 
     private void setUpTestPath() {
         String random = UUID.randomUUID().toString();
-        userPath = STORAGE_DIRECTORY.resolve(random + USER_FILE);
+        userPath = STORAGE_DIRECTORY.resolve(random + USER_TEST_FILE);
     }
 
     private void setUpUser() {
         initializedUser = userService.register(
-                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
+                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword(), null));
     }
 
     @AfterEach
@@ -64,7 +64,7 @@ class FileUserServiceTest {
     @Test
     void registerDuplicateUser() {
         UserRegisterDto otherUserWithSameEmail = new UserRegisterDto(OTHER_USER.getName(), LONGIN_USER.getEmail(),
-                OTHER_USER.getPassword());
+                OTHER_USER.getPassword(), null);
 
         assertThatThrownBy(() ->
                 userService.register(otherUserWithSameEmail))
@@ -92,7 +92,7 @@ class FileUserServiceTest {
     @Test
     void findByName() {
         UserRegisterDto otherUserWithSameEmail = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(),
-                OTHER_USER.getPassword());
+                OTHER_USER.getPassword(), null);
 
         userService.register(otherUserWithSameEmail);
         List<UserDto> users = userService.findByName(initializedUser.name());

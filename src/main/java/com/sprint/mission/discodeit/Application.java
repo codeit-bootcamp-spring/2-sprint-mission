@@ -108,10 +108,10 @@ public class Application {
 
     public static UserDto setupUser(UserController userController) {
         UserDto loginUser = userController.register(
-                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword())
+                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword(), null)
         );
         userController.register(
-                new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword())
+                new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword(), null)
         );
         return loginUser;
     }

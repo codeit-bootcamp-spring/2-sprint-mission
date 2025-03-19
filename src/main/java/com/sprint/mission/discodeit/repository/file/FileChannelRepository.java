@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_TEST_FILE;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class FileChannelRepository implements ChannelRepository {
-    private Path channelPath = STORAGE_DIRECTORY.resolve(CHANNEL_FILE);
+    private Path channelPath = CHANNEL_TEST_FILE;
 
     public void changePath(Path path) {
         this.channelPath = path;

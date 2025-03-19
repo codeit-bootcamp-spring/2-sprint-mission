@@ -54,7 +54,7 @@ public final class FileUtils {
         }
     }
 
-    private static void init(Path directory) {
+    public static void init(Path directory) {
         if (Files.exists(directory)) {
             return;
         }

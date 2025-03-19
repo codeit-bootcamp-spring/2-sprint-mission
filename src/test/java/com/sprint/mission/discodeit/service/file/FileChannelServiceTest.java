@@ -4,9 +4,9 @@ import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
 import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
 import static com.sprint.mission.discodeit.constant.ChannelInfo.CHANNEL_NAME;
 import static com.sprint.mission.discodeit.constant.ChannelInfo.UPDATED_CHANNEL_NAME;
-import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_TEST_FILE;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.discodeit.constant.FilePath.USER_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.USER_TEST_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -42,8 +42,8 @@ class FileChannelServiceTest {
 
     private void setUpTestFilePath() {
         String random = UUID.randomUUID().toString();
-        userTestFilePath = STORAGE_DIRECTORY.resolve(random + USER_FILE);
-        channelTestFilePath = STORAGE_DIRECTORY.resolve(random + CHANNEL_FILE);
+        userTestFilePath = STORAGE_DIRECTORY.resolve(random + USER_TEST_FILE);
+        channelTestFilePath = STORAGE_DIRECTORY.resolve(random + CHANNEL_TEST_FILE);
     }
 
     private void setUpService() {
@@ -59,12 +59,12 @@ class FileChannelServiceTest {
 
     private void setUpChannel(UserDto loginUser) {
         initializedChannel = channelService.create(CHANNEL_NAME,
-                new UserDto(loginUser.id(), loginUser.name(), loginUser.email()));
+                new UserDto(loginUser.id(), loginUser.name(), loginUser.email(), null));
     }
 
     private UserDto setUpUser() {
         UserRegisterDto user = new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(),
-                LONGIN_USER.getPassword());
+                LONGIN_USER.getPassword(), null);
 
         return userService.register(user);
     }
@@ -83,7 +83,7 @@ class FileChannelServiceTest {
     @Test
     void addMember() {
         UserDto otherUser = userService.register(new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(),
-                OTHER_USER.getPassword()));
+                OTHER_USER.getPassword(), null));
 
         ChannelDto channelDto = channelService.addMember(initializedChannel.id(), OTHER_USER.getEmail());
         assertThat(channelDto.usersDto().users()).contains(otherUser);

@@ -8,21 +8,23 @@ import lombok.Getter;
 
 @Getter
 public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private UUID id;
+    private static final long SERIAL_VERSION_UID = 1L;
+    private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
     private String name;
     private String email;
     private String password;
+    private UUID profileId;
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
         this.createdAt = ZonedDateTime.now().toInstant();
         this.updatedAt = createdAt;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.profileId = profileId;
     }
 
     public void updateName(String name) {

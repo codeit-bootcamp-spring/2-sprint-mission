@@ -5,12 +5,14 @@ import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_ACCESS_D
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
 import com.sprint.mission.discodeit.controller.UserController;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
@@ -27,13 +29,13 @@ public class Beans {
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     public Beans() {
-        initializeFileBeans();
+        initializeJCFBeans();
         initializeBeans();
     }
 
     private void initializeBeans() {
         saveBean(UserService.class,
-                new BasicUserService(findBean(UserRepository.class)));
+                new BasicUserService(findBean(UserRepository.class), findBean(BinaryContentRepository.class)));
         saveBean(MessageService.class,
                 new BasicMessageService(findBean(MessageRepository.class), findBean(UserRepository.class)));
         saveBean(ChannelService.class,
@@ -51,6 +53,7 @@ public class Beans {
     }
 
     private void initializeJCFBeans() {
+        saveBean(BinaryContentRepository.class, new JCFBinaryContentRepository());
         saveBean(UserRepository.class, new JCFUserRepository());
         saveBean(ChannelRepository.class, new JCFChannelRepository());
         saveBean(MessageRepository.class, new JCFMessageRepository());

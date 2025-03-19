@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit;
 
-import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_FILE;
-import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_TEST_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_TEST_FILE;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.discodeit.constant.FilePath.USER_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.USER_TEST_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -17,9 +17,9 @@ class ApplicationTest extends ConsoleTestTemplate {
     @AfterEach
     void tearDown() throws IOException {
         // TODO: 3/18/25 나중에 빈 설정에서 Path 변수 수정 필요
-        Files.deleteIfExists(STORAGE_DIRECTORY.resolve(USER_FILE));
-        Files.deleteIfExists(STORAGE_DIRECTORY.resolve(CHANNEL_FILE));
-        Files.deleteIfExists(STORAGE_DIRECTORY.resolve(MESSAGE_FILE));
+        Files.deleteIfExists(STORAGE_DIRECTORY.resolve(USER_TEST_FILE));
+        Files.deleteIfExists(STORAGE_DIRECTORY.resolve(CHANNEL_TEST_FILE));
+        Files.deleteIfExists(STORAGE_DIRECTORY.resolve(MESSAGE_TEST_FILE));
     }
 
     @DisplayName("처음 서버를 생성했을떄 화면을 출력한다")

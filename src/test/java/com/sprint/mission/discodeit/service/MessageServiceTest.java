@@ -23,7 +23,7 @@ class MessageServiceTest {
     void setUp() {
         UserRepository userRepository = new JCFUserRepository();
         User user = userRepository.save(
-                new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
+                new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword(), null));
 
         messageService = new JCFMessageService(new JCFMessageRepository(), userRepository);
         setUpMessage = messageService.create(MESSAGE_CONTENT, UUID.randomUUID(), user.getId());

@@ -23,7 +23,7 @@ class UserServiceTest {
     void setUp() {
         userService = new JCFUserService(new JCFUserRepository());
         setUpUser = userService.register(
-                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
+                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword(), null));
     }
 
     @AfterEach
@@ -57,7 +57,7 @@ class UserServiceTest {
     @Test
     void 유저_이름_다수_조회() {
         UserRegisterDto otherUser = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(),
-                OTHER_USER.getPassword());
+                OTHER_USER.getPassword(), null);
         userService.register(otherUser);
 
         assertThat(userService.findByName(LONGIN_USER.getName())).hasSize(2);

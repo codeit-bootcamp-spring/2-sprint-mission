@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.file;
 
 import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_TEST_FILE;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.discodeit.constant.FilePath.USER_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.USER_TEST_FILE;
 import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -44,8 +44,8 @@ class FileMessageServiceTest {
 
     private void setUpTestFilePath() {
         String random = UUID.randomUUID().toString();
-        userTestFilePath = STORAGE_DIRECTORY.resolve(random + USER_FILE);
-        messageTestFilePath = STORAGE_DIRECTORY.resolve(random + MESSAGE_FILE);
+        userTestFilePath = STORAGE_DIRECTORY.resolve(random + USER_TEST_FILE);
+        messageTestFilePath = STORAGE_DIRECTORY.resolve(random + MESSAGE_TEST_FILE);
     }
 
     private void setUpService() {
@@ -64,7 +64,7 @@ class FileMessageServiceTest {
 
     private void setUpUser() {
         initializedUser = userService.register(
-                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()));
+                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword(), null));
     }
 
     @AfterEach

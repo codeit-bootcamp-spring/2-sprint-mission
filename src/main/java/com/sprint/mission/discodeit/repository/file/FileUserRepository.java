@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.discodeit.constant.FilePath.USER_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.USER_TEST_FILE;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class FileUserRepository implements UserRepository {
-    private Path userPath = STORAGE_DIRECTORY.resolve(USER_FILE);
+    private Path userPath = USER_TEST_FILE;
 
     public void changePath(Path path) {
         this.userPath = path;

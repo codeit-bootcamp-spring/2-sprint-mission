@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_TEST_FILE;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class FileMessageRepository implements MessageRepository {
-    private Path messagePath = STORAGE_DIRECTORY.resolve(MESSAGE_FILE);
+    private Path messagePath = MESSAGE_TEST_FILE;
 
     public void changePath(Path path) {
         this.messagePath = path;
