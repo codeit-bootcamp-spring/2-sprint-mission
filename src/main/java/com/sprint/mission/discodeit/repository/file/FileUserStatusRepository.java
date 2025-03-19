@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -36,6 +37,16 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
             throw new NoSuchElementException("해당 userId를 가진 userStatus를 찾을 수 없습니다 : " + userId);
         }
         return userIdMap.get(userId);
+    }
+
+    @Override
+    public void updateTimeById(UUID readStatusId, Instant updateTime) {
+        super.storage.get(readStatusId).updateUpdatedAt(updateTime);
+    }
+
+    @Override
+    public void updateTimeByUserId(UUID userId, Instant updateTime) {
+        findUserStatusByUserId(userId).updateUpdatedAt(updateTime);
     }
 
     @Override
