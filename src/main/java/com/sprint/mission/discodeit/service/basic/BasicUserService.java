@@ -44,9 +44,9 @@ public class BasicUserService implements UserService {
         userRepository.addUser(user);
         userStatusRepository.addUserStatus(new UserStatus(user.getId()));
 
-        if (dto.getProfilePicturePath() != null) {
-            String fileName = extractFileName(dto.getProfilePicturePath());
-            BinaryContent profile = new BinaryContent(user.getId(), fileName, determineFileType(fileName), dto.getProfilePicturePath());
+        String filePath = dto.getProfilePicturePath();
+        if (filePath != null) {
+            BinaryContent profile = new BinaryContent(user.getId(), extractFileName(filePath), determineFileType(filePath), filePath);
             binaryContentRepository.addBinaryContent(profile);
         }
         return user;
@@ -84,9 +84,9 @@ public class BasicUserService implements UserService {
         if (dto.getUsername() != null) user.updateUsername(dto.getUsername());
         if (dto.getPassword() != null) user.updatePassword(dto.getPassword());
         if (dto.getEmail() != null) user.updateEmail(dto.getEmail());
-        if (dto.getProfilePicturePath() != null) {
-            String fileName = extractFileName(dto.getProfilePicturePath());
-            BinaryContent profile = new BinaryContent(user.getId(), fileName, determineFileType(fileName), dto.getProfilePicturePath());
+        String filePath = dto.getProfilePicturePath();
+        if (filePath != null) {
+            BinaryContent profile = new BinaryContent(user.getId(), extractFileName(filePath), determineFileType(filePath), filePath);
             binaryContentRepository.addBinaryContent(profile);
         }
     }
@@ -123,11 +123,8 @@ public class BasicUserService implements UserService {
         return filePath.substring(filePath.lastIndexOf("/") + 1);
     }
 
-    private String determineFileType(String fileName) {
-        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) return "image/jpeg";
-        if (fileName.endsWith(".png")) return "image/png";
-        if (fileName.endsWith(".gif")) return "image/gif";
-        return "application/octet-stream"; // 알 수 없는 경우 기본값
+    private String determineFileType(String filePath) {
+        return filePath.substring(filePath.lastIndexOf(".") + 1);
     }
 
     private UserFindDto mapToUserFindDto(User user) {
