@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +25,18 @@ public class BasicAuthService implements AuthService {
     public UserDTO login(LoginParam loginParam) {
         User user = findUserByUsername(loginParam);
         checkPassword(user, loginParam);
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
+        UserStatus userStatus = findUserStatusByUserId(user.getId());
         return UserMapper.userEntityToDTO(user, userStatus);
     }
 
     private User findUserByUsername(LoginParam loginParam) {
         return userRepository.findByUsername(loginParam.username())
-                .orElseThrow(() -> new NoSuchElementException("해당 username과 일치하는 유저가 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException(loginParam.username() + "과 일치하는 유저가 없습니다."));
+    }
+
+    private UserStatus findUserStatusByUserId(UUID id) {
+        return userStatusRepository.findByUserId(id)
+                .orElseThrow(() -> new NoSuchElementException( id + "의 userStatus는 존재하지 않습니다."));
     }
 
     private void checkPassword(User user, LoginParam loginParam) {
