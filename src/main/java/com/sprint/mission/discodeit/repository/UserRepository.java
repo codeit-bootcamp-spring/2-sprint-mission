@@ -22,4 +22,8 @@ public interface UserRepository {
     void deleteUserById(UUID userId);
 
     boolean existsById(UUID userId);
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
 }

@@ -1,7 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.UserCreateDto;
+import com.sprint.mission.discodeit.dto.UserFindDto;
+import com.sprint.mission.discodeit.dto.UserUpdateDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -16,21 +24,37 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
 
     private void saveUser() {
         userRepository.save();
     }
 
     @Override
-    public User createUser(String username, String email, String password) {
-        User user = new User(username, email, password);
+    public User createUser(UserCreateDto dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("이미 존재하는 Email입니다");
+        }
+        if (userRepository.existsByUsername(dto.getUsername())) {
+            throw new IllegalArgumentException("이미 존재하는 Username입니다");
+        }
+
+        User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword());
         userRepository.addUser(user);
+        userStatusRepository.addUserStatus(new UserStatus(user.getId()));
+
+        if (dto.getProfilePicturePath() != null) {
+            String fileName = extractFileName(dto.getProfilePicturePath());
+            BinaryContent profile = new BinaryContent(user.getId(), fileName, determineFileType(fileName), dto.getProfilePicturePath());
+            binaryContentRepository.addBinaryContent(profile);
+        }
         return user;
     }
 
     @Override
-    public User getUserById(UUID userId) {
-        return userRepository.findUserById(userId);
+    public UserFindDto getUserById(UUID userId) {
+        return mapToUserFindDto(userRepository.findUserById(userId));
     }
 
     @Override
@@ -39,37 +63,32 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<User> findUsersByIds(Set<UUID> userIds) {
-        return userRepository.findUsersByIds(userIds);
+    public List<UserFindDto> findUsersByIds(Set<UUID> userIds) {
+        return userRepository.findUsersByIds(userIds).stream()
+                .map(this::mapToUserFindDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findUserAll();
+    public List<UserFindDto> getAllUsers() {
+        return userRepository.findUserAll().stream()
+                .map(this::mapToUserFindDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void updateUsername(UUID userId, String newUsername) {
-        validateUserExists(userId);
-        User user = userRepository.findUserById(userId);
-        user.updateUsername(newUsername);
-        saveUser();
-    }
+    public void updateUser(UserUpdateDto dto) {
+        validateUserExists(dto.getUserid());
+        User user = userRepository.findUserById(dto.getUserid());
 
-    @Override
-    public void updatePassword(UUID userId, String newPassword) {
-        validateUserExists(userId);
-        User user = userRepository.findUserById(userId);
-        user.updatePassword(newPassword);
-        saveUser();
-    }
-
-    @Override
-    public void updateEmail(UUID userId, String newEmail) {
-        validateUserExists(userId);
-        User user = userRepository.findUserById(userId);
-        user.updateEmail(newEmail);
-        saveUser();
+        if (dto.getUsername() != null) user.updateUsername(dto.getUsername());
+        if (dto.getPassword() != null) user.updatePassword(dto.getPassword());
+        if (dto.getEmail() != null) user.updateEmail(dto.getEmail());
+        if (dto.getProfilePicturePath() != null) {
+            String fileName = extractFileName(dto.getProfilePicturePath());
+            BinaryContent profile = new BinaryContent(user.getId(), fileName, determineFileType(fileName), dto.getProfilePicturePath());
+            binaryContentRepository.addBinaryContent(profile);
+        }
     }
 
     @Override
@@ -82,6 +101,8 @@ public class BasicUserService implements UserService {
     @Override
     public void deleteUser(UUID userId) {
         userRepository.deleteUserById(userId);
+        userStatusRepository.deleteUserStatusById(userId);
+        binaryContentRepository.deleteBinaryContent(userId);
     }
 
     @Override
@@ -97,4 +118,26 @@ public class BasicUserService implements UserService {
             throw new RuntimeException("존재하지 않는 유저입니다.");
         }
     }
+
+    private String extractFileName(String filePath) {
+        return filePath.substring(filePath.lastIndexOf("/") + 1);
+    }
+
+    private String determineFileType(String fileName) {
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) return "image/jpeg";
+        if (fileName.endsWith(".png")) return "image/png";
+        if (fileName.endsWith(".gif")) return "image/gif";
+        return "application/octet-stream"; // 알 수 없는 경우 기본값
+    }
+
+    private UserFindDto mapToUserFindDto(User user) {
+        UserFindDto dto = new UserFindDto();
+        dto.setUserid(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setStatus(userStatusRepository.findUserStatusById(user.getId()).getStatus()); // ✅ 온라인 상태 추가
+        return dto;
+    }
+
+
 }

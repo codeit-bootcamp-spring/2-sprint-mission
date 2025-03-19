@@ -10,15 +10,26 @@ import java.util.UUID;
 @Getter
 public class UserStatus extends BaseEntity {
 
+    private static final int ONLINE_THRESHOLD = 300;
     private final UUID userid;
+    private UserStatusType status;
 
     public UserStatus(UUID userid) {
         this.userid = userid;
+        this.status = UserStatusType.Online;
     }
 
-    public boolean isUserOnline() {
-        return Duration.between(getUpdatedAt(), Instant.now()).getSeconds() < 300;
+    public UserStatusType isUserOnline() {
+        if (Duration.between(getUpdatedAt(), Instant.now()).getSeconds() < ONLINE_THRESHOLD) {
+            status = UserStatusType.Online;
+        } else {
+            status = UserStatusType.Offline;
+        }
+        return status;
     }
 
+    public void updateLastActiveAt() {
+        updateTimestamp();
+    }
 
 }
