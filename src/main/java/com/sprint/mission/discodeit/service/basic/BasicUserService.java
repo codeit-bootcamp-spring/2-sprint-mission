@@ -22,8 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    private final UserStatusService userStatusService; // 레파지토리로 변경해야 함.
-    private final BasicBinaryContentService basicBinaryContentService; // 얘도..ㅎㅎ
+    private final UserStatusService userStatusService;
+    private final BasicBinaryContentService basicBinaryContentService;
 
     public BasicUserService(@Qualifier("fileUserRepository") UserRepository userRepository,
                             UserStatusService userStatusService,

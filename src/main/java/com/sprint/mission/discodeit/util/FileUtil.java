@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 public class FileUtil {
     private static final String EXTENSION = ".ser";
@@ -41,6 +42,18 @@ public class FileUtil {
         }
         return object;
     }
+
+
+    public static void saveBinaryContent(Path directory, MultipartFile file, UUID id) {
+        Path filePath = resolvePath(directory, id);
+        try (FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
+            byte[] fileData = file.getBytes();
+            fos.write(fileData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public static <T> Optional<T> findById(Path directory, UUID id) {
         T objectNullable = null;
