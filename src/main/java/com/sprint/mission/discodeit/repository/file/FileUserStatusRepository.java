@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class FileUserStatusRepository implements UserStatusRepository, FileRepository<UserStatus> {
-    private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "userStatuses");
+    private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "userstatuses");
     private final Map<UUID, UserStatus> userStatusMap;
 
     public FileUserStatusRepository() {
@@ -61,11 +61,7 @@ public class FileUserStatusRepository implements UserStatusRepository, FileRepos
     @Override
     public void deleteByUserId(UUID userId) {
         findByUserId(userId)
-                .ifPresent(userStatus -> {
-                    deleteFileById(userStatus.getId());
-                    userStatusMap.remove(userStatus.getId());
-                });
-
+                .ifPresent(userStatus -> deleteById(userStatus.getId()));
     }
 
     @Override
