@@ -46,7 +46,12 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
         boolean isExistChannel = channelRepository.findAll().stream()
-                .anyMatch(channel -> channel.getName().equals(channelCreatePublicDto.name()));
+                .filter(channel ->
+                        channel.getType().equals(ChannelType.PUBLIC)
+                )
+                .anyMatch(channel ->
+                        channel.getName().equals(channelCreatePublicDto.name())
+                );
 
         if (isExistChannel) {
             throw new RuntimeException(channelCreatePublicDto.name() + " 채널은 이미 존재합니다.");
