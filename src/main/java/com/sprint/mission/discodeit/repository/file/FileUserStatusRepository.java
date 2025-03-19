@@ -13,9 +13,11 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
 public class FileUserStatusRepository implements UserStatusRepository {
 
     private static final Path DIRECTORY_PATH = Paths.get(System.getProperty("user.dir"), "data",
