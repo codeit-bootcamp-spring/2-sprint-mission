@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusRepository {
-    void save(ReadStatus readStatus);
+    void save();
 
     void addReadStatus(ReadStatus readStatus);
+
+    void addUser(UUID channelId, UUID userId);
 
     ReadStatus findReadStatusById(UUID id);
 

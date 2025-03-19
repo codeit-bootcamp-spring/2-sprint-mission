@@ -9,22 +9,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class ReadStatus extends BaseEntity {
-    private final UUID userId;
-    private final Map<UUID, Instant> channelIds = new ConcurrentHashMap<>();
+    private final UUID channelId;
+    private final Map<UUID, Instant> userIds = new ConcurrentHashMap<>();
 
-    public ReadStatus(UUID userId) {
-        this.userId = userId;
+    public ReadStatus(UUID channelId) {
+        this.channelId = channelId;
     }
 
-    public void addChannel(UUID channelId) {
-        channelIds.put(channelId, Instant.now());
+    public void addUser(UUID userId) {
+        userIds.put(userId, Instant.now());
     }
 
-    public void removeChannel(UUID channelId) {
-        channelIds.remove(channelId);
+    public void removeUser(UUID userId) {
+        userIds.remove(userId);
     }
 
-    public void updateLastAccessTime(UUID channelId) {
-        channelIds.put(channelId, Instant.now());
+    public void updateLastAccessTime(UUID userId) {
+        userIds.put(userId, Instant.now());
     }
 }
