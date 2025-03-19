@@ -1,5 +1,6 @@
 package com.sprint.discodeit.service.file.chnnel;
 
+import com.sprint.discodeit.domain.dto.readStatusDto.ReadStatusRequestDto;
 import com.sprint.discodeit.domain.entity.ReadStatus;
 import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.domain.entity.UserStatus;
@@ -20,6 +21,29 @@ public class ReadStatusService {
     private final FileUserRepository fileUserRepository;
     private final BaseUserStatusRepository baseUserStatusRepository;
     private final ReadStatusRepository readStatusRepository;
+
+    public ReadStatus create(ReadStatusRequestDto readStatusRequestDto){
+        ReadStatus readStatus = new ReadStatus(readStatusRequestDto.userId(),Instant.now(), readStatusRequestDto.check(), readStatusRequestDto.userId());
+        return readStatus;
+    }
+
+
+    public ReadStatus find(UUID id){
+        ReadStatus readStatus = readStatusRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("조회가 불가능 합니다."));
+        return readStatus;
+    }
+
+    public ReadStatus findAll(UUID userId){
+        ReadStatus readStatus = readStatusRepository.findAllByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다"));
+        return readStatus;
+
+
+    }
+
+
+
 
     public ReadStatus dispatchChannelCreation(String channelName, List<UUID> userUUid, UUID channelId) {
         for(UUID u : userUUid) {

@@ -1,7 +1,6 @@
 package com.sprint.discodeit.repository.file;
 
 import com.sprint.discodeit.domain.entity.ReadStatus;
-import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.repository.util.AbstractFileRepository;
 import com.sprint.discodeit.repository.util.FilePathUtil;
 import com.sprint.discodeit.repository.util.SaveRepository;
@@ -39,6 +38,20 @@ public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> imp
         readStatusMap.remove(readStatusOptional.get().getId());
         writeToFile(readStatusMap);
     }
+
+
+    public Optional<ReadStatus> findById(UUID uuid) {
+        Map<UUID, ReadStatus> readStatusMap = loadAll();
+        return Optional.ofNullable(readStatusMap.get(uuid));
+    }
+
+    public Optional<ReadStatus> findAllByUserId(UUID userId) {
+        Map<UUID, ReadStatus> readStatusMap = loadAll();
+        return readStatusMap.values().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .findFirst();
+    }
+
 
     public List<UUID> findByUserIdAndChannelId(UUID channelId) {
         Map<UUID, ReadStatus> readStatusMap = loadAll();
