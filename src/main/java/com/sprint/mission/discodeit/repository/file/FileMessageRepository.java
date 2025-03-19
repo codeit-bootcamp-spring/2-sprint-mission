@@ -13,7 +13,7 @@ import java.util.*;
 public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository {
     private Map<UUID, NavigableSet<Message>> channelIdMessages;       // channelId를 Key로 가지는 TreeSet<Message> / List가 아니라 NavigatbaleSet을 사용하는 이유는 구간조회가 빠르기 때문
 
-    public FileMessageRepository(FileChannelRepository fileChannelRepository) {
+    public FileMessageRepository() {
         super(Message.class, Paths.get(System.getProperty("user.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\messagedata"));
         channelIdMessages = new HashMap<>();
     }
