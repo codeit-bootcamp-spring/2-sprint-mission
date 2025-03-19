@@ -23,8 +23,8 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Optional<Message> findById(UUID messageId) {
-        return Optional.ofNullable(data.get(messageId));
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
@@ -44,8 +44,8 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void deleteById(UUID messageId) {
-        data.remove(messageId);
+    public void deleteById(UUID id) {
+        data.remove(id);
     }
 
     @Override

@@ -22,8 +22,8 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(UUID userId) {
-        return Optional.ofNullable(data.get(userId));
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
@@ -51,7 +51,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void deleteById(UUID userId) {
-        data.remove(userId);
+    public void deleteById(UUID id) {
+        data.remove(id);
     }
 }

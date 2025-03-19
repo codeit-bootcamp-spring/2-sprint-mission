@@ -33,8 +33,8 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
     }
 
     @Override
-    public Optional<User> findById(UUID userId) {
-        return Optional.ofNullable(userMap.get(userId));
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(userMap.get(id));
     }
 
     @Override
@@ -62,9 +62,9 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
     }
 
     @Override
-    public void deleteById(UUID userId) {
-        deleteFileById(userId);
-        userMap.remove(userId);
+    public void deleteById(UUID id) {
+        deleteFileById(id);
+        userMap.remove(id);
     }
 
     @Override
@@ -81,8 +81,8 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
     }
 
     @Override
-    public void deleteFileById(UUID userId) {
-        Path filePath = directory.resolve(userId + ".ser");
+    public void deleteFileById(UUID id) {
+        Path filePath = directory.resolve(id + ".ser");
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {

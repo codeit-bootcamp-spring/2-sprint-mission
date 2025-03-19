@@ -34,8 +34,8 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
     }
 
     @Override
-    public Optional<Message> findById(UUID messageId) {
-        return Optional.ofNullable(messageMap.get(messageId));
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(messageMap.get(id));
     }
 
     @Override
@@ -61,9 +61,9 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
     }
 
     @Override
-    public void deleteById(UUID messageId) {
-        deleteFileById(messageId);
-        messageMap.remove(messageId);
+    public void deleteById(UUID id) {
+        deleteFileById(id);
+        messageMap.remove(id);
     }
 
     @Override
@@ -79,8 +79,8 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
     }
 
     @Override
-    public void deleteFileById(UUID messageId) {
-        Path filePath = directory.resolve(messageId + ".ser");
+    public void deleteFileById(UUID id) {
+        Path filePath = directory.resolve(id + ".ser");
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {

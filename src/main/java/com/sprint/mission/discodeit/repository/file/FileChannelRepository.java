@@ -37,8 +37,8 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
     }
 
     @Override
-    public Optional<Channel> findById(UUID channelId) {
-        return Optional.ofNullable(channelMap.get(channelId));
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(channelMap.get(id));
     }
 
     @Override
@@ -47,9 +47,9 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
     }
 
     @Override
-    public void deleteById(UUID channelId) {
-        deleteFileById(channelId);
-        channelMap.remove(channelId);
+    public void deleteById(UUID id) {
+        deleteFileById(id);
+        channelMap.remove(id);
     }
 
     @Override
@@ -66,8 +66,8 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
     }
 
     @Override
-    public void deleteFileById(UUID channelId) {
-        Path filePath = directory.resolve(channelId + ".ser");
+    public void deleteFileById(UUID id) {
+        Path filePath = directory.resolve(id + ".ser");
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
