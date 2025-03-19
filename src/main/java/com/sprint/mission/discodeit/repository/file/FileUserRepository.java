@@ -33,20 +33,12 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     // existsById(),findById(), getAll()  굳이 file을 탐색할 필요 없다고 생각해 storage를 통해 정보 확인, -> super.add, super.findById, super.getAll 사용
 
     @Override
-    public void deleteById(UUID userId) {
-        super.deleteById(userId);                 //users에서 삭제
-        super.deleteFile(userId);                 //file 삭제
-        usernames.remove(super.findById(userId).getUserName());
-        emails.remove(super.findById(userId).getUserName());
-    }
-
-    @Override
-    public void updateUserName(UUID userId, String userName) {
+    public void updateUserName(UUID userId, String newUserName) {
         User findUser = super.findById(userId);     // findById 에서 예외 처리
-        findUser.updateUserName(userName);
+        findUser.updateUserName(newUserName);
         saveToFile(directory.resolve(userId.toString() + ".ser"), findUser);
         usernames.remove(findUser.getUserName());
-        usernames.put(userName, findUser);
+        usernames.put(newUserName, findUser);
     }
 
     @Override
@@ -93,5 +85,13 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
             throw new NoSuchElementException("해당 email을 가진 user 가 존재하지 않습니다.");
         }
         return emails.get(email);
+    }
+
+    @Override
+    public void deleteById(UUID userId) {
+        super.deleteById(userId);                 //users에서 삭제
+        super.deleteFile(userId);                 //file 삭제
+        usernames.remove(super.findById(userId).getUserName());
+        emails.remove(super.findById(userId).getUserName());
     }
 }
