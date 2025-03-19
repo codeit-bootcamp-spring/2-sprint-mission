@@ -23,10 +23,6 @@ public class JCFUserRepository implements UserRepository {
         return Optional.ofNullable(this.data.get(id));
     }
 
-    @Override
-    public Optional<User> findByUsername(String username) {
-        return Optional.ofNullable(this.data.get(username));
-    }
 
     @Override
     public List<User> findAll() {

@@ -16,7 +16,7 @@ public class AuthService {
     }
 
     public AuthResponse login(AuthLoginRequest request) {
-        User user = userRepository.findByUsername(request.username())
+        User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));
 
         // 비밀번호 일치 여부 확인 (실제 구현에서는 비밀번호 해싱 로직 필요!)
