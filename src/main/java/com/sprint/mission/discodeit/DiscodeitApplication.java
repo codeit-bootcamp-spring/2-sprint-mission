@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -73,9 +74,11 @@ public class DiscodeitApplication {
                             case CREATE_USER:
                                 System.out.print("사용자 이름 입력: ");
                                 String userName = sc.nextLine();
-                                System.out.println("사용자 이메일 입력: ");
+                                System.out.print("사용자 비밀번호 입력: ");
+                                String password = sc.nextLine();
+                                System.out.print("사용자 이메일 입력: ");
                                 String userEmail = sc.nextLine();
-                                CreateUserRequest request = new CreateUserRequest(userName, userEmail, null, null);
+                                CreateUserRequest request = new CreateUserRequest(userName, password, userEmail, null, null);
                                 User user = userService.createUser(request);
                                 System.out.println("사용자 생성 완료: " + user);
                                 break;
@@ -84,7 +87,7 @@ public class DiscodeitApplication {
                                 System.out.print("조회할 사용자 ID 입력: ");
                                 UUID userId = UUID.fromString(sc.nextLine());
                                 System.out.println("사용자 조회: " + userService.getUserById(userId)
-                                        .map(User::toString).orElse("사용자를 찾을 수 없습니다."));
+                                        .map(UserResponse::toString).orElse("사용자를 찾을 수 없습니다."));
                                 break;
                         }
                         break;

@@ -10,17 +10,22 @@ import java.time.Instant;
 public class User extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    private String username;
+    private String password;
     private String email;
 
-    public User(String name, String email) {
+
+    public User(String username, String password, String email) {
         super();
-        this.name = name;
+        this.username = username;
+        this.password = password;
         this.email = email;
+
     }
 
-    public void update(String name, String email, Instant updatedAt) {
-        this.name = name;
+    public void update(String username, String password, String email, Instant updatedAt) {
+        this.username = username;
+        this.password = password;
         this.email = email;
         this.updatedAt = updatedAt;
     }
@@ -28,7 +33,8 @@ public class User extends BaseEntity implements Serializable {
     @Override
     public String toString() {
         return "User{" +
-                "name='" + name + '\'' +
+                "username='" + username + '\'' +
+                ", password='****'" +
                 ", email='" + email + '\'' +
                 ", id=" + id +
                 ", createdAt=" + TimeFormatter.formatTimestamp(createdAt) +

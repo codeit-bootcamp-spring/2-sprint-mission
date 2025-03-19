@@ -28,12 +28,12 @@ public class BasicUserService implements UserService {
     @Override
     public User createUser(CreateUserRequest request) {
         if (userRepository.getAllUsers().stream().anyMatch(
-                user -> user.getName().equals(request.name()) || user.getEmail().equals(request.email())
+                user -> user.getUsername().equals(request.username()) || user.getEmail().equals(request.email())
         )) {
             throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
         }
 
-        User user = new User(request.name(), request.email());
+        User user = new User(request.username(), request.password(), request.email());
         userRepository.save(user);
 
         if (request.profileImageFileName() != null && request.profileImageFilePath() != null) {
@@ -56,7 +56,7 @@ public class BasicUserService implements UserService {
         return userRepository.getUserById(userId)
                 .map(user -> new UserResponse(
                         user.getId(),
-                        user.getName(),
+                        user.getUsername(),
                         user.getEmail(),
                         userStatusRepository.getById(userId)
                                 .map(UserStatus::isOnline)
@@ -67,10 +67,10 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserResponse> getUsersByName(String name) {
         return userRepository.getAllUsers().stream()
-                .filter(user -> user.getName().equals(name))
+                .filter(user -> user.getUsername().equals(name))
                 .map(user -> new UserResponse(
                         user.getId(),
-                        user.getName(),
+                        user.getUsername(),
                         user.getEmail(),
                         userStatusRepository.getById(user.getId())
                                 .map(UserStatus::isOnline).orElse(false)
@@ -83,7 +83,7 @@ public class BasicUserService implements UserService {
         return userRepository.getAllUsers().stream()
                 .map(user -> new UserResponse(
                         user.getId(),
-                        user.getName(),
+                        user.getUsername(),
                         user.getEmail(),
                         userStatusRepository.getById(user.getId())
                                 .map(UserStatus::isOnline).orElse(false)
@@ -95,7 +95,7 @@ public class BasicUserService implements UserService {
     public void updateUser(UpdateUserRequest request) {
         userRepository.getUserById(request.userId()).ifPresent(user -> {
             Instant updatedTime = Instant.now();
-            user.update(request.newName(), request.newEmail(), updatedTime);
+            user.update(request.newName(), user.getPassword(), request.newEmail(), updatedTime);
             userRepository.save(user);
 
             if(request.profileImageFileName() != null && request.profileImageFilePath() != null) {

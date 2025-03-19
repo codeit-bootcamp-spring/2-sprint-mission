@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.dto;
 
 public record CreateUserRequest(
-        String name,
+        String username,
+        String password,
         String email,
         String profileImageFileName,
         String profileImageFilePath
