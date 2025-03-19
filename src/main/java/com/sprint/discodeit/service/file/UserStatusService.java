@@ -1,9 +1,36 @@
 package com.sprint.discodeit.service.file;
 
+import com.sprint.discodeit.domain.StatusType;
+import com.sprint.discodeit.domain.entity.User;
+import com.sprint.discodeit.domain.entity.UserStatus;
+import com.sprint.discodeit.repository.UserRepository;
+import com.sprint.discodeit.repository.UserStatusRepository;
+import com.sprint.discodeit.repository.file.BaseUserStatusRepository;
+import com.sprint.discodeit.repository.file.FileUserRepository;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserStatusService {
+
+    private final BaseUserStatusRepository baseuserStatusRepository;
+    private final FileUserRepository fileuserRepository;
+
+    public User creat(UUID userId, StatusType statusType){
+        User user = fileuserRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Optional.ofNullable(user.getUserStatusId())
+                .ifPresent(status -> {
+                    throw new IllegalArgumentException("이미 상태값이 존재하는 사용자입니다.");
+                });
+        UserStatus userStatus = new UserStatus(Instant.now(), statusType.toString());
+        user.associateStatus(userStatus);
+        return user;
+    }
 
 
 }

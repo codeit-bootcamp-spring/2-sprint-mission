@@ -4,11 +4,8 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 
 @Getter
-@NoArgsConstructor
 public class UserStatus implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -23,8 +23,6 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     @Override
     public Optional<User> findById(UUID userId) {
         Map<UUID, User> users = loadAll();
-        System.out.println(users.containsKey(userId));
-        System.out.println("이거 확인 해볼게 " + Optional.ofNullable(users.get(userId)));
         return Optional.ofNullable(users.get(userId));
     }
 
@@ -68,6 +66,11 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     public Optional<User> findByPassword(String password) {
         Map<UUID, User> users = loadAll();
         return users.values().stream().filter(user -> user.getPassword().equals(password)).findFirst();
+    }
+
+    public Optional<User> findByStatusId(UUID statusId) {
+        Map<UUID, User> users = loadAll();
+        return users.values().stream().filter(user -> user.getUserStatusId().equals(statusId)).findFirst();
     }
 
 }
