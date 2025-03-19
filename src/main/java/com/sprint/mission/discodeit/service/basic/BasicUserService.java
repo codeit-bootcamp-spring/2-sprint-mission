@@ -108,7 +108,9 @@ public class BasicUserService implements UserService {
         User user = userRepository.findUserById(userUUID)
                 .orElseThrow(NullPointerException::new);
         binaryContentRepository.delete(user.getProfile());
-        userStatusRepository.delete(user.getId());
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자 상태 오류"));
+        userStatusRepository.delete(userStatus.getId());
         boolean isDeleted = userRepository.deleteUserById(user.getId());
         if (!isDeleted) {
             System.out.println("삭제 실패");
