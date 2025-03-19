@@ -1,8 +1,11 @@
 package com.sprint.discodeit.service.file;
 
+import com.sprint.discodeit.domain.dto.messageDto.MessageRequestDto;
+import com.sprint.discodeit.domain.entity.BinaryContent;
 import com.sprint.discodeit.domain.entity.Message;
+import com.sprint.discodeit.domain.mapper.MessageMapper;
 import com.sprint.discodeit.repository.file.FileMessageRepository;
-import com.sprint.discodeit.service.MessageService;
+import com.sprint.discodeit.service.MessageServiceV1;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -11,13 +14,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class FileMessageService implements MessageService {
+public class FileMessageService implements MessageServiceV1 {
 
     private final FileMessageRepository fileMessageRepository;
+    private final BinaryContentService binaryContentService;
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId) {
-        Message message = new Message(content, channelId, authorId);
+    public Message create(MessageRequestDto messageRequestDto) {
+        List<BinaryContent> binaryContents = binaryContentService.convertToBinaryContents(messageRequestDto.file());
+        binaryContentService.saveBinaryContents(binaryContents);
+        List<UUID> uuids = binaryContentService.convertToUUIDs(binaryContents);
+        Message message = MessageMapper.toMessage(messageRequestDto, uuids);
         fileMessageRepository.save(message);
         return message;
     }
@@ -29,8 +36,8 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAll() {
-        return fileMessageRepository.findByAll().stream().toList();
+    public List<Message> findAll(UUID channelId) {
+        return fileMessageRepository.findByChannelAndMessageContext(channelId)
     }
 
     @Override
@@ -44,4 +51,5 @@ public class FileMessageService implements MessageService {
     public void delete(UUID messageId) {
         fileMessageRepository.delete(messageId);
     }
+
 }
