@@ -31,12 +31,6 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
     }
 
     @Override
-    public void deleteById(UUID channelId) {
-        super.deleteById(channelId);
-        super.deleteFile(channelId);
-    }
-
-    @Override
     public void updateChannelName(UUID channelId, String newChannelName) {
         Channel findChannel = super.findById(channelId);
         findChannel.updateChannelName(newChannelName);
@@ -47,5 +41,11 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
         Channel findChannel = super.findById(channelId);
         findChannel.addParticipant(newParticipantId);
         super.saveToFile(super.directory.resolve(channelId.toString() + ".ser"), findChannel);
+    }
+
+    @Override
+    public void deleteById(UUID channelId) {
+        super.deleteById(channelId);
+        super.deleteFile(channelId);
     }
 }
