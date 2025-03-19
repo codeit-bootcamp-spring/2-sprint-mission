@@ -58,6 +58,6 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void deleteUserStatus(UUID id) {
-
+        this.userStatusRepository.deleteById(id);
     }
 }
