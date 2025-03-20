@@ -74,19 +74,23 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
 
     @Override
     public void deleteByUserId(UUID userId) {
-        this.userIdMap.remove(userId);
-        List<ReadStatus> readStatusList = this.findByUserId(userId);
-        readStatusList.forEach(readStatus -> channelIdMap.get(readStatus.getChannelId()).remove(readStatus));
-        readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
-        readStatusList.forEach(readStatus -> super.deleteFile(readStatus.getId()));
+        if (!userIdMap.get(userId).isEmpty()) {
+            List<ReadStatus> readStatusList = this.findByUserId(userId);
+            readStatusList.forEach(readStatus -> channelIdMap.get(readStatus.getChannelId()).remove(readStatus));
+            readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
+            readStatusList.forEach(readStatus -> super.deleteFile(readStatus.getId()));
+        }
+        userIdMap.remove(userId);
     }
 
     @Override
     public void deleteByChannelId(UUID channelId) {
-        List<ReadStatus> readStatusList = this.findByChannelId(channelId);
-        this.channelIdMap.remove(channelId);
-        readStatusList.forEach(readStatus -> userIdMap.get(readStatus.getUserId()).remove(readStatus));
-        readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
-        readStatusList.forEach(readStatus -> super.deleteFile(readStatus.getId()));
+        if (!channelIdMap.get(channelId).isEmpty()) {
+            List<ReadStatus> readStatusList = this.findByChannelId(channelId);
+            readStatusList.forEach(readStatus -> userIdMap.get(readStatus.getUserId()).remove(readStatus));
+            readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
+            readStatusList.forEach(readStatus -> super.deleteFile(readStatus.getId()));
+        }
+        channelIdMap.remove(channelId);
     }
 }
