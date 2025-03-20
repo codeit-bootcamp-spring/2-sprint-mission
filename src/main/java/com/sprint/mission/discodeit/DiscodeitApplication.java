@@ -1,6 +1,13 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.DTO.*;
+import com.sprint.mission.discodeit.DTO.Channel.ChannelDetailsDto;
+import com.sprint.mission.discodeit.DTO.Channel.CreatePublicChannelDto;
+import com.sprint.mission.discodeit.DTO.Message.CreateMessageDto;
+import com.sprint.mission.discodeit.DTO.Message.MessageDto;
+import com.sprint.mission.discodeit.DTO.Message.UpdateMessageDto;
+import com.sprint.mission.discodeit.DTO.User.UserCreateRequest;
+import com.sprint.mission.discodeit.DTO.User.UserDto;
+import com.sprint.mission.discodeit.DTO.User.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -62,33 +69,33 @@ public class DiscodeitApplication {
 			ChannelDetailsDto createdChannel = channelService.createPublicChannel(new CreatePublicChannelDto("테스트용 채널", "테스트용 채널입니다"));
 			UserCreateRequest createRequest = new UserCreateRequest("user1", "user1@codeit.com", "user1234");
 			UserDto userDto = userService.create(createRequest, Optional.empty());
-			Message message = messageService.create("안녕하세요.", createdChannel.id(), userDto.id());
-			System.out.println("메시지 생성: " + message.getId());
+			CreateMessageDto createdMessage = new CreateMessageDto("안녕하세요.", createdChannel.id(), userDto.id(), List.of());
+			System.out.println("메시지 생성: " + createdMessage.authorId());
 			// 조회
 			try {
-				Message foundMessage = messageService.find(message.getId());
-				System.out.println("메시지 조회(단건): " + foundMessage.getId());
+				MessageDto foundMessage = messageService.find(createdMessage.authorId());
+				System.out.println("메시지 조회(단건): " + foundMessage.id());
 			} catch (NoSuchElementException e) {
 				System.out.println("메시지 조회 실패: " + e.getMessage());
 			}
-			List<Message> foundMessages = messageService.findAll();
+			List<MessageDto> foundMessages = messageService.findAllByChannelId(createdChannel.id());
 			System.out.println("메시지 조회(다건): " + foundMessages.size());
 			// 수정
 			try{
-				Message updatedMessage = messageService.update(message.getId(), "반갑습니다.");
-				System.out.println("메시지 수정: " + updatedMessage.getContent());
+				UpdateMessageDto updatedMessage = new UpdateMessageDto(createdMessage.authorId(), "반갑습니다.");
+				System.out.println("메시지 수정: " + updatedMessage.newContent());
 			} catch (NoSuchElementException e) {
 				System.out.println("메시지 수정 실패: " + e.getMessage());
 			}
 			//삭제
 			try {
-				messageService.delete(message.getId());
+				messageService.delete(createdMessage.authorId());
 				System.out.println("메시지 삭제 성공");
 			} catch (NoSuchElementException e) {
 				System.out.println("메시지 삭제 실패: " + e.getMessage());
 			}
 
-			List<Message> foundMessagesAfterDelete = messageService.findAll();
+			List<MessageDto> foundMessagesAfterDelete = messageService.findAllByChannelId(createdChannel.id());
 			System.out.println("메시지 삭제 후 조회: " + foundMessagesAfterDelete.size());
 			//테스트 후 삭제
 			channelService.delete(createdChannel.id());
@@ -110,8 +117,9 @@ public class DiscodeitApplication {
 	}
 
 	static void messageCreateTest(MessageService messageService, ChannelDetailsDto channel, UserDto author) {
-		Message message = messageService.create("안녕하세요.", channel.id(), author.id());
-		System.out.println("메시지 생성: " + message.getId());
+		CreateMessageDto createMessageDto = new CreateMessageDto("안녕하세요.", channel.id(), author.id(), List.of());
+		MessageDto message = messageService.create(createMessageDto);
+		System.out.println("메시지 생성: " + message.id());
 	}
 
 	public static void main(String[] args) {
