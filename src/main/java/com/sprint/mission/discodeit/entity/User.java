@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
@@ -11,6 +12,7 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private UUID id;
+    private UUID profileId;
     private Instant createdAt;
     private Instant updatedAt;
     private String username;
@@ -23,6 +25,11 @@ public class User implements Serializable {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    public UUID setProfileId(UUID BinaryContentId){
+        this.profileId = BinaryContentId;
+        return this.profileId;
     }
 
     public void update(String newUsername, String newEmail, String newPassword) {
