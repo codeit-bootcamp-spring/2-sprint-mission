@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.DTO.Message.CreateMessageDto;
 import com.sprint.mission.discodeit.DTO.Message.MessageDto;
 import com.sprint.mission.discodeit.DTO.Message.UpdateMessageDto;
-import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 import java.util.UUID;
