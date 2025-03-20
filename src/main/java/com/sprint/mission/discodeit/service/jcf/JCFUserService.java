@@ -29,8 +29,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public UserDto findById(UUID id) {
-        User user = userRepository.findById(id)
+    public UserDto findById(UUID userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         return UserDto.fromEntity(user);
@@ -69,13 +69,13 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void updateName(UUID id, String name) {
-        userRepository.updateName(id, name);
+    public void updateName(UUID userId, String name) {
+        userRepository.updateName(userId, name);
     }
 
     @Override
-    public void delete(UUID id) {
-        userRepository.delete(id);
+    public void delete(UUID userId) {
+        userRepository.delete(userId);
     }
 
     private void validateDuplicateEmail(User requestUser) {

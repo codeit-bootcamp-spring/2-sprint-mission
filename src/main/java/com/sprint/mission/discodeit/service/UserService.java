@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface UserService {
     UserDto register(UserRegisterDto userRegisterDto, UUID profileId);
 
-    UserDto findById(UUID id);
+    UserDto findById(UUID userId);
 
     UserDto findByName(String name);
 
@@ -19,7 +19,7 @@ public interface UserService {
 
     List<UserDto> findAllByIds(List<UUID> userIds);
 
-    void updateName(UUID id, String name);
+    void updateName(UUID userId, String name);
 
-    void delete(UUID id);
+    void delete(UUID userId);
 }

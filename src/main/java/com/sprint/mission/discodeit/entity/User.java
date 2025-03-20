@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.UUID;
-import lombok.Getter;
 
 @Getter
 public class User implements Serializable {
@@ -16,6 +17,7 @@ public class User implements Serializable {
     private String email;
     private String password;
     private UUID profileId;
+    private UserStatus userStatus;
 
     public User(String name, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
@@ -25,6 +27,7 @@ public class User implements Serializable {
         this.email = email;
         this.password = password;
         this.profileId = profileId;
+        this.userStatus = new UserStatus(this.id);
     }
 
     public void updateName(String name) {

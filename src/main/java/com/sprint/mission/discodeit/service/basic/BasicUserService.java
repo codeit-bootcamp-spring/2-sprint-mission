@@ -34,13 +34,12 @@ public class BasicUserService implements UserService {
                 profileId)
         );
         userStatusRepository.save(new UserStatus(savedUser.getId()));
-
         return UserDto.fromEntity(savedUser);
     }
 
     @Override
-    public UserDto findById(UUID id) {
-        User user = userRepository.findById(id)
+    public UserDto findById(UUID userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         return UserDto.fromEntity(user);
@@ -79,18 +78,18 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateName(UUID id, String name) {
-        userRepository.updateName(id, name);
+    public void updateName(UUID userId, String name) {
+        userRepository.updateName(userId, name);
     }
 
     @Override
-    public void delete(UUID id) {
-        userRepository.delete(id);
+    public void delete(UUID userId) {
+        userRepository.delete(userId);
     }
 
     private void validateDuplicateUserName(String name) {
-        boolean isDuplicate = !userRepository.findByName(name)
-                .isEmpty();
+        boolean isDuplicate = userRepository.findByName(name)
+                .isPresent();
 
         if (isDuplicate) {
             throw new IllegalArgumentException("이미 존재하는 이름 입니다");

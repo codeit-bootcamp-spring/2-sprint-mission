@@ -51,6 +51,15 @@ class UserServiceTest {
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("유저 로그인 상태를 확인합니다")
+    @Test
+    void registerValidateUserStatus() {
+        UserRegisterDto sameNameUser = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), LONGIN_USER.getPassword());
+        UserDto user = userService.register(sameNameUser, null);
+
+        assertThat(user.isLogin()).isFalse();
+    }
+
     @Test
     void 유저_UUID_단건_조회_예외테스트() {
         UUID id = UUID.randomUUID();

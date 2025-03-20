@@ -1,11 +1,5 @@
 package com.sprint.mission.discodeit.service;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.constant.ChannelInfo.CHANNEL_NAME;
-import static com.sprint.mission.discodeit.constant.ChannelInfo.UPDATED_CHANNEL_NAME;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.entity.User;
@@ -13,9 +7,16 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
+
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.constant.ChannelInfo.CHANNEL_NAME;
+import static com.sprint.mission.discodeit.constant.ChannelInfo.UPDATED_CHANNEL_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ChannelServiceTest {
     private ChannelService channelService;
@@ -29,7 +30,7 @@ class ChannelServiceTest {
 
         channelService = new JCFChannelService(new JCFChannelRepository(), userRepository);
         setUpChannel = channelService.create(CHANNEL_NAME,
-                new UserDto(user.getId(), LONGIN_USER.getName(), LONGIN_USER.getEmail(), null));
+                new UserDto(user.getId(), LONGIN_USER.getName(), LONGIN_USER.getEmail(), null, false));
     }
 
     @Test

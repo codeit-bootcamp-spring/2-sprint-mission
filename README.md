@@ -195,8 +195,8 @@ public static void main(String[]args){
 2. find, findAll
 
 - DTO를 활용하여
-- [ ] 사용자의 온라인 상태 정보를 같이 포함하세요.
-- [ ] 패스워드 정보는 제외하세요.
+- [x] 사용자의 온라인 상태 정보를 같이 포함하세요.
+- [x] 패스워드 정보는 제외하세요.
 
 3. update
 
