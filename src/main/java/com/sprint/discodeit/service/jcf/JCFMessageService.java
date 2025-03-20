@@ -1,6 +1,8 @@
 package com.sprint.discodeit.service.jcf;
 
+import com.sprint.discodeit.domain.entity.Channel;
 import com.sprint.discodeit.domain.entity.Message;
+import com.sprint.discodeit.domain.entity.User;
 import com.sprint.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.discodeit.service.MessageService;
@@ -21,12 +23,12 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId) {
-        jcfChannelRepository.findById(channelId);
-        userService.find(authorId);
-        Message message = new Message(content, channelId, authorId);
-        jcfMessageRepository.save(message);
-        return message;
+    public void create(String content, UUID channelId, UUID authorId) {
+//        Channel channel = jcfChannelRepository.findById(channelId).orElseThrow(() -> new IllegalArgumentException("없는 채널 입니다."));
+//        User user = userService.find(authorId);
+//        Message message = new Message(content,channel.getId(), authorId);
+//        jcfMessageRepository.save(message);
+
     }
 
     @Override
