@@ -206,7 +206,7 @@ public static void main(String[]args){
 
 4. delete
 
-- [ ] 관련된 도메인도 같이 삭제합니다.
+- [x] 관련된 도메인도 같이 삭제합니다.
     - BinaryContent(프로필), UserStatus
 
 #### AuthService 구현

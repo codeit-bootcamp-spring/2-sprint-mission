@@ -35,4 +35,10 @@ public class UserController {
 
         return user;
     }
+
+    public void delete(UUID userId) {
+        UserDto beforeUpdatedUser = userService.findById(userId);
+        userService.delete(userId);
+        binaryContentService.delete(beforeUpdatedUser.profileId());
+    }
 }

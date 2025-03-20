@@ -37,12 +37,14 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent findById(UUID id) {
-        return binaryContentRepository.findById(id);
+        BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow();
+        return binaryContent;
     }
 
     @Override
     public void delete(UUID id) {
-        deleteImageFileFromPath(binaryContentRepository.findById(id).getPath());
+        BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow();
+        deleteImageFileFromPath(binaryContent.getPath());
         binaryContentRepository.delete(id);
     }
 

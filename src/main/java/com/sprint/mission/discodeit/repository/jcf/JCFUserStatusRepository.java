@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -18,7 +19,20 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findById(UUID id) {
-        return userStatusRepository.get(id);
+    public Optional<UserStatus> findById(UUID id) {
+        return Optional.ofNullable(userStatusRepository.get(id));
+    }
+
+    @Override
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return userStatusRepository.values()
+                .stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .findFirst();
+    }
+
+    @Override
+    public void delete(UUID id) {
+        userStatusRepository.remove(id);
     }
 }

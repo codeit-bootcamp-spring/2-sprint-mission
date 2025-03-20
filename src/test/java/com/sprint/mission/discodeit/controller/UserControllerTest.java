@@ -26,7 +26,9 @@ import java.nio.file.Files;
 
 import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
 import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
+import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class UserControllerTest {
     private UserStatusRepository userStatusRepository;
@@ -68,7 +70,7 @@ class UserControllerTest {
                 OTHER_USER.getPassword());
 
         UserDto user = userController.register(userRegisterDto, file);
-        BinaryContent binaryContent = binaryContentRepository.findById(user.profileId());
+        BinaryContent binaryContent = binaryContentRepository.findById(user.profileId()).get();
 
         byte[] storedFileBytes = Files.readAllBytes(binaryContent.getPath());
         assertThat(binaryProfileImage).isEqualTo(storedFileBytes);
@@ -95,11 +97,33 @@ class UserControllerTest {
         );
         UserDto profileImageUpdatedUser = userController.updateProfile(user.id(), otherFile);
 
-        BinaryContent binaryContent = binaryContentRepository.findById(profileImageUpdatedUser.profileId());
+        BinaryContent binaryContent = binaryContentRepository.findById(profileImageUpdatedUser.profileId()).get();
         byte[] storedFileBytes = Files.readAllBytes(binaryContent.getPath());
 
         assertThat(updatedProfileImage).isEqualTo(storedFileBytes);
     }
+
+    @DisplayName("유저 삭제시 이미지와 UserStatus가 삭제됩니다.")
+    @Test
+    void delete() {
+        MockMultipartFile file = new MockMultipartFile(
+                MediaType.IMAGE_JPEG_VALUE,
+                MESSAGE_CONTENT.getBytes()
+        );
+        UserRegisterDto userRegisterDto = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(),
+                OTHER_USER.getPassword());
+
+
+        UserDto user = userController.register(userRegisterDto, file);
+        userController.delete(user.id());
+
+        assertAll(
+                () -> assertThat(userRepository.findById(user.id())).isEmpty(),
+                () -> assertThat(userStatusRepository.findByUserId(user.id())).isEmpty(),
+                () -> assertThat(binaryContentRepository.findById(user.profileId())).isEmpty()
+        );
+    }
+
 
     private byte[] loadImageFileFromResource(String filePath) {
         byte[] binaryProfileImage;
