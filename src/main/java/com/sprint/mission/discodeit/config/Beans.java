@@ -3,17 +3,11 @@ package com.sprint.mission.discodeit.config;
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
 import com.sprint.mission.discodeit.controller.UserController;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.*;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -40,7 +34,7 @@ public class Beans {
         saveBean(BinaryContentService.class,
                 new BasicBinaryContentService(findBean(BinaryContentRepository.class)));
         saveBean(UserService.class,
-                new BasicUserService(findBean(UserRepository.class)));
+                new BasicUserService(findBean(UserRepository.class), findBean(UserStatusRepository.class)));
         saveBean(MessageService.class,
                 new BasicMessageService(findBean(MessageRepository.class), findBean(UserRepository.class)));
         saveBean(ChannelService.class,
@@ -58,6 +52,7 @@ public class Beans {
     }
 
     private void initializeJCFBeans() {
+        saveBean(UserStatusRepository.class, new JCFUserStatusRepository());
         saveBean(BinaryContentRepository.class, new JCFBinaryContentRepository());
         saveBean(UserRepository.class, new JCFUserRepository());
         saveBean(ChannelRepository.class, new JCFChannelRepository());

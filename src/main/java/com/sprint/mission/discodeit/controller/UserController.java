@@ -19,7 +19,6 @@ public class UserController {
 
     public UserDto register(UserRegisterDto userRegisterDto, MultipartFile multipartFile) {
         UUID profileId = binaryContentService.createProfileImage(multipartFile);
-
         return userService.register(userRegisterDto, profileId);
     }
 

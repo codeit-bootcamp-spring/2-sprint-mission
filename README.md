@@ -165,7 +165,7 @@ public static void main(String[]args){
     - 사용자가 채널 별 **마지막으로 메시지를 읽은 시간**을 표현하는 도메인 모델입니다. 사용자별 각 채널에 **읽지 않은 메시지를 확인**하기 위해 활용합니다.
 
 
-- [ ]  UserStatus(userId)
+- [x]  UserStatus(userId)
 - 사용자 별 **마지막으로 확인된 접속 시간**을 표현하는 도메인 모델입니다. **사용자의 온라인 상태를 확인**하기 위해 활용합니다.
 - [ ] 마지막 접속 시간을 기준으로 현재 로그인한 유저로 판단할 수 있는 메소드를 정의하세요.
     - 마지막 접속 시간이 현재 시간으로부터 5분 이내이면 현재 접속 중인 유저로 간주합니다.
@@ -190,7 +190,7 @@ public static void main(String[]args){
 - [x] DTO를 활용해 파라미터를 그룹화합니다.
     - 유저를 등록하기 위해 필요한 파라미터, 프로필 이미지를 등록하기 위해 필요한 파라미터 등
 - [x] username과 email은 다른 유저와 같으면 안됩니다.
-- [ ] UserStatus를 같이 생성합니다.
+- [x] UserStatus를 같이 생성합니다.
 
 2. find, findAll
 
@@ -223,10 +223,10 @@ public static void main(String[]args){
 1. create
 
 - PRIVATE 채널과 PUBLIC 채널을 생성하는 메소드를 분리합니다.
-- [ ] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
+  - [ ] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
 - PRIVATE 채널을 생성할 때:
-    - [ ] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
-    - [ ] name과 description 속성은 생략합니다.
+  - [ ] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
+  - [ ] name과 description 속성은 생략합니다.
 - PUBLIC 채널을 생성할 때에는 기존 로직을 유지합니다.
 
 2. find

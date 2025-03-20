@@ -3,7 +3,9 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,18 +20,20 @@ import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
 
     @Override
     public UserDto register(UserRegisterDto userRegisterDto, UUID profileId) {
         validateDuplicateEmail(userRegisterDto.email());
         validateDuplicateUserName(userRegisterDto.name());
 
-        User requestUser = new User(
+        User savedUser = userRepository.save(new User(
                 userRegisterDto.name(),
                 userRegisterDto.email(),
                 userRegisterDto.password(),
-                profileId);
-        User savedUser = userRepository.save(requestUser);
+                profileId)
+        );
+        userStatusRepository.save(new UserStatus(savedUser.getId()));
 
         return UserDto.fromEntity(savedUser);
     }

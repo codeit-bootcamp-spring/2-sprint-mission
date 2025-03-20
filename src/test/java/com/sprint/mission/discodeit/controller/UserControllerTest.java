@@ -5,8 +5,10 @@ import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
@@ -27,6 +29,7 @@ import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserControllerTest {
+    private UserStatusRepository userStatusRepository;
     private UserRepository userRepository;
     private BinaryContentRepository binaryContentRepository;
     private UserService userService;
@@ -35,9 +38,10 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
+        userStatusRepository = new JCFUserStatusRepository();
         userRepository = new JCFUserRepository();
         binaryContentRepository = new JCFBinaryContentRepository();
-        userService = new BasicUserService(userRepository);
+        userService = new BasicUserService(userRepository, userStatusRepository);
         binaryContentService = new BasicBinaryContentService(binaryContentRepository);
         userController = new UserController(userService, binaryContentService);
     }
