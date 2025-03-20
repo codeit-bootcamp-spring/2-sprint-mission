@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-@Primary
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data;
 
@@ -29,7 +28,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAll() {
-        return data.values().stream().toList();
+        return new ArrayList<>(data.values());
     }
 
     @Override

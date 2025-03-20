@@ -14,7 +14,7 @@ public class FileUserRepository extends AbstractFileRepository<Map<UUID, User>> 
     private Map<UUID, User> data;
 
     public FileUserRepository() {
-        super(User.class.getSimpleName());
+        super("User");
         this.data = loadData();
     }
 

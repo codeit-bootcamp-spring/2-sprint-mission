@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository.jcf;
+package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -8,16 +8,25 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-public class JCFBinaryContentRepository implements BinaryContentRepository {
-    private final Map<UUID, BinaryContent> data;
+@Primary
+public class FileBinaryContentRepository extends AbstractFileRepository<Map<UUID, BinaryContent>> implements BinaryContentRepository {
 
-    public JCFBinaryContentRepository() {
-        this.data = new HashMap<>();
+    private Map<UUID, BinaryContent> data;
+
+    public FileBinaryContentRepository() {
+        super("BinaryContent");
+        this.data = loadData();
+    }
+
+    @Override
+    protected Map<UUID, BinaryContent> getEmptyData() {
+        return new HashMap<>();
     }
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
         data.put(binaryContent.getId(), binaryContent);
+        saveData(data);
         return binaryContent;
     }
 
@@ -41,5 +50,6 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     @Override
     public void deleteById(UUID id) {
         data.remove(id);
+        saveData(data);
     }
 }

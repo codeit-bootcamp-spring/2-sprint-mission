@@ -28,7 +28,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return data.values().stream().toList();
+        return new ArrayList<>(data.values());
     }
 
     @Override

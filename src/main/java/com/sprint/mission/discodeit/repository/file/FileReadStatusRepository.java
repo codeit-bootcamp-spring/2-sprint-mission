@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository.jcf;
+package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.common.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -8,16 +8,25 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-public class JCFReadStatusRepository implements ReadStatusRepository {
-    private final Map<UUID, ReadStatus> data;
+@Primary
+public class FileReadStatusRepository extends AbstractFileRepository<Map<UUID, ReadStatus>> implements ReadStatusRepository {
 
-    public JCFReadStatusRepository() {
-        this.data = new HashMap<>();
+    private Map<UUID, ReadStatus> data;
+
+    public FileReadStatusRepository() {
+        super("ReadStatus");
+        this.data = loadData();
+    }
+
+    @Override
+    protected Map<UUID, ReadStatus> getEmptyData() {
+        return new HashMap<>();
     }
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
         data.put(readStatus.getId(), readStatus);
+        saveData(data);
         return readStatus;
     }
 
@@ -56,6 +65,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     @Override
     public void deleteById(UUID id) {
         data.remove(id);
+        saveData(data);
     }
 
     @Override
@@ -65,5 +75,6 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
                 .map(ReadStatus::getId)
                 .toList();
         keysToRemove.forEach(data::remove);
+        saveData(data);
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-@Primary
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data;
 
@@ -29,7 +28,7 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findAll() {
-        return data.values().stream().toList();
+        return new ArrayList<>(data.values());
     }
 
     @Override

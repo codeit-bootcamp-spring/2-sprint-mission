@@ -3,16 +3,19 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.dto.auth.AuthLoginRequestDto;
 import com.sprint.mission.discodeit.dto.auth.AuthLoginResponseDto;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelFindResponseDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.entity.message.Message;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -36,7 +39,18 @@ public class DiscodeitApplication {
         ReadStatusService readStatusService = context.getBean(ReadStatusService.class);
 
 //        if (true) {
-//            printUsers(userService);
+//            List<UserResponseDto> userDtos = userService.findAll();
+//            System.out.println("=== 유저 목록 ===");
+//            userDtos.forEach(System.out::println);
+//            System.out.println("=== 유저 상태 목록 ===");
+//            userStatusService.findAll().forEach(System.out::println);
+//            System.out.println("=== 유저1이 가입된 채널 목록 ===");
+//            List<ChannelFindResponseDto> channels = channelService.findAllByUserId(userDtos.get(0).id());
+//            channels.forEach(System.out::println);
+//            System.out.println("=== 채널 별 메세지 목록 ===");
+//            channels.forEach(c -> messageService.findAllByChannelId(c.id()).forEach(System.out::println));
+//            System.out.println("=== 읽기 상태 목록 ===");
+//            userDtos.forEach(u -> System.out.println(readStatusService.findAllByUserId(u.id())));
 //            return;
 //        }
 
@@ -82,6 +96,11 @@ public class DiscodeitApplication {
         channelService.delete(publicChannels.get(0).getId());
         System.out.println("===================== user1이 있는 모든 채널 출력: 2개여야함=====================");
         printChannelsByUser(channelService, userDtos.get(0).id());
+    }
+
+    private static void printUserStatuses(UserStatusService userStatusService) {
+        System.out.println("===================== 유저 상태 findAll로 출력 =====================");
+        userStatusService.findAll().forEach(System.out::println);
     }
 
     private static void testMessageUpdate(MessageService messageService, UUID messageId) {
