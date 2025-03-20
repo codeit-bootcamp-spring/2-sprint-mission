@@ -70,17 +70,21 @@ public class JCFReadStatusRepository extends AbstractRepository<ReadStatus> impl
 
     @Override
     public void deleteByUserId(UUID userId) {
-        this.userIdMap.remove(userId);
-        List<ReadStatus> readStatusList = this.findByUserId(userId);
-        readStatusList.forEach(readStatus -> channelIdMap.get(readStatus.getChannelId()).remove(readStatus));
-        readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
+        if (!userIdMap.get(userId).isEmpty()) {
+            List<ReadStatus> readStatusList = this.findByUserId(userId);
+            readStatusList.forEach(readStatus -> channelIdMap.get(readStatus.getChannelId()).remove(readStatus));
+            readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
+        }
+        userIdMap.remove(userId);
     }
 
     @Override
     public void deleteByChannelId(UUID channelId) {
-        List<ReadStatus> readStatusList = this.findByChannelId(channelId);
-        this.channelIdMap.remove(channelId);
-        readStatusList.forEach(readStatus -> userIdMap.get(readStatus.getUserId()).remove(readStatus));
-        readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
+        if (!channelIdMap.get(channelId).isEmpty()) {
+            List<ReadStatus> readStatusList = this.findByChannelId(channelId);
+            readStatusList.forEach(readStatus -> userIdMap.get(readStatus.getUserId()).remove(readStatus));
+            readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
+        }
+        channelIdMap.remove(channelId);
     }
 }
