@@ -2,13 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.user.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
-@Primary
+@ConditionalOnProperty(value = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
 public class FileUserStatusRepository extends AbstractFileRepository<Map<UUID, UserStatus>> implements UserStatusRepository {
 
     private Map<UUID, UserStatus> data;

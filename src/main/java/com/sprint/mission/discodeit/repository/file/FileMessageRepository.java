@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +10,7 @@ import java.util.*;
 import java.util.Comparator;
 
 @Repository
-@Primary
+@ConditionalOnProperty(value = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
 public class FileMessageRepository extends AbstractFileRepository<Map<UUID, Message>> implements MessageRepository {
 
     private Map<UUID, Message> data;

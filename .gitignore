@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 
 file-data-map
+data
 
 ### STS ###
 .apt_generated

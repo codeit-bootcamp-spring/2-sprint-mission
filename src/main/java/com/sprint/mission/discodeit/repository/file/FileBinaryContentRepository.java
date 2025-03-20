@@ -2,13 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
-@Primary
+@ConditionalOnProperty(value = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
 public class FileBinaryContentRepository extends AbstractFileRepository<Map<UUID, BinaryContent>> implements BinaryContentRepository {
 
     private Map<UUID, BinaryContent> data;

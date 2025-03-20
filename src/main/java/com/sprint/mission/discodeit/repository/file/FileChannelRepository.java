@@ -2,13 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
-@Primary
+@ConditionalOnProperty(value = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
 public class FileChannelRepository extends AbstractFileRepository<Map<UUID, Channel>> implements ChannelRepository {
 
     private Map<UUID, Channel> data;
