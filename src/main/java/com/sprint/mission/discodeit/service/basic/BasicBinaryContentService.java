@@ -3,34 +3,28 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.dto.BinaryContentCreateParam;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateParam;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@AllArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
-    public BasicBinaryContentService(
-            @Qualifier("fileBinaryContentRepository") BinaryContentRepository binaryContentRepository) {
-        this.binaryContentRepository = binaryContentRepository;
-    }
-
     @Override
     public List<UUID> create(BinaryContentCreateParam createParam) {
-        Path FilePath = Paths.get(System.getProperty("user.dir"), "file-data-map",
-                BinaryContent.class.getSimpleName());
-
         return createParam.files().stream()
                 .map(file -> {
+                    UUID id = UUID.randomUUID();
+                    String filePath = binaryContentRepository.saveFile(createParam.type(), file, id);
                     BinaryContent bc = new BinaryContent(createParam.type(), file.getOriginalFilename(),
-                            FilePath, file.getSize());
-                    BinaryContent resBinaryContent = binaryContentRepository.save(bc, file);
+                            filePath, file.getSize(), getFileExtension(file));
+                    BinaryContent resBinaryContent = binaryContentRepository.save(bc);
                     return resBinaryContent.getId();
                 }).toList();
     }
@@ -49,8 +43,16 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public void delete(UUID id) {
         if (!binaryContentRepository.existsById(id)) {
-            throw new NoSuchElementException(id + " 에 해당하는 BinaryContent를 찾을 수 없음");
+            throw new IllegalArgumentException(id + " 에 해당하는 BinaryContent를 찾을 수 없음");
         }
         binaryContentRepository.deleteById(id);
+    }
+
+    private String getFileExtension(MultipartFile file) {
+        String filename = file.getOriginalFilename();
+        if (filename != null && filename.contains(".")) {
+            return filename.substring(filename.lastIndexOf(".") + 1);
+        }
+        return "";
     }
 }
