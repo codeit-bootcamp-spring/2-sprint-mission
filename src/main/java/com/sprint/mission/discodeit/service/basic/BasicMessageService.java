@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.service.message.MessageDTO;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageParam;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -69,13 +70,13 @@ public class BasicMessageService implements MessageService {
 
     private void validateMessageInput(CreateMessageParam createMessageParam) {
         if (createMessageParam.content() == null || createMessageParam.content().isBlank()) {
-            throw new IllegalArgumentException("content는 필수 입력값입니다.");
+            throw RestExceptions.BAD_REQUEST;
         }
         if (userRepository.findById(createMessageParam.authorId()).isEmpty()) {
-            throw new NoSuchElementException("유저가 존재하지 않습니다. id : " + createMessageParam.authorId());
+            throw new NoSuchElementException(RestExceptions.USER_NOT_FOUND);
         }
         if(channelRepository.findById(createMessageParam.channelId()).isEmpty()) {
-            throw new NoSuchElementException("채널이 존재하지 않습니다. id : " + createMessageParam.channelId());
+            throw new NoSuchElementException(RestExceptions.CHANNEL_NOT_FOUND);
         }
     }
 
@@ -102,6 +103,6 @@ public class BasicMessageService implements MessageService {
 
     private Message findMessageById(UUID id) {
         return messageRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(id + "메시지가 존재하지 않습니다."));
+                .orElseThrow(() -> RestExceptions.MESSAGE_NOT_FOUND);
     }
 }

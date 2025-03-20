@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusParam
 import com.sprint.mission.discodeit.dto.service.readStatus.ReadStatusDTO;
 import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusParam;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.RestException;
+import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -78,23 +80,23 @@ public class BasicReadStatusService implements ReadStatusService {
 
     private void checkUserExists(CreateReadStatusParam createReadStatusParam) {
         userRepository.findById(createReadStatusParam.userId())
-                .orElseThrow(() -> new NoSuchElementException(createReadStatusParam.userId() + "user가 존재하지 않습니다."));
+                .orElseThrow(() -> RestExceptions.USER_NOT_FOUND);
     }
 
     private void checkChannelExists(CreateReadStatusParam createReadStatusParam) {
         channelRepository.findById(createReadStatusParam.channelId())
-                .orElseThrow(() -> new NoSuchElementException(createReadStatusParam.channelId() + "channel이 존재하지 않습니다"));
+                .orElseThrow(() -> RestExceptions.CHANNEL_NOT_FOUND);
     }
 
     private void checkDuplicateReadStatus(CreateReadStatusParam createReadStatusParam) {
         if (readStatusRepository.existsByUserIdAndChannelId(createReadStatusParam.userId(), createReadStatusParam.channelId())) {
-            throw new IllegalStateException("이미 ReadStatus가 존재하는 userId와 channelId 입니다.");
+            throw RestExceptions.DUPLICATE_READ_STATUS;
         }
     }
 
     private ReadStatus findReadStatusById(UUID id) {
         return readStatusRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(id + " ReadStatus가 존재하지 않습니다."));
+                .orElseThrow(() -> RestExceptions.READ_STATUS_NOT_FOUND);
     }
 
     private ReadStatus createReadStatusEntity(CreateReadStatusParam createReadStatusParam) {

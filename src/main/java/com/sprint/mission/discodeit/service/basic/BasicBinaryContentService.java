@@ -3,13 +3,12 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.service.BinaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.service.BinaryContent.CreateBinaryContentParam;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -46,7 +45,6 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private BinaryContentDTO binaryContentEntityToDTO(BinaryContent binaryContent) {
         return BinaryContentDTO.builder()
-                .content(binaryContent.getContent())
                 .filename(binaryContent.getFilename())
                 .createdAt(binaryContent.getCreatedAt())
                 .id(binaryContent.getId())
@@ -55,13 +53,12 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private BinaryContent createBinaryContentEntity(CreateBinaryContentParam createBinaryContentParam) {
         return BinaryContent.builder()
-                .content(createBinaryContentParam.content())
                 .filename(createBinaryContentParam.filename())
                 .build();
     }
 
     private BinaryContent findBinaryContentById(UUID id) {
         return binaryContentRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(id + " binaryContent가 존재하지 않습니다."));
+                .orElseThrow(() -> RestExceptions.BINARY_CONTENT_NOT_FOUND);
     }
 }

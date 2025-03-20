@@ -7,11 +7,9 @@ import com.sprint.mission.discodeit.dto.service.channel.UpdateChannelParam;
 import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusParam;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +68,7 @@ public class BasicChannelService implements ChannelService {
     public UUID update(UpdateChannelParam updateChannelParam) {
         Channel channel = findChannelById(updateChannelParam.id());
         if(channel.getType() == ChannelType.PRIVATE) {
-            throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
+            throw RestExceptions.UNAUTHORIZED_PRIVATE_CHANNEL;
         }
         channel.update(updateChannelParam.name(), updateChannelParam.description());
         channelRepository.save(channel);
@@ -86,7 +84,7 @@ public class BasicChannelService implements ChannelService {
 
     private void validateChannelField(CreateChannelParam createChannelParam) {
         if (createChannelParam.type() == null || createChannelParam.name() == null || createChannelParam.name().isBlank() || createChannelParam.description() == null || createChannelParam.description().isBlank()) {
-            throw new IllegalArgumentException("type, name, description은 필수 입력값입니다.");
+            throw RestExceptions.BAD_REQUEST;
         }
     }
 
@@ -151,12 +149,12 @@ public class BasicChannelService implements ChannelService {
 
     private Channel findChannelById(UUID id) {
         return channelRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(id + "채널이 존재하지 않습니다."));
+                .orElseThrow(() -> RestExceptions.CHANNEL_NOT_FOUND);
     }
 
     private Instant findMessageLatestTimeInChannel(UUID channelId) {
         return messageRepository.findLatestMessageTimeByChannelId(channelId)
-                .orElseThrow(() -> new NoSuchElementException(channelId + " 채널에는 메시지가 없습니다."));
+                .orElseThrow(() -> RestExceptions.MESSAGE_NOT_FOUND);
     }
 
 

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -45,7 +46,7 @@ public class BasicUserService implements UserService {
     public UserDTO find(UUID userId) {
         User findUser = findUserById(userId);
         UserStatus findUserStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException(userId + "유저의 UserStatus가 존재하지 않습니다."));
+                .orElseThrow(() -> RestExceptions.USER_STATUS_NOT_FOUND);
         return UserMapper.userEntityToDTO(findUser, findUserStatus);
     }
 
@@ -82,19 +83,19 @@ public class BasicUserService implements UserService {
     private void validateUserField(CreateUserParam createUserParam) {
         if (Stream.of(createUserParam.username(), createUserParam.email(), createUserParam.password())
                 .anyMatch(field -> field == null || field.isBlank())) {
-            throw new IllegalArgumentException("username, email, password는 필수 입력값입니다.");
+            throw RestExceptions.BAD_REQUEST;
         }
     }
 
     private void checkDuplicateUsername(CreateUserParam createUserParam) {
         if (userRepository.existsByUsername(createUserParam.username())) {
-            throw new IllegalStateException("중복된 username입니다.");
+            throw RestExceptions.DUPLICATE_USERNAME;
         }
     }
 
     private void checkDuplicateEmail(CreateUserParam createUserParam) {
         if(userRepository.existsByEmail(createUserParam.email())) {
-            throw new IllegalStateException("중복된 email입니다.");
+            throw RestExceptions.DUPLICATE_EMAIL;
         }
     }
 
@@ -109,7 +110,7 @@ public class BasicUserService implements UserService {
 
     private User findUserById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
+                .orElseThrow(() ->RestExceptions.USER_NOT_FOUND);
     }
 
 

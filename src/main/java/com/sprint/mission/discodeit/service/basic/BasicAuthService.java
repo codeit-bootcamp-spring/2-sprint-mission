@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.service.auth.LoginParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.repository.AuthService;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -11,8 +12,6 @@ import com.sprint.mission.discodeit.util.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -31,17 +30,17 @@ public class BasicAuthService implements AuthService {
 
     private User findUserByUsername(LoginParam loginParam) {
         return userRepository.findByUsername(loginParam.username())
-                .orElseThrow(() -> new NoSuchElementException(loginParam.username() + "과 일치하는 유저가 없습니다."));
+                .orElseThrow(() -> RestExceptions.USER_NOT_FOUND);
     }
 
     private UserStatus findUserStatusByUserId(UUID id) {
         return userStatusRepository.findByUserId(id)
-                .orElseThrow(() -> new NoSuchElementException( id + "의 userStatus는 존재하지 않습니다."));
+                .orElseThrow(() -> RestExceptions.USER_STATUS_NOT_FOUND);
     }
 
     private void checkPassword(User user, LoginParam loginParam) {
         if (!StringUtils.equals(user.getPassword(), loginParam.password())) {
-            throw new IllegalStateException("비밀번호가 틀립니다.");
+            throw RestExceptions.INVALID_PASSWORD;
         }
     }
 }

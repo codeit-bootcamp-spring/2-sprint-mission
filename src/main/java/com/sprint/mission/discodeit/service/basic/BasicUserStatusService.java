@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.service.UserStatus.CreatedUserStatusPara
 import com.sprint.mission.discodeit.dto.service.UserStatus.UpdateUserStatusParam;
 import com.sprint.mission.discodeit.dto.service.UserStatus.UserStatusDTO;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -65,12 +66,12 @@ public class BasicUserStatusService implements UserStatusService {
 
     private void checkUserExists(CreatedUserStatusParam createdUserStatusParam) {
         userRepository.findById(createdUserStatusParam.userId())
-                .orElseThrow(() -> new NoSuchElementException(createdUserStatusParam.userId() + "유저가 존재하지 않습니다."));
+                .orElseThrow(() -> RestExceptions.USER_NOT_FOUND);
     }
 
     private void checkDuplicateUser(CreatedUserStatusParam createdUserStatusParam) {
         if (userStatusRepository.existsByUserId(createdUserStatusParam.userId())) {
-            throw new IllegalStateException(createdUserStatusParam.userId() + "의" + " UserStatus는 이미 존재합니다.");
+            throw RestExceptions.DUPLICATE_USER_STATUS;
         }
     }
 
@@ -91,6 +92,6 @@ public class BasicUserStatusService implements UserStatusService {
 
     private UserStatus findUserStatusById(UUID id) {
         return userStatusRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(id + "UserStatus가 존재하지 않습니다."));
+                .orElseThrow(() -> RestExceptions.USER_STATUS_NOT_FOUND);
     }
 }
