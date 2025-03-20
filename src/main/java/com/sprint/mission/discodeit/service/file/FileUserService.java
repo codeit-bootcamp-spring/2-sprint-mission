@@ -74,6 +74,11 @@ public class FileUserService implements UserService {
     }
 
     @Override
+    public UserDto updateProfileImage(UUID userId, UUID profileId) {
+        return null;
+    }
+
+    @Override
     public void delete(UUID userId) {
         userRepository.delete(userId);
     }

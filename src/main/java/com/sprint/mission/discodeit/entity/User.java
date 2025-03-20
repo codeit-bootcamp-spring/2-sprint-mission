@@ -35,6 +35,11 @@ public class User implements Serializable {
         updateLastModified();
     }
 
+    public void updateProfileImage(UUID profileId) {
+        this.profileId = profileId;
+        updateLastModified();
+    }
+
     public boolean isSameName(String name) {
         return this.name.equals(name);
     }

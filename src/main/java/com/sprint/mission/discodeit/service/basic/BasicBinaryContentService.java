@@ -36,8 +36,22 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public BinaryContent findById(UUID Id) {
-        return binaryContentRepository.findById(Id);
+    public BinaryContent findById(UUID id) {
+        return binaryContentRepository.findById(id);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        deleteImageFileFromPath(binaryContentRepository.findById(id).getPath());
+        binaryContentRepository.delete(id);
+    }
+
+    private void deleteImageFileFromPath(Path imageFilePath) {
+        try {
+            Files.deleteIfExists(imageFilePath);
+        } catch (IOException e) {
+            throw new UncheckedIOException("프로필이미지 파일을 삭제할 수 없습니다.", e);
+        }
     }
 
     private void saveImageFileToPath(MultipartFile multipartFile, Path directoryPath, Path imageFilePath) {

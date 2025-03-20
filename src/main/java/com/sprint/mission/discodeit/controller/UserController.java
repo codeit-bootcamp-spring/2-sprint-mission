@@ -19,10 +19,20 @@ public class UserController {
 
     public UserDto register(UserRegisterDto userRegisterDto, MultipartFile multipartFile) {
         UUID profileId = binaryContentService.createProfileImage(multipartFile);
+
         return userService.register(userRegisterDto, profileId);
     }
 
     public List<UserDto> findAll() {
         return userService.findAll();
+    }
+
+    public UserDto updateProfile(UUID userId, MultipartFile multipartFile) {
+        UserDto beforeUpdatedUser = userService.findById(userId);
+        UUID profileId = binaryContentService.createProfileImage(multipartFile);
+        UserDto user = userService.updateProfileImage(userId, profileId);
+        binaryContentService.delete(beforeUpdatedUser.profileId());
+
+        return user;
     }
 }

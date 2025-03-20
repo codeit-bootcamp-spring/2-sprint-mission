@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class BinaryContentServiceTest {
     private BinaryContentService binaryContentService;
@@ -39,5 +40,23 @@ class BinaryContentServiceTest {
 
         byte[] storedFileBytes = Files.readAllBytes(binaryContent.getPath());
         assertThat(file.getBytes()).isEqualTo(storedFileBytes);
+    }
+
+    @DisplayName("기존 이미지 삭제시 로컬 저장소에도 삭제됩니다.")
+    @Test
+    void updateProfileImage() {
+        MockMultipartFile file = new MockMultipartFile(
+                MediaType.IMAGE_JPEG_VALUE,
+                MESSAGE_CONTENT.getBytes()
+        );
+
+        UUID profileId = binaryContentService.createProfileImage(file);
+        BinaryContent binaryContent = binaryContentService.findById(profileId);
+        binaryContentService.delete(profileId);
+
+        assertAll(
+                () -> assertThat(binaryContentService.findById(profileId)).isNull(),
+                () -> assertThat(Files.exists(binaryContent.getPath())).isFalse()
+        );
     }
 }

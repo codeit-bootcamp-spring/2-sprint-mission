@@ -58,7 +58,7 @@ class UserControllerTest {
     @DisplayName("프로필 사진 저장을 선택했을떄 파일 저장 경로를 반환합니다")
     @Test
     void register() throws IOException {
-        byte[] binaryProfileImage = loadImageFileFromResource();
+        byte[] binaryProfileImage = loadImageFileFromResource("dog.jpg");
         MockMultipartFile file = new MockMultipartFile(
                 MediaType.IMAGE_JPEG_VALUE,
                 binaryProfileImage
@@ -74,13 +74,40 @@ class UserControllerTest {
         assertThat(binaryProfileImage).isEqualTo(storedFileBytes);
     }
 
-    private byte[] loadImageFileFromResource() {
+    @DisplayName("사용자 이미지를 업데이트하고 유저 정보를 반환합니다")
+    @Test
+    void updateProfileImage() throws IOException {
+        byte[] existingProfileImage = loadImageFileFromResource("dog.jpg");
+        MockMultipartFile file = new MockMultipartFile(
+                MediaType.IMAGE_JPEG_VALUE,
+                existingProfileImage
+        );
+        UserRegisterDto userRegisterDto = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(),
+                OTHER_USER.getPassword());
+
+        UserDto user = userController.register(userRegisterDto, file);
+
+
+        byte[] updatedProfileImage = loadImageFileFromResource("Kirby.jpg");
+        MockMultipartFile otherFile = new MockMultipartFile(
+                MediaType.IMAGE_JPEG_VALUE,
+                updatedProfileImage
+        );
+        UserDto profileImageUpdatedUser = userController.updateProfile(user.id(), otherFile);
+
+        BinaryContent binaryContent = binaryContentRepository.findById(profileImageUpdatedUser.profileId());
+        byte[] storedFileBytes = Files.readAllBytes(binaryContent.getPath());
+
+        assertThat(updatedProfileImage).isEqualTo(storedFileBytes);
+    }
+
+    private byte[] loadImageFileFromResource(String filePath) {
         byte[] binaryProfileImage;
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("dog.jpg")) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filePath)) {
             assert inputStream != null;
             binaryProfileImage = inputStream.readAllBytes();
         } catch (IOException e) {
-            throw new UncheckedIOException("src/resources 파일에 dog파일이 없습니다.", e);
+            throw new UncheckedIOException("src/resources 파일에" + filePath + "파일이 없습니다.", e);
         }
 
         return binaryProfileImage;

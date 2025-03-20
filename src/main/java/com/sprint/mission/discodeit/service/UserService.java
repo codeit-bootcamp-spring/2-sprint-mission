@@ -21,5 +21,7 @@ public interface UserService {
 
     void updateName(UUID userId, String name);
 
+    UserDto updateProfileImage(UUID userId, UUID profileId);
+
     void delete(UUID userId);
 }

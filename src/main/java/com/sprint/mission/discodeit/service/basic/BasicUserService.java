@@ -83,6 +83,17 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    public UserDto updateProfileImage(UUID userId, UUID profileId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+
+        user.updateProfileImage(profileId);
+        User savedUser = userRepository.save(user);
+
+        return UserDto.fromEntity(savedUser);
+    }
+
+    @Override
     public void delete(UUID userId) {
         userRepository.delete(userId);
     }

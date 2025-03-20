@@ -22,4 +22,9 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     public BinaryContent findById(UUID id) {
         return binaryContentRepository.get(id);
     }
+
+    @Override
+    public void delete(UUID id) {
+        binaryContentRepository.remove(id);
+    }
 }
