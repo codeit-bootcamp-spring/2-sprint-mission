@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.UserResponse;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -131,7 +129,7 @@ public class DiscodeitApplication {
                                 System.out.print("조회할 채널 ID 입력: ");
                                 UUID channelId = UUID.fromString(sc.nextLine());
                                 System.out.println("채널 조회: " + channelService.getChannelById(channelId)
-                                        .map(Channel::toString).orElse("채널을 찾을 수 없습니다."));
+                                        .map(ChannelResponse::toString).orElse("채널을 찾을 수 없습니다."));
                                 break;
 
                             case UPDATE_CHANNEL:
@@ -139,7 +137,8 @@ public class DiscodeitApplication {
                                 UUID channelIdToUpdate = UUID.fromString(sc.nextLine());
                                 System.out.print("새로운 채널 입력: ");
                                 String newChannelName = sc.nextLine();
-                                channelService.updateChannel(channelIdToUpdate, newChannelName);
+                                UpdateChannelRequest updateChannelRequest = new UpdateChannelRequest(channelIdToUpdate, newChannelName);
+                                channelService.updateChannel(updateChannelRequest);
                                 System.out.println("채널 수정 완료");
                                 break;
 
