@@ -10,7 +10,11 @@ public interface BinaryContentRepository {
 
     void addBinaryContent(BinaryContent content);
 
-    BinaryContent findBinaryContent(UUID binaryContentId);
+    BinaryContent findBinaryContentById(UUID id);
+
+    BinaryContent findBinaryContentByUserId(UUID referenceId);
+
+    List<BinaryContent> findBinaryContentByMessageId(UUID referenceId);
 
     List<BinaryContent> findAllBinaryContents();
 

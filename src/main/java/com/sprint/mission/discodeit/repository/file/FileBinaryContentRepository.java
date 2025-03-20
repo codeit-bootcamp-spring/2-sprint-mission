@@ -34,6 +34,11 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
+    public BinaryContent findBinaryContentById(UUID id) {
+        return binaryContentMap.get(id);
+    }
+
+    @Override
     public BinaryContent findBinaryContentByUserId(UUID referenceId) {
         return binaryContentMap.values().stream()
                 .filter(content -> content.id().equals(referenceId))
