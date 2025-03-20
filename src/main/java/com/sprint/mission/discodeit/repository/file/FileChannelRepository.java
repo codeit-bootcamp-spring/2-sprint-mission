@@ -15,25 +15,25 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 public class FileChannelRepository implements ChannelRepository {
 
-    private static final String FILE_PATH = "src/main/resources/channels.dat";
+    private static final String fileName = "channels.dat";
     private static Map<UUID, Channel> channels = new ConcurrentHashMap<>();
     private final FileStorageManager fileStorageManager;
 
     @Autowired
     public FileChannelRepository(@Lazy FileStorageManager fileStorageManager) {
         this.fileStorageManager = fileStorageManager;
-        channels = fileStorageManager.loadFile(FILE_PATH);
+        channels = fileStorageManager.loadFile(fileName);
     }
 
     @Override
     public void save() {
-        fileStorageManager.saveFile(FILE_PATH, channels);
+        fileStorageManager.saveFile(fileName, channels);
     }
 
     @Override
     public void addChannel(Channel channel) {
         channels.put(channel.getId(), channel);
-        fileStorageManager.saveFile(FILE_PATH, channels);
+        fileStorageManager.saveFile(fileName, channels);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void deleteChannelById(UUID channelId) {
         channels.remove(channelId);
-        fileStorageManager.saveFile(FILE_PATH, channels);
+        fileStorageManager.saveFile(fileName, channels);
     }
 
     @Override

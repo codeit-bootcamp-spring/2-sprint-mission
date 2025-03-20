@@ -13,18 +13,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
-    private static final String FILE_PATH = "src/main/resources/binaryContent.dat";
+    private static final String fileName = "binaryContent.dat";
     private static Map<UUID, BinaryContent> binaryContentMap = new ConcurrentHashMap<>();
     private final FileStorageManager fileStorageManager;
 
     public FileBinaryContentRepository(FileStorageManager fileStorageManager) {
         this.fileStorageManager = fileStorageManager;
-        binaryContentMap = fileStorageManager.loadFile(FILE_PATH);
+        binaryContentMap = fileStorageManager.loadFile(fileName);
     }
 
     @Override
     public void save() {
-        fileStorageManager.saveFile(FILE_PATH, binaryContentMap);
+        fileStorageManager.saveFile(fileName, binaryContentMap);
     }
 
     @Override

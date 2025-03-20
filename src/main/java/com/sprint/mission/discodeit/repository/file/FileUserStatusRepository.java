@@ -13,19 +13,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class FileUserStatusRepository implements UserStatusRepository {
-    private static final String FILE_PATH = "src/main/resources/userStatus.dat";
+    private static final String fileName = "userStatus.dat";
     private static Map<UUID, UserStatus> userStatusMap = new ConcurrentHashMap<>();
     private final FileStorageManager fileStorageManager;
 
     @Autowired
     public FileUserStatusRepository(FileStorageManager fileStorageManager) {
         this.fileStorageManager = fileStorageManager;
-        userStatusMap = fileStorageManager.loadFile(FILE_PATH);
+        userStatusMap = fileStorageManager.loadFile(fileName);
     }
 
     @Override
     public void save() {
-        fileStorageManager.saveFile(FILE_PATH, userStatusMap);
+        fileStorageManager.saveFile(fileName, userStatusMap);
     }
 
     @Override

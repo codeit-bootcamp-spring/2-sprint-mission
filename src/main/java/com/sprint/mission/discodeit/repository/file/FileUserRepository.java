@@ -12,25 +12,25 @@ import java.util.stream.Collectors;
 @Repository
 public class FileUserRepository implements UserRepository {
 
-    private static final String FILE_PATH = "src/main/resources/users.dat";
+    private static final String fileName = "users.dat";
     private static Map<UUID, User> users = new ConcurrentHashMap<>();
     private final FileStorageManager fileStorageManager;
 
     @Autowired
     public FileUserRepository(FileStorageManager fileStorageManager) {
         this.fileStorageManager = fileStorageManager;
-        users = fileStorageManager.loadFile(FILE_PATH);
+        users = fileStorageManager.loadFile(fileName);
     }
 
     @Override
     public void save() {
-        fileStorageManager.saveFile(FILE_PATH, users);
+        fileStorageManager.saveFile(fileName, users);
     }
 
     @Override
     public void addUser(User user) {
         users.put(user.getId(), user);
-        fileStorageManager.saveFile(FILE_PATH, users);
+        fileStorageManager.saveFile(fileName, users);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void deleteUserById(UUID userId) {
         users.remove(userId);
-        fileStorageManager.saveFile(FILE_PATH, users);
+        fileStorageManager.saveFile(fileName, users);
     }
 
     @Override

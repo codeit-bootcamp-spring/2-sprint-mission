@@ -11,19 +11,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 public class FileMessageRepository implements MessageRepository {
 
-    private static final String FILE_PATH = "src/main/resources/messages.dat";
+    private static final String fileName = "messages.dat";
     private static Map<UUID, Message> messages = new ConcurrentHashMap<>();
     private final FileStorageManager fileStorageManager;
 
     @Autowired
     public FileMessageRepository(FileStorageManager fileStorageManager) {
         this.fileStorageManager = fileStorageManager;
-        messages = fileStorageManager.loadFile(FILE_PATH);
+        messages = fileStorageManager.loadFile(fileName);
     }
 
     @Override
     public void save() {
-        fileStorageManager.saveFile(FILE_PATH, messages);
+        fileStorageManager.saveFile(fileName, messages);
     }
 
     @Override
