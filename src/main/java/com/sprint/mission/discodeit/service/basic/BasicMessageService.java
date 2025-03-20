@@ -30,6 +30,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentService binaryContentService;
     private final MessageUpdaterProvider messageUpdaterProvider;
 
+    // 일단 미션에서 요구해서 createMessage 메서드에서 binaryContent를 create하도록 구현했지만, controller에서 따로 분리되어 실행되도록 하는게 맞는 것 같다.
     @Override
     public UUID createMessage(MessageCreateRequest messageCreateRequest) {
         UserService.validateUserId(messageCreateRequest.senderId(), this.userRepository);
