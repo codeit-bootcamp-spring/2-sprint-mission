@@ -207,7 +207,8 @@ public class DiscodeitApplication {
                                 UUID messageIdToUpdate = UUID.fromString(sc.nextLine());
                                 System.out.println("새로운 메시지 내용 입력: ");
                                 String newMessageText = sc.nextLine();
-                                messageService.updateMessage(messageIdToUpdate, newMessageText);
+                                UpdateMessageRequest updateRequest = new UpdateMessageRequest(messageIdToUpdate, newMessageText);
+                                messageService.updateMessage(updateRequest);
                                 System.out.println("메시지 수정 완료");
                                 break;
 
