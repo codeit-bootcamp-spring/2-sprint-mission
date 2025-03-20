@@ -2,29 +2,22 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.util.List;
+import com.sprint.mission.discodeit.service.dto.user.LoginRequest;
 import java.util.NoSuchElementException;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
 
-    public AuthService(@Qualifier("fileUserRepository") UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    List<User> login() {
-        List<User> users = userRepository.findAll();
-        if (users.isEmpty()) {
-            throw new IllegalArgumentException("user 객체가 없습니다.");
+    public User login(LoginRequest loginRequest) {
+        User user = userRepository.findByUsername(loginRequest.username())
+                .orElseThrow(() -> new NoSuchElementException(loginRequest.username() + " 와 동일한 username이 없음"));
+        if (!user.getPassword().equals(loginRequest.password())) {
+            throw new IllegalArgumentException("login 실패");
         }
-        List<User> filteredUsers = users.stream().filter(user -> user.getUsername().equals(user.getPassword()))
-                .toList();
-        if (filteredUsers.isEmpty()) {
-            throw new NoSuchElementException("username과 password가 일치하는 유저는 없습니다.");
-        }
-        return filteredUsers;
+        return user;
     }
 }
