@@ -37,7 +37,7 @@ public class DiscodeitApplication {
         ChannelService channelService = context.getBean(ChannelService.class);
         MessageService messageService = context.getBean(MessageService.class);
         ReadStatusService readStatusService = context.getBean(ReadStatusService.class);
-
+//        System.out.println(System.getProperty("user.dir"));
 //        if (true) {
 //            List<UserResponseDto> userDtos = userService.findAll();
 //            System.out.println("=== 유저 목록 ===");

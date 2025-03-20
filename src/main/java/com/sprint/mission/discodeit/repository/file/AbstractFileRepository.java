@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,8 +10,8 @@ import java.nio.file.Paths;
 public abstract class AbstractFileRepository<T> {
     protected final Path path;
 
-    protected AbstractFileRepository(String className) {
-        this.path = Paths.get("data", className + ".ser");
+    protected AbstractFileRepository(String directory, String fileName) {
+        this.path = Paths.get(directory, fileName);
         init(path.getParent());
     }
 

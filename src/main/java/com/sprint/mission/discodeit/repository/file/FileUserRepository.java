@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -11,11 +12,10 @@ import java.util.*;
 @Repository
 @ConditionalOnProperty(value = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
 public class FileUserRepository extends AbstractFileRepository<Map<UUID, User>> implements UserRepository {
-
     private Map<UUID, User> data;
 
-    public FileUserRepository() {
-        super("User");
+    public FileUserRepository(@Value("${discodeit.repository.file-directory}") String directory) {
+        super(directory, User.class.getSimpleName()+".ser");
         this.data = loadData();
     }
 

@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -14,8 +16,8 @@ public class FileChannelRepository extends AbstractFileRepository<Map<UUID, Chan
 
     private Map<UUID, Channel> data;
 
-    public FileChannelRepository() {
-        super("Channel");
+    public FileChannelRepository(@Value("${discodeit.repository.file-directory}") String directory) {
+        super(directory, Channel.class.getSimpleName()+".ser");
         this.data = loadData();
     }
 

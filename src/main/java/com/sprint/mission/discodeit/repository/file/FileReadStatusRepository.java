@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.common.ReadStatus;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -14,8 +16,8 @@ public class FileReadStatusRepository extends AbstractFileRepository<Map<UUID, R
 
     private Map<UUID, ReadStatus> data;
 
-    public FileReadStatusRepository() {
-        super("ReadStatus");
+    public FileReadStatusRepository(@Value("${discodeit.repository.file-directory}") String directory) {
+        super(directory, ReadStatus.class.getSimpleName()+".ser");
         this.data = loadData();
     }
 

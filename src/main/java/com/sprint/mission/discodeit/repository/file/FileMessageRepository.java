@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.message.Message;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -15,8 +17,8 @@ public class FileMessageRepository extends AbstractFileRepository<Map<UUID, Mess
 
     private Map<UUID, Message> data;
 
-    public FileMessageRepository() {
-        super("Message");
+    public FileMessageRepository(@Value("${discodeit.repository.file-directory}") String directory) {
+        super(directory, Message.class.getSimpleName()+".ser");
         this.data = loadData();
     }
 

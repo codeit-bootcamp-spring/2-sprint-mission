@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -14,8 +16,8 @@ public class FileBinaryContentRepository extends AbstractFileRepository<Map<UUID
 
     private Map<UUID, BinaryContent> data;
 
-    public FileBinaryContentRepository() {
-        super("BinaryContent");
+    public FileBinaryContentRepository(@Value("${discodeit.repository.file-directory}") String directory) {
+        super(directory, BinaryContent.class.getSimpleName()+".ser");
         this.data = loadData();
     }
 
