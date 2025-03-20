@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ public class BasicUserService implements UserService {
 
         String filePath = dto.getProfilePicturePath();
         if (filePath != null) {
-            BinaryContent profile = new BinaryContent(user.getId(), extractFileName(filePath), determineFileType(filePath), filePath);
+            BinaryContent profile = new BinaryContent(user.getId(), filePath);
             binaryContentRepository.addBinaryContent(profile);
         }
         return user;
@@ -74,6 +75,14 @@ public class BasicUserService implements UserService {
         return userRepository.findUserAll().stream()
                 .map(this::mapToUserFindDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public BinaryContent findProfileById(UUID userId) {
+        return Optional.ofNullable(userRepository.findUserById(userId))
+                .map(User::getProfileId)
+                .map(binaryContentRepository::findBinaryContentById)
+                .orElse(null);
     }
 
     @Override

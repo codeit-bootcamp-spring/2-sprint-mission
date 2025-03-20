@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.MessageUpdateDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public interface MessageService {
     Message getMessageById(UUID messageId); // 메세지 조회
 
     List<Message> findMessagesByUserAndChannel(UUID senderId, UUID channelId); // 특정 유저가 특정 채널에서 작성한 메세지 확인
+
+    List<BinaryContent> findAttachmentsById(UUID messageId);
 
     List<Message> findallByChannelId(UUID channelId); // 채널 내 모든 메세지 확인
 

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.UserCreateDto;
 import com.sprint.mission.discodeit.dto.UserFindDto;
 import com.sprint.mission.discodeit.dto.UserUpdateDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public interface UserService {
     String getUserNameById(UUID userId); //유저 이름 조회
 
     List<UserFindDto> findUsersByIds(Set<UUID> userIds);
+
+    BinaryContent findProfileById(UUID userId);
 
     List<UserFindDto> getAllUsers();   //모든 유저 조회
 

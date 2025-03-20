@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -37,9 +38,11 @@ public class BasicMessageService implements MessageService {
 
         channelService.addMessage(channelId, message.getId());
 
-        dto.getFilePath().forEach(filePath ->
-                binaryContentRepository.addBinaryContent(
-                        new BinaryContent(channelId, filePath)));
+        for (String path : dto.getFilePath()) {
+            BinaryContent binaryContent = new BinaryContent(channelId, path);
+            binaryContentRepository.addBinaryContent(binaryContent);
+            message.addAttachment(binaryContent.id());
+        }
 
         messageRepository.addMessage(message);
         return message;
@@ -49,6 +52,17 @@ public class BasicMessageService implements MessageService {
     public Message getMessageById(UUID messageId) {
         validateMessageExists(messageId);
         return messageRepository.findMessageById(messageId);
+    }
+
+    @Override
+    public List<BinaryContent> findAttachmentsById(UUID messageId) {
+        validateMessageExists(messageId);
+        List<BinaryContent> binaryContents = new ArrayList<>();
+        messageRepository.findMessageById(messageId).getAttachmentIds().forEach(attachmentId -> {
+            binaryContents.add(binaryContentRepository.findBinaryContentById(attachmentId));
+        });
+
+        return binaryContents;
     }
 
     @Override
