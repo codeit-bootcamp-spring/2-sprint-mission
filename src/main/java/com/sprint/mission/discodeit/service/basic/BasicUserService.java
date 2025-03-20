@@ -52,6 +52,9 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserDTO> findAll() {
         List<User> users = userRepository.findAll();
+        // UserDTO에 isLogin 정보를 담기 위함
+        // UserStatusMap을 만들고, User와 해당하는 UserStatus 객체를 userEntityToDTO 메서드에 넘겨줌
+        // userEntityDTO에서 userStatus.isLoginUser() 메서드를 실행시켜 isLogin에 대한 정보를 생성
         Map<UUID, UserStatus> userStatusMap = userStatusRepository.findAll().stream()
                 .collect(Collectors.toMap(userStatus -> userStatus.getUserId(), userStatus -> userStatus));
         return users.stream()
