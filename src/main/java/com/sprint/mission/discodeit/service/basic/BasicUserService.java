@@ -22,6 +22,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserDto register(UserRegisterDto userRegisterDto, UUID profileId) {
         validateDuplicateEmail(userRegisterDto.email());
+        validateDuplicateUserName(userRegisterDto.name());
 
         User requestUser = new User(
                 userRegisterDto.name(),
@@ -83,13 +84,22 @@ public class BasicUserService implements UserService {
         userRepository.delete(id);
     }
 
+    private void validateDuplicateUserName(String name) {
+        boolean isDuplicate = !userRepository.findByName(name)
+                .isEmpty();
+
+        if (isDuplicate) {
+            throw new IllegalArgumentException("이미 존재하는 이름 입니다");
+        }
+    }
+
     private void validateDuplicateEmail(String requestEmail) {
         boolean isDuplicate = userRepository.findAll()
                 .stream()
                 .anyMatch(existingUser -> existingUser.isSameEmail(requestEmail));
 
         if (isDuplicate) {
-            throw new IllegalArgumentException("이미 존재하는 유저입니다");
+            throw new IllegalArgumentException("이미 존재하는 이메일 입니다");
         }
     }
 }

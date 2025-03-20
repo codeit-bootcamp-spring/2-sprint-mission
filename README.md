@@ -189,7 +189,7 @@ public static void main(String[]args){
 - [x] 선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
 - [x] DTO를 활용해 파라미터를 그룹화합니다.
     - 유저를 등록하기 위해 필요한 파라미터, 프로필 이미지를 등록하기 위해 필요한 파라미터 등
-- [ ] username과 email은 다른 유저와 같으면 안됩니다.
+- [x] username과 email은 다른 유저와 같으면 안됩니다.
 - [ ] UserStatus를 같이 생성합니다.
 
 2. find, findAll

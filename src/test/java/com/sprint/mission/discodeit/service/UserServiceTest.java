@@ -3,9 +3,10 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -22,7 +23,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = new JCFUserService(new JCFUserRepository());
+        userService = new BasicUserService(new JCFUserRepository());
         setUpUser = userService.register(
                 new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()), null);
     }
@@ -30,6 +31,24 @@ class UserServiceTest {
     @AfterEach
     void tearDown() {
         userService.delete(setUpUser.id());
+    }
+
+    @DisplayName("유저 등록시 중복된 이메일이 있을 경우 예외 처리합니다")
+    @Test
+    void registerDuplicateEmail() {
+        UserRegisterDto sameEmailUser = new UserRegisterDto(OTHER_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword());
+        assertThatThrownBy(() -> {
+            userService.register(sameEmailUser, null);
+        }).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("유저 등록시 중복된 유저 이름이 있을 경우 예외 처리합니다")
+    @Test
+    void registerDuplicateUserName() {
+        UserRegisterDto sameNameUser = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(), LONGIN_USER.getPassword());
+        assertThatThrownBy(() -> {
+            userService.register(sameNameUser, null);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -53,15 +72,6 @@ class UserServiceTest {
         UserDto userDto = users.get(0);
 
         assertThat(userDto.name()).isEqualTo(LONGIN_USER.getName());
-    }
-
-    @Test
-    void 유저_이름_다수_조회() {
-        UserRegisterDto otherUser = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(),
-                OTHER_USER.getPassword());
-        userService.register(otherUser, null);
-
-        assertThat(userService.findByName(LONGIN_USER.getName())).hasSize(2);
     }
 
     @Test
