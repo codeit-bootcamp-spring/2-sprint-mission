@@ -16,6 +16,8 @@ public interface ReadStatusRepository {
 
     List<ReadStatus> findAllReadStatus();
 
+    void updateTime(UUID channelId, UUID userId);
+
     void deleteReadStatusById(UUID id);
 
     boolean existReadStatusById(UUID id);

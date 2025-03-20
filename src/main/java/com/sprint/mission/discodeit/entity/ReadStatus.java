@@ -27,4 +27,13 @@ public class ReadStatus extends BaseEntity {
     public void updateLastAccessTime(UUID userId) {
         userIds.put(userId, Instant.now());
     }
+
+    @Override
+    public String toString() {
+        return "ReadStatus{" +
+                "id=" + getId() +
+                ", channelId=" + channelId +
+                ", userIds=" + userIds +
+                '}';
+    }
 }

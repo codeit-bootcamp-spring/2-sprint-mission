@@ -1,36 +1,20 @@
-package com.sprint.mission.discodeit.repository.file;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
-@Repository
-public class FileReadStatusRepository implements ReadStatusRepository {
-
-    private static final String FILE_PATH = "src/main/resources/readStatus.dat";
-    private static Map<UUID, ReadStatus> readStatusMap = new ConcurrentHashMap<>();
-    private final FileStorageManager fileStorageManager;
-
-    public FileReadStatusRepository(FileStorageManager fileStorageManager) {
-        this.fileStorageManager = fileStorageManager;
-        readStatusMap = fileStorageManager.loadFile(FILE_PATH);
-    }
+public class JCFReadStatusRepository implements ReadStatusRepository {
+    private static final Map<UUID, ReadStatus> readStatusMap = new HashMap<>();
 
     @Override
     public void save() {
-        fileStorageManager.saveFile(FILE_PATH, readStatusMap);
     }
 
     @Override
     public void addReadStatus(ReadStatus readStatus) {
         readStatusMap.put(readStatus.getId(), readStatus);
-        save();
     }
 
     @Override
@@ -39,7 +23,6 @@ public class FileReadStatusRepository implements ReadStatusRepository {
                 .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                 .findFirst()
                 .ifPresent(readStatus -> readStatus.addUser(userId));
-        save();
     }
 
     @Override
@@ -58,13 +41,11 @@ public class FileReadStatusRepository implements ReadStatusRepository {
                 .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                 .findFirst()
                 .ifPresent(readStatus -> readStatus.updateLastAccessTime(userId));
-        save();
     }
 
     @Override
     public void deleteReadStatusById(UUID id) {
         readStatusMap.remove(id);
-        save();
     }
 
     @Override
