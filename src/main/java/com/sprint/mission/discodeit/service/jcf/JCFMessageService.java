@@ -4,6 +4,10 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateParam;
+import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,23 +20,34 @@ public class JCFMessageService implements MessageService {
     //
     private final ChannelService channelService;
     private final UserService userService;
+    private final BasicBinaryContentService basicBinaryContentService;
 
-    public JCFMessageService(ChannelService channelService, UserService userService) {
+    public JCFMessageService(ChannelService channelService, UserService userService,
+                             BasicBinaryContentService basicBinaryContentService) {
         this.data = new HashMap<>();
         this.channelService = channelService;
         this.userService = userService;
+        this.basicBinaryContentService = basicBinaryContentService;
     }
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+    public Message create(MessageCreateRequest createRequest) {
         try {
-            channelService.find(channelId);
-            userService.find(authorId);
+            channelService.find(createRequest.getChannelId());
+            userService.find(createRequest.getAuthorId());
         } catch (NoSuchElementException e) {
             throw e;
         }
+        List<UUID> idList = null;
 
-        Message message = new Message(content, channelId, authorId, attachmentIds);
+        if (createRequest.getType() != null && createRequest.getFiles() != null && !createRequest.getFiles()
+                .isEmpty()) {
+            BinaryContentCreateParam binaryContentCreateParam = new BinaryContentCreateParam(createRequest.getType(),
+                    createRequest.getFiles());
+            idList = basicBinaryContentService.create(binaryContentCreateParam);
+        }
+        Message message = new Message(createRequest.getContent(), createRequest.getChannelId(),
+                createRequest.getAuthorId(), idList);
         this.data.put(message.getId(), message);
 
         return message;
@@ -47,25 +62,31 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAll() {
-        return this.data.values().stream().toList();
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return findAll().stream()
+                .filter(message -> message.getChannelId().equals(channelId)).toList();
     }
 
     @Override
-    public Message update(UUID messageId, String newContent) {
-        Message messageNullable = this.data.get(messageId);
+    public Message update(MessageUpdateRequest updateRequest) {
+        Message messageNullable = this.data.get(updateRequest.id());
         Message message = Optional.ofNullable(messageNullable)
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
-        message.update(newContent);
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + updateRequest.id() + " not found"));
+        message.update(updateRequest.newContent());
 
         return message;
     }
 
     @Override
     public void delete(UUID messageId) {
-        if (!this.data.containsKey(messageId)) {
-            throw new NoSuchElementException("Message with id " + messageId + " not found");
+        Message message = find(messageId);
+        if (message.getAttachmentIds() != null) {
+            message.getAttachmentIds().forEach(basicBinaryContentService::delete);
         }
         this.data.remove(messageId);
+    }
+
+    private List<Message> findAll() {
+        return this.data.values().stream().toList();
     }
 }

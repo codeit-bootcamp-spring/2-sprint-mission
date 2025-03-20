@@ -4,6 +4,10 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateParam;
+import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,8 +28,10 @@ public class FileMessageService implements MessageService {
     //
     private final ChannelService channelService;
     private final UserService userService;
+    private final BasicBinaryContentService basicBinaryContentService;
 
-    public FileMessageService(ChannelService channelService, UserService userService) {
+    public FileMessageService(ChannelService channelService, UserService userService,
+                              BasicBinaryContentService basicBinaryContentService) {
         this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
@@ -36,22 +42,29 @@ public class FileMessageService implements MessageService {
         }
         this.channelService = channelService;
         this.userService = userService;
-    }
-
-    private Path resolvePath(UUID id) {
-        return DIRECTORY.resolve(id + EXTENSION);
+        this.basicBinaryContentService = basicBinaryContentService;
     }
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+    public Message create(MessageCreateRequest createRequest) {
         try {
-            channelService.find(channelId);
-            userService.find(authorId);
+            channelService.find(createRequest.getChannelId());
+            userService.find(createRequest.getAuthorId());
         } catch (NoSuchElementException e) {
             throw e;
         }
 
-        Message message = new Message(content, channelId, authorId, attachmentIds);
+        List<UUID> idList = null;
+
+        if (createRequest.getType() != null && createRequest.getFiles() != null && !createRequest.getFiles()
+                .isEmpty()) {
+            BinaryContentCreateParam binaryContentCreateParam = new BinaryContentCreateParam(createRequest.getType(),
+                    createRequest.getFiles());
+            idList = basicBinaryContentService.create(binaryContentCreateParam);
+        }
+        Message message = new Message(createRequest.getContent(), createRequest.getChannelId(),
+                createRequest.getAuthorId(), idList);
+
         Path path = resolvePath(message.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
@@ -85,7 +98,51 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return findAll().stream()
+                .filter(message -> message.getChannelId().equals(channelId)).toList();
+    }
+
+    @Override
+    public Message update(MessageUpdateRequest updateRequest) {
+        Message messageNullable = null;
+        Path path = resolvePath(updateRequest.id());
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                messageNullable = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        Message message = Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + updateRequest.id() + " not found"));
+        message.update(updateRequest.newContent());
+
+        return message;
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        Path path = resolvePath(messageId);
+        if (Files.notExists(path)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
+        }
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
+
+    private List<Message> findAll() {
         try {
             return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
@@ -100,41 +157,6 @@ public class FileMessageService implements MessageService {
                         }
                     })
                     .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public Message update(UUID messageId, String newContent) {
-        Message messageNullable = null;
-        Path path = resolvePath(messageId);
-        if (Files.exists(path)) {
-            try (
-                    FileInputStream fis = new FileInputStream(path.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                messageNullable = (Message) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        Message message = Optional.ofNullable(messageNullable)
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
-        message.update(newContent);
-
-        return message;
-    }
-
-    @Override
-    public void delete(UUID messageId) {
-        Path path = resolvePath(messageId);
-        if (Files.notExists(path)) {
-            throw new NoSuchElementException("Message with id " + messageId + " not found");
-        }
-        try {
-            Files.delete(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
