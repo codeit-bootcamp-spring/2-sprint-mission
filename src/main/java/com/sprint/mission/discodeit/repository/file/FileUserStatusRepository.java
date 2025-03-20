@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository.jcf;
+package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.user.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -8,16 +8,25 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-public class JCFUserStatusRepository implements UserStatusRepository {
-    private final Map<UUID, UserStatus> data;
+@Primary
+public class FileUserStatusRepository extends AbstractFileRepository<Map<UUID, UserStatus>> implements UserStatusRepository {
 
-    public JCFUserStatusRepository() {
-        this.data = new HashMap<>();
+    private Map<UUID, UserStatus> data;
+
+    public FileUserStatusRepository() {
+        super("UserStatus");
+        this.data = loadData();
+    }
+
+    @Override
+    protected Map<UUID, UserStatus> getEmptyData() {
+        return new HashMap<>();
     }
 
     @Override
     public UserStatus save(UserStatus userStatus) {
         data.put(userStatus.getId(), userStatus);
+        saveData(data);
         return userStatus;
     }
 
@@ -35,7 +44,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public List<UserStatus> findAll() {
-        return data.values().stream().toList();
+        return new ArrayList<>(data.values());
     }
 
     @Override
@@ -46,6 +55,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public void deleteById(UUID id) {
         data.remove(id);
+        saveData(data);
     }
 
     @Override
@@ -55,5 +65,6 @@ public class JCFUserStatusRepository implements UserStatusRepository {
                 .map(UserStatus::getId)
                 .toList();
         keysToRemove.forEach(data::remove);
+        saveData(data);
     }
 }

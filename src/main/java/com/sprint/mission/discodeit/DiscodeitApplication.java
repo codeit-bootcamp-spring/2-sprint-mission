@@ -35,14 +35,19 @@ public class DiscodeitApplication {
         MessageService messageService = context.getBean(MessageService.class);
         ReadStatusService readStatusService = context.getBean(ReadStatusService.class);
 
+//        if (true) {
+//            printUsers(userService);
+//            return;
+//        }
+
         List<BinaryContent> profiles = setUpProfiles(binaryContentService);
         List<UserCreateResponseDto> userDtos = setupUsers(userService, profiles);
-        printUser1(userService, userDtos.get(0));
-        printUsers(userService, userDtos);
+        printUserById(userService, userDtos.get(0).id());
+        printUsers(userService);
         deleteUser(userService, userDtos, binaryContentService, profiles);
-        printUsers(userService, userDtos);
+        printUsers(userService);
         updateUser1(userService, userDtos.get(0));
-        printUser1(userService, userDtos.get(0));
+        printUserById(userService, userDtos.get(0).id());
 
         System.out.println();
 
@@ -161,9 +166,9 @@ public class DiscodeitApplication {
 
     }
 
-    private static void printUser1(UserService userService, UserCreateResponseDto user1Dto) {
+    private static void printUserById(UserService userService, UUID userId) {
         System.out.println("===================== 유저 1 find로 출력 =====================");
-        System.out.println(userService.find(user1Dto.id()));
+        System.out.println(userService.find(userId));
     }
 
     private static List<BinaryContent> setUpProfiles(BinaryContentService binaryContentService) {
@@ -183,7 +188,7 @@ public class DiscodeitApplication {
         return List.of(user1Dto, user2Dto, user3Dto, user4Dto);
     }
 
-    private static void printUsers(UserService userService, List<UserCreateResponseDto> userDtos) {
+    private static void printUsers(UserService userService) {
         System.out.println("===================== 유저 findAll로 출력 =====================");
         userService.findAll().forEach(System.out::println);
     }
