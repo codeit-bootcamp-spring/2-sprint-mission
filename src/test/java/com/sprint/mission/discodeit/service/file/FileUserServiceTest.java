@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
@@ -41,8 +40,7 @@ class FileUserServiceTest {
     }
 
     private void setUpTestPath() {
-        String random = UUID.randomUUID().toString();
-        userPath = STORAGE_DIRECTORY.resolve(random + USER_TEST_FILE);
+        userPath = STORAGE_DIRECTORY.resolve(USER_TEST_FILE);
     }
 
     private void setUpUser() {
@@ -89,16 +87,16 @@ class FileUserServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("이름이 같은 유저들을 반환한다")
+    @DisplayName("이름으로 유저를 조회한다")
     @Test
     void findByName() {
         UserRegisterDto otherUserWithSameEmail = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword());
-
         userService.register(otherUserWithSameEmail, null);
-        List<UserDto> users = userService.findByName(initializedUser.name());
 
-        assertThat(users).hasSize(2);
+        UserDto user = userService.findByName(initializedUser.name());
+
+        assertThat(user.name()).isEqualTo(LONGIN_USER.getName());
     }
 
     @DisplayName("이메일이 같은 유저를 반환한다")

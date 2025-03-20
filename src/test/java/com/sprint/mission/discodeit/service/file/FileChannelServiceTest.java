@@ -40,9 +40,8 @@ class FileChannelServiceTest {
     }
 
     private void setUpTestFilePath() {
-        String random = UUID.randomUUID().toString();
-        userTestFilePath = STORAGE_DIRECTORY.resolve(random + USER_TEST_FILE);
-        channelTestFilePath = STORAGE_DIRECTORY.resolve(random + CHANNEL_TEST_FILE);
+        userTestFilePath = STORAGE_DIRECTORY.resolve(USER_TEST_FILE);
+        channelTestFilePath = STORAGE_DIRECTORY.resolve(CHANNEL_TEST_FILE);
     }
 
     private void setUpService() {

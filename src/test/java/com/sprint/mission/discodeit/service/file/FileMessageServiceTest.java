@@ -42,9 +42,8 @@ class FileMessageServiceTest {
     }
 
     private void setUpTestFilePath() {
-        String random = UUID.randomUUID().toString();
-        userTestFilePath = STORAGE_DIRECTORY.resolve(random + USER_TEST_FILE);
-        messageTestFilePath = STORAGE_DIRECTORY.resolve(random + MESSAGE_TEST_FILE);
+        userTestFilePath = STORAGE_DIRECTORY.resolve(USER_TEST_FILE);
+        messageTestFilePath = STORAGE_DIRECTORY.resolve(MESSAGE_TEST_FILE);
     }
 
     private void setUpService() {

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
@@ -68,10 +67,9 @@ class UserServiceTest {
 
     @Test
     void 유저_이름_단건_조회() {
-        List<UserDto> users = userService.findByName(LONGIN_USER.getName());
-        UserDto userDto = users.get(0);
+        UserDto user = userService.findByName(LONGIN_USER.getName());
 
-        assertThat(userDto.name()).isEqualTo(LONGIN_USER.getName());
+        assertThat(user.name()).isEqualTo(LONGIN_USER.getName());
     }
 
     @Test

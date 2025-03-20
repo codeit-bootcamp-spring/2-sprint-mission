@@ -43,11 +43,11 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserDto> findByName(String name) {
-        return userRepository.findByName(name)
-                .stream()
-                .map(UserDto::fromEntity)
-                .toList();
+    public UserDto findByName(String name) {
+        User user = userRepository.findByName(name)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+
+        return UserDto.fromEntity(user);
     }
 
     @Override

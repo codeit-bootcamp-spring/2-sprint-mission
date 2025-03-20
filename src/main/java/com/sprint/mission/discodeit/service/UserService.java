@@ -11,7 +11,7 @@ public interface UserService {
 
     UserDto findById(UUID id);
 
-    List<UserDto> findByName(String name);
+    UserDto findByName(String name);
 
     List<UserDto> findAll();
 

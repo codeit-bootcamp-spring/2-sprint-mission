@@ -1,18 +1,19 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.discodeit.constant.FilePath.USER_TEST_FILE;
-import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
-import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
-
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
+
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
+
+import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.discodeit.constant.FilePath.USER_TEST_FILE;
+import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
+import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 
 @Repository
 public class FileUserRepository implements UserRepository {
@@ -40,13 +41,13 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findByName(String name) {
+    public Optional<User> findByName(String name) {
         Map<UUID, User> users = loadObjectsFromFile(userPath);
 
         return users.values()
                 .stream()
                 .filter(user -> user.isSameName(name))
-                .toList();
+                .findFirst();
     }
 
     @Override
