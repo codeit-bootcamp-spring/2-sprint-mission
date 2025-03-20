@@ -30,7 +30,7 @@ public class BasicMessageService implements MessageService {
             channelService.find(dto.channelId());
             userService.find(dto.authorId());
         } catch (NoSuchElementException e){
-            throw e;
+            throw new NoSuchElementException("Channel or user not found");
         }
 
         Message message = new Message(dto.content(), dto.channelId(), dto.authorId());
