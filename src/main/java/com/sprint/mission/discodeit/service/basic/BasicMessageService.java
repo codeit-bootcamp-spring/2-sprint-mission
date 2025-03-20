@@ -47,7 +47,11 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageDto find(UUID messageId) {
-        return mapToDto(messageRepository.findById(messageId));
+        Message message = messageRepository.findById(messageId);
+        if (message == null) {
+            throw new NoSuchElementException("Message not found with ID: " + messageId);
+        }
+        return mapToDto(message);
     }
 
     @Override
@@ -85,6 +89,10 @@ public class BasicMessageService implements MessageService {
     }
 
     private MessageDto mapToDto(Message message) {
+        if (message == null) {
+            throw new IllegalArgumentException("Message cannot be null");
+        }
+
         return new MessageDto(
                 message.getId(),
                 message.getContent(),
