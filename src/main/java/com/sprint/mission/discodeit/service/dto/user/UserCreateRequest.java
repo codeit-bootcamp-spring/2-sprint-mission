@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.dto;
+package com.sprint.mission.discodeit.service.dto.user;
 
 import com.sprint.mission.discodeit.entity.BinaryContentType;
 import lombok.AllArgsConstructor;
@@ -7,11 +7,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 @AllArgsConstructor
 @Data
-public class UserCreateParam {
+public class UserCreateRequest {
     private final String username;
     private final String email;
     private final String password;
-    
+
     private BinaryContentType type;
     private MultipartFile file;
 }
+
+

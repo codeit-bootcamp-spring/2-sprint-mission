@@ -8,15 +8,12 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@Qualifier("fileUserRepository")
 public class FileUserRepository implements UserRepository {
     private final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map",
             User.class.getSimpleName());
-    private final String EXTENSION = ".ser";
 
     public FileUserRepository() {
         FileUtil.init(DIRECTORY);
@@ -29,12 +26,12 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findById(UUID id) {
-        return FileUtil.findById(DIRECTORY, id);
+        return FileUtil.findById(DIRECTORY, id, User.class);
     }
 
     @Override
     public List<User> findAll() {
-        return FileUtil.findAll(DIRECTORY);
+        return FileUtil.findAll(DIRECTORY, User.class);
     }
 
     @Override
@@ -55,5 +52,11 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void deleteById(UUID id) {
         FileUtil.delete(DIRECTORY, id);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return findAll().stream()
+                .filter(u -> u.getUsername().equals(username)).findFirst();
     }
 }

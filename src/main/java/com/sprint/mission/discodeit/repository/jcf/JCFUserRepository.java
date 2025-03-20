@@ -7,11 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
 
-@Repository
-@Qualifier("jcfUserRepository")
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;
 
@@ -53,5 +49,11 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public void deleteById(UUID id) {
         this.data.remove(id);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return this.data.values().stream()
+                .filter(u -> u.getUsername().equals(username)).findFirst();
     }
 }

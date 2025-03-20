@@ -7,11 +7,11 @@ import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
-import com.sprint.mission.discodeit.service.dto.BinaryContentCreateParam;
-import com.sprint.mission.discodeit.service.dto.UserCreateParam;
-import com.sprint.mission.discodeit.service.dto.UserInfoResponse;
-import com.sprint.mission.discodeit.service.dto.UserStatusParam;
-import com.sprint.mission.discodeit.service.dto.UserUpdateParam;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateParam;
+import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
+import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusParam;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,10 +24,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Service;
+import java.util.stream.Stream;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service
 public class FileUserService implements UserService {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
@@ -48,38 +47,8 @@ public class FileUserService implements UserService {
         this.basicBinaryContentService = basicBinaryContentService;
     }
 
-    private Path resolvePath(UUID id) {
-        return DIRECTORY.resolve(id + EXTENSION);
-    }
-
-    private boolean existsByUsername(String username) {
-        return findAll().stream().anyMatch(u -> u.getUsername().equals(username));
-    }
-
-    private boolean existsByEmail(String email) {
-        return findAll().stream().anyMatch(u -> u.getEmail().equals(email));
-    }
-
-    private void duplicateUsername(String username) {
-        if (existsByUsername(username)) {
-            throw new IllegalArgumentException(username + " 은 중복된 username.");
-        }
-    }
-
-    private void duplicateEmail(String email) {
-        if (existsByEmail(email)) {
-            throw new IllegalArgumentException(email + " 은 중복된 email.");
-        }
-    }
-
-    private UUID profileCreate(BinaryContentType type, List<MultipartFile> file) {
-        BinaryContentCreateParam binaryContentCreateParam = new BinaryContentCreateParam(type, file);
-        List<UUID> idList = basicBinaryContentService.create(binaryContentCreateParam);
-        return idList.get(0);
-    }
-
     @Override
-    public User create(UserCreateParam createParam) {
+    public User create(UserCreateRequest createParam) {
         duplicateUsername(createParam.getUsername());
         duplicateEmail(createParam.getEmail());
 
@@ -165,7 +134,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateParam updateParam) {
+    public User update(UserUpdateRequest updateParam) {
         duplicateUsername(updateParam.getNewUsername());
         duplicateEmail(updateParam.getNewEemail());
 
@@ -225,5 +194,57 @@ public class FileUserService implements UserService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .flatMap(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            User user = (User) ois.readObject();
+                            return user.getUsername().equals(username) ? Stream.of(user) : Stream.empty();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .findFirst();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
+
+    private boolean existsByUsername(String username) {
+        return findAll().stream().anyMatch(u -> u.getUsername().equals(username));
+    }
+
+    private boolean existsByEmail(String email) {
+        return findAll().stream().anyMatch(u -> u.getEmail().equals(email));
+    }
+
+    private void duplicateUsername(String username) {
+        if (existsByUsername(username)) {
+            throw new IllegalArgumentException(username + " 은 중복된 username.");
+        }
+    }
+
+    private void duplicateEmail(String email) {
+        if (existsByEmail(email)) {
+            throw new IllegalArgumentException(email + " 은 중복된 email.");
+        }
+    }
+
+    private UUID profileCreate(BinaryContentType type, List<MultipartFile> file) {
+        BinaryContentCreateParam binaryContentCreateParam = new BinaryContentCreateParam(type, file);
+        List<UUID> idList = basicBinaryContentService.create(binaryContentCreateParam);
+        return idList.get(0);
     }
 }

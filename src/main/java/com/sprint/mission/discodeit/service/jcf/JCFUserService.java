@@ -6,14 +6,15 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
-import com.sprint.mission.discodeit.service.dto.BinaryContentCreateParam;
-import com.sprint.mission.discodeit.service.dto.UserCreateParam;
-import com.sprint.mission.discodeit.service.dto.UserInfoResponse;
-import com.sprint.mission.discodeit.service.dto.UserUpdateParam;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateParam;
+import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
+import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,26 +29,8 @@ public class JCFUserService implements UserService {
         this.basicBinaryContentService = basicBinaryContentService;
     }
 
-    private void duplicateUsername(String username) {
-        if (existsByUsername(username)) {
-            throw new IllegalArgumentException(username + " 은 중복된 username.");
-        }
-    }
-
-    private void duplicateEmail(String email) {
-        if (existsByEmail(email)) {
-            throw new IllegalArgumentException(email + " 은 중복된 email.");
-        }
-    }
-
-    private UUID profileCreate(BinaryContentType type, List<MultipartFile> file) {
-        BinaryContentCreateParam binaryContentCreateParam = new BinaryContentCreateParam(type, file);
-        List<UUID> idList = basicBinaryContentService.create(binaryContentCreateParam);
-        return idList.get(0);
-    }
-
     @Override
-    public User create(UserCreateParam createParam) {
+    public User create(UserCreateRequest createParam) {
         duplicateUsername(createParam.getUsername());
         duplicateEmail(createParam.getEmail());
         UUID binaryContentId = null;
@@ -92,7 +75,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateParam updateParam) {
+    public User update(UserUpdateRequest updateParam) {
         duplicateUsername(updateParam.getNewUsername());
         duplicateEmail(updateParam.getNewEemail());
 
@@ -129,6 +112,30 @@ public class JCFUserService implements UserService {
         userStatusService.delete(userStatus.getId());
 
         this.data.remove(userId);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return this.data.values().stream()
+                .filter(u -> u.getUsername().equals(username)).findFirst();
+    }
+
+    private void duplicateUsername(String username) {
+        if (existsByUsername(username)) {
+            throw new IllegalArgumentException(username + " 은 중복된 username.");
+        }
+    }
+
+    private void duplicateEmail(String email) {
+        if (existsByEmail(email)) {
+            throw new IllegalArgumentException(email + " 은 중복된 email.");
+        }
+    }
+
+    private UUID profileCreate(BinaryContentType type, List<MultipartFile> file) {
+        BinaryContentCreateParam binaryContentCreateParam = new BinaryContentCreateParam(type, file);
+        List<UUID> idList = basicBinaryContentService.create(binaryContentCreateParam);
+        return idList.get(0);
     }
 
     private boolean existsByUsername(String username) {
