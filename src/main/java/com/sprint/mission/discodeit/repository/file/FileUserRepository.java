@@ -92,9 +92,9 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
 
     @Override
     public void deleteById(UUID userId) {
-        super.deleteById(userId);                 //users에서 삭제
-        super.deleteFile(userId);                 //file 삭제
         usernames.remove(super.findById(userId).getUserName());
         emails.remove(super.findById(userId).getUserName());
+        super.deleteById(userId);                 //users에서 삭제
+        super.deleteFile(userId);                 //file 삭제
     }
 }

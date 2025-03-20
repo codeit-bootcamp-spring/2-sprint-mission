@@ -83,8 +83,8 @@ public class JCFUserRepository extends AbstractRepository<User> implements UserR
 
     @Override
     public void deleteById(UUID userId) {
-        super.deleteById(userId);
         usernames.remove(super.findById(userId).getUserName());
         emails.remove(super.findById(userId).getUserName());
+        super.deleteById(userId);
     }
 }
