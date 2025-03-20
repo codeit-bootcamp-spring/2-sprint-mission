@@ -43,42 +43,45 @@ public class FileUtil {
         return object;
     }
 
-
-    public static void saveBinaryContent(Path directory, MultipartFile file, UUID id) {
+    // 바꾸기
+    public static String saveBinaryContent(Path directory, MultipartFile file, UUID id) {
         Path filePath = resolvePath(directory, id);
         try (FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
             byte[] fileData = file.getBytes();
             fos.write(fileData);
+            return filePath.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-
-    public static <T> Optional<T> findById(Path directory, UUID id) {
-        T objectNullable = null;
+    public static <T> Optional<T> findById(Path directory, UUID id, Class<T> clazz) {
         Path filePath = resolvePath(directory, id);
-        if (Files.exists(filePath)) {
-            try (
-                    FileInputStream fis = new FileInputStream(filePath.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                objectNullable = (T) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+        if (!Files.exists(filePath)) {
+            return Optional.empty();
         }
-        return Optional.ofNullable(objectNullable);
+        try (
+                FileInputStream fis = new FileInputStream(filePath.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+        ) {
+            Object object = ois.readObject();
+            if (clazz.isInstance(object)) {
+                return Optional.of(clazz.cast(object));
+            }
+            return Optional.empty();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static <T> List<T> findAll(Path directory) {
+    public static <T> List<T> findAll(Path directory, Class<T> clazz) {
         List<T> objectList = new ArrayList<>();
         try {
             Files.list(directory)
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .forEach(path -> {
                         UUID id = UUID.fromString(path.getFileName().toString().replace(EXTENSION, ""));
-                        Optional<T> objectNullable = findById(directory, id);
+                        Optional<T> objectNullable = findById(directory, id, clazz);
                         objectNullable.ifPresent(objectList::add);
                     });
         } catch (IOException e) {
