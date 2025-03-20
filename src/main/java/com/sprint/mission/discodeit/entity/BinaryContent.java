@@ -11,13 +11,17 @@ public class BinaryContent {
     private final UUID id;
     private final Instant createdAt;
     private final String filename;
-    private final byte[] content;
+    private final String path;
+    private final long size;
+    private final String type;
 
     @Builder
-    public BinaryContent(String filename, byte[] content) {
+    public BinaryContent(String filename, String path, long size, String type) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.filename = filename;
-        this.content = content;
+        this.path = path;
+        this.size = size;
+        this.type = type;
     }
 }
