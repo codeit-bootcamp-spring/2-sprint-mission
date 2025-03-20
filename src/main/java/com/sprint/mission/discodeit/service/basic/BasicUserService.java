@@ -42,6 +42,7 @@ public class BasicUserService implements UserService {
         UUID profileImageId = this.binaryContentService.create(userCreateRequest.profileImage());
         User newUser = new User(userCreateRequest.userName(), userCreateRequest.userEmail(), userCreateRequest.password(), profileImageId); //각 요소에 대한 유효성 검증은 User 생성자에게 맡긴다
         this.userRepository.add(newUser);
+        this.readStatusRepository.addUserIdMap(newUser.getId());
         UserStatus newUserStatus = new UserStatus(newUser.getId());
         this.userStatusRepository.add(newUserStatus);
         return newUser.getId();

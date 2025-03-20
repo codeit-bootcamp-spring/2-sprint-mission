@@ -23,11 +23,21 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
     }
 
     @Override
+    public void addUserIdMap(UUID userId) {
+        this.userIdMap.put(userId, new ArrayList<>());
+    }
+
+    @Override
+    public void addChannelIdMap(UUID channelId) {
+        this.channelIdMap.put(channelId, new ArrayList<>());
+    }
+
+    @Override
     public void add (ReadStatus newReadStatus) {
         super.add(newReadStatus);
         super.saveToFile(super.directory.resolve(newReadStatus.getId().toString() + ".ser"), newReadStatus);
-        this.userIdMap.computeIfAbsent(newReadStatus.getUserId(), userId -> new ArrayList<>()).add(newReadStatus);
-        this.channelIdMap.computeIfAbsent(newReadStatus.getChannelId(), channelId -> new ArrayList<>()).add(newReadStatus);
+        this.userIdMap.get(newReadStatus.getUserId()).add(newReadStatus);
+        this.channelIdMap.get(newReadStatus.getChannelId()).add(newReadStatus);
     }
 
     @Override

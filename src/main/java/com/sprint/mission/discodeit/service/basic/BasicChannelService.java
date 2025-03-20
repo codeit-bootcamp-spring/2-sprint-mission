@@ -38,7 +38,7 @@ public class BasicChannelService implements ChannelService {
     public UUID createPrivateChannel(PrivateChannelCreateRequest privateChannelCreateRequest) {
         Channel newChannel = new Channel(ChannelType.PRIVATE);      // private channel 생성자 호출
         this.channelRepository.add(newChannel);
-
+        this.readStatusRepository.addChannelIdMap(newChannel.getId());
         // for 문이 transaction 처리가 간편하다 하여 stream 사용X
         for(UserReadResponse user : privateChannelCreateRequest.users()) {
             this.readStatusRepository.add(new ReadStatus(user.userId(), newChannel.getId()));
@@ -53,6 +53,7 @@ public class BasicChannelService implements ChannelService {
     public UUID createPublicChannel(String channelName) {
         Channel newChannel = new Channel(ChannelType.PUBLIC, channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
         this.channelRepository.add(newChannel);
+        this.readStatusRepository.addChannelIdMap(newChannel.getId());
         this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
         return newChannel.getId();
     }
