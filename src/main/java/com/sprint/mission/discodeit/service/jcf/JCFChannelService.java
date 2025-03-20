@@ -29,7 +29,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> findAll() {
+    public List<Channel> findAllByUserId(UUID userId) {
         return this.data.values().stream().toList();
     }
 
