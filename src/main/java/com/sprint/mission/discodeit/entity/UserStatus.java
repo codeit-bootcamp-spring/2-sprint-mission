@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -15,10 +16,12 @@ public class UserStatus implements Serializable {
 
     private final UUID id;
     private final Instant createdAt;
+    @Setter
     private Instant updatedAt;
 
     private final UUID userId;
     private Instant lastActivatedAt;
+    @Setter
     private Status status;
 
     public UserStatus(UUID userId, Status online) {
@@ -54,4 +57,7 @@ public class UserStatus implements Serializable {
     public Status getStatus() {
         return isCurrentlyOnline() ? Status.ONLINE : Status.OFFLINE;
     }
+
+    public boolean getCurrentOnline() { return isCurrentlyOnline(); }
+
 }

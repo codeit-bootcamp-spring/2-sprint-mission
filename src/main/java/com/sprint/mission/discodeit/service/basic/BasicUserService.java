@@ -82,7 +82,6 @@ public class BasicUserService implements UserService {
     public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest) {
         User existingUser = userRepository.findById(userId).orElseThrow();
 
-        // username과 email이 중복되지 않도록 검사
         if (userUpdateRequest.newUsername() != null && !userUpdateRequest.newUsername().equals(existingUser.getUsername())) {
             if (userRepository.existsByUsername(userUpdateRequest.newUsername())) {
                 throw new RuntimeException("Username already exists");
