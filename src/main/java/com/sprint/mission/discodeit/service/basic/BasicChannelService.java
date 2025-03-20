@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.ChannelResponse;
 import com.sprint.mission.discodeit.dto.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -73,7 +74,7 @@ public class BasicChannelService implements ChannelService {
         // private 채널일 경우 userId가 참여한 경우에만 접근 가능
         return readStatusRepository.getAll().stream()
                 .anyMatch(status -> status.getChannelId().equals(channel.getId())
-                && status.getUserId().equals(userId));
+                        && status.getUserId().equals(userId));
     }
 
     private ChannelResponse convertToChannelResponse(Channel channel) {
@@ -103,10 +104,13 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UUID channelId, String newName) {
-        channelRepository.getChannelById(channelId).ifPresent(channel -> {
+    public void updateChannel(UpdateChannelRequest request) {
+        channelRepository.getChannelById(request.channelId()).ifPresent(channel -> {
+            if (channel.getName().equals("PRIVATE CHANNEL")) {
+                throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
+            }
             Instant updatedTime = Instant.now();
-            channel.update(newName, updatedTime);
+            channel.update(request.newName(), updatedTime);
             channelRepository.save(channel);
         });
     }
