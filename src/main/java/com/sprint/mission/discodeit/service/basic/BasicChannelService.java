@@ -48,24 +48,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Optional<ChannelResponse> getChannelById(UUID channelId) {
         return channelRepository.getChannelById(channelId)
-                .map(channel -> {
-                    Instant latestMessageTime = messageRepository.getAllMessagesByChannel(channelId).stream()
-                            .map(Message::getCreatedAt)
-                            .max(Instant::compareTo)
-                            .orElse(null);
-
-                    List<UUID> participantUserIds = readStatusRepository.getAll().stream()
-                            .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                            .map(ReadStatus::getUserId)
-                            .collect(Collectors.toList());
-
-                    return new ChannelResponse(
-                            channel.getId(),
-                            channel.getName(),
-                            latestMessageTime,
-                            participantUserIds
-                    );
-                });
+                .map(this::convertToChannelResponse);
     }
 
     @Override
@@ -76,8 +59,47 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> getAllChannels() {
-        return channelRepository.getAllChannels();
+    public List<ChannelResponse> findAllByUserId(UUID userId) {
+        return channelRepository.getAllChannels().stream()
+                .filter(channel -> canUserAccessChannel(channel, userId))
+                .map(this::convertToChannelResponse)
+                .toList();
+    }
+
+    private boolean canUserAccessChannel(Channel channel, UUID userId) {
+        if (!channel.getName().equals("PRIVATE_CHANNEL")) {
+            return true;
+        }
+        // private 채널일 경우 userId가 참여한 경우에만 접근 가능
+        return readStatusRepository.getAll().stream()
+                .anyMatch(status -> status.getChannelId().equals(channel.getId())
+                && status.getUserId().equals(userId));
+    }
+
+    private ChannelResponse convertToChannelResponse(Channel channel) {
+        Instant latestMessageTime = getLatestMessageTime(channel.getId());
+        List<UUID> participantUserIds = getParticipantUserIds(channel.getId());
+
+        return new ChannelResponse(
+                channel.getId(),
+                channel.getName(),
+                latestMessageTime,
+                participantUserIds
+        );
+    }
+
+    private Instant getLatestMessageTime(UUID channelId) {
+        return messageRepository.getAllMessagesByChannel(channelId).stream()
+                .map(Message::getCreatedAt)
+                .max(Instant::compareTo)
+                .orElse(null);
+    }
+
+    private List<UUID> getParticipantUserIds(UUID channelId) {
+        return readStatusRepository.getAll().stream()
+                .filter(status -> status.getChannelId().equals(channelId))
+                .map(ReadStatus::getUserId)
+                .toList();
     }
 
     @Override

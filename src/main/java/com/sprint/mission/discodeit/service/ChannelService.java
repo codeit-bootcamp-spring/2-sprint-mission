@@ -14,7 +14,7 @@ public interface ChannelService {
     Channel createPublicChannel(PublicChannelCreateRequest request);
     Optional<ChannelResponse> getChannelById(UUID channelId);
     List<Channel> getChannelsByName(String name);
-    List<Channel> getAllChannels();
+    List<ChannelResponse> findAllByUserId(UUID userId);
     void updateChannel(UUID channelId, String newName);
     void deleteChannel(UUID channelId);
 }
