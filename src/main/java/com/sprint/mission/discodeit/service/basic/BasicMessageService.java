@@ -39,7 +39,7 @@ public class BasicMessageService implements MessageService {
 
         dto.getFilePath().forEach(filePath ->
                 binaryContentRepository.addBinaryContent(
-                        new BinaryContent(channelId, extractFileName(filePath), determineFileType(filePath), filePath)));
+                        new BinaryContent(channelId, filePath)));
 
         messageRepository.addMessage(message);
         return message;
@@ -99,13 +99,5 @@ public class BasicMessageService implements MessageService {
         if (!messageRepository.existsById(messageId)) {
             throw new IllegalArgumentException("존재하지 않는 메세지입니다.");
         }
-    }
-
-    private String extractFileName(String filePath) {
-        return filePath.substring(filePath.lastIndexOf("/") + 1);
-    }
-
-    private String determineFileType(String filePath) {
-        return filePath.substring(filePath.lastIndexOf(".") + 1);
     }
 }
