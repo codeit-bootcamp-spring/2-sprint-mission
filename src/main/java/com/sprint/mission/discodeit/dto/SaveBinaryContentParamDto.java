@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.dto;
 
+import com.sprint.mission.discodeit.constant.SubDirectory;
+
 public record SaveBinaryContentParamDto(
-        byte[] image
+        SubDirectory subDirectory,
+        String filePath,
+        byte[] profile
 ) {
 
 }

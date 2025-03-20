@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.dto;
 
 import java.util.UUID;
 
-public record UpdateUserDto(
+public record UpdateUserParamDto(
         UUID userUUID,
         String nickname,
-        byte[] imageFile
+        UUID profileId
 ){
 }

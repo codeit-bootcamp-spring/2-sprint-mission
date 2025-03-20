@@ -2,22 +2,27 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.custom.AppendObjectOutputStream;
 import com.sprint.mission.discodeit.dto.FindUserDto;
-import com.sprint.mission.discodeit.dto.UpdateUserDto;
-import com.sprint.mission.discodeit.dto.UserSaveDto;
+import com.sprint.mission.discodeit.dto.SaveUserParamDto;
+import com.sprint.mission.discodeit.dto.UpdateUserParamDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class FileUserService implements UserService {
 
     @Override
-    public UserSaveDto save(String username, String password, String nickname, String email, byte[] profile) {
+    public void save(SaveUserParamDto saveUserParamDto) {
 
-        User user = new User(username, password, nickname, email, UUID.randomUUID());
+        User user = new User(
+                saveUserParamDto.username(), saveUserParamDto.password(),
+                saveUserParamDto.nickname(), saveUserParamDto.email(),
+                saveUserParamDto.profileUUID());
         try {
             String fileName = "user.ser";
             // 파일 존재 여부 확인
@@ -30,12 +35,9 @@ public class FileUserService implements UserService {
             oos.close();
             fos.close();
 
-            return new UserSaveDto(user.getId(), user.getNickname(), UUID.randomUUID(), user.getCreatedAt());
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return null;
     }
 
     @Override
@@ -87,7 +89,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void update(UpdateUserDto updateUserDto) {
+    public void update(UpdateUserParamDto updateUserDto) {
         List<User> userList = Collections.EMPTY_LIST;
 
         userList.stream()

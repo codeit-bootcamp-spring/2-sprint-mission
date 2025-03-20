@@ -6,7 +6,9 @@ import lombok.Getter;
 public enum SubDirectory {
     USER("user"),
     CHANNEL("channel"),
-    MESSAGE("message");
+    MESSAGE("message"),
+    PROFILE("profile"),
+    FILE("file");
 
     private final String directory;
 

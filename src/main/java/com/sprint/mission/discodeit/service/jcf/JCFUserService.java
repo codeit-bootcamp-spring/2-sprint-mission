@@ -1,23 +1,28 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.dto.FindUserDto;
-import com.sprint.mission.discodeit.dto.UpdateUserDto;
-import com.sprint.mission.discodeit.dto.UserSaveDto;
+import com.sprint.mission.discodeit.dto.SaveUserParamDto;
+import com.sprint.mission.discodeit.dto.UpdateUserParamDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class JCFUserService implements UserService {
 
     private final List<User> userList = new ArrayList<>();
 
     @Override
-    public UserSaveDto save(String username, String password, String nickname, String email, byte[] profile) {
-        User user = new User(username, password, nickname, email, UUID.randomUUID());
+    public void save(SaveUserParamDto saveUserParamDto) {
+        User user = new User(
+                saveUserParamDto.username(), saveUserParamDto.password(),
+                saveUserParamDto.nickname(), saveUserParamDto.email(),
+                saveUserParamDto.profileUUID());
         userList.add(user);
         System.out.println("유저 생성 완료" + user);
-        return new UserSaveDto(user.getId(), user.getNickname(), user.getProfile(), user.getCreatedAt());
     }
 
     @Override
@@ -40,7 +45,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void update(UpdateUserDto updateUserDto) {
+    public void update(UpdateUserParamDto updateUserDto) {
         if (userList.stream().noneMatch(data -> data.getId().equals(updateUserDto.userUUID()))) {
             System.out.println("[실패]수정하려는 아이디가 존재하지 않습니다.");
             return;

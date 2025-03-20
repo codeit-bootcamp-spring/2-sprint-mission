@@ -5,8 +5,8 @@ import java.util.UUID;
 
 public record SaveMessageParamDto(
         UUID channelId,
-        UUID UserId,
+        UUID userId,
         String content,
-        List<byte[]> imageList
+        List<UUID> attachmentList
 ) {
 }

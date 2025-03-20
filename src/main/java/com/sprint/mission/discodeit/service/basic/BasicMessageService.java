@@ -30,19 +30,15 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void sendMessage(SaveMessageParamDto saveMessageParamDto) {
-        userRepository.findUserById(saveMessageParamDto.UserId())
+        userRepository.findUserById(saveMessageParamDto.userId())
                 .orElseThrow(NullPointerException::new);
 
         channelRepository.findChannelById(saveMessageParamDto.channelId())
                 .orElseThrow(NullPointerException::new);
 
-        List<UUID> attachmentList = saveMessageParamDto.imageList().stream()
-                .map(image -> {
-                    BinaryContent binaryContent = new BinaryContent(image);
-                    return binaryContentRepository.save(binaryContent).getId();
-                })
-                .toList();
-        Message message = new Message(saveMessageParamDto.content(), saveMessageParamDto.UserId(), saveMessageParamDto.channelId(), attachmentList);
+        Message message = new Message(
+                saveMessageParamDto.content(), saveMessageParamDto.userId(),
+                saveMessageParamDto.channelId(), saveMessageParamDto.attachmentList());
         messageRepository.save(message);
 
         System.out.println("[성공]" + saveMessageParamDto);

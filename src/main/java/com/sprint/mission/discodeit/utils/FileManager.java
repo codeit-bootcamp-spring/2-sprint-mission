@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.utils;
 
+import com.sprint.mission.discodeit.constant.ImageType;
 import com.sprint.mission.discodeit.constant.SubDirectory;
+import com.sprint.mission.discodeit.dto.SaveFileDto;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 public class FileManager {
@@ -110,5 +109,41 @@ public class FileManager {
             return true;
         }
         return false;
+    }
+
+    public SaveFileDto writeToFile(SubDirectory subDirectory, byte[] fileData, String originalFileName) {
+        String extension = getFileExtension(originalFileName);
+        if (subDirectory.equals(SubDirectory.PROFILE)&&!isValidImageExtension(extension)) {
+            throw new IllegalArgumentException("[실패] 허용되지 않은 파일 형식");
+        }
+
+        String fileName = UUID.randomUUID().toString() + "." + extension;
+        String filePath = BASE_DIR + subDirectory.getDirectory() + "\\" + fileName;
+
+        File directory = new File(BASE_DIR + subDirectory.getDirectory());
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(fileData);
+            fos.flush();
+        } catch (IOException e) {
+            throw new RuntimeException("[실패] 파일 저장 실패", e);
+        }
+        return new SaveFileDto(filePath, fileName);
+    }
+
+    private String getFileExtension(String fileName) {
+        int lastIndex = fileName.lastIndexOf(".");
+        if (lastIndex == -1) {
+            throw new IllegalArgumentException("[실패] 확장자 오류");
+        }
+        return fileName.substring(lastIndex + 1).toLowerCase();
+    }
+
+    private boolean isValidImageExtension(String extension) {
+        return Arrays.stream(ImageType.values())
+                .anyMatch(type -> type.name().equalsIgnoreCase(extension));
     }
 }

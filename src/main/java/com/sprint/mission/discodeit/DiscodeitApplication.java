@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.constant.ChannelType;
+import com.sprint.mission.discodeit.constant.SubDirectory;
 import com.sprint.mission.discodeit.dto.*;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.service.basic.BasicAuthService;
@@ -29,6 +31,7 @@ public class DiscodeitApplication {
         final ChannelService channelService = context.getBean(ChannelService.class);
         final MessageService messageService = context.getBean(MessageService.class);
         final UserStatusService userStatusService = context.getBean(UserStatusService.class);
+        final BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
 
         Scanner sc = new Scanner(System.in);
 
@@ -37,7 +40,7 @@ public class DiscodeitApplication {
 
         while (true) {
             if (userToken == null) {
-                userToken = initPage(userService, authService);
+                userToken = initPage(userService, authService, binaryContentService);
             }
             if (userToken == null) continue;
             userStatusService.updateByUserId(userToken);
@@ -93,7 +96,7 @@ public class DiscodeitApplication {
                             if (channelToken == null) break;
                             messageService.findMessageByChannelId(channelToken)
                                     .forEach(System.out::println);
-                            sendMessageByChannel(messageService, channelToken, userToken);
+                            sendMessageByChannel(messageService, binaryContentService, channelToken, userToken);
                             break;
                         case 3:
                             System.out.println(channelService.findAllByUserId(userToken));
@@ -114,7 +117,7 @@ public class DiscodeitApplication {
                     System.out.print("입력란: ");
                     int updateNum = sc.nextInt();
                     sc.nextLine();
-                    updateByNum(userService, channelService, messageService, updateNum);
+                    updateByNum(userService, channelService, messageService, binaryContentService,updateNum);
                     break;
                 case 4:
                     System.out.println("=== 삭제 ===");
@@ -133,7 +136,7 @@ public class DiscodeitApplication {
         }
     }
 
-    private static UUID initPage(UserService userService, AuthService authService) {
+    private static UUID initPage(UserService userService, AuthService authService, BinaryContentService binaryContentService) {
         Scanner sc = new Scanner(System.in);
         System.out.println("\n1. 로그인\n2. 회원 가입");
         System.out.print("입력: ");
@@ -143,7 +146,7 @@ public class DiscodeitApplication {
             case 1:
                 return loginPage(authService);
             case 2:
-                registerPage(userService);
+                registerPage(userService, binaryContentService);
                 break;
         }
         return null;
@@ -163,9 +166,11 @@ public class DiscodeitApplication {
         return authService.login(username, password).getId();
     }
 
-    private static void registerPage(UserService userService) {
+    private static void registerPage(UserService userService, BinaryContentService binaryContentService) {
         try {
             Scanner sc = new Scanner(System.in);
+            UUID profileId = null;
+
             System.out.print("아이디 입력: ");
             String username = sc.nextLine();
             System.out.print("비밀번호 입력: ");
@@ -174,16 +179,16 @@ public class DiscodeitApplication {
             String nickname = sc.nextLine();
             System.out.print("이메일 입력: ");
             String email = sc.nextLine();
-
             System.out.print("이미지 경로 (넣고싶지 않다면 엔터): ");
-            String profilePath = sc.nextLine().trim();
-            byte[] profile = null;
+            String profilePath = sc.nextLine();
             if (!profilePath.isEmpty()) {
-                profile = Files.readAllBytes(Path.of(profilePath));
+                byte[] profile = Files.readAllBytes(Path.of(profilePath));
+                BinaryContent binaryContent = binaryContentService.save(new SaveBinaryContentParamDto(SubDirectory.PROFILE, profilePath, profile));
+                profileId = binaryContent.getId();
             }
-            System.out.println(userService.save(username, password, nickname, email, profile));
+            userService.save(new SaveUserParamDto(username, password, nickname, email, profileId));
         } catch (IOException e) {
-            System.out.println("[오류] 이미지 파일을 읽을 수 없습니다.");
+            System.out.println("[실패] 잘못된 경로의 파일");
             e.printStackTrace();
         }
     }
@@ -194,7 +199,7 @@ public class DiscodeitApplication {
         return findChannelDto.channelUUID();
     }
 
-    private static void sendMessageByChannel(MessageService messageService, UUID channelUUID, UUID userUUID) {
+    private static void sendMessageByChannel(MessageService messageService, BinaryContentService binaryContentService,UUID channelUUID, UUID userUUID) {
         try {
             Scanner sc = new Scanner(System.in);
             while (true) {
@@ -204,17 +209,18 @@ public class DiscodeitApplication {
                 sc.nextLine();
 
                 String content;
-                List<byte[]> imageList = new ArrayList<>();
+                List<UUID> AttachIdList = new ArrayList<>();
 
                 switch (commentType) {
                     case 1:
                         while (true) {
                             System.out.print("첨부할 파일 경로 입력 (종료: EXIT): ");
-                            String imagePath = sc.nextLine().trim();
-                            if (imagePath.equalsIgnoreCase("EXIT")) break;
+                            String filePath = sc.nextLine();
+                            if (filePath.equalsIgnoreCase("EXIT")) break;
                             try {
-                                byte[] file = Files.readAllBytes(Path.of(imagePath));
-                                imageList.add(file);
+                                byte[] file = Files.readAllBytes(Path.of(filePath));
+                                BinaryContent binaryContent = binaryContentService.save(new SaveBinaryContentParamDto(SubDirectory.FILE, filePath, file));
+                                AttachIdList.add(binaryContent.getId());
                             } catch (IOException e) {
                                 System.out.println("파일 읽기 실패: " + e.getMessage());
                             }
@@ -232,7 +238,7 @@ public class DiscodeitApplication {
                         System.out.println("잘못된 입력");
                         continue;
                 }
-                SaveMessageParamDto saveMessageParamDto = new SaveMessageParamDto(channelUUID, userUUID, content, imageList);
+                SaveMessageParamDto saveMessageParamDto = new SaveMessageParamDto(channelUUID, userUUID, content, AttachIdList);
                 messageService.sendMessage(saveMessageParamDto);
             }
         } catch (Exception e) {
@@ -304,24 +310,26 @@ public class DiscodeitApplication {
         }
     }
 
-    private static void updateByNum(UserService userService, ChannelService channelService, MessageService messageService, int updateNum) {
+    private static void updateByNum(UserService userService, ChannelService channelService, MessageService messageService, BinaryContentService binaryContentService,int updateNum) {
         Scanner sc = new Scanner(System.in);
         switch (updateNum) {
             case 1:
-                try{
+                try {
                     System.out.print("변경할 사용자 아이디 입력: ");
                     UUID userUUID = UUID.fromString(sc.nextLine());
                     System.out.print("원하는 닉네임 입력: ");
                     String nickname = sc.nextLine();
-                    System.out.print("이미지 경로 (넣고싶지 않다면 엔터): ");
-                    String profilePath = sc.nextLine();
 
-                    byte[] profile = new byte[0];
+                    UUID profileId = userService.findByUser(userUUID).profileId();
+                    System.out.print("이미지 경로 (수정을 원하지 않을 시 엔터): ");
+                    String profilePath = sc.nextLine();
                     if (!profilePath.isEmpty()) {
-                        profile = Files.readAllBytes(Path.of(profilePath));
+                        byte[] profile = Files.readAllBytes(Path.of(profilePath));
+                        BinaryContent binaryContent = binaryContentService.save(new SaveBinaryContentParamDto(SubDirectory.PROFILE, profilePath, profile));
+                        profileId = binaryContent.getId();
                     }
 
-                    UpdateUserDto updateUserDto = new UpdateUserDto(userUUID, nickname, profile);
+                    UpdateUserParamDto updateUserDto = new UpdateUserParamDto(userUUID, nickname, profileId);
                     userService.update(updateUserDto);
                 } catch (IOException e) {
                     e.printStackTrace();
