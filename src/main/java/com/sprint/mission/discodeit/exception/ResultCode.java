@@ -7,8 +7,8 @@ public enum ResultCode implements Code{
 
     BAD_REQUEST (400, "BAD REQUEST"),
 
-    UNAUTHORIZED_PRIVATE_CHANNEL(401, "private channel is unauthorized"),
-    INVALID_PASSWORD(401, "invalid password"),
+    UNAUTHORIZED_PRIVATE_CHANNEL(401, "Private channel is unauthorized"),
+    INVALID_PASSWORD(401, "Invalid password"),
 
     USER_NOT_FOUND (404, "User not found"),
     CHANNEL_NOT_FOUND (404, "Channel not found"),
