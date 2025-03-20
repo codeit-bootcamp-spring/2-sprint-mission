@@ -50,6 +50,12 @@ public class FileChannelRepository implements ChannelRepository {
         return channels.containsKey(channelId);
     }
 
+    @Override
+    public boolean existsById(UUID channelId) {
+        Map<UUID, Channel> channels = loadChannels();
+        return channels.containsKey(channelId);
+    }
+
     private Map<UUID, Channel> loadChannels() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {

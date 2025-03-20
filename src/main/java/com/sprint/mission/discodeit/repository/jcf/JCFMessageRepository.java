@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
+import java.time.Instant;
 import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
@@ -45,6 +46,20 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public boolean exists(UUID messageId) {
-        return false;
+        return this.data.containsKey(messageId);
+    }
+
+    @Override
+    public Instant findLatestMessageTimeByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .map(Message::getCreatedAt)
+                .max(Instant::compareTo)
+                .orElse(null);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        data.entrySet().removeIf(entry -> entry.getValue().getChannelId().equals(channelId));
     }
 }

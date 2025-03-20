@@ -51,4 +51,9 @@ public class JCFChannelRepository implements ChannelRepository {
     public boolean exists(UUID channelId) {
         return this.data.containsKey(channelId);
     }
+
+    @Override
+    public boolean existsById(UUID channelId) {
+        return this.data.containsKey(channelId);
+    }
 }

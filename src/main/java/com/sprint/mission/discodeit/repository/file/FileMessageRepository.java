@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.time.Instant;
 import java.util.*;
 
 @Repository
@@ -46,7 +47,22 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public boolean exists(UUID messageId) {
-        return false;
+        Map<UUID, Message> messages = loadMessages();
+        return messages.containsKey(messageId);
+    }
+
+    @Override
+    public Instant findLatestMessageTimeByChannelId(UUID channelId) {
+        return loadMessages().values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .map(Message::getCreatedAt)
+                .max(Instant::compareTo)
+                .orElse(null);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+
     }
 
     private Map<UUID, Message> loadMessages() {
