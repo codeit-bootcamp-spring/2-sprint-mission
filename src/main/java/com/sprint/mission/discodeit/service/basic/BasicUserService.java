@@ -31,6 +31,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentService binaryContentService;
     private final UserUpdaterProvider userUpdaterProvider;
 
+    // 이 부분도 createMessage처럼 컨트롤러에서 createBinaryContent 와 userCreate을 분리하는게 좋을듯
     @Override
     public UUID createUser(UserCreateRequest userCreateRequest) {
         if (userRepository.existsByUserName(userCreateRequest.userName())) {
