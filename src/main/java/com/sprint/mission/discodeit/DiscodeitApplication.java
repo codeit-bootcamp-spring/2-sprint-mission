@@ -15,6 +15,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -189,7 +190,8 @@ public class DiscodeitApplication {
                                 System.out.print("메시지 내용 입력: ");
                                 String messageText = sc.nextLine();
 
-                                Message message = messageService.createMessage(userId, channelId, messageText);
+                                CreateMessageRequest request = new CreateMessageRequest(userId, channelId, messageText, new ArrayList<>());
+                                Message message = messageService.createMessage(request);
                                 System.out.println("메시지 생성 완료: " + message);
                                 break;
 
