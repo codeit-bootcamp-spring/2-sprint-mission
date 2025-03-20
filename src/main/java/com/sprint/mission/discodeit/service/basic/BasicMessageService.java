@@ -31,7 +31,7 @@ public class BasicMessageService implements MessageService {
     private final MessageUpdaterProvider messageUpdaterProvider;
 
     @Override
-    public Message createMessage(MessageCreateRequest messageCreateRequest) {
+    public UUID createMessage(MessageCreateRequest messageCreateRequest) {
         UserService.validateUserId(messageCreateRequest.senderId(), this.userRepository);
         ChannelService.validateChannelId(messageCreateRequest.channelId(), this.channelRepository);
         Channel channel = channelRepository.findById(messageCreateRequest.channelId());
@@ -47,7 +47,7 @@ public class BasicMessageService implements MessageService {
         }
         this.messageRepository.add(newMessage);
         channel.setLastMessageTime(newMessage.getCreatedAt());              // 채널에 마지막 메세지 시간 초기화
-        return newMessage;
+        return newMessage.getId();
     }
 
     @Override

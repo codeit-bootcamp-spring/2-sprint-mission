@@ -32,7 +32,7 @@ public class BasicUserService implements UserService {
     private final UserUpdaterProvider userUpdaterProvider;
 
     @Override
-    public User createUser(UserCreateRequest userCreateRequest) {
+    public UUID createUser(UserCreateRequest userCreateRequest) {
         if (userRepository.existsByUserName(userCreateRequest.userName())) {
             throw new DuplicateUserNameException(userCreateRequest.userName());
         }
@@ -44,7 +44,7 @@ public class BasicUserService implements UserService {
         this.userRepository.add(newUser);
         UserStatus newUserStatus = new UserStatus(newUser.getId());
         this.userStatusRepository.add(newUserStatus);
-        return newUser;
+        return newUser.getId();
     }
 
     @Override

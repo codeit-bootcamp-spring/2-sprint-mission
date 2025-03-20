@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public interface MessageService {
-    Message createMessage(MessageCreateRequest messageCreateRequest);
+    UUID createMessage(MessageCreateRequest messageCreateRequest);
     Message readMessage(UUID messageId);
     List<Message> findAllByChannelId(UUID channelId);
     void updateMessage(MessageUpdateRequest messageUpdateRequest);

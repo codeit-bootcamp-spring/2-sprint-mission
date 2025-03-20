@@ -9,7 +9,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.*;
 
 public interface UserService {
-    User createUser(UserCreateRequest userCreateRequest);
+    UUID createUser(UserCreateRequest userCreateRequest);
     UserReadResponse readUser(UUID id);
     List<UserReadResponse> readAllUsers();
     void updateUser(UserUpdateRequest userUpdateRequest);

@@ -35,7 +35,7 @@ public class BasicChannelService implements ChannelService {
     private final ChannelUpdaterProvider updaterProvider;
 
     @Override
-    public Channel createPrivateChannel(PrivateChannelCreateRequest privateChannelCreateRequest) {
+    public UUID createPrivateChannel(PrivateChannelCreateRequest privateChannelCreateRequest) {
         Channel newChannel = new Channel(ChannelType.PRIVATE);      // private channel 생성자 호출
         this.channelRepository.add(newChannel);
 
@@ -46,15 +46,15 @@ public class BasicChannelService implements ChannelService {
         }
 
         this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
-        return newChannel;
+        return newChannel.getId();
     }
 
     @Override
-    public Channel createPublicChannel(String channelName) {
+    public UUID createPublicChannel(String channelName) {
         Channel newChannel = new Channel(ChannelType.PUBLIC, channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
         this.channelRepository.add(newChannel);
         this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
-        return newChannel;
+        return newChannel.getId();
     }
 
     @Override
