@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentFindDto;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentUpdateDto;
+import com.sprint.mission.discodeit.service.dto.binarycontentdto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +35,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 throw new RuntimeException(e);
             }
         }
-        throw new IllegalArgumentException("Profile path is invalid.");
+        return null;
     }
 
 
@@ -85,7 +82,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent matchingBinaryContent = binaryContentRepository.load().stream()
                 .filter(m -> m.getId().equals(binaryContentDeleteDto.Id()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("Profile not found."));
+                .orElse(null);
         binaryContentRepository.remove(matchingBinaryContent);
     }
 }

@@ -1,15 +1,19 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.dto.userdto.UserCreateDto;
-import com.sprint.mission.discodeit.service.dto.userdto.UserDeleteDto;
-import com.sprint.mission.discodeit.service.dto.userdto.UserFindDto;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
+import com.sprint.mission.discodeit.service.dto.userdto.*;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.dto.userdto.UserUpdateDto;
+import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusCreateDto;
+import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusDeleteDto;
+import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +24,9 @@ import java.util.*;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
+    private final BinaryContentService binaryContentService;
+    private final UserStatusService userStatusService;
 
     @Override
     public User create(UserCreateDto userCreateDto) {
@@ -39,54 +44,95 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("Email already exists.");
         }
 
+        // binary content 생성
+        BinaryContentCreateDto binaryContentCreateDto = new BinaryContentCreateDto(userCreateDto.path());
+        BinaryContent binaryContent = binaryContentService.create(binaryContentCreateDto);
+
+        // profile ID 추가 후 user 생성
         User user = new User(userCreateDto.name(), userCreateDto.email(), userCreateDto.password());
+        UUID profileId =  (binaryContent != null) ? binaryContent.getId() : null;
+        user.update(userCreateDto.name(), userCreateDto.email(), userCreateDto.password(), profileId);
         User createdUser = userRepository.save(user);
         System.out.println(createdUser);
-        return user;
+
+        // user status 생성
+        UserStatusCreateDto userStatusCreateDto = new UserStatusCreateDto(createdUser.getId());
+        userStatusService.create(userStatusCreateDto);
+
+        return createdUser;
     }
 
 
     @Override
-    public User getUser(UserFindDto userFindDto) {
-        Optional<User> user = userRepository.load().stream()
-                .filter(u -> u.getId().equals(userFindDto.userId()))
-                .findAny();
-        return user.orElseThrow(() -> new NoSuchElementException("User does not exist."));
+    public UserFindResponseDto find(UserFindRequestDto userFindRequestDto) {
+        // userRepository 에서 User Id로 조회
+        User matchingUser = userRepository.load().stream()
+                .filter(u -> u.getId().equals(userFindRequestDto.userId()))
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("User does not exist."));
+
+        // userStatusRepository 에서 User Id로 조회
+        UserStatus matchingUserStatus = userStatusRepository.load().stream()
+                .filter(u -> u.getUserId().equals(userFindRequestDto.userId()))
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("User Status does not exist."));
+        //
+        return UserFindResponseDto.UserFindResponse(matchingUser, matchingUserStatus);
     }
 
 
     @Override
-    public List<User> getAllUser() {
-        List<User> userList = userRepository.load();
+    public List<UserFindAllResponseDto> findAllUser() {
+        List<User> userList = userRepository.load().stream().toList();
         if (userList.isEmpty()) {
-            throw new NoSuchElementException("Profile not found.");
+            throw new NoSuchElementException("User list is empty.");
         }
-        return userList;
+        List<UserStatus> userStatusList = userStatusRepository.load().stream().toList();
+        if (userStatusList.isEmpty()) {
+            throw new NoSuchElementException("User Status list is empty.");
+        }
+
+        return UserFindAllResponseDto.UserFindAllResponse(userList, userStatusList);
     }
+
 
     @Override
     public User update(UserUpdateDto userUpdateDto) {
-        Optional<User> matchingUser = userRepository.load().stream()
+        User matchingUser = userRepository.load().stream()
                 .filter(u -> u.getId().equals(userUpdateDto.userId()))
-                .findAny();
-        if (matchingUser.isEmpty()) {
-            throw new NoSuchElementException("User does not exist.");
-        }
-        User user = matchingUser.get();
-        user.update(userUpdateDto.changeName(), userUpdateDto.changeEmail(), userUpdateDto.changePassword());
-        userRepository.save(user);
-        return user;
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("User does not exist."));
+
+        BinaryContentCreateDto binaryContentCreateDto = new BinaryContentCreateDto(userUpdateDto.path());
+        BinaryContent binaryContent = binaryContentService.create(binaryContentCreateDto);
+
+        BinaryContentDeleteDto binaryContentDeleteDto = new BinaryContentDeleteDto(matchingUser.getProfileId());
+        binaryContentService.delete(binaryContentDeleteDto);
+
+        UUID profileId =  (binaryContent != null) ? binaryContent.getId() : matchingUser.getProfileId();
+        matchingUser.update(userUpdateDto.changeName(), userUpdateDto.changeEmail(), userUpdateDto.changePassword(), profileId);
+        userRepository.save(matchingUser);
+
+        UserStatusUpdateDto userStatusUpdateDto = new UserStatusUpdateDto(matchingUser.getId());
+        userStatusService.updateByUserId(userStatusUpdateDto);
+
+        return matchingUser;
     }
+
 
     @Override
     public void delete(UserDeleteDto userDeleteDto) {
-        Optional<User> matchingUser = userRepository.load().stream()
+        User matchingUser = userRepository.load().stream()
                 .filter(u -> u.getId().equals(userDeleteDto.userId()))
-                .findAny();
-        if (matchingUser.isEmpty()) {
-            throw new NoSuchElementException("User does not exist.");
-        }
-        User user = matchingUser.get();
-        userRepository.remove(user);
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("User does not exist."));
+
+        BinaryContentDeleteDto binaryContentDeleteDto = new BinaryContentDeleteDto(matchingUser.getProfileId());
+        binaryContentService.delete(binaryContentDeleteDto);
+
+        UserStatusDeleteDto userStatusDeleteDto = new UserStatusDeleteDto(matchingUser.getId());
+        userStatusService.delete(userStatusDeleteDto);
+
+        userRepository.remove(matchingUser);
     }
 }

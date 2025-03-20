@@ -13,20 +13,22 @@ public class Message extends BaseEntity {
     private String message;
     private final UUID channelId;
     private final UUID senderId;
-    private final List<UUID> attachmentIds;
+    private final List<UUID> attachmentIds = new ArrayList<>();
 
 
     public Message(String message, UUID channelId, UUID senderId) {
         this.message = message;
         this.channelId = channelId;
         this.senderId = senderId;
-        this.attachmentIds = new ArrayList<>();
     }
 
-    public void updateMessage(String newMessage) {
+    public void updateMessage(String newMessage, List<UUID> attachmentIds) {
         this.message = newMessage;
+        if (attachmentIds != null) {
+            this.attachmentIds.clear();
+            this.attachmentIds.addAll(attachmentIds);
+        }
         super.update();
-        System.out.printf("내용이 [ %s ] 로 변경되었습니다.", this.message);
     }
 
     @Override
@@ -44,7 +46,9 @@ public class Message extends BaseEntity {
 
     @Override
     public String toString() {
-        return "\nchannelID: " + channelId + "\nSenderID: " + senderId + "\nMessage: " + message +
+        return "\nMessage ID: " + this.getId() +
+                "\nchannelID: " + channelId + "\nSenderID: " + senderId + "\nMessage: " + message +
+                "\nAttachments ID: " + attachmentIds +
                 "\nCreatedAt: " + this.getCreatedAtFormatted() +
                 "\nUpdatedAt: " + this.getUpdatedAttFormatted() +
                 "\nUUID: " + this.getId();

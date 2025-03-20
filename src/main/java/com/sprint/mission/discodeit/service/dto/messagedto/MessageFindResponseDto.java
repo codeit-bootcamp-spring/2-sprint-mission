@@ -12,15 +12,18 @@ public record MessageFindResponseDto(
         UUID id,
         String message,
         UUID channelId,
-        UUID senderId
+        UUID senderId,
+        List<UUID> attachmentIds
 
 ) {
     public static MessageFindResponseDto fromMessage(Message message) {
         return new MessageFindResponseDto(
-                        message.getId(),
-                        message.getMessage(),
-                        message.getChannelId(),
-                        message.getSenderId()
+                message.getId(),
+                message.getMessage(),
+                message.getChannelId(),
+                message.getSenderId(),
+                message.getAttachmentIds()
+
                 );
     }
 }

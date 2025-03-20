@@ -12,7 +12,8 @@ public record MessageFindAllByChannelIdResponseDto(
         UUID id,
         String message,
         UUID channelId,
-        UUID senderId
+        UUID senderId,
+        List<UUID> attachmentIds
 
 ) {
     public static List<MessageFindAllByChannelIdResponseDto> fromChannel(List<Message> message) {
@@ -21,7 +22,8 @@ public record MessageFindAllByChannelIdResponseDto(
                         m.getId(),
                         m.getMessage(),
                         m.getChannelId(),
-                        m.getSenderId()
+                        m.getSenderId(),
+                        m.getAttachmentIds()
                 ))
                 .toList();
     }

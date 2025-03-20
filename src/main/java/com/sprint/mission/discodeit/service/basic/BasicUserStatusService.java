@@ -12,9 +12,7 @@ import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusUpdateDt
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -63,29 +61,23 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus updateByUserId(UserStatusUpdateDto userStatusUpdateDto) {
-        Optional<UserStatus> matchingUserStatus = userStatusRepository.load().stream()
+        UserStatus matchingUserStatus = userStatusRepository.load().stream()
                 .filter(u -> u.getUserId().equals(userStatusUpdateDto.userId()))
-                .findAny();
-        if (matchingUserStatus.isEmpty()) {
-            throw new NoSuchElementException("User does not exist.");
-        }
-        UserStatus userStatus = matchingUserStatus.get();
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("User does not exist."));
         Instant currentTime = Instant.now();
-        userStatus.updateLastConnectionTime(currentTime);
-        userStatusRepository.save(userStatus);
-        return userStatus;
+        matchingUserStatus.updateLastConnectionTime(currentTime);
+        userStatusRepository.save(matchingUserStatus);
+        return matchingUserStatus;
     }
 
 
     @Override
     public void delete(UserStatusDeleteDto userStatusDeleteDto) {
-        Optional<UserStatus> matchingUserStatus = userStatusRepository.load().stream()
+        UserStatus matchingUserStatus = userStatusRepository.load().stream()
                 .filter(u -> u.getUserId().equals(userStatusDeleteDto.userId()))
-                .findAny();
-        if (matchingUserStatus.isEmpty()) {
-            throw new NoSuchElementException("User does not exist.");
-        }
-        UserStatus userStatus = matchingUserStatus.get();
-        userStatusRepository.remove(userStatus);
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("User does not exist."));
+        userStatusRepository.remove(matchingUserStatus);
     }
 }
