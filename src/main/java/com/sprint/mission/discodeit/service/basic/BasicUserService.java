@@ -52,7 +52,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserReadResponse readUser(UUID userId) {
         User findUser = this.userRepository.findById(userId);
-        UserStatus findUserStatus = this.userStatusRepository.findById(userId);
+        UserStatus findUserStatus = this.userStatusRepository.findUserStatusByUserId(userId);
         return new UserReadResponse(
                 findUser.getId(),
                 findUser.getUserName(),
@@ -70,7 +70,7 @@ public class BasicUserService implements UserService {
                                 user.getUserName(),
                                 user.getUserEmail(),
                                 user.getProfileId(),
-                                this.userStatusRepository.findById(user.getId()).isOnline()
+                                this.userStatusRepository.findUserStatusByUserId(user.getId()).isOnline()
                         )
                 )
                 .collect(Collectors.toList());
