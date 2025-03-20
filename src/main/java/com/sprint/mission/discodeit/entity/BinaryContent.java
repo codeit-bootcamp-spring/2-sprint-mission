@@ -5,12 +5,14 @@ import java.util.UUID;
 
 @Getter
 public class BinaryContent extends BaseImmutableEntity {
-    private final UUID ownerId;     // 파일의 소유자(User 또는 Message)
+    private final UUID userId;
+    private final UUID messageId;
     private final String fileName;
     private final String filePath;
 
-    public BinaryContent(UUID ownerId, String fileName, String filePath) {
-        this.ownerId = ownerId;
+    public BinaryContent(UUID userId, UUID messageId, String fileName, String filePath) {
+        this.userId = userId;
+        this.messageId = messageId;
         this.fileName = fileName;
         this.filePath = filePath;
     }

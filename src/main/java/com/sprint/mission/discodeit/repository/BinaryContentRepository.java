@@ -11,4 +11,6 @@ public interface BinaryContentRepository {
     Optional<BinaryContent> getById(UUID id);
     List<BinaryContent> getAll();
     void deleteById(UUID id);
+    List<BinaryContent> getByUserId(UUID userId);
+    List<BinaryContent> getByMessageId(UUID messageId);
 }

@@ -33,16 +33,19 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
         }
 
-        User user = new User(request.username(), request.password(), request.email());
+        User user = new User(request.username(), request.password(), request.email(), null);
         userRepository.save(user);
 
         if (request.profileImageFileName() != null && request.profileImageFilePath() != null) {
             BinaryContent profileImage = new BinaryContent(
                     user.getId(),
+                    null,
                     request.profileImageFileName(),
                     request.profileImageFilePath()
             );
             binaryContentRepository.save(profileImage);
+            user.setProfileId(profileImage.getId());  // User의 profileId 업데이트
+            userRepository.save(user);
         }
 
         UserStatus userStatus = new UserStatus(user.getId());
@@ -98,20 +101,27 @@ public class BasicUserService implements UserService {
             user.update(request.newName(), user.getPassword(), request.newEmail(), updatedTime);
             userRepository.save(user);
 
-            if(request.profileImageFileName() != null && request.profileImageFilePath() != null) {
+            if (request.profileImageFileName() != null && request.profileImageFilePath() != null) {
                 BinaryContent profileImage = new BinaryContent(
                         user.getId(),
+                        null,
                         request.profileImageFileName(),
                         request.profileImageFilePath()
                 );
                 binaryContentRepository.save(profileImage);
+                user.setProfileId(profileImage.getId());
+                userRepository.save(user);
             }
         });
     }
 
     @Override
     public void deleteUser(UUID userId) {
-        binaryContentRepository.deleteById(userId);
+        userRepository.getUserById(userId).ifPresent(user -> {
+            if (user.getProfileId() != null) {
+                binaryContentRepository.deleteById(user.getProfileId());
+            }
+        });
         userStatusRepository.deleteById(userId);
         userRepository.deleteUser(userId);
     }
