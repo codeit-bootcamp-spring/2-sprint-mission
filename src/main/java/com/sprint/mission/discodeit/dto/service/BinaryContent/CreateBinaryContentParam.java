@@ -7,6 +7,8 @@ import java.util.UUID;
 @Builder
 public record CreateBinaryContentParam(
         String filename,
-        byte[] content
+        String path,
+        long size,
+        String type
 ) {
 }
