@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -64,10 +65,10 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(UUID messageId, String newText) {
-        messageRepository.getMessageById(messageId).ifPresent(message -> {
+    public void updateMessage(UpdateMessageRequest request) {
+        messageRepository.getMessageById(request.messageId()).ifPresent(message -> {
             Instant updatedTime = Instant.now();
-            message.update(newText, updatedTime);
+            message.update(request.newText(), updatedTime);
             messageRepository.save(message);
         });
     }
