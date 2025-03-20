@@ -5,23 +5,25 @@ import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.service.dto.UserStatusParam;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusParam;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
-    private UserStatusRepository userStatusRepository;
-    private UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void create(UserStatusParam statusparam) {
         if (!userRepository.existsById(statusparam.userId())) {
-            throw new NoSuchElementException(statusparam.userId() + " 에 해당하는 사용자를 찾을 수 없음");
+            throw new IllegalArgumentException(statusparam.userId() + " 에 해당하는 사용자를 찾을 수 없음");
         }
 
         if (userStatusRepository.existsByUserId(statusparam.userId())) {
@@ -50,7 +52,6 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus update(UserStatusParam statusparam) {
-        UUID userId = statusparam.userId();
         UserStatus userStatus = findByUserId(statusparam.userId());
         userStatus.update(statusparam.status());
         return userStatusRepository.save(userStatus);
@@ -70,11 +71,10 @@ public class BasicUserStatusService implements UserStatusService {
         return userStatusRepository.save(userStatus);
     }
 
-    // 삭제하려는 userId가진 UserStatus조회 -> 있으면 해당 UserStatus 삭제 -> User객체 삭제
     @Override
     public void delete(UUID id) {
         if (!userStatusRepository.existsById(id)) {
-            throw new NoSuchElementException(id + " 에 해당하는 userStatus를 찾을 수 없음");
+            throw new IllegalArgumentException(id + " 에 해당하는 userStatus를 찾을 수 없음");
         }
         userRepository.deleteById(id);
     }

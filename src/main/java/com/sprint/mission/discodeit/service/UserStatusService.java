@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.service.dto.UserStatusParam;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusParam;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.util.FileUtil;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,10 +11,9 @@ import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class FileUserStatusRepository {
+public class FileUserStatusRepository implements UserStatusRepository {
     private final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map",
             UserStatus.class.getSimpleName());
-    private final String EXTENSION = ".ser";
 
     public FileUserStatusRepository() {
         FileUtil.init(DIRECTORY);
@@ -24,11 +24,11 @@ public class FileUserStatusRepository {
     }
 
     public Optional<UserStatus> findById(UUID id) {
-        return FileUtil.findById(DIRECTORY, id);
+        return FileUtil.findById(DIRECTORY, id, UserStatus.class);
     }
 
     public List<UserStatus> findAll() {
-        return FileUtil.findAll(DIRECTORY);
+        return FileUtil.findAll(DIRECTORY, UserStatus.class);
     }
 
     public void deleteById(UUID id) {
