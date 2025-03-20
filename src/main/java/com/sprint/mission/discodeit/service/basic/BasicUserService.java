@@ -1,44 +1,33 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
-import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
-import static com.sprint.mission.discodeit.constant.FilePath.IMAGE_STORAGE_DIRECTORY;
-import static com.sprint.mission.discodeit.constant.FilePath.JPG_EXTENSION;
-import static com.sprint.mission.util.FileUtils.init;
-
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
 
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public UserDto register(UserRegisterDto userRegisterDto) {
+    public UserDto register(UserRegisterDto userRegisterDto, UUID profileId) {
         validateDuplicateEmail(userRegisterDto.email());
-        UUID profileId = processProfileImage(userRegisterDto);
 
         User requestUser = new User(
                 userRegisterDto.name(),
                 userRegisterDto.email(),
                 userRegisterDto.password(),
                 profileId);
-
         User savedUser = userRepository.save(requestUser);
 
         return UserDto.fromEntity(savedUser);
@@ -102,26 +91,5 @@ public class BasicUserService implements UserService {
         if (isDuplicate) {
             throw new IllegalArgumentException("이미 존재하는 유저입니다");
         }
-    }
-
-    private void saveImageFile(UserRegisterDto userRegisterDto, Path directoryPath, Path imageFile) {
-        try {
-            init(directoryPath);
-            Files.write(imageFile, userRegisterDto.multipartFile().getBytes());
-        } catch (IOException e) {
-            throw new UncheckedIOException("프로필이미지 파일을 저장할 수 없습니다.", e);
-        }
-    }
-
-    private UUID processProfileImage(UserRegisterDto userRegisterDto) {
-        if (userRegisterDto.multipartFile() == null) {
-            return null;
-        }
-
-        Path imageFile = IMAGE_STORAGE_DIRECTORY.resolve(UUID.randomUUID() + JPG_EXTENSION);
-        saveImageFile(userRegisterDto, IMAGE_STORAGE_DIRECTORY, imageFile);
-
-        BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(imageFile));
-        return binaryContent.getProfileId();
     }
 }

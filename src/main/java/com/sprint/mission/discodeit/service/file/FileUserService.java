@@ -1,15 +1,16 @@
 package com.sprint.mission.discodeit.service.file;
 
-import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
-import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
-
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+
 import java.util.List;
 import java.util.UUID;
+
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
 
 public class FileUserService implements UserService {
     private final UserRepository userRepository;
@@ -19,7 +20,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public UserDto register(UserRegisterDto userRegisterDto) {
+    public UserDto register(UserRegisterDto userRegisterDto, UUID profileId) {
         User requestUser = new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password(), null);
         validateDuplicateEmail(requestUser);
         User savedUser = userRepository.save(requestUser);

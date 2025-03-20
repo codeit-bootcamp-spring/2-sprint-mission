@@ -1,15 +1,5 @@
 package com.sprint.mission.discodeit.service.file;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
-import static com.sprint.mission.discodeit.constant.ChannelInfo.CHANNEL_NAME;
-import static com.sprint.mission.discodeit.constant.ChannelInfo.UPDATED_CHANNEL_NAME;
-import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_TEST_FILE;
-import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.discodeit.constant.FilePath.USER_TEST_FILE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
@@ -17,14 +7,23 @@ import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
+
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
+import static com.sprint.mission.discodeit.constant.ChannelInfo.CHANNEL_NAME;
+import static com.sprint.mission.discodeit.constant.ChannelInfo.UPDATED_CHANNEL_NAME;
+import static com.sprint.mission.discodeit.constant.FilePath.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class FileChannelServiceTest {
     private Path userTestFilePath;
@@ -64,9 +63,9 @@ class FileChannelServiceTest {
 
     private UserDto setUpUser() {
         UserRegisterDto user = new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(),
-                LONGIN_USER.getPassword(), null);
+                LONGIN_USER.getPassword());
 
-        return userService.register(user);
+        return userService.register(user, null);
     }
 
     @AfterEach
@@ -83,7 +82,7 @@ class FileChannelServiceTest {
     @Test
     void addMember() {
         UserDto otherUser = userService.register(new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(),
-                OTHER_USER.getPassword(), null));
+                OTHER_USER.getPassword()), null);
 
         ChannelDto channelDto = channelService.addMember(initializedChannel.id(), OTHER_USER.getEmail());
         assertThat(channelDto.usersDto().users()).contains(otherUser);

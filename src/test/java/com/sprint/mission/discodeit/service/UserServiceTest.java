@@ -1,19 +1,20 @@
 package com.sprint.mission.discodeit.service;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.UUID;
+
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserServiceTest {
     private UserService userService;
@@ -23,7 +24,7 @@ class UserServiceTest {
     void setUp() {
         userService = new JCFUserService(new JCFUserRepository());
         setUpUser = userService.register(
-                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword(), null));
+                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()), null);
     }
 
     @AfterEach
@@ -57,8 +58,8 @@ class UserServiceTest {
     @Test
     void 유저_이름_다수_조회() {
         UserRegisterDto otherUser = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(),
-                OTHER_USER.getPassword(), null);
-        userService.register(otherUser);
+                OTHER_USER.getPassword());
+        userService.register(otherUser, null);
 
         assertThat(userService.findByName(LONGIN_USER.getName())).hasSize(2);
     }

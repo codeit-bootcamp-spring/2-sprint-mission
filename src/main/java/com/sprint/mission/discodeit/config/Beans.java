@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.config;
 
-import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_ACCESS_DENIED_TO_BEAN_STORAGE;
-
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
 import com.sprint.mission.discodeit.controller.UserController;
@@ -16,14 +14,19 @@ import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_ACCESS_DENIED_TO_BEAN_STORAGE;
 
 public class Beans {
     private final Map<Class<?>, Object> beans = new HashMap<>();
@@ -34,14 +37,16 @@ public class Beans {
     }
 
     private void initializeBeans() {
+        saveBean(BinaryContentService.class,
+                new BasicBinaryContentService(findBean(BinaryContentRepository.class)));
         saveBean(UserService.class,
-                new BasicUserService(findBean(UserRepository.class), findBean(BinaryContentRepository.class)));
+                new BasicUserService(findBean(UserRepository.class)));
         saveBean(MessageService.class,
                 new BasicMessageService(findBean(MessageRepository.class), findBean(UserRepository.class)));
         saveBean(ChannelService.class,
                 new BasicChannelService(findBean(ChannelRepository.class), findBean(UserRepository.class)));
 
-        saveBean(UserController.class, new UserController(findBean(UserService.class)));
+        saveBean(UserController.class, new UserController(findBean(UserService.class), findBean(BinaryContentService.class)));
         saveBean(MessageController.class, new MessageController(findBean(MessageService.class)));
         saveBean(ChannelController.class, new ChannelController(findBean(ChannelService.class)));
     }

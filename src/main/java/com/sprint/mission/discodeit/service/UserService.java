@@ -2,12 +2,12 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
-import java.util.Arrays;
+
 import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserDto register(UserRegisterDto userRegisterDto);
+    UserDto register(UserRegisterDto userRegisterDto, UUID profileId);
 
     UserDto findById(UUID id);
 

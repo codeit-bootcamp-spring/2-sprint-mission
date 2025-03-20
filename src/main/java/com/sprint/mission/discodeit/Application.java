@@ -1,35 +1,26 @@
 package com.sprint.mission.discodeit;
 
-import static com.sprint.mission.discodeit.command.Command.CHANNEL_CHANGE;
-import static com.sprint.mission.discodeit.command.Command.CHANNEL_CREATION;
-import static com.sprint.mission.discodeit.command.Command.CHANNEL_NAME_UPDATE;
-import static com.sprint.mission.discodeit.command.Command.EXIT;
-import static com.sprint.mission.discodeit.command.Command.MESSAGE_SEND;
-import static com.sprint.mission.discodeit.command.Command.USER_JOIN;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
-import static com.sprint.mission.discodeit.view.OutputView.printHello;
-import static com.sprint.mission.discodeit.view.OutputView.printServer;
-
 import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
-import com.sprint.mission.discodeit.command.handler.ChannelChangeHandler;
-import com.sprint.mission.discodeit.command.handler.ChannelCreationHandler;
-import com.sprint.mission.discodeit.command.handler.ChannelNameUpdateHandler;
-import com.sprint.mission.discodeit.command.handler.Handler;
-import com.sprint.mission.discodeit.command.handler.MessageSendHandler;
-import com.sprint.mission.discodeit.command.handler.UserJoinHandler;
+import com.sprint.mission.discodeit.command.handler.*;
 import com.sprint.mission.discodeit.config.Beans;
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
 import com.sprint.mission.discodeit.controller.UserController;
 import com.sprint.mission.discodeit.view.InputView;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+
+import static com.sprint.mission.discodeit.command.Command.*;
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
+import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
+import static com.sprint.mission.discodeit.view.OutputView.printHello;
+import static com.sprint.mission.discodeit.view.OutputView.printServer;
 
 public class Application {
     private static final String SETUP_CHANNEL_NAME = "general";
@@ -108,10 +99,10 @@ public class Application {
 
     public static UserDto setupUser(UserController userController) {
         UserDto loginUser = userController.register(
-                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword(), null)
+                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()), null
         );
         userController.register(
-                new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword(), null)
+                new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null
         );
         return loginUser;
     }
