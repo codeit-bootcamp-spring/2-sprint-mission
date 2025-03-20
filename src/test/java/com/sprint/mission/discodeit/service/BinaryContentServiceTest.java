@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.application.BinaryContentDto;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class BinaryContentServiceTest {
@@ -36,9 +37,9 @@ class BinaryContentServiceTest {
         );
 
         UUID profileId = binaryContentService.createProfileImage(file);
-        BinaryContent binaryContent = binaryContentService.findById(profileId);
+        BinaryContentDto binaryContent = binaryContentService.findById(profileId);
 
-        byte[] storedFileBytes = Files.readAllBytes(binaryContent.getPath());
+        byte[] storedFileBytes = Files.readAllBytes(binaryContent.path());
         assertThat(file.getBytes()).isEqualTo(storedFileBytes);
     }
 
@@ -51,12 +52,13 @@ class BinaryContentServiceTest {
         );
 
         UUID profileId = binaryContentService.createProfileImage(file);
-        BinaryContent binaryContent = binaryContentService.findById(profileId);
+        BinaryContentDto binaryContent = binaryContentService.findById(profileId);
         binaryContentService.delete(profileId);
 
         assertAll(
-                () -> assertThat(binaryContentService.findById(profileId)).isNull(),
-                () -> assertThat(Files.exists(binaryContent.getPath())).isFalse()
+                () -> assertThatThrownBy(() -> binaryContentService.findById(profileId))
+                        .isInstanceOf(IllegalArgumentException.class),
+                () -> assertThat(Files.exists(binaryContent.path())).isFalse()
         );
     }
 }

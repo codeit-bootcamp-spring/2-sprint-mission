@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.application.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -36,14 +37,18 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
-        BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow();
-        return binaryContent;
+    public BinaryContentDto findById(UUID id) {
+        BinaryContent binaryContent = binaryContentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
+
+        return BinaryContentDto.fromEntity(binaryContent);
     }
 
     @Override
     public void delete(UUID id) {
-        BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow();
+        BinaryContent binaryContent = binaryContentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
+
         deleteImageFileFromPath(binaryContent.getPath());
         binaryContentRepository.delete(id);
     }
