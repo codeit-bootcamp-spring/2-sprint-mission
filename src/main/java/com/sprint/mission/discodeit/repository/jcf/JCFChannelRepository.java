@@ -11,21 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFChannelRepository implements ChannelRepository {
-    private static volatile JCFChannelRepository instance;
     private final Map<UUID, Channel> data;
 
-    public static JCFChannelRepository getInstance() {
-        if (instance == null) {
-            synchronized (JCFChannelRepository.class) {
-                if (instance == null) {
-                    instance = new JCFChannelRepository();
-                }
-            }
-        }
-        return instance;
-    }
 
-    private JCFChannelRepository() {
+    public JCFChannelRepository() {
         this.data = new ConcurrentHashMap<>();
     }
 

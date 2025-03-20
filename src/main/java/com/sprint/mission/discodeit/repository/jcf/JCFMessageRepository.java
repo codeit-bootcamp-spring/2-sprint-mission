@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data;
 
-    private JCFMessageRepository() {
+    public JCFMessageRepository() {
         this.data = new ConcurrentHashMap<>();
     }
 

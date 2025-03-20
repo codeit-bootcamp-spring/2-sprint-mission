@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;
 
-    private JCFUserRepository() {
+    public JCFUserRepository() {
         this.data = new ConcurrentHashMap<>();
     }
 
