@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.time.Instant;
 
 public interface MessageRepository {
     Message save(Message message);
@@ -12,4 +13,5 @@ public interface MessageRepository {
     List<Message> findAll();
     boolean existsById(UUID id);
     void deleteById(UUID id);
+    Optional<Instant> findLatestMessageTimeByChannelId(UUID channelId);
 }

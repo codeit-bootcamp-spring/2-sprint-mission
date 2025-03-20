@@ -12,6 +12,7 @@ public class UserStatus {
     private Instant updatedAtSeconds;
     private final UUID userId;
     private Instant lastActiveAt;
+    private boolean isOnline;
 
     public UserStatus(UUID userId, Instant lastActiveAt) {
         this.id = UUID.randomUUID();

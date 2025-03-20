@@ -45,10 +45,10 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UUID messageId, String newContent) {
+    public Message update(UUID messageId, String newContent,List<UUID> newAttachmentIds) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
-        message.update(newContent);
+        message.update(newContent, newAttachmentIds);
         return messageRepository.save(message);
     }
 

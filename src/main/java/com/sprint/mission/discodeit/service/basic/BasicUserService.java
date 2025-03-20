@@ -123,6 +123,14 @@ public class BasicUserService implements UserService {
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("User with id " + userId + " not found");
         }
+        binaryContentRepository.findByUserId(userId).ifPresent(binaryContent -> {
+            if (binaryContent.getUserId() != null){
+                binaryContentRepository.deleteById(binaryContent.getId());
+            }
+        });
+
+        userStatusRepository.findByUserId(userId).ifPresent(userStatus -> userStatusRepository.deleteById(userStatus.getId()));
+
         userRepository.deleteById(userId);
     }
 }

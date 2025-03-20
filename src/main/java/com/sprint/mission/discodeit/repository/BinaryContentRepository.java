@@ -13,5 +13,5 @@ public interface BinaryContentRepository {
     Optional<BinaryContent> findByUserId(UUID userId); //프로필이미지 조회
     List<BinaryContent> findByMessageId(UUID messageId); //파일 목록 조회
     void save(BinaryContent binaryContent);
-    void delete(UUID id);
+    void deleteById(UUID id);
 }

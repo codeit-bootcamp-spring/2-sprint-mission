@@ -12,6 +12,6 @@ public interface UserStatusRepository {
     Optional<UserStatus> findByUserId(UUID userId);
     void save(UserStatus userStatus);
     void updateLastActiveAt(UUID userId, Instant newLastActiveAt);
-    void delete(UUID userId);
+    void deleteById(UUID userId);
     boolean isUserOnline(UUID userId);
 }
