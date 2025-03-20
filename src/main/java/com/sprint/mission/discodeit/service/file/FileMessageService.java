@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
@@ -56,3 +57,4 @@ public class FileMessageService implements MessageService {
         fileMessageRepository.deleteById(messageId);
     }
 }
+*/
