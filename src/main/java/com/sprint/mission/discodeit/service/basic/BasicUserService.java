@@ -86,7 +86,7 @@ public class BasicUserService implements UserService {
         if (dto.getEmail() != null) user.updateEmail(dto.getEmail());
         String filePath = dto.getProfilePicturePath();
         if (filePath != null) {
-            BinaryContent profile = new BinaryContent(user.getId(), extractFileName(filePath), determineFileType(filePath), filePath);
+            BinaryContent profile = new BinaryContent(user.getId(), filePath);
             binaryContentRepository.addBinaryContent(profile);
         }
     }
@@ -117,14 +117,6 @@ public class BasicUserService implements UserService {
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("존재하지 않는 유저입니다.");
         }
-    }
-
-    private String extractFileName(String filePath) {
-        return filePath.substring(filePath.lastIndexOf("/") + 1);
-    }
-
-    private String determineFileType(String filePath) {
-        return filePath.substring(filePath.lastIndexOf(".") + 1);
     }
 
     private UserFindDto mapToUserFindDto(User user) {
