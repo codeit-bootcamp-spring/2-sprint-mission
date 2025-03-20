@@ -16,6 +16,7 @@ public class JCFMessageRepository extends AbstractRepository<Message> implements
 
     private JCFMessageRepository() {
         super(Message.class, new ConcurrentHashMap<>());
+        channelIdMessages = new ConcurrentHashMap<>();
     }
 
     @Override
