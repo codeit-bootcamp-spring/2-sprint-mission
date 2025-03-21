@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.Request.ChannelCreateDTO;
-import com.sprint.mission.discodeit.DTO.RequestToService.ChannelJoinQuitDTO;
-import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelCRUDDTO;
-import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelDTO;
+import com.sprint.mission.discodeit.dto.legacy.request.ChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.requestToService.ChannelJoinQuitDTO;
+import com.sprint.mission.discodeit.dto.legacy.channel.ChannelCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.channel.ChannelDTO;
 import com.sprint.mission.discodeit.exception.Empty.EmptyMessageListException;
 import com.sprint.mission.discodeit.exception.NotFound.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.NotFound.MessageNotFoundException;
@@ -43,7 +43,7 @@ public class BasicChannelService implements ChannelService {
         UUID serverId = channelCreateDTO.serverId();
         UUID creatorId = channelCreateDTO.creatorId();
         try {
-            User user = userRepository.find(creatorId);
+            User user = userRepository.findById(creatorId);
             Server findServer = serverRepository.find(serverId);
             Channel channel;
 
@@ -68,7 +68,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public User join(ChannelJoinQuitDTO channelJoinQuitDTO) {
         Channel findChannel = channelRepository.find(channelJoinQuitDTO.channelId());
-        User user = userRepository.find(channelJoinQuitDTO.userId());
+        User user = userRepository.findById(channelJoinQuitDTO.userId());
         User join = channelRepository.join(findChannel, user);
 
         if (channelJoinQuitDTO.type() == ChannelType.PRIVATE) {
@@ -83,7 +83,7 @@ public class BasicChannelService implements ChannelService {
     public User quit(ChannelJoinQuitDTO channelJoinQuitDTO) {
 
         Channel findChannel = channelRepository.find(channelJoinQuitDTO.channelId());
-        User user = userRepository.find(channelJoinQuitDTO.userId());
+        User user = userRepository.findById(channelJoinQuitDTO.userId());
 
         User quit = channelRepository.quit(findChannel, user);
 

@@ -24,8 +24,8 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent find(UUID binaryId) {
-        BinaryContent content = CommonUtils.findById(binaryContentList, binaryId, BinaryContent::getBinaryContentId)
+    public BinaryContent findById(UUID binaryId) {
+        BinaryContent content = CommonUtils.findById(binaryContentList, binaryId, BinaryContent::getId)
                 .orElseThrow(() -> new BinaryContentNotFoundException("바이너리 데이터를 찾을 수 없습니다."));
         return content;
     }
@@ -41,7 +41,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     @Override
     public boolean delete(UUID binaryId) {
         try {
-            BinaryContent content = find(binaryId);
+            BinaryContent content = findById(binaryId);
             binaryContentList.remove(content);
             return true;
         } catch (BinaryContentNotFoundException e) {

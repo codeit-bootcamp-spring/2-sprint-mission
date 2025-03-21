@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.legacy.Server.ServerCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.exception.Empty.EmptyServerListException;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.exception.NotFound.ServerNotFoundException;

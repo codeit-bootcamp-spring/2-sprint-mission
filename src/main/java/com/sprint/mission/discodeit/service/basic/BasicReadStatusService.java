@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.legacy.ReadStatus.ReadStatusCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.readstatus.ReadStatusCRUDDTO;
 import com.sprint.mission.discodeit.exception.Valid.DuplicateReadStatusException;
 import com.sprint.mission.discodeit.exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -30,7 +30,7 @@ public class BasicReadStatusService implements ReadStatusService {
             UUID channelId = readStatusCRUDDTO.channelId();
 
             //채널, 유저가 있는지 확인하는 매커니즘
-            userRepository.find(userId);
+            userRepository.findById(userId);
             channelRepository.find(channelId);
 
             List<ReadStatus> list = readStatusRepository.findAllByUserId(userId);

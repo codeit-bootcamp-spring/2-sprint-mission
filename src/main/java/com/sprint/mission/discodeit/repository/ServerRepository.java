@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.DTO.legacy.Server.ServerCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.Request.UserLoginDTO;
+import com.sprint.mission.discodeit.dto.legacy.request.UserLoginDTO;
 import com.sprint.mission.discodeit.exception.NotFound.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.Valid.InvalidPasswordException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -21,7 +21,7 @@ public class BasicAuthService implements AuthService {
     @CustomLogging
     @Override
     public boolean loginUser(UserLoginDTO userLoginDTO) {
-        List<User> list = userRepository.findUserList();
+        List<User> list = userRepository.findAll();
         User user = CommonUtils.findByName(list, userLoginDTO.userName(), User::getName)
                 .orElseThrow(() -> new UserNotFoundException("로그인 실패: 해당 유저를 찾지 못했습니다."));
         boolean login = user.getPassword().equals(userLoginDTO.password());

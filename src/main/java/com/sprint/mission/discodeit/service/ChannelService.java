@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.Request.ChannelCreateDTO;
-import com.sprint.mission.discodeit.DTO.RequestToService.ChannelJoinQuitDTO;
-import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelCRUDDTO;
-import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelDTO;
+import com.sprint.mission.discodeit.dto.legacy.request.ChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.requestToService.ChannelJoinQuitDTO;
+import com.sprint.mission.discodeit.dto.legacy.channel.ChannelCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.channel.ChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Service;

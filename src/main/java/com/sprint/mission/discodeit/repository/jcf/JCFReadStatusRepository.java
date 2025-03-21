@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.legacy.ReadStatus.ReadStatusCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.readstatus.ReadStatusCRUDDTO;
 import com.sprint.mission.discodeit.exception.Empty.EmptyReadStatusListException;
 import com.sprint.mission.discodeit.exception.NotFound.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;

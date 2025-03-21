@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.legacy.Message.MessageCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.message.MessageCRUDDTO;
 import com.sprint.mission.discodeit.exception.Empty.EmptyMessageListException;
 import com.sprint.mission.discodeit.exception.NotFound.MessageNotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;

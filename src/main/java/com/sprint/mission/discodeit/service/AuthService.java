@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.Request.UserLoginDTO;
+import com.sprint.mission.discodeit.dto.legacy.request.UserLoginDTO;
 import org.springframework.stereotype.Service;
 
 /**

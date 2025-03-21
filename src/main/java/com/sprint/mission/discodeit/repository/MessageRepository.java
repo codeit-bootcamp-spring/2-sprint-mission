@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.DTO.legacy.Message.MessageCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.message.MessageCRUDDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.stereotype.Repository;

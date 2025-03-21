@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.legacy.UserStatus.UserStatusCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.userstatus.UserStatusCRUDDTO;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserStatusListException;
 import com.sprint.mission.discodeit.exception.NotFound.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;

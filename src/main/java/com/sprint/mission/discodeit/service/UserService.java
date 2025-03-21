@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.RequestToService.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.DTO.RequestToService.UserCreateDTO;
-import com.sprint.mission.discodeit.DTO.RequestToService.UserUpdateDTO;
-import com.sprint.mission.discodeit.DTO.legacy.User.UserCRUDDTO;
-import com.sprint.mission.discodeit.DTO.legacy.User.UserFindDTO;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
+import com.sprint.mission.discodeit.dto.request.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.legacy.user.UserFindDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,14 +13,14 @@ public interface UserService {
 
     void reset(boolean adminAuth);
 
-    User create(UserCreateDTO userCreateDTO, Optional<BinaryContentCreateDTO> binaryContentDTO);
+    UUID create(CreateUserRequestDTO userCreateDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO);
 
-    UserFindDTO find(UUID userId);
+    UserFindDTO findById(UUID userId);
 
-    List<UserFindDTO> findAll();
+    List<UserFindDTO> listAllUsers();
 
-    boolean delete(String userId);
-
-    User update(String userId, UserUpdateDTO userUpdateDTO, Optional<BinaryContentCreateDTO>binaryContentDTO);
+//    boolean delete(String userId);
+//
+//    User update(String userId, UserUpdateDTO userUpdateDTO, Optional<CreateBinaryContentRequestDTO>binaryContentDTO);
 
 }

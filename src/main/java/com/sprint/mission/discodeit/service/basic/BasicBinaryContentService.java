@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.legacy.BinaryContent.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.legacy.binarycontent.BinaryContentDTO;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.logging.CustomLogging;
@@ -26,8 +26,8 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public BinaryContent find(UUID binaryId) {
-        BinaryContent binaryContent = binaryContentRepository.find(binaryId);
+    public BinaryContent findById(UUID binaryId) {
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryId);
         return binaryContent;
     }
     @Override

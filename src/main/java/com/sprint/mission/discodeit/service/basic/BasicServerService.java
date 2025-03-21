@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.Request.ServerCreateRequestDTO;
-import com.sprint.mission.discodeit.DTO.legacy.Server.ServerCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.request.ServerCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.legacy.server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.exception.Empty.EmptyServerListException;
 import com.sprint.mission.discodeit.exception.NotFound.ServerNotFoundException;
 import com.sprint.mission.discodeit.exception.NotFound.UserNotFoundException;
@@ -35,7 +35,7 @@ public class BasicServerService implements ServerService {
     public Server create(ServerCreateRequestDTO serverCreateRequestDTO) {
         UUID userId = serverCreateRequestDTO.ownerId();
         try {
-            User owner = userRepository.find(userId);
+            User owner = userRepository.findById(userId);
 
             Server server = new Server(userId, serverCreateRequestDTO.name());
             serverRepository.save(server, owner);
@@ -54,7 +54,7 @@ public class BasicServerService implements ServerService {
         UUID userUUID = UUID.fromString(userId);
         try {
             Server server = serverRepository.find(serverUUID);
-            User user = userRepository.find(userUUID);
+            User user = userRepository.findById(userUUID);
             serverRepository.join(server, user);
             return user;
         } catch (UserNotFoundException e) {
@@ -70,7 +70,7 @@ public class BasicServerService implements ServerService {
         UUID userUUID = UUID.fromString(userId);
         try {
             Server server = serverRepository.find(serverUUID);
-            User user = userRepository.find(userUUID);
+            User user = userRepository.findById(userUUID);
             serverRepository.quit(server, user);
             return user;
         } catch (UserNotFoundException e) {

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.RequestToService.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.DTO.RequestToService.MessageWriteDTO;
-import com.sprint.mission.discodeit.DTO.legacy.Message.MessageCRUDDTO;
+import com.sprint.mission.discodeit.dto.requestToService.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.dto.requestToService.MessageWriteDTO;
+import com.sprint.mission.discodeit.dto.legacy.message.MessageCRUDDTO;
 import com.sprint.mission.discodeit.exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.exception.legacy.NotFoundExceptions;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -44,7 +44,7 @@ public class BasicMessageService implements MessageService {
         UUID userId = UUID.fromString(messageWriteDTO.creatorId());
         UUID channelUUID = UUID.fromString(messageWriteDTO.channelId());
 
-        User user = userRepository.find(userId);
+        User user = userRepository.findById(userId);
         Channel channel = channelRepository.find(channelUUID);
 
         Message message = new Message(userId,user.getName(), channelUUID, messageWriteDTO.text());
@@ -134,6 +134,6 @@ public class BasicMessageService implements MessageService {
                 binaryContentCreateDTO.bytes()
         );
         binaryContentRepository.save(content);
-        return content.getBinaryContentId();
+        return content.getId();
     }
 }

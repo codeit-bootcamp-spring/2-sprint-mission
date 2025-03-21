@@ -1,4 +1,4 @@
-import com.sprint.mission.discodeit.DTO.RequestToService.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.requestToService.UserCreateDTO;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ServerRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;

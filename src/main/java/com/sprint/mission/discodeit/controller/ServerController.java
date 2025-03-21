@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.DTO.Request.ServerCreateRequestDTO;
-import com.sprint.mission.discodeit.DTO.Request.UserIDDTO;
+import com.sprint.mission.discodeit.dto.legacy.request.ServerCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.legacy.request.UserIDDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ServerService;

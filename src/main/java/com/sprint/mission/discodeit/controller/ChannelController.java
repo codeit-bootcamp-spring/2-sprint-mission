@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.DTO.Request.ChannelCreateDTO;
-import com.sprint.mission.discodeit.DTO.Request.EnterChannelDTO;
-import com.sprint.mission.discodeit.DTO.Request.QuitChannelDTO;
-import com.sprint.mission.discodeit.DTO.RequestToService.ChannelJoinQuitDTO;
-import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelDTO;
+import com.sprint.mission.discodeit.dto.legacy.request.ChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.legacy.request.EnterChannelDTO;
+import com.sprint.mission.discodeit.dto.legacy.request.QuitChannelDTO;
+import com.sprint.mission.discodeit.dto.requestToService.ChannelJoinQuitDTO;
+import com.sprint.mission.discodeit.dto.legacy.channel.ChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;

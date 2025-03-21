@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.DTO.legacy.UserStatus.UserStatusCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.userstatus.UserStatusCRUDDTO;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import org.springframework.stereotype.Repository;
 

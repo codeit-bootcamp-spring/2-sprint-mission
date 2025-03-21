@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.DTO.RequestToService.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.requestToService.UserUpdateDTO;
 import com.sprint.mission.discodeit.exception.NotFound.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.exception.NotFound.UserNotFoundException;
@@ -58,7 +58,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User find(UUID userId) {
+    public User findById(UUID userId) {
         User user = CommonUtils.findById(userList, userId, User::getId)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
 
@@ -66,7 +66,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findUserList() {
+    public List<User> findAll() {
         if (userList.isEmpty()) {
             throw new EmptyUserListException("유저 리스트가 비어있습니다.");
         }

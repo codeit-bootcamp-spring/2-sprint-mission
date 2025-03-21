@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.DTO.legacy.Channel.ChannelCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.channel.ChannelCRUDDTO;
 import com.sprint.mission.discodeit.exception.Empty.EmptyChannelListException;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.exception.NotFound.ChannelNotFoundException;

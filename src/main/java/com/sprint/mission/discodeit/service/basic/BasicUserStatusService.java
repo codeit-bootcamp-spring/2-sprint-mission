@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.legacy.UserStatus.UserStatusCRUDDTO;
+import com.sprint.mission.discodeit.dto.legacy.userstatus.UserStatusCRUDDTO;
 import com.sprint.mission.discodeit.exception.Valid.DuplicateUserStatusException;
 import com.sprint.mission.discodeit.exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -26,7 +26,7 @@ public class BasicUserStatusService implements UserStatusService {
     public void create(String userId) {
         try {
             UUID userUUID = UUID.fromString(userId);
-            User user = userRepository.find(userUUID);
+            User user = userRepository.findById(userUUID);
             UserStatus userStatus = userStatusRepository.findByUserId(userUUID);
 
             if (userStatus == null) {

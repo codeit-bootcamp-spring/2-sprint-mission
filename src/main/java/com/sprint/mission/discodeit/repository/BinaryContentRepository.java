@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface BinaryContentRepository {
     BinaryContent save(BinaryContent binaryContent);
 
-    BinaryContent find(UUID binaryId);
+    BinaryContent findById(UUID binaryId);
 
     List<BinaryContent> findAllByIdIn();
 
