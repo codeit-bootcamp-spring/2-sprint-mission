@@ -12,6 +12,7 @@ public record BinaryContentDTO(
         String filename,
         String path,
         long size,
-        String type
+        String type,
+        byte[] bytes
 ) {
 }

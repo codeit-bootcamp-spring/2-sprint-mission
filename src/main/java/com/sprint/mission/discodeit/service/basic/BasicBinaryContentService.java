@@ -51,6 +51,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .type(binaryContent.getType())
                 .size(binaryContent.getSize())
                 .path(binaryContent.getPath())
+                .bytes(binaryContent.getBytes())
                 .build();
     }
 
@@ -60,6 +61,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .path(createBinaryContentParam.path())
                 .size(createBinaryContentParam.size())
                 .type(createBinaryContentParam.type())
+                .bytes(createBinaryContentParam.bytes())
                 .build();
     }
 
