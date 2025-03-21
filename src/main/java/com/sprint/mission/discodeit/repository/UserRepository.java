@@ -15,12 +15,14 @@ public interface UserRepository {
 
     User save(User user);
 
-    User findById(UUID userId);
+    User findById(UUID id);
 
     List<User> findAll( );
 
     User update(User user, UserUpdateDTO userCRUDDTO,UUID replaceProfileId);
 
     UUID remove(User user);
+
+    boolean existId(UUID id);
 
 }

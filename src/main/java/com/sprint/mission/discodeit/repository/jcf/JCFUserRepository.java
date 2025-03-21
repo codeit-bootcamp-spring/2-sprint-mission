@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.dto.requestToService.UserUpdateDTO;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.exception.NotFound.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.legacy.NotFoundExceptions;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.util.CommonUtils;
 import com.sprint.mission.discodeit.entity.User;
@@ -67,5 +68,10 @@ public class JCFUserRepository implements UserRepository {
         }
         userList.remove(user);
         return user.getId();
+    }
+
+    @Override
+    public boolean existId(UUID id) {
+        return userList.stream().anyMatch(u -> u.getId().equals(id));
     }
 }

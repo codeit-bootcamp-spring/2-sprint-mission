@@ -99,5 +99,10 @@ public class FileUserRepository implements UserRepository {
         fileRepository.save(userList);
         return user.getId();
     }
+
+    @Override
+    public boolean existId(UUID id) {
+        return userList.stream().anyMatch(u -> u.getId().equals(id));
+    }
 }
 
