@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.legacy.UserStatus.UserStatusCRUDDTO;
-import com.sprint.mission.discodeit.Exception.Valid.DuplicateUserStatusException;
-import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
-import com.sprint.mission.discodeit.Repository.UserRepository;
-import com.sprint.mission.discodeit.Repository.UserStatusRepository;
+import com.sprint.mission.discodeit.exception.Valid.DuplicateUserStatusException;
+import com.sprint.mission.discodeit.exception.legacy.NotFoundException;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.logging.CustomLogging;

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.legacy.BinaryContent.BinaryContentDTO;
-import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.service.BinaryContentService;

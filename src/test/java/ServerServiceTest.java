@@ -1,10 +1,8 @@
-import com.sprint.mission.discodeit.DTO.Request.ServerCreateRequestDTO;
 import com.sprint.mission.discodeit.DTO.RequestToService.UserCreateDTO;
-import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.Repository.ServerRepository;
-import com.sprint.mission.discodeit.Repository.UserRepository;
-import com.sprint.mission.discodeit.Repository.UserStatusRepository;
-import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ServerRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.basic.BasicServerService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
@@ -19,7 +17,6 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)

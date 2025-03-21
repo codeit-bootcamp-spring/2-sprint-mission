@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.legacy.ReadStatus.ReadStatusCRUDDTO;
-import com.sprint.mission.discodeit.Exception.Valid.DuplicateReadStatusException;
-import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
-import com.sprint.mission.discodeit.Repository.ChannelRepository;
-import com.sprint.mission.discodeit.Repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.exception.Valid.DuplicateReadStatusException;
+import com.sprint.mission.discodeit.exception.legacy.NotFoundException;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.service.ReadStatusService;

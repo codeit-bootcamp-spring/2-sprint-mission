@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.Request.UserLoginDTO;
-import com.sprint.mission.discodeit.Exception.NotFound.UserNotFoundException;
-import com.sprint.mission.discodeit.Exception.Valid.InvalidPasswordException;
-import com.sprint.mission.discodeit.Repository.UserRepository;
-import com.sprint.mission.discodeit.Util.CommonUtils;
+import com.sprint.mission.discodeit.exception.NotFound.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.Valid.InvalidPasswordException;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.util.CommonUtils;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.service.AuthService;

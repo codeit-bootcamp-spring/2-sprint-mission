@@ -2,11 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.Request.ServerCreateRequestDTO;
 import com.sprint.mission.discodeit.DTO.legacy.Server.ServerCRUDDTO;
-import com.sprint.mission.discodeit.Exception.Empty.EmptyServerListException;
-import com.sprint.mission.discodeit.Exception.NotFound.ServerNotFoundException;
-import com.sprint.mission.discodeit.Exception.NotFound.UserNotFoundException;
-import com.sprint.mission.discodeit.Repository.ServerRepository;
-import com.sprint.mission.discodeit.Repository.UserRepository;
+import com.sprint.mission.discodeit.exception.Empty.EmptyServerListException;
+import com.sprint.mission.discodeit.exception.NotFound.ServerNotFoundException;
+import com.sprint.mission.discodeit.exception.NotFound.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.ServerRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.logging.CustomLogging;
