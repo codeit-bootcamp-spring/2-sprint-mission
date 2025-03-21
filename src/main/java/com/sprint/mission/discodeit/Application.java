@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 import static com.sprint.mission.discodeit.command.Command.*;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.OTHER_USER;
 import static com.sprint.mission.discodeit.view.OutputView.printHello;
 import static com.sprint.mission.discodeit.view.OutputView.printServer;
 
@@ -99,7 +99,7 @@ public class Application {
 
     public static UserDto setupUser(UserController userController) {
         UserDto loginUser = userController.register(
-                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()), null
+                new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null
         );
         userController.register(
                 new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null

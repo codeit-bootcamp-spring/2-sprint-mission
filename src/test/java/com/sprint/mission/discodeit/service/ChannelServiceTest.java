@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
 import static com.sprint.mission.discodeit.constant.ChannelInfo.CHANNEL_NAME;
 import static com.sprint.mission.discodeit.constant.ChannelInfo.UPDATED_CHANNEL_NAME;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -26,11 +26,11 @@ class ChannelServiceTest {
     void setUp() {
         UserRepository userRepository = new JCFUserRepository();
         User user = userRepository.save(
-                new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword(), null));
+                new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
         channelService = new JCFChannelService(new JCFChannelRepository(), userRepository);
         setUpChannel = channelService.create(CHANNEL_NAME,
-                new UserDto(user.getId(), LONGIN_USER.getName(), LONGIN_USER.getEmail(), null, false));
+                new UserDto(user.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
     }
 
     @Test

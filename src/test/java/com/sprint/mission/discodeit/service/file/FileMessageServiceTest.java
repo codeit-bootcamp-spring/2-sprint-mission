@@ -19,9 +19,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
 import static com.sprint.mission.discodeit.constant.FilePath.*;
 import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -62,7 +62,7 @@ class FileMessageServiceTest {
 
     private void setUpUser() {
         initializedUser = userService.register(
-                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()), null);
+                new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
     }
 
     @AfterEach

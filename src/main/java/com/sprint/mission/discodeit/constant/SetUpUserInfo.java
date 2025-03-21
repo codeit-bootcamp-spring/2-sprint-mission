@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.config;
+package com.sprint.mission.discodeit.constant;
 
 public enum SetUpUserInfo {
-    LONGIN_USER("황지환", "hwang@naver.com", "12345"),
+    LOGIN_USER("황지환", "hwang@naver.com", "12345"),
     OTHER_USER("박지환", "park@naver.com", "12345");
 
     private final String name;

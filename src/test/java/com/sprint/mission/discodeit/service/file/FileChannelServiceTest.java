@@ -17,11 +17,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
 import static com.sprint.mission.discodeit.constant.ChannelInfo.CHANNEL_NAME;
 import static com.sprint.mission.discodeit.constant.ChannelInfo.UPDATED_CHANNEL_NAME;
 import static com.sprint.mission.discodeit.constant.FilePath.*;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -61,8 +61,8 @@ class FileChannelServiceTest {
     }
 
     private UserDto setUpUser() {
-        UserRegisterDto user = new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(),
-                LONGIN_USER.getPassword());
+        UserRegisterDto user = new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(),
+                LOGIN_USER.getPassword());
 
         return userService.register(user, null);
     }

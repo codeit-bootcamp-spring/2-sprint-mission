@@ -24,9 +24,9 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
 import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -51,8 +51,8 @@ class UserControllerTest {
     @DisplayName("프로필 사진 저장을 선택하지 않았을떄 profile 아이디를 null을 반환합니다")
     @Test
     void registerException() {
-        UserRegisterDto userRegisterDto = new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(),
-                LONGIN_USER.getPassword());
+        UserRegisterDto userRegisterDto = new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(),
+                LOGIN_USER.getPassword());
         UserDto user = userController.register(userRegisterDto, null);
         assertThat(user.profileId()).isNull();
     }

@@ -48,6 +48,14 @@ public class User implements Serializable {
         return this.email.equals(email);
     }
 
+    public boolean isSamePassword(String password) {
+        return this.password.equals(password);
+    }
+
+    public void changeUserStatus() {
+        this.userStatus.changeUserStatus();
+    }
+
     private void updateLastModified() {
         this.updatedAt = ZonedDateTime.now().toInstant();
     }

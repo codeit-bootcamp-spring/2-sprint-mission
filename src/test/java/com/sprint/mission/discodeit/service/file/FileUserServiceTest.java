@@ -14,10 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.discodeit.constant.FilePath.USER_TEST_FILE;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -45,7 +45,7 @@ class FileUserServiceTest {
 
     private void setUpUser() {
         initializedUser = userService.register(
-                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()), null);
+                new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
     }
 
     @AfterEach
@@ -56,13 +56,13 @@ class FileUserServiceTest {
     @DisplayName("입력받은 유저정보를 서버에 등록한다")
     @Test
     void register() {
-        assertThat(initializedUser.email()).isEqualTo(LONGIN_USER.getEmail());
+        assertThat(initializedUser.email()).isEqualTo(LOGIN_USER.getEmail());
     }
 
     @DisplayName("유저 등록시 서버에 이메일이 같은 이미 등록된 유저가 있을떄 예외를 반환한다")
     @Test
     void registerDuplicateUser() {
-        UserRegisterDto otherUserWithSameEmail = new UserRegisterDto(OTHER_USER.getName(), LONGIN_USER.getEmail(),
+        UserRegisterDto otherUserWithSameEmail = new UserRegisterDto(OTHER_USER.getName(), LOGIN_USER.getEmail(),
                 OTHER_USER.getPassword());
 
         assertThatThrownBy(() ->
@@ -90,19 +90,19 @@ class FileUserServiceTest {
     @DisplayName("이름으로 유저를 조회한다")
     @Test
     void findByName() {
-        UserRegisterDto otherUserWithSameEmail = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(),
+        UserRegisterDto otherUserWithSameEmail = new UserRegisterDto(LOGIN_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword());
         userService.register(otherUserWithSameEmail, null);
 
         UserDto user = userService.findByName(initializedUser.name());
 
-        assertThat(user.name()).isEqualTo(LONGIN_USER.getName());
+        assertThat(user.name()).isEqualTo(LOGIN_USER.getName());
     }
 
     @DisplayName("이메일이 같은 유저를 반환한다")
     @Test
     void findByEmail() {
-        UserDto user = userService.findByEmail(LONGIN_USER.getEmail());
+        UserDto user = userService.findByEmail(LOGIN_USER.getEmail());
 
         assertThat(initializedUser.id()).isEqualTo(user.id());
     }

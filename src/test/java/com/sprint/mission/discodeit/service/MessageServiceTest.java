@@ -1,19 +1,20 @@
 package com.sprint.mission.discodeit.service;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
+
+import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MessageServiceTest {
     private MessageService messageService;
@@ -23,7 +24,7 @@ class MessageServiceTest {
     void setUp() {
         UserRepository userRepository = new JCFUserRepository();
         User user = userRepository.save(
-                new User(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword(), null));
+                new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
         messageService = new JCFMessageService(new JCFMessageRepository(), userRepository);
         setUpMessage = messageService.create(MESSAGE_CONTENT, UUID.randomUUID(), user.getId());

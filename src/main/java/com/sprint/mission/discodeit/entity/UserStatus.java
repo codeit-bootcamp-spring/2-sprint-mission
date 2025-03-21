@@ -24,7 +24,13 @@ public class UserStatus implements Serializable {
         this.isLogin = false;
     }
 
-    private void update() {
+    public void changeUserStatus() {
+        this.isLogin = !this.isLogin;
+        updateLastModified();
+
+    }
+
+    private void updateLastModified() {
         this.updatedAt = ZonedDateTime.now().toInstant();
     }
 }

@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.LONGIN_USER;
-import static com.sprint.mission.discodeit.config.SetUpUserInfo.OTHER_USER;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
+import static com.sprint.mission.discodeit.constant.SetUpUserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -24,13 +24,13 @@ class UserServiceTest {
     void setUp() {
         userService = new BasicUserService(new JCFUserRepository(), new JCFUserStatusRepository());
         setUpUser = userService.register(
-                new UserRegisterDto(LONGIN_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword()), null);
+                new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
     }
 
     @DisplayName("유저 등록시 중복된 이메일이 있을 경우 예외 처리합니다")
     @Test
     void registerDuplicateEmail() {
-        UserRegisterDto sameEmailUser = new UserRegisterDto(OTHER_USER.getName(), LONGIN_USER.getEmail(), LONGIN_USER.getPassword());
+        UserRegisterDto sameEmailUser = new UserRegisterDto(OTHER_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword());
         assertThatThrownBy(() -> {
             userService.register(sameEmailUser, null);
         }).isInstanceOf(IllegalArgumentException.class);
@@ -39,7 +39,7 @@ class UserServiceTest {
     @DisplayName("유저 등록시 중복된 유저 이름이 있을 경우 예외 처리합니다")
     @Test
     void registerDuplicateUserName() {
-        UserRegisterDto sameNameUser = new UserRegisterDto(LONGIN_USER.getName(), OTHER_USER.getEmail(), LONGIN_USER.getPassword());
+        UserRegisterDto sameNameUser = new UserRegisterDto(LOGIN_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
         assertThatThrownBy(() -> {
             userService.register(sameNameUser, null);
         }).isInstanceOf(IllegalArgumentException.class);
@@ -48,7 +48,7 @@ class UserServiceTest {
     @DisplayName("유저 로그인 상태를 확인합니다")
     @Test
     void registerValidateUserStatus() {
-        UserRegisterDto sameNameUser = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), LONGIN_USER.getPassword());
+        UserRegisterDto sameNameUser = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
         UserDto user = userService.register(sameNameUser, null);
 
         assertThat(user.isLogin()).isFalse();
@@ -71,9 +71,9 @@ class UserServiceTest {
 
     @Test
     void 유저_이름_단건_조회() {
-        UserDto user = userService.findByName(LONGIN_USER.getName());
+        UserDto user = userService.findByName(LOGIN_USER.getName());
 
-        assertThat(user.name()).isEqualTo(LONGIN_USER.getName());
+        assertThat(user.name()).isEqualTo(LOGIN_USER.getName());
     }
 
     @Test

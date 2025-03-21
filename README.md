@@ -213,10 +213,10 @@ public static void main(String[]args){
 
 1. login
 
-- [ ] username, password과 일치하는 유저가 있는지 확인합니다.
-    - [ ] 일치하는 유저가 있는 경우: 유저 정보 반환
-    - [ ] 일치하는 유저가 없는 경우: 예외 발생
-- [ ] DTO를 활용해 파라미터를 그룹화합니다.
+- [x] username, password과 일치하는 유저가 있는지 확인합니다.
+    - [x] 일치하는 유저가 있는 경우: 유저 정보 반환
+    - [x] 일치하는 유저가 없는 경우: 예외 발생
+- [x] DTO를 활용해 파라미터를 그룹화합니다.
 
 #### ChannelService 고도화
 
