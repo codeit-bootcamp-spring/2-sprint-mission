@@ -71,8 +71,8 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
 
     @Override
     public void deleteById(UUID messageId) {
+        channelIdMessages.get(super.findById(messageId).getChannelId()).remove(super.findById(messageId));
         super.deleteById(messageId);
         super.deleteFile(messageId);
-        channelIdMessages.get(super.findById(messageId).getChannelId()).remove(super.findById(messageId));
     }
 }
