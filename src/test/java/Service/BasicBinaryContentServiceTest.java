@@ -87,10 +87,12 @@ public class BasicBinaryContentServiceTest {
 
     @Test
     void 파일전체조회_성공() {
+        byte[] bytes = {(byte)0xAB, (byte)0xCD};
+
         List<BinaryContent> mockBinaryContentList = List.of(
-                new BinaryContent("testImage2", "www.testImage2.com", 400, "jpeg"),
-                new BinaryContent("testImage3", "www.testImage3.com", 600, "jpeg"),
-                new BinaryContent("testImage4", "www.testImage4.com", 800, "jpeg")
+                new BinaryContent("testImage2", "www.testImage2.com", 400, "jpeg", bytes),
+                new BinaryContent("testImage3", "www.testImage3.com", 600, "jpeg", bytes),
+                new BinaryContent("testImage4", "www.testImage4.com", 800, "jpeg", bytes)
         );
 
         when(binaryContentRepository.findById(mockBinaryContentList.get(0).getId())).thenReturn(Optional.of(mockBinaryContentList.get(0)));
