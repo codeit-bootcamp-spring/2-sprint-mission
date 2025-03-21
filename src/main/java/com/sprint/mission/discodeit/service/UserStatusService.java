@@ -13,5 +13,10 @@ public interface UserStatusService {
     Optional<UserStatus> find(UUID id);
     List<UserStatus> findAll();
     UserStatus update(UserStatusUpdateRequestDTO dto);
+
+    UserStatus updateByUserId(UUID userId, UserStatusUpdateRequestDTO dto);
+
     void delete(UUID id);
+
+    Optional<UserStatus> findByUserId(UUID userId);
 }

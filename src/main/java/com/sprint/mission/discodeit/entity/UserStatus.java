@@ -12,16 +12,18 @@ public class UserStatus {
     private UUID userId;
     @Setter
     private String status;
-    private Instant lastSeenAt;  // ✅ String → Instant로 변경
+    @Setter
+    private Instant lastSeenAt;
 
     public UserStatus(UUID id, UUID userId, String status, Instant lastSeenAt) {
         this.id = id;
         this.userId = userId;
-        this.status = "ONLINE";
+        this.status = status;
         this.lastSeenAt = lastSeenAt;
     }
 
     public boolean isOnline() {
-        return "ONLINE".equalsIgnoreCase(this.status);
+        return Instant.now().minusSeconds(300).isBefore(lastSeenAt);
     }
+
 }

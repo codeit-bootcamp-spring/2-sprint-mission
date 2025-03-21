@@ -57,10 +57,23 @@ public class UserStatusServiceImpl implements UserStatusService {
     }
 
     @Override
+    public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequestDTO dto) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException("UserStatus not found for user " + userId));
+        userStatus.setStatus(dto.getStatus());
+        return userStatusRepository.save(userStatus);
+    }
+
+    @Override
     public void delete(UUID id) {
         if (!userStatusRepository.existsById(id)) {
             throw new NoSuchElementException("UserStatus not found with id " + id);
         }
         userStatusRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return userStatusRepository.findByUserId(userId);
     }
 }
