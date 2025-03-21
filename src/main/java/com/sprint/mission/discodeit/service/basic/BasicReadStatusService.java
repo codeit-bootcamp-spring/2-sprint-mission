@@ -51,6 +51,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusFindResponses;
     }
 
+    // 이 메서드는 언제 호출해야 하는가? 메세지를 작성할 때? 채널에 접속할 때? 채널에 접속해서 스크롤을 내려 메세지를 확인할 때?
     @Override
     public void updateReadStatus(ReadStatusUpdateRequest readStatusUpdateRequest) {
         this.readStatusRepository.updateReadTime(readStatusUpdateRequest.id(), readStatusUpdateRequest.readTime());
