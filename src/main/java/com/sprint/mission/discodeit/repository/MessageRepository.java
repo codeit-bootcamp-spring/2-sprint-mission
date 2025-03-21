@@ -12,6 +12,7 @@ public interface MessageRepository {
     Optional<Message> findById(UUID id);
     List<Message> findAll();
     boolean existsById(UUID id);
-    void deleteById(UUID id);
+    void deleteByMessageId(UUID id);
+    void deleteByChannelId(UUID channelId);
     Optional<Instant> findLatestMessageTimeByChannelId(UUID channelId);
 }

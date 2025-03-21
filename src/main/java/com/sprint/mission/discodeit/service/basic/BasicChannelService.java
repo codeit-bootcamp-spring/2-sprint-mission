@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 
 import com.sprint.mission.discodeit.dto.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -71,7 +72,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelResponseDto> findAllByUserId(UUID userId) { // ✅ 반환 타입 수정
+    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
         List<Channel> allChannels = channelRepository.findAll();
 
         return allChannels.stream()
@@ -94,15 +95,30 @@ public class BasicChannelService implements ChannelService {
                             userIds
                     );
                 })
-                .collect(Collectors.toList()); // ✅ Collectors import 필요
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Channel update(UUID channelId, String newName, String newDescription) {
-        Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
-        channel.update(newName, newDescription);
-        return channelRepository.save(channel);
+    public ChannelResponseDto update(ChannelUpdateRequestDto updateRequest) {
+        Channel channel = channelRepository.findById(updateRequest.getChannelId())
+                .orElseThrow(() -> new NoSuchElementException("Channel with id " + updateRequest.getChannelId() + " not found"));
+
+        if (channel.getType() == ChannelType.PRIVATE) {
+            throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
+        }
+
+        if (updateRequest.getNewName() != null) {
+            channel.update(updateRequest.getNewName(), updateRequest.getNewDescription());
+        }
+
+        Channel updatedChannel = channelRepository.save(channel);
+
+        return ChannelResponseDto.builder()
+                .id(updatedChannel.getId())
+                .type(updatedChannel.getType())
+                .name(updatedChannel.getName())
+                .description(updatedChannel.getDescription())
+                .build();
     }
 
     @Override
@@ -110,6 +126,8 @@ public class BasicChannelService implements ChannelService {
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
+        messageRepository.deleteByChannelId(channelId);
+        readStatusRepository.deleteByChannelId(channelId);
         channelRepository.deleteById(channelId);
     }
 }

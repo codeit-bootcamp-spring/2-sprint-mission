@@ -11,6 +11,6 @@ public interface ChannelService {
     Channel createPrivateChannel(PrivateChannelCreateRequestDto requestDto);
     ChannelResponseDto find(UUID channelId);
     List<ChannelResponseDto> findAllByUserId(UUID userID);
-    Channel update(UUID channelId, String newName, String newDescription);
+    ChannelResponseDto update(ChannelUpdateRequestDto updateRequest);
     void delete(UUID channelId);
 }

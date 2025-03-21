@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +20,7 @@ public class ChannelResponseDto {
     private Instant latestMessageAt;
     private List<UUID> userIds;
 
+    @Builder
     public ChannelResponseDto(UUID id, ChannelType type, String name, String description, Instant latestMessageAt, List<UUID> userIds) {
        this.id = id;
        this.type = type;

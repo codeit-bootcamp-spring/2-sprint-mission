@@ -14,5 +14,6 @@ public interface ReadStatusRepository {
     void save(ReadStatus readStatus); //전체 업데이트(readStatus 생성)
     void updateLastReadAt(UUID userId, UUID channelId, Instant newLastReadAt); //부분 업데이트(이미 readStatus가 존재한다면)
     void delete(UUID userId, UUID channelId);
+    void deleteByChannelId(UUID channelId);
     List<UUID> findUserIdsByChannelId(UUID channelId);
 }

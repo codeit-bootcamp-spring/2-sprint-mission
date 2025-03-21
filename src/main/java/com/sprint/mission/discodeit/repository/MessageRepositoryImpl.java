@@ -31,9 +31,15 @@ public class MessageRepositoryImpl implements MessageRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public void deleteByMessageId(UUID id) {
         messages.removeIf(m -> m.getId().equals(id));
     }
+
+    @Override
+    public void deleteByChannelId(UUID channelId){
+        messages.removeIf(m -> m.getChannelId().equals(channelId));
+    }
+
     @Override
     public Optional<Instant> findLatestMessageTimeByChannelId(UUID channelId){
         return messages.stream()

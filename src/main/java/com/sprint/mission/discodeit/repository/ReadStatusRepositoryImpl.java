@@ -37,6 +37,11 @@ public class ReadStatusRepositoryImpl implements ReadStatusRepository {
     }
 
     @Override
+    public void deleteByChannelId(UUID channelId) {
+        readStatusList.removeIf(r -> r.getChannelId().equals(channelId));
+    }
+
+    @Override
     public List<UUID> findUserIdsByChannelId(UUID channelId) {
         return readStatusList.stream()
                 .filter(rs -> rs.getChannelId().equals(channelId))
