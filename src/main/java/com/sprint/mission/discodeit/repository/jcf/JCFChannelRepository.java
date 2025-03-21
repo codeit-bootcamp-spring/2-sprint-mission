@@ -29,13 +29,12 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel update(Channel channel) {
-        channelMap.put(channel.getId(), channel);
-        return channel;
+    public boolean existsById(UUID id) {
+        return this.channelMap.containsKey(id);
     }
 
     @Override
-    public boolean delete(UUID channelId) {
-        return this.channelMap.remove(channelId) != null;
+    public void deleteById(UUID id) {
+        this.channelMap.remove(id);
     }
 }

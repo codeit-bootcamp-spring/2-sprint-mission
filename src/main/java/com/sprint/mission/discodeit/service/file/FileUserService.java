@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -31,7 +31,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<UserDto> findAll() {
         return fileUserRepository.findAll().stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());

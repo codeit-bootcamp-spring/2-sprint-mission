@@ -25,6 +25,7 @@ public class FileDataManager {
         } catch (FileNotFoundException e) {
             return null;
         } catch (IOException | ClassNotFoundException e) {
+            System.out.println("파일 읽기 중 오류 발생: " + e.getMessage());  // 로깅 추가
             throw new RuntimeException("데이터를 불러오는데 실패했습니다.", e);
         }
     }

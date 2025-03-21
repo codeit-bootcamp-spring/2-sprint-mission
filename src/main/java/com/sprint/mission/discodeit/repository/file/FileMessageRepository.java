@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
     private final String fileName = "message.ser";
     private final Map<UUID, Message> messageMap;
@@ -46,18 +48,15 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message update(Message message) {
-        this.messageMap.put(message.getId(), message);
-        saveMessageList();
-        return message;
+    public boolean existsById(UUID id) {
+        return messageMap.containsKey(id);
     }
 
     @Override
-    public boolean delete(UUID messageId) {
-        boolean removed = messageMap.remove(messageId) != null;
+    public void deleteById(UUID id) {
+        boolean removed = messageMap.remove(id) != null;
         if (removed) {
             saveMessageList();
         }
-        return removed;
     }
 }

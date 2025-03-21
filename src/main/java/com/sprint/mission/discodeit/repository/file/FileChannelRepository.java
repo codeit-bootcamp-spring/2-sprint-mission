@@ -3,10 +3,12 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private final String fileName = "channel.ser";
     private final Map<UUID, Channel> channelMap;
@@ -47,22 +49,15 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel update(Channel channel) {
-        this.channelMap.put(channel.getId(), channel);
-        saveChannelList();
-        return channel;
+    public boolean existsById(UUID id) {
+        return channelMap.containsKey(id);  // channelMap에서 id가 존재하는지 확인
     }
 
     @Override
-    public boolean delete(UUID channelId) {
-        boolean removed = channelMap.remove(channelId) != null;
+    public void deleteById(UUID id) {
+        boolean removed = channelMap.remove(id) != null;
         if (removed) {
-            saveChannelList();
+            saveChannelList();  // 삭제 후 변경 사항 저장
         }
-        return removed;
-    }
-
-    public Map<UUID, Channel> getChannelMap() {
-        return channelMap;
     }
 }

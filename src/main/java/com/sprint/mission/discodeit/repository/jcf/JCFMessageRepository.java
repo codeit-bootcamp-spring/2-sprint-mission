@@ -29,13 +29,12 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message update(Message message) {
-        messageMap.put(message.getId(), message);
-        return message;
+    public boolean existsById(UUID id) {
+        return this.messageMap.containsKey(id);
     }
 
     @Override
-    public boolean delete(UUID messageId) {
-        return messageMap.remove(messageId) != null;
+    public void deleteById(UUID id) {
+        this.messageMap.remove(id);
     }
 }

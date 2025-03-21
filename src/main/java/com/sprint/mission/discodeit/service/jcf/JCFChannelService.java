@@ -45,8 +45,8 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void delete(UUID channelId) {
-        Channel removedChannel = this.channelMap.remove(channelId);
-        if (removedChannel == null) {
+        Channel removed = this.channelMap.remove(channelId);
+        if (removed == null) {
             throw new NoSuchElementException("해당 채널을 찾을 수 없습니다 : " + channelId);
         }
     }

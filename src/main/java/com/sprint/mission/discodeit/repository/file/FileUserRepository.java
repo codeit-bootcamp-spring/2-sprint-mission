@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
 public class FileUserRepository implements UserRepository {
     private final String fileName = "user.ser";
     private final Map<UUID, User> userMap;
@@ -46,18 +48,15 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User update(User user) {
-        this.userMap.put(user.getId(), user);
-        saveUserList();
-        return user;
+    public boolean existsById(UUID id) {
+        return this.userMap.containsKey(id);
     }
 
     @Override
-    public boolean delete(UUID userId) {
-        boolean removed = userMap.remove(userId) != null;
+    public void deleteById(UUID id) {
+        boolean removed = this.userMap.remove(id) != null;
         if (removed) {
             saveUserList();
         }
-        return removed;
     }
 }

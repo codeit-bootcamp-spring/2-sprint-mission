@@ -24,18 +24,17 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(UUID userId) {
-        return Optional.ofNullable(userMap.get(userId));
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(userMap.get(id));
     }
 
     @Override
-    public User update(User user) {
-        userMap.put(user.getId(), user);
-        return user;
+    public boolean existsById(UUID id) {
+        return this.userMap.containsKey(id);
     }
 
     @Override
-    public boolean delete(UUID userId) {
-        return userMap.remove(userId) != null;
+    public void deleteById(UUID id) {
+        this.userMap.remove(id);
     }
 }
