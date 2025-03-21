@@ -31,7 +31,10 @@ public class BasicReadStatusService implements ReadStatusService {
         Channel channel = channelRepository.findChannelById(saveReadStatusParamDto.channelUUID())
                         .orElseThrow(NullPointerException::new);
 
-        ReadStatus readStatus = new ReadStatus(user.getId(), channel.getId());
+        ReadStatus readStatus = ReadStatus.builder()
+                .channelId(channel.getId())
+                .userId(user.getId())
+                .build();
 
         readStatusRepository.save(readStatus);
     }
@@ -49,10 +52,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void update(UpdateReadStatusParamDto updateReadStatusParamDto) {
-        readStatusRepository.update(
-                updateReadStatusParamDto.userUUID(),
-                updateReadStatusParamDto.channelUUID()
-        );
+        readStatusRepository.update(updateReadStatusParamDto.readStatusUUID());
     }
 
     @Override

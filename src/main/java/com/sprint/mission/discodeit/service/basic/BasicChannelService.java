@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.dto.ChannelSaveDto;
 import com.sprint.mission.discodeit.dto.ChannelUpdateParamDto;
+import com.sprint.mission.discodeit.dto.CheckReadStatusDto;
 import com.sprint.mission.discodeit.dto.FindChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -37,7 +38,10 @@ public class BasicChannelService implements ChannelService {
         Channel channel = new Channel(channelName, channelType);
         channelRepository.save(channel);
         userList.forEach(userUUID -> {
-            ReadStatus readStatus = new ReadStatus(userUUID, channel.getId());
+            ReadStatus readStatus = ReadStatus.builder()
+                    .channelId(channel.getId())
+                    .userId(userUUID)
+                    .build();
             readStatusRepository.save(readStatus);
         });
         return new ChannelSaveDto(channel.getId(), channelName, channel.getChannelType(), channel.getCreatedAt());
@@ -78,14 +82,59 @@ public class BasicChannelService implements ChannelService {
     public List<FindChannelDto> findAllByUserId(UUID userUUID) {
         List<ReadStatus> readStatusFindByUserId = readStatusRepository.findByUserId(userUUID);
 
-        Set<UUID> readChannelIdSet = readStatusFindByUserId.stream()
+        Set<UUID> privateChannelIdSet = readStatusFindByUserId.stream()
                 .map(ReadStatus::getChannelId)
                 .collect(Collectors.toSet());
 
         return channelRepository.findAllChannel().stream()
-                .filter(channel -> channel.getChannelType().equals(ChannelType.PUBLIC) || readChannelIdSet.contains(channel.getId()))
-                .map(channel ->  findChannel(channel.getId()))
+                .filter(channel -> channel.getChannelType().equals(ChannelType.PUBLIC) || privateChannelIdSet.contains(channel.getId()))
+                .map(channel -> findChannel(channel.getId()))
                 .toList();
+    }
+
+    @Override
+    public UUID joinChannel(UUID channelUUID, UUID userUUID) {
+        Channel channel = channelRepository.findChannelById(channelUUID)
+                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다."));
+
+        if(channel.getChannelType().equals(ChannelType.PRIVATE)){
+            ReadStatus readStatus = readStatusRepository.findByChannelId(channelUUID).stream()
+                    .filter(data -> data.getUserId().equals(userUUID))
+                    .findAny()
+                    .orElseThrow(() -> new IllegalArgumentException("private채널은 초대된 사용자만 입장 가능"));
+            readStatusRepository.update(readStatus.getId());
+        }
+        return channel.getId();
+    }
+
+    @Override
+    public List<CheckReadStatusDto> checkReadStatusByUserId(UUID userUUID) {
+        return readStatusRepository.findByUserId(userUUID).stream()
+                .map(readStatus -> {
+                    Channel channel = channelRepository.findChannelById(readStatus.getChannelId())
+                            .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다"));
+
+                    List<Message> messageList = messageRepository.findMessageByChannel(channel.getId());
+
+                    Message lastMessage = messageList.stream()
+                            .max(Comparator.comparing(Message::getCreatedAt))
+                            .orElse(null);
+
+                    if (lastMessage == null || lastMessage.getCreatedAt() == null) {
+                        return null;
+                    }
+
+                    if (!readStatus.isRead(lastMessage.getCreatedAt())) {
+                        return new CheckReadStatusDto(
+                                channel.getId(),
+                                channel.getChannelName(),
+                                lastMessage.getCreatedAt()
+                        );
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -110,9 +159,9 @@ public class BasicChannelService implements ChannelService {
                 });
 
         readStatusRepository.findByChannelId(channelUUID)
-                        .forEach(readStatus -> {
-                            readStatusRepository.delete(readStatus.getChannelId());
-                        });
+                .forEach(readStatus -> {
+                    readStatusRepository.delete(readStatus.getChannelId());
+                });
 
         messageRepository.deleteMessageById(channelUUID);
 

@@ -41,11 +41,11 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void update(UUID userUUID, UUID channelUUID) {
-        findByUserId(userUUID).stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(channelUUID))
+    public void update(UUID readStatusUUID) {
+        readStatusList.stream()
+                .filter(readStatus -> readStatus.getId().equals(readStatusUUID))
                 .findAny()
-                .ifPresent(ReadStatus::updateTime);
+                .ifPresent(ReadStatus::updateLastReadAt);
     }
 
     @Override

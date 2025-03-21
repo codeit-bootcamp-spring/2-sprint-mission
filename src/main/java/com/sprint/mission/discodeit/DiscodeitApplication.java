@@ -44,6 +44,15 @@ public class DiscodeitApplication {
             }
             if (userToken == null) continue;
             userStatusService.updateByUserId(userToken);
+            System.out.println("읽지않은 채널 메세지");
+            channelService.checkReadStatusByUserId(userToken)
+                    .forEach(checkReadStatusDto -> {
+                        System.out.println("--------------------------");
+                        System.out.println("채널 아이디" + checkReadStatusDto.ChannelUUID());
+                        System.out.println("채널 이름" + checkReadStatusDto.channelName());
+                        System.out.println("마지막 메세지 시간" + checkReadStatusDto.lastMessageTime());
+                    });
+
             System.out.println(" ======== 메뉴 ======== ");
             System.out.println("1. 채널 이용\n2. 조회\n3. 수정\n4. 삭제\n5. 로그아웃\n6. 나가기");
             System.out.print("입력란: ");
@@ -92,10 +101,18 @@ public class DiscodeitApplication {
                         case 2:
                             System.out.print("채널 아이디 입력: ");
                             UUID channelUUID = UUID.fromString(sc.nextLine());
-                            channelToken = selectChannel(channelService, channelUUID);
+                            channelToken = channelService.joinChannel(channelUUID, userToken);
                             if (channelToken == null) break;
                             messageService.findMessageByChannelId(channelToken)
-                                    .forEach(System.out::println);
+                                    .forEach(message -> {
+                                        System.out.println("사용자 아이디: " + message.getUserUUID());
+                                        if (!message.getAttachmentList().isEmpty()) {
+                                            System.out.println("=== 이미지 ===");
+                                            System.out.println(message.getAttachmentList());
+                                        }
+                                        System.out.println("말풍선: " + message.getContent());
+                                        System.out.println("보낸 시간: " + message.getCreatedAt());
+                                    });
                             sendMessageByChannel(messageService, binaryContentService, channelToken, userToken);
                             break;
                         case 3:
@@ -117,7 +134,7 @@ public class DiscodeitApplication {
                     System.out.print("입력란: ");
                     int updateNum = sc.nextInt();
                     sc.nextLine();
-                    updateByNum(userService, channelService, messageService, binaryContentService,updateNum);
+                    updateByNum(userService, channelService, messageService, binaryContentService, updateNum);
                     break;
                 case 4:
                     System.out.println("=== 삭제 ===");
@@ -193,13 +210,7 @@ public class DiscodeitApplication {
         }
     }
 
-    private static UUID selectChannel(ChannelService channelService, UUID channelUUID) {
-        FindChannelDto findChannelDto = channelService.findChannel(channelUUID);
-        if (findChannelDto == null) return null;
-        return findChannelDto.channelUUID();
-    }
-
-    private static void sendMessageByChannel(MessageService messageService, BinaryContentService binaryContentService,UUID channelUUID, UUID userUUID) {
+    private static void sendMessageByChannel(MessageService messageService, BinaryContentService binaryContentService, UUID channelUUID, UUID userUUID) {
         try {
             Scanner sc = new Scanner(System.in);
             while (true) {
@@ -310,7 +321,7 @@ public class DiscodeitApplication {
         }
     }
 
-    private static void updateByNum(UserService userService, ChannelService channelService, MessageService messageService, BinaryContentService binaryContentService,int updateNum) {
+    private static void updateByNum(UserService userService, ChannelService channelService, MessageService messageService, BinaryContentService binaryContentService, int updateNum) {
         Scanner sc = new Scanner(System.in);
         switch (updateNum) {
             case 1:
