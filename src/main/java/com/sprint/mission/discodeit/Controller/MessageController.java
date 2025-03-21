@@ -44,7 +44,7 @@ public class MessageController  {
 //
 //    }
 
-    @DeleteMapping("/{messageId}")
+    @DeleteMapping("/delete/{messageId}")
     public ResponseEntity<String> delete(@PathVariable String messageId) {
         boolean isDelete = messageService.delete(messageId);
         if (isDelete == true) {

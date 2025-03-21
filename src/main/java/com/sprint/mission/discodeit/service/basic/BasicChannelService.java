@@ -130,7 +130,6 @@ public class BasicChannelService implements ChannelService {
         return findDTOList;
     }
 
-    @CustomLogging
     @Override
     public boolean delete(String channelId) {
         UUID channelUUID = UUID.fromString(channelId);

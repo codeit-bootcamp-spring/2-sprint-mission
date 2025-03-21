@@ -58,7 +58,7 @@ public class ChannelController {
 //
 //    }
 
-    @DeleteMapping("/{channelId}")
+    @DeleteMapping("/delete/{channelId}")
     public ResponseEntity<String> delete(@PathVariable String channelId) {
         boolean isDelete = channelService.delete(channelId);
         if (isDelete == true) {

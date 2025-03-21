@@ -1,0 +1,32 @@
+### 채널 생성 요청 (POST)
+POST http://localhost:8080/channels/create
+Content-Type: application/json
+
+{
+  "serverId": "5fe9e34c-ef4c-4bbd-8dcb-4e6119f410b7",
+  "creatorId": "943f741a-0cf4-4eb6-87d1-a37b379ab1e1",
+  "name": "test",
+  "type": "PUBLIC"
+}
+### 채널 가입
+PUT http://localhost:8080/channels/join/bc6fd3ee-b716-4041-870b-44f1eecdc2c2
+Content-Type: application/json
+
+{
+  "userId": "b687cfa9-62f2-4c1d-9797-21ee3072597d",
+  "type": "PUBLIC"
+}
+### 채널 탈퇴
+PUT http://localhost:8080/channels/quit/{{channelId}}
+Content-Type: application/json
+
+{
+  "userId": null
+}
+
+### 채널 전체 조회(GET)
+GET http://localhost:8080/channels/461b763b-82d9-4253-ba6b-cdaab6ad2147
+Content-Type: application/json
+
+### 채널 삭제 (DELETE)
+DELETE http://localhost:8080/channels/delete/2d6b4ff6-822a-4228-9b80-3eb2de92d96d

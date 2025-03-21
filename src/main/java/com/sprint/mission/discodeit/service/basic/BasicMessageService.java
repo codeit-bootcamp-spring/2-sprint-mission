@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.RequestToService.MessageWriteDTO;
 import com.sprint.mission.discodeit.DTO.RequestToService.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.DTO.RequestToService.MessageWriteDTO;
 import com.sprint.mission.discodeit.DTO.legacy.Message.MessageCRUDDTO;
 import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
+import com.sprint.mission.discodeit.Exception.legacy.NotFoundExceptions;
 import com.sprint.mission.discodeit.Repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.Repository.ChannelRepository;
 import com.sprint.mission.discodeit.Repository.MessageRepository;
@@ -17,7 +18,6 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -85,7 +85,7 @@ public class BasicMessageService implements MessageService {
                 System.out.println(message.getCreatorName() + " : " + message.getText());
             }
         } catch (NotFoundException e) {
-            System.out.println("메시지 함이 비어있습니다.");
+            throw NotFoundExceptions.MESSAGE_NOT_FOUND;
         }
 
     }

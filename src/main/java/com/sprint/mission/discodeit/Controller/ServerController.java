@@ -48,9 +48,9 @@ public class ServerController {
 //
 //    }
 
-    @DeleteMapping("/{ownerId}")
-    public ResponseEntity<String> delete(@PathVariable String ownerId) {
-        boolean isDelete = serverService.delete(ownerId);
+    @DeleteMapping("/delete/{serverId}")
+    public ResponseEntity<String> delete(@PathVariable String serverId) {
+        boolean isDelete = serverService.delete(serverId);
         if (isDelete == true) {
             return ResponseEntity.ok("Delete successful");
         } else {

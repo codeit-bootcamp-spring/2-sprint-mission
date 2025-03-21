@@ -4,10 +4,11 @@ import com.sprint.mission.discodeit.DTO.Request.ServerCreateRequestDTO;
 import com.sprint.mission.discodeit.DTO.legacy.Server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
+@Service
 public interface ServerService {
 
     void reset(boolean adminAuth);

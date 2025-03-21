@@ -102,9 +102,10 @@ public class JCFServerRepository implements ServerRepository {
 
 
     @Override
-    public void remove(UUID userId) {
-        List<Server> list = findAllByUserId(userId);
-        Server server = findByOwnerId(userId);
+    public void remove(UUID serverId) {
+        Server server = find(serverId);
+        UUID ownerId = server.getOwnerId();
+        List<Server> list = findAllByUserId(ownerId);
         list.remove(server);
     }
 

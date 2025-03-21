@@ -23,7 +23,6 @@ public interface MessageService {
 
     void print(String channelId);
 
-
     boolean delete(String messageId);
 
     boolean update(String messageId, MessageCRUDDTO messageCRUDDTO);

@@ -133,10 +133,10 @@ public class FileServerRepository implements ServerRepository {
 
 
     @Override
-    public void remove(UUID userId) {
-        List<Server> list = findAllByUserId(userId);
-        Server server = findByOwnerId(userId);
-        list.remove(server);
+    public void remove(UUID serverId) {
+        Server server = find(serverId);
+        UUID ownerId = server.getOwnerId();
+        List<Server> list = findAllByUserId(ownerId);
 
         fileRepository.save(serverList);
     }

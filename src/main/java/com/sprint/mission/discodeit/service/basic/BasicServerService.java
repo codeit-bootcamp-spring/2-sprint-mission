@@ -116,10 +116,10 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public boolean delete(String userId) {
-        UUID userUUID = UUID.fromString(userId);
+    public boolean delete(String serverId) {
+        UUID serverUUID = UUID.fromString(serverId);
         try {
-            serverRepository.remove(userUUID);
+            serverRepository.remove(serverUUID);
             return true;
         } catch (ServerNotFoundException e) {
             System.out.println("delete: 서버를 찾지 못했습니다.");

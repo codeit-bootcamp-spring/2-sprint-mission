@@ -4,8 +4,8 @@ Content-Type: application/json
 
 {
   "userCreateDTO": {
-    "userName": "test3",
-    "email": "test3",
+    "userName": "test2",
+    "email": "test2",
     "password": "test"
   },
   "binaryContentCreateDTO": {
@@ -19,4 +19,4 @@ GET http://localhost:8080/users
 Content-Type: application/json
 
 ### 사용자 삭제 (DELETE)
-DELETE http://localhost:8080/users/8f7f2ec6-3b96-4de6-b2bb-cc3b12e67899
+DELETE http://localhost:8080/users/39414fe1-9f76-47de-b876-a32cadc2e88e

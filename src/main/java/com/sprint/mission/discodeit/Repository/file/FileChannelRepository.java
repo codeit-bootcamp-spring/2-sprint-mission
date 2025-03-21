@@ -137,8 +137,9 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void remove(UUID channelId) {
-        List<Channel> list = findAllByChannelId(channelId);
         Channel channel = find(channelId);
+        UUID serverId = channel.getServerId();
+        List<Channel> list = channelList.get(serverId);
         list.remove(channel);
         fileRepository.save(channelList);
     }
