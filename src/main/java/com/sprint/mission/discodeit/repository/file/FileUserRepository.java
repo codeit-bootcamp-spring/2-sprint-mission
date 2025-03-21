@@ -7,12 +7,13 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.util.*;
 
-@Repository
 public class FileUserRepository implements UserRepository {
     private static final String FILE_NAME = "users.ser";
     private final Map<UUID, User> data = new HashMap<>();
+    private final String filePath;
 
-    public FileUserRepository() {
+    public FileUserRepository(String directory) {
+        this.filePath = directory + "/" + FILE_NAME;
         loadFromFile();
     }
 
@@ -64,9 +65,9 @@ public class FileUserRepository implements UserRepository {
     }
 
     private void loadFromFile() {
-        File file = new File(FILE_NAME);
+        File file = new File(filePath);
         if (!file.exists()) return;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             Object obj = ois.readObject();
             if (obj instanceof Map<?, ?> map) {
                 for (Map.Entry<?, ?> entry : map.entrySet()) {

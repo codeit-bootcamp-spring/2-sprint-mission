@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
     private final Map<UUID, ReadStatus> data = new HashMap<>();
     private static final String FILE_NAME = "readStatus.ser";
+    private final String filePath;
 
-
-    public FileReadStatusRepository() {
+    public FileReadStatusRepository(String directory) {
+        this.filePath = directory + "/" + FILE_NAME;
         loadFromFile();
     }
 
@@ -62,9 +62,9 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     private void loadFromFile() {
-        File file = new File(FILE_NAME);
+        File file = new File(filePath);
         if (!file.exists()) return;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             Object obj = ois.readObject();
             if (obj instanceof Map<?, ?> map) {
                 for (Map.Entry<?, ?> entry : map.entrySet()) {

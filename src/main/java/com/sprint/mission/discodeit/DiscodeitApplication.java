@@ -11,11 +11,13 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.List;
 
 @SpringBootApplication
+@ConfigurationPropertiesScan("com.sprint.mission.discodeit.config")
 public class DiscodeitApplication {
 
     public static void main(String[] args) {
@@ -46,7 +48,7 @@ public class DiscodeitApplication {
             BinaryContent attachment = binaryContentService.create(new CreateBinaryContentDto("file.txt", fileBytes));
 
             // 5. 메시지 생성 (첨부파일 포함)
-            Message message = messageService.create(new CreateMessageDto(privateChannel.getUuid(),user.getUuid(),"비밀 메시지입니다.", List.of(attachment.getUuid()))
+            Message message = messageService.create(new CreateMessageDto(privateChannel.getUuid(), user.getUuid(), "비밀 메시지입니다.", List.of(attachment.getUuid()))
             );
             System.out.println("메시지 생성 완료: " + message.getUuid());
 
@@ -66,7 +68,6 @@ public class DiscodeitApplication {
             System.err.println("[ERROR] " + e.getMessage());
         }
     }
-
 
 
 }
