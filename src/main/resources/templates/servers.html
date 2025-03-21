@@ -17,6 +17,7 @@
     <th>생성일</th>
     <th>수정일</th>
     <th>삭제</th>
+    <th>채널 관리</th>
   </tr>
   </thead>
   <tbody id="serverTableBody">
@@ -62,6 +63,7 @@
             <td>${new Date(server.createdAt).toLocaleString()}</td>
             <td>${new Date(server.updatedAt).toLocaleString()}</td>
             <td><button onclick="deleteServer('${server.id}')">삭제</button></td>
+            <td><a href="/users/${userId}/servers/${server.id}"> <button>채널 관리</button></a></td>
           `;
                 tbody.appendChild(row);
               });

@@ -1,16 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
-import com.sprint.mission.discodeit.dto.UserFindDTO;
 import com.sprint.mission.discodeit.dto.request.CreateChannelRequestDTO;
-import com.sprint.mission.discodeit.dto.request.JoinQuitChannelRequestDTO;
-import com.sprint.mission.discodeit.exception.Empty.EmptyMessageListException;
-import com.sprint.mission.discodeit.exception.NotFound.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.NotFound.MessageNotFoundException;
-import com.sprint.mission.discodeit.exception.NotFound.ServerNotFoundException;
-import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.Empty.EmptyMessageListException;
+import com.sprint.mission.discodeit.exception.NotFound.MessageNotFoundException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -57,38 +53,37 @@ public class BasicChannelService implements ChannelService {
 
     }
 
+//    @Override
+//    public UserFindDTO join(JoinQuitChannelRequestDTO channelJoinQuitDTO) {
+//        Channel findChannel = channelRepository.find(channelJoinQuitDTO.channelId());
+//        User user = userRepository.findById(channelJoinQuitDTO.userId());
+//        User join = channelRepository.join(findChannel, user);
+//
+//        if (findChannel.getType() == ChannelType.PRIVATE) {
+//            createReadStatus(user, findChannel);
+//        }
+//
+//        return new UserFindDTO(join.getId(),join.getProfileId(),join.getName(),join.getEmail(),join.getCreatedAt(),join.getUpdatedAt());
+//    }
+//
+//    @CustomLogging
+//    @Override
+//    public UserFindDTO quit(JoinQuitChannelRequestDTO channelJoinQuitDTO) {
+//        Channel findChannel = channelRepository.find(channelJoinQuitDTO.channelId());
+//        User user = userRepository.findById(channelJoinQuitDTO.userId());
+//
+//        User quit = channelRepository.quit(findChannel, user);
+//
+//        return new UserFindDTO(quit.getId(),quit.getProfileId(),quit.getName(),quit.getEmail(),quit.getCreatedAt(),quit.getUpdatedAt());
+//    }
+
     @Override
-    public UserFindDTO join(JoinQuitChannelRequestDTO channelJoinQuitDTO) {
-        Channel findChannel = channelRepository.find(channelJoinQuitDTO.channelId());
-        User user = userRepository.findById(channelJoinQuitDTO.userId());
-        User join = channelRepository.join(findChannel, user);
-
-        if (findChannel.getType() == ChannelType.PRIVATE) {
-            createReadStatus(user, findChannel);
-        }
-
-        return new UserFindDTO(join.getId(),join.getProfileId(),join.getName(),join.getEmail(),join.getCreatedAt(),join.getUpdatedAt());
-    }
-
-    @CustomLogging
-    @Override
-    public UserFindDTO quit(JoinQuitChannelRequestDTO channelJoinQuitDTO) {
-        Channel findChannel = channelRepository.find(channelJoinQuitDTO.channelId());
-        User user = userRepository.findById(channelJoinQuitDTO.userId());
-
-        User quit = channelRepository.quit(findChannel, user);
-
-        return new UserFindDTO(quit.getId(),quit.getProfileId(),quit.getName(),quit.getEmail(),quit.getCreatedAt(),quit.getUpdatedAt());
-    }
-
-    @Override
-    public ChannelFindDTO find(String channelId) {
-        UUID channelUUID = UUID.fromString(channelId);
-        Channel channel = channelRepository.find(channelUUID);
+    public ChannelFindDTO find(UUID channelId) {
+        Channel channel = channelRepository.find(channelId);
         Instant lastMessageTime = null;
 
         try {
-            List<Message> messageList = messageRepository.findAllByChannelId(channelUUID);
+            List<Message> messageList = messageRepository.findAllByChannelId(channelId);
             Message message = messageList.get(messageList.size() - 1);
             lastMessageTime = message.createdAt;
         } catch (EmptyMessageListException e) {
@@ -109,44 +104,28 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelFindDTO> findAllByServerAndUser(String serverId) {
-        UUID serverUUID = UUID.fromString(serverId);
-        List<Channel> channelList = channelRepository.findAllByServerId(serverUUID);
+    public List<ChannelFindDTO> findAllByServerAndUser(UUID serverId) {
+        List<Channel> channelList = channelRepository.findAllByServerId(serverId);
         List<ChannelFindDTO> findDTOList = new ArrayList<>();
 
         for (Channel channel : channelList) {
-            ChannelFindDTO channelFindDTO = find(channel.getChannelId().toString());
+            ChannelFindDTO channelFindDTO = find(channel.getChannelId());
             findDTOList.add(channelFindDTO);
         }
         return findDTOList;
     }
 
     @Override
-    public boolean delete(String channelId) {
-        UUID channelUUID = UUID.fromString(channelId);
-
-        try {
-            channelRepository.remove(channelUUID);
-            deleteAllMessage(channelUUID);
-            deleteAllReadStatus(channelUUID);
-            return true;
-
-        } catch (MessageNotFoundException e) {
-            System.out.println("삭제 중 메시지 함이 없습니다.");
-            return false;
-        } catch (ServerNotFoundException e) {
-            System.out.println("서버를 찾을 수 없습니다.");
-            return false;
-        } catch (ChannelNotFoundException e) {
-            System.out.println("채널을 찾을 수 없습니다.");
-            return false;
-        }
+    public void delete(UUID channelId) {
+        channelRepository.remove(channelId);
+        deleteAllMessage(channelId);
+        deleteAllReadStatus(channelId);
     }
 
 //    @CustomLogging
 //    @Override
 //    public boolean update(ChannelCRUDDTO channelCRUDDTO, ChannelCRUDDTO channelUpdateDTO) {
-//        UUID userId = channelCRUDDTO.creatorId();
+//        UUID userId = channelCRUDDTO.userId();
 //        UUID channelId = channelCRUDDTO.channelId();
 //
 //        Channel findChannel = channelRepository.find(channelId);
@@ -165,21 +144,19 @@ public class BasicChannelService implements ChannelService {
 //    }
 
     @Override
-    public boolean printChannels(String serverId) {
-        UUID serverUUID = UUID.fromString(serverId);
+    public void printChannels(UUID serverId) {
 
-        List<Channel> channels = channelRepository.findAllByServerId(serverUUID);
+        List<Channel> channels = channelRepository.findAllByServerId(serverId);
         channels.forEach(System.out::println);
-        return true;
+
     }
 
     @Override
-    public boolean printUsersInChannel(String channelId) {
-        UUID channelUUID = UUID.fromString(channelId);
-        Channel channel = channelRepository.find(channelUUID);
+    public void printUsersInChannel(UUID channelId) {
+        Channel channel = channelRepository.find(channelId);
         List<User> list = channel.getUserList();
         list.forEach(System.out::println);
-        return true;
+
     }
 
 

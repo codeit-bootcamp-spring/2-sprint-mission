@@ -19,19 +19,19 @@ public interface ChannelService {
 
     UUID create(CreateChannelRequestDTO channelCreateDTO);
 
-    UserFindDTO join(JoinQuitChannelRequestDTO channelJoinQuitDTO);
+//    UserFindDTO join(JoinQuitChannelRequestDTO channelJoinQuitDTO);
+//
+//    UserFindDTO quit(JoinQuitChannelRequestDTO channelJoinQuitDTO);
 
-    UserFindDTO quit(JoinQuitChannelRequestDTO channelJoinQuitDTO);
+    ChannelFindDTO find(UUID channelId);
 
-    ChannelFindDTO find(String channelId);
+    List<ChannelFindDTO> findAllByServerAndUser(UUID serverId );
 
-    List<ChannelFindDTO> findAllByServerAndUser(String serverId );
+    void printChannels(UUID serverId);
 
-    boolean printChannels(String serverId);
+    void printUsersInChannel(UUID channelId);
 
-    boolean printUsersInChannel(String channelId);
-
-    boolean delete(String channelId);
+    void delete(UUID channelId);
 
 //    boolean update(ChannelCRUDDTO channelCRUDDTO, ChannelCRUDDTO channelUpdateDTO);
 
