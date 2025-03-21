@@ -63,16 +63,15 @@ public class JCFReadStatusRepository extends AbstractRepository<ReadStatus> impl
     @Override
     public void deleteById(UUID readStatusId) {
         ReadStatus target = super.findById(readStatusId);
-        this.userIdMap.get(super.findById(readStatusId).getUserId()).remove(target);
-        this.channelIdMap.get(super.findById(readStatusId).getChannelId()).remove(target);
-        super.deleteById(readStatusId);
+        this.userIdMap.get(super.findById(readStatusId).getUserId()).remove(target);        // userIdMap의 target 삭제
+        this.channelIdMap.get(super.findById(readStatusId).getChannelId()).remove(target);  // channelIdMap의 target 삭제
+        super.deleteById(readStatusId);                                                     // storage의 target 삭제
     }
 
     @Override
     public void deleteByUserId(UUID userId) {
         if (!userIdMap.get(userId).isEmpty()) {
-            List<ReadStatus> readStatusList = this.findByUserId(userId);
-            readStatusList.forEach(readStatus -> channelIdMap.get(readStatus.getChannelId()).remove(readStatus));
+            List<ReadStatus> readStatusList = new ArrayList<>(this.findByUserId(userId));
             readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
         }
         userIdMap.remove(userId);
@@ -81,8 +80,7 @@ public class JCFReadStatusRepository extends AbstractRepository<ReadStatus> impl
     @Override
     public void deleteByChannelId(UUID channelId) {
         if (!channelIdMap.get(channelId).isEmpty()) {
-            List<ReadStatus> readStatusList = this.findByChannelId(channelId);
-            readStatusList.forEach(readStatus -> userIdMap.get(readStatus.getUserId()).remove(readStatus));
+            List<ReadStatus> readStatusList = new ArrayList<>(this.findByChannelId(channelId));
             readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
         }
         channelIdMap.remove(channelId);
