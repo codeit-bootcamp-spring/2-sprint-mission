@@ -65,7 +65,7 @@ public class JCFMessageRepository extends AbstractRepository<Message> implements
 
     @Override
     public void deleteById(UUID messageId) {
-        super.deleteById(messageId);
         channelIdMessages.get(super.findById(messageId).getChannelId()).remove(super.findById(messageId));
+        super.deleteById(messageId);
     }
 }
