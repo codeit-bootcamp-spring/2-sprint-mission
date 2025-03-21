@@ -8,11 +8,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public class FileMessageRepository implements MessageRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
@@ -82,6 +82,16 @@ public class FileMessageRepository implements MessageRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<Message> findByChannelId(UUID channelId) {
+        return List.of();
+    }
+
+    @Override
+    public Optional<Instant> findLatestMessageTimeByChannelId(UUID channelId) {
+        return Optional.empty();
     }
 
     @Override
