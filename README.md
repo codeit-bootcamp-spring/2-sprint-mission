@@ -10,7 +10,7 @@
 
 2. Spring 프로젝트 초기화
 
-- [ ] Spring Initializr를 통해 zip 파일을 다운로드하세요.
+- [x] Spring Initializr를 통해 zip 파일을 다운로드하세요.
     - [x] 빌드 시스템은 Gradle - Groovy를 사용합니다.
     - [x] 언어는 Java 17를 사용합니다.
     - [x] Spring Boot의 버전은 3.4.0입니다.
@@ -94,14 +94,14 @@ public static void main(String[]args){
     - 프로필 이미지 입력(url or FilePath)/시간이 된다면 실제 이미지 업로드 해보기
     - 이미지 경로 등록
     - 등록된 유저정보와 함께 이미지 id와 경로 반환
-- [ ] 유저 프로필이미지 변경 기능
+- [x] 유저 프로필이미지 변경 기능
     - 프로필 이미지 입력(url or FilePath)
     - 입력된 이미지 경로로 변경
     - 등록된 유저정보와 함께 이미지 id와 경로 반환
 
 #### AuthService 구현
 
-- [ ] 로그인 기능
+- [x] 로그인 기능
     - username, password 입력
     - 로그인시 유저의 UserStatus 로그인으로 갱신
     - 로그인한 유저의 id, 이름, 프로필 ID 반환
@@ -113,14 +113,14 @@ public static void main(String[]args){
         - [ ] private 채널 생성
             - private 상태와 유저 id 전달
             - private에 참여하는 유저 id와 유저별 readStatus 채널에 저장
-        - [ ] public 채널 생성[기존로직 탐구 필요]
+        - [ ] public 채널 생성
             - public 매개변수 전달
             - public 생성
-    - [ ] 채널 조회 - find(), findALL()
-        - [ ] public 조회 및 반환
-        - [ ] 유저 private한 채널 반환
-            - 본인 id 입력값 받기
-            - 채널 private 중에 본인이 속한 채널 조회
+- [ ] 채널 조회 - find(), findALL()
+    - [ ] public 조회 및 반환
+    - [ ] 유저 private한 채널 반환
+        - 본인 id 입력값 받기
+        - 채널 private 중에 본인이 속한 채널 조회
 
 #### MessageService 고도화
 
@@ -376,6 +376,10 @@ public static void main(String[]args){
   ~~~
 
 ## 미완성 및 개선해야할 부분
+
+### 스프링 1차 미션
+- [ ] 다른 레이어에 있는 테스트는 어디에 넣고 어디서 검증하는게 좋은가
+- [ ] 스프링테스트와 단위테스트, 통합테스트
 
 ### 파일 저장소 미션
 
