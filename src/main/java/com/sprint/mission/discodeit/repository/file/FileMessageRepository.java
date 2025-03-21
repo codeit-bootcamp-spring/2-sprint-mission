@@ -1,22 +1,31 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
     private static final String FILE_NAME = "message.ser";
     private final Map<UUID, Message> data = new HashMap<>();
+
+    public FileMessageRepository() {
+        loadFromFile();
+    }
 
     @Override
     public Message save(Message message) {
         data.put(message.getUuid(), message);
         saveToFile();
+
         return data.get(message.getUuid());
     }
 
@@ -32,18 +41,18 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAllByChannelKey(UUID channelKey) {
-        return data.values().stream()
-                .filter(m -> m.getChannelKey().equals(channelKey))
-                .toList();
+    public List<Message> findAll() {
+        return data.values().stream().toList();
     }
 
     @Override
-    public Message findByMessageId(int messageId) {
-        return data.values().stream()
-                .filter(m -> m.getMessageId() == messageId)
-                .findFirst()
-                .orElse(null);
+    public boolean existsByKey(UUID messageKey) {
+        return data.containsKey(messageKey);
+    }
+
+    @Override
+    public List<Message> findAllByChannelKey(UUID channelKey) {
+        return data.values().stream().filter(m -> m.getChannelKey().equals(channelKey)).toList();
     }
 
     private void saveToFile() {

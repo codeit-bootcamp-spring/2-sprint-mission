@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
 public class FileUserRepository implements UserRepository {
     private static final String FILE_NAME = "users.ser";
     private final Map<UUID, User> data = new HashMap<>();
@@ -18,6 +20,7 @@ public class FileUserRepository implements UserRepository {
     public User save(User user) {
         data.put(user.getUuid(), user);
         saveToFile();
+
         return data.get(user.getUuid());
     }
 
@@ -27,27 +30,29 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public List<User> findAll() {
+        return data.values().stream().toList();
+    }
+
+    @Override
     public boolean existsByKey(UUID userKey) {
         return data.containsKey(userKey);
+    }
+
+    @Override
+    public boolean existsByName(String userName) {
+        return data.values().stream().anyMatch(user -> user.getName().equals(userName));
+    }
+
+    @Override
+    public boolean existsByEmail(String userEmail) {
+        return data.values().stream().anyMatch(user -> user.getEmail().equals(userEmail));
     }
 
     @Override
     public void delete(User user) {
         data.remove(user.getUuid());
         saveToFile();
-    }
-
-    @Override
-    public User findByUserId(String userId) {
-        return data.values().stream()
-                .filter(u -> u.getId().equals(userId))
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public List<User> findAllByIds(List<String> userIds) {
-        return data.values().stream().filter(u -> userIds.contains(u.getId())).toList();
     }
 
     private void saveToFile() {

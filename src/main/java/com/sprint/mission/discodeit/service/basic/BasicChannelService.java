@@ -1,131 +1,123 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+@Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
-    ChannelRepository channelRepository;
-    UserService userService;
-    public BasicChannelService(ChannelRepository channelRepository, UserService userService) {
-        this.channelRepository = channelRepository;
-        this.userService = userService;
-    }
+    private final ChannelRepository channelRepository;
+    private final MessageRepository messageRepository;
+    private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public UUID signUp(String name, UUID userKey) {
-        Channel channel = channelRepository.findByName(name);
-        if (channel == null) {
-            throw new IllegalArgumentException("[Error] 가입하려는 채널이 존재하지 않습니다.");
-        }
-        if (isSignUp(name, userKey)) {
-            throw new IllegalStateException("[Error] 이미 가입된 채널입니다.");
-        }
-        channel.updateMemberKeys(userKey);
-        channel.updateMemberNames(userService.getUserName(userKey));
-        return channel.getUuid();
-    }
-
-    @Override
-    public Channel create(String category, String name, String introduction, UUID memberKey, UUID ownerKey) {
-        Channel checkedChannel = channelRepository.findByName(name);
-        if (channelRepository.existsByKey(checkedChannel.getUuid())) {
-            throw new IllegalArgumentException("[Error] 동일한 채널명이 존재합니다.");
-        }
-        Channel channel = new Channel(category, name, introduction, memberKey, ownerKey, userService.getUserName(memberKey), userService.getUserName(ownerKey));
+    public Channel createPublic(CreatePublicChannelDto request) {
+        Channel channel = new Channel(request.type(), request.channelName(), request.introduction());
         return channelRepository.save(channel);
     }
 
     @Override
-    public Channel read(String name) {
-        Channel channel = channelRepository.findByName(name);
-        if (channel == null) {
-            throw new IllegalArgumentException("[Error] 조회할 채널이 존재하지 않습니다.");
-        }
-        return channel;
-    }
-
-    @Override
-    public List<Channel> readAll(List<String> names) {
-        List<Channel> channels = channelRepository.findAllByNames(names);
-        if (channels.isEmpty()) {
-            throw new IllegalArgumentException("[Error] 조회할 채널이 존재하지 않습니다.");
-        }
-        return channels;
-    }
-
-    @Override
-    public Channel update(String inputNameToModify, String category, String name, String introduction, UUID userKey) {
-        Channel channel = channelRepository.findByName(inputNameToModify);
-        if (channel == null) {
-            throw new IllegalArgumentException("[Error] 존재하지 않는 채널입니다.");
-        }
-        if (!isOwner(channel.getUuid(), userKey)) {
-            throw new IllegalArgumentException("[Error] 권한이 부족합니다.");
-        }
-        if (!category.isEmpty()) {
-            channel.updateCategory(category);
-        }
-        if (!name.isEmpty()) {
-            channel.updateName(name);
-        }
-        if (!name.isEmpty()) {
-            channel.updateIntroduction(introduction);
+    public Channel createPrivate(CreatePrivateChannelDto request) {
+        Channel channel = new Channel(request.type(), null, null);
+        for (UUID memberKey : request.memberKeys()) {
+            ReadStatus readStatus = new ReadStatus(memberKey, channel.getUuid(), Instant.EPOCH);
+            readStatusRepository.save(readStatus);
         }
         return channelRepository.save(channel);
     }
 
+
     @Override
-    public void delete(String name, UUID userKey) {
-        Channel channel = channelRepository.findByName(name);
+    public ReadChannelResponseDto read(ReadChannelRequestDto requestDto) {
+        Channel channel = channelRepository.findByKey(requestDto.channelKey());
+        if (channel == null) {
+            throw new IllegalArgumentException("[Error] channel is null");
+        }
+        return createReadChannelResponse(channel);
+    }
+
+    @Override
+    public List<ReadChannelResponseDto> readAllByUserKey(UUID userKey) {
+        List<Channel> publicChannels = channelRepository.findAll().stream()
+                .filter(publicChannel -> publicChannel.getType() == ChannelType.PUBLIC)
+                .toList();
+        List<UUID> privateChannelKeys = readStatusRepository.findAllByUserKey(userKey).stream()
+                .map(ReadStatus::getChannelKey)
+                .toList();
+        List<Channel> privateChannels = channelRepository.findAllByKeys(privateChannelKeys);
+        return Stream.concat(publicChannels.stream(), privateChannels.stream())
+                .map(this::createReadChannelResponse)
+                .toList();
+    }
+
+    @Override
+    public UpdateChannelDto update(UpdateChannelDto requestDto) {
+        Channel channel = channelRepository.findByKey(requestDto.channelKey());
         if (channel == null) {
             throw new IllegalArgumentException("[Error] 존재하지 않는 채널입니다.");
         }
-        if (!isOwner(channel.getUuid(), userKey)) {
-            throw new IllegalArgumentException("[Error] 권한이 부족합니다.");
+        if (channel.getType() == ChannelType.PRIVATE) {
+            throw new IllegalArgumentException("[Error] PRIVATE 채널은 수정할 수 없습니다.");
         }
+        if (!requestDto.newName().isEmpty()) {
+            channel.updateName(requestDto.newName());
+        }
+        if (!requestDto.newIntroduction().isEmpty()) {
+            channel.updateIntroduction(requestDto.newIntroduction());
+        }
+        channelRepository.save(channel);
+        return new UpdateChannelDto(channel.getUuid(), channel.getName(), channel.getIntroduction());
+    }
+
+    @Override
+    public void delete(UUID channelKey) {
+        Channel channel = channelRepository.findByKey(channelKey);
+        if (channel == null) {
+            throw new IllegalArgumentException("[Error] 존재하지 않는 채널입니다.");
+        }
+
+        List<Message> messages = messageRepository.findAllByChannelKey(channelKey);
+        for (Message message : messages) {
+            messageRepository.delete(message.getUuid());
+        }
+
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelKey(channelKey);
+        for (ReadStatus readStatus : readStatuses) {
+            readStatusRepository.delete(readStatus.getUuid());
+        }
+
         channelRepository.delete(channel.getUuid());
     }
 
-    @Override
-    public UUID login(String name, UUID userKey) {
-        Channel channel = channelRepository.findByName(name);
-        if (channel == null) {
-            throw new IllegalArgumentException("[Error] 채널을 찾을 수 없습니다.");
+    private ReadChannelResponseDto createReadChannelResponse(Channel channel) {
+        Instant lastMessageAt = messageRepository.findAllByChannelKey(channel.getUuid()).stream()
+                .map(Message::getCreatedAt)
+                .max(Instant::compareTo)
+                .orElse(null);
+        List<UUID> participantUserIds = null;
+
+        if (channel.getType() == ChannelType.PRIVATE) {
+            participantUserIds = readStatusRepository.findAllByChannelKey(channel.getUuid()).stream()
+                    .map(ReadStatus::getUserKey)
+                    .toList();
         }
-        if (!isSignUp(name,userKey)) {
-            throw new IllegalStateException("[Error] 해당 채널에 가입되지 않았습니다.");
-        }
-        return channel.getUuid();
+
+        return new ReadChannelResponseDto(channel.getUuid(), channel.getType(), channel.getName(), channel.getIntroduction(), lastMessageAt, participantUserIds);
     }
 
-    @Override
-    public String getChannelName(UUID channelKey) {
-        if (channelKey == null) {
-            throw new IllegalArgumentException("[Error] 채널을 찾을 수 없습니다.");
-        }
-        return channelRepository.findByKey(channelKey).getName();
-    }
-
-    private boolean isSignUp(String name, UUID userKey) {
-        Channel channel = channelRepository.findByName(name);
-        if (channel == null) {
-            throw new IllegalArgumentException("[Error] 채널을 찾을 수 없습니다.");
-        }
-        return channel.getMemberKeys().contains(userKey);
-    }
-
-    private boolean isOwner(UUID channelKey, UUID userKey) {
-        if (channelKey == null) {
-            throw new IllegalArgumentException("[Error] 채널을 찾을 수 없습니다.");
-        }
-        if (userKey == null) {
-            throw new IllegalArgumentException("[Error] 유저를 찾을 수 없습니다.");
-        }
-        return channelRepository.findByKey(channelKey).getOwnerKey().equals(userKey);
-    }
 }

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data = new HashMap<>();
     private static final String FILE_NAME = "channel.ser";
@@ -21,7 +23,25 @@ public class FileChannelRepository implements ChannelRepository {
     public Channel save(Channel channel) {
         data.put(channel.getUuid(), channel);
         saveToFile();
+
         return data.get(channel.getUuid());
+    }
+
+    @Override
+    public Channel findByKey(UUID channelKey) {
+        return data.get(channelKey);
+    }
+
+    @Override
+    public List<Channel> findAll() {
+        return data.values().stream().toList();
+    }
+
+    @Override
+    public List<Channel> findAllByKeys(List<UUID> channelKeys) {
+        return channelKeys.stream()
+                .map(data::get)
+                .toList();
     }
 
     @Override
@@ -31,28 +51,8 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findByKey(UUID channelKey) {
-        return data.get(channelKey);
-    }
-
-    @Override
     public boolean existsByKey(UUID channelKey) {
         return data.containsKey(channelKey);
-    }
-
-    @Override
-    public Channel findByName(String name) {
-        return data.values().stream()
-                .filter(c -> c.getName().equals(name))
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public List<Channel> findAllByNames(List<String> names) {
-        return data.values().stream()
-                .filter(c -> names.contains(c.getName()))
-                .toList();
     }
 
     private void saveToFile() {
