@@ -75,8 +75,7 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
     @Override
     public void deleteByUserId(UUID userId) {
         if (!userIdMap.get(userId).isEmpty()) {
-            List<ReadStatus> readStatusList = this.findByUserId(userId);
-            readStatusList.forEach(readStatus -> channelIdMap.get(readStatus.getChannelId()).remove(readStatus));
+            List<ReadStatus> readStatusList = new ArrayList<>(this.findByUserId(userId));
             readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
             readStatusList.forEach(readStatus -> super.deleteFile(readStatus.getId()));
         }
@@ -86,8 +85,7 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
     @Override
     public void deleteByChannelId(UUID channelId) {
         if (!channelIdMap.get(channelId).isEmpty()) {
-            List<ReadStatus> readStatusList = this.findByChannelId(channelId);
-            readStatusList.forEach(readStatus -> userIdMap.get(readStatus.getUserId()).remove(readStatus));
+            List<ReadStatus> readStatusList = new ArrayList<>(this.findByChannelId(channelId));
             readStatusList.forEach(readStatus -> this.deleteById(readStatus.getId()));
             readStatusList.forEach(readStatus -> super.deleteFile(readStatus.getId()));
         }
