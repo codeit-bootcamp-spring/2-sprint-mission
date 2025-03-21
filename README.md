@@ -108,9 +108,9 @@ public static void main(String[]args){
 
 #### ChannelService 고도화
 
-- [ ] 채널 private, public 메서드 구분
-    - [ ] 채널 생성
-        - [ ] private 채널 생성
+- [x] 채널 private, public 메서드 구분
+    - [x] 채널 생성
+        - [x] private 채널 생성
             - private 상태와 유저 id 전달
             - private에 참여하는 유저 id와 유저별 readStatus 채널에 저장
         - [x] public 채널 생성
@@ -158,7 +158,7 @@ public static void main(String[]args){
 
 2. 새로운 도메인 추가하기
 
-- [ ] 공통: 앞서 정의한 도메인 모델과 동일하게 공통 필드(id, createdAt, updatedAt)를 포함합니다.
+- [x] 공통: 앞서 정의한 도메인 모델과 동일하게 공통 필드(id, createdAt, updatedAt)를 포함합니다.
 
 
 - [x] ReadStatus(userId, channelId)
@@ -225,8 +225,8 @@ public static void main(String[]args){
 - PRIVATE 채널과 PUBLIC 채널을 생성하는 메소드를 분리합니다.
   - [x] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
 - PRIVATE 채널을 생성할 때:
-  - [ ] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
-  - [ ] name과 description 속성은 생략합니다.
+  - [x] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
+  - [x] name과 description 속성은 생략합니다.
 - PUBLIC 채널을 생성할 때에는 기존 로직을 유지합니다.
 
 2. find

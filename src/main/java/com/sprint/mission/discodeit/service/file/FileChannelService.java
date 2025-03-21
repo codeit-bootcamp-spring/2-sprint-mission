@@ -4,8 +4,11 @@ import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.ChannelRegisterDto;
 import com.sprint.mission.discodeit.application.UsersDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +25,16 @@ import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT
 public class FileChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
+    private final ReadStatusRepository readStatusRepository;
 
     @Override
     public ChannelDto create(ChannelRegisterDto channelRegisterDto) {
-        Channel channel = new Channel(channelRegisterDto.channelType(), channelRegisterDto.name(), channelRegisterDto.owner().id());
+        Channel channel = new Channel(channelRegisterDto.channelType(), channelRegisterDto.name());
         Channel savedChannel = channelRepository.save(channel);
+
+        if (channelRegisterDto.channelType().equals(ChannelType.PRIVATE)) {
+            readStatusRepository.create(new ReadStatus(channelRegisterDto.owner().id(), savedChannel.getId()));
+        }
 
         return ChannelDto.fromEntity(savedChannel, UsersDto.fromEntity(findChannelUsers(channel)));
     }
@@ -59,23 +67,24 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto addMember(UUID id, String friendEmail) {
+    public ChannelDto addMemberToPrivate(UUID id, String friendEmail) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
         User friend = userRepository.findByEmail(friendEmail)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
 
-        channel.addMember(friend.getId());
+        readStatusRepository.create(new ReadStatus(friend.getId(), channel.getId()));
         channelRepository.save(channel);
 
         return ChannelDto.fromEntity(channel, UsersDto.fromEntity(findChannelUsers(channel)));
     }
 
     private List<User> findChannelUsers(Channel channel) {
-        return channel.getUserIds()
+        return readStatusRepository.findByChannelId(channel.getId())
                 .stream()
-                .map(userRepository::findById)
+                .sorted(Comparator.comparing(ReadStatus::getCreatedAt))
+                .map(readStatus -> userRepository.findById(readStatus.getUserId()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();

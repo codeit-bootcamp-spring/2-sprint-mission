@@ -91,13 +91,13 @@ public class Application {
         handlers.put(CHANNEL_CHANGE, new ChannelChangeHandler(channelController, inputView));
     }
 
-    public static ChannelDto setupChannel(ChannelController channelController, UserDto loginUser) {
+    private static ChannelDto setupChannel(ChannelController channelController, UserDto loginUser) {
         ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, SETUP_CHANNEL_NAME, loginUser);
 
         return channelController.create(channelRegisterDto);
     }
 
-    public static UserDto setupUser(UserController userController) {
+    private static UserDto setupUser(UserController userController) {
         UserDto loginUser = userController.register(
                 new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null
         );

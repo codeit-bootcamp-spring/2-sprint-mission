@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    ChannelDto addMember(UUID id, String friendEmail);
+    ChannelDto addMemberToPrivate(UUID id, String friendEmail);
 
     ChannelDto create(ChannelRegisterDto channelRegisterDto);
 

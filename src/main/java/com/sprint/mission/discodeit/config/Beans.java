@@ -38,7 +38,7 @@ public class Beans {
         saveBean(MessageService.class,
                 new BasicMessageService(findBean(MessageRepository.class), findBean(UserRepository.class)));
         saveBean(ChannelService.class,
-                new BasicChannelService(findBean(ChannelRepository.class), findBean(UserRepository.class)));
+                new BasicChannelService(findBean(ChannelRepository.class), findBean(UserRepository.class), findBean(ReadStatusRepository.class)));
 
         saveBean(UserController.class, new UserController(findBean(UserService.class), findBean(BinaryContentService.class)));
         saveBean(MessageController.class, new MessageController(findBean(MessageService.class)));
@@ -52,6 +52,7 @@ public class Beans {
     }
 
     private void initializeJCFBeans() {
+        saveBean(ReadStatusRepository.class, new JCFReadStatusRepository());
         saveBean(UserStatusRepository.class, new JCFUserStatusRepository());
         saveBean(BinaryContentRepository.class, new JCFBinaryContentRepository());
         saveBean(UserRepository.class, new JCFUserRepository());

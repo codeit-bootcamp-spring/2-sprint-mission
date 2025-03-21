@@ -28,6 +28,6 @@ public class ChannelController {
     }
 
     public ChannelDto addMember(ChannelDto channelDto, String friendEmail) {
-        return channelService.addMember(channelDto.id(), friendEmail);
+        return channelService.addMemberToPrivate(channelDto.id(), friendEmail);
     }
 }

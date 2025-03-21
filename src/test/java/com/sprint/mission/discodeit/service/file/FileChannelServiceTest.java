@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import org.junit.jupiter.api.AfterEach;
@@ -54,7 +55,7 @@ class FileChannelServiceTest {
         channelRepository.changePath(channelTestFilePath);
 
         userService = new FileUserService(userRepository);
-        channelService = new FileChannelService(channelRepository, userRepository);
+        channelService = new FileChannelService(channelRepository, userRepository, new JCFReadStatusRepository());
     }
 
     private void setUpChannel(UserDto loginUser) {
@@ -85,7 +86,7 @@ class FileChannelServiceTest {
         UserDto otherUser = userService.register(new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword()), null);
 
-        ChannelDto channelDto = channelService.addMember(initializedChannel.id(), OTHER_USER.getEmail());
+        ChannelDto channelDto = channelService.addMemberToPrivate(initializedChannel.id(), OTHER_USER.getEmail());
         assertThat(channelDto.usersDto().users()).contains(otherUser);
     }
 
