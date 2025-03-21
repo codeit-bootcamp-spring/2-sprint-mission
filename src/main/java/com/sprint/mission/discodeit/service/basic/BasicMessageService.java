@@ -62,6 +62,7 @@ public class BasicMessageService implements MessageService {
         return this.messageRepository.findMessageListByChannelId(channelId);
     }
 
+    // binaryContent를 업데이트할지 다음 미션의 컨트롤러에서 결정할 것!
     @Override
     public void updateMessage(MessageUpdateRequest messageUpdateRequest) {
         Message findMessage = this.messageRepository.findById(messageUpdateRequest.messageId());
