@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.BinaryContentType;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateParam;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -28,17 +27,15 @@ public class BasicUserService implements UserService {
     private final BasicBinaryContentService basicBinaryContentService;
 
     @Override
-    public User create(UserCreateRequest createRequest) {
-        duplicateUsername(createRequest.getUsername());
-        duplicateEmail(createRequest.getEmail());
-        UUID binaryContentId = null;
+    public User create(UserCreateRequest createRequest,
+                       Optional<BinaryContentCreateRequest> binaryContentRequestNullable) {
+        duplicateUsername(createRequest.username());
+        duplicateEmail(createRequest.email());
+        UUID binaryContentId = binaryContentRequestNullable
+                .map(basicBinaryContentService::create).map(BinaryContent::getId).orElse(null);
 
-        if (createRequest.getType() != null && createRequest.getFile() != null && !createRequest.getFile().isEmpty()) {
-            binaryContentId = profileCreate(createRequest.getType(), List.of(createRequest.getFile()));
-        }
-
-        User user = new User(createRequest.getUsername(), createRequest.getEmail(), createRequest.getPassword(),
-                binaryContentId);
+        User user = new User(createRequest.username(), createRequest.email()
+                , createRequest.password(), binaryContentId);
 
         UserStatusParam statusParam = new UserStatusParam(user.getId(), UserStatusType.ONLINE);
         userStatusService.create(statusParam);
@@ -73,26 +70,31 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateRequest updateRequest) {
-        duplicateUsername(updateRequest.getNewUsername());
-        duplicateEmail(updateRequest.getNewEemail());
-
-        User user = userRepository.findById(updateRequest.getId())
+    public User update(UserUpdateRequest updateRequest,
+                       Optional<BinaryContentCreateRequest> binaryContentRequestNullable) {
+        User user = userRepository.findById(updateRequest.id())
                 .orElseThrow(() -> new NoSuchElementException(
-                        updateRequest.getId() + " 에 해당하는 userStatus를 찾을 수 없음"));
-        UUID binaryContentId = user.getProfileId();
+                        updateRequest.id() + " 에 해당하는 userStatus를 찾을 수 없음"));
 
-        if (updateRequest.getNewType() != null && updateRequest.getNewFile() != null
-                && !updateRequest.getNewFile().isEmpty()) {
-            if (binaryContentId != null) {
-                basicBinaryContentService.delete(user.getProfileId());
-            }
-            binaryContentId = profileCreate(updateRequest.getNewType()
-                    , List.of(updateRequest.getNewFile()));
-        }
+        String newUsername = updateRequest.newUsername().orElse(user.getUsername());
+        String newEmail = updateRequest.newEemail().orElse(user.getEmail());
+        duplicateUsername(newUsername);
+        duplicateEmail(newEmail);
 
-        user.update(updateRequest.getNewUsername(), updateRequest.getNewEemail()
-                , updateRequest.getNewPassword(), binaryContentId);
+        UUID binaryContentId = binaryContentRequestNullable
+                .map(request -> {
+                    if (user.getProfileId() != null) {
+                        basicBinaryContentService.delete(user.getProfileId());
+                    }
+                    return basicBinaryContentService.create(request);
+                }).map(BinaryContent::getId).orElse(null);
+
+        user.update(
+                updateRequest.newUsername().orElse(user.getUsername()),
+                updateRequest.newEemail().orElse(user.getEmail()),
+                updateRequest.newPassword().orElse(user.getPassword()),
+                binaryContentId
+        );
 
         return userRepository.save(user);
     }
@@ -125,11 +127,5 @@ public class BasicUserService implements UserService {
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException(email + " 은 중복된 email.");
         }
-    }
-
-    private UUID profileCreate(BinaryContentType type, List<MultipartFile> file) {
-        BinaryContentCreateParam binaryContentCreateParam = new BinaryContentCreateParam(type, file);
-        List<UUID> idList = basicBinaryContentService.create(binaryContentCreateParam);
-        return idList.get(0);
     }
 }

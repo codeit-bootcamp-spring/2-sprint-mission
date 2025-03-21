@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.entity.BinaryContentType;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateParam;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
@@ -25,7 +25,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
-import org.springframework.web.multipart.MultipartFile;
 
 public class FileUserService implements UserService {
     private final Path DIRECTORY;
@@ -48,18 +47,14 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User create(UserCreateRequest createParam) {
-        duplicateUsername(createParam.getUsername());
-        duplicateEmail(createParam.getEmail());
-
-        UUID binaryContentId = null;
-
-        if (createParam.getType() != null && createParam.getFile() != null && !createParam.getFile().isEmpty()) {
-            binaryContentId = profileCreate(createParam.getType(), List.of(createParam.getFile()));
-        }
-
-        User user = new User(createParam.getUsername(), createParam.getEmail(), createParam.getPassword(),
-                binaryContentId);
+    public User create(UserCreateRequest createRequest,
+                       Optional<BinaryContentCreateRequest> binaryContentRequestNullable) {
+        duplicateUsername(createRequest.username());
+        duplicateEmail(createRequest.email());
+        UUID binaryContentId = binaryContentRequestNullable
+                .map(basicBinaryContentService::create).map(BinaryContent::getId).orElse(null);
+        User user = new User(createRequest.username(), createRequest.email()
+                , createRequest.password(), binaryContentId);
 
         UserStatusParam statusParam = new UserStatusParam(user.getId(), UserStatusType.ONLINE);
         userStatusService.create(statusParam);
@@ -134,13 +129,11 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateRequest updateParam) {
-        duplicateUsername(updateParam.getNewUsername());
-        duplicateEmail(updateParam.getNewEemail());
-
+    public User update(UserUpdateRequest updateRequest,
+                       Optional<BinaryContentCreateRequest> binaryContentRequestNullable) {
         User userNullable = null;
 
-        Path path = resolvePath(updateParam.getId());
+        Path path = resolvePath(updateRequest.id());
         if (Files.exists(path)) {
             try (
                     FileInputStream fis = new FileInputStream(path.toFile());
@@ -153,20 +146,26 @@ public class FileUserService implements UserService {
         }
 
         User user = Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + updateParam.getId() + " not found"));
-        UUID binaryContentId = user.getProfileId();
+                .orElseThrow(() -> new NoSuchElementException("User with id " + updateRequest.id() + " not found"));
 
-        if (updateParam.getNewType() != null && updateParam.getNewFile() != null
-                && !updateParam.getNewFile().isEmpty()) {
-            if (binaryContentId != null) {
-                basicBinaryContentService.delete(user.getProfileId());
-            }
-            binaryContentId = profileCreate(updateParam.getNewType()
-                    , List.of(updateParam.getNewFile()));
-        }
+        String newUsername = updateRequest.newUsername().orElse(user.getUsername());
+        String newEmail = updateRequest.newEemail().orElse(user.getEmail());
+        duplicateUsername(newUsername);
+        duplicateEmail(newEmail);
+        UUID binaryContentId = binaryContentRequestNullable
+                .map(request -> {
+                    if (user.getProfileId() != null) {
+                        basicBinaryContentService.delete(user.getProfileId());
+                    }
+                    return basicBinaryContentService.create(request);
+                }).map(BinaryContent::getId).orElse(null);
 
-        user.update(updateParam.getNewUsername(), updateParam.getNewEemail()
-                , updateParam.getNewPassword(), binaryContentId);
+        user.update(
+                updateRequest.newUsername().orElse(user.getUsername()),
+                updateRequest.newEemail().orElse(user.getEmail()),
+                updateRequest.newPassword().orElse(user.getPassword()),
+                binaryContentId
+        );
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
@@ -242,9 +241,9 @@ public class FileUserService implements UserService {
         }
     }
 
-    private UUID profileCreate(BinaryContentType type, List<MultipartFile> file) {
-        BinaryContentCreateParam binaryContentCreateParam = new BinaryContentCreateParam(type, file);
-        List<UUID> idList = basicBinaryContentService.create(binaryContentCreateParam);
+    /*private UUID profileCreate(BinaryContentType type, List<MultipartFile> file) {
+        BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(type, file);
+        List<UUID> idList = basicBinaryContentService.create(binaryContentCreateRequest);
         return idList.get(0);
-    }
+    }*/
 }

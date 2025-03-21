@@ -1,22 +1,23 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.BinaryContentType;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateParam;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusParam;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.web.multipart.MultipartFile;
 
 public class JCFUserService implements UserService {
     private final Map<UUID, User> data;
@@ -30,17 +31,17 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User create(UserCreateRequest createParam) {
-        duplicateUsername(createParam.getUsername());
-        duplicateEmail(createParam.getEmail());
-        UUID binaryContentId = null;
-
-        if (createParam.getType() != null && createParam.getFile() != null && !createParam.getFile().isEmpty()) {
-            binaryContentId = profileCreate(createParam.getType(), List.of(createParam.getFile()));
-        }
-
-        User user = new User(createParam.getUsername(), createParam.getEmail(), createParam.getPassword(),
+    public User create(UserCreateRequest createRequest,
+                       Optional<BinaryContentCreateRequest> binaryContentRequestNullable) {
+        duplicateUsername(createRequest.username());
+        duplicateEmail(createRequest.email());
+        UUID binaryContentId = binaryContentRequestNullable
+                .map(basicBinaryContentService::create).map(BinaryContent::getId).orElse(null);
+        User user = new User(createRequest.username(), createRequest.email(), createRequest.password(),
                 binaryContentId);
+        UserStatusParam statusParam = new UserStatusParam(user.getId(), UserStatusType.ONLINE);
+        userStatusService.create(statusParam);
+
         this.data.put(user.getId(), user);
 
         return user;
@@ -61,9 +62,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public List<UserInfoResponse> findAll() {
-        return data.entrySet().stream()
-                .map(entry -> {
-                    User user = entry.getValue();
+        return data.values().stream()
+                .map(user -> {
                     UserStatus userStatus = userStatusService.findByUserId(user.getId());
                     return new UserInfoResponse(
                             user.getId(), user.getCreatedAt(),
@@ -75,28 +75,32 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateRequest updateParam) {
-        duplicateUsername(updateParam.getNewUsername());
-        duplicateEmail(updateParam.getNewEemail());
-
-        User userNullable = this.data.get(updateParam.getId());
+    public User update(UserUpdateRequest updateRequest,
+                       Optional<BinaryContentCreateRequest> binaryContentRequestNullable) {
+        User userNullable = this.data.get(updateRequest.id());
         if (userNullable == null) {
-            throw new NoSuchElementException("User with id " + updateParam.getId() + " not found");
+            throw new NoSuchElementException("User with id " + updateRequest.id() + " not found");
         }
 
-        UUID binaryContentId = userNullable.getProfileId();
+        String newUsername = updateRequest.newUsername().orElse(userNullable.getUsername());
+        String newEmail = updateRequest.newEemail().orElse(userNullable.getEmail());
+        duplicateUsername(newUsername);
+        duplicateEmail(newEmail);
 
-        if (updateParam.getNewType() != null && updateParam.getNewFile() != null
-                && !updateParam.getNewFile().isEmpty()) {
-            if (binaryContentId != null) {
-                basicBinaryContentService.delete(userNullable.getProfileId());
-            }
-            binaryContentId = profileCreate(updateParam.getNewType()
-                    , List.of(updateParam.getNewFile()));
-        }
+        UUID binaryContentId = binaryContentRequestNullable
+                .map(request -> {
+                    if (userNullable.getProfileId() != null) {
+                        basicBinaryContentService.delete(userNullable.getProfileId());
+                    }
+                    return basicBinaryContentService.create(request);
+                }).map(BinaryContent::getId).orElse(null);
 
-        userNullable.update(updateParam.getNewUsername(), updateParam.getNewEemail()
-                , updateParam.getNewPassword(), binaryContentId);
+        userNullable.update(
+                updateRequest.newUsername().orElse(userNullable.getUsername()),
+                updateRequest.newEemail().orElse(userNullable.getEmail()),
+                updateRequest.newPassword().orElse(userNullable.getPassword()),
+                binaryContentId
+        );
 
         this.data.put(userNullable.getId(), userNullable);
         return userNullable;
@@ -130,12 +134,6 @@ public class JCFUserService implements UserService {
         if (existsByEmail(email)) {
             throw new IllegalArgumentException(email + " 은 중복된 email.");
         }
-    }
-
-    private UUID profileCreate(BinaryContentType type, List<MultipartFile> file) {
-        BinaryContentCreateParam binaryContentCreateParam = new BinaryContentCreateParam(type, file);
-        List<UUID> idList = basicBinaryContentService.create(binaryContentCreateParam);
-        return idList.get(0);
     }
 
     private boolean existsByUsername(String username) {

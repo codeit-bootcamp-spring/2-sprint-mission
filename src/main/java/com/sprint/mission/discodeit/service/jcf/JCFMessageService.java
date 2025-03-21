@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateParam;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
 import java.util.HashMap;
@@ -31,23 +31,15 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message create(MessageCreateRequest createRequest) {
-        try {
-            channelService.find(createRequest.getChannelId());
-            userService.find(createRequest.getAuthorId());
-        } catch (NoSuchElementException e) {
-            throw e;
-        }
-        List<UUID> idList = null;
-
-        if (createRequest.getType() != null && createRequest.getFiles() != null && !createRequest.getFiles()
-                .isEmpty()) {
-            BinaryContentCreateParam binaryContentCreateParam = new BinaryContentCreateParam(createRequest.getType(),
-                    createRequest.getFiles());
-            idList = basicBinaryContentService.create(binaryContentCreateParam);
-        }
-        Message message = new Message(createRequest.getContent(), createRequest.getChannelId(),
-                createRequest.getAuthorId(), idList);
+    public Message create(MessageCreateRequest createRequest,
+                          List<BinaryContentCreateRequest> binaryContentRequestList) {
+        channelService.find(createRequest.channelId());
+        userService.find(createRequest.authorId());
+        List<UUID> idList = binaryContentRequestList.stream()
+                .map(request ->
+                        basicBinaryContentService.create(request).getId()).toList();
+        Message message = new Message(createRequest.content(), createRequest.channelId(),
+                createRequest.authorId(), idList);
         this.data.put(message.getId(), message);
 
         return message;

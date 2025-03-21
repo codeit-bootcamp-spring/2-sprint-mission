@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateParam;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
 import java.util.List;
@@ -24,23 +24,20 @@ public class BasicMessageService implements MessageService {
     private final BasicBinaryContentService basicBinaryContentService;
 
     @Override
-    public Message create(MessageCreateRequest createRequest) {
-        if (!channelRepository.existsById(createRequest.getChannelId())) {
-            throw new NoSuchElementException(createRequest.getChannelId() + "에 해당하는 Channel을 찾을 수 없음");
+    public Message create(MessageCreateRequest createRequest,
+                          List<BinaryContentCreateRequest> binaryContentRequestList) {
+        if (!channelRepository.existsById(createRequest.channelId())) {
+            throw new NoSuchElementException(createRequest.channelId() + "에 해당하는 Channel을 찾을 수 없음");
         }
-        if (!userRepository.existsById(createRequest.getAuthorId())) {
-            throw new NoSuchElementException(createRequest.getAuthorId() + "에 해당하는 Author를 찾을 수 없음");
+        if (!userRepository.existsById(createRequest.authorId())) {
+            throw new NoSuchElementException(createRequest.authorId() + "에 해당하는 Author를 찾을 수 없음");
         }
-        List<UUID> idList = null;
+        List<UUID> idList = binaryContentRequestList.stream()
+                .map(request ->
+                        basicBinaryContentService.create(request).getId()).toList();
 
-        if (createRequest.getType() != null && createRequest.getFiles() != null && !createRequest.getFiles()
-                .isEmpty()) {
-            BinaryContentCreateParam binaryContentCreateParam = new BinaryContentCreateParam(createRequest.getType(),
-                    createRequest.getFiles());
-            idList = basicBinaryContentService.create(binaryContentCreateParam);
-        }
-        Message message = new Message(createRequest.getContent(), createRequest.getChannelId(),
-                createRequest.getAuthorId(), idList);
+        Message message = new Message(createRequest.content(), createRequest.channelId(),
+                createRequest.authorId(), idList);
         return messageRepository.save(message);
     }
 
