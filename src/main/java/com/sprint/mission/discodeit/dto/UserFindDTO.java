@@ -9,6 +9,6 @@ public record UserFindDTO(
         String name,
         String email,
         Instant createdAt,
-        Instant updateAt
+        Instant updatedAt
 ) {
 }

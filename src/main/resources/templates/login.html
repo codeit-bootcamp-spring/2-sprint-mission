@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+  <script>
+    function submitLoginForm(event) {
+      event.preventDefault(); // 기본 폼 제출 동작 방지
+
+      const userName = document.getElementById("userName").value;
+      const password = document.getElementById("password").value;
+
+      fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userName, password })
+      })
+              .then(response => {
+                if (!response.ok) {
+                  return response.text().then(errMsg => { throw new Error(errMsg); });
+                }
+                return response.json();
+              })
+              .then(data => {
+                alert("로그인 성공!");
+                window.location.href = "/"; // 로그인 성공 시 메인 페이지로 이동
+              })
+              .catch(error => {
+                console.error('로그인 실패:', error);
+                alert("로그인 실패: " + error.message);
+              });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("loginForm").addEventListener("submit", submitLoginForm);
+    });
+  </script>
+</head>
+<body>
+
+<h1>로그인</h1>
+<form id="loginForm">
+  <label for="userName">아이디:</label><br/>
+  <input type="text" id="userName" name="userName" required><br/><br/>
+
+  <label for="password">비밀번호:</label><br/>
+  <input type="password" id="password" name="password" required><br/><br/>
+
+  <button type="submit">로그인</button>
+</form>
+
+<br/>
+<a href="/">🏠 홈으로</a>
+<a href="/register">📝 회원가입</a>
+
+</body>
+</html>

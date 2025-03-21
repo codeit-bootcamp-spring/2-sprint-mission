@@ -19,8 +19,8 @@ public interface UserService {
 
     List<UserFindDTO> listAllUsers();
 
-//    boolean delete(String userId);
-//
+    void delete(UUID userId);
+
 //    User update(String userId, UserUpdateDTO userUpdateDTO, Optional<CreateBinaryContentRequestDTO>binaryContentDTO);
 
 }

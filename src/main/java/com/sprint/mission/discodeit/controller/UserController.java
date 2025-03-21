@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,15 +52,6 @@ public class UserController {
         return ResponseEntity.ok(new CreateUserResult(id));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserLoginRequestDTO userLoginDTO) {
-        boolean isSuccess = authService.loginUser(userLoginDTO);
-        if (isSuccess == true) {
-            return ResponseEntity.ok("Login successful");
-        } else {
-            return ResponseEntity.status(401).body("Invalid id or password");
-        }
-    }
 
     @GetMapping
     public ResponseEntity<UserDisplayList> findAll() {
@@ -89,15 +79,11 @@ public class UserController {
     }
 
 
-//    @DeleteMapping("/{userId}")
-//    public ResponseEntity<String> delete(@PathVariable String userId) {
-//        boolean isDelete = userService.delete(userId);
-//        if (isDelete == true) {
-//            return ResponseEntity.ok("Delete successful");
-//        } else {
-//            return ResponseEntity.status(401).body("Delete failed");
-//        }
-//    }
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> delete(@PathVariable UUID userId) {
+        userService.delete(userId);
+        return ResponseEntity.ok("Delete successful");
+    }
 
     //    @PutMapping("/online/{userId}")
 //    public ResponseEntity<UserStatus> online(@PathVariable String userId, @RequestBody UserStatusDTO UserstatusDTO) {

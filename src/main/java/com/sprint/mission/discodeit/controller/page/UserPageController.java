@@ -5,6 +5,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class UserPageController {
+    @GetMapping("/userIndex")
+    public String getIndexPage() {
+        return "userIndex";
+    }
+
     @GetMapping("/users")
     public String getUserListPage() {
         return "users";
@@ -12,7 +17,11 @@ public class UserPageController {
 
     @GetMapping("/register")
     public String getRegisterPage() {
-        return "register";  // templates/legacy_register.html 파일을 렌더링
+        return "register";
     }
 
+    @GetMapping("/login")
+    public String getLoginPage() {
+        return "login";
+    }
 }

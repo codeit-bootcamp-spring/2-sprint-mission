@@ -16,6 +16,8 @@
         <th>이름</th>
         <th>이메일</th>
         <th>가입일</th>
+        <th>수정일</th>
+        <th>삭제</th>
     </tr>
     </thead>
     <tbody id="userTableBody">
@@ -49,6 +51,7 @@
                         <td>${user.email}</td>
                         <td>${new Date(user.createdAt).toLocaleString()}</td>
                         <td>${new Date(user.updatedAt).toLocaleString()}</td>
+                        <td><button onclick="deleteUser('${user.id}')">삭제</button></td>
                     `;
                     userTableBody.appendChild(row);
                 });
@@ -58,9 +61,26 @@
                 alert('유저 목록을 불러오는데 실패했습니다.');
             });
     }
+    function deleteUser(userId) {
+        if (!confirm("정말 삭제하시겠습니까?")) return;
 
+        fetch(`/api/users/${userId}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("삭제 실패");
+                }
+                alert("삭제 성공");
+                loadUsers(); // 목록 다시 불러오기
+            })
+            .catch(error => {
+                console.error("유저 삭제 오류:", error);
+                alert("유저 삭제에 실패했습니다.");
+            });
+    }
     document.addEventListener('DOMContentLoaded', loadUsers);
 </script>
-<a href="/">🏠 홈으로</a>
+<a href="/userIndex">🏠 유저 페이지로</a>
 </body>
 </html>

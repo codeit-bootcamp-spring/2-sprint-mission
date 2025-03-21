@@ -85,7 +85,8 @@ public class BasicUserService implements UserService {
 
         return list;
     }
-//
+
+    //
 //    @CustomLogging
 //    @Override
 //    public User update(String userId, UserUpdateDTO userUpdateDTO, Optional<CreateBinaryContentRequestDTO>binaryContentDTO) {
@@ -103,34 +104,17 @@ public class BasicUserService implements UserService {
 //        }
 //    }
 //
-//    @CustomLogging
-//    @Override
-//    public boolean delete(String userId) {
-//        UUID userUUID = UUID.fromString(userId);
-//        try {
-//            User findUser = userRepository.find(userUUID);
-//
-//            userRepository.remove(findUser);
-//            userStatusRepository.delete(findUser.getId());
-//
-//            Optional.ofNullable(findUser.getProfileId())
-//                    .ifPresent(binaryContentRepository::delete);
-//
-//            return true;
-//        } catch (UserNotFoundException e) {
-//            System.out.println("delete: 유저를 찾지 못했습니다.");
-//            return false;
-//        } catch (UserStatusNotFoundException e) {
-//            System.out.println("delete: 유저 상태를 찾지 못했습니다.");
-//            return false;
-//        } catch (BinaryContentNotFoundException e) {
-//            System.out.println("delete: 바이너리 정보를 찾지 못했습니다.");
-//            return false;
-//        } catch (EmptyUserListException e) {
-//            System.out.println("delete: 유저 리스트가 비어있습니다.");
-//            return false;
-//        }
-//    }
+    @CustomLogging
+    @Override
+    public void delete(UUID userId) {
+        User findUser = userRepository.findById(userId);
+        userRepository.remove(findUser);
+        userStatusRepository.delete(findUser.getId());
+
+        Optional.ofNullable(findUser.getProfileId())
+                .ifPresent(binaryContentRepository::delete);
+
+    }
 
     private UUID makeBinaryContent(Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
         UUID profileId = binaryContentDTO.map(contentDTO -> {
