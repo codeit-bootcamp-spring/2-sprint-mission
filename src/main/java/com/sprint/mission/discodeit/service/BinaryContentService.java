@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.service.BinaryContent.BinaryContentDTO;
-import com.sprint.mission.discodeit.dto.service.BinaryContent.CreateBinaryContentParam;
+import com.sprint.mission.discodeit.dto.service.binaryContent.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.service.binaryContent.CreateBinaryContentParam;
 
 import java.util.List;
 import java.util.UUID;

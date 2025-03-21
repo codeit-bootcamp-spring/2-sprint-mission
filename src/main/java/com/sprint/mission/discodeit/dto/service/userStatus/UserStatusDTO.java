@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.service.UserStatus;
+package com.sprint.mission.discodeit.dto.service.userStatus;
 
 import lombok.Builder;
 

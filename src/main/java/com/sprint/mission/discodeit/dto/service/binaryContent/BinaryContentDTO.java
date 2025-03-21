@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.service.BinaryContent;
+package com.sprint.mission.discodeit.dto.service.binaryContent;
 
 import lombok.Builder;
 

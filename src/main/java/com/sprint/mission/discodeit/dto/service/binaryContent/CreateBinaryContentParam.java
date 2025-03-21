@@ -1,8 +1,6 @@
-package com.sprint.mission.discodeit.dto.service.BinaryContent;
+package com.sprint.mission.discodeit.dto.service.binaryContent;
 
 import lombok.Builder;
-
-import java.util.UUID;
 
 @Builder
 public record CreateBinaryContentParam(
