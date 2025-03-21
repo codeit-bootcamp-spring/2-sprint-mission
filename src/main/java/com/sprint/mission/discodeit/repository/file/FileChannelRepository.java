@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.dto.legacy.channel.ChannelCRUDDTO;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.Empty.EmptyChannelListException;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.exception.NotFound.ChannelNotFoundException;
@@ -8,9 +10,6 @@ import com.sprint.mission.discodeit.exception.NotFound.SaveFileNotFoundException
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.util.CommonUtils;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Server;
-import com.sprint.mission.discodeit.entity.User;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -119,21 +118,21 @@ public class FileChannelRepository implements ChannelRepository {
 
         return channels;
     }
-
-    @Override
-    public Channel update(Channel targetChannel, ChannelCRUDDTO channelUpdateDTO) {
-        if (channelUpdateDTO.channelId() != null) {
-            targetChannel.setChannelId(channelUpdateDTO.channelId());
-        }
-        if (channelUpdateDTO.name() != null) {
-            targetChannel.setName(channelUpdateDTO.name());
-        }
-        if (channelUpdateDTO.type() != null) {
-            targetChannel.setType(channelUpdateDTO.type());
-        }
-        fileRepository.save(channelList);
-        return targetChannel;
-    }
+//
+//    @Override
+//    public Channel update(Channel targetChannel, ChannelCRUDDTO channelUpdateDTO) {
+//        if (channelUpdateDTO.channelId() != null) {
+//            targetChannel.setChannelId(channelUpdateDTO.channelId());
+//        }
+//        if (channelUpdateDTO.name() != null) {
+//            targetChannel.setName(channelUpdateDTO.name());
+//        }
+//        if (channelUpdateDTO.type() != null) {
+//            targetChannel.setType(channelUpdateDTO.type());
+//        }
+//        fileRepository.save(channelList);
+//        return targetChannel;
+//    }
 
     @Override
     public void remove(UUID channelId) {

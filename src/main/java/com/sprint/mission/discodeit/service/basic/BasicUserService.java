@@ -1,20 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.UserFindDTO;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequestDTO;
-import com.sprint.mission.discodeit.dto.legacy.user.UserCRUDDTO;
-import com.sprint.mission.discodeit.dto.legacy.user.UserFindDTO;
-import com.sprint.mission.discodeit.exception.Empty.EmptyUserListException;
-import com.sprint.mission.discodeit.exception.NotFound.UserStatusNotFoundException;
-import com.sprint.mission.discodeit.exception.Valid.DuplicateUserException;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.util.CommonUtils;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.Valid.DuplicateUserException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,68 +37,53 @@ public class BasicUserService implements UserService {
     @CustomLogging
     @Override
     public UUID create(CreateUserRequestDTO userCreateDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
-        UserCRUDDTO checkDuplicate = UserCRUDDTO.checkDuplicate(userCreateDTO.name(), userCreateDTO.email());
-        try {
-            checkDuplicate(checkDuplicate);
-            User user = new User(userCreateDTO.name(), userCreateDTO.email(), userCreateDTO.password());
-            UUID profileId = makeBinaryContent(binaryContentDTO);
-            user.setProfileId(profileId);
-            userRepository.save(user);
 
-            UserStatus userStatus = new UserStatus(user.getId());
-            userStatusRepository.save(userStatus);
+        checkDuplicate(userCreateDTO.name(), userCreateDTO.email());
 
-            return user.getId();
-        } catch (DuplicateUserException e) {
-            throw new DuplicateUserException("register: 중복된 유저가 존재합니다.");
-        }
+        User user = new User(userCreateDTO.name(), userCreateDTO.email(), userCreateDTO.password());
+        UUID profileId = makeBinaryContent(binaryContentDTO);
+        user.setProfileId(profileId);
+        userRepository.save(user);
+
+        UserStatus userStatus = new UserStatus(user.getId());
+        userStatusRepository.save(userStatus);
+
+        return user.getId();
     }
 
     @Override
     public UserFindDTO findById(UUID userId) {
         User user = userRepository.findById(userId);
+
         UserStatus userStatus = userStatusRepository.findByUserId(userId);
         userStatus.updateStatus();
 
-        UserFindDTO userFindDTO = UserFindDTO.find(
+        UserFindDTO userFindDTO = new UserFindDTO(
                 user.getId(),
                 user.getProfileId(),
                 user.getName(),
                 user.getEmail(),
                 user.getCreatedAt(),
-                user.getUpdatedAt(),
-                userStatus
+                user.getUpdatedAt()
+//                userStatus
         );
 
         return userFindDTO;
-
-
     }
 
     @Override
     public List<UserFindDTO> listAllUsers() {
-        List<UserFindDTO> findList = new ArrayList<>();
-        try {
-            List<User> userList = userRepository.findAll();
-            for (User user : userList) {
-                UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
-                UserFindDTO userFindDTO = UserFindDTO.find(
-                        user.getId(),
-                        user.getProfileId(),
-                        user.getName(),
-                        user.getEmail(),
-                        user.getCreatedAt(),
-                        user.getUpdatedAt(),
-                        userStatus
-                );
-                findList.add(userFindDTO);
-            }
-            return findList;
-        } catch (EmptyUserListException e) {
-            throw new EmptyUserListException("findAll: 유저 리스트가 비어있습니다.");
-        } catch (UserStatusNotFoundException e) {
-            throw new UserStatusNotFoundException(("findAll: 유저 상태를 찾을 수 없습니다."));
-        }
+        List<User> userList = userRepository.findAll();
+
+        List<UserFindDTO> list = userList.stream().map(user -> new UserFindDTO(
+                user.getId(),
+                user.getProfileId(),
+                user.getName(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getUpdatedAt())).toList();
+
+        return list;
     }
 //
 //    @CustomLogging
@@ -166,12 +147,9 @@ public class BasicUserService implements UserService {
         return profileId;
     }
 
-    private void checkDuplicate(UserCRUDDTO userCRUDDTO) {
-        try {
-            List<User> list = userRepository.findAll();
-            CommonUtils.checkUserDuplicate(list, userCRUDDTO.userName(), User::getName);
-            CommonUtils.checkUserDuplicate(list, userCRUDDTO.email(), User::getEmail);
-        } catch (EmptyUserListException e) {
+    private void checkDuplicate(String name, String email) {
+        if (userRepository.existName(name) || userRepository.existEmail(email)) {
+            throw new DuplicateUserException("동일한 유저가 존재합니다.");
         }
     }
 }

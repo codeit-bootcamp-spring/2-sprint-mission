@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.dto.legacy.userstatus.UserStatusCRUDDTO;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserStatusListException;
 import com.sprint.mission.discodeit.exception.NotFound.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.exception.NotFound.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -63,14 +62,14 @@ public class FileUserStatusRepository implements UserStatusRepository {
         return userStatusList;
     }
 
-    @Override
-    public UserStatus update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO) {
-        if (userStatusUpdateDTO.userStatusId() != null) {
-            userStatus.setUserStatusId(userStatusUpdateDTO.userStatusId());
-        }
-        fileRepository.save(userStatusList);
-        return userStatus;
-    }
+//    @Override
+//    public UserStatus update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO) {
+//        if (userStatusUpdateDTO.userStatusId() != null) {
+//            userStatus.setUserStatusId(userStatusUpdateDTO.userStatusId());
+//        }
+//        fileRepository.save(userStatusList);
+//        return userStatus;
+//    }
 
     @Override
     public void delete(UUID id) {

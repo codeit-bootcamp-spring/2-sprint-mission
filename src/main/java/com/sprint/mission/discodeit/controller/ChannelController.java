@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.legacy.request.ChannelCreateDTO;
-import com.sprint.mission.discodeit.dto.legacy.request.EnterChannelDTO;
-import com.sprint.mission.discodeit.dto.legacy.request.QuitChannelDTO;
-import com.sprint.mission.discodeit.dto.requestToService.ChannelJoinQuitDTO;
-import com.sprint.mission.discodeit.dto.legacy.channel.ChannelDTO;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
+
+import com.sprint.mission.discodeit.dto.ChannelFindDTO;
+import com.sprint.mission.discodeit.dto.UserFindDTO;
+import com.sprint.mission.discodeit.dto.request.CreateChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.request.JoinQuitChannelRequestDTO;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,33 +20,27 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @PostMapping("/create")
-    public ResponseEntity<Channel> create(@RequestBody ChannelCreateDTO channelCreateDTO) {
-        Channel channel = channelService.create(channelCreateDTO);
-        return ResponseEntity.ok(channel);
+    public ResponseEntity<UUID> create(@RequestBody CreateChannelRequestDTO channelCreateDTO) {
+        UUID id = channelService.create(channelCreateDTO);
+        return ResponseEntity.ok(id);
     }
 
-    @PutMapping("/join/{channelId}")
-    public ResponseEntity<String> join(@PathVariable String channelId, @RequestBody EnterChannelDTO enterChannelDTO) {
-        UUID channelUUID = UUID.fromString(channelId);
-        UUID userUUID = UUID.fromString(enterChannelDTO.userId());
-        ChannelJoinQuitDTO joinDTO = ChannelJoinQuitDTO.join(channelUUID, userUUID, enterChannelDTO.type());
-        User join = channelService.join(joinDTO);
-        return ResponseEntity.ok(join.getName() + " has entered the server");
+    @PutMapping("/join")
+    public ResponseEntity<UserFindDTO> join(@RequestBody JoinQuitChannelRequestDTO joinQuitChannelRequestDTO) {
+        UserFindDTO join = channelService.join(joinQuitChannelRequestDTO);
+        return ResponseEntity.ok(join);
     }
 
-    @PutMapping("/quit/{channelId}")
-    public ResponseEntity<String> quit(@PathVariable String channelId, @RequestBody QuitChannelDTO quitChannelDTO) {
-        UUID channelUUID = UUID.fromString(channelId);
-        UUID userUUID = UUID.fromString(quitChannelDTO.userId());
-        ChannelJoinQuitDTO quitDTO = ChannelJoinQuitDTO.quit(channelUUID, userUUID);
-        User quit = channelService.quit(quitDTO);
+    @PutMapping("/quit")
+    public ResponseEntity<UserFindDTO> quit(@RequestBody JoinQuitChannelRequestDTO joinQuitChannelRequestDTO) {
+        UserFindDTO quit = channelService.quit(joinQuitChannelRequestDTO);
 
-        return ResponseEntity.ok(quit.getName() + " has quit the server");
+        return ResponseEntity.ok(quit);
     }
 
     @GetMapping("/{serverId}")
-    public ResponseEntity<List<ChannelDTO>> findAll(@PathVariable String serverId) {
-        List<ChannelDTO> list = channelService.findAllByServerAndUser(serverId);
+    public ResponseEntity<List<ChannelFindDTO>> findAll(@PathVariable String serverId) {
+        List<ChannelFindDTO> list = channelService.findAllByServerAndUser(serverId);
         return ResponseEntity.ok(list);
     }
 

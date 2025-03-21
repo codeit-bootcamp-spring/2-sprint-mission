@@ -1,13 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.legacy.userstatus.UserStatusCRUDDTO;
-import com.sprint.mission.discodeit.exception.Valid.DuplicateUserStatusException;
-import com.sprint.mission.discodeit.exception.legacy.NotFoundException;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.Valid.DuplicateUserStatusException;
+import com.sprint.mission.discodeit.exception.legacy.NotFoundException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -62,17 +61,17 @@ public class BasicUserStatusService implements UserStatusService {
         return all;
     }
 
-    @Override
-    @CustomLogging
-    public void update(String userId, String replaceId) {
-        UUID userUUID = UUID.fromString(userId);
-        UUID replaceUUID = UUID.fromString(replaceId);
-
-        UserStatus userStatus = userStatusRepository.findByUserId(userUUID);
-        UserStatusCRUDDTO userStatusUpdateDTO = UserStatusCRUDDTO.update(replaceUUID);
-
-        userStatusRepository.update(userStatus, userStatusUpdateDTO);
-    }
+//    @Override
+//    @CustomLogging
+//    public void update(String userId, String replaceId) {
+//        UUID userUUID = UUID.fromString(userId);
+//        UUID replaceUUID = UUID.fromString(replaceId);
+//
+//        UserStatus userStatus = userStatusRepository.findByUserId(userUUID);
+//        UserStatusCRUDDTO userStatusUpdateDTO = UserStatusCRUDDTO.update(replaceUUID);
+//
+//        userStatusRepository.update(userStatus, userStatusUpdateDTO);
+//    }
 
     @Override
     @CustomLogging

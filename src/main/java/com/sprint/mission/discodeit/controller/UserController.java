@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
 
-import com.sprint.mission.discodeit.dto.legacy.user.UserFindDTO;
-import com.sprint.mission.discodeit.dto.legacy.request.UserLoginDTO;
+import com.sprint.mission.discodeit.dto.UserFindDTO;
+import com.sprint.mission.discodeit.dto.display.UserDisplayList;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UserLoginRequestDTO;
 import com.sprint.mission.discodeit.dto.result.CreateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -53,7 +54,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
+    public ResponseEntity<String> login(@RequestBody UserLoginRequestDTO userLoginDTO) {
         boolean isSuccess = authService.loginUser(userLoginDTO);
         if (isSuccess == true) {
             return ResponseEntity.ok("Login successful");
@@ -63,9 +64,9 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserFindDTO>> findAll() {
-        List<UserFindDTO> all = userService.listAllUsers();
-        return ResponseEntity.ok(all);
+    public ResponseEntity<UserDisplayList> findAll() {
+        UserDisplayList displayList = new UserDisplayList(userService.listAllUsers());
+        return ResponseEntity.ok(displayList);
     }
 
     @GetMapping("/{id}/profile")

@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.legacy.message.MessageCRUDDTO;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.Empty.EmptyMessageListException;
 import com.sprint.mission.discodeit.exception.NotFound.MessageNotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.util.CommonUtils;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -70,16 +69,16 @@ public class JCFMessageRepository implements MessageRepository {
         return messages;
     }
 
-    @Override
-    public Message update(Message message, MessageCRUDDTO messageUpdateDTO) {
-        if (messageUpdateDTO.text() != null) {
-            message.setText(messageUpdateDTO.text());
-        }
-        if (messageUpdateDTO.messageId() != null) {
-            message.setMessageId(messageUpdateDTO.messageId());
-        }
-        return message;
-    }
+//    @Override
+//    public Message update(Message message, MessageCRUDDTO messageUpdateDTO) {
+//        if (messageUpdateDTO.text() != null) {
+//            message.setText(messageUpdateDTO.text());
+//        }
+//        if (messageUpdateDTO.messageId() != null) {
+//            message.setMessageId(messageUpdateDTO.messageId());
+//        }
+//        return message;
+//    }
 
     @Override
     public void remove(UUID messageId) {

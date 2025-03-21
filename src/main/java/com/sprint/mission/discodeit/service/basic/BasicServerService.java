@@ -1,15 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.legacy.request.ServerCreateRequestDTO;
-import com.sprint.mission.discodeit.dto.legacy.server.ServerCRUDDTO;
+import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.Empty.EmptyServerListException;
 import com.sprint.mission.discodeit.exception.NotFound.ServerNotFoundException;
 import com.sprint.mission.discodeit.exception.NotFound.UserNotFoundException;
+import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.ServerRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.entity.Server;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.service.ServerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -30,22 +28,22 @@ public class BasicServerService implements ServerService {
         }
     }
 
-    @CustomLogging
-    @Override
-    public Server create(ServerCreateRequestDTO serverCreateRequestDTO) {
-        UUID userId = serverCreateRequestDTO.ownerId();
-        try {
-            User owner = userRepository.findById(userId);
-
-            Server server = new Server(userId, serverCreateRequestDTO.name());
-            serverRepository.save(server, owner);
-            serverRepository.join(server, owner);
-
-            return server;
-        } catch (UserNotFoundException e) {
-            throw new UserNotFoundException("create: 유저 저장소에 해당 유저가 존재하지 않습니다.");
-        }
-    }
+//    @CustomLogging
+//    @Override
+//    public Server create(ServerCreateRequestDTO serverCreateRequestDTO) {
+//        UUID userId = serverCreateRequestDTO.ownerId();
+//        try {
+//            User owner = userRepository.findById(userId);
+//
+//            Server server = new Server(userId, serverCreateRequestDTO.name());
+//            serverRepository.save(server, owner);
+//            serverRepository.join(server, owner);
+//
+//            return server;
+//        } catch (UserNotFoundException e) {
+//            throw new UserNotFoundException("create: 유저 저장소에 해당 유저가 존재하지 않습니다.");
+//        }
+//    }
 
     @Override
     @CustomLogging
@@ -53,7 +51,7 @@ public class BasicServerService implements ServerService {
         UUID serverUUID = UUID.fromString(serverId);
         UUID userUUID = UUID.fromString(userId);
         try {
-            Server server = serverRepository.find(serverUUID);
+            Server server = serverRepository.findById(serverUUID);
             User user = userRepository.findById(userUUID);
             serverRepository.join(server, user);
             return user;
@@ -69,7 +67,7 @@ public class BasicServerService implements ServerService {
         UUID serverUUID = UUID.fromString(serverId);
         UUID userUUID = UUID.fromString(userId);
         try {
-            Server server = serverRepository.find(serverUUID);
+            Server server = serverRepository.findById(serverUUID);
             User user = userRepository.findById(userUUID);
             serverRepository.quit(server, user);
             return user;
@@ -84,7 +82,7 @@ public class BasicServerService implements ServerService {
     public Server find(String serverId) {
         UUID serverUUID = UUID.fromString(serverId);
         try {
-            Server server = serverRepository.find(serverUUID);
+            Server server = serverRepository.findById(serverUUID);
             return server;
         } catch (ServerNotFoundException e) {
             throw new ServerNotFoundException("find: 서버 저장소에 해당 서버가 존재하지 않습니다.");
@@ -102,18 +100,18 @@ public class BasicServerService implements ServerService {
         }
     }
 
-    @Override
-    public Server update(String serverId, ServerCRUDDTO serverCRUDDTO) {
-        UUID serverUUID = UUID.fromString(serverId);
-        try {
-            Server server = serverRepository.find(serverUUID);
-            Server update = serverRepository.update(server, serverCRUDDTO);
-            return update;
-        } catch (ServerNotFoundException e) {
-            System.out.println("update: 해당 서버가 존재하지 않습니다.");
-            return null;
-        }
-    }
+//    @Override
+//    public Server update(String serverId, ServerCRUDDTO serverCRUDDTO) {
+//        UUID serverUUID = UUID.fromString(serverId);
+//        try {
+//            Server server = serverRepository.findById(serverUUID);
+//            Server update = serverRepository.update(server, serverCRUDDTO);
+//            return update;
+//        } catch (ServerNotFoundException e) {
+//            System.out.println("update: 해당 서버가 존재하지 않습니다.");
+//            return null;
+//        }
+//    }
 
     @Override
     public boolean delete(String serverId) {

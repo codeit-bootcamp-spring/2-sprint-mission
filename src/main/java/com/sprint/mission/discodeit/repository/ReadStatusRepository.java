@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.dto.legacy.readstatus.ReadStatusCRUDDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +16,7 @@ public interface ReadStatusRepository {
 
     List<ReadStatus> findAllByChannelId(UUID channelId);
 
-    ReadStatus update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO);
+//    ReadStatus update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO);
 
     void delete(UUID readStatusId);
 }

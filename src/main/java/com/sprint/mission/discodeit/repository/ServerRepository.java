@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.dto.legacy.server.ServerCRUDDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;
@@ -18,13 +17,13 @@ public interface ServerRepository {
 
     User quit(Server server, User user);
 
-    Server find(UUID serverId);
+    Server findById(UUID serverId);
 
     Server findByOwnerId(UUID userId);
 
     List<Server> findAllByUserId(UUID userId);
 
-    Server update(Server targetServer, ServerCRUDDTO serverCRUDDTO);
+//    Server update(Server targetServer, ServerCRUDDTO serverCRUDDTO);
 
     void remove(UUID userId);
 }

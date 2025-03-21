@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.UserFindDTO;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequestDTO;
-import com.sprint.mission.discodeit.dto.legacy.user.UserFindDTO;
 
 import java.util.List;
 import java.util.Optional;

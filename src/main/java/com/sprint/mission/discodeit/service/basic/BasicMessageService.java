@@ -1,19 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.requestToService.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.dto.requestToService.MessageWriteDTO;
-import com.sprint.mission.discodeit.dto.legacy.message.MessageCRUDDTO;
-import com.sprint.mission.discodeit.exception.legacy.NotFoundException;
-import com.sprint.mission.discodeit.exception.legacy.NotFoundExceptions;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
+import com.sprint.mission.discodeit.dto.request.CreateMessageRequestDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.legacy.NotFoundException;
+import com.sprint.mission.discodeit.exception.legacy.NotFoundExceptions;
 import com.sprint.mission.discodeit.logging.CustomLogging;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,14 +39,11 @@ public class BasicMessageService implements MessageService {
 
     @CustomLogging
     @Override
-    public Message create(MessageWriteDTO messageWriteDTO,List<Optional<BinaryContentCreateDTO>> binaryContentDTOs) {
-        UUID userId = UUID.fromString(messageWriteDTO.creatorId());
-        UUID channelUUID = UUID.fromString(messageWriteDTO.channelId());
+    public Message create(CreateMessageRequestDTO messageWriteDTO, List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs) {
+        User user = userRepository.findById(messageWriteDTO.creatorId());
+        Channel channel = channelRepository.find(messageWriteDTO.channelId());
 
-        User user = userRepository.findById(userId);
-        Channel channel = channelRepository.find(channelUUID);
-
-        Message message = new Message(userId,user.getName(), channelUUID, messageWriteDTO.text());
+        Message message = new Message(user.getId(),user.getName(), channel.getChannelId(), messageWriteDTO.text());
 
         List<UUID> binaryContentIdList = makeBinaryContent(binaryContentDTOs);
         message.setAttachmentIds(binaryContentIdList);
@@ -106,18 +102,18 @@ public class BasicMessageService implements MessageService {
         return true;
     }
 
-    @CustomLogging
-    @Override
-    public boolean update(String messageId, MessageCRUDDTO messageCRUDDTO) {
-        UUID messageUUID = UUID.fromString(messageId);
+//    @CustomLogging
+//    @Override
+//    public boolean update(String messageId, MessageCRUDDTO messageCRUDDTO) {
+//        UUID messageUUID = UUID.fromString(messageId);
+//
+//        Message message = messageRepository.find(messageUUID);
+//
+//        messageRepository.update(message, messageCRUDDTO);
+//        return true;
+//    }
 
-        Message message = messageRepository.find(messageUUID);
-
-        messageRepository.update(message, messageCRUDDTO);
-        return true;
-    }
-
-    private List<UUID> makeBinaryContent(List<Optional<BinaryContentCreateDTO>> binaryContentDTOs) {
+    private List<UUID> makeBinaryContent(List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs) {
         List<UUID> collect = binaryContentDTOs.stream()
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -126,7 +122,7 @@ public class BasicMessageService implements MessageService {
         return collect;
     }
 
-    private UUID saveBinaryContent(BinaryContentCreateDTO binaryContentCreateDTO) {
+    private UUID saveBinaryContent(CreateBinaryContentRequestDTO binaryContentCreateDTO) {
         BinaryContent content = new BinaryContent(
                 binaryContentCreateDTO.fileName(),
                 (long)binaryContentCreateDTO.bytes().length,

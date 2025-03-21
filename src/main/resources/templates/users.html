@@ -1,10 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>유저 목록</title>
 </head>
 <body>
 
+<h1>등록된 유저 목록</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>프로필 이미지</th>
+        <th>아이디</th>
+        <th>이름</th>
+        <th>이메일</th>
+        <th>가입일</th>
+    </tr>
+    </thead>
+    <tbody id="userTableBody">
+    <!-- JavaScript가 데이터를 삽입할 예정 -->
+    </tbody>
+</table>
+
+<script>
+    function loadUsers() {
+        fetch('/api/users')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('서버 응답 오류');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const userTableBody = document.getElementById('userTableBody');
+                userTableBody.innerHTML = ''; // 기존 데이터 초기화
+
+                data.users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <img src="/api/users/${user.id}/profile"
+                                 onerror="this.onerror=null; this.src='/images/default-profile.png';"
+                                 width="50" height="50">
+                        </td>
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${new Date(user.createdAt).toLocaleString()}</td>
+                        <td>${new Date(user.updatedAt).toLocaleString()}</td>
+                    `;
+                    userTableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('유저 목록 불러오기 실패:', error);
+                alert('유저 목록을 불러오는데 실패했습니다.');
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUsers);
+</script>
+<a href="/">🏠 홈으로</a>
 </body>
 </html>

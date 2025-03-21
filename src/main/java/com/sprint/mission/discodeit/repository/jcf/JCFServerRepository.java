@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.legacy.server.ServerCRUDDTO;
+import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.Empty.EmptyServerListException;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.exception.NotFound.ServerNotFoundException;
 import com.sprint.mission.discodeit.exception.NotFound.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ServerRepository;
 import com.sprint.mission.discodeit.util.CommonUtils;
-import com.sprint.mission.discodeit.entity.Server;
-import com.sprint.mission.discodeit.entity.User;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -57,7 +56,7 @@ public class JCFServerRepository implements ServerRepository {
     }
 
     @Override
-    public Server find(UUID serverId) {
+    public Server findById(UUID serverId) {
         List<Server> list = serverList.values().stream().flatMap(List::stream).toList();
         Server server = CommonUtils.findById(list, serverId, Server::getServerId)
                 .orElseThrow(() -> new ServerNotFoundException("서버를 찾을 수 없습니다."));
@@ -86,24 +85,24 @@ public class JCFServerRepository implements ServerRepository {
         return list;
     }
 
-    @Override
-    public Server update(Server targetServer, ServerCRUDDTO serverCRUDDTO) {
-        if (serverCRUDDTO.serverId() != null) {
-            targetServer.setServerId(serverCRUDDTO.serverId());
-        }
-        if (serverCRUDDTO.userId() != null) {
-            targetServer.setOwnerId(serverCRUDDTO.userId());
-        }
-        if (serverCRUDDTO.name() != null) {
-            targetServer.setName(serverCRUDDTO.name());
-        }
-        return targetServer;
-    }
+//    @Override
+//    public Server update(Server targetServer, ServerCRUDDTO serverCRUDDTO) {
+//        if (serverCRUDDTO.serverId() != null) {
+//            targetServer.setServerId(serverCRUDDTO.serverId());
+//        }
+//        if (serverCRUDDTO.userId() != null) {
+//            targetServer.setOwnerId(serverCRUDDTO.userId());
+//        }
+//        if (serverCRUDDTO.name() != null) {
+//            targetServer.setName(serverCRUDDTO.name());
+//        }
+//        return targetServer;
+//    }
 
 
     @Override
     public void remove(UUID serverId) {
-        Server server = find(serverId);
+        Server server = findById(serverId);
         UUID ownerId = server.getOwnerId();
         List<Server> list = findAllByUserId(ownerId);
         list.remove(server);

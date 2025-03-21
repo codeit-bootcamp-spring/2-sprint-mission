@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.dto.legacy.userstatus.UserStatusCRUDDTO;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +16,7 @@ public interface UserStatusRepository {
 
     List<UserStatus> findAll();
 
-    UserStatus update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO);
+//    UserStatus update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO);
 
     void delete(UUID id);
 }

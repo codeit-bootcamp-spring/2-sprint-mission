@@ -25,4 +25,8 @@ public interface UserRepository {
 
     boolean existId(UUID id);
 
+    boolean existName(String name);
+
+    boolean existEmail(String email);
+
 }

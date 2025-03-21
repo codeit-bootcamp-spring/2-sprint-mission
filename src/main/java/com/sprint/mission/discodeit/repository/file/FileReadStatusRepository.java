@@ -1,13 +1,12 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.dto.legacy.readstatus.ReadStatusCRUDDTO;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.Empty.EmptyReadStatusListException;
 import com.sprint.mission.discodeit.exception.NotFound.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.exception.NotFound.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.util.CommonUtils;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -75,14 +74,14 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         return list;
     }
 
-    @Override
-    public ReadStatus update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO) {
-        if (readStatusCRUDDTO.readStatusId() != null) {
-            readStatus.setReadStatusId(readStatusCRUDDTO.readStatusId());
-        }
-        fileRepository.save(readStatusList);
-        return readStatus;
-    }
+//    @Override
+//    public ReadStatus update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO) {
+//        if (readStatusCRUDDTO.readStatusId() != null) {
+//            readStatus.setReadStatusId(readStatusCRUDDTO.readStatusId());
+//        }
+//        fileRepository.save(readStatusList);
+//        return readStatus;
+//    }
 
     @Override
     public void delete(UUID readStatusId) {

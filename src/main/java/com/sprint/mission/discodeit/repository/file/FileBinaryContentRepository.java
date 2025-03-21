@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.Empty.EmptyBinaryContentListException;
 import com.sprint.mission.discodeit.exception.NotFound.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.NotFound.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.FileRepositoryImpl;
 import com.sprint.mission.discodeit.util.CommonUtils;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 

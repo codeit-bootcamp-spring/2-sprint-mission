@@ -1,14 +1,15 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.legacy.request.ChannelCreateDTO;
-import com.sprint.mission.discodeit.dto.requestToService.ChannelJoinQuitDTO;
-import com.sprint.mission.discodeit.dto.legacy.channel.ChannelCRUDDTO;
-import com.sprint.mission.discodeit.dto.legacy.channel.ChannelDTO;
+
+import com.sprint.mission.discodeit.dto.ChannelFindDTO;
+import com.sprint.mission.discodeit.dto.UserFindDTO;
+import com.sprint.mission.discodeit.dto.request.CreateChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.request.JoinQuitChannelRequestDTO;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -16,15 +17,15 @@ public interface ChannelService {
 
     void reset(boolean adminAuth);
 
-    Channel create(ChannelCreateDTO channelCreateDTO);
+    UUID create(CreateChannelRequestDTO channelCreateDTO);
 
-    User join(ChannelJoinQuitDTO channelJoinQuitDTO);
+    UserFindDTO join(JoinQuitChannelRequestDTO channelJoinQuitDTO);
 
-    User quit(ChannelJoinQuitDTO channelJoinQuitDTO);
+    UserFindDTO quit(JoinQuitChannelRequestDTO channelJoinQuitDTO);
 
-    ChannelDTO find(String channelId);
+    ChannelFindDTO find(String channelId);
 
-    List<ChannelDTO> findAllByServerAndUser(String serverId );
+    List<ChannelFindDTO> findAllByServerAndUser(String serverId );
 
     boolean printChannels(String serverId);
 
@@ -32,6 +33,6 @@ public interface ChannelService {
 
     boolean delete(String channelId);
 
-    boolean update(ChannelCRUDDTO channelCRUDDTO, ChannelCRUDDTO channelUpdateDTO);
+//    boolean update(ChannelCRUDDTO channelCRUDDTO, ChannelCRUDDTO channelUpdateDTO);
 
 }

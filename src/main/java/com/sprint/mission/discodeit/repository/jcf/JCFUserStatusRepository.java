@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.legacy.userstatus.UserStatusCRUDDTO;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserStatusListException;
 import com.sprint.mission.discodeit.exception.NotFound.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -45,13 +44,13 @@ public class JCFUserStatusRepository implements UserStatusRepository {
         return userStatusList;
     }
 
-    @Override
-    public UserStatus update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO) {
-        if (userStatusUpdateDTO.userStatusId() != null) {
-            userStatus.setUserStatusId(userStatusUpdateDTO.userStatusId());
-        }
-        return userStatus;
-    }
+//    @Override
+//    public UserStatus update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO) {
+//        if (userStatusUpdateDTO.userStatusId() != null) {
+//            userStatus.setUserStatusId(userStatusUpdateDTO.userStatusId());
+//        }
+//        return userStatus;
+//    }
 
     @Override
     public void delete(UUID id) {
