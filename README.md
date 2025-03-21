@@ -223,17 +223,17 @@ public static void main(String[]args){
 1. create
 
 - PRIVATE 채널과 PUBLIC 채널을 생성하는 메소드를 분리합니다.
-  - [x] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
+    - [x] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
 - PRIVATE 채널을 생성할 때:
-  - [x] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
-  - [x] name과 description 속성은 생략합니다.
+    - [x] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
+    - [x] name과 description 속성은 생략합니다.
 - PUBLIC 채널을 생성할 때에는 기존 로직을 유지합니다.
 
 2. find
 
 - DTO를 활용하여:
-    - [ ] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
-    - [ ] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
+    - [x] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
+    - [x] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
 
 3. findAll
 
@@ -378,6 +378,7 @@ public static void main(String[]args){
 ## 미완성 및 개선해야할 부분
 
 ### 스프링 1차 미션
+
 - [ ] 다른 레이어에 있는 테스트는 어디에 넣고 어디서 검증하는게 좋은가
 - [ ] 스프링테스트와 단위테스트, 통합테스트
 

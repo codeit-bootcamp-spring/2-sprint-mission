@@ -42,7 +42,7 @@ public class Beans {
 
         saveBean(UserController.class, new UserController(findBean(UserService.class), findBean(BinaryContentService.class)));
         saveBean(MessageController.class, new MessageController(findBean(MessageService.class)));
-        saveBean(ChannelController.class, new ChannelController(findBean(ChannelService.class)));
+        saveBean(ChannelController.class, new ChannelController(findBean(ChannelService.class), findBean(MessageService.class), findBean(UserService.class)));
     }
 
     private void initializeFileBeans() {

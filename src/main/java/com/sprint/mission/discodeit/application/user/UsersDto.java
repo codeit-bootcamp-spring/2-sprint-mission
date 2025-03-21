@@ -1,6 +1,7 @@
-package com.sprint.mission.discodeit.application;
+package com.sprint.mission.discodeit.application.user;
 
 import com.sprint.mission.discodeit.entity.User;
+
 import java.util.List;
 
 public record UsersDto(List<UserDto> users) {

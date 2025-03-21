@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.view;
 
 import com.ibm.icu.text.Transliterator;
-import com.sprint.mission.discodeit.application.ChannelDto;
 import com.sprint.mission.discodeit.application.MessageDto;
-import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.application.channel.ChannelDto;
+import com.sprint.mission.discodeit.application.user.UserDto;
+
 import java.util.ArrayList;
 import java.util.List;
 

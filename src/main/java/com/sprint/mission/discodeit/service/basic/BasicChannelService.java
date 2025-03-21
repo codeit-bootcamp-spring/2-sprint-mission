@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.ChannelDto;
-import com.sprint.mission.discodeit.application.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.UsersDto;
+import com.sprint.mission.discodeit.application.channel.ChannelDto;
+import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
+import com.sprint.mission.discodeit.application.user.UsersDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;

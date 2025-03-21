@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.UserDto;
-import com.sprint.mission.discodeit.application.UserLoginDto;
-import com.sprint.mission.discodeit.application.UserRegisterDto;
+import com.sprint.mission.discodeit.application.user.UserDto;
+import com.sprint.mission.discodeit.application.user.UserLoginDto;
+import com.sprint.mission.discodeit.application.user.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;

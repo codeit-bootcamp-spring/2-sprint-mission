@@ -1,17 +1,19 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
-
 import com.sprint.mission.discodeit.application.MessageDto;
-import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.application.user.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
 
 public class JCFMessageService implements MessageService {
     private final MessageRepository messageRepository;
@@ -63,6 +65,15 @@ public class JCFMessageService implements MessageService {
     @Override
     public void delete(UUID id) {
         messageRepository.delete(id);
+    }
+
+    @Override
+    public Instant findLastMessageCreatedAtByChannelId(UUID channelId) {
+        return this.findByChannelId(channelId)
+                .stream()
+                .max(Comparator.comparing(MessageDto::createdAt))
+                .map(MessageDto::createdAt)
+                .orElse(Instant.ofEpochSecond(0));
     }
 
     private User findMessageUser(Message message) {

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.ChannelDto;
-import com.sprint.mission.discodeit.application.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.application.channel.ChannelDto;
+import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
+import com.sprint.mission.discodeit.application.user.UserDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.jcf.JCFReadStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -41,8 +42,16 @@ class ChannelServiceTest {
         assertThat(setUpChannel.name()).isEqualTo(CHANNEL_NAME);
     }
 
+    @DisplayName("private 채널 ID로 조회된 채널을 반환합니다")
     @Test
     void 채널_단건_조회() {
+        ChannelDto channel = channelService.findById(setUpChannel.id());
+        assertThat(setUpChannel.id() + setUpChannel.name()).isEqualTo(channel.id() + channel.name());
+    }
+
+    @DisplayName("public 채널 ID로 조회된 채널을 반환합니다")
+    @Test
+    void 사적_채널_단건_조회() {
         ChannelDto channel = channelService.findById(setUpChannel.id());
         assertThat(setUpChannel.id() + setUpChannel.name()).isEqualTo(channel.id() + channel.name());
     }

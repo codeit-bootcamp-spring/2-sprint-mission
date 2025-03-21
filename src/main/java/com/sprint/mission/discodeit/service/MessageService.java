@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.application.MessageDto;
+
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,4 +18,6 @@ public interface MessageService {
     void updateContext(UUID id, String context);
 
     void delete(UUID id);
+
+    Instant findLastMessageCreatedAtByChannelId(UUID channelId);
 }

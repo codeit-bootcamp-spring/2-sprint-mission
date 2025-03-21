@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.UserDto;
-import com.sprint.mission.discodeit.application.UserRegisterDto;
+import com.sprint.mission.discodeit.application.user.UserDto;
+import com.sprint.mission.discodeit.application.user.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;

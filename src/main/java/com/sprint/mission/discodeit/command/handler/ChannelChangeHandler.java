@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.command.handler;
 
-import static com.sprint.mission.discodeit.view.OutputView.printOtherChannels;
-
-import com.sprint.mission.discodeit.application.ChannelDto;
-import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.application.channel.ChannelDto;
+import com.sprint.mission.discodeit.application.user.UserDto;
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.view.InputView;
+
 import java.util.List;
+
+import static com.sprint.mission.discodeit.view.OutputView.printOtherChannels;
 
 public class ChannelChangeHandler extends Handler {
     public ChannelChangeHandler(ChannelController channelController, InputView inputView) {
