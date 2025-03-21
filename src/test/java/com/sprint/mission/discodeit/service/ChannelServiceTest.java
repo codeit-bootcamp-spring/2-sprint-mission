@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.application.ChannelDto;
+import com.sprint.mission.discodeit.application.ChannelRegisterDto;
 import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
@@ -29,8 +31,8 @@ class ChannelServiceTest {
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
         channelService = new JCFChannelService(new JCFChannelRepository(), userRepository);
-        setUpChannel = channelService.create(CHANNEL_NAME,
-                new UserDto(user.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
+        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, new UserDto(user.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
+        setUpChannel = channelService.create(channelRegisterDto);
     }
 
     @Test

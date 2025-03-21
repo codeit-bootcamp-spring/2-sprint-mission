@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -93,7 +94,7 @@ class FileMessageServiceTest {
     @DisplayName("같은 채널ID를 가지는 메세지들을 조회합니다")
     @Test
     void findByChannelId() {
-        Channel channel = new Channel("test", UUID.randomUUID());
+        Channel channel = new Channel(ChannelType.PUBLIC, "test", UUID.randomUUID());
         messageService.create(MESSAGE_CONTENT, channel.getId(), initializedUser.id());
         messageService.create(MESSAGE_CONTENT + "123", channel.getId(), initializedUser.id());
 

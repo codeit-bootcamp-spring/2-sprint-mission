@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import lombok.Getter;
 
 @Getter
 public class Channel implements Serializable {
@@ -15,13 +16,15 @@ public class Channel implements Serializable {
     private final Instant createdAt;
     private Instant updatedAt;
     private String name;
+    private ChannelType type;
     private final List<UUID> userIds = new ArrayList<>();
 
-    public Channel(String name, UUID ownerId) {
+    public Channel(ChannelType channelType, String name, UUID ownerId) {
         this.id = UUID.randomUUID();
         this.createdAt = ZonedDateTime.now().toInstant();
         this.updatedAt = createdAt;
         this.name = name;
+        this.type = channelType;
         this.userIds.add(ownerId);
     }
 

@@ -113,7 +113,7 @@ public static void main(String[]args){
         - [ ] private 채널 생성
             - private 상태와 유저 id 전달
             - private에 참여하는 유저 id와 유저별 readStatus 채널에 저장
-        - [ ] public 채널 생성
+        - [x] public 채널 생성
             - public 매개변수 전달
             - public 생성
 - [ ] 채널 조회 - find(), findALL()
@@ -161,7 +161,7 @@ public static void main(String[]args){
 - [ ] 공통: 앞서 정의한 도메인 모델과 동일하게 공통 필드(id, createdAt, updatedAt)를 포함합니다.
 
 
-- [ ] ReadStatus(userId, channelId)
+- [x] ReadStatus(userId, channelId)
     - 사용자가 채널 별 **마지막으로 메시지를 읽은 시간**을 표현하는 도메인 모델입니다. 사용자별 각 채널에 **읽지 않은 메시지를 확인**하기 위해 활용합니다.
 
 
@@ -223,7 +223,7 @@ public static void main(String[]args){
 1. create
 
 - PRIVATE 채널과 PUBLIC 채널을 생성하는 메소드를 분리합니다.
-  - [ ] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
+  - [x] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
 - PRIVATE 채널을 생성할 때:
   - [ ] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
   - [ ] name과 description 속성은 생략합니다.

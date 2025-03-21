@@ -1,21 +1,20 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.application.ChannelDto;
-import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.application.ChannelRegisterDto;
 import com.sprint.mission.discodeit.service.ChannelService;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
+
 @Controller
+@RequiredArgsConstructor
 public class ChannelController {
     private final ChannelService channelService;
 
-    public ChannelController(ChannelService channelService) {
-        this.channelService = channelService;
-    }
-
-    public ChannelDto create(String name, UserDto owner) {
-        return channelService.create(name, owner);
+    public ChannelDto create(ChannelRegisterDto channelRegisterDto) {
+        return channelService.create(channelRegisterDto);
     }
 
     public List<ChannelDto> findAll() {

@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.application.ChannelDto;
+import com.sprint.mission.discodeit.application.ChannelRegisterDto;
 import com.sprint.mission.discodeit.application.UserDto;
 import com.sprint.mission.discodeit.application.UserRegisterDto;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -56,8 +58,8 @@ class FileChannelServiceTest {
     }
 
     private void setUpChannel(UserDto loginUser) {
-        initializedChannel = channelService.create(CHANNEL_NAME,
-                new UserDto(loginUser.id(), loginUser.name(), loginUser.email(), null, false));
+        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, new UserDto(loginUser.id(), loginUser.name(), loginUser.email(), null, false));
+        initializedChannel = channelService.create(channelRegisterDto);
     }
 
     private UserDto setUpUser() {

@@ -1,22 +1,23 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
-import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
-
 import com.sprint.mission.discodeit.application.ChannelDto;
-import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.application.ChannelRegisterDto;
 import com.sprint.mission.discodeit.application.UsersDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
 
 @Service
 @RequiredArgsConstructor
@@ -25,10 +26,11 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
 
     @Override
-    public ChannelDto create(String name, UserDto owner) {
-        Channel channel = channelRepository.save(new Channel(name, owner.id()));
+    public ChannelDto create(ChannelRegisterDto channelRegisterDto) {
+        Channel channel = new Channel(channelRegisterDto.channelType(), channelRegisterDto.name(), channelRegisterDto.owner().id());
+        Channel savedChannel = channelRepository.save(channel);
 
-        return ChannelDto.fromEntity(channel, UsersDto.fromEntity(findChannelUsers(channel)));
+        return ChannelDto.fromEntity(savedChannel, UsersDto.fromEntity(findChannelUsers(channel)));
     }
 
     @Override

@@ -1,14 +1,12 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.application.ChannelDto;
-import com.sprint.mission.discodeit.application.MessageDto;
-import com.sprint.mission.discodeit.application.UserDto;
-import com.sprint.mission.discodeit.application.UserRegisterDto;
+import com.sprint.mission.discodeit.application.*;
 import com.sprint.mission.discodeit.command.handler.*;
 import com.sprint.mission.discodeit.config.Beans;
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
 import com.sprint.mission.discodeit.controller.UserController;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.view.InputView;
 
 import java.util.HashMap;
@@ -94,7 +92,9 @@ public class Application {
     }
 
     public static ChannelDto setupChannel(ChannelController channelController, UserDto loginUser) {
-        return channelController.create(SETUP_CHANNEL_NAME, loginUser);
+        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, SETUP_CHANNEL_NAME, loginUser);
+
+        return channelController.create(channelRegisterDto);
     }
 
     public static UserDto setupUser(UserController userController) {
