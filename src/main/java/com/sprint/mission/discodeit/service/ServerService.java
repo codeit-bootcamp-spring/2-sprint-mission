@@ -1,28 +1,30 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.request.CreateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public interface ServerService {
 
     void reset(boolean adminAuth);
 
-//    Server create(ServerCreateRequestDTO serverCreateRequestDTO);
+    Server create(CreateServerRequestDTO createServerRequestDTO);
 
-    User join(String serverId, String userId);
+    User join(UUID serverId, UUID userId);
 
-    User quit(String serverId, String userId);
+    User quit(UUID serverId, UUID userId);
 
-    Server find(String serverId);
+    Server findById(UUID serverId);
 
-    List<Server> findServerAll(String ownerId);
+    List<Server> findServerAll(UUID ownerId);
 
 //    Server update(String serverId, ServerCRUDDTO serverCRUDDTO);
 
-    boolean delete(String serverId);
+    void delete(UUID serverId);
 
 }

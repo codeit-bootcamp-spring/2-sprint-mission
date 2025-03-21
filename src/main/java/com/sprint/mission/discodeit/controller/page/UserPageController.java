@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class UserPageController {
-    @GetMapping("/userIndex")
+    @GetMapping("/index")
     public String getIndexPage() {
-        return "userIndex";
+        return "index";
     }
 
     @GetMapping("/users")

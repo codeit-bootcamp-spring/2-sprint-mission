@@ -5,10 +5,8 @@ import com.sprint.mission.discodeit.dto.UserFindDTO;
 import com.sprint.mission.discodeit.dto.display.UserDisplayList;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequestDTO;
-import com.sprint.mission.discodeit.dto.request.UserLoginRequestDTO;
 import com.sprint.mission.discodeit.dto.result.CreateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -27,7 +25,6 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
-    private final AuthService authService;
     private final BinaryContentService binaryContentService;
     private final UserStatusService userStatusService;
 

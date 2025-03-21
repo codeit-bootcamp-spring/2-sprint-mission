@@ -18,6 +18,7 @@
         <th>가입일</th>
         <th>수정일</th>
         <th>삭제</th>
+        <th>서버 관리</th>
     </tr>
     </thead>
     <tbody id="userTableBody">
@@ -52,6 +53,7 @@
                         <td>${new Date(user.createdAt).toLocaleString()}</td>
                         <td>${new Date(user.updatedAt).toLocaleString()}</td>
                         <td><button onclick="deleteUser('${user.id}')">삭제</button></td>
+                        <td><a href="/users/${user.id}/servers"><button>서버 관리</button></a></td>
                     `;
                     userTableBody.appendChild(row);
                 });
@@ -81,6 +83,6 @@
     }
     document.addEventListener('DOMContentLoaded', loadUsers);
 </script>
-<a href="/userIndex">🏠 유저 페이지로</a>
+<a href="/">🏠 유저 페이지로</a>
 </body>
 </html>

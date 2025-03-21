@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.request.CreateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.Empty.EmptyServerListException;
@@ -28,76 +29,48 @@ public class BasicServerService implements ServerService {
         }
     }
 
-//    @CustomLogging
-//    @Override
-//    public Server create(ServerCreateRequestDTO serverCreateRequestDTO) {
-//        UUID userId = serverCreateRequestDTO.ownerId();
-//        try {
-//            User owner = userRepository.findById(userId);
-//
-//            Server server = new Server(userId, serverCreateRequestDTO.name());
-//            serverRepository.save(server, owner);
-//            serverRepository.join(server, owner);
-//
-//            return server;
-//        } catch (UserNotFoundException e) {
-//            throw new UserNotFoundException("create: 유저 저장소에 해당 유저가 존재하지 않습니다.");
-//        }
-//    }
+    @CustomLogging
+    @Override
+    public Server create(CreateServerRequestDTO createServerRequestDTO) {
+
+        User owner = userRepository.findById(createServerRequestDTO.userId());
+        Server server = new Server(owner.getId(), createServerRequestDTO.name());
+        serverRepository.save(server, owner);
+        serverRepository.join(server, owner);
+
+        return server;
+
+    }
 
     @Override
     @CustomLogging
-    public User join(String serverId, String userId) {
-        UUID serverUUID = UUID.fromString(serverId);
-        UUID userUUID = UUID.fromString(userId);
-        try {
-            Server server = serverRepository.findById(serverUUID);
-            User user = userRepository.findById(userUUID);
-            serverRepository.join(server, user);
-            return user;
-        } catch (UserNotFoundException e) {
-            throw new UserNotFoundException("join: 유저 저장소에 해당 유저가 존재하지 않습니다.");
-        } catch (ServerNotFoundException e) {
-            throw new ServerNotFoundException("join: 서버 저장소에 해당 서버가 존재하지 않습니다.");
-        }
+    public User join(UUID serverId, UUID userId) {
+        Server server = serverRepository.findById(serverId);
+        User user = userRepository.findById(userId);
+        serverRepository.join(server, user);
+        return user;
     }
 
     @Override
-    public User quit(String serverId, String userId) {
-        UUID serverUUID = UUID.fromString(serverId);
-        UUID userUUID = UUID.fromString(userId);
-        try {
-            Server server = serverRepository.findById(serverUUID);
-            User user = userRepository.findById(userUUID);
-            serverRepository.quit(server, user);
-            return user;
-        } catch (UserNotFoundException e) {
-            throw new UserNotFoundException("join: 유저 저장소에 해당 유저가 존재하지 않습니다.");
-        } catch (ServerNotFoundException e) {
-            throw new ServerNotFoundException("join: 서버 저장소에 해당 서버가 존재하지 않습니다.");
-        }
+    public User quit(UUID serverId, UUID userId) {
+        Server server = serverRepository.findById(serverId);
+        User user = userRepository.findById(userId);
+        serverRepository.quit(server, user);
+        return user;
     }
 
     @Override
-    public Server find(String serverId) {
-        UUID serverUUID = UUID.fromString(serverId);
-        try {
-            Server server = serverRepository.findById(serverUUID);
-            return server;
-        } catch (ServerNotFoundException e) {
-            throw new ServerNotFoundException("find: 서버 저장소에 해당 서버가 존재하지 않습니다.");
-        }
+    public Server findById(UUID serverId) {
+        Server server = serverRepository.findById(serverId);
+        return server;
+
     }
 
     @Override
-    public List<Server> findServerAll(String ownerId) {
-        UUID ownerUUID = UUID.fromString(ownerId);
-        try {
-            List<Server> serverList = serverRepository.findAllByUserId(ownerUUID);
-            return serverList;
-        } catch (EmptyServerListException e) {
-            throw new EmptyServerListException("findServerAll: 서버 저장소에 서버가 존재하지 않습니다.");
-        }
+    public List<Server> findServerAll(UUID ownerId) {
+        List<Server> serverList = serverRepository.findAllByUserId(ownerId);
+        return serverList;
+
     }
 
 //    @Override
@@ -114,21 +87,8 @@ public class BasicServerService implements ServerService {
 //    }
 
     @Override
-    public boolean delete(String serverId) {
-        UUID serverUUID = UUID.fromString(serverId);
-        try {
-            serverRepository.remove(serverUUID);
-            return true;
-        } catch (ServerNotFoundException e) {
-            System.out.println("delete: 서버를 찾지 못했습니다.");
-            return false;
-        } catch (UserNotFoundException e) {
-            System.out.println("delete: 유저를 찾지 못했습니다.");
-            return false;
-        } catch (EmptyServerListException e) {
-            System.out.println("delete: 서버 리스트가 비어있습니다.");
-            return false;
-        }
+    public void delete(UUID serverId) {
+        serverRepository.remove(serverId);
     }
 
 }
