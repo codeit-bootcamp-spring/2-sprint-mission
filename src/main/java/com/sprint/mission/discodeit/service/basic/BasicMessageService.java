@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.Request.MessageWriteDTO;
+import com.sprint.mission.discodeit.DTO.RequestToService.MessageWriteDTO;
 import com.sprint.mission.discodeit.DTO.RequestToService.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.DTO.legacy.Message.MessageCRUDDTO;
 import com.sprint.mission.discodeit.Exception.legacy.NotFoundException;
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -117,20 +118,22 @@ public class BasicMessageService implements MessageService {
     }
 
     private List<UUID> makeBinaryContent(List<Optional<BinaryContentCreateDTO>> binaryContentDTOs) {
-        List<UUID> attachmentIds = new ArrayList<>();
-        for (Optional<BinaryContentCreateDTO> binaryContentDTO : binaryContentDTOs) {
-            UUID profileId = binaryContentDTO.map(contentDTO -> {
-                String fileName = contentDTO.fileName();
-                String contentType = contentDTO.contentType();
-                byte[] bytes = contentDTO.bytes();
-                long size = (long) bytes.length;
+        List<UUID> collect = binaryContentDTOs.stream()
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(this::saveBinaryContent)
+                .collect(Collectors.toList());
+        return collect;
+    }
 
-                BinaryContent content = new BinaryContent(fileName, size, contentType, bytes);
-                binaryContentRepository.save(content);
-                return content.getBinaryContentId();
-            }).orElse(null);
-            attachmentIds.add(profileId);
-        }
-        return attachmentIds;
+    private UUID saveBinaryContent(BinaryContentCreateDTO binaryContentCreateDTO) {
+        BinaryContent content = new BinaryContent(
+                binaryContentCreateDTO.fileName(),
+                (long)binaryContentCreateDTO.bytes().length,
+                binaryContentCreateDTO.contentType(),
+                binaryContentCreateDTO.bytes()
+        );
+        binaryContentRepository.save(content);
+        return content.getBinaryContentId();
     }
 }

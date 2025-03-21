@@ -1,6 +1,4 @@
-package com.sprint.mission.discodeit.DTO.Request;
-
-import java.util.UUID;
+package com.sprint.mission.discodeit.DTO.RequestToService;
 
 public record MessageWriteDTO(
         String creatorId,
