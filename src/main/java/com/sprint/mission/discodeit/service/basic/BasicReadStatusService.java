@@ -18,9 +18,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
-    ReadStatusRepository readStatusRepository;
-    UserRepository userRepository;
-    ChannelRepository channelRepository;
+    private final ReadStatusRepository readStatusRepository;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
 
     @Override
     public ReadStatus create(CreateReadStatusRequest request) {
