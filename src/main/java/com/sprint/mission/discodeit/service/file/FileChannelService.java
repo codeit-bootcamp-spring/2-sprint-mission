@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -22,7 +23,6 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -81,21 +81,19 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public List<ChannelByIdResponse> findAllByUserId(UUID userId) {
+        List<UUID> joinedChannelIds = readStatusService.findAllByUserId(userId).stream()
+                .map(ReadStatus::getChannelId).toList();
         return findAll().stream()
+                .filter(channel ->
+                        channel.getType().equals(ChannelType.PUBLIC) || joinedChannelIds.contains(channel.getId()))
                 .map(channel -> {
                     Instant lastMessageTime = findLastMessageTime(channel.getId());
-                    if (channel.getType() == ChannelType.PUBLIC) {
-                        return new ChannelByIdResponse(lastMessageTime, channel, null);
-                    } else {
-                        List<UUID> userIdsInChannel = readStatusService.findAllUserByChannelId(
-                                channel.getId());
-                        if (userIdsInChannel.contains(userId)) {
-                            return new ChannelByIdResponse(lastMessageTime, channel, userIdsInChannel);
-                        } else {
-                            return null;
-                        }
+                    if (channel.getType() == ChannelType.PRIVATE) {
+                        List<UUID> userIdsInChannel = readStatusService.findAllUserByChannelId(channel.getId());
+                        return new ChannelByIdResponse(lastMessageTime, channel, userIdsInChannel);
                     }
-                }).filter(Objects::nonNull).toList();
+                    return new ChannelByIdResponse(lastMessageTime, channel, null);
+                }).toList();
     }
 
 
@@ -121,7 +119,10 @@ public class FileChannelService implements ChannelService {
             throw new IllegalArgumentException("비공개 채널은 수정 불가능");
         }
 
-        channel.update(updateRequest.newName(), updateRequest.newDescription());
+        channel.update(
+                updateRequest.newName().orElse(channel.getName()),
+                updateRequest.newDescription().orElse(channel.getDescription())
+        );
 
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
