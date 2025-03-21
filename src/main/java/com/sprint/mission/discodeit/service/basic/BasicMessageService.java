@@ -73,10 +73,10 @@ public class BasicMessageService implements MessageService {
             throw RestExceptions.BAD_REQUEST;
         }
         if (userRepository.findById(createMessageParam.authorId()).isEmpty()) {
-            throw new NoSuchElementException(RestExceptions.USER_NOT_FOUND);
+            throw RestExceptions.USER_NOT_FOUND;
         }
         if(channelRepository.findById(createMessageParam.channelId()).isEmpty()) {
-            throw new NoSuchElementException(RestExceptions.CHANNEL_NOT_FOUND);
+            throw RestExceptions.CHANNEL_NOT_FOUND;
         }
     }
 
