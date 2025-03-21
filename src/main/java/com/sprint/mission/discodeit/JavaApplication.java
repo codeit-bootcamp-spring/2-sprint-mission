@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
+/*import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -24,11 +24,11 @@ import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;*/
 
 
 public class JavaApplication {
-    static User setupUser(UserService userService) {
+    /*static User setupUser(UserService userService) {
         User user = userService.createUser("testUser1", "test1@codeit.com", "1234");
         return user;
     }
@@ -41,11 +41,11 @@ public class JavaApplication {
     static void messageCreateTest(MessageService messageService, Channel channel, User author) {
         Message message = messageService.createMessage(author.getId(), "testMessage1", channel.getId());
         System.out.println("메시지 생성: " + message.getId());
-    }
+    }*/
 
     public static void main(String[] args) {
         // JCF
-        UserRepository jcfUserRepository = JCFUserRepository.getInstance();
+        /*UserRepository jcfUserRepository = JCFUserRepository.getInstance();
         ChannelRepository jcfChannelRepository = JCFChannelRepository.getInstance();
         MessageRepository jcfMessageRepository = JCFMessageRepository.getInstance();
 
@@ -55,11 +55,12 @@ public class JavaApplication {
 
         User user1 = setupUser(jcfUserService);
         Channel channel1 = setupChannel(jcfChannelService);
-        messageCreateTest(jcfMessageService, channel1, user1);
+        jcfChannelService.addChannelParticipant(channel1.getId(), user1.getId());
+        messageCreateTest(jcfMessageService, channel1, user1);*/
 
 
         // File
-        UserRepository fileUserRepository = FileUserRepository.getInstance();
+        /*UserRepository fileUserRepository = FileUserRepository.getInstance();
         ChannelRepository fileChannelRepository = FileChannelRepository.getInstance();
         MessageRepository fileMessageRepository = FileMessageRepository.getInstance();
 
@@ -69,6 +70,6 @@ public class JavaApplication {
 
         User user2 = setupUser(fileUserService);
         Channel channel2 = setupChannel(fileChannelService);
-        messageCreateTest(fileMessageService, channel2, user2);
+        messageCreateTest(fileMessageService, channel2, user2);*/
     }
 }
