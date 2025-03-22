@@ -17,5 +17,5 @@ public interface ChannelService {
 
     void updateName(UUID id, String name);
 
-    void delete(UUID id);
+    void delete(UUID channelId);
 }

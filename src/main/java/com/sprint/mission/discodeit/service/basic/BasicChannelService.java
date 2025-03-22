@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_CHANNEL_
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final MessageRepository messageRepository;
 
     @Override
     public ChannelDto create(ChannelRegisterDto channelRegisterDto) {
@@ -77,8 +79,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void delete(UUID id) {
-        channelRepository.delete(id);
+    public void delete(UUID channelId) {
+        channelRepository.delete(channelId);
+        readStatusRepository.deleteByChannelId(channelId);
+        messageRepository.deleteByChannelId(channelId);
     }
 
     @Override

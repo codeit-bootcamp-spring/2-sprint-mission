@@ -42,7 +42,7 @@ class ChannelControllerTest {
         ReadStatusRepository readStatusRepository = new JCFReadStatusRepository();
         userService = new BasicUserService(userRepository, userStatusRepository);
         messageService = new BasicMessageService(messageRepository, userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository, readStatusRepository);
+        ChannelService channelService = new BasicChannelService(channelRepository, readStatusRepository, messageRepository);
         channelController = new ChannelController(channelService, messageService, userService, new BasicReadStatusService(readStatusRepository));
 
         UserRegisterDto userRegisterDto = new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword());

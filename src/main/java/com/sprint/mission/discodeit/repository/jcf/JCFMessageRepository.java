@@ -2,11 +2,8 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> messages = new HashMap<>();
@@ -39,5 +36,18 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void delete(UUID id) {
         messages.remove(id);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        List<UUID> sameChannelMessageIds = messages.values()
+                .stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .map(Message::getId)
+                .toList();
+
+        for (UUID messageId : sameChannelMessageIds) {
+            messages.remove(messageId);
+        }
     }
 }

@@ -35,7 +35,7 @@ public class Beans {
         saveBean(MessageService.class,
                 new BasicMessageService(findBean(MessageRepository.class), findBean(UserRepository.class)));
         saveBean(ChannelService.class,
-                new BasicChannelService(findBean(ChannelRepository.class), findBean(ReadStatusRepository.class)));
+                new BasicChannelService(findBean(ChannelRepository.class), findBean(ReadStatusRepository.class), findBean(MessageRepository.class)));
 
         saveBean(UserController.class, new UserController(findBean(UserService.class), findBean(BinaryContentService.class)));
         saveBean(MessageController.class, new MessageController(findBean(MessageService.class)));

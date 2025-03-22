@@ -35,4 +35,22 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
                 .filter(readStatus -> readStatus.getUserId().equals(userId))
                 .toList();
     }
+
+    @Override
+    public void delete(UUID readStatusId) {
+        readStatuses.remove(readStatusId);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        List<UUID> readStatusIdWithSameChannel = readStatuses.values()
+                .stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .map(ReadStatus::getId)
+                .toList();
+
+        for (UUID readStatusId : readStatusIdWithSameChannel) {
+            readStatuses.remove(readStatusId);
+        }
+    }
 }

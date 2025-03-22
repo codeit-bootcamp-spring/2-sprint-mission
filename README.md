@@ -252,7 +252,7 @@ public static void main(String[]args){
 
 5. delete
 
-- [ ] 관련된 도메인도 같이 삭제합니다.
+- [x] 관련된 도메인도 같이 삭제합니다.
     - Message, ReadStatus
 
 #### MessageService 고도화
@@ -381,6 +381,7 @@ public static void main(String[]args){
 
 - [ ] 다른 레이어에 있는 테스트는 어디에 넣고 어디서 검증하는게 좋은가
 - [ ] 스프링테스트와 단위테스트, 통합테스트
+- [ ] 채널 서비스에서 메세지 생성시간 컨트롤러가 아닌 서비스레이어에서 찾아서 반환하기 
 
 ### 파일 저장소 미션
 

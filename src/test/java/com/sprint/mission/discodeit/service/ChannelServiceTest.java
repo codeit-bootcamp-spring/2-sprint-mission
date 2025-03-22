@@ -5,8 +5,11 @@ import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
 import com.sprint.mission.discodeit.application.user.UserDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFReadStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
@@ -28,14 +31,19 @@ class ChannelServiceTest {
     private ChannelDto setUpChannel;
     private User setUpUser;
     private UserRepository userRepository;
+    private MessageRepository messageRepository;
+    private ReadStatusRepository readStatusRepository;
 
     @BeforeEach
     void setUp() {
+        messageRepository = new JCFMessageRepository();
+        readStatusRepository = new JCFReadStatusRepository();
+
         userRepository = new JCFUserRepository();
         setUpUser = userRepository.save(
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
-        channelService = new BasicChannelService(new JCFChannelRepository(), new JCFReadStatusRepository());
+        channelService = new BasicChannelService(new JCFChannelRepository(), readStatusRepository, messageRepository);
         ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
         setUpChannel = channelService.create(channelRegisterDto);
     }
@@ -90,13 +98,41 @@ class ChannelServiceTest {
         assertThat(setUpUserChannelIds).containsExactlyInAnyOrder(setUpChannel.id(), setUpUserPrivateChannel.id());
     }
 
-
+    @DisplayName("채널 삭제시 메세지와 ReadStatus도 삭제합니다")
     @Test
     void 채널_삭제() {
-        UUID id = setUpChannel.id();
-        channelService.delete(id);
+        UUID channelId = setUpChannel.id();
+        channelService.delete(channelId);
 
-        assertThatThrownBy(() -> channelService.findById(id))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> channelService.findById(channelId)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("채널 삭제시 메세지도 삭제합니다")
+    @Test
+    void 채널_삭제시_메세지삭제() {
+        UUID channelId = setUpChannel.id();
+        channelService.delete(channelId);
+
+        boolean isExisting = messageRepository.findAll()
+                .stream()
+                .anyMatch(message -> message.getChannelId().equals(channelId));
+
+        assertThat(isExisting).isFalse();
+    }
+
+    @DisplayName("Private 채널 삭제시 ReadStatus도 삭제합니다")
+    @Test
+    void Private_채널_삭제시_ReadStatus_삭제() {
+        ChannelRegisterDto setUpUserChannelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
+        ChannelDto privateChannel = channelService.create(setUpUserChannelRegisterDto);
+
+        UUID privateChannelId = privateChannel.id();
+        channelService.delete(privateChannelId);
+
+        boolean isExisting = readStatusRepository.findByChannelId(privateChannelId)
+                .stream()
+                .anyMatch(message -> message.getChannelId().equals(privateChannelId));
+        
+        assertThat(isExisting).isFalse();
     }
 }

@@ -1,18 +1,19 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_TEST_FILE;
-import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
-import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
-
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
+
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
+
+import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_TEST_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
+import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 
 @Repository
 public class FileMessageRepository implements MessageRepository {
@@ -62,5 +63,19 @@ public class FileMessageRepository implements MessageRepository {
         Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
         messages.remove(id);
         saveObjectsToFile(STORAGE_DIRECTORY, messagePath, messages);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
+        List<UUID> sameChannelMessageIds = messages.values()
+                .stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .map(Message::getId)
+                .toList();
+
+        for (UUID messageId : sameChannelMessageIds) {
+            messages.remove(messageId);
+        }
     }
 }
