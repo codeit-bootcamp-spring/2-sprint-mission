@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.UserFindDTO;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -86,24 +87,22 @@ public class BasicUserService implements UserService {
         return list;
     }
 
-    //
-//    @CustomLogging
-//    @Override
-//    public User update(String userId, UserUpdateDTO userUpdateDTO, Optional<CreateBinaryContentRequestDTO>binaryContentDTO) {
-//        UUID userUUID = UUID.fromString(userId);
-//        try {
-//            User findUser = userRepository.find(userUUID);
-//            UUID newProfileId = makeBinaryContent(binaryContentDTO);
-//
-//            User update = userRepository.update(findUser, userUpdateDTO, newProfileId);
-//
-//            return update;
-//        } catch (UserNotFoundException e) {
-//            System.out.println("update: 해당 유저가 존재하지 않습니다.");
-//            return null;
-//        }
-//    }
-//
+
+    @CustomLogging
+    @Override
+    public UUID update(UUID userId, UpdateUserRequestDTO updateUserRequestDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+        User user = userRepository.findById(userId);
+        UUID profileId = user.getProfileId();
+        if (profileId != null) {
+            binaryContentRepository.delete(profileId);
+        }
+        UUID newProfileId = makeBinaryContent(binaryContentDTO);
+
+        User update = userRepository.update(user, updateUserRequestDTO, newProfileId);
+
+        return update.getId();
+    }
+
     @CustomLogging
     @Override
     public void delete(UUID userId) {

@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.requestToService.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateUserRequestDTO;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.exception.NotFound.UserNotFoundException;
-import com.sprint.mission.discodeit.exception.legacy.NotFoundExceptions;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.util.CommonUtils;
-import com.sprint.mission.discodeit.entity.User;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -45,17 +44,16 @@ public class JCFUserRepository implements UserRepository {
         return userList;
     }
 
-
     @Override
-    public User update(User user, UserUpdateDTO userUpdateDTO,UUID replaceProfileId) {
-        if (userUpdateDTO.replaceName() != null) {
-            user.setName(userUpdateDTO.replaceName());
+    public User update(User user, UpdateUserRequestDTO updateUserRequestDTO, UUID newProfileId) {
+        if (updateUserRequestDTO.replaceName() != null) {
+            user.setName(updateUserRequestDTO.replaceName());
         }
-        if (userUpdateDTO.replaceEmail() != null) {
-            user.setEmail(userUpdateDTO.replaceEmail());
+        if (updateUserRequestDTO.replaceEmail() != null) {
+            user.setEmail(updateUserRequestDTO.replaceEmail());
         }
-        if (replaceProfileId != null) {
-            user.setProfileId(replaceProfileId);
+        if (newProfileId != null) {
+            user.setProfileId(newProfileId);
         }
         return user;
     }

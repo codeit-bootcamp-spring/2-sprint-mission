@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.UserFindDTO;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateUserRequestDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,6 @@ public interface UserService {
 
     void delete(UUID userId);
 
-//    User update(String userId, UserUpdateDTO userUpdateDTO, Optional<CreateBinaryContentRequestDTO>binaryContentDTO);
+    UUID update(UUID userId, UpdateUserRequestDTO updateUserRequestDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO);
 
 }

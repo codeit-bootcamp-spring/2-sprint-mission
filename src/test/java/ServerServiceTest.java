@@ -1,9 +1,9 @@
-import com.sprint.mission.discodeit.dto.requestToService.UserCreateDTO;
+
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ServerRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.basic.BasicServerService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.UUID;
-
-import static org.mockito.Mockito.verify;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -38,8 +36,6 @@ public class ServerServiceTest {
 
     @InjectMocks
     private BasicServerService serverService;
-
-    UserCreateDTO userCreateDTO;
 
     @BeforeEach
     void setUp() {

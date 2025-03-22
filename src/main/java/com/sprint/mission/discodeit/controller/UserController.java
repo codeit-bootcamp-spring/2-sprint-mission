@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.UserFindDTO;
 import com.sprint.mission.discodeit.dto.display.UserDisplayList;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.dto.result.CreateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -44,6 +45,7 @@ public class UserController {
                     file.getBytes()
             ));
         }
+
         UUID id = userService.create(createUserRequestDTO, binaryContentRequest);
 
         return ResponseEntity.ok(new CreateUserResult(id));
@@ -89,12 +91,24 @@ public class UserController {
 //        return ResponseEntity.ok(userStatus);
 //    }
 
-//    @PutMapping("/update/{userId}")
-//    public ResponseEntity<User> update(@PathVariable String userId, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
-//        UserUpdateDTO userUpdateDTO = userUpdateRequestDTO.userUpdateDTO();
-//        Optional<BinaryContentCreateDTO> binaryContentCreateDTO = Optional.ofNullable(userUpdateRequestDTO.binaryContentCreateDTO());
-//        User update = userService.update(userId, userUpdateDTO, binaryContentCreateDTO);
-//
-//        return ResponseEntity.ok(update);
-//    }
+    @PutMapping("/{userId}")
+    public ResponseEntity<UUID> update(@PathVariable UUID userId,
+                                         @RequestPart("user") UpdateUserRequestDTO updateUserRequestDTO,
+                                         @RequestPart(value = "profileImage", required = false) MultipartFile file) throws IOException {
+
+        Optional<CreateBinaryContentRequestDTO> binaryContentRequest = Optional.empty();
+
+        if (file != null && !file.isEmpty()) {
+            binaryContentRequest = Optional.of(new CreateBinaryContentRequestDTO(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+            ));
+        }
+
+
+        UUID update = userService.update(userId, updateUserRequestDTO, binaryContentRequest);
+
+        return ResponseEntity.ok(update);
+    }
 }
