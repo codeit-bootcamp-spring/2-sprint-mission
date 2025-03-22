@@ -56,14 +56,15 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId);
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId);
-
+        boolean online = userStatus.isOnline();
         UserFindDTO userFindDTO = new UserFindDTO(
                 user.getId(),
                 user.getProfileId(),
                 user.getName(),
                 user.getEmail(),
                 user.getCreatedAt(),
-                user.getUpdatedAt()
+                user.getUpdatedAt(),
+                online
         );
 
         return userFindDTO;
@@ -73,16 +74,16 @@ public class BasicUserService implements UserService {
     public List<UserFindDTO> listAllUsers() {
         List<User> userList = userRepository.findAll();
 
-
         return userList.stream().map(user -> new UserFindDTO(
                 user.getId(),
                 user.getProfileId(),
                 user.getName(),
                 user.getEmail(),
                 user.getCreatedAt(),
-                user.getUpdatedAt())).toList();
+                user.getUpdatedAt(),
+                userStatusRepository.findByUserId(user.getId()).isOnline()
+        )).toList();
     }
-
 
     @CustomLogging
     @Override

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.create.CreateUserRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.dto.result.CreateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -84,12 +85,23 @@ public class UserController {
         return ResponseEntity.ok("Delete successful");
     }
 
-    //    @PutMapping("/online/{userId}")
-//    public ResponseEntity<UserStatus> online(@PathVariable String userId, @RequestBody UserStatusDTO UserstatusDTO) {
-//        UserStatus userStatus = userStatusService.findByUserId(userId);
-//
-//        return ResponseEntity.ok(userStatus);
-//    }
+    @PutMapping("/online/{userId}")
+    public ResponseEntity<UUID> online(@PathVariable UUID userId) {
+        UserStatus userStatus = userStatusService.findByUserId(userId);
+        userStatus.updatedTime();
+
+        return ResponseEntity.ok(userStatus.getUserStatusId());
+    }
+
+
+    @PutMapping("/offline/{userId}")
+    public ResponseEntity<UUID> offline(@PathVariable UUID userId) {
+        UserStatus userStatus = userStatusService.findByUserId(userId);
+        userStatus.setOffline();
+
+        return ResponseEntity.ok(userStatus.getUserStatusId());
+    }
+
 
     @PostMapping(value = "/update/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UUID> update(@PathVariable UUID userId,
