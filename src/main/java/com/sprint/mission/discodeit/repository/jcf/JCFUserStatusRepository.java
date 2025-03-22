@@ -1,13 +1,9 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.constant.UserStatusType;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,15 +42,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
         userStatusList.stream()
                 .filter(userStatus -> userStatus.getId().equals(userStatusUUID))
                 .findAny()
-                .ifPresent((userStatus) -> {
-                    if (userStatus.getLastLoginTime() == null ||
-                            Duration.between(userStatus.getLastLoginTime().atZone(ZoneId.systemDefault()).toInstant(), Instant.now())
-                                    .toMinutes() >= 5) {
-                        userStatus.updateLastStatus(UserStatusType.NOTCONNECTIED);
-                        return;
-                    }
-                    userStatus.updateLastStatus(UserStatusType.CONNECTING);
-                });
+                .ifPresent(UserStatus::updateLastLoginTime);
     }
 
     @Override

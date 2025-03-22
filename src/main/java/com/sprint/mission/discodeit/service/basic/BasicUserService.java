@@ -59,17 +59,13 @@ public class BasicUserService implements UserService {
         User user = userRepository.findUserById(userUUID)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원"));
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                .map(data -> {
-                    userStatusRepository.update(data.getId());
-                    return data;
-                })
                 .orElseThrow(() -> new IllegalArgumentException("사용자 상태 확인 불가"));
 
         FindUserDto findUserDto = new FindUserDto(
                 user.getId(), user.getNickname(),
                 user.getProfile(), user.getCreatedAt(),
                 user.getUpdatedAt(), userStatus.getUpdatedAt(),
-                userStatus.getUserStatusType());
+                userStatus.isLastStatus());
 
         return findUserDto;
     }

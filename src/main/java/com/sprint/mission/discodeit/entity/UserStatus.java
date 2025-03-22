@@ -22,15 +22,16 @@ public class UserStatus extends BaseEntity implements Serializable {
     @Builder.Default
     private Instant lastLoginTime = null;
 
-    @Builder.Default
-    private UserStatusType userStatusType = UserStatusType.NOTCONNECTIED;
-
     public void updateLastLoginTime() {
         lastLoginTime = ZonedDateTime.now(ZoneId.systemDefault()).toInstant();
+        super.updateTime();
     }
 
-    public void updateLastStatus(UserStatusType userStatusType) {
+    public UserStatusType isLastStatus() {
         super.updateTime();
-        this.userStatusType = userStatusType;
+        if(lastLoginTime == null || lastLoginTime.isBefore(Instant.now().minusSeconds(300))) {
+            return UserStatusType.NOTCONNECTIED;
+        }
+        return UserStatusType.CONNECTING;
     }
 }

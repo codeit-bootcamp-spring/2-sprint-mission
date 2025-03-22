@@ -47,7 +47,6 @@ public class BasicUserStatusService implements UserStatusService {
                 .filter(userStatus -> userStatus.getUserUUID().equals(userUUID))
                 .findAny()
                 .ifPresent(userStatus -> {
-                    userStatus.updateLastLoginTime();
                     userStatusRepository.update(userStatus.getId());
                 });
     }
