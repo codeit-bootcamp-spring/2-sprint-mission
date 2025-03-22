@@ -67,7 +67,7 @@ public class FileManager {
             for (File file : files) {
                 try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                     Message message = (Message) ois.readObject();
-                    if(message.getChannelUUID() == id) {
+                    if(message.getChannelUUID().equals(id)) {
                         list.add(message);
                     }
                 } catch (IOException | ClassNotFoundException e) {

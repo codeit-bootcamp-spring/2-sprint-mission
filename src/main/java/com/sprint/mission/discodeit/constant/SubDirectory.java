@@ -9,6 +9,7 @@ public enum SubDirectory {
     MESSAGE("message"),
     USER_STATUS("userstatus"),
     READ_STATUS("readstatus"),
+    BINARY_CONTENT("binarycontent"),
     PROFILE("profile"),
     FILE("file");
 

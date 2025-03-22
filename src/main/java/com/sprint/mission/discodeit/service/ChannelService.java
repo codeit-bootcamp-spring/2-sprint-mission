@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.dto.*;
 
 import java.util.List;

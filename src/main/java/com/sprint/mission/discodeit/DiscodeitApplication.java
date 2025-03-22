@@ -312,7 +312,13 @@ public class DiscodeitApplication {
                         break;
                     case 2:
                         messageService.findAllMessages()
-                                .forEach(System.out::println);
+                                .forEach(message -> {
+                                    System.out.println(message.getId());
+                                    System.out.println(message.getChannelUUID());
+                                    System.out.println(message.getAttachmentList());
+                                    System.out.println(message.getContent());
+                                    System.out.println(message.getCreatedAt());
+                                });
                         break;
                     case 3:
                         System.out.print("조회할 채널 아이디: ");
