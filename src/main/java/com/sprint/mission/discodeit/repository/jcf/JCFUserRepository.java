@@ -31,9 +31,8 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User findById(UUID userId) {
-        User user = CommonUtils.findById(userList, userId, User::getId)
+        return CommonUtils.findById(userList, userId, User::getId)
                 .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
-        return user;
     }
 
     @Override

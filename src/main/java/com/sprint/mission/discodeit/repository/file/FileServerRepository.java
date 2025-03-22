@@ -86,20 +86,17 @@ public class FileServerRepository implements ServerRepository {
     @Override
     public Server findById(UUID serverId) {
         List<Server> list = serverList.values().stream().flatMap(List::stream).toList();
-        Server server = CommonUtils.findById(list, serverId, Server::getServerId)
+        return CommonUtils.findById(list, serverId, Server::getServerId)
                 .orElseThrow(() -> new ServerNotFoundException("서버를 찾을 수 없습니다."));
-
-        return server;
     }
 
     @Override
     public Server findByOwnerId(UUID userId) {
         List<Server> servers = findAllByUserId(userId);
-        Server server = servers.stream().filter(s -> s.getUserId().equals(userId))
+        return servers.stream().filter(s -> s.getUserId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new UserNotFoundException("서버장을 찾을 수 없습니다."));
 
-        return server;
     }
 
     @Override
@@ -131,6 +128,7 @@ public class FileServerRepository implements ServerRepository {
         Server server = findById(serverId);
         UUID ownerId = server.getUserId();
         List<Server> list = findAllByUserId(ownerId);
+        list.remove(server);
 
         fileRepository.save(serverList);
     }

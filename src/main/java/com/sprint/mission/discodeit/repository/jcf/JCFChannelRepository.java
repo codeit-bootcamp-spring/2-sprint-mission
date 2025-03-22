@@ -61,9 +61,8 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public Channel find(UUID channelId) {
         List<Channel> list = channelList.values().stream().flatMap(List::stream).toList();
-        Channel channel = CommonUtils.findById(list, channelId, Channel::getChannelId)
+        return  CommonUtils.findById(list, channelId, Channel::getChannelId)
                 .orElseThrow(() -> new ChannelNotFoundException("채널을 찾을 수 없습니다."));
-        return channel;
     }
 
     @Override

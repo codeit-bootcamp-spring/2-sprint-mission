@@ -37,9 +37,8 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public Message find(UUID messageId) {
         List<Message> list = messageList.values().stream().flatMap(List::stream).toList();
-        Message message = CommonUtils.findById(list, messageId, Message::getMessageId)
+        return CommonUtils.findById(list, messageId, Message::getMessageId)
                 .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
-        return message;
     }
 
     @Override

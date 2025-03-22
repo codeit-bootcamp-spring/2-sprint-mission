@@ -57,7 +57,7 @@ public class MessageController {
 
 
     @GetMapping
-    public ResponseEntity<MessageDisplayList> findAll(@PathVariable String channelId) {
+    public ResponseEntity<MessageDisplayList> findAll(@PathVariable UUID channelId) {
         List<MessageFindDTO> list = messageService.findAllByChannelId(channelId);
         return ResponseEntity.ok(new MessageDisplayList(list));
     }

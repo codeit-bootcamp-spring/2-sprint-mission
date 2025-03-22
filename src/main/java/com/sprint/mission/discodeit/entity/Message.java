@@ -41,11 +41,6 @@ public class Message implements Serializable {
         this.text = text;
     }
 
-    public void setMessageId(UUID messageId) {
-        this.messageId = messageId;
-        this.updatedAt = Instant.now();
-    }
-
     public void setText(String text) {
         this.text = text;
         this.updatedAt = Instant.now();

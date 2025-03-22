@@ -95,13 +95,11 @@ public class BasicChannelService implements ChannelService {
         }
 
         if (channel.getType() == ChannelType.PUBLIC) {
-            ChannelFindDTO channelDTO = new ChannelFindDTO(channel.getChannelId(), channel.getName(), null, lastMessageTime);
-            return channelDTO;
+            return new ChannelFindDTO(channel.getChannelId(), channel.getName(), null, lastMessageTime);
         } else {
             List<User> userList = channel.getUserList();
             List<UUID> userIdList = userList.stream().map(User::getId).toList();
-            ChannelFindDTO channelDTO = new ChannelFindDTO(channel.getChannelId(), channel.getName(), userIdList, lastMessageTime);
-            return channelDTO;
+            return new ChannelFindDTO(channel.getChannelId(), channel.getName(), userIdList, lastMessageTime);
         }
     }
 

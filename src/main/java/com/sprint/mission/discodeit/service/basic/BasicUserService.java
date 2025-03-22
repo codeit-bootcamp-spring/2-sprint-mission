@@ -16,7 +16,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -76,15 +75,14 @@ public class BasicUserService implements UserService {
     public List<UserFindDTO> listAllUsers() {
         List<User> userList = userRepository.findAll();
 
-        List<UserFindDTO> list = userList.stream().map(user -> new UserFindDTO(
+
+        return userList.stream().map(user -> new UserFindDTO(
                 user.getId(),
                 user.getProfileId(),
                 user.getName(),
                 user.getEmail(),
                 user.getCreatedAt(),
                 user.getUpdatedAt())).toList();
-
-        return list;
     }
 
 
@@ -116,7 +114,8 @@ public class BasicUserService implements UserService {
     }
 
     private UUID makeBinaryContent(Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
-        UUID profileId = binaryContentDTO.map(contentDTO -> {
+
+        return binaryContentDTO.map(contentDTO -> {
             String fileName = contentDTO.fileName();
             String contentType = contentDTO.contentType();
             byte[] bytes = contentDTO.bytes();
@@ -126,8 +125,6 @@ public class BasicUserService implements UserService {
             binaryContentRepository.save(content);
             return content.getId();
         }).orElse(null);
-
-        return profileId;
     }
 
     private void checkDuplicate(String name, String email) {
