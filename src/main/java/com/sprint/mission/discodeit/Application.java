@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.application.MessageDto;
-import com.sprint.mission.discodeit.application.channel.ChannelDto;
 import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
+import com.sprint.mission.discodeit.application.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.application.user.UserDto;
 import com.sprint.mission.discodeit.application.user.UserRegisterDto;
 import com.sprint.mission.discodeit.command.handler.*;
@@ -35,7 +35,7 @@ public class Application {
 
         printHello();
         UserDto loginUser = setupUser(userController);
-        ChannelDto currentChannel = setupChannel(channelController, loginUser);
+        ChannelResponseDto currentChannel = setupChannel(channelController, loginUser);
 
         Map<String, Handler> userCommandHandlers = new HashMap<>();
         try (Scanner scanner = new Scanner(System.in)) {
@@ -50,7 +50,7 @@ public class Application {
     }
 
     private static void run(ChannelController channelController, MessageController messageController,
-                            Map<String, Handler> handlers, UserDto loginUser, ChannelDto currentChannel,
+                            Map<String, Handler> handlers, UserDto loginUser, ChannelResponseDto currentChannel,
                             InputView inputView) {
         while (true) {
             List<MessageDto> currentChannelMessages = messageController.findByChannelId(currentChannel.id());
@@ -78,8 +78,8 @@ public class Application {
         }
     }
 
-    private static ChannelDto executeActionAndGetResponse(Map<String, Handler> handlers, String userCommand,
-                                                          ChannelDto currentChannel, UserDto loginUser) {
+    private static ChannelResponseDto executeActionAndGetResponse(Map<String, Handler> handlers, String userCommand,
+                                                                  ChannelResponseDto currentChannel, UserDto loginUser) {
         Handler handler = handlers.get(userCommand);
         return handler.execute(currentChannel, loginUser);
     }
@@ -95,7 +95,7 @@ public class Application {
         handlers.put(CHANNEL_CHANGE, new ChannelChangeHandler(channelController, inputView));
     }
 
-    private static ChannelDto setupChannel(ChannelController channelController, UserDto loginUser) {
+    private static ChannelResponseDto setupChannel(ChannelController channelController, UserDto loginUser) {
         ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, SETUP_CHANNEL_NAME, loginUser);
 
         return channelController.create(channelRegisterDto);

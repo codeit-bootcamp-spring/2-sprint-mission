@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
 import com.sprint.mission.discodeit.application.user.UserDto;
 import com.sprint.mission.discodeit.application.user.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFReadStatusRepository;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.ChannelInfo.CHANNEL_NAME;
@@ -34,6 +37,7 @@ class FileChannelServiceTest {
     private UserService userService;
     private ChannelService channelService;
     private ChannelDto initializedChannel;
+    private ReadStatusRepository readStatusRepository;
 
     @BeforeEach
     void setUp() {
@@ -55,7 +59,8 @@ class FileChannelServiceTest {
         channelRepository.changePath(channelTestFilePath);
 
         userService = new FileUserService(userRepository);
-        channelService = new FileChannelService(channelRepository, userRepository, new JCFReadStatusRepository());
+        readStatusRepository = new JCFReadStatusRepository();
+        channelService = new FileChannelService(channelRepository, readStatusRepository);
     }
 
     private void setUpChannel(UserDto loginUser) {
@@ -86,8 +91,13 @@ class FileChannelServiceTest {
         UserDto otherUser = userService.register(new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword()), null);
 
-        ChannelDto channelDto = channelService.addMemberToPrivate(initializedChannel.id(), OTHER_USER.getEmail());
-        assertThat(channelDto.usersDto().users()).contains(otherUser);
+        ChannelDto channelDto = channelService.addMemberToPrivate(initializedChannel.id(), otherUser.id());
+        List<UUID> channelUsers = readStatusRepository.findByChannelId(channelDto.id())
+                .stream()
+                .map(ReadStatus::getUserId)
+                .toList();
+
+        assertThat(channelUsers).contains(otherUser.id());
     }
 
     @DisplayName("로그인된 유저와 채널 이름을 통해 채널 생성합니다")

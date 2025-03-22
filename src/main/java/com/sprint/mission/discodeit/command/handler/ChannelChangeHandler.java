@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.command.handler;
 
-import com.sprint.mission.discodeit.application.channel.ChannelDto;
+import com.sprint.mission.discodeit.application.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.application.user.UserDto;
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.view.InputView;
@@ -15,10 +15,10 @@ public class ChannelChangeHandler extends Handler {
     }
 
     @Override
-    public ChannelDto execute(ChannelDto currentChannel, UserDto loginUser) {
-        List<ChannelDto> channels = super.channelController.findAll()
+    public ChannelResponseDto execute(ChannelResponseDto currentChannel, UserDto loginUser) {
+        List<ChannelResponseDto> channels = super.channelController.findAll()
                 .stream()
-                .filter(channel -> !channel.equals(currentChannel))
+                .filter(channel -> !channel.id().equals(currentChannel.id()))
                 .toList();
 
         printOtherChannels(channels);

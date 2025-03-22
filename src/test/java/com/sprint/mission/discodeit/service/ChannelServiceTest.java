@@ -32,7 +32,7 @@ class ChannelServiceTest {
         User user = userRepository.save(
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
-        channelService = new JCFChannelService(new JCFChannelRepository(), userRepository, new JCFReadStatusRepository());
+        channelService = new JCFChannelService(new JCFChannelRepository(), new JCFReadStatusRepository());
         ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, new UserDto(user.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
         setUpChannel = channelService.create(channelRegisterDto);
     }

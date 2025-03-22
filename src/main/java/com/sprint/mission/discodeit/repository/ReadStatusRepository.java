@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusRepository {
-    ReadStatus create(ReadStatus readStatus);
+    ReadStatus save(ReadStatus readStatus);
 
     List<ReadStatus> findByChannelId(UUID channelId);
 }

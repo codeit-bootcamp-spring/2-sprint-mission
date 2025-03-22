@@ -14,7 +14,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     private final Map<UUID, ReadStatus> readStatuses = new HashMap<>();
 
     @Override
-    public ReadStatus create(ReadStatus readStatus) {
+    public ReadStatus save(ReadStatus readStatus) {
         readStatuses.put(readStatus.getId(), readStatus);
 
         return readStatus;

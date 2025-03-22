@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.view;
 
 import com.ibm.icu.text.Transliterator;
 import com.sprint.mission.discodeit.application.MessageDto;
-import com.sprint.mission.discodeit.application.channel.ChannelDto;
+import com.sprint.mission.discodeit.application.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.application.user.UserDto;
 
 import java.util.ArrayList;
@@ -20,16 +20,16 @@ public class OutputView {
         System.out.println("안녕하세요 코드잇2기 서버입니다.");
     }
 
-    public static void printOtherChannels(List<ChannelDto> channels) {
+    public static void printOtherChannels(List<ChannelResponseDto> channels) {
         System.out.println("# 이동할 채널을 선택해주세요");
         int count = 1;
-        for (ChannelDto channel : channels) {
+        for (ChannelResponseDto channel : channels) {
             System.out.println("- " + channel.name() + " : " + count++ + "번");
         }
     }
 
-    public static void printServer(List<ChannelDto> channels, UserDto loginUser, List<MessageDto> messages,
-                                   ChannelDto currentChannel) {
+    public static void printServer(List<ChannelResponseDto> channels, UserDto loginUser, List<MessageDto> messages,
+                                   ChannelResponseDto currentChannel) {
         String title = String.format(" 코드잇 2기  | %s", currentChannel.name());
         String content = formatContent(channels, loginUser, messages, currentChannel);
 
@@ -42,9 +42,9 @@ public class OutputView {
                 %n""", title, content);
     }
 
-    private static String formatContent(List<ChannelDto> channels, UserDto loginUser,
+    private static String formatContent(List<ChannelResponseDto> channels, UserDto loginUser,
                                         List<MessageDto> currentChannelMessages,
-                                        ChannelDto currentChannel) {
+                                        ChannelResponseDto currentChannel) {
 
         List<String> formattedChannels = formatChannels(channels, currentChannel);
         List<String> formattedMessages = formatMessages(currentChannelMessages);
@@ -79,10 +79,10 @@ public class OutputView {
         }
     }
 
-    private static List<String> formatChannels(List<ChannelDto> channels, ChannelDto currentChannel) {
+    private static List<String> formatChannels(List<ChannelResponseDto> channels, ChannelResponseDto currentChannel) {
         List<String> formattedChannels = new ArrayList<>();
 
-        for (ChannelDto channel : channels) {
+        for (ChannelResponseDto channel : channels) {
             String channelName = "  " + channel.name();
             if (channel.id().equals(currentChannel.id())) {
                 channelName = "# " + channelName.trim();

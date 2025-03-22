@@ -2,31 +2,25 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.application.channel.ChannelDto;
 import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.user.UsersDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
-import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
 
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
-    private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
 
     @Override
@@ -35,10 +29,10 @@ public class BasicChannelService implements ChannelService {
         Channel savedChannel = channelRepository.save(channel);
 
         if (channelRegisterDto.channelType().equals(ChannelType.PRIVATE)) {
-            readStatusRepository.create(new ReadStatus(channelRegisterDto.owner().id(), savedChannel.getId()));
+            readStatusRepository.save(new ReadStatus(channelRegisterDto.owner().id(), savedChannel.getId()));
         }
 
-        return ChannelDto.fromEntity(savedChannel, UsersDto.fromEntity(findChannelUsers(channel)));
+        return ChannelDto.fromEntity(savedChannel);
     }
 
 
@@ -47,7 +41,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
-        return ChannelDto.fromEntity(channel, UsersDto.fromEntity(findChannelUsers(channel)));
+        return ChannelDto.fromEntity(channel);
     }
 
     @Override
@@ -55,7 +49,7 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.findAll()
                 .stream()
                 .sorted(Comparator.comparing(Channel::getCreatedAt))
-                .map(channel -> ChannelDto.fromEntity(channel, UsersDto.fromEntity(findChannelUsers(channel))))
+                .map(ChannelDto::fromEntity)
                 .toList();
     }
 
@@ -70,27 +64,14 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto addMemberToPrivate(UUID id, String friendEmail) {
-        Channel channel = channelRepository.findById(id)
+    public ChannelDto addMemberToPrivate(UUID channelId, UUID friendId) {
+        Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
-        User friend = userRepository.findByEmail(friendEmail)
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
+        readStatusRepository.save(new ReadStatus(friendId, channel.getId()));
+        channelRepository.save(channel); // TODO: 3/22/25 필요있는지 확인 필요
 
-        readStatusRepository.create(new ReadStatus(friend.getId(), channel.getId()));
-        channelRepository.save(channel);
-
-        return ChannelDto.fromEntity(channel, UsersDto.fromEntity(findChannelUsers(channel)));
-    }
-
-    private List<User> findChannelUsers(Channel channel) {
-        return readStatusRepository.findByChannelId(channel.getId())
-                .stream()
-                .sorted(Comparator.comparing(ReadStatus::getCreatedAt))
-                .map(readStatus -> userRepository.findById(readStatus.getUserId()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
+        return ChannelDto.fromEntity(channel);
     }
 }
 

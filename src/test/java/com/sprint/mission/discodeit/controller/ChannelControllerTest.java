@@ -1,22 +1,19 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.application.MessageDto;
-import com.sprint.mission.discodeit.application.channel.ChannelDto;
 import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
 import com.sprint.mission.discodeit.application.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.application.user.UserDto;
 import com.sprint.mission.discodeit.application.user.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.jcf.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicReadStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +31,6 @@ class ChannelControllerTest {
     private ChannelController channelController;
     private UserService userService;
     private MessageService messageService;
-
     private UserDto owner;
 
     @BeforeEach
@@ -43,10 +39,11 @@ class ChannelControllerTest {
         UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
         MessageRepository messageRepository = new JCFMessageRepository();
         ChannelRepository channelRepository = new JCFChannelRepository();
+        ReadStatusRepository readStatusRepository = new JCFReadStatusRepository();
         userService = new BasicUserService(userRepository, userStatusRepository);
         messageService = new BasicMessageService(messageRepository, userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository, userRepository, new JCFReadStatusRepository());
-        channelController = new ChannelController(channelService, messageService, userService);
+        ChannelService channelService = new BasicChannelService(channelRepository, readStatusRepository);
+        channelController = new ChannelController(channelService, messageService, userService, new BasicReadStatusService(readStatusRepository));
 
         UserRegisterDto userRegisterDto = new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword());
         owner = userService.register(userRegisterDto, null);
@@ -56,7 +53,7 @@ class ChannelControllerTest {
     @Test
     void findById() {
         ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, owner);
-        ChannelDto channel = channelController.create(channelRegisterDto);
+        ChannelResponseDto channel = channelController.create(channelRegisterDto);
 
         messageService.create(MESSAGE_CONTENT, channel.id(), owner.id());
         MessageDto messageDto = messageService.create(MESSAGE_CONTENT + 123, channel.id(), owner.id());
@@ -73,10 +70,14 @@ class ChannelControllerTest {
         UserRegisterDto userRegisterDto2 = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword());
         userService.register(userRegisterDto2, null);
         ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, owner);
-        ChannelDto channel = channelController.create(channelRegisterDto);
+        ChannelResponseDto channel = channelController.create(channelRegisterDto);
 
-        ChannelDto channel2 = channelController.addMember(channel, OTHER_USER.getEmail());
-        List<String> userNames = channel2.usersDto().users().stream().map(UserDto::name).toList();
+        ChannelResponseDto channelResponseDto = channelController.addMemberToPrivate(channel.id(), OTHER_USER.getEmail());
+        List<String> userNames = channelResponseDto.usersDto()
+                .users()
+                .stream()
+                .map(UserDto::name)
+                .toList();
 
         assertThat(userNames).contains(LOGIN_USER.getName(), OTHER_USER.getName());
     }
@@ -86,7 +87,7 @@ class ChannelControllerTest {
     @Test
     void findByIdPublicChannel() {
         ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, owner);
-        ChannelDto channel = channelController.create(channelRegisterDto);
+        ChannelResponseDto channel = channelController.create(channelRegisterDto);
         ChannelResponseDto channelResponseDto = channelController.findById(channel.id());
 
         assertThat(channelResponseDto.usersDto()).isNull();

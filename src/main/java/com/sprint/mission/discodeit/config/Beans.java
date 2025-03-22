@@ -8,10 +8,7 @@ import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.*;
-import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
@@ -38,11 +35,11 @@ public class Beans {
         saveBean(MessageService.class,
                 new BasicMessageService(findBean(MessageRepository.class), findBean(UserRepository.class)));
         saveBean(ChannelService.class,
-                new BasicChannelService(findBean(ChannelRepository.class), findBean(UserRepository.class), findBean(ReadStatusRepository.class)));
+                new BasicChannelService(findBean(ChannelRepository.class), findBean(ReadStatusRepository.class)));
 
         saveBean(UserController.class, new UserController(findBean(UserService.class), findBean(BinaryContentService.class)));
         saveBean(MessageController.class, new MessageController(findBean(MessageService.class)));
-        saveBean(ChannelController.class, new ChannelController(findBean(ChannelService.class), findBean(MessageService.class), findBean(UserService.class)));
+        saveBean(ChannelController.class, new ChannelController(findBean(ChannelService.class), findBean(MessageService.class), findBean(UserService.class), findBean(ReadStatusService.class)));
     }
 
     private void initializeFileBeans() {
