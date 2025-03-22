@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.MessageFindDTO;
-import com.sprint.mission.discodeit.dto.display.MessageDisplayList;
 import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.create.CreateMessageRequestDTO;
+import com.sprint.mission.discodeit.dto.display.MessageDisplayList;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -30,12 +29,9 @@ public class MessageController {
     public ResponseEntity<Message> create(
             @PathVariable UUID serverId,
             @PathVariable UUID channelId,
-            @RequestParam("message") MultipartFile messageJson,
-            @RequestParam(value = "profileImage", required = false) List<MultipartFile> files
+            @RequestPart("message") CreateMessageRequestDTO messageDTO,
+            @RequestPart(value = "profileImage", required = false) List<MultipartFile> files
     ) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        CreateMessageRequestDTO messageDTO = objectMapper.readValue(messageJson.getBytes(), CreateMessageRequestDTO.class);
-
         List<Optional<CreateBinaryContentRequestDTO>> list = new ArrayList<>();
         if (files != null) {
             for (MultipartFile file : files) {

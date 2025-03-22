@@ -34,7 +34,6 @@ public class UserController {
     public ResponseEntity<CreateUserResult> register(
             @RequestPart("user") CreateUserRequestDTO createUserRequestDTO,
             @RequestPart(value = "profileImage", required = false) MultipartFile file
-
     ) throws IOException {
 
         Optional<CreateBinaryContentRequestDTO> binaryContentRequest = Optional.empty();
