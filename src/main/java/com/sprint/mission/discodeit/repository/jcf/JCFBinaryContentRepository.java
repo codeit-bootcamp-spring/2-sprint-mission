@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = true)
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFBinaryContentRepository implements BinaryContentRepository {
     private final Map<UUID, BinaryContent> data = new HashMap<>();
 

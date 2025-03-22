@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = true)
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data = new HashMap<>();
 
