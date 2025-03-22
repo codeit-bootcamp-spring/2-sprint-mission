@@ -5,10 +5,8 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 
 import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_TEST_FILE;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
@@ -77,5 +75,18 @@ public class FileMessageRepository implements MessageRepository {
         for (UUID messageId : sameChannelMessageIds) {
             messages.remove(messageId);
         }
+    }
+
+
+    @Override
+    public Instant findLastMessageCreatedAtByChannelId(UUID channelId) {
+        Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
+
+        return messages.values()
+                .stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt))
+                .map(Message::getCreatedAt)
+                .orElse(Instant.ofEpochSecond(0));
     }
 }

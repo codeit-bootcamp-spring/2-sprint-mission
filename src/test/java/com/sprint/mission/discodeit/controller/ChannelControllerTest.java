@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.MessageDto;
-import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.application.user.UserDto;
-import com.sprint.mission.discodeit.application.user.UserRegisterDto;
+import com.sprint.mission.discodeit.application.channeldto.ChannelRegisterDto;
+import com.sprint.mission.discodeit.application.channeldto.ChannelResponseDto;
+import com.sprint.mission.discodeit.application.userdto.UserDto;
+import com.sprint.mission.discodeit.application.userdto.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.jcf.*;
@@ -22,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.sprint.mission.discodeit.constant.ChannelInfo.CHANNEL_NAME;
-import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
 import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
 import static com.sprint.mission.discodeit.constant.SetUpUserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ChannelControllerTest {
     private ChannelController channelController;
     private UserService userService;
-    private MessageService messageService;
     private UserDto owner;
 
     @BeforeEach
@@ -41,27 +38,11 @@ class ChannelControllerTest {
         ChannelRepository channelRepository = new JCFChannelRepository();
         ReadStatusRepository readStatusRepository = new JCFReadStatusRepository();
         userService = new BasicUserService(userRepository, userStatusRepository);
-        messageService = new BasicMessageService(messageRepository, userRepository);
         ChannelService channelService = new BasicChannelService(channelRepository, readStatusRepository, messageRepository);
-        channelController = new ChannelController(channelService, messageService, userService, new BasicReadStatusService(readStatusRepository));
+        channelController = new ChannelController(channelService, userService, new BasicReadStatusService(readStatusRepository));
 
         UserRegisterDto userRegisterDto = new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword());
         owner = userService.register(userRegisterDto, null);
-    }
-
-    @DisplayName("채널조회시 가장 최근 메세지의 시간정보를 반환합니다.")
-    @Test
-    void findById() {
-        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, owner);
-        ChannelResponseDto channel = channelController.create(channelRegisterDto);
-
-        messageService.create(MESSAGE_CONTENT, channel.id(), owner.id());
-        MessageDto messageDto = messageService.create(MESSAGE_CONTENT + 123, channel.id(), owner.id());
-        MessageDto message = messageService.findById(messageDto.messageId());
-
-
-        ChannelResponseDto channelRe = channelController.findById(channel.id());
-        assertThat(channelRe.lastMessageCreatedAt()).isEqualTo(message.createdAt());
     }
 
     @DisplayName("Private 채널 조회시 유저의 세부 정보를 반환합니다.")

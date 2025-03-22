@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.ReadStatus.ReadStatusesDto;
+import com.sprint.mission.discodeit.application.readstatusdto.ReadStatusesDto;
 
 import java.util.UUID;
 

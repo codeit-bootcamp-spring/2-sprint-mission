@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.application.user.UserDto;
-import com.sprint.mission.discodeit.application.user.UserRegisterDto;
+import com.sprint.mission.discodeit.application.userdto.UserDto;
+import com.sprint.mission.discodeit.application.userdto.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;

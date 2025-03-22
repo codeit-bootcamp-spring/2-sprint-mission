@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.application.user;
+package com.sprint.mission.discodeit.application.userdto;
 
 import com.sprint.mission.discodeit.entity.User;
 

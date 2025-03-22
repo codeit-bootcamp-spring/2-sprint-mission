@@ -1,14 +1,15 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.application.channel.ChannelDto;
-import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.user.UserDto;
-import com.sprint.mission.discodeit.application.user.UserRegisterDto;
+import com.sprint.mission.discodeit.application.channeldto.ChannelDto;
+import com.sprint.mission.discodeit.application.channeldto.ChannelRegisterDto;
+import com.sprint.mission.discodeit.application.userdto.UserDto;
+import com.sprint.mission.discodeit.application.userdto.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -60,7 +61,7 @@ class FileChannelServiceTest {
 
         userService = new FileUserService(userRepository);
         readStatusRepository = new JCFReadStatusRepository();
-        channelService = new FileChannelService(channelRepository, readStatusRepository);
+        channelService = new FileChannelService(channelRepository, readStatusRepository, new JCFMessageRepository());
     }
 
     private void setUpChannel(UserDto loginUser) {

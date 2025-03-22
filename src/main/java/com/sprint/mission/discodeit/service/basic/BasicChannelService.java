@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.channel.ChannelDto;
-import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
+import com.sprint.mission.discodeit.application.channeldto.ChannelDto;
+import com.sprint.mission.discodeit.application.channeldto.ChannelRegisterDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -34,16 +35,16 @@ public class BasicChannelService implements ChannelService {
             readStatusRepository.save(new ReadStatus(channelRegisterDto.owner().id(), savedChannel.getId()));
         }
 
-        return ChannelDto.fromEntity(savedChannel);
+        return ChannelDto.fromEntity(savedChannel, Instant.ofEpochSecond(0));
     }
-
 
     @Override
     public ChannelDto findById(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
-        return ChannelDto.fromEntity(channel);
+        Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId());
+        return ChannelDto.fromEntity(channel, lastMessageCreatedAt);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class BasicChannelService implements ChannelService {
         List<ChannelDto> publicChannels = channelRepository.findAll()
                 .stream()
                 .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
-                .map(ChannelDto::fromEntity)
+                .map(channel -> ChannelDto.fromEntity(channel, messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())))
                 .toList();
 
         List<ChannelDto> privateChannels = readStatusRepository.findByUserId(userId)
@@ -75,7 +76,10 @@ public class BasicChannelService implements ChannelService {
             throw new IllegalArgumentException("Private 파일은 수정할 수 없습니다.");
         }
 
-        return ChannelDto.fromEntity(channelRepository.updateName(id, name));
+        Channel updatedChannel = channelRepository.updateName(id, name);
+        Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId());
+
+        return ChannelDto.fromEntity(updatedChannel, lastMessageCreatedAt);
     }
 
     @Override
@@ -91,9 +95,9 @@ public class BasicChannelService implements ChannelService {
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
         readStatusRepository.save(new ReadStatus(friendId, channel.getId()));
-        channelRepository.save(channel); // TODO: 3/22/25 필요있는지 확인 필요
+        Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId());
 
-        return ChannelDto.fromEntity(channel);
+        return ChannelDto.fromEntity(channel, lastMessageCreatedAt);
     }
 }
 

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.user.UserDto;
-import com.sprint.mission.discodeit.application.user.UserRegisterDto;
+import com.sprint.mission.discodeit.application.userdto.UserDto;
+import com.sprint.mission.discodeit.application.userdto.UserRegisterDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;

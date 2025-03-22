@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.command.handler;
 
-import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.application.user.UserDto;
+import com.sprint.mission.discodeit.application.channeldto.ChannelRegisterDto;
+import com.sprint.mission.discodeit.application.channeldto.ChannelResponseDto;
+import com.sprint.mission.discodeit.application.userdto.UserDto;
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.view.InputView;

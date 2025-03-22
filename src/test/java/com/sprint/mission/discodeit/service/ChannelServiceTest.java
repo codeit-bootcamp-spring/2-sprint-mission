@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.channel.ChannelDto;
-import com.sprint.mission.discodeit.application.channel.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.user.UserDto;
+import com.sprint.mission.discodeit.application.channeldto.ChannelDto;
+import com.sprint.mission.discodeit.application.channeldto.ChannelRegisterDto;
+import com.sprint.mission.discodeit.application.userdto.UserDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -22,6 +23,7 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.ChannelInfo.CHANNEL_NAME;
 import static com.sprint.mission.discodeit.constant.ChannelInfo.UPDATED_CHANNEL_NAME;
+import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
 import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -132,7 +134,18 @@ class ChannelServiceTest {
         boolean isExisting = readStatusRepository.findByChannelId(privateChannelId)
                 .stream()
                 .anyMatch(message -> message.getChannelId().equals(privateChannelId));
-        
+
         assertThat(isExisting).isFalse();
+    }
+
+    @DisplayName("채널조회시 가장 최근 메세지의 시간정보를 반환합니다.")
+    @Test
+    void findById() {
+        messageRepository.save(new Message(MESSAGE_CONTENT, setUpChannel.id(), setUpUser.getId()));
+        Message message = messageRepository.save(new Message(MESSAGE_CONTENT + 123, setUpChannel.id(), setUpUser.getId()));
+
+
+        ChannelDto channel = channelService.findById(setUpChannel.id());
+        assertThat(channel.lastMessageCreatedAt()).isEqualTo(message.getCreatedAt());
     }
 }
