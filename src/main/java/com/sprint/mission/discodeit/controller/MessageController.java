@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.MessageFindDTO;
 import com.sprint.mission.discodeit.dto.display.MessageDisplayList;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.request.CreateMessageRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateMessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/servers/{serverId}/channels/{channelId}/messages")
-public class MessageController  {
+public class MessageController {
     private final MessageService messageService;
 
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -61,19 +62,20 @@ public class MessageController  {
         return ResponseEntity.ok(new MessageDisplayList(list));
     }
 
-//    @PutMapping("/update/{userId}")
-//    public ResponseEntity<> update(@PathVariable String , @RequestBody UserUpdateRequestDTO ) {
-//
-//
-//    }
+    @PutMapping(value = "/update/{messageId}")
+    public ResponseEntity<UUID> update(
+            @PathVariable String serverId,
+            @PathVariable String channelId,
+            @PathVariable UUID messageId,
+            @RequestParam("message") UpdateMessageDTO updateMessageDTO) {
+
+        UUID update = messageService.update(messageId, updateMessageDTO);
+        return ResponseEntity.ok(update);
+    }
 
     @DeleteMapping("/delete/{messageId}")
-    public ResponseEntity<String> delete(@PathVariable String messageId) {
-        boolean isDelete = messageService.delete(messageId);
-        if (isDelete == true) {
-            return ResponseEntity.ok("Delete successful");
-        } else {
-            return ResponseEntity.status(401).body("Delete failed");
-        }
+    public ResponseEntity<String> delete(@PathVariable UUID messageId) {
+        messageService.delete(messageId);
+        return ResponseEntity.ok("Delete successful");
     }
 }

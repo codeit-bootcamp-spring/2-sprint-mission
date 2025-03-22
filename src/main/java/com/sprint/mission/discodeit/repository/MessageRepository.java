@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.sprint.mission.discodeit.dto.request.UpdateMessageDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.stereotype.Repository;
@@ -19,7 +20,7 @@ public interface MessageRepository {
 
     List<Message> findAllByMessageId(UUID messageId);
 
-//    Message update(Message message, MessageCRUDDTO messageCRUDDTO);
+    Message update(Message message,  UpdateMessageDTO updateMessageDTO);
 
     void remove(UUID messageId);
 }

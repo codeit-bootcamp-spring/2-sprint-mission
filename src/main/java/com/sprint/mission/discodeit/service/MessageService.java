@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.MessageFindDTO;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.request.CreateMessageRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateMessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -17,14 +19,14 @@ public interface MessageService {
 
     Message create(CreateMessageRequestDTO messageWriteDTO, List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs);
 
-    MessageFindDTO find(String messageId);
+    MessageFindDTO find(UUID messageId);
 
-    List<MessageFindDTO> findAllByChannelId(String channelId);
+    List<MessageFindDTO> findAllByChannelId(UUID channelId);
 
-    void print(String channelId);
+    void print(UUID channelId);
 
-    boolean delete(String messageId);
+    void delete(UUID messageId);
 
-//    boolean update(String messageId, MessageCRUDDTO messageCRUDDTO);
+    UUID update(UUID messageId, UpdateMessageDTO updateMessageDTO );
 
 }

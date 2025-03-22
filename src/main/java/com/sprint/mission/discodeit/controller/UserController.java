@@ -91,7 +91,7 @@ public class UserController {
 //        return ResponseEntity.ok(userStatus);
 //    }
 
-    @PutMapping("/{userId}")
+    @PostMapping(value = "/update/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UUID> update(@PathVariable UUID userId,
                                          @RequestPart("user") UpdateUserRequestDTO updateUserRequestDTO,
                                          @RequestPart(value = "profileImage", required = false) MultipartFile file) throws IOException {

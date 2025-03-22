@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.dto.request.UpdateMessageDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.Empty.EmptyMessageListException;
@@ -95,17 +96,14 @@ public class FileMessageRepository implements MessageRepository {
         return messages;
     }
 
-//    @Override
-//    public Message update(Message message, MessageCRUDDTO messageUpdateDTO) {
-//        if (messageUpdateDTO.text() != null) {
-//            message.setText(messageUpdateDTO.text());
-//        }
-//        if (messageUpdateDTO.messageId() != null) {
-//            message.setMessageId(messageUpdateDTO.messageId());
-//        }
-//        fileRepository.save(messageList);
-//        return message;
-//    }
+    @Override
+    public Message update(Message message,  UpdateMessageDTO updateMessageDTO) {
+        if (updateMessageDTO.replaceText() != null) {
+            message.setText(updateMessageDTO.replaceText());
+        }
+        fileRepository.save(messageList);
+        return message;
+    }
 
     @Override
     public void remove(UUID messageId) {
