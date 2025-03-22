@@ -56,15 +56,14 @@ class MessageServiceTest {
         MessageDto messageDto = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, channelId, setUpUser.getId()), new ArrayList<>());
 
         List<MessageDto> messages = messageService.findAllByChannelId(channelId);
-        assertThat(messages).containsExactlyInAnyOrder(setUpMessage, messageDto);
+        assertThat(messages).containsExactly(setUpMessage, messageDto);
     }
 
     @Test
     void 메세지_내용_수정() {
-        messageService.updateContext(setUpMessage.messageId(), MESSAGE_CONTENT + "123");
+        MessageDto message = messageService.updateContext(setUpMessage.messageId(), MESSAGE_CONTENT + "123");
 
-        assertThat(messageService.findById(setUpMessage.messageId()).context())
-                .isNotEqualTo(MESSAGE_CONTENT);
+        assertThat(message.context()).isEqualTo(MESSAGE_CONTENT + "123");
     }
 
     @Test

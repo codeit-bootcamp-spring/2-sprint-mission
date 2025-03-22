@@ -13,7 +13,7 @@ public interface MessageService {
 
     List<MessageDto> findAllByChannelId(UUID channelId);
 
-    void updateContext(UUID id, String context);
+    MessageDto updateContext(UUID id, String context);
 
     void delete(UUID id);
 }

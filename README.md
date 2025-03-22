@@ -269,7 +269,7 @@ public static void main(String[]args){
 
 3. update
 
-- [ ] DTO를 활용해 파라미터를 그룹화합니다.
+- [x] DTO를 활용해 파라미터를 그룹화합니다.
     - 수정 대상 객체의 id 파라미터, 수정할 값 파라미터
 
 4. delete

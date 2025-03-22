@@ -48,12 +48,14 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void updateContext(UUID id, String context) {
+    public Message updateContext(UUID id, String context) {
         Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
         messages.get(id)
                 .updateContext(context);
 
         saveObjectsToFile(STORAGE_DIRECTORY, messagePath, messages);
+
+        return (Message) loadObjectsFromFile(messagePath).get(id);
     }
 
     @Override

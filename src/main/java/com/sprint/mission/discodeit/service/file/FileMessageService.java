@@ -48,8 +48,9 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void updateContext(UUID id, String context) {
-        messageRepository.updateContext(id, context);
+    public MessageDto updateContext(UUID id, String context) {
+        Message message = messageRepository.updateContext(id, context);
+        return MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message)));
     }
 
     @Override
