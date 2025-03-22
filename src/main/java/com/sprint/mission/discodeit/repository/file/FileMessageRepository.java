@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -9,27 +11,24 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
-    private static final FileMessageRepository instance = new FileMessageRepository();
-    private static final String FILE_PATH = "messages.ser";
+    private final String filePath;
     private final Map<UUID, Message> data;
 
-    private FileMessageRepository() {
+    public FileMessageRepository(@Value("${discodeit.repository.file-directory}") String baseDir) {
+        this.filePath = baseDir + "/messages.ser";
         this.data = loadData();
     }
 
-    public static FileMessageRepository getInstance() {
-        return instance;
-    }
-
     private void saveData() throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(data);
         }
     }
 
     private Map<UUID, Message> loadData() {
-        File file = new File(FILE_PATH);
+        File file = new File(filePath);
         if (!file.exists()) {
             return new HashMap<>();
         }

@@ -2,31 +2,32 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserStatusRepository implements UserStatusRepository {
-    private static final FileUserStatusRepository instance = new FileUserStatusRepository();
-    private static final String FILE_PATH = "userStatus.ser";
-    private Map<UUID, UserStatus> data;
+    private final String filePath;
+    private final Map<UUID, UserStatus> data;
 
-    private FileUserStatusRepository() {
+    public FileUserStatusRepository(@Value("${discodeit.repository.file-directory}") String baseDir) {
+        this.filePath = baseDir + "/userStatus.ser";
         this.data = loadData();
     }
 
-    public static FileUserStatusRepository getInstance() {
-        return instance;
-    }
-
     private void saveData() throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(data);
         }
     }
 
     private Map<UUID, UserStatus> loadData() {
-        File file = new File(FILE_PATH);
+        File file = new File(filePath);
         if (!file.exists()) {
             return new HashMap<>();
         }

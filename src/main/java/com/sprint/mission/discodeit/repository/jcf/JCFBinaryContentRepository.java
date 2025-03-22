@@ -2,19 +2,18 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = true)
 public class JCFBinaryContentRepository implements BinaryContentRepository {
-    private static final JCFBinaryContentRepository instance = new JCFBinaryContentRepository();
     private final Map<UUID, BinaryContent> data = new HashMap<>();
 
-    private JCFBinaryContentRepository() {}
-
-    public static JCFBinaryContentRepository getInstance() {
-        return instance;
-    }
+    public JCFBinaryContentRepository() {}
 
     @Override
     public void save(BinaryContent binaryContent) {

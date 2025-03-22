@@ -2,18 +2,17 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = true)
 public class JCFChannelRepository implements ChannelRepository {
-    private static final JCFChannelRepository instance = new JCFChannelRepository();
     private final Map<UUID, Channel> data = new HashMap<>();
 
-    private JCFChannelRepository() {}
-
-    public static JCFChannelRepository getInstance() {
-        return instance;
-    }
+    public JCFChannelRepository() {}
 
     @Override
     public void save(Channel channel) {
