@@ -61,8 +61,8 @@ public class FileUserRepository implements UserRepository {
         return user;
     }
 
-    public User update(User user, String newUsername, String newEmail, String newPassword){
-        user.update(newUsername, newEmail, newPassword);
+    public User update(User user, String newUsername, String newEmail, String newPassword, UUID newProfileID){
+        user.update(newUsername, newEmail, newPassword, newProfileID);
 
         dataSave();
         return user;

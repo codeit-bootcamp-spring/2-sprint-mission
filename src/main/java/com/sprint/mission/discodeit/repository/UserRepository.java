@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Optional;
 
 public interface UserRepository {
 
@@ -11,7 +12,7 @@ public interface UserRepository {
 
     User save(User user);
 
-    User update(User user, String newUsername, String newEmail, String newPassword);
+    User update(User user, String newUsername, String newEmail, String newPassword, UUID newProfileId);
 
     List<User> findAll();
 

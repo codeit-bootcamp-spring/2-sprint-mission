@@ -1,15 +1,16 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public class BaseEntity{
     private final UUID id;
-    private final long createdAt; // 객체생성시간
-    private long updatedAt; // 객체수정시간
+    private final Instant createdAt; // 객체생성시간
+    private Instant updatedAt; // 객체수정시간
 
     public BaseEntity() {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.ofEpochSecond(System.currentTimeMillis());
         this.updatedAt = createdAt;
 
     }
@@ -17,15 +18,15 @@ public class BaseEntity{
     public UUID getId() {
         return id;
     }
-    public long getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
-    public long getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
     public void update() {
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.ofEpochSecond(System.currentTimeMillis());
     }
 
 }

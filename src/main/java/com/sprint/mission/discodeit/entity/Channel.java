@@ -9,8 +9,8 @@ import lombok.Getter;
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
     //
     private ChannelType type;
     private String name;
@@ -18,7 +18,7 @@ public class Channel implements Serializable {
 
     public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
+        this.createdAt = Instant.now();
         //
         this.type = type;
         this.name = name;
@@ -37,7 +37,7 @@ public class Channel implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
+            this.updatedAt = Instant.ofEpochSecond(Instant.now().getEpochSecond());
         }
     }
 }
