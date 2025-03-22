@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.dto.request.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.Empty.EmptyServerListException;
@@ -115,20 +116,14 @@ public class FileServerRepository implements ServerRepository {
         return list;
     }
 
-//    @Override
-//    public Server update(Server targetServer, ServerCRUDDTO serverCRUDDTO) {
-//        if (serverCRUDDTO.serverId() != null) {
-//            targetServer.setServerId(serverCRUDDTO.serverId());
-//        }
-//        if (serverCRUDDTO.userId() != null) {
-//            targetServer.setOwnerId(serverCRUDDTO.userId());
-//        }
-//        if (serverCRUDDTO.name() != null) {
-//            targetServer.setName(serverCRUDDTO.name());
-//        }
-//        fileRepository.save(serverList);
-//        return targetServer;
-//    }
+    @Override
+    public Server update(Server server, UpdateServerRequestDTO updateServerRequestDTO) {
+        if (updateServerRequestDTO.replaceName() != null) {
+            server.setName(updateServerRequestDTO.replaceName());
+        }
+        fileRepository.save(serverList);
+        return server;
+    }
 
 
     @Override

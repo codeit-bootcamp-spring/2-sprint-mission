@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.request.CreateServerRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public interface ServerService {
 
     List<Server> findServerAll(UUID ownerId);
 
-//    Server update(String serverId, ServerCRUDDTO serverCRUDDTO);
+    UUID update(UUID serverId, UpdateServerRequestDTO updateServerRequestDTO);
 
     void delete(UUID serverId);
 

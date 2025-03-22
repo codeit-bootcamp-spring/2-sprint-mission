@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.display.ServerDisplayItem;
 import com.sprint.mission.discodeit.dto.display.ServerDisplayList;
 import com.sprint.mission.discodeit.dto.request.CreateServerNameDTO;
 import com.sprint.mission.discodeit.dto.request.CreateServerRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.dto.result.CreateServerResult;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.service.ServerService;
@@ -49,11 +50,12 @@ public class ServerController {
         return ResponseEntity.ok(new ServerDisplayList(list));
     }
 
-//    @PutMapping("/update/{userId}")
-//    public ResponseEntity<User> update(@PathVariable String , @RequestBody UserUpdateRequestDTO ) {
-//
-//
-//    }
+    @PutMapping("/update/{serverId}")
+    public ResponseEntity<UUID> update(@PathVariable UUID serverId, @RequestBody UpdateServerRequestDTO updateServerRequestDTO) {
+        UUID update = serverService.update(serverId, updateServerRequestDTO);
+
+        return ResponseEntity.ok(update);
+    }
 
     @DeleteMapping("/{serverId}")
     public ResponseEntity<String> delete(@PathVariable UUID serverId) {

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.sprint.mission.discodeit.dto.request.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Repository;
@@ -23,7 +24,7 @@ public interface ServerRepository {
 
     List<Server> findAllByUserId(UUID userId);
 
-//    Server update(Server targetServer, ServerCRUDDTO serverCRUDDTO);
+    Server update(Server server, UpdateServerRequestDTO updateServerRequestDTO);
 
     void remove(UUID userId);
 }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.CreateServerRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.Empty.EmptyServerListException;
@@ -73,18 +74,14 @@ public class BasicServerService implements ServerService {
 
     }
 
-//    @Override
-//    public Server update(String serverId, ServerCRUDDTO serverCRUDDTO) {
-//        UUID serverUUID = UUID.fromString(serverId);
-//        try {
-//            Server server = serverRepository.findById(serverUUID);
-//            Server update = serverRepository.update(server, serverCRUDDTO);
-//            return update;
-//        } catch (ServerNotFoundException e) {
-//            System.out.println("update: 해당 서버가 존재하지 않습니다.");
-//            return null;
-//        }
-//    }
+    @Override
+    public UUID update(UUID serverId, UpdateServerRequestDTO updateServerRequestDTO) {
+
+        Server server = serverRepository.findById(serverId);
+        Server update = serverRepository.update(server, updateServerRequestDTO);
+        return update.getServerId();
+
+    }
 
     @Override
     public void delete(UUID serverId) {
