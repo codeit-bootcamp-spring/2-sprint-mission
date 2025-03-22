@@ -11,7 +11,7 @@ import java.util.UUID;
 
 //@Repository
 public class JCFUserStatusRepository implements UserStatusRepository {
-    List<UserStatus> userStatusList = new ArrayList<>();
+    private final List<UserStatus> userStatusList = new ArrayList<>();
 
     @Override
     public void save(UserStatus userStatus) {

@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Repository
 public class JCFBinaryContentRepository implements BinaryContentRepository {
-    List<BinaryContent> binaryContentList = new ArrayList<>();
+    private final List<BinaryContent> binaryContentList = new ArrayList<>();
 
     @Override
     public void save(BinaryContent binaryContent) {

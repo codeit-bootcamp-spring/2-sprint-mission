@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Repository
 public class JCFMessageRepository implements MessageRepository {
 
-    List<Message> messageList = new ArrayList<>();
+    private final List<Message> messageList = new ArrayList<>();
 
     @Override
     public Message save(Message message) {
