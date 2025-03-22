@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
@@ -20,6 +19,7 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -56,7 +56,7 @@ public class FileUserService implements UserService {
         User user = new User(createRequest.username(), createRequest.email()
                 , createRequest.password(), binaryContentId);
 
-        UserStatusParam statusParam = new UserStatusParam(user.getId(), UserStatusType.ONLINE);
+        UserStatusParam statusParam = new UserStatusParam(user.getId(), Instant.now());
         userStatusService.create(statusParam);
 
         Path path = resolvePath(user.getId());
@@ -93,7 +93,7 @@ public class FileUserService implements UserService {
 
         return new UserInfoResponse(user.getId(),
                 user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
-                user.getEmail(), user.getProfileId(), userStatus.getStatus());
+                user.getEmail(), user.getProfileId(), userStatus.isOnline());
     }
 
     @Override
@@ -119,7 +119,7 @@ public class FileUserService implements UserService {
                                 user.getId(), user.getCreatedAt(),
                                 user.getUpdatedAt(), user.getUsername(),
                                 user.getEmail(), user.getProfileId(),
-                                userStatus.getStatus()
+                                userStatus.isOnline()
                         );
                     }).toList();
         } catch (IOException e) {
@@ -240,10 +240,4 @@ public class FileUserService implements UserService {
             throw new IllegalArgumentException(email + " 은 중복된 email.");
         }
     }
-
-    /*private UUID profileCreate(BinaryContentType type, List<MultipartFile> file) {
-        BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(type, file);
-        List<UUID> idList = basicBinaryContentService.create(binaryContentCreateRequest);
-        return idList.get(0);
-    }*/
 }

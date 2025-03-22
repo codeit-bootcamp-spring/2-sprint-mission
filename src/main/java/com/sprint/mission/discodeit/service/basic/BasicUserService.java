@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -12,6 +11,7 @@ import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusParam;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class BasicUserService implements UserService {
         User user = new User(createRequest.username(), createRequest.email()
                 , createRequest.password(), binaryContentId);
 
-        UserStatusParam statusParam = new UserStatusParam(user.getId(), UserStatusType.ONLINE);
+        UserStatusParam statusParam = new UserStatusParam(user.getId(), Instant.now());
         userStatusService.create(statusParam);
 
         return userRepository.save(user);
@@ -51,7 +51,7 @@ public class BasicUserService implements UserService {
 
         return new UserInfoResponse(user.getId(),
                 user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
-                user.getEmail(), user.getProfileId(), userStatus.getStatus());
+                user.getEmail(), user.getProfileId(), userStatus.isOnline());
     }
 
     @Override
@@ -64,7 +64,7 @@ public class BasicUserService implements UserService {
                             user.getId(), user.getCreatedAt(),
                             user.getUpdatedAt(), user.getUsername(),
                             user.getEmail(), user.getProfileId(),
-                            userStatus.getStatus()
+                            userStatus.isOnline()
                     );
                 }).toList();
     }

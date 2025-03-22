@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
@@ -12,6 +11,7 @@ import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusParam;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +39,7 @@ public class JCFUserService implements UserService {
                 .map(basicBinaryContentService::create).map(BinaryContent::getId).orElse(null);
         User user = new User(createRequest.username(), createRequest.email(), createRequest.password(),
                 binaryContentId);
-        UserStatusParam statusParam = new UserStatusParam(user.getId(), UserStatusType.ONLINE);
+        UserStatusParam statusParam = new UserStatusParam(user.getId(), Instant.now());
         userStatusService.create(statusParam);
 
         this.data.put(user.getId(), user);
@@ -57,7 +57,7 @@ public class JCFUserService implements UserService {
 
         return new UserInfoResponse(userNullable.getId(),
                 userNullable.getCreatedAt(), userNullable.getUpdatedAt(), userNullable.getUsername(),
-                userNullable.getEmail(), userNullable.getProfileId(), userStatus.getStatus());
+                userNullable.getEmail(), userNullable.getProfileId(), userStatus.isOnline());
     }
 
     @Override
@@ -69,7 +69,7 @@ public class JCFUserService implements UserService {
                             user.getId(), user.getCreatedAt(),
                             user.getUpdatedAt(), user.getUsername(),
                             user.getEmail(), user.getProfileId(),
-                            userStatus.getStatus()
+                            userStatus.isOnline()
                     );
                 }).toList();
     }

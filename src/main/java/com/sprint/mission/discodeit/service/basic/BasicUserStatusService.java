@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusParam;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,7 +27,7 @@ public class BasicUserStatusService implements UserStatusService {
         if (userStatusRepository.existsByUserId(statusparam.userId())) {
             throw new IllegalStateException(statusparam.userId() + " 에 해당하는 userStatus가 이미 존재함");
         }
-        UserStatus userStatus = new UserStatus(statusparam.userId(), statusparam.status());
+        UserStatus userStatus = new UserStatus(statusparam.userId(), statusparam.time());
         userStatusRepository.save(userStatus);
     }
 
@@ -53,21 +51,15 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus update(UserStatusParam statusparam) {
         UserStatus userStatus = findByUserId(statusparam.userId());
-        userStatus.update(statusparam.status());
+        userStatus.update(statusparam.time());
         return userStatusRepository.save(userStatus);
     }
 
     @Override
     public UserStatus updateByUserId(UUID userId) {
         UserStatus userStatus = findByUserId(userId);
-        UserStatusType status;
         Instant now = Instant.now();
-        if (Duration.between(userStatus.getUpdatedAt(), now).toMinutes() > 5) {
-            status = UserStatusType.OFFLINE;
-        } else {
-            status = UserStatusType.ONLINE;
-        }
-        userStatus.update(status);
+        userStatus.update(now);
         return userStatusRepository.save(userStatus);
     }
 
