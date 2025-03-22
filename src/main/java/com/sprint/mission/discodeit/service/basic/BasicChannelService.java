@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.request.CreateChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.Empty.EmptyMessageListException;
 import com.sprint.mission.discodeit.exception.NotFound.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.Valid.ChannelModificationNotAllowedException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -122,26 +124,16 @@ public class BasicChannelService implements ChannelService {
         deleteAllReadStatus(channelId);
     }
 
-//    @CustomLogging
-//    @Override
-//    public boolean update(ChannelCRUDDTO channelCRUDDTO, ChannelCRUDDTO channelUpdateDTO) {
-//        UUID userId = channelCRUDDTO.userId();
-//        UUID channelId = channelCRUDDTO.channelId();
-//
-//        Channel findChannel = channelRepository.find(channelId);
-//        if (findChannel.getType() == ChannelType.PRIVATE) {
-//            System.out.println("private 채널은 수정할 수 없습니다.");
-//            return false;
-//        }
-//
-//        if (findChannel.getCreatorId().equals(userId)) {
-//            channelRepository.update(findChannel, channelUpdateDTO);
-//            return true;
-//        } else {
-//            System.out.println("채널 수정 권한 없음");
-//            return false;
-//        }
-//    }
+    @CustomLogging
+    @Override
+    public UUID update(UUID channelId, UpdateChannelDTO updateChannelDTO) {
+        Channel findChannel = channelRepository.find(channelId);
+        if (findChannel.getType() == ChannelType.PRIVATE) {
+            throw new ChannelModificationNotAllowedException("private 채널은 수정할 수 없습니다.");
+        }
+        Channel update = channelRepository.update(findChannel, updateChannelDTO);
+        return update.getChannelId();
+    }
 
     @Override
     public void printChannels(UUID serverId) {

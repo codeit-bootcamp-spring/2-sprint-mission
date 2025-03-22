@@ -4,6 +4,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.display.ChannelDisplayList;
 import com.sprint.mission.discodeit.dto.request.CreateChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateChannelDTO;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -43,11 +44,11 @@ public class ChannelController {
 
 //    }
 
-//    @PutMapping("/update/{userId}")
-//    public ResponseEntity<User> update(@PathVariable String , @RequestBody UserUpdateRequestDTO ) {
-//
-//
-//    }
+    @PutMapping("/update/{channelId}")
+    public ResponseEntity<UUID> update(@PathVariable UUID channelId, @RequestBody UpdateChannelDTO updateChannelDTO ) {
+        UUID update = channelService.update(channelId, updateChannelDTO);
+        return ResponseEntity.ok(update);
+    }
 
     @DeleteMapping("/{channelId}")
     public ResponseEntity<String> delete(@PathVariable UUID channelId) {

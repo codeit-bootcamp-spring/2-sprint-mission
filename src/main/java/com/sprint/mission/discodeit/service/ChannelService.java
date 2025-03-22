@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.UserFindDTO;
 import com.sprint.mission.discodeit.dto.request.CreateChannelRequestDTO;
 import com.sprint.mission.discodeit.dto.request.JoinQuitChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.request.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,6 @@ public interface ChannelService {
 
     void delete(UUID channelId);
 
-//    boolean update(ChannelCRUDDTO channelCRUDDTO, ChannelCRUDDTO channelUpdateDTO);
+    UUID update(UUID channelId, UpdateChannelDTO updateChannelDTO);
 
 }

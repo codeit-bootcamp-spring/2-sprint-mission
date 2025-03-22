@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.dto.request.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -94,19 +95,16 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
 
-//    @Override
-//    public Channel update(Channel targetChannel, ChannelCRUDDTO channelUpdateDTO) {
-//        if (channelUpdateDTO.channelId() != null) {
-//            targetChannel.setChannelId(channelUpdateDTO.channelId());
-//        }
-//        if (channelUpdateDTO.name() != null) {
-//            targetChannel.setName(channelUpdateDTO.name());
-//        }
-//        if (channelUpdateDTO.type() != null) {
-//            targetChannel.setType(channelUpdateDTO.type());
-//        }
-//        return targetChannel;
-//    }
+    @Override
+    public Channel update(Channel channel, UpdateChannelDTO updateChannelDTO) {
+        if (updateChannelDTO.replaceName() != null) {
+            channel.setName(updateChannelDTO.replaceName());
+        }
+        if (updateChannelDTO.replaceType() != channel.getType()) {
+            channel.setType(updateChannelDTO.replaceType());
+        }
+        return channel;
+    }
 
     @Override
     public void remove(UUID channelId) {
