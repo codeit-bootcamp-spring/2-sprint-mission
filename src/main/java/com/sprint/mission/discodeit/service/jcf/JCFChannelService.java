@@ -43,7 +43,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelDto> findAll() {
+    public List<ChannelDto> findAllByUserId(UUID userId) {
         return channelRepository.findAll()
                 .stream()
                 .sorted(Comparator.comparing(Channel::getCreatedAt))

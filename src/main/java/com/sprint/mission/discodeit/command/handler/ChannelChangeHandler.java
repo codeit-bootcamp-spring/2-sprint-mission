@@ -16,7 +16,7 @@ public class ChannelChangeHandler extends Handler {
 
     @Override
     public ChannelResponseDto execute(ChannelResponseDto currentChannel, UserDto loginUser) {
-        List<ChannelResponseDto> channels = super.channelController.findAll()
+        List<ChannelResponseDto> channels = super.channelController.findAll(loginUser.id())
                 .stream()
                 .filter(channel -> !channel.id().equals(currentChannel.id()))
                 .toList();

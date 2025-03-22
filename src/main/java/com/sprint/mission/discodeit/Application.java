@@ -54,7 +54,7 @@ public class Application {
                             InputView inputView) {
         while (true) {
             List<MessageDto> currentChannelMessages = messageController.findByChannelId(currentChannel.id());
-            printServer(channelController.findAll(), loginUser, currentChannelMessages, currentChannel);
+            printServer(channelController.findAll(loginUser.id()), loginUser, currentChannelMessages, currentChannel);
 
             String userCommand = readCommand(inputView);
             if (userCommand.equals(EXIT)) {

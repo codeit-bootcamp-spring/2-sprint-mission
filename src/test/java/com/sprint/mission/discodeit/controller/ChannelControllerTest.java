@@ -83,7 +83,7 @@ class ChannelControllerTest {
     }
 
 
-    @DisplayName("public 채널 조회시 User모음에 null을 반환합니다.")
+    @DisplayName("Public 채널 조회시 User모음에 null을 반환합니다.")
     @Test
     void findByIdPublicChannel() {
         ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, owner);

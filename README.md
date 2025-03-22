@@ -116,9 +116,9 @@ public static void main(String[]args){
         - [x] public 채널 생성
             - public 매개변수 전달
             - public 생성
-- [ ] 채널 조회 - find(), findALL()
-    - [ ] public 조회 및 반환
-    - [ ] 유저 private한 채널 반환
+- [x] 채널 조회 - find(), findALL()
+    - [x] public 조회 및 반환
+    - [x] 유저 private한 채널 반환
         - 본인 id 입력값 받기
         - 채널 private 중에 본인이 속한 채널 조회
 
@@ -238,11 +238,11 @@ public static void main(String[]args){
 3. findAll
 
 - DTO를 활용하여:
-    - [ ] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
-    - [ ] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
-- [ ] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
-- [ ] PUBLIC 채널 목록은 전체 조회합니다.
-- [ ] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
+    - [x] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
+    - [x] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
+- [x] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
+- [x] PUBLIC 채널 목록은 전체 조회합니다.
+- [x] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
 
 4. update
 

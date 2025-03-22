@@ -13,7 +13,7 @@ public interface ChannelService {
 
     ChannelDto findById(UUID id);
 
-    List<ChannelDto> findAll();
+    List<ChannelDto> findAllByUserId(UUID userId);
 
     void updateName(UUID id, String name);
 

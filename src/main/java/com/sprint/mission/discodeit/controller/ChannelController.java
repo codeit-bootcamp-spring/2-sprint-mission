@@ -35,20 +35,17 @@ public class ChannelController {
         return ChannelResponseDto.fromEntity(channel, Instant.ofEpochSecond(0), null);
     }
 
-    public List<ChannelResponseDto> findAll() {
-        return channelService.findAll()
+    public List<ChannelResponseDto> findAll(UUID userId) {
+        return channelService.findAllByUserId(userId)
                 .stream()
-                .map(channel -> {
-                    Instant lastMessageCreatedAt = messageService.findLastMessageCreatedAtByChannelId(channel.id());
-                    return createPrivateChannelResponse(lastMessageCreatedAt, channel);
-                })
+                .map(this::createChannelResponse)
                 .toList();
     }
 
     public ChannelResponseDto updateNameToPublic(UUID channelId, String channelName) {
-        channelService.updateName(channelId, channelName);
-
+        channelService.updateName(channelId, channelName); // TODO: 3/22/25 update한뒤 바로 해당 채널 반환할 수 있도록한다
         Instant lastMessageCreatedAt = messageService.findLastMessageCreatedAtByChannelId(channelId);
+
         ChannelDto channel = channelService.findById(channelId);
 
         return ChannelResponseDto.fromEntity(channel, lastMessageCreatedAt, null);
@@ -63,8 +60,18 @@ public class ChannelController {
     }
 
     public ChannelResponseDto findById(UUID channelId) {
-        Instant lastMessageCreatedAt = messageService.findLastMessageCreatedAtByChannelId(channelId);
         ChannelDto channel = channelService.findById(channelId);
+        Instant lastMessageCreatedAt = messageService.findLastMessageCreatedAtByChannelId(channelId);
+
+        if (channel.type().equals(ChannelType.PRIVATE)) {
+            return createPrivateChannelResponse(lastMessageCreatedAt, channel);
+        }
+
+        return ChannelResponseDto.fromEntity(channel, lastMessageCreatedAt, null);
+    }
+
+    private ChannelResponseDto createChannelResponse(ChannelDto channel) {
+        Instant lastMessageCreatedAt = messageService.findLastMessageCreatedAtByChannelId(channel.id());
 
         if (channel.type().equals(ChannelType.PRIVATE)) {
             return createPrivateChannelResponse(lastMessageCreatedAt, channel);

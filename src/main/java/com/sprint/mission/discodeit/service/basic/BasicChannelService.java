@@ -11,7 +11,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,12 +45,23 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelDto> findAll() {
-        return channelRepository.findAll()
+    public List<ChannelDto> findAllByUserId(UUID userId) {
+        List<ChannelDto> channels = new ArrayList<>();
+        List<ChannelDto> publicChannels = channelRepository.findAll()
                 .stream()
-                .sorted(Comparator.comparing(Channel::getCreatedAt))
+                .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
                 .map(ChannelDto::fromEntity)
                 .toList();
+
+        List<ChannelDto> privateChannels = readStatusRepository.findByUserId(userId)
+                .stream()
+                .map(readStatus -> this.findById(readStatus.getChannelId()))
+                .toList();
+
+        channels.addAll(publicChannels);
+        channels.addAll(privateChannels);
+
+        return channels;
     }
 
     @Override
