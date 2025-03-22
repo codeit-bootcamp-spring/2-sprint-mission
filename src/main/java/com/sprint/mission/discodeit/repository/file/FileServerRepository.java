@@ -94,7 +94,7 @@ public class FileServerRepository implements ServerRepository {
     @Override
     public Server findByOwnerId(UUID userId) {
         List<Server> servers = findAllByUserId(userId);
-        Server server = servers.stream().filter(s -> s.getOwnerId().equals(userId))
+        Server server = servers.stream().filter(s -> s.getUserId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new UserNotFoundException("서버장을 찾을 수 없습니다."));
 
@@ -134,7 +134,7 @@ public class FileServerRepository implements ServerRepository {
     @Override
     public void remove(UUID serverId) {
         Server server = findById(serverId);
-        UUID ownerId = server.getOwnerId();
+        UUID ownerId = server.getUserId();
         List<Server> list = findAllByUserId(ownerId);
 
         fileRepository.save(serverList);

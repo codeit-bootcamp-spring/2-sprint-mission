@@ -35,8 +35,8 @@ public class BasicChannelService implements ChannelService {
     @CustomLogging
     @Override
     public UUID create(CreateChannelRequestDTO channelCreateDTO) {
-        User user = userRepository.findById(channelCreateDTO.serverId());
-        Server findServer = serverRepository.findById(channelCreateDTO.creatorId());
+        User user = userRepository.findById(channelCreateDTO.userId());
+        Server findServer = serverRepository.findById(channelCreateDTO.serverId());
         Channel channel;
 
         if (channelCreateDTO.type() == ChannelType.PRIVATE) {

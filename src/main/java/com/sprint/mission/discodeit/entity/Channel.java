@@ -18,7 +18,7 @@ public class Channel implements Serializable {
 
     private UUID channelId;
     private final UUID serverId;
-    private final UUID creatorId;
+    private final UUID userId;
 
     private String name;
     private List<User> userList = new ArrayList<>();
@@ -28,18 +28,18 @@ public class Channel implements Serializable {
     public final Instant createdAt;
     public Instant updatedAt;
 
-    public Channel(UUID serverId, UUID creatorId, String name ) {
-        this(UUID.randomUUID(), serverId, creatorId,Instant.now(), name, ChannelType.PUBLIC);
+    public Channel(UUID serverId, UUID userId, String name ) {
+        this(UUID.randomUUID(), serverId, userId,Instant.now(), name, ChannelType.PUBLIC);
     }
 
-    public Channel(UUID serverId, UUID creatorId, String name, ChannelType type) {
-        this(UUID.randomUUID(), serverId, creatorId,Instant.now(), name, type);
+    public Channel(UUID serverId, UUID userId, String name, ChannelType type) {
+        this(UUID.randomUUID(), serverId, userId,Instant.now(), name, type);
     }
 
-    public Channel(UUID channelId, UUID serverId, UUID creatorId, Instant createdAt, String name,ChannelType type) {
+    public Channel(UUID channelId, UUID serverId, UUID userId, Instant createdAt, String name, ChannelType type) {
         this.channelId = channelId;
         this.serverId = serverId;
-        this.creatorId = creatorId;
+        this.userId = userId;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
         this.name = name;

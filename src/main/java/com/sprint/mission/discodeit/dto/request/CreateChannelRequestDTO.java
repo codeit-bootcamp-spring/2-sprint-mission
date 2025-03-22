@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public record CreateChannelRequestDTO(
         UUID serverId,
-        UUID creatorId,
+        UUID userId,
         String name,
         ChannelType type
 ) {

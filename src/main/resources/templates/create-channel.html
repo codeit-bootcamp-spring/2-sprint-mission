@@ -10,7 +10,7 @@
 
 <!-- 숨겨진 ID들 -->
 <input type="hidden" id="serverId" th:value="${serverId}" />
-<input type="hidden" id="creatorId" th:value="${userId}" />
+<input type="hidden" id="userId" th:value="${userId}" />
 
 <form id="channelForm">
   <label>채널 이름:</label><br/>
@@ -35,16 +35,16 @@
     event.preventDefault();
 
     const serverId = document.getElementById("serverId").value;
-    const creatorId = document.getElementById("creatorId").value;
+    const userId = document.getElementById("userId").value;
     const name = document.getElementById("channelName").value;
     const type = document.getElementById("channelType").value;
 
-    fetch(`/api/channels/create`, {
+    fetch(`/api/servers/${serverId}/channels/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         serverId: serverId,
-        creatorId: creatorId,  // ✅ DTO 명세에 맞게 userId로 보내야 함
+        userId: userId,
         name: name,
         type: type
       })
@@ -55,7 +55,7 @@
             })
             .then(data => {
               alert(`채널 생성 완료! ID: ${data}`);
-              window.location.href = `/users/${creatorId}/servers/${serverId}`;
+              window.location.href = `/users/${userId}/servers/${serverId}`;
             })
             .catch(err => {
               console.error("에러:", err);

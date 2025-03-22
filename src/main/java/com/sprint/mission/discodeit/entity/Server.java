@@ -18,7 +18,7 @@ public class Server implements Serializable {
 
     private UUID serverId;
 
-    private UUID ownerId;
+    private UUID userId;
 
     private String name;
     private List<User> userList = new ArrayList<>();
@@ -26,13 +26,13 @@ public class Server implements Serializable {
     public final Instant createdAt;
     public Instant updatedAt;
 
-    public Server(UUID ownerId, String name) {
-        this(UUID.randomUUID(), ownerId, Instant.now(), name);
+    public Server(UUID userId, String name) {
+        this(UUID.randomUUID(), userId, Instant.now(), name);
     }
 
-    public Server(UUID serverId, UUID ownerId, Instant createdAt, String name) {
+    public Server(UUID serverId, UUID userId, Instant createdAt, String name) {
         this.serverId = serverId;
-        this.ownerId = ownerId;
+        this.userId = userId;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
         this.name = name;
@@ -43,8 +43,8 @@ public class Server implements Serializable {
         updatedAt = Instant.now();
     }
 
-    public void setOwnerId(UUID ownerId) {
-        this.ownerId = ownerId;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
         updatedAt = Instant.now();
     }
 
