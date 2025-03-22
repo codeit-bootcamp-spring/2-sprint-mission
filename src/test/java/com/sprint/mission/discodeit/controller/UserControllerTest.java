@@ -125,7 +125,7 @@ class UserControllerTest {
     }
 
 
-    private byte[] loadImageFileFromResource(String filePath) {
+    public byte[] loadImageFileFromResource(String filePath) {
         byte[] binaryProfileImage;
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filePath)) {
             assert inputStream != null;

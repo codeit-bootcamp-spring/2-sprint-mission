@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -141,8 +142,8 @@ class ChannelServiceTest {
     @DisplayName("채널조회시 가장 최근 메세지의 시간정보를 반환합니다.")
     @Test
     void findById() {
-        messageRepository.save(new Message(MESSAGE_CONTENT, setUpChannel.id(), setUpUser.getId()));
-        Message message = messageRepository.save(new Message(MESSAGE_CONTENT + 123, setUpChannel.id(), setUpUser.getId()));
+        messageRepository.save(new Message(MESSAGE_CONTENT, setUpChannel.id(), setUpUser.getId(), new ArrayList<>()));
+        Message message = messageRepository.save(new Message(MESSAGE_CONTENT + 123, setUpChannel.id(), setUpUser.getId(), new ArrayList<>()));
 
 
         ChannelDto channel = channelService.findById(setUpChannel.id());

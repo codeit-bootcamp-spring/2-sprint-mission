@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.application.MessageDto;
+import com.sprint.mission.discodeit.application.messagedto.MessageCreationDto;
+import com.sprint.mission.discodeit.application.messagedto.MessageDto;
 import com.sprint.mission.discodeit.application.userdto.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Comparator;
 import java.util.List;
@@ -14,18 +16,14 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
 
+@RequiredArgsConstructor
 public class JCFMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
 
-    public JCFMessageService(MessageRepository messageRepository, UserRepository userRepository) {
-        this.messageRepository = messageRepository;
-        this.userRepository = userRepository;
-    }
-
     @Override
-    public MessageDto create(String context, UUID channelId, UUID userId) {
-        Message message = messageRepository.save(new Message(context, channelId, userId));
+    public MessageDto create(MessageCreationDto messageCreationDto, List<UUID> attachmentsIds) {
+        Message message = messageRepository.save(new Message(messageCreationDto.context(), messageCreationDto.chanelId(), messageCreationDto.userId(), attachmentsIds));
 
         return MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message)));
     }

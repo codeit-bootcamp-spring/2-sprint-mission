@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.view;
 
 import com.ibm.icu.text.Transliterator;
-import com.sprint.mission.discodeit.application.MessageDto;
 import com.sprint.mission.discodeit.application.channeldto.ChannelResponseDto;
+import com.sprint.mission.discodeit.application.messagedto.MessageDto;
 import com.sprint.mission.discodeit.application.userdto.UserDto;
 
 import java.util.ArrayList;

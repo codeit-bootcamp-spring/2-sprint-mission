@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.application.MessageDto;
+import com.sprint.mission.discodeit.application.messagedto.MessageCreationDto;
+import com.sprint.mission.discodeit.application.messagedto.MessageDto;
 import com.sprint.mission.discodeit.application.userdto.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -24,8 +25,8 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public MessageDto create(String context, UUID channelId, UUID userId) {
-        Message message = messageRepository.save(new Message(context, channelId, userId));
+    public MessageDto create(MessageCreationDto messageCreationDto, List<UUID> attachmentsIds) {
+        Message message = messageRepository.save(new Message(messageCreationDto.context(), messageCreationDto.chanelId(), messageCreationDto.userId(), attachmentsIds));
 
         return MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message)));
     }

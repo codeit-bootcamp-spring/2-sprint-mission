@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.MessageDto;
+import com.sprint.mission.discodeit.application.messagedto.MessageCreationDto;
+import com.sprint.mission.discodeit.application.messagedto.MessageDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
@@ -9,6 +10,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
@@ -27,7 +29,7 @@ class MessageServiceTest {
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
         messageService = new JCFMessageService(new JCFMessageRepository(), userRepository);
-        setUpMessage = messageService.create(MESSAGE_CONTENT, UUID.randomUUID(), user.getId());
+        setUpMessage = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, UUID.randomUUID(), user.getId()), new ArrayList<>());
     }
 
     @Test

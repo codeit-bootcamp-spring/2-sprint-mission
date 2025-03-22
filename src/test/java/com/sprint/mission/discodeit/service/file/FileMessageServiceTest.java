@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.application.MessageDto;
+import com.sprint.mission.discodeit.application.messagedto.MessageCreationDto;
+import com.sprint.mission.discodeit.application.messagedto.MessageDto;
 import com.sprint.mission.discodeit.application.userdto.UserDto;
 import com.sprint.mission.discodeit.application.userdto.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,7 +60,7 @@ class FileMessageServiceTest {
     }
 
     private void setUpMessage() {
-        initializedMessage = messageService.create(MESSAGE_CONTENT, UUID.randomUUID(), initializedUser.id());
+        initializedMessage = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, UUID.randomUUID(), initializedUser.id()), new ArrayList<>());
     }
 
     private void setUpUser() {
@@ -95,8 +97,8 @@ class FileMessageServiceTest {
     @Test
     void findByChannelId() {
         Channel channel = new Channel(ChannelType.PUBLIC, "test");
-        messageService.create(MESSAGE_CONTENT, channel.getId(), initializedUser.id());
-        messageService.create(MESSAGE_CONTENT + "123", channel.getId(), initializedUser.id());
+        messageService.create(new MessageCreationDto(MESSAGE_CONTENT, channel.getId(), initializedUser.id()), new ArrayList<>());
+        messageService.create(new MessageCreationDto(MESSAGE_CONTENT + "123", channel.getId(), initializedUser.id()), new ArrayList<>());
 
         List<MessageDto> messages = messageService.findByChannelId(channel.getId());
 
