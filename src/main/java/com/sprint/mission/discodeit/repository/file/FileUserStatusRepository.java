@@ -62,25 +62,17 @@ public class FileUserStatusRepository implements UserStatusRepository {
         return userStatusList;
     }
 
-//    @Override
-//    public UserStatus update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO) {
-//        if (userStatusUpdateDTO.userStatusId() != null) {
-//            userStatus.setUserStatusId(userStatusUpdateDTO.userStatusId());
-//        }
-//        fileRepository.save(userStatusList);
-//        return userStatus;
-//    }
+    @Override
+    public UserStatus update(UserStatus userStatus) {
+        userStatus.updatedTime();
+        fileRepository.save(userStatusList);
+        return userStatus;
+    }
 
     @Override
-    public void delete(UUID id) {
-        try {
-            UserStatus userStatus = findByUserId(id);
-            userStatusList.remove(userStatus);
-            fileRepository.save(userStatusList);
-        } catch (UserStatusNotFoundException e) {
-            UserStatus userStatus = findByStatusId(id);
-            userStatusList.remove(userStatus);
-            fileRepository.save(userStatusList);
-        }
+    public void delete(UUID userStatusId) {
+        UserStatus userStatus = findByStatusId(userStatusId);
+        userStatusList.remove(userStatus);
+        fileRepository.save(userStatusList);
     }
 }

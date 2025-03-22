@@ -44,22 +44,15 @@ public class JCFUserStatusRepository implements UserStatusRepository {
         return userStatusList;
     }
 
-//    @Override
-//    public UserStatus update(UserStatus userStatus, UserStatusCRUDDTO userStatusUpdateDTO) {
-//        if (userStatusUpdateDTO.userStatusId() != null) {
-//            userStatus.setUserStatusId(userStatusUpdateDTO.userStatusId());
-//        }
-//        return userStatus;
-//    }
+    @Override
+    public UserStatus update(UserStatus userStatus) {
+        userStatus.updatedTime();
+        return userStatus;
+    }
 
     @Override
-    public void delete(UUID id) {
-        try {
-            UserStatus userStatus = findByUserId(id);
-            userStatusList.remove(userStatus);
-        } catch (UserStatusNotFoundException e) {
-            UserStatus userStatus = findByStatusId(id);
-            userStatusList.remove(userStatus);
-        }
+    public void delete(UUID userStatusId) {
+        UserStatus userStatus = findByStatusId(userStatusId);
+        userStatusList.remove(userStatus);
     }
 }

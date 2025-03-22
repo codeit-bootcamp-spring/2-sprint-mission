@@ -58,10 +58,8 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
 //    @Override
-//    public ReadStatus update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO) {
-//        if (readStatusCRUDDTO.readStatusId() != null) {
-//            readStatus.setReadStatusId(readStatusCRUDDTO.readStatusId());
-//        }
+//    public ReadStatus update(ReadStatus readStatus) {
+//        readStatus.
 //        return readStatus;
 //    }
 

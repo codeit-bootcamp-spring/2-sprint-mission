@@ -31,9 +31,4 @@ public class ReadStatus implements Serializable {
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
     }
-
-    public void setReadStatusId(UUID readStatusId) {
-        this.readStatusId = readStatusId;
-        updatedAt = Instant.now();
-    }
 }

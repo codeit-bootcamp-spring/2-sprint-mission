@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,7 @@ import java.util.UUID;
 @Service
 public interface BinaryContentService {
 
-//    BinaryContent create(BinaryContentDTO binaryContentDTO);
+    BinaryContent create(CreateBinaryContentRequestDTO createBinaryContentRequestDTO);
 
     BinaryContent findById(UUID binaryId);
 

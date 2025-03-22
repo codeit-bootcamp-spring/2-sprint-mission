@@ -23,8 +23,6 @@ public class UserStatus implements Serializable {
     public final Instant createdAt;
     public Instant updatedAt;
 
-    @ToString.Include
-    public UserStatusType status;
 
     public UserStatus(UUID userId) {
         this(UUID.randomUUID(), userId, Instant.now());
@@ -35,7 +33,6 @@ public class UserStatus implements Serializable {
         this.userId = userId;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
-        this.status = UserStatusType.ONLINE;
     }
 
     public void setUserStatusId(UUID userStatusId) {
@@ -50,11 +47,6 @@ public class UserStatus implements Serializable {
     private boolean isOnline() {
         return Duration.between(updatedAt, Instant.now()).getSeconds() <= 300;
     }
-
-    public void updateStatus() {
-        this.status = isOnline() ? UserStatusType.ONLINE : UserStatusType.OFFLINE;
-    }
-
 
 
 }
