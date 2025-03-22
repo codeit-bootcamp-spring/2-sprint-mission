@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.CreateReadStatusRequestDTO;
+import com.sprint.mission.discodeit.dto.create.CreateReadStatusRequestDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.Valid.DuplicateReadStatusException;
 import com.sprint.mission.discodeit.logging.CustomLogging;

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
-import com.sprint.mission.discodeit.dto.request.CreateChannelRequestDTO;
-import com.sprint.mission.discodeit.dto.request.UpdateChannelDTO;
+import com.sprint.mission.discodeit.dto.create.CreateChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.Empty.EmptyMessageListException;
 import com.sprint.mission.discodeit.exception.NotFound.MessageNotFoundException;

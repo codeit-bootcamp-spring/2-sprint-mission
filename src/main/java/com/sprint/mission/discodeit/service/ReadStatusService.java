@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.request.CreateReadStatusRequestDTO;
+import com.sprint.mission.discodeit.dto.create.CreateReadStatusRequestDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import org.springframework.stereotype.Service;
 

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.UserFindDTO;
-import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
-import com.sprint.mission.discodeit.dto.request.CreateUserRequestDTO;
-import com.sprint.mission.discodeit.dto.request.UpdateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
+import com.sprint.mission.discodeit.dto.create.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -56,7 +56,6 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId);
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId);
-        userStatus.updateStatus();
 
         UserFindDTO userFindDTO = new UserFindDTO(
                 user.getId(),
@@ -65,7 +64,6 @@ public class BasicUserService implements UserService {
                 user.getEmail(),
                 user.getCreatedAt(),
                 user.getUpdatedAt()
-//                userStatus
         );
 
         return userFindDTO;

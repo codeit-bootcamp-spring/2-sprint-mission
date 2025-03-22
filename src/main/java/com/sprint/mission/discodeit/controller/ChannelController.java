@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.display.ChannelDisplayList;
-import com.sprint.mission.discodeit.dto.request.CreateChannelRequestDTO;
-import com.sprint.mission.discodeit.dto.request.UpdateChannelDTO;
+import com.sprint.mission.discodeit.dto.create.CreateChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

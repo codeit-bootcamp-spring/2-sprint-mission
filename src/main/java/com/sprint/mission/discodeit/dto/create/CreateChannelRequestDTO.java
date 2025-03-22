@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.request;
+package com.sprint.mission.discodeit.dto.create;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
 
