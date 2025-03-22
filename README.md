@@ -246,9 +246,9 @@ public static void main(String[]args){
 
 4. update
 
-- [ ] DTO를 활용해 파라미터를 그룹화합니다.
+- [x] DTO를 활용해 파라미터를 그룹화합니다.
     - 수정 대상 객체의 id 파라미터, 수정할 값 파라미터
-- [ ] PRIVATE 채널은 수정할 수 없습니다.
+- [x] PRIVATE 채널은 수정할 수 없습니다.
 
 5. delete
 

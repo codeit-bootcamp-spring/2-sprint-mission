@@ -52,12 +52,23 @@ class ChannelServiceTest {
         assertThat(setUpChannel.id() + setUpChannel.name()).isEqualTo(channel.id() + channel.name());
     }
 
+    @DisplayName("Public 채널이름을 수정하고 수정된 채널 정보를 반환합니다.")
     @Test
-    void 채널_이름_수정() {
+    void Public_채널_이름_수정() {
         channelService.updateName(setUpChannel.id(), UPDATED_CHANNEL_NAME);
 
         assertThat(channelService.findById(setUpChannel.id()).name())
                 .isEqualTo(UPDATED_CHANNEL_NAME);
+    }
+
+    @DisplayName("Private 채널 수정 시도시 예외를 반환합니다.")
+    @Test
+    void Private_채널_이름_수정_예외() {
+        ChannelRegisterDto setUpUserChannelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
+        ChannelDto setUpUserPrivateChannel = channelService.create(setUpUserChannelRegisterDto);
+
+        assertThatThrownBy(() -> channelService.updateName(setUpUserPrivateChannel.id(), UPDATED_CHANNEL_NAME))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("전체 조회시 public 채널과 요청한 유저가 속한 private 채널만 반환합니다.")

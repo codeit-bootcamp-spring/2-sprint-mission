@@ -66,6 +66,13 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void updateName(UUID id, String name) {
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
+
+        if (channel.getType().equals(ChannelType.PRIVATE)) {
+            throw new IllegalArgumentException("Private 파일은 수정할 수 없습니다.");
+        }
+
         channelRepository.updateName(id, name);
     }
 
