@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.MessageFindDTO;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.request.CreateMessageRequestDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -40,7 +41,7 @@ public class BasicMessageService implements MessageService {
     @CustomLogging
     @Override
     public Message create(CreateMessageRequestDTO messageWriteDTO, List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs) {
-        User user = userRepository.findById(messageWriteDTO.creatorId());
+        User user = userRepository.findById(messageWriteDTO.userId());
         Channel channel = channelRepository.find(messageWriteDTO.channelId());
 
         Message message = new Message(user.getId(),user.getName(), channel.getChannelId(), messageWriteDTO.text());
@@ -53,19 +54,21 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message find(String messageId) {
+    public MessageFindDTO find(String messageId) {
         UUID messageUUID = UUID.fromString(messageId);
 
         Message message = messageRepository.find(messageUUID);
+        MessageFindDTO messageFindDTO = new MessageFindDTO(message.getUserName(), message.text, message.createdAt);
 
-        return message;
+        return messageFindDTO;
     }
 
     @Override
-    public List<Message> findAllByChannelId(String channelId) {
+    public List<MessageFindDTO> findAllByChannelId(String channelId) {
         UUID channelUUID = UUID.fromString(channelId);
         List<Message> list = messageRepository.findAllByChannelId(channelUUID);
-        return list;
+        List<MessageFindDTO> messageFindDTOS = list.stream().map(message -> new MessageFindDTO(message.getUserName(), message.text, message.createdAt)).toList();
+        return messageFindDTOS;
     }
 
     @Override
@@ -78,7 +81,7 @@ public class BasicMessageService implements MessageService {
 
             List<Message> messages = messageRepository.findAllByChannelId(channel.getChannelId());
             for (Message message : messages) {
-                System.out.println(message.getCreatorName() + " : " + message.getText());
+                System.out.println(message.getUserName() + " : " + message.getText());
             }
         } catch (NotFoundException e) {
             throw NotFoundExceptions.MESSAGE_NOT_FOUND;

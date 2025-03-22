@@ -46,7 +46,7 @@
     }
 
     function loadChannels() {
-        const serverId = document.getElementById("serverIdText").textContent.trim();
+        const { userId, serverId } = getIds();  // ✅ 여기서 가져오고
 
         fetch(`/api/servers/${serverId}/channels`)
             .then(res => res.json())
@@ -57,11 +57,15 @@
                 data.channels.forEach(channel => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-            <td>${channel.channelId}</td>
-            <td>${channel.name || '(비공개 채널)'}</td>
-            <td>${channel.userIdList ? channel.userIdList.length : 0}명</td>
-            <td>${channel.lastMessageAt ? new Date(channel.lastMessageAt).toLocaleString() : '-'}</td>
-          `;
+                    <td>${channel.channelId}</td>
+                    <td>
+                      <a href="/users/${userId}/servers/${serverId}/channels/${channel.channelId}/messages">
+                        ${channel.name || '(비공개 채널)'}
+                      </a>
+                    </td>
+                    <td>${channel.userIdList ? channel.userIdList.length : 0}명</td>
+                    <td>${channel.lastMessageAt ? new Date(channel.lastMessageAt).toLocaleString() : '-'}</td>
+                `;
                     tbody.appendChild(row);
                 });
             })
@@ -70,6 +74,7 @@
                 alert("채널 목록을 불러오지 못했습니다.");
             });
     }
+
 
     document.addEventListener("DOMContentLoaded", () => {
         setCreateChannelLink();

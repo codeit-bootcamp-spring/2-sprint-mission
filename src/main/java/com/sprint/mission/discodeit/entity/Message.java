@@ -17,9 +17,9 @@ public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private  UUID messageId;
-    private final UUID creatorId;
-    private final String creatorName;
+    private final UUID userId;
     private final UUID channelId;
+    private final String userName;
 
     public final Instant createdAt;
     public Instant updatedAt;
@@ -27,13 +27,13 @@ public class Message implements Serializable {
     public List<UUID> attachmentIds = new ArrayList<>();
     public String text;
 
-    public Message(UUID creatorId, String creatorName, UUID channelId, String text) {
-        this(creatorId, creatorName, channelId, UUID.randomUUID(), Instant.now(), text);
+    public Message(UUID userId, String userName, UUID channelId, String text) {
+        this(userId, userName, channelId, UUID.randomUUID(), Instant.now(), text);
     }
 
-    public Message(UUID creatorId, String creatorName, UUID channelId, UUID messageId, Instant createdAt, String text) {
-        this.creatorId = creatorId;
-        this.creatorName = creatorName;
+    public Message(UUID userId, String userName, UUID channelId, UUID messageId, Instant createdAt, String text) {
+        this.userId = userId;
+        this.userName = userName;
         this.channelId = channelId;
         this.messageId = messageId;
         this.createdAt = createdAt;

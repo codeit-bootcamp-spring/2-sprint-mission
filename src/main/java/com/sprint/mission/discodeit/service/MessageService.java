@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.MessageFindDTO;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequestDTO;
 import com.sprint.mission.discodeit.dto.request.CreateMessageRequestDTO;
 import com.sprint.mission.discodeit.entity.Message;
@@ -16,9 +17,9 @@ public interface MessageService {
 
     Message create(CreateMessageRequestDTO messageWriteDTO, List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs);
 
-    Message find(String messageId);
+    MessageFindDTO find(String messageId);
 
-    List<Message> findAllByChannelId(String channelId);
+    List<MessageFindDTO> findAllByChannelId(String channelId);
 
     void print(String channelId);
 
