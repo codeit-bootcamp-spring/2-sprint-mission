@@ -1,18 +1,19 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_TEST_FILE;
-import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
-import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
-
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
+
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
+
+import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_TEST_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
+import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 
 @Repository
 public class FileChannelRepository implements ChannelRepository {
@@ -49,12 +50,14 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void updateName(UUID id, String name) {
+    public Channel updateName(UUID id, String name) {
         Map<UUID, Channel> channels = loadObjectsFromFile(channelPath);
         Channel channel = channels.get(id);
         channel.updateName(name);
 
         saveObjectsToFile(STORAGE_DIRECTORY, channelPath, channels);
+
+        return channel;
     }
 
     @Override

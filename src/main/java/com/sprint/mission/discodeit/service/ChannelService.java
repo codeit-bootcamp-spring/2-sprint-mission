@@ -15,7 +15,7 @@ public interface ChannelService {
 
     List<ChannelDto> findAllByUserId(UUID userId);
 
-    void updateName(UUID id, String name);
+    ChannelDto updateName(UUID id, String name);
 
     void delete(UUID channelId);
 }

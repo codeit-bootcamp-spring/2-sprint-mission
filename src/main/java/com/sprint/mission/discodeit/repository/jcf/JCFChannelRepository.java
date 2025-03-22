@@ -2,11 +2,8 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.util.*;
 
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> channels = new HashMap<>();
@@ -31,9 +28,11 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void updateName(UUID id, String name) {
+    public Channel updateName(UUID id, String name) {
         Channel channel = channels.get(id);
         channel.updateName(name);
+
+        return channel;
     }
 
     @Override
