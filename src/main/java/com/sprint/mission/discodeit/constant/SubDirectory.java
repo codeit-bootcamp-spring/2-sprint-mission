@@ -8,6 +8,7 @@ public enum SubDirectory {
     CHANNEL("channel"),
     MESSAGE("message"),
     USER_STATUS("userstatus"),
+    READ_STATUS("readstatus"),
     PROFILE("profile"),
     FILE("file");
 

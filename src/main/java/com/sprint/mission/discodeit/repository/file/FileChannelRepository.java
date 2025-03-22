@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-//@Repository
+@Repository
 @RequiredArgsConstructor
 public class FileChannelRepository implements ChannelRepository {
 
