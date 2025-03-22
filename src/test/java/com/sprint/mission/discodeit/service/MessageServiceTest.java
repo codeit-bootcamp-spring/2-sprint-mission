@@ -6,11 +6,13 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
@@ -21,15 +23,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class MessageServiceTest {
     private MessageService messageService;
     private MessageDto setUpMessage;
+    private UUID channelId;
+    private User setUpUser;
 
     @BeforeEach
     void setUp() {
         UserRepository userRepository = new JCFUserRepository();
-        User user = userRepository.save(
+        setUpUser = userRepository.save(
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
-        messageService = new JCFMessageService(new JCFMessageRepository(), userRepository);
-        setUpMessage = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, UUID.randomUUID(), user.getId()), new ArrayList<>());
+        messageService = new BasicMessageService(new JCFMessageRepository(), userRepository);
+        channelId = UUID.randomUUID();
+        setUpMessage = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, channelId, setUpUser.getId()), new ArrayList<>());
     }
 
     @Test
@@ -43,6 +48,15 @@ class MessageServiceTest {
 
         assertThat(message.context())
                 .isEqualTo(MESSAGE_CONTENT);
+    }
+
+    @DisplayName("조회시 채널 ID를 받으면 채널에 해당하는 메세지들을 생성 순서에 맞게 반환합니다.")
+    @Test
+    void findAllByChannelIdTest() {
+        MessageDto messageDto = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, channelId, setUpUser.getId()), new ArrayList<>());
+
+        List<MessageDto> messages = messageService.findAllByChannelId(channelId);
+        assertThat(messages).containsExactlyInAnyOrder(setUpMessage, messageDto);
     }
 
     @Test

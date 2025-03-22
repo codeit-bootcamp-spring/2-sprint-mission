@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,16 +39,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDto> findAll() {
-        return messageRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(Message::getCreatedAt))
-                .map(message -> MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message))))
-                .toList();
-    }
-
-    @Override
-    public List<MessageDto> findByChannelId(UUID channelId) {
+    public List<MessageDto> findAllByChannelId(UUID channelId) {
         return messageRepository.findAll()
                 .stream()
                 .filter(message -> message.getChannelId().equals(channelId))

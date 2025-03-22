@@ -265,7 +265,7 @@ public static void main(String[]args){
 
 2. findAll
 
-- [ ] 특정 Channel의 Message 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findallByChannelId
+- [x] 특정 Channel의 Message 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findallByChannelId
 
 3. update
 

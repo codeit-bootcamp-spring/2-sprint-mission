@@ -26,6 +26,6 @@ public class MessageController {
     }
 
     public List<MessageDto> findByChannelId(UUID channelId) {
-        return messageService.findByChannelId(channelId);
+        return messageService.findAllByChannelId(channelId);
     }
 }

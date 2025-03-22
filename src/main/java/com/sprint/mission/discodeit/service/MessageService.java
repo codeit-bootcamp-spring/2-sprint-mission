@@ -11,9 +11,7 @@ public interface MessageService {
 
     MessageDto findById(UUID id);
 
-    List<MessageDto> findAll();
-
-    List<MessageDto> findByChannelId(UUID channelId);
+    List<MessageDto> findAllByChannelId(UUID channelId);
 
     void updateContext(UUID id, String context);
 

@@ -100,7 +100,7 @@ class FileMessageServiceTest {
         messageService.create(new MessageCreationDto(MESSAGE_CONTENT, channel.getId(), initializedUser.id()), new ArrayList<>());
         messageService.create(new MessageCreationDto(MESSAGE_CONTENT + "123", channel.getId(), initializedUser.id()), new ArrayList<>());
 
-        List<MessageDto> messages = messageService.findByChannelId(channel.getId());
+        List<MessageDto> messages = messageService.findAllByChannelId(channel.getId());
 
         assertThat(messages).hasSize(2);
     }
