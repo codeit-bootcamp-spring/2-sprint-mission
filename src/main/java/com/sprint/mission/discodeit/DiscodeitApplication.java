@@ -75,9 +75,11 @@ public class DiscodeitApplication {
                             sc.nextLine();
                             System.out.print("채널명 입력: ");
                             String channelName = sc.nextLine();
+                            SaveChannelParamDto saveChannelParamDto;
                             switch (typeChoice) {
                                 case 1:
-                                    System.out.println(channelService.createPublicChannel(channelName, ChannelType.PUBLIC));
+                                    saveChannelParamDto = new SaveChannelParamDto(channelName, ChannelType.PUBLIC, List.of());
+                                    System.out.println(channelService.createPublicChannel(saveChannelParamDto));
                                     break;
                                 case 2:
                                     List<UUID> userList = new ArrayList<>();
@@ -92,7 +94,8 @@ public class DiscodeitApplication {
                                             userList.add(userUUID);
                                         }
                                     }
-                                    System.out.println(channelService.createPrivateChannel(channelName, ChannelType.PRIVATE, userList));
+                                    saveChannelParamDto = new SaveChannelParamDto(channelName, ChannelType.PRIVATE, userList);
+                                    System.out.println(channelService.createPrivateChannel(saveChannelParamDto));
                                     break;
                                 default:
                                     break;
@@ -351,7 +354,7 @@ public class DiscodeitApplication {
                 UUID channelUUID = UUID.fromString(sc.nextLine());
                 System.out.print("원하는 채널명 입력: ");
                 String channelName = sc.nextLine();
-                ChannelUpdateParamDto channelUpdateParamDto = new ChannelUpdateParamDto(channelUUID, channelName);
+                UpdateChannelParamDto channelUpdateParamDto = new UpdateChannelParamDto(channelUUID, channelName);
                 channelService.updateChannel(channelUpdateParamDto);
                 return;
             case 3:

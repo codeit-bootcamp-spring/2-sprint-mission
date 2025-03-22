@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.constant.ChannelType;
-import com.sprint.mission.discodeit.dto.ChannelSaveDto;
-import com.sprint.mission.discodeit.dto.ChannelUpdateParamDto;
-import com.sprint.mission.discodeit.dto.CheckReadStatusDto;
-import com.sprint.mission.discodeit.dto.FindChannelDto;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -27,24 +24,24 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
 
     @Override
-    public ChannelSaveDto createPublicChannel(String channelName, ChannelType channelType) {
-        Channel channel = new Channel(channelName, channelType);
+    public SaveChannelDto createPublicChannel(SaveChannelParamDto saveChannelParamDto) {
+        Channel channel = new Channel(saveChannelParamDto.channelName(), saveChannelParamDto.channelType());
         channelRepository.save(channel);
-        return new ChannelSaveDto(channel.getId(), channelName, channel.getChannelType(), channel.getCreatedAt());
+        return new SaveChannelDto(channel.getId(), channel.getChannelName(), channel.getChannelType(), channel.getCreatedAt());
     }
 
     @Override
-    public ChannelSaveDto createPrivateChannel(String channelName, ChannelType channelType, List<UUID> userList) {
-        Channel channel = new Channel(channelName, channelType);
+    public SaveChannelDto createPrivateChannel(SaveChannelParamDto saveChannelParamDto) {
+        Channel channel = new Channel(saveChannelParamDto.channelName(), saveChannelParamDto.channelType());
         channelRepository.save(channel);
-        userList.forEach(userUUID -> {
+        saveChannelParamDto.userList().forEach(userUUID -> {
             ReadStatus readStatus = ReadStatus.builder()
                     .channelId(channel.getId())
                     .userId(userUUID)
                     .build();
             readStatusRepository.save(readStatus);
         });
-        return new ChannelSaveDto(channel.getId(), channelName, channel.getChannelType(), channel.getCreatedAt());
+        return new SaveChannelDto(channel.getId(), saveChannelParamDto.channelName(), channel.getChannelType(), channel.getCreatedAt());
     }
 
     @Override
@@ -138,7 +135,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(ChannelUpdateParamDto channelUpdateParamDto) {
+    public void updateChannel(UpdateChannelParamDto channelUpdateParamDto) {
         Channel channel = channelRepository.findChannelById(channelUpdateParamDto.channelUUID())
                 .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다."));
 
