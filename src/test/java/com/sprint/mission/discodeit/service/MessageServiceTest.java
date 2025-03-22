@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.application.messagedto.MessageCreationDto;
 import com.sprint.mission.discodeit.application.messagedto.MessageDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
@@ -32,7 +33,7 @@ class MessageServiceTest {
         setUpUser = userRepository.save(
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
-        messageService = new BasicMessageService(new JCFMessageRepository(), userRepository);
+        messageService = new BasicMessageService(new JCFMessageRepository(), userRepository, new JCFBinaryContentRepository());
         channelId = UUID.randomUUID();
         setUpMessage = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, channelId, setUpUser.getId()), new ArrayList<>());
     }

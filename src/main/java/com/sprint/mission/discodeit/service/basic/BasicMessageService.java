@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.application.messagedto.MessageDto;
 import com.sprint.mission.discodeit.application.userdto.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -22,6 +23,7 @@ import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_MESSAGE_
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public MessageDto create(MessageCreationDto messageCreationDto, List<UUID> attachmentsIds) {
@@ -56,6 +58,11 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void delete(UUID id) {
+        MessageDto message = this.findById(id);
+        for (UUID attachmentId : message.attachmentIds()) {
+            binaryContentRepository.delete(attachmentId);
+        }
+
         messageRepository.delete(id);
     }
 

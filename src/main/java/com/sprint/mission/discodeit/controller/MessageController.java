@@ -32,4 +32,8 @@ public class MessageController {
     public MessageDto updateContent(UUID messageId, String context) {
         return messageService.updateContext(messageId, context);
     }
+
+    public void delete(UUID messageId) {
+        messageService.delete(messageId);
+    }
 }
