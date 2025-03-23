@@ -1,93 +1,108 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserRole;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.service.dto.MessageCreateDto;
+import com.sprint.mission.discodeit.service.dto.MessageResponseDto;
+import com.sprint.mission.discodeit.service.dto.MessageUpdateDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
-    private final ChannelService channelService;
-    private final UserService userService;
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
     private final MessageRepository messageRepository;
-
-    public BasicMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
-        this.userService = userService;
-        this.channelService = channelService;
-        this.messageRepository = messageRepository;
-    }
-
-    /*
-    private static volatile BasicMessageService instance;
-    public static BasicMessageService getInstance(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
-        if (instance == null) {
-            synchronized (BasicMessageService.class) {
-                if (instance == null) {
-                    instance = new BasicMessageService(userService, channelService, messageRepository);
-                }
-            }
-        }
-        return instance;
-    }
-    */
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public void createMessage(Message message) {
-        //요청자 확인
-        User user = findUserOrThrow(message.getUserId());
-        //채널 확인
-        Channel channel = findChannelOrThrow(message.getChannelId());
-        //작성 권한 확인
+    public void createMessage(MessageCreateDto createDto) {
+        User user = userRepository.findById(createDto.userId());
+        Channel channel = channelRepository.findById(createDto.channelId());
+
         validateWritePermission(user, channel.getWritePermission());
-        //create
-        messageRepository.createMessage(message);
+
+        List<UUID> updatedAttachmentIds = createDto.attachmentIds() != null ? new ArrayList<>(createDto.attachmentIds()) : new ArrayList<>();
+        if (createDto.attachments() != null && !createDto.attachments().isEmpty()) {
+            updatedAttachmentIds.addAll(createDto.attachments().stream()
+                    .map(BinaryContentDto::convertToBinaryContent)
+                    .map(binaryContentRepository::createBinaryContent)
+                    .toList());
+        }
+
+        messageRepository.createMessage(createDto.convertCreateDtoToMessage(updatedAttachmentIds));
     }
 
     @Override
-    public Optional<Message> selectMessageById(UUID id) {
-        return messageRepository.selectMessageById(id);
+    public MessageResponseDto findById(UUID id) {
+        Message message = messageRepository.findById(id);
+
+        return MessageResponseDto.convertToResponseDto(message);
     }
 
     @Override
-    public List<Message> selectMessagesByChannel(UUID channelId) {
-        return messageRepository.selectMessagesByChannel(channelId);
+    public List<MessageResponseDto> findAllByChannelId(UUID channelId) {
+        return messageRepository.findAllByChannelId(channelId)
+                .stream()
+                .map(MessageResponseDto::convertToResponseDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void updateMessage(UUID id, String content, UUID userId, UUID channelId) {
-        //요청자 확인
-        User user = findUserOrThrow(userId);
-        //메시지 유효성 확인
-        Message message = findMessageOrThrow(id);
-        //채널 확인
-        ensureMessageBelongsToChannel(message, channelId);
-        //수정 권한 확인
+    public void updateMessage(MessageUpdateDto updateDto) {
+        User user = userRepository.findById(updateDto.userId());
+        Message message = messageRepository.findById(updateDto.id());
+        ensureMessageBelongsToChannel(message, updateDto.channelId());
         validateEditDeletePermission(user, message.getUserId());
-        //update
-        messageRepository.updateMessage(id, content, userId, channelId);
+
+        List<UUID> updatedAttachmentIds = updateDto.attachmentIds() != null ? new ArrayList<>(updateDto.attachmentIds()) : new ArrayList<>();
+        if ((updateDto.attachments() != null && !updateDto.attachments().isEmpty())) {
+            updateDto.attachments().stream()
+                    .peek(attachmentDto -> binaryContentRepository.deleteBinaryContent(attachmentDto.contentId()))
+                    .map(BinaryContentDto::convertToBinaryContent)
+                    .map(binaryContentRepository::createBinaryContent)
+                    .forEach(updatedAttachmentIds::add);
+        } else {
+            updatedAttachmentIds = updateDto.attachmentIds();
+        }
+
+        messageRepository.updateMessage(updateDto.id(), updateDto.content(), updateDto.userId(), updateDto.channelId(), updatedAttachmentIds);
     }
 
     @Override
     public void deleteMessage(UUID id, UUID userId, UUID channelId) {
-        //요청자 확인
-        User user = findUserOrThrow(userId);
-        //메시지 유효성 확인
-        Message message = findMessageOrThrow(id);
-        //채널 확인
+        User user = userRepository.findById(userId);
+        Message message = messageRepository.findById(id);
         ensureMessageBelongsToChannel(message, channelId);
-        //삭제 권한 확인
         validateEditDeletePermission(user, message.getUserId());
-        //delete
+
+        if (message.getAttachmentIds() != null && !message.getAttachmentIds().isEmpty()) {
+            message.getAttachmentIds()
+                    .forEach(binaryContentRepository::deleteBinaryContent);
+        }
+
         messageRepository.deleteMessage(id, userId, channelId);
     }
 
     /*******************************
      * Validation check
      *******************************/
-    private void ensureMessageBelongsToChannel(Message message, UUID channelId){
+    private void ensureMessageBelongsToChannel(Message message, UUID channelId) {
         if (!message.getChannelId().equals(channelId)) {
             throw new RuntimeException("해당 메시지는 요청한 채널에 속하지 않습니다.");
         }
@@ -103,21 +118,6 @@ public class BasicMessageService implements MessageService {
         if (!user.getId().equals(messageUserId) && user.getRole() != UserRole.ADMIN) {
             throw new RuntimeException("메시지를 수정/삭제할 권한이 없습니다.");
         }
-    }
-
-    private Message findMessageOrThrow(UUID messageId){
-        return selectMessageById(messageId)
-                .orElseThrow(() -> new RuntimeException("해당 메시지가 존재하지 않습니다. : " + messageId));
-    }
-
-    private Channel findChannelOrThrow(UUID channelId){
-        return channelService.selectChannelById(channelId)
-                .orElseThrow(() -> new RuntimeException("해당 채널이 존재하지 않습니다. : " + channelId));
-    }
-
-    private User findUserOrThrow(UUID userId) {
-        return userService.selectUserById(userId)
-                .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다. : " + userId));
     }
 
 }
