@@ -3,76 +3,88 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserService implements UserService {
     private final Map<UUID, User> data;
-    private static JCFUserService instance = null;
 
-    public static JCFUserService getInstance() {
-        if (instance == null) {
-            instance = new JCFUserService();
-        }
-        return instance;
-    }
-
-    private JCFUserService() {
+    public JCFUserService() {
         this.data = new HashMap<>();
     }
 
     @Override
-    public UUID createUser(String username) {
-        User user = new User(username);
+    public User createUser(String userName, String email, String password) {
+        User user = new User(userName, email, password);
         data.put(user.getId(), user);
         System.out.println("사용자가 생성되었습니다: \n" + user);
-        return user.getId();
+        return user;
     }
 
     @Override
-    public void searchUser(UUID id) {
-        if (!data.containsKey(id)) {
-            System.out.println("조회하신 사용자가 존재하지 않습니다.");
-            return;
-        }
-        System.out.println("USER: " + data.get(id));
-
+    public User searchUser(UUID userId) {
+        User user = findUser(userId);
+        System.out.println("USER: " + user);
+        return user;
     }
 
     @Override
-    public void searchAllUsers() {
+    public List<User> searchAllUsers() {
         if (data.isEmpty()) {
-            System.out.println("등록된 사용자가 존재하지 않습니다.");
-            return;
+            throw new NoSuchElementException("등록된 사용자가 존재하지 않습니다.");
         }
-        for (User user : data.values()) {
+        List<User> users = new ArrayList<>(data.values());
+        for (User user : users) {
             System.out.println("USER: " + user);
         }
-    }
-
-    @Override
-    public void updateUser(UUID id) {
-        if (!data.containsKey(id)) {
-            System.out.println("업데이트할 사용자가 존재하지 않습니다.");
-            return;
-        }
-        data.get(id).updateTime(System.currentTimeMillis());
-        System.out.println(id + " 사용자 업데이트 완료되었습니다.");
+        return users;
 
     }
 
     @Override
-    public void deleteUser(UUID id) {
-        if (!data.containsKey(id)) {
-            System.out.println("삭제할 사용자가 존재하지 않습니다.");
-            return;
-        }
-        data.remove(id);
-        System.out.println(id + " 사용자 삭제 완료되었습니다.");
+    public User updateAll(UUID userId, String userName, String email, String password) {
+        User user = findUser(userId);
+        user.updateAll(userName, email, password);
+        System.out.println(userId + " 사용자 업데이트 완료되었습니다.");
+        return user;
+    }
+
+    @Override
+    public User updateUserName(UUID userId, String userName) {
+        User user = findUser(userId);
+        user.updateUserName(userName);
+        System.out.println(userId + " 사용자 이름이 업데이트 완료되었습니다.");
+        return user;
+    }
+
+    @Override
+    public User updateEmail(UUID userId, String email) {
+        User user = findUser(userId);
+        user.updateEmail(email);
+        System.out.println(userId + " 사용자 이메일이 업데이트 완료되었습니다.");
+        return user;
+    }
+
+    @Override
+    public User updatePassword(UUID userId, String password) {
+        User user = findUser(userId);
+        user.updatePassword(password);
+        System.out.println(userId + " 사용자 비밀번호가 업데이트 완료되었습니다.");
+        return user;
+    }
+
+    @Override
+    public void deleteUser(UUID userId) {
+        findUser(userId);
+        data.remove(userId);
+        System.out.println(userId + " 사용자 삭제 완료되었습니다.");
 
     }
-    public boolean existUser(UUID id){
-        return data.containsKey(id);
+
+    public User findUser(UUID userId) {
+        User user = data.get(userId);
+        if (user == null) {
+            throw new NoSuchElementException("해당 사용자가 존재하지 않습니다.");
+        }
+        return user;
     }
 }

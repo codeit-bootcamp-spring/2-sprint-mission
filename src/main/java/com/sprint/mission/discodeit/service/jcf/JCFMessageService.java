@@ -1,86 +1,75 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    private static JCFMessageService instance;
     private final Map<UUID, Message> data;
 
-    private JCFUserService userservice;
-    private JCFChannelService channelservice;
+    private final UserService userService;
+    private final ChannelService channelService;
 
-    public static JCFMessageService getInstance(JCFUserService userService, JCFChannelService channelService) {
-        if (instance == null) {
-            instance = new JCFMessageService(userService, channelService);
-        }
-        return instance;
+    public JCFMessageService(UserService userService, ChannelService channelService) {
+        this.data = new HashMap<>();
+        this.userService = userService;
+        this.channelService = channelService;
     }
-
-    private JCFMessageService(JCFUserService userservice, JCFChannelService channelservice) {
-        this.userservice = userservice;
-        this.channelservice = channelservice;
-        data = new HashMap<>();
-    }
-
 
     @Override
-    public UUID createMessage(UUID userId, UUID channelId) {
-        if (!userservice.existUser(userId)) {
-            throw new IllegalArgumentException("존재하지 않는 사용자 입니다. 메세지를 생성할 수 없습니다.");
+    public Message createMessage(String text, UUID userId, UUID channelId) {
+        channelService.searchChannel(channelId);
+        userService.searchUser(userId);
 
-        }
-        if (!channelservice.existChannel(channelId)) {
-            throw new IllegalArgumentException("존재하지 않는 채널 입니다. 메세지를 생성할 수 없습니다.");
-        }
-        Message message = new Message(userId, channelId);
+        Message message = new Message(text, userId, channelId);
         data.put(message.getId(), message);
         System.out.println("메세지가 생성되었습니다: \n" + message);
-        return message.getId();
+        return message;
     }
 
     @Override
-    public void searchMessage(UUID id) {
-        if (!data.containsKey(id)) {
-            System.out.println("조회하신 메세지가 존재하지 않습니다.");
-            return;
-        }
-        System.out.println("MESSAGE: " + data.get(id));
+    public Message searchMessage(UUID messageId) {
+        Message message = findMessage(messageId);
+        System.out.println("MESSAGE: " + data.get(messageId));
+        return message;
     }
 
     @Override
-    public void searchAllMessages() {
+    public List<Message> searchAllMessages() {
         if (data.isEmpty()) {
-            System.out.println("등록된 메세지가 존재하지 않습니다.");
-            return;
+            throw new NoSuchElementException("등록된 메세지가 존재하지 않습니다.");
         }
-        for (Message message : data.values()) {
+        List<Message> messages = new ArrayList<>(data.values());
+        for (Message message : messages) {
             System.out.println("MESSAGE: " + message);
         }
+        return messages;
     }
 
     @Override
-    public void updateMessage(UUID id) {
-        if (!data.containsKey(id)) {
-            System.out.println("업데이트할 메세지가 존재하지 않습니다.");
-            return;
-        }
-        data.get(id).updateTime(System.currentTimeMillis());
-        System.out.println(id + " 메세지 업데이트 완료되었습니다.");
+    public Message updateMessage(UUID messageId, String text) {
+        Message message = findMessage(messageId);
+        message.updateText(text);
+        System.out.println(messageId + " 메세지 업데이트 완료되었습니다.");
+        return message;
     }
 
     @Override
-    public void deleteMessage(UUID id) {
-        if (!data.containsKey(id)) {
-            System.out.println("삭제할 메세지가 존재하지 않습니다.");
-            return;
-        }
-        data.remove(id);
-        System.out.println(id + " 메세지 삭제 완료되었습니다.");
+    public void deleteMessage(UUID messageId) {
+        findMessage(messageId);
+        data.remove(messageId);
+        System.out.println(messageId + " 메세지 삭제 완료되었습니다.");
 
+    }
+
+    private Message findMessage(UUID messageId) {
+        Message message = data.get(messageId);
+        if (message == null) {
+            throw new NoSuchElementException("해당 메세지가 존재하지 않습니다.");
+        }
+        return message;
     }
 }

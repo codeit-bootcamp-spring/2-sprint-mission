@@ -1,78 +1,53 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 public class JavaApplication {
+    static User setupUser(UserService userService) {
+        User user = userService.createUser("woody", "woody@codeit.com", "woody1234");
+        return user;
+    }
+
+    static Channel setupChannel(ChannelService channelService) {
+        Channel channel = channelService.createChannel(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+        return channel;
+    }
+
+    static void messageCreateTest(MessageService messageService, User author, Channel channel) {
+        Message message = messageService.createMessage("안녕하세요.", author.getId(), channel.getId());
+        System.out.println("메시지 생성: " + message.getId());
+    }
+
     public static void main(String[] args) {
-        JCFUserService userservice = JCFUserService.getInstance();
-        JCFChannelService channelservice = JCFChannelService.getInstance();
-        JCFMessageService messageservice = JCFMessageService.getInstance(userservice, channelservice);
+        // 레포지토리 초기화
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
 
-        // user 등록
-        UUID user1 = userservice.createUser("김이름");
-        UUID user2 = userservice.createUser("김연두");
-        UUID user3 = userservice.createUser("이비누");
-        //user 전체 조회
-        userservice.searchAllUsers();
-        //특정 user 조회
-        userservice.searchUser(user2);
-        //user 수정
-        userservice.updateUser(user2);
-        //수정된 user 조회
-        userservice.searchUser(user2);
-        //user 삭제
-        userservice.deleteUser(user1);
-        //삭제 확인
-        userservice.searchUser(user1);
+        // 서비스 초기화
+        UserService userService = new BasicUserService(userRepository);
+        ChannelService channelService = new BasicChannelService(channelRepository);
+        MessageService messageService = new BasicMessageService(messageRepository, userRepository, channelRepository);
 
-
-        // Channel 등록
-        UUID channel1 = channelservice.createChannel();
-        UUID channel2 = channelservice.createChannel();
-        //channel 전체 조회
-        channelservice.searchAllChannels();
-        //특정 channel 조회
-        channelservice.searchChannel(channel2);
-        //channel 수정
-        channelservice.updateChannel(channel2);
-        //수정된 channel 조회
-        channelservice.searchChannel(channel2);
-        //channel 삭제
-        channelservice.deleteChannel(channel1);
-        //삭제 확인
-        channelservice.searchChannel(channel1);
-
-
-        //Message 등록
-        UUID message1 = null;
-        try {
-            message1 = messageservice.createMessage(user2, channel1);
-        } catch (IllegalArgumentException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
-        UUID message2 = null;
-        try {
-            message2 = messageservice.createMessage(user2, channel2);
-        } catch (IllegalArgumentException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
-        //message 전체 조회
-        messageservice.searchAllMessages();
-        //특정 channel 조회
-        messageservice.searchMessage(message2);
-        //channel 수정
-        messageservice.updateMessage(message2);
-        //수정된 channel 조회
-        messageservice.searchMessage(message2);
-        //channel 삭제
-        messageservice.deleteMessage(message1);
-        //삭제 확인
-        messageservice.searchMessage(message1);
-
-
+        // 셋업
+        User user = setupUser(userService);
+        Channel channel = setupChannel(channelService);
+        // 테스트
+        messageCreateTest(messageService, user, channel);
     }
 }

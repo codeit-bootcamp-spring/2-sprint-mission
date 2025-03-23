@@ -2,108 +2,126 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-    public class FileUserRepository implements UserRepository {
-        private static final Path directoryPath = Paths.get("data/users");
-        private static FileUserRepository instance = null;
+@Repository
+public class FileUserRepository implements UserRepository {
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-        public static synchronized FileUserRepository getInstance() {
-            if (instance == null) {
-                instance = new FileUserRepository();
-            }
-            return instance;
-        }
-
-        private FileUserRepository() {
+    public FileUserRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
             try {
-                Files.createDirectories(directoryPath);
+                Files.createDirectories(DIRECTORY);
             } catch (IOException e) {
-                throw new RuntimeException("디렉토리를 생성할 수 없습니다: " + e.getMessage());
-            }
-        }
-
-        private Path getFilePath(UUID userId) {
-            return directoryPath.resolve("user-" + userId + ".data");
-        }
-
-        private User loadUser(Path filePath) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
-                return (User) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException("사용자 데이터 읽기 실패: " + filePath, e);
-            }
-        }
-
-        @Override
-        public void save(User user) {
-            Path filePath = getFilePath(user.getId());
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
-                oos.writeObject(user);
-            } catch (IOException e) {
-                throw new RuntimeException("사용자 저장 실패: " + user.getId(), e);
-            }
-        }
-
-        @Override
-        public User findById(UUID id) {
-            Path filePath = getFilePath(id);
-            if (Files.exists(filePath)) {
-                return loadUser(filePath);
-            }
-            return null;
-        }
-
-        @Override
-        public List<User> findAll() {
-            try {
-                return Files.list(directoryPath)
-                        .filter(Files::isRegularFile)
-                        .map(this::loadUser)
-                        .toList();
-            } catch (IOException e) {
-                throw new RuntimeException("사용자 목록을 불러오는 중 오류 발생", e);
-            }
-
-        }
-
-        @Override
-        public void delete(UUID id) {
-            Path filePath = getFilePath(id);
-            try {
-                Files.deleteIfExists(filePath);
-                System.out.println(id + " 사용자 삭제 완료되었습니다.");
-            } catch (IOException e) {
-                throw new RuntimeException("사용자 삭제 실패: " + id, e);
-            }
-        }
-
-        @Override
-        public void update(User user) {
-            user.updateTime(System.currentTimeMillis());
-            save(user);
-            System.out.println(user.getId() + " 사용자 업데이트 완료되었습니다.");
-        }
-        @Override
-        public boolean existsById(UUID id) {
-            return Files.exists(getFilePath(id));
-        }
-
-        @Override
-        public boolean existsByUsername(String username) {
-            try {
-                return Files.list(directoryPath)
-                        .filter(Files::isRegularFile)
-                        .map(this::loadUser)
-                        .anyMatch(user -> user.getUsername().equals(username));
-            } catch (IOException e) {
-                throw new RuntimeException("사용자 목록을 가져오는 중 오류 발생", e);
+                throw new RuntimeException(e);
             }
         }
     }
+
+    private Path getFilePath(UUID userId) {
+        return DIRECTORY.resolve("user-" + userId + EXTENSION);
+    }
+
+    public void serialize(User user) {
+        Path path = getFilePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException("사용자 데이터를 저장하는 중 오류 발생: " + path, e);
+        }
+    }
+
+    public User deserialize(Path path) {
+        try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+        ) {
+            return (User) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("사용자 파일을 읽는 중 오류 발생: " + path, e);
+        }
+    }
+
+    @Override
+    public User save(User user) {
+        serialize(user);
+        return user;
+    }
+
+    @Override
+    public Optional<User> findById(UUID userId) {
+        Path path = getFilePath(userId);
+        if (Files.notExists(path)) {
+            return Optional.empty();
+        }
+        return Optional.of(deserialize(path));
+    }
+
+    @Override
+    public Optional<User> findByUserName(String userName) {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path->deserialize(path))
+                    .filter(user -> user.getUserName().equals(userName))
+                    .findFirst();
+        } catch (IOException e) {
+            throw new RuntimeException("사용자 검색 중 오류 발생 (username: " + userName + ")", e);
+        }
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path->deserialize(path))
+                    .filter(user -> user.getEmail().equals(email)) // email 비교
+                    .findFirst();
+        } catch (IOException e) {
+            throw new RuntimeException("사용자 검색 중 오류 발생 (email: " + email + ")", e);
+        }
+    }
+
+    @Override
+    public List<User> findAll() {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> deserialize(path))
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException("사용자 목록을 불러오는 중 오류 발생", e);
+        }
+
+    }
+
+    @Override
+    public boolean existsById(UUID userId) {
+        return Files.exists(getFilePath(userId));
+    }
+
+    @Override
+    public void delete(UUID userId) {
+        Path path = getFilePath(userId);
+        try {
+            Files.deleteIfExists(path);
+            System.out.println(userId + " 사용자 삭제 완료되었습니다.");
+        } catch (IOException e) {
+            throw new RuntimeException("사용자 삭제 실패: " + userId, e);
+        }
+    }
+}
