@@ -1,18 +1,32 @@
 package com.sprint.mission.discodeit.utils;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.constant.ImageType;
 import com.sprint.mission.discodeit.constant.SubDirectory;
 import com.sprint.mission.discodeit.dto.SaveFileDto;
 import com.sprint.mission.discodeit.entity.Message;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.*;
 
 @Component
+@Configuration
 public class FileManager {
 
-    private final String BASE_DIR = System.getProperty("user.dir") + "\\src\\main\\resources\\dir\\";
+    //private final String BASE_DIR = System.getProperty("user.dir") + "\\src\\main\\resources\\dir\\";
+
+    private final RepositoryProperties repositoryProperties;
+
+    private String BASE_DIR;
+
+    public FileManager(RepositoryProperties repositoryProperties) {
+        this.repositoryProperties = repositoryProperties;
+        this.BASE_DIR = System.getProperty("user.dir") + repositoryProperties.getFileDirectory();
+    }
 
     public <T extends Serializable> void writeToFile(SubDirectory subDirectory, T object, UUID id) {
         String fileName = id.toString() + ".ser";

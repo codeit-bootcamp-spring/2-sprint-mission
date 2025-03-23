@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-//@Repository
+@Repository
 public class JCFReadStatusRepository implements ReadStatusRepository {
 
     private final List<ReadStatus> readStatusList = new ArrayList<>();

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-//@Repository
+@Repository
 public class JCFUserRepository implements UserRepository {
 
     private final List<User> userList = new ArrayList<>();

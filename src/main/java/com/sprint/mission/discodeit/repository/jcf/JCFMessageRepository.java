@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-//@Repository
+@Repository
 public class JCFMessageRepository implements MessageRepository {
 
     private final List<Message> messageList = new ArrayList<>();
