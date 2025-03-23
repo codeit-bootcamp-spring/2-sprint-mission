@@ -8,4 +8,11 @@ import lombok.Getter;
 public class BinaryContent {
     private UUID id;
     private Instant createdAt;
+    private String filePath;
+
+    public BinaryContent(String filePath) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.filePath = filePath;
+    }
 }

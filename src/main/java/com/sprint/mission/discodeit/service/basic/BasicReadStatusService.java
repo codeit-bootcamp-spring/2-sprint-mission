@@ -74,6 +74,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusRepository.update(dto.getReadStatusId());
     }
 
+    @Override
     public void delete(UUID readStatusId){
         readStatusRepository.delete(readStatusId);
     }

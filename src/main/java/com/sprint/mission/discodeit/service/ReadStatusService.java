@@ -11,4 +11,5 @@ public interface ReadStatusService {
     ReadStatus findById(UUID id);
     List<ReadStatus> findAllByUserId(UUID userId);
     ReadStatus update(ReadStatusUpdate dto);
+    void delete(UUID id);
 }
