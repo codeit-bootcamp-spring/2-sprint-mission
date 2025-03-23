@@ -109,7 +109,11 @@ public class BasicChannelService implements ChannelService {
         return readStatusRepository.findByUserId(userUUID).stream()
                 .map(readStatus -> {
                     Channel channel = channelRepository.findChannelById(readStatus.getChannelId())
-                            .orElseThrow(() -> new IllegalArgumentException("채널이 존재하지 않습니다"));
+                            .orElse(null);
+
+                    if (channel == null) {
+                        return null;
+                    }
 
                     List<Message> messageList = messageRepository.findMessageByChannel(channel.getId());
 
