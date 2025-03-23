@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.application.messagedto.MessageCreationDto;
-import com.sprint.mission.discodeit.application.messagedto.MessageDto;
-import com.sprint.mission.discodeit.application.userdto.UserDto;
+import com.sprint.mission.discodeit.application.dto.message.MessageCreationDto;
+import com.sprint.mission.discodeit.application.dto.message.MessageDto;
+import com.sprint.mission.discodeit.application.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;

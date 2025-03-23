@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.readstatusdto.ReadStatusDto;
-import com.sprint.mission.discodeit.application.readstatusdto.ReadStatusesDto;
+import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusDto;
+import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusesDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;

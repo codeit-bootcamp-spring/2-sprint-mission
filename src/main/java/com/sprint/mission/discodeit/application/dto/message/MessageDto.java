@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.application.messagedto;
+package com.sprint.mission.discodeit.application.dto.message;
 
-import com.sprint.mission.discodeit.application.userdto.UserDto;
+import com.sprint.mission.discodeit.application.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.time.Instant;

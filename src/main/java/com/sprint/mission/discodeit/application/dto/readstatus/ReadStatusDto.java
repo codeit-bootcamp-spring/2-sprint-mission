@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.application.readstatusdto;
+package com.sprint.mission.discodeit.application.dto.readstatus;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 

@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.application.channeldto;
+package com.sprint.mission.discodeit.application.dto.channel;
 
-import com.sprint.mission.discodeit.application.userdto.UsersDto;
+import com.sprint.mission.discodeit.application.dto.user.UsersDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.time.Instant;

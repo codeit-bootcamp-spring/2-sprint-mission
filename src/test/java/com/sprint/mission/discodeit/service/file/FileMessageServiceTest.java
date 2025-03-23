@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.application.messagedto.MessageCreationDto;
-import com.sprint.mission.discodeit.application.messagedto.MessageDto;
-import com.sprint.mission.discodeit.application.userdto.UserDto;
-import com.sprint.mission.discodeit.application.userdto.UserRegisterDto;
+import com.sprint.mission.discodeit.application.dto.message.MessageCreationDto;
+import com.sprint.mission.discodeit.application.dto.message.MessageDto;
+import com.sprint.mission.discodeit.application.dto.user.UserDto;
+import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;

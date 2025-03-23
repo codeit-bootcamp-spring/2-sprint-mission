@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.BinaryContentDto;
-import com.sprint.mission.discodeit.application.BinaryContentsDto;
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentDto;
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentsDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

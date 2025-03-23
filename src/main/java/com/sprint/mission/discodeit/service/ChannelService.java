@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.channeldto.ChannelDto;
-import com.sprint.mission.discodeit.application.channeldto.ChannelRegisterDto;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterDto;
 
 import java.util.List;
 import java.util.UUID;

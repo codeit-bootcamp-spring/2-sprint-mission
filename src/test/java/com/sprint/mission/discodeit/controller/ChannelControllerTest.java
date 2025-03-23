@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.channeldto.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.channeldto.ChannelResponseDto;
-import com.sprint.mission.discodeit.application.userdto.UserDto;
-import com.sprint.mission.discodeit.application.userdto.UserRegisterDto;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterDto;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.application.dto.user.UserDto;
+import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.jcf.*;

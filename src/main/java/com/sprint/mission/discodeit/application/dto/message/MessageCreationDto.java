@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.application.messagedto;
+package com.sprint.mission.discodeit.application.dto.message;
 
 import java.util.UUID;
 
