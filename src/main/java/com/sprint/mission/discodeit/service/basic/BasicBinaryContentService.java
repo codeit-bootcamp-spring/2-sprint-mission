@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.application.BinaryContentDto;
+import com.sprint.mission.discodeit.application.BinaryContentsDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.FilePath.IMAGE_STORAGE_DIRECTORY;
@@ -42,6 +44,15 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
 
         return BinaryContentDto.fromEntity(binaryContent);
+    }
+
+    @Override
+    public BinaryContentsDto findByIdIn(List<UUID> ids) {
+        List<BinaryContentDto> binaryContentDtos = ids.stream()
+                .map(this::findById)
+                .toList();
+
+        return new BinaryContentsDto(binaryContentDtos);
     }
 
     @Override

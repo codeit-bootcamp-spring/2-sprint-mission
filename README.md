@@ -339,15 +339,15 @@ public static void main(String[]args){
 
 2. find
 
-- [ ] id로 조회합니다.
+- [x] id로 조회합니다.
 
 3. findAllByIdIn
 
-- [ ] id 목록으로 조회합니다.
+- [x] id 목록으로 조회합니다.
 
 4. delete
 
-- [ ] id로 삭제합니다.
+- [x] id로 삭제합니다.
 
 ##### 새로운 도메인 Repository 구현체 구현
 
