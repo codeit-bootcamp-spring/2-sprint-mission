@@ -106,17 +106,14 @@ public class UserDto {
     public static class Login {
         private String email;
         private String password;
-        
-        // 기본 생성자
         public Login() {}
-        
-        // 파라미터가 있는 생성자
+
         public Login(String email, String password) {
             this.email = email;
             this.password = password;
         }
         
-        // getter/setter
+
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
         public String getPassword() { return password; }

@@ -116,7 +116,7 @@ public class BasicUserStatusServiceImpl implements UserStatusService {
             
         if (userStatus.getLastSeenAt() == null) return false;
         
-        return Duration.between(userStatus.getLastSeenAt(), LocalDateTime.now()).toMinutes() <= 5;
+        return userStatus.isOnline();
     }
 
     @Override

@@ -9,14 +9,10 @@ import com.sprint.mission.discodeit.service.MessageRepository;
 import com.sprint.mission.discodeit.service.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,7 +37,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatusDto.ResponseReadStatus create(ReadStatusDto.Create readStatusDto) {
-        // 연관 엔티티 존재 검증
+
         validateUserAndChannel(readStatusDto.getUserId(), readStatusDto.getChannelId());
         
         // 메시지 존재 확인

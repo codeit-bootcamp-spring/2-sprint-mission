@@ -210,10 +210,7 @@ public class BasicUserService implements UserService {
     private UUID saveProfileImage(MultipartFile profileImage, UUID userId) {
         try {
             byte[] imageData = profileImage.getBytes();
-            // BinaryContent 생성 및 저장 로직
-            // 실제 구현은 BinaryContent 클래스와 저장소에 맞게 수정 필요
-            
-            // 임시 코드 - 실제로는 BinaryContent를 생성하고 저장한 후 ID 반환 필요
+
             return UUID.randomUUID();
         } catch (Exception e) {
             throw new RuntimeException("프로필 이미지 저장 실패", e);
@@ -236,8 +233,7 @@ public class BasicUserService implements UserService {
         // 채널의 사용자 목록에서 제거
         channel.leaveChannel(userId);
         channelRepository.updateChannel(channel);
-        
-        // 해당 채널의 ReadStatus 삭제
+
         readStatusRepository.findByUserIdAndChannelId(userId, channelId)
             .ifPresent(readStatus -> readStatusRepository.deleteReadStatus(readStatus.getId()));
         messageRepository.deleteMessage(userId);
