@@ -19,6 +19,11 @@ public class ReadStatusRepositoryImpl implements ReadStatusRepository {
     }
 
     @Override
+    public List<ReadStatus> findAll() {
+        return new ArrayList<>(readStatusList);
+    }
+
+    @Override
     public void save(ReadStatus readStatus) {
         //중복체크
         if (findByUserAndChannel(readStatus.getUserId(), readStatus.getChannelId()).isEmpty()) {

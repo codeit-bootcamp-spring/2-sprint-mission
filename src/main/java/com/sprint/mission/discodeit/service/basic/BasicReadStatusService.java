@@ -42,4 +42,12 @@ public class BasicReadStatusService implements ReadStatusService {
         readStatusRepository.save(readStatus);
         return readStatus;
     }
-}
+
+    @Override
+    public ReadStatus find(UUID userId, UUID channelId) {
+        return readStatusRepository.findByUserAndChannel(userId, channelId)
+                .orElseThrow(() -> new NoSuchElementException("No ReadStatus found for user" + userId + "and channel" + channelId));
+    }
+
+    }
+
