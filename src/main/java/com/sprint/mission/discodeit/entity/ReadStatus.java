@@ -4,65 +4,60 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Getter
-public class UserStatus implements Serializable {
+public class ReadStatus implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
     private final UUID userId;
-    private Instant lastActiveAt;
+    private final UUID channelId;
+    private Instant lastReadAt;
 
-    public UserStatus(UUID userId) {
-        validateReadStatus(userId);
+    public ReadStatus(UUID userId, UUID channelId) {
+        validateReadStatus(userId, channelId);
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
         this.userId = userId;
-        this.lastActiveAt = Instant.now();
+        this.channelId = channelId;
+        this.lastReadAt = Instant.now();
     }
 
-    public void update(Instant lastActiveAt) {
-        if(lastActiveAt != null && lastActiveAt.isAfter(this.lastActiveAt)){
-            this.lastActiveAt = lastActiveAt;
+    public void update(Instant lastReadAt) {
+        if(lastReadAt != null && lastReadAt.isAfter(this.lastReadAt)){
+            this.lastReadAt = lastReadAt;
             updateLastModifiedAt();
         }
-    }
-
-    public void updateByUserId() {
-        this.lastActiveAt = Instant.now();
-        updateLastModifiedAt();
     }
 
     private void updateLastModifiedAt() {
         this.updatedAt = Instant.now();
     }
 
-    public boolean isOnline() {
-        return lastActiveAt != null &&
-                lastActiveAt.isAfter(Instant.now().minus(5, ChronoUnit.MINUTES));
-    }
-
     @Override
     public String toString() {
-        return "UserStatus{" +
+        return "ReadStatus{" +
                 "id=" + id +
-                ", lastActiveAt=" + lastActiveAt +
                 ", userId=" + userId +
+                ", channelId=" + channelId +
+                ", lastReadAt=" + lastReadAt +
                 '}';
     }
 
     /*******************************
      * Validation check
      *******************************/
-    private void validateReadStatus(UUID userId){
+    private void validateReadStatus(UUID userId, UUID channelId){
         // 1. null check
         if (userId == null) {
             throw new IllegalArgumentException("userId가 없습니다.");
+        }
+        if (channelId == null) {
+            throw new IllegalArgumentException("channelId가 없습니다.");
         }
     }
 
