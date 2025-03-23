@@ -19,17 +19,15 @@ public class FileManager {
 
     //private final String BASE_DIR = System.getProperty("user.dir") + "\\src\\main\\resources\\dir\\";
 
-    private final RepositoryProperties repositoryProperties;
-
     private String BASE_DIR;
+    private final String DATA_EXTENSION = ".ser";
 
     public FileManager(RepositoryProperties repositoryProperties) {
-        this.repositoryProperties = repositoryProperties;
         this.BASE_DIR = System.getProperty("user.dir") + repositoryProperties.getFileDirectory();
     }
 
     public <T extends Serializable> void writeToFile(SubDirectory subDirectory, T object, UUID id) {
-        String fileName = id.toString() + ".ser";
+        String fileName = id.toString() + DATA_EXTENSION;
         String filePath = BASE_DIR + subDirectory.getDirectory() + "\\" + fileName;
 
         File directory = new File(BASE_DIR + subDirectory.getDirectory());
@@ -53,7 +51,7 @@ public class FileManager {
             return list;
         }
 
-        File[] files = directory.listFiles((dir, name) -> name.endsWith(".ser"));
+        File[] files = directory.listFiles((dir, name) -> name.endsWith(DATA_EXTENSION));
         if (files != null) {
             for (File file : files) {
                 try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -76,7 +74,7 @@ public class FileManager {
             return list;
         }
 
-        File[] files = directory.listFiles((dir, name) -> name.endsWith(".ser"));
+        File[] files = directory.listFiles((dir, name) -> name.endsWith(DATA_EXTENSION));
         if (files != null) {
             for (File file : files) {
                 try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -100,7 +98,7 @@ public class FileManager {
             return Optional.empty();
         }
 
-        String fileName = id.toString() + ".ser";
+        String fileName = id.toString() + DATA_EXTENSION;
         File file = new File(directoryPath + fileName);
 
         if (file.exists()) {
@@ -116,7 +114,7 @@ public class FileManager {
 
     public boolean deleteFileById(SubDirectory subDirectory, UUID id) {
         String directoryPath = BASE_DIR + subDirectory.getDirectory() + "\\";
-        String fileName = id.toString() + ".ser";
+        String fileName = id.toString() + DATA_EXTENSION;
         File file = new File(directoryPath + fileName);
         if (file.exists()) {
             file.delete();
