@@ -1,17 +1,18 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.DTO.MessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
-    private final MessageRepository messageRepository;
+    private final JCFMessageRepository messageRepository;
     private final UserService userService;
     private final ChannelService channelService;
 
@@ -22,22 +23,23 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(UUID userId, UUID channelId, String content) {
-        userService.getUser(userId);
-        channelService.getChannel(channelId);
+    public Message createMessage(MessageDTO messageDTO) {
+        userService.getUser(messageDTO.senderId());
+        channelService.getChannel(messageDTO.channelId());
 
-        Message message = new Message(userId, channelId, content);
+        Message message = new Message(
+                messageDTO.senderId(),
+                messageDTO.channelId(),
+                messageDTO.content()
+        );
         messageRepository.save(message);
         return message;
     }
 
     @Override
     public Message getMessage(UUID id) {
-        Message message = messageRepository.findById(id);
-        if (message == null) {
-            throw new IllegalArgumentException("존재하지 않는 메시지입니다.");
-        }
-        return message;
+        return messageRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메시지입니다."));
     }
 
     @Override
