@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.service.dto.channel;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
+import java.util.List;
+import java.util.UUID;
 
-public record PublicChannelParam(
+public record PrivateChannelRequest(
         ChannelType type,
-        String name,
-        String description
+        List<UUID> userIds
 ) {
 }

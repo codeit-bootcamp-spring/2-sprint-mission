@@ -22,9 +22,6 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void create(ReadStatusCreateParam param) {
-        if (!channelRepository.existsById(param.channelId())) {
-            throw new IllegalArgumentException(param.channelId() + " 에 해당하는 Channel을 찾을 수 없음");
-        }
         param.userIds().forEach(userId -> {
             if (!userRepository.existsById(userId)) {
                 throw new IllegalArgumentException(userId + " 에 해당하는 User을 찾을 수 없음");
@@ -33,8 +30,8 @@ public class BasicReadStatusService implements ReadStatusService {
                 if (readStatus.getChannelId().equals(param.channelId())) {
                     throw new IllegalArgumentException("중복된 객체 존재");
                 }
-                readStatusRepository.save(new ReadStatus(userId, param.channelId()));
             });
+            readStatusRepository.save(new ReadStatus(userId, param.channelId()));
         });
     }
 
@@ -76,9 +73,6 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void delete(UUID id) {
-        if (!readStatusRepository.existsById(id)) {
-            throw new IllegalArgumentException(id + " 에 해당하는 ReadStatus을 찾을 수 없음");
-        }
         readStatusRepository.delete(id);
     }
 }
