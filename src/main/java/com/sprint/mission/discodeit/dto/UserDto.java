@@ -19,13 +19,11 @@ public class UserDto {
     @Getter
     @Builder(toBuilder = true)
     public static class Create {
-
         @NotBlank
         @Email
         private final String email;         // 이메일
         @NotBlank
         private final String password;      // 비밀번호
-        private final MultipartFile profileImage;  // 선택적 프로필 이미지
     }
     @Getter
     @Builder(toBuilder = true)

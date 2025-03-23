@@ -97,20 +97,12 @@ public class BasicUserService implements UserService {
             checkEmailDuplication(createUserDto.getEmail());
         }
 
-        // 사용자 생성
         User user = new User(createUserDto.getEmail(), createUserDto.getPassword());
         
         if (!userRepository.register(user)) {
             throw new RuntimeException("사용자 저장 실패");
         }
-        
-        // 프로필 이미지 처리
-        if (createUserDto.getProfileImage() != null) {
-            UUID profileImageId = saveProfileImage(createUserDto.getProfileImage(), user.getId());
-            user.setProfileId(profileImageId);
-            userRepository.updateUser(user);
-        }
-        
+
         return UserMapping.INSTANCE.userToResponse(user);
     }
 
@@ -206,16 +198,7 @@ public class BasicUserService implements UserService {
             });
     }
     
-    // 프로필 이미지 저장
-    private UUID saveProfileImage(MultipartFile profileImage, UUID userId) {
-        try {
-            byte[] imageData = profileImage.getBytes();
 
-            return UUID.randomUUID();
-        } catch (Exception e) {
-            throw new RuntimeException("프로필 이미지 저장 실패", e);
-        }
-    }
     
     // 채널 떠나기
     public void leaveChannel(UUID userId, UUID channelId) {
