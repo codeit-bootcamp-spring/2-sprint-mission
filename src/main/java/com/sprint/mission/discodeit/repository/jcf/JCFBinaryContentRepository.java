@@ -14,7 +14,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        binaryContentRepository.put(binaryContent.getProfileId(), binaryContent);
+        binaryContentRepository.put(binaryContent.getId(), binaryContent);
 
         return binaryContent;
     }

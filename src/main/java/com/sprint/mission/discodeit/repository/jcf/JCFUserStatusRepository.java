@@ -8,23 +8,23 @@ import java.util.*;
 
 @Repository
 public class JCFUserStatusRepository implements UserStatusRepository {
-    private final Map<UUID, UserStatus> userStatusRepository = new HashMap<>();
+    private final Map<UUID, UserStatus> userStatuses = new HashMap<>();
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        userStatusRepository.put(userStatus.getId(), userStatus);
+        userStatuses.put(userStatus.getId(), userStatus);
 
         return userStatus;
     }
 
     @Override
     public Optional<UserStatus> findById(UUID id) {
-        return Optional.ofNullable(userStatusRepository.get(id));
+        return Optional.ofNullable(userStatuses.get(id));
     }
 
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
-        return userStatusRepository.values()
+        return userStatuses.values()
                 .stream()
                 .filter(userStatus -> userStatus.getUserId().equals(userId))
                 .findFirst();
@@ -32,14 +32,14 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public List<UserStatus> findAll() {
-        return userStatusRepository.values()
+        return userStatuses.values()
                 .stream()
                 .toList();
     }
 
     @Override
     public UserStatus update(UUID userStatusId) {
-        UserStatus userStatus = userStatusRepository.get(userStatusId);
+        UserStatus userStatus = userStatuses.get(userStatusId);
         userStatus.updateLastLoginAt();
 
         return userStatus;
@@ -47,6 +47,6 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void delete(UUID id) {
-        userStatusRepository.remove(id);
+        userStatuses.remove(id);
     }
 }

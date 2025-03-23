@@ -35,7 +35,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(imageFile));
 
-        return binaryContent.getProfileId();
+        return binaryContent.getId();
     }
 
     @Override
@@ -60,7 +60,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
 
-        deleteImageFileFromPath(binaryContent.getPath());
+        deleteImageFileFromPath(Path.of(binaryContent.getPath()));
         binaryContentRepository.delete(id);
     }
 

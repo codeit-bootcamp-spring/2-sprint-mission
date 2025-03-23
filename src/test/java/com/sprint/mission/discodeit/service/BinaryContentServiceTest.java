@@ -13,6 +13,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ class BinaryContentServiceTest {
         UUID profileId = binaryContentService.createProfileImage(file);
         BinaryContentDto binaryContent = binaryContentService.findById(profileId);
 
-        byte[] storedFileBytes = Files.readAllBytes(binaryContent.path());
+        byte[] storedFileBytes = Files.readAllBytes(Path.of(binaryContent.path()));
         assertThat(file.getBytes()).isEqualTo(storedFileBytes);
     }
 
@@ -86,7 +87,7 @@ class BinaryContentServiceTest {
         assertAll(
                 () -> assertThatThrownBy(() -> binaryContentService.findById(profileId))
                         .isInstanceOf(IllegalArgumentException.class),
-                () -> assertThat(Files.exists(binaryContent.path())).isFalse()
+                () -> assertThat(Files.exists(Path.of(binaryContent.path()))).isFalse()
         );
     }
 }

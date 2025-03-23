@@ -14,4 +14,7 @@ public class FilePath {
     public static final Path MESSAGE_TEST_FILE = STORAGE_DIRECTORY.resolve("message" + SER_EXTENSION);
     public static final Path USER_TEST_FILE = STORAGE_DIRECTORY.resolve("user" + SER_EXTENSION);
     public static final Path IMAGE_STORAGE_DIRECTORY = STORAGE_DIRECTORY.resolve(Paths.get("images", "profile"));
+    public static final Path USER_STATUS_TEST_FILE = STORAGE_DIRECTORY.resolve("userStatus" + SER_EXTENSION);
+    public static final Path READ_STATUS_TEST_FILE = STORAGE_DIRECTORY.resolve("readStatus" + SER_EXTENSION);
+    public static final Path BINARY_CONTENT_TEST_FILE = STORAGE_DIRECTORY.resolve("binaryContent" + SER_EXTENSION);
 }

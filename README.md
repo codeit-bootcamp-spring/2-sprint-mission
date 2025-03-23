@@ -130,7 +130,7 @@ public static void main(String[]args){
     - 메세지와 함께 첨부파일 저장
     - 메세지 id와 함께 반환
 
-#### ReadStatusService 구현
+#### ReadStatusService 구현[추후 관련 기능이 있다면 보강]
 
 - [ ] 채널 메세지 읽음 확인
     - [ ] 유저가 마지막으로 메세지를 읽은 시점 기록
@@ -178,7 +178,7 @@ public static void main(String[]args){
     - [x] User, Message 도메인 모델과의 의존 관계 방향성을 잘 고려하여 id 참조 필드를 추가하세요.
 
 
-- [ ]  각 도메인 모델 별 레포지토리 인터페이스를 선언하세요.
+- [x]  각 도메인 모델 별 레포지토리 인터페이스를 선언하세요.
 - 레포지토리 아직 구현하지마세요. 이어지는 서비스 고도화 요구사항에 따라 레포지토리 인터페이스에 메소드가 추가될 수 있어요.
 
 ### *Service 고도화
@@ -351,7 +351,7 @@ public static void main(String[]args){
 
 ##### 새로운 도메인 Repository 구현체 구현
 
-- [ ]  지금까지 인터페이스로 설계한 각각의 Repository를 JCF, File로 각각 구현하세요.
+- [x]  지금까지 인터페이스로 설계한 각각의 Repository를 JCF, File로 각각 구현하세요.
 
 ## 심화 요구사항
 

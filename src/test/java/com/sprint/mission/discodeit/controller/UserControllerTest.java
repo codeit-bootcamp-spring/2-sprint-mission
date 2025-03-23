@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
 import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
@@ -72,7 +73,7 @@ class UserControllerTest {
         UserDto user = userController.register(userRegisterDto, file);
         BinaryContent binaryContent = binaryContentRepository.findById(user.profileId()).get();
 
-        byte[] storedFileBytes = Files.readAllBytes(binaryContent.getPath());
+        byte[] storedFileBytes = Files.readAllBytes(Path.of(binaryContent.getPath()));
         assertThat(binaryProfileImage).isEqualTo(storedFileBytes);
     }
 
@@ -98,7 +99,7 @@ class UserControllerTest {
         UserDto profileImageUpdatedUser = userController.updateProfile(user.id(), otherFile);
 
         BinaryContent binaryContent = binaryContentRepository.findById(profileImageUpdatedUser.profileId()).get();
-        byte[] storedFileBytes = Files.readAllBytes(binaryContent.getPath());
+        byte[] storedFileBytes = Files.readAllBytes(Path.of(binaryContent.getPath()));
 
         assertThat(updatedProfileImage).isEqualTo(storedFileBytes);
     }
