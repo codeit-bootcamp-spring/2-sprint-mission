@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.service.advance.UserServiceImp;
 import com.sprint.mission.discodeit.service.basic.BasicChannelServiceImp;
 import com.sprint.mission.discodeit.service.basic.BasicMessageServiceImp;
 import com.sprint.mission.discodeit.service.basic.BasicUserServiceImp;
@@ -23,8 +22,8 @@ public class ServiceConfig {
     }
 
     @Bean
-    public UserService userService(UserRepository userRepository) {
-        return new BasicUserServiceImp(userRepository);
+    public UserService userService(UserRepository userRepository, BinaryContentRepository binaryContentRepository, UserStatusRepository userStatusRepository) {
+        return new UserServiceImp(userRepository, binaryContentRepository, userStatusRepository);
     }
 
 }
