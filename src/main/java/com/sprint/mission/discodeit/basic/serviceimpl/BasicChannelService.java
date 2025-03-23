@@ -208,13 +208,13 @@ public class BasicChannelService implements ChannelService {
 
     // 채널명 중복 체크 로직
     private void checkChannelNameDuplication(String channelName) {
-        // findByName 메서드 사용 (인터페이스와 일치)
+
         channelRepository.findByName(channelName).ifPresent(channel -> {
             throw new IllegalArgumentException("이미 존재하는 채널명입니다: " + channelName);
         });
     }
     
-    // 최근 메시지 시간 조회 (헬퍼 메서드)
+
     private Optional<ZonedDateTime> findLatestMessageTimestamp(UUID channelId) {
         // MessageRepository에 findLatestByChannelId 메서드가 있으면 사용, 없으면 직접 구현
         List<Message> channelMessages = messageRepository.findAllByChannelId(channelId);
@@ -227,7 +227,7 @@ public class BasicChannelService implements ChannelService {
                 .max(ZonedDateTime::compareTo);
     }
     
-    // 채널의 모든 메시지 삭제 (헬퍼 메서드)
+
     private void deleteAllMessagesByChannelId(UUID channelId) {
         List<Message> messages = messageRepository.findAllByChannelId(channelId);
         for (Message message : messages) {

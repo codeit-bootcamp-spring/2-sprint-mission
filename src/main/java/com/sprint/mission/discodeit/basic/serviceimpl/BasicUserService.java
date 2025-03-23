@@ -240,6 +240,9 @@ public class BasicUserService implements UserService {
         // 해당 채널의 ReadStatus 삭제
         readStatusRepository.findByUserIdAndChannelId(userId, channelId)
             .ifPresent(readStatus -> readStatusRepository.deleteReadStatus(readStatus.getId()));
+        messageRepository.deleteMessage(userId);
+        readStatusRepository.deleteAllByUserId(userId);
+        binaryContentRepository.delete(userId);
     }
 }
 

@@ -118,8 +118,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
                 
                 responses.add(response);
             } catch (NoSuchElementException e) {
-                // 존재하지 않는 ID일 경우 예외 발생
-                throw e;
+               throw new NoSuchElementException(e.getMessage());
             }
         }
         
