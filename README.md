@@ -312,24 +312,24 @@ public static void main(String[]args){
 
 2. find
 
-- [ ] id로 조회합니다.
+- [x] id로 조회합니다.
 
 3. findAll
 
-- [ ] 모든 객체를 조회합니다.
+- [x] 모든 객체를 조회합니다.
 
 4. update
 
-- [ ] DTO를 활용해 파라미터를 그룹화합니다.
+- [x] DTO를 활용해 파라미터를 그룹화합니다.
 - 수정 대상 객체의 id 파라미터, 수정할 값 파라미터
 
 5. updateByUserId
 
-- [ ] userId 로 특정 User의 객체를 업데이트합니다.
+- [x] userId 로 특정 User의 객체를 업데이트합니다.
 
 6. delete
 
-- [ ] id로 삭제합니다.
+- [x] id로 삭제합니다.
 
 #### BinaryContentService 구현
 

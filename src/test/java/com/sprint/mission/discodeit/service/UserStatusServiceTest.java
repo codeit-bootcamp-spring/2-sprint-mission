@@ -37,7 +37,6 @@ class UserStatusServiceTest {
         userStatusRepository.save(new UserStatus(random));
         UserStatusService userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
 
-
         assertThatThrownBy(() -> userStatusService.create(random)).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -54,4 +53,32 @@ class UserStatusServiceTest {
         assertThatThrownBy(() -> userStatusService.create(user.getId())).isInstanceOf(IllegalArgumentException.class);
     }
 
+
+    @Test
+    void findByUserId() {
+        UserRepository userRepository = new JCFUserRepository();
+        User user = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
+
+        UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
+        UserStatusService userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
+
+        UserStatusDto userStatusDto = userStatusService.create(user.getId());
+        UserStatusDto userStatusDto1 = userStatusService.findByUserId(user.getId());
+
+        assertThat(userStatusDto.id()).isEqualTo(userStatusDto1.id());
+    }
+
+    @Test
+    void updateByUserId() {
+        UserRepository userRepository = new JCFUserRepository();
+        User user = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
+
+        UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
+        UserStatusService userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
+
+        UserStatusDto userStatusDto = userStatusService.create(user.getId());
+        UserStatusDto updatedUserStatusDto = userStatusService.updateByUserId(user.getId());
+
+        assertThat(updatedUserStatusDto.lastLoginAt()).isAfter(userStatusDto.lastLoginAt());
+    }
 }
