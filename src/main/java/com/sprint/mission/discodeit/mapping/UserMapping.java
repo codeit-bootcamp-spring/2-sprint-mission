@@ -23,7 +23,5 @@ public interface UserMapping {
     void updateUserFromDto(UserDto.Update dto, @MappingTarget User user);
     UserDto.Update userToDto(User user);
 
-   
-    @Mapping(source = "user.id", target = "id")
-    UserDto.Summary userToSummaryManual(User user, UserStatus userStatus);
+
 }

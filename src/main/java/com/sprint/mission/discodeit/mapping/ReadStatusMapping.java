@@ -19,5 +19,4 @@ public interface ReadStatusMapping {
     void updateEntityFromDto(ReadStatusDto.Update updateDto, @MappingTarget ReadStatus readStatus);
     
 
-    ReadStatusDto.Update entityToUpdateDto(ReadStatus readStatus);
 } 

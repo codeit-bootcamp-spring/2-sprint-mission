@@ -13,9 +13,6 @@ public interface FileMapping {
     FileMapping INSTANCE = Mappers.getMapper(FileMapping.class);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    BinaryContent dtoToBinaryContent(BinaryContentDto.Create createDto, @MappingTarget BinaryContent binaryContent);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     BinaryContentDto.Summary binaryContentToSummary(BinaryContent binaryContent);
 
     @Mapping(target = "fileName", source = "binaryContent.fileName")
