@@ -15,7 +15,9 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        return userStatusRepository.put(userStatus.getId(), userStatus);
+        userStatusRepository.put(userStatus.getId(), userStatus);
+
+        return userStatus;
     }
 
     @Override

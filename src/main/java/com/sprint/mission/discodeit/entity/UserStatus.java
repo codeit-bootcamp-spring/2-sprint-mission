@@ -14,6 +14,7 @@ public class UserStatus implements Serializable {
     private final UUID userId;
     private final Instant createdAt;
     private Instant updatedAt;
+    private Instant lastLoginAt;
     private boolean isLogin;
 
     public UserStatus(UUID userId) {
@@ -21,6 +22,7 @@ public class UserStatus implements Serializable {
         this.userId = userId;
         this.createdAt = ZonedDateTime.now().toInstant();
         this.updatedAt = createdAt;
+        this.lastLoginAt = Instant.ofEpochSecond(0);
         this.isLogin = false;
     }
 
