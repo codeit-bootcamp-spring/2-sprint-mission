@@ -28,10 +28,10 @@ public class JavaApplication {
         ChannelService channelService = context.getBean(ChannelService.class);
         MessageService messageService = context.getBean(MessageService.class);
 
-        // DiscodeitApplication에 옮겨둔 static 메소드 호출
-        User user = DiscodeitApplication.setupUser(userService);
-        Channel channel = DiscodeitApplication.setupChannel(channelService);
-        DiscodeitApplication.messageCreateTest(messageService, channel, user);
+//        // DiscodeitApplication에 옮겨둔 static 메소드 호출
+//        User user = DiscodeitApplication.setupUser(userService);
+//        Channel channel = DiscodeitApplication.setupChannel(channelService);
+//        DiscodeitApplication.messageCreateTest(messageService, channel, user);
 
         /*// 셋업
         User user = setupUser(userService);

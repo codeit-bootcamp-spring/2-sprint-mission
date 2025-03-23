@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @AllArgsConstructor
 @Getter
+@Setter
 public class UserStatus {
     private UUID id;
     private UUID userid;

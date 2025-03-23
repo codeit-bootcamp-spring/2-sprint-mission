@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,11 +9,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
-public class BinaryContent {
-    private UUID id;
+public class CreateBinaryContentDTO {
     private byte[] content;
     private String contentType;
-    //
     private UUID userId;
     private UUID messageId;
 }

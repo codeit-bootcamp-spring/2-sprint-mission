@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -11,6 +12,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.List;
+
 @SpringBootApplication
 public class DiscodeitApplication {
 	public static void main(String[] args) {
@@ -21,26 +24,53 @@ public class DiscodeitApplication {
 		ChannelService channelService = content.getBean(ChannelService.class);
 		MessageService messageService = content.getBean(MessageService.class);
 
-		// DiscodeitApplication에 옮겨둔 static 메소드 호출
-		User user = DiscodeitApplication.setupUser(userService);
-		Channel channel = DiscodeitApplication.setupChannel(channelService);
-		DiscodeitApplication.messageCreateTest(messageService, channel, user);
+		System.out.println("===== TEST START =====");
 
-	}
+		try {
+			// 1) 유저 생성 테스트
+			CreateUserDTO userDTO = new CreateUserDTO("alice", "alice@example.com", "password123", null, null);
+			UserResponseDTO createdUser = userService.create(userDTO);
+			System.out.println("Created user: " + createdUser);
 
-	// test
-	static User setupUser(UserService userService) {
-		User user = userService.create("woody", "woody@codeit.com", "woody1234");
-		return user;
-	}
+			// 2) 채널 생성 테스트 (PUBLIC 채널 예시)
+			CreatePublicChannelDTO channelDTO = new CreatePublicChannelDTO("General", "General discussion channel");
+			ChannelResponseDTO createdChannel = channelService.createPublic(channelDTO);
+			System.out.println("Created channel: " + createdChannel);
 
-	static Channel setupChannel(ChannelService channelService) {
-		Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
-		return channel;
-	}
+			// 3) 메시지 생성 테스트
+			CreateMessageDTO messageDTO = new CreateMessageDTO(
+					"Hello, Channel!",
+					createdUser.getId(),
+					createdChannel.getChannelId(),
+					null // 첨부파일 없다고 가정
+			);
+			Message createdMessage = messageService.create(messageDTO);
+			System.out.println("Created message: " + createdMessage);
 
-	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-		Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
-		System.out.println("메시지 생성: " + message.getId());
+			// 4) 유저, 채널, 메시지 조회
+			//    (메소드 시그니처는 실제 코드에 맞게 조정)
+			List<UserResponseDTO> allUsers = userService.findAll();
+			System.out.println("All users: " + allUsers);
+
+			List<ChannelResponseDTO> allChannels = channelService.findAll();
+			System.out.println("All channels: " + allChannels);
+
+			List<Message> channelMessages = messageService.findAllByChannelId(createdChannel.getChannelId());
+			System.out.println("Messages in channel: " + channelMessages);
+
+			 // 5) 업데이트 테스트 (원하면 추가)
+			 UpdateChannelDTO updateChDto = new UpdateChannelDTO(createdChannel.getChannelId(), "NewName", "NewDescription");
+			 ChannelResponseDTO updatedChannel = channelService.update(updateChDto);
+			 System.out.println("Updated channel: " + updatedChannel);
+
+			 // 6) 삭제 테스트 (원하면 추가)
+			 messageService.delete(createdMessage.getId());
+			 System.out.println("Deleted message with id: " + createdMessage.getId());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("===== TEST END =====");
 	}
 }
