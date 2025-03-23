@@ -26,7 +26,7 @@ public class ReadStatus implements Serializable {
         this.lastReadTime = createdAt;
     }
 
-    public void updateLastReadAt() {
+    public void updateLastReadTime() {
         this.lastReadTime = ZonedDateTime.now().toInstant();
         updateLastModified();
     }

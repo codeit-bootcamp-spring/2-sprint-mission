@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.basic;
+package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.application.readstatusdto.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFReadStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.service.basic.BasicReadStatusService;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -19,7 +20,7 @@ import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class BasicReadStatusServiceTest {
+class ReadStatusServiceTest {
     @Test
     void create() {
         UserRepository userRepository = new JCFUserRepository();
@@ -73,5 +74,4 @@ class BasicReadStatusServiceTest {
 
         assertThatThrownBy(() -> basicReadStatusService.create(user.getId(), channel.getId())).isInstanceOf(IllegalArgumentException.class);
     }
-
 }

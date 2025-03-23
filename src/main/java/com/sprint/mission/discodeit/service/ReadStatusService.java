@@ -9,4 +9,12 @@ public interface ReadStatusService {
     ReadStatusDto create(UUID userId, UUID channelId);
 
     ReadStatusesDto findByChannelId(UUID channelId);
+
+    ReadStatusDto find(UUID readStatusId);
+
+    ReadStatusesDto findAllByUserId(UUID useId);
+
+    ReadStatusDto updateLastReadTime(UUID readStatusId);
+
+    void delete(UUID readStatusId);
 }

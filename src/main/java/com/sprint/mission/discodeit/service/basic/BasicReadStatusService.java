@@ -44,4 +44,29 @@ public class BasicReadStatusService implements ReadStatusService {
         List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(channelId);
         return ReadStatusesDto.fromEntity(readStatuses);
     }
+
+    @Override
+    public ReadStatusDto find(UUID readStatusId) {
+        ReadStatus readStatus = readStatusRepository.find(readStatusId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 Id의 객체가 없습니다."));
+
+        return ReadStatusDto.fromEntity(readStatus);
+    }
+
+    @Override
+    public ReadStatusesDto findAllByUserId(UUID useId) {
+        List<ReadStatus> readStatuses = readStatusRepository.findByUserId(useId);
+        return ReadStatusesDto.fromEntity(readStatuses);
+    }
+
+    @Override
+    public ReadStatusDto updateLastReadTime(UUID readStatusId) {
+        ReadStatus readStatus = readStatusRepository.updateLastReadTime(readStatusId);
+        return ReadStatusDto.fromEntity(readStatus);
+    }
+
+    @Override
+    public void delete(UUID readStatusId) {
+        readStatusRepository.delete(readStatusId);
+    }
 }

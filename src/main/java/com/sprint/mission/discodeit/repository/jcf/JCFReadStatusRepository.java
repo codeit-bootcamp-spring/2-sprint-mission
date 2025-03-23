@@ -4,10 +4,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public class JCFReadStatusRepository implements ReadStatusRepository {
@@ -18,6 +15,11 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
         readStatuses.put(readStatus.getId(), readStatus);
 
         return readStatus;
+    }
+
+    @Override
+    public Optional<ReadStatus> find(UUID readStatusId) {
+        return Optional.ofNullable(readStatuses.get(readStatusId));
     }
 
     @Override
@@ -34,6 +36,14 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
                 .stream()
                 .filter(readStatus -> readStatus.getUserId().equals(userId))
                 .toList();
+    }
+
+    @Override
+    public ReadStatus updateLastReadTime(UUID readStatusId) {
+        ReadStatus readStatus = readStatuses.get(readStatusId);
+        readStatus.updateLastReadTime();
+
+        return readStatus;
     }
 
     @Override
