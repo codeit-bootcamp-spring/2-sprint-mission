@@ -8,6 +8,4 @@ import lombok.Getter;
 public class BinaryContent {
     private UUID id;
     private Instant createdAt;
-
-
 }

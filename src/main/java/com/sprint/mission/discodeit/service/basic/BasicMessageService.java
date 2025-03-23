@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.message.MessageCreate;
+import com.sprint.mission.discodeit.dto.message.MessageUpdate;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.List;
@@ -16,9 +19,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
-    public Message create(String content, UUID channelId, UUID authorId){
-        Message message = new Message(content, channelId, authorId);
+    public Message create(MessageCreate dto){
+        Message message = new Message(dto.getContent(), dto.getChannelID(), dto.getAuthorId(), dto.getContents());
         return messageRepository.save(message);
     }
 
@@ -26,18 +30,20 @@ public class BasicMessageService implements MessageService {
         return messageRepository.findById(messageId);
     }
 
-    public List<Message> findAll(){
-        return messageRepository.findAll();
+    public List<Message> findAllByChannelId(UUID channelId){
+        return messageRepository.findAll().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
-    public Message update(UUID messageId, String newContent){
+    public Message update(MessageUpdate dto){
         Map<UUID, Message> messageData = messageRepository.getMessageData();
 
-        Message messageNullable = messageData.get(messageId);
+        Message messageNullable = messageData.get(dto.getMessageId());
         Message message = Optional.ofNullable(messageNullable)
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + dto.getMessageId() + " not found"));
 
-        return messageRepository.update(message, newContent);
+        return messageRepository.update(message, dto.getNewContent());
     }
 
     public void delete(UUID messageId){
@@ -47,5 +53,8 @@ public class BasicMessageService implements MessageService {
         }
 
         messageRepository.delete(messageId);
+        messageData.get(messageId).getAttachmentIds().stream()
+                .filter(id -> binaryContentRepository.findById(id) != null)
+                .forEach(binaryContentRepository::delete);
     }
 }
