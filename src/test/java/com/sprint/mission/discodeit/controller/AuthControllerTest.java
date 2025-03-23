@@ -39,12 +39,12 @@ class AuthControllerTest {
         authService.login(new UserLoginDto(LOGIN_USER.getName(), LOGIN_USER.getPassword()));
     }
 
-    @DisplayName("로그인 시 유저 상태 저장 체크")
+    @DisplayName("로그인 시 유저 상태가 저장되는지 체크")
     @Test
-    void loginTest() {
+    void loginTest() { // TODO: 3/23/25 UserStatus안에 넣을건지 수정 바람
         User user = userRepository.findById(setUpUser.id()).orElseThrow();
         UserStatus userStatus = userStatusRepository.findByUserId(setUpUser.id()).orElseThrow();
 
-        assertThat(user.getUserStatus().isLogin() && userStatus.isLogin()).isTrue();
+        assertThat(user.getUserStatus().getId()).isEqualTo(userStatus.getId());
     }
 }

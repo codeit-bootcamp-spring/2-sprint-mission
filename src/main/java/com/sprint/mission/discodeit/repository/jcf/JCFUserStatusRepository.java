@@ -44,7 +44,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
         return userStatus;
     }
-    
+
     @Override
     public void delete(UUID id) {
         userStatusRepository.remove(id);

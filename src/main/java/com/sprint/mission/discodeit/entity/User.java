@@ -53,7 +53,7 @@ public class User implements Serializable {
     }
 
     public void changeUserStatus() {
-        this.userStatus.changeUserStatus();
+        this.userStatus.isLogin(ZonedDateTime.now().toInstant());
     }
 
     private void updateLastModified() {
