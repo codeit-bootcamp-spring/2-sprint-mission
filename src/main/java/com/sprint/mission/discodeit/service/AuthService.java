@@ -6,3 +6,4 @@ import com.sprint.mission.discodeit.entity.User;
 public interface AuthService {
     User login(AuthDto authDto);
 }
+

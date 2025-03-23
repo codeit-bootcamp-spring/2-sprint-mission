@@ -38,8 +38,14 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(messageMap.values());
+    public List<Message> findAllByChannelId(UUID channelId) {
+        List<Message> messages = new ArrayList<>();
+        for (Message message : messageMap.values()) {
+            if (message.getChannelId().equals(channelId)) {
+                messages.add(message);
+            }
+        }
+        return messages;
     }
 
     @Override
@@ -48,13 +54,13 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public boolean existsById(UUID id) {
-        return messageMap.containsKey(id);
+    public boolean existsById(UUID messageId) {
+        return messageMap.containsKey(messageId);
     }
 
     @Override
-    public void deleteById(UUID id) {
-        boolean removed = messageMap.remove(id) != null;
+    public void deleteById(UUID messageId) {
+        boolean removed = messageMap.remove(messageId) != null;
         if (removed) {
             saveMessageList();
         }

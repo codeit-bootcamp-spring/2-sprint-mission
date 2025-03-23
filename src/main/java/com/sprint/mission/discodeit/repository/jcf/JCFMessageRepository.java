@@ -19,8 +19,14 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(messageMap.values());
+    public List<Message> findAllByChannelId(UUID channelId) {
+        List<Message> messages = new ArrayList<>();
+        for (Message message : messageMap.values()) {
+            if (message.getChannelId().equals(channelId)) {
+                messages.add(message);
+            }
+        }
+        return messages;
     }
 
     @Override
@@ -29,12 +35,12 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public boolean existsById(UUID id) {
-        return this.messageMap.containsKey(id);
+    public boolean existsById(UUID messageId) {
+        return this.messageMap.containsKey(messageId);
     }
 
     @Override
-    public void deleteById(UUID id) {
-        this.messageMap.remove(id);
+    public void deleteById(UUID messageId) {
+        this.messageMap.remove(messageId);
     }
 }

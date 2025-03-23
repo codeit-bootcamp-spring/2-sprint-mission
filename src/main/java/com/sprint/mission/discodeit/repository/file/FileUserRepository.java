@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 
-import java.io.*;
 import java.util.*;
 
 @Repository
@@ -48,6 +47,13 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByUserName(String userName) {
+        return userMap.values().stream()
+                .filter(user -> user.getUserName().equals(userName))
+                .findFirst();
+    }
+
+    @Override
     public boolean existsById(UUID id) {
         return this.userMap.containsKey(id);
     }
@@ -58,5 +64,17 @@ public class FileUserRepository implements UserRepository {
         if (removed) {
             saveUserList();
         }
+    }
+
+    @Override
+    public boolean existsByUserName(String userName) {
+        return userMap.values().stream()
+                .anyMatch(user -> user.getUserName().equals(userName));
+    }
+
+    @Override
+    public boolean existsByUserEmail(String userEmail) {
+        return userMap.values().stream()
+                .anyMatch(user -> user.getUserEmail().equals(userEmail));
     }
 }
