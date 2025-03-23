@@ -281,9 +281,9 @@ public static void main(String[]args){
 
 1. create
 
-- [ ] DTO를 활용해 파라미터를 그룹화합니다.
-- [ ] 관련된 Channel이나 User가 존재하지 않으면 예외를 발생시킵니다.
-- [ ] 같은 Channel과 User와 관련된 객체가 이미 존재하면 예외를 발생시킵니다.
+- [x] DTO를 활용해 파라미터를 그룹화합니다.
+- [x] 관련된 Channel이나 User가 존재하지 않으면 예외를 발생시킵니다.
+- [x] 같은 Channel과 User와 관련된 객체가 이미 존재하면 예외를 발생시킵니다.
 
 2. find
 

@@ -8,10 +8,8 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.jcf.*;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicReadStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +37,7 @@ class ChannelControllerTest {
         ReadStatusRepository readStatusRepository = new JCFReadStatusRepository();
         userService = new BasicUserService(userRepository, userStatusRepository);
         ChannelService channelService = new BasicChannelService(channelRepository, readStatusRepository, messageRepository);
-        channelController = new ChannelController(channelService, userService, new BasicReadStatusService(readStatusRepository));
+        channelController = new ChannelController(channelService, userService, new BasicReadStatusService(readStatusRepository, channelRepository, userRepository));
 
         UserRegisterDto userRegisterDto = new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword());
         owner = userService.register(userRegisterDto, null);
