@@ -36,17 +36,18 @@ public class BasicUserService implements UserService {
 
         User user = new User(createRequest.username(), createRequest.email()
                 , createRequest.password(), binaryContentId);
-
-        UserStatusParam statusParam = new UserStatusParam(user.getId(), Instant.now());
+        User userSave = userRepository.save(user);
+        Instant now = Instant.now();
+        UserStatusParam statusParam = new UserStatusParam(user.getId(), now);
         userStatusService.create(statusParam);
 
-        return userRepository.save(user);
+        return userSave;
     }
 
     @Override
     public UserInfoResponse find(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException(userId + " 에 해당하는 userStatus를 찾을 수 없음"));
+                .orElseThrow(() -> new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음"));
         UserStatus userStatus = userStatusService.findByUserId(user.getId());
 
         return new UserInfoResponse(user.getId(),

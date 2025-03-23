@@ -65,9 +65,6 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void delete(UUID id) {
-        if (!userStatusRepository.existsById(id)) {
-            throw new IllegalArgumentException(id + " 에 해당하는 userStatus를 찾을 수 없음");
-        }
-        userRepository.deleteById(id);
+        userStatusRepository.deleteById(id);
     }
 }

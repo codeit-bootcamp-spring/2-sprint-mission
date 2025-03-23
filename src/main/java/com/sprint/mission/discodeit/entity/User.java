@@ -32,7 +32,6 @@ public class User implements Serializable {
         this.profileId = profileId;
     }
 
-    // 프로필 사진을 변경한다고 하면, BinaryContent에서 해당 유저의 프로필을 삭제한 후 새로 생성해야 함.
     public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
         boolean anyValueUpdated = false;
         if (newUsername != null && !newUsername.equals(this.username)) {

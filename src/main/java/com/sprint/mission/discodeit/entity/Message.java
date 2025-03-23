@@ -6,8 +6,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class Message implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
