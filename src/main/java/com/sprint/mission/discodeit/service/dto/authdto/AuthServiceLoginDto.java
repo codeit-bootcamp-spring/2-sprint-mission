@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.dto;
+package com.sprint.mission.discodeit.service.dto.authdto;
 
 public record AuthServiceLoginDto(
         String name,

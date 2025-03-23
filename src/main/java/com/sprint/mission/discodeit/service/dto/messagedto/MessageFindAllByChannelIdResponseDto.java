@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.service.dto.messagedto;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 

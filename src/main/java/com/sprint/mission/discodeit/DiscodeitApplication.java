@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.*;
-import com.sprint.mission.discodeit.service.dto.AuthServiceLoginDto;
+import com.sprint.mission.discodeit.service.dto.authdto.AuthServiceLoginDto;
 import com.sprint.mission.discodeit.service.dto.channeldto.*;
 import com.sprint.mission.discodeit.service.dto.messagedto.*;
 import com.sprint.mission.discodeit.service.dto.userdto.*;
@@ -157,8 +157,12 @@ public class DiscodeitApplication {
                                 } catch (NoSuchElementException e) {
                                     System.out.println(e.getMessage());
                                 }
-                                break;
-
+                                if (currentUser.getId().equals(userUuid8)) {
+                                    break;
+                                } else{
+                                    isLoggedIn = false;
+                                    continue;
+                                }
                             case "5":
                                 continue;
                         }

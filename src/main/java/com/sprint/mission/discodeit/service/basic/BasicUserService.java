@@ -11,12 +11,11 @@ import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCr
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
 import com.sprint.mission.discodeit.service.dto.userdto.*;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusCreateDto;
-import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusDeleteDto;
 import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -56,8 +55,9 @@ public class BasicUserService implements UserService {
         System.out.println(createdUser);
 
         // user status 생성
-        UserStatusCreateDto userStatusCreateDto = new UserStatusCreateDto(createdUser.getId());
-        userStatusService.create(userStatusCreateDto);
+        Instant currentTime = Instant.now();
+        UserStatus userStatus = new UserStatus(createdUser.getId(), currentTime);
+        userStatusRepository.save(userStatus);
 
         return createdUser;
     }
@@ -76,7 +76,7 @@ public class BasicUserService implements UserService {
                 .filter(u -> u.getUserId().equals(userFindRequestDto.userId()))
                 .findAny()
                 .orElseThrow(() -> new NoSuchElementException("User Status does not exist."));
-        //
+
         return UserFindResponseDto.UserFindResponse(matchingUser, matchingUserStatus);
     }
 
@@ -115,7 +115,7 @@ public class BasicUserService implements UserService {
 
         UserStatusUpdateDto userStatusUpdateDto = new UserStatusUpdateDto(matchingUser.getId());
         userStatusService.updateByUserId(userStatusUpdateDto);
-
+        
         return matchingUser;
     }
 
@@ -127,11 +127,15 @@ public class BasicUserService implements UserService {
                 .findAny()
                 .orElseThrow(() -> new NoSuchElementException("User does not exist."));
 
+        UserStatus matchingUserStatus = userStatusRepository.load().stream()
+                .filter(us -> us.getUserId().equals(matchingUser.getId()))
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("User Status does not exist."));
+
         BinaryContentDeleteDto binaryContentDeleteDto = new BinaryContentDeleteDto(matchingUser.getProfileId());
         binaryContentService.delete(binaryContentDeleteDto);
 
-        UserStatusDeleteDto userStatusDeleteDto = new UserStatusDeleteDto(matchingUser.getId());
-        userStatusService.delete(userStatusDeleteDto);
+        userStatusRepository.remove(matchingUserStatus);
 
         userRepository.remove(matchingUser);
     }

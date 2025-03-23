@@ -34,8 +34,8 @@ public class BasicChannelService implements ChannelService {
 
         // Read Status를 생성
         ReadStatusCreateDto readStatusCreateDto = new ReadStatusCreateDto(channelCreatePrivateDto.userId(), createdPirvateChannel.getId());
-        readStatusService.create(readStatusCreateDto);
-
+        ReadStatus createdReadStatus = readStatusService.create(readStatusCreateDto);
+        System.out.println(createdReadStatus);
         return createdPirvateChannel;
     }
 
@@ -73,16 +73,20 @@ public class BasicChannelService implements ChannelService {
     @Override
     public List<ChannelFindAllByUserIdResponseDto> findAllByUserId(ChannelFindAllByUserIdRequestDto channelFindAllByUserIdRequestDto) {
         List<Channel> channelList = channelRepository.load();
+        List<ReadStatus> readStatusList = readStatusRepository.load();
+        // public channel list 조회
         List<Channel> publicChannelList = channelList.stream()
                 .filter(c -> c.getType().equals(ChannelType.PUBLIC))
                 .toList();
 
-        List<ReadStatus> readStatusList = readStatusRepository.load().stream()
+        // readStatus list 를 userId로 조회
+        List<ReadStatus> readStatusListByUser = readStatusList.stream()
                 .filter(c -> c.getUserId().equals(channelFindAllByUserIdRequestDto.userId()))
                 .toList();
 
+        // channel list 에서 readStatus list 의 channelId로 조회
         List<Channel> privateChannelList = channelList.stream().filter(c -> c.getType().equals(ChannelType.PRIVATE))
-                .filter(f -> readStatusList.stream().anyMatch(r -> r.getChannelId().equals(f.getId())))
+                .filter(f -> readStatusListByUser.stream().anyMatch(r -> r.getChannelId().equals(f.getId())))
                 .toList();
 
         List<Channel> AllChannelByUserId = new ArrayList<>();
