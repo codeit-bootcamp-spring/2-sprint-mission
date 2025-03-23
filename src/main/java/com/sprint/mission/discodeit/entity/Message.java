@@ -1,60 +1,48 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private final UUID userId;
     private final UUID channelId;
     private String content;
-    private static final long serialVersionUID = 1L;
+    private List<UUID> attachmentIds;
 
-    public Message(UUID userId, UUID channelId, String content) {
+    public Message(UUID userId, UUID channelId, String content, List<UUID> attachmentIds) {
         validateMessage(userId, channelId, content);
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
         this.userId = userId;
         this.channelId = channelId;
         this.content = content;
+        this.attachmentIds = attachmentIds;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void update(String content) {
+    public void update(String content, List<UUID> attachmentIds) {
         if (content != null) {
             this.content = content;
             updateLastModifiedAt();
         }
+        if (attachmentIds != null){
+            this.attachmentIds = attachmentIds;
+            updateLastModifiedAt();
+        }
     }
 
-    protected final void updateLastModifiedAt() {
-        this.updatedAt = System.currentTimeMillis();
+    private void updateLastModifiedAt() {
+        this.updatedAt = Instant.now();
     }
 
     @Override
