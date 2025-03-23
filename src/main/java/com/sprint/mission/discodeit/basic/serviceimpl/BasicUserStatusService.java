@@ -14,17 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 
-public class BasicUserStatusServiceImpl implements UserStatusService {
+public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
     @Autowired
-    public BasicUserStatusServiceImpl(
+    public BasicUserStatusService(
             @Qualifier("basicUserStatusRepository") UserStatusRepository userStatusRepository,
             @Qualifier("basicUserRepository") UserRepository userRepository) {
         this.userStatusRepository = userStatusRepository;

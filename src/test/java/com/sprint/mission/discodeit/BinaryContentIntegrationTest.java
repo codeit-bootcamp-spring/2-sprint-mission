@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.basic.repositoryimpl.BasicBinaryContentRepositoryImpl;
+import com.sprint.mission.discodeit.basic.repositoryimpl.BasicBinaryContentRepositoryImplement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 public class BinaryContentIntegrationTest {
 
     @Spy
-    private BinaryContentRepository binaryContentRepository = new BasicBinaryContentRepositoryImpl();
+    private BinaryContentRepository binaryContentRepository = new BasicBinaryContentRepositoryImplement();
 
     @Mock
     private BinaryContentService binaryContentService;

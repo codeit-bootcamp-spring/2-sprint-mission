@@ -45,7 +45,6 @@ public class ChannelIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        /
         userId = UUID.randomUUID();
         channelId = UUID.randomUUID();
         

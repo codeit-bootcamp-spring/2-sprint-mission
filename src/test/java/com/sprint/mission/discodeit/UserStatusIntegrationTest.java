@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.basic.repositoryimpl.UserStatusRepositoryImplement;
 import com.sprint.mission.discodeit.dto.StatusDto;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.service.UserRepository;
 import com.sprint.mission.discodeit.service.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.basic.repositoryimpl.UserStatusRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,7 +24,7 @@ import static org.mockito.Mockito.*;
 public class UserStatusIntegrationTest {
 
     @Spy
-    private UserStatusRepository userStatusRepository = new UserStatusRepositoryImpl();
+    private UserStatusRepository userStatusRepository = new UserStatusRepositoryImplement();
 
     @Mock
     private UserStatusService userStatusService;

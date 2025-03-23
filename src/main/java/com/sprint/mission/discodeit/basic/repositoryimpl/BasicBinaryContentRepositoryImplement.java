@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository("basicBinaryContentRepository")
-public class BasicBinaryContentRepositoryImpl implements BinaryContentRepository {
+public class BasicBinaryContentRepositoryImplement implements BinaryContentRepository {
     private final Map<UUID, BinaryContent> binaryContentMap = new HashMap<>();
     
     @Override

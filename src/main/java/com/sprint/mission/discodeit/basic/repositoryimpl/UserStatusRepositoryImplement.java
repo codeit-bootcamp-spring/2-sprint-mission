@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository("basicUserStatusRepository")
-public class UserStatusRepositoryImpl implements UserStatusRepository {
+public class UserStatusRepositoryImplement implements UserStatusRepository {
     private final Map<UUID, UserStatus> userStatuses = new HashMap<>();
     
     @Override

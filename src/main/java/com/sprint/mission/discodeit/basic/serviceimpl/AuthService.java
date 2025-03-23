@@ -3,28 +3,23 @@ package com.sprint.mission.discodeit.basic.serviceimpl;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.mapping.UserMapping;
-import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserRepository;
 import com.sprint.mission.discodeit.service.UserStatusRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.Optional;
 
 @Service
-public class AuthServiceImpl implements AuthService {
+public class AuthService implements com.sprint.mission.discodeit.service.AuthService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
 
     @Autowired
-    public AuthServiceImpl(
+    public AuthService(
             @Qualifier("basicUserRepository") UserRepository userRepository, 
             @Qualifier("basicUserStatusRepository") UserStatusRepository userStatusRepository) {
         this.userRepository = userRepository;

@@ -4,10 +4,8 @@ import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapping.FileMapping;
 import com.sprint.mission.discodeit.service.BinaryContentRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageRepository;
 import com.sprint.mission.discodeit.service.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -16,14 +14,14 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
-public class BinaryContentServiceImpl implements BinaryContentService {
+public class BasicBinaryContentService implements com.sprint.mission.discodeit.service.BinaryContentService {
 
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final MessageRepository messageRepository;
 
     @Autowired
-    public BinaryContentServiceImpl(
+    public BasicBinaryContentService(
             @Qualifier("basicUserRepository") UserRepository userRepository,
             @Qualifier("basicBinaryContentRepository") BinaryContentRepository binaryContentRepository,
             @Qualifier("basicMessageRepository") MessageRepository messageRepository) {

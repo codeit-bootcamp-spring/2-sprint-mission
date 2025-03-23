@@ -62,7 +62,7 @@
 //        MessageRepository messageRepository = FileMessageRepositoryImplement.getInstance();
 //
 //        UserChannelService userChannelService = new UserChannelService(userRepository, channelRepository);
-//        UserStatusRepository userStatus = new UserStatusRepositoryImpl();
+//        UserStatusRepository userStatus = new UserStatusRepositoryImplement();
 //        userService = new BasicUserService(userRepository, userChannelService,userStatus);
 //        channelService = new BasicChannelService(channelRepository, userChannelService);
 //        messageService = new BasicMessageService(messageRepository, userRepository, channelRepository);
