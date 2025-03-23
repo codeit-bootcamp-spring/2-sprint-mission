@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.DTO.MessageService.MessageCreateDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -16,8 +17,8 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public Message create(String message, UUID userId, UUID channelId) {
-        Message newMessage = new Message(message, userId, channelId);
+    public Message create(MessageCreateDTO messageCreateDTO) {
+        Message newMessage = messageCreateDTO.toEntity();
         return messageRepository.save(newMessage);
     }
 

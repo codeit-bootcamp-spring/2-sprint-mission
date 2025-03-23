@@ -10,7 +10,7 @@ import java.util.*;
 public class FileUserRepository implements UserRepository {
     private final String USER_FILE = "users.ser";
     private final Map<UUID, User> userData;
-    private final SaveLoadHandler saveLoadHandler;
+    private final SaveLoadHandler<User> saveLoadHandler;
 
     public  FileUserRepository() {
         saveLoadHandler = new SaveLoadHandler<>(USER_FILE);
@@ -47,6 +47,9 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void delete(UUID id) {
+        if(!userData.containsKey(id)){
+            throw new NoSuchElementException("유저 " + id + "가 존재하지 않습니다.");
+        }
         userData.remove(id);
         saveLoadHandler.saveData(userData);
     }

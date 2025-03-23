@@ -12,16 +12,16 @@ public class MainDomain implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
     public MainDomain() {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
+        this.createdAt = Instant.now();
         update();
     }
 
     protected void update() {
-        this.updatedAt = Instant.now().getEpochSecond();
+        this.updatedAt = Instant.now();
     }
 }

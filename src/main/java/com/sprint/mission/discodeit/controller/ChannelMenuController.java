@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.DTO.channelService.ChannelCreateDTO;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.menus.ChannelMenu;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -104,8 +105,8 @@ public class ChannelMenuController {
         System.out.println("생성할 채널타입, 채널명을 입력해주세요: ");
         ChannelType type = getChannelTypeFromInput("채널타입: ");
         String channelName = getChannelNameFromInput("채널명: ");
-
-        System.out.println("채널 생성 완료: \n" + channelService.create(type,channelName));
+        ChannelCreateDTO channelCreateDto = new ChannelCreateDTO(type, channelName);
+        System.out.println("채널 생성 완료: \n" + channelService.create(channelCreateDto));
 
     }
 

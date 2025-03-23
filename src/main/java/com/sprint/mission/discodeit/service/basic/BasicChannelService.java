@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.DTO.channelService.ChannelCreateDTO;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,8 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public Channel create(ChannelType type, String name) {
-        Channel channel = new Channel(type, name);
+    public Channel create(ChannelCreateDTO channelCreateDto) {
+        Channel channel = channelCreateDto.toEntity();
         return channelRepository.save(channel);
     }
 

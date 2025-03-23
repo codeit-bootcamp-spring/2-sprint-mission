@@ -10,7 +10,7 @@ import java.util.*;
 public class FileMessageRepository implements MessageRepository {
     private final String MESSAGE_FILE = "messages.ser";
     private final Map<UUID, Message> messageData;
-    private final SaveLoadHandler saveLoadHandler;
+    private final SaveLoadHandler<Message> saveLoadHandler;
 
     public FileMessageRepository() {
         saveLoadHandler = new SaveLoadHandler<>(MESSAGE_FILE);
@@ -69,6 +69,9 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void delete(UUID id) {
+        if(!messageData.containsKey(id)){
+            throw new NoSuchElementException("채널 " + id + "가 존재하지 않습니다.");
+        }
         messageData.remove(id);
         saveLoadHandler.saveData(messageData);
     }

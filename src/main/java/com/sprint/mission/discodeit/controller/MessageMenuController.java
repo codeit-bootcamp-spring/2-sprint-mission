@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.DTO.MessageService.MessageCreateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.menus.MessageMenu;
@@ -136,7 +137,8 @@ public class MessageMenuController {
 
     private void createMessage(){
         String message = getMessageInput("작성할 메세지: ");
-        messageService.create(message,loggedUser.getId(),currentChannel.getId());
+        MessageCreateDTO messageCreateDTO = new MessageCreateDTO(message,loggedUser.getId(), currentChannel.getId());
+        messageService.create(messageCreateDTO);
     }
 
     private void findMessage(){

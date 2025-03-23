@@ -11,7 +11,7 @@ import java.util.*;
 public class FileChannelRepository implements ChannelRepository {
     private final String CHANNEL_FILE = "channels.ser";
     private final Map<UUID,Channel> channelData;
-    private final SaveLoadHandler saveLoadHandler;
+    private final SaveLoadHandler<Channel> saveLoadHandler;
 
     public FileChannelRepository() {
         saveLoadHandler = new SaveLoadHandler<>(CHANNEL_FILE);

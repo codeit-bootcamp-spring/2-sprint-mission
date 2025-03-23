@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.DTO.MessageService.MessageCreateDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -20,15 +21,15 @@ public class JCFMessageService implements MessageService {
 
 
     @Override
-    public Message create(String writingMessage, UUID userId, UUID channelId) {
+    public Message create(MessageCreateDTO messageCreateDTO) {
         try{
-            channelService.find(channelId);
-            userService.find(userId);
+            channelService.find(messageCreateDTO.channelId());
+            userService.find(messageCreateDTO.userId());
         }catch (NoSuchElementException e){
             throw new IllegalArgumentException("채널 혹은 유저가 존재하지 않습니다.");
         }
 
-        Message message = new Message(writingMessage, userId, channelId);
+        Message message = messageCreateDTO.toEntity();
         messageData.put(message.getId(), message);
         return message;
     }

@@ -3,11 +3,14 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class User extends MainDomain {
     private String userName;
     private String email;
     private String password;
+    private UUID profileId;
 
     public User(String userName, String email, String password){
         super();
@@ -16,8 +19,9 @@ public class User extends MainDomain {
         this.password = password;
     }
 
-
-
+    public void useProfileId(UUID profileId) {
+        this.profileId = profileId;
+    }
 
     public void updateUser(String newUserName, String newEmail, String newPassword){
         boolean anyValueUpdated = false;
@@ -43,7 +47,6 @@ public class User extends MainDomain {
         return "User {" +
                 "userID= " + getId()  +
                 ", userName= " + userName +
-                ", email= " + email +
-                ", password= " + password + "}";
+                ", email= " + email + "}";
     }
 }
