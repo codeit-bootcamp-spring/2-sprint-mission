@@ -38,7 +38,7 @@ public class FileChannelRepositoryImplement implements ChannelRepository {
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
                 return (Map<UUID, Channel>) in.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                System.err.println("채널 데이터 로드 중 오류 발생: " + e.getMessage());
+               throw new RuntimeException(e);
             }
         }
         
@@ -56,7 +56,8 @@ public class FileChannelRepositoryImplement implements ChannelRepository {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(channelRepository);
         } catch (IOException e) {
-            System.err.println("채널 데이터 저장 중 오류 발생: " + e.getMessage());
+            throw new RuntimeException(e);
+
         }
     }
     

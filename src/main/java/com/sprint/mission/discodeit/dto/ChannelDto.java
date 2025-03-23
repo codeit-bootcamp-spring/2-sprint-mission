@@ -25,20 +25,26 @@ public class ChannelDto {
     public static class CreatePublic {
         @NotBlank
         private String channelName;
+        @NotBlank
         private UUID ownerId;
         private String description;
     }
     @Getter
     @Builder(toBuilder = true)
     public static class CreatePrivate {
+        @NotBlank
         private UUID ownerId;
+        @NotBlank
         private Set<UUID> participantIds;
+        @NotBlank
         private String channelName; // 선택적 필드
     }
     @Getter
     @Builder(toBuilder = true)
     public static class Update {
+        @NotBlank
         private UUID channelId;
+        @NotBlank
         private String channelName;
         private String description;
     }
@@ -67,7 +73,7 @@ public class ChannelDto {
         private final boolean isPrivate;        // PRIVATE 채널 여부
         private final int participantCount;     // 참여자 수
         private final ZonedDateTime lastMessageAt; // 최근 메시지 시간
-        private final Set<UUID> participantIds; // 참여자 ID 목록 (private)
+        private final Set<UUID> participantIds; // 참여자 ID 목록
 
         public static Summary from(Channel channel, ReadStatus readStatus) {
             SummaryBuilder builder = Summary.builder()

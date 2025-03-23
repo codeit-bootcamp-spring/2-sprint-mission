@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,28 +13,28 @@ public class ReadStatusDto {
     @Getter
     @Setter
     public static class Create {
-        @NotNull(message = "채널 ID는 필수입니다")
+        @NotNull
         private UUID channelId;
 
-        @NotNull(message = "사용자 ID는 필수입니다")
+        @NotNull
         private UUID userId;
 
-        @NotNull(message = "마지막으로 읽은 메시지 ID는 필수입니다")
+        @NotNull
         private UUID lastReadMessageId;
     }
     @Getter
     @Setter
     public static class Update {
-        @NotNull(message = "읽음 상태 ID는 필수입니다")
+        @NotNull
         private UUID id;
-        
-        @NotNull(message = "마지막으로 읽은 메시지 ID는 필수입니다")
+        @NotNull
         private UUID lastReadMessageId;
     }
     
 
     @Getter
     @Setter
+    @NotBlank
     public static class ResponseReadStatus {
         private UUID id;
         private UUID channelId;

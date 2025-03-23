@@ -38,7 +38,8 @@ public class FileUserStatusRepositoryImpl implements UserStatusRepository {
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
                 return (Map<UUID, UserStatus>) in.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                System.err.println("사용자 상태 데이터 로드 중 오류 발생: " + e.getMessage());
+                throw new RuntimeException(e);
+
             }
         }
         
@@ -56,7 +57,8 @@ public class FileUserStatusRepositoryImpl implements UserStatusRepository {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(userStatuses);
         } catch (IOException e) {
-            System.err.println("사용자 상태 데이터 저장 중 오류 발생: " + e.getMessage());
+            throw new RuntimeException(e);
+
         }
     }
     

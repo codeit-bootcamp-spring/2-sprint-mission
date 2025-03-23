@@ -20,18 +20,18 @@ public class UserDto {
     @Builder(toBuilder = true)
     public static class Create {
 
-        @NotBlank(message = "이메일은 필수입니다.")
-        @Email(message = "유효한 이메일 형식이어야 합니다.")
+        @NotBlank
+        @Email
         private final String email;         // 이메일
-        @NotBlank(message = "비밀번호는 필수입니다.")
+        @NotBlank
         private final String password;      // 비밀번호
         private final MultipartFile profileImage;  // 선택적 프로필 이미지
     }
     @Getter
     @Builder(toBuilder = true)
     public static class FindByUser {
-        @NotBlank(message="이메일을 입력하세요")
-        @Email(message = "유효한 이메일 형식이어야 합니다")
+        @NotBlank
+        @Email
         private final String email;
     }
     //응답 dto
@@ -52,13 +52,12 @@ public class UserDto {
 
     @Getter
     @Builder(toBuilder = true)
+    @NotBlank
     public static class Summary {
-        @NotNull  // null 체크가 필요
+         // null 체크가 필요
         private final UUID id;  // 유저 아이디
 
-        @NotBlank
         private final String email; // 이메일
-
         private final UUID profileImage;  // 프로필 이미지 ID
 
         private final boolean online; // 유저의 상태

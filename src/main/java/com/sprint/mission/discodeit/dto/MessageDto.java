@@ -20,18 +20,19 @@ public class MessageDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @NotBlank
     public static class Create {
         private UUID channelId;
         private UUID authorId;
         private String content;
         private List<BinaryContentDto.Create> binaryContents;
     }
-
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Update {
+        @NotNull
         private UUID messageId;
         private String content;
         private List<BinaryContentDto.Create> binaryContents;
@@ -41,6 +42,7 @@ public class MessageDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @NotBlank
     public static class Response {
         private UUID messageId;
         private UUID channelId;
@@ -65,6 +67,7 @@ public class MessageDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @NotBlank
     public static class Summary {
         private UUID id;
         private UUID senderId;           // 발신자

@@ -38,7 +38,8 @@ public class FileMessageRepositoryImplement implements MessageRepository {
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
                 return (Map<UUID, Message>) in.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                System.err.println("메시지 데이터 로드 중 오류 발생: " + e.getMessage());
+                throw new RuntimeException(e);
+
             }
         }
         
@@ -56,7 +57,8 @@ public class FileMessageRepositoryImplement implements MessageRepository {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(messageRepository);
         } catch (IOException e) {
-            System.err.println("메시지 데이터 저장 중 오류 발생: " + e.getMessage());
+            throw new RuntimeException(e);
+
         }
     }
 

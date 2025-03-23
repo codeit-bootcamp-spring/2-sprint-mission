@@ -35,8 +35,8 @@ public class FileReadStatusRepositoryImplement implements ReadStatusRepository {
                 return (Map<UUID, ReadStatus>) in.readObject();
             }
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("읽음 상태 데이터 로드 실패: " + e.getMessage());
-            return new HashMap<>();
+            throw new RuntimeException(e);
+
         }
     }
     
@@ -49,7 +49,8 @@ public class FileReadStatusRepositoryImplement implements ReadStatusRepository {
                 out.writeObject(readStatusRepository);
             }
         } catch (IOException e) {
-            System.err.println("읽음 상태 데이터 저장 실패: " + e.getMessage());
+            throw new RuntimeException(e);
+
         }
     }
     

@@ -38,7 +38,7 @@ public class FileBinaryContentRepositoryImpl implements BinaryContentRepository 
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
                 return (Map<UUID, BinaryContent>) in.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                System.err.println("바이너리 콘텐츠 데이터 로드 중 오류 발생: " + e.getMessage());
+                throw new RuntimeException(e);
             }
         }
         
@@ -56,7 +56,7 @@ public class FileBinaryContentRepositoryImpl implements BinaryContentRepository 
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(binaryContentMap);
         } catch (IOException e) {
-            System.err.println("바이너리 콘텐츠 데이터 저장 중 오류 발생: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
     
