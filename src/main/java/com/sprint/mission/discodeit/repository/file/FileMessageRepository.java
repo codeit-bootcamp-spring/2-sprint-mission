@@ -8,14 +8,20 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileMessageRepository implements MessageRepository {
-    private final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map",
-            Message.class.getSimpleName());
+    private final Path DIRECTORY;
 
-    public FileMessageRepository() {
+    public FileMessageRepository(
+            @Value("${discodeit.repository.file-directory:file-data-map}") String fileDirectory
+    ) {
+        DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+                Message.class.getSimpleName());
         FileUtil.init(DIRECTORY);
     }
 

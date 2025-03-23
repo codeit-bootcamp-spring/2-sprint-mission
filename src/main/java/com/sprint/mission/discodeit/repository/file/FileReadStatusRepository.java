@@ -8,14 +8,20 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
-    private static final Path DIRECTORY
-            = Paths.get(System.getProperty("user.dir"), "file-data-map", ReadStatus.class.getSimpleName());
+    private final Path DIRECTORY;
 
-    public FileReadStatusRepository() {
+    public FileReadStatusRepository(
+            @Value("${discodeit.repository.file-directory:file-data-map}") String fileDirectory
+    ) {
+        DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+                ReadStatus.class.getSimpleName());
         FileUtil.init(DIRECTORY);
     }
 
