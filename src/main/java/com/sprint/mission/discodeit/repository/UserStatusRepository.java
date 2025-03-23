@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreate;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdate;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -15,7 +16,7 @@ public interface UserStatusRepository {
 
     Map<UUID, UserStatus> getUserStatusData();
 
-    UserStatus save(UserStatus dto);
+    UserStatus save(UserStatus userStatus);
 
     UserStatus update(UserStatusUpdate dto);
 

@@ -29,7 +29,7 @@ public class BasicUserStatusService implements UserStatusService {
         Map<UUID, User> userData = userRepository.getUserData();
 
         User user = Optional.ofNullable(userData.get(dto.getUserId()))
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userRepository.getUserData() + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("User with id " + dto.getUserId() + " not found"));
 
         if(userStatusData.values().stream()
                 .anyMatch(userStatus -> userStatus.getUserId().equals(user.getId()))){

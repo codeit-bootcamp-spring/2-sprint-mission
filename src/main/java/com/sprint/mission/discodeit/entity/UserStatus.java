@@ -32,7 +32,7 @@ public class UserStatus implements Serializable {
     public void update(Instant newActivatedAt) {
         boolean anyValueUpdated = false;
         if(activatedAt != null&&!newActivatedAt.equals(activatedAt)) {
-            this.updatedAt = newActivatedAt;
+            this.activatedAt = newActivatedAt;
             anyValueUpdated = true;
         }
         if(anyValueUpdated) {
