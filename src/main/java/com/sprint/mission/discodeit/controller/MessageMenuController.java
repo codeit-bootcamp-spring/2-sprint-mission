@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.DTO.MessageService.MessageCreateDTO;
+import com.sprint.mission.discodeit.DTO.UserService.AuthDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.menus.MessageMenu;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -16,21 +18,27 @@ public class MessageMenuController {
     private final MessageService messageService;
     private final UserService userService;
     private final ChannelService channelService;
+    private final AuthService authService;
     private final Scanner scanner;
     private static User loggedUser;
     private static Channel currentChannel;
 
 
-    public MessageMenuController(UserService userService, ChannelService channelService, MessageService messageService, Scanner scanner) {
+    public MessageMenuController(UserService userService, ChannelService channelService, MessageService messageService,AuthService authService, Scanner scanner) {
         this.messageService = messageService;
         this.userService =  userService;
         this.channelService = channelService;
+        this.authService = authService;
         this.scanner = scanner;
 
     }
 
     public void handleMessageMenu() {
-        if(!logInUser(getIdFromInput("로그인할 유저 ID 입력= "))){
+        String loginUserName = getMessageInput("로그인: ");
+        String loginPassword = getMessageInput("비밀번호: ");
+        AuthDTO authDTO = new AuthDTO(loginUserName, loginPassword);
+        if(!logInUser(authService.login(authDTO)))
+        {
             return;
         }
         if(!currentChannel(getIdFromInput("접속할 채널 ID 입력= "))){
@@ -105,13 +113,13 @@ public class MessageMenuController {
         }
     }
 
-    private boolean logInUser(UUID loggedInUserId) {
+    private boolean logInUser(User user) {
         try {
-            if(loggedUser == userService.find(loggedInUserId)) {
+            if(loggedUser == user) {
                 System.out.println("이미 로그인 되어있는 유저입니다.");
                 return false;
             }
-            loggedUser = userService.find(loggedInUserId);
+            loggedUser = user;
             return true;
         }catch (NoSuchElementException e){
             System.out.println(e.getMessage());
