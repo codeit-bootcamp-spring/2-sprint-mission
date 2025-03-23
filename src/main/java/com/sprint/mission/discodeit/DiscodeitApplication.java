@@ -183,7 +183,7 @@ public class DiscodeitApplication {
         if (user == null) {
             return null;
         }
-        return authService.login(username, password).getId();
+        return user.getId();
     }
 
     private static void registerPage(UserService userService, BinaryContentService binaryContentService) {
