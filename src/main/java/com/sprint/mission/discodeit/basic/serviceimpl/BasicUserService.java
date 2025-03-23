@@ -1,115 +1,245 @@
 package com.sprint.mission.discodeit.basic.serviceimpl;
 
+import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.util.ValidationUtil;
-import com.sprint.mission.discodeit.service.UserRepository;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapping.UserMapping;
+import com.sprint.mission.discodeit.service.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
+@Service
+@Validated
 public class BasicUserService implements UserService {
+
     private final UserRepository userRepository;
-    private final UserChannelService userChannelService;
-    
-    // 싱글톤 인스턴스
-    private static BasicUserService instance;
-    
-    // private 생성자로 변경하여 외부에서 인스턴스 생성을 제한
-    private BasicUserService(
-            UserRepository userRepository,
-            UserChannelService userChannelService) {
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final ChannelRepository channelRepository;
+    private final ReadStatusRepository readStatusRepository;
+    private final MessageRepository messageRepository;
+
+    @Autowired
+    public BasicUserService(
+            @Qualifier("basicUserRepository") UserRepository userRepository,
+            @Qualifier("basicUserStatusRepository") UserStatusRepository userStatusRepository,
+            @Qualifier("basicBinaryContentRepository") BinaryContentRepository binaryContentRepository,
+            @Qualifier("basicChannelRepository") ChannelRepository channelRepository,
+            @Qualifier("basicReadStatusRepository") ReadStatusRepository readStatusRepository,
+            @Qualifier("basicMessageRepository") MessageRepository messageRepository) {
         this.userRepository = userRepository;
-        this.userChannelService = userChannelService;
+        this.userStatusRepository = userStatusRepository;
+        this.binaryContentRepository = binaryContentRepository;
+        this.channelRepository = channelRepository;
+        this.readStatusRepository = readStatusRepository;
+        this.messageRepository = messageRepository;
     }
-    
-    // 싱글톤 인스턴스를 반환하는 정적 메소드
-    public static synchronized BasicUserService getInstance(
-            UserRepository userRepository,
-            UserChannelService userChannelService) {
-        if (instance == null) {
-            instance = new BasicUserService(userRepository, userChannelService);
+
+
+    @Override
+    public UserDto.Summary findByUserId(UUID id) {
+        User user = userRepository.findByUser(id)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다"));
+        UserStatus userStatus = userStatusRepository.findById(user.getId())
+                .orElseThrow(() -> new NoSuchElementException("사용자 상태를 찾을 수 없습니다"));
+        return UserMapping.INSTANCE.userToSummary(user, userStatus);
+    }
+
+    @Override
+    public List<UserDto.Summary> findByAllUsersId() {
+        Set<UUID> userIds = userRepository.findAllUsers();
+        List<UserDto.Summary> summaryList = new ArrayList<>();
+
+        for (UUID userId : userIds) {
+            User user = userRepository.findByUser(userId)
+                    .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다"));
+            UserStatus status = userStatusRepository.findById(userId)
+                    .orElseThrow(() -> new NoSuchElementException("상태 정보를 찾을 수 없습니다"));
+
+            summaryList.add(UserMapping.INSTANCE.userToSummary(user, status));
         }
-        return instance;
+
+        return summaryList;
     }
 
     @Override
-    public User findByUserId(UUID userId) {
-        ValidationUtil.validateNotNull(userId, "사용자 ID");
-        return userRepository.findByUser(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
-    }
-
-    @Override
-    public Set<UUID> findByAllUsersId() {
-        return userRepository.findAllUsers();
-    }
-
-    @Override
-    public User deleteUser(UUID userId) {
-        ValidationUtil.validateNotNull(userId, "사용자 ID");
+    public void deleteUser(UUID userId) {
+        userRepository.findByUser(userId)
+            .orElseThrow(() -> new NoSuchElementException("User not found"));
         
-        User user = userRepository.findByUser(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
-        userChannelService.cleanupUserChannels(userId);
-        userRepository.deleteUser(userId);
-        return user;
-    }
-    @Override
-    public void createdUser(String email, String password) {
-        ValidationUtil.validateNotEmpty(email, "이메일");
-        ValidationUtil.validateNotEmpty(password, "비밀번호");
-
-        // 이메일 중복 체크
-        checkEmailDuplication(email);
-
-        User user = new User(email, password);
-        userRepository.register(user);
-    }
-
-    public User updateEmail(UUID userId, String newEmail) {
-        ValidationUtil.validateNotNull(userId, "사용자 ID");
-        ValidationUtil.validateNotEmpty(newEmail, "이메일");
-
-        // 이메일 중복 체크
-        checkEmailDuplication(newEmail);
-
-        User user = userRepository.findByUser(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
-        user.setEmail(newEmail);
-
-        // 변경된 사용자 정보를 저장
-        userRepository.updateUser(user);
-
-        return user;
-    }
-    @Override
-    public User updatePassword(UUID userId, String newPassword) {
-        ValidationUtil.validateNotNull(userId, "사용자 ID");
-        ValidationUtil.validateNotEmpty(newPassword, "비밀번호");
-
-        User user = userRepository.findByUser(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
-
-        if(user.getPassword().equals(newPassword)){
-            throw new IllegalArgumentException("같은 비밀번호로는 변경 불가합니다.");
+        // 1. 사용자가 소유한 바이너리 콘텐츠 삭제
+        deleteUserBinaryContents(userId);
+        
+        // 2. 사용자 상태 삭제
+        deleteUserStatus(userId);
+        
+        // 3. 사용자 채널 관련 정보 정리
+        cleanupUserChannels(userId);
+            
+        // 4. 사용자 삭제
+        if (!userRepository.deleteUser(userId)) {
+            throw new RuntimeException("사용자 삭제 실패");
         }
-        // 변경된 사용자 정보를 저장
-        userRepository.updateUser(user);
-        return user;
     }
 
-    private void checkEmailDuplication(String email) {
-        Optional<User> existingUser = userRepository.findAllUsers().stream()
-                .map(userRepository::findByUser)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .filter(user -> user.getEmail().equals(email))
-                .findFirst();
+    @Override
+    public UserDto.Response createdUser(UserDto.Create createUserDto) {
+        // 이메일 유효성 검증
+        if (createUserDto.getEmail() != null) {
+            checkEmailDuplication(createUserDto.getEmail());
+        }
 
+        // 사용자 생성
+        User user = new User(createUserDto.getEmail(), createUserDto.getPassword());
+        
+        if (!userRepository.register(user)) {
+            throw new RuntimeException("사용자 저장 실패");
+        }
+        
+        // 프로필 이미지 처리
+        if (createUserDto.getProfileImage() != null) {
+            UUID profileImageId = saveProfileImage(createUserDto.getProfileImage(), user.getId());
+            user.setProfileId(profileImageId);
+            userRepository.updateUser(user);
+        }
+        
+        return UserMapping.INSTANCE.userToResponse(user);
+    }
+
+    @Override
+    public UserDto.Update updateUser(UserDto.Update updateUserDto) {
+        // 사용자 찾기
+        UUID userId = updateUserDto.getId();
+        Optional<User> userOptional = userRepository.findByUser(userId);
+        
+        if (userOptional.isEmpty()) {
+            throw new NoSuchElementException("사용자를 찾을 수 없습니다: " + userId);
+        }
+        
+        User user = userOptional.get();
+        
+        // 비밀번호 업데이트
+        if (updateUserDto.getPassword() != null) {
+            user.setPassword(updateUserDto.getPassword());
+        }
+        
+        // 프로필 이미지 업데이트
+        if (updateUserDto.getProfileImage() != null) {
+            user.setProfileId(updateUserDto.getProfileImage());
+        }
+        
+        // 사용자 정보 업데이트
+        if (!userRepository.updateUser(user)) {
+            throw new RuntimeException("사용자 정보 업데이트 실패");
+        }
+        
+        return UserMapping.INSTANCE.userToDto(user);
+    }
+
+    private User getUserOrThrow(UUID userId) {
+        return userRepository.findByUser(userId)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다"));
+    }
+
+    private UserStatus getUserStatusOrThrow(UUID userId) {
+        return userStatusRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("사용자 상태를 찾을 수 없습니다"));
+    }
+
+    // 이메일 중복 검사 메서드
+    private void checkEmailDuplication(String email) {
+        // findByEmail 메서드 사용 (인터페이스와 일치)
+        Optional<User> existingUser = userRepository.findByEmail(email);
+        
         if (existingUser.isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다: " + email);
         }
     }
+    
+    // 사용자의 채널 관련 정보 정리
+    private void cleanupUserChannels(UUID userId) {
+        // 사용자가 참여 중인 모든 채널 찾기
+        User user = getUserOrThrow(userId);
+        
+        for (UUID channelId : new ArrayList<>(user.getBelongChannels())) {
+            // 채널에서 사용자 제거
+            channelRepository.findById(channelId).ifPresent(channel -> {
+                channel.leaveChannel(userId);
+                channelRepository.updateChannel(channel);
+                
+                // 해당 채널의 ReadStatus 삭제
+                readStatusRepository.findByUserIdAndChannelId(userId, channelId)
+                    .ifPresent(readStatus -> readStatusRepository.deleteReadStatus(readStatus.getId()));
+            });
+        }
+    }
+    
+    // 사용자 상태 삭제
+    private void deleteUserStatus(UUID userId) {
+        userStatusRepository.findById(userId)
+            .ifPresent(status -> userStatusRepository.delete(status.getId()));
+    }
+    
+    // 사용자 바이너리 콘텐츠 삭제
+    private void deleteUserBinaryContents(UUID userId) {
+        // 프로필 이미지 등 사용자 관련 바이너리 콘텐츠 삭제
+        User user = getUserOrThrow(userId);
+        if (user.getProfileId() != null) {
+            binaryContentRepository.delete(user.getProfileId());
+        }
+        
+        // 사용자가 작성한 메시지의 첨부파일 삭제
+        messageRepository.findAll().stream()
+            .filter(message -> message.getAuthorId().equals(userId))
+            .forEach(message -> {
+                for (UUID attachmentId : new ArrayList<>(message.getAttachmentIds())) {
+                    binaryContentRepository.delete(attachmentId);
+                }
+            });
+    }
+    
+    // 프로필 이미지 저장
+    private UUID saveProfileImage(MultipartFile profileImage, UUID userId) {
+        try {
+            byte[] imageData = profileImage.getBytes();
+            // BinaryContent 생성 및 저장 로직
+            // 실제 구현은 BinaryContent 클래스와 저장소에 맞게 수정 필요
+            
+            // 임시 코드 - 실제로는 BinaryContent를 생성하고 저장한 후 ID 반환 필요
+            return UUID.randomUUID();
+        } catch (Exception e) {
+            throw new RuntimeException("프로필 이미지 저장 실패", e);
+        }
+    }
+    
+    // 채널 떠나기
+    public void leaveChannel(UUID userId, UUID channelId) {
+        User user = getUserOrThrow(userId);
+        Channel channel = channelRepository.findById(channelId)
+            .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다"));
+            
+        // 사용자의 채널 목록에서 제거
+        if (user.getBelongChannels().removeIf(c -> c.equals(channelId))) {
+            userRepository.updateUser(user);
+        } else {
+            throw new IllegalStateException("유저가 채널에 존재하지 않습니다");
+        }
+        
+        // 채널의 사용자 목록에서 제거
+        channel.leaveChannel(userId);
+        channelRepository.updateChannel(channel);
+        
+        // 해당 채널의 ReadStatus 삭제
+        readStatusRepository.findByUserIdAndChannelId(userId, channelId)
+            .ifPresent(readStatus -> readStatusRepository.deleteReadStatus(readStatus.getId()));
+    }
 }
+

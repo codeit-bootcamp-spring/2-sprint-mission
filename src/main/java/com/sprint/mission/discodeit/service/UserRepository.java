@@ -11,4 +11,5 @@ public interface UserRepository {
      boolean deleteUser(UUID userId); //삭제
      Set<UUID> findAllUsers(); //전체조회
      boolean updateUser(User user);
+     Optional<User> findByEmail(String email);
 }

@@ -2,40 +2,31 @@ package com.sprint.mission.discodeit.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
-/**
- * User 저장소의 파일 기반 구현 클래스
- */
+@Repository("fileUserRepository")
 public class FileUserRepositoryImplement implements UserRepository {
     private static final String DATA_DIR = "data";
     private static final String USER_DATA_FILE = "users.dat";
     
-    private Map<UUID, User> userRepository;
+    private final Map<UUID, User> userRepository;
     
-    // 싱글톤 인스턴스
-    private static FileUserRepositoryImplement instance;
+    private String FILEPATH = "./data/user_data.ser";
     
-    // private 생성자로 변경
-    private FileUserRepositoryImplement() {
-        loadData();
+    public FileUserRepositoryImplement() {
+        userRepository = loadData();
     }
     
-    // 싱글톤 인스턴스를 반환하는 정적 메소드
-    public static synchronized FileUserRepositoryImplement getInstance() {
-        if (instance == null) {
-            instance = new FileUserRepositoryImplement();
-        }
-        return instance;
+    public FileUserRepositoryImplement(String dataDir) {
+        FILEPATH = dataDir + "/user_data.ser";
+        userRepository = loadData();
     }
     
-    /**
-     * 메모리에 데이터를 파일로부터 로드합니다.
-     */
     @SuppressWarnings("unchecked")
-    private void loadData() {
+    private Map<UUID, User> loadData() {
         File dir = new File(DATA_DIR);
         if (!dir.exists()) {
             dir.mkdirs();
@@ -45,35 +36,27 @@ public class FileUserRepositoryImplement implements UserRepository {
         
         if (file.exists()) {
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
-                userRepository = (Map<UUID, User>) in.readObject();
-                System.out.println("사용자 데이터 로드 완료: " + userRepository.size() + "명의 사용자");
+                return (Map<UUID, User>) in.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException("사용자 데이터 로드 중 오류 발생: " + e.getMessage());
+                System.err.println("사용자 데이터 로드 중 오류 발생: " + e.getMessage());
             }
-        } else {
-            userRepository = new HashMap<>();
-            System.out.println("새로운 사용자 저장소 생성");
         }
+        
+        return new HashMap<>();
     }
     
-    /**
-     * 메모리의 데이터를 파일에 저장합니다.
-     */
     private synchronized void saveData() {
         File dir = new File(DATA_DIR);
         if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                throw new RuntimeException("데이터 디렉토리 생성 실패: " + DATA_DIR);
-            }
+            dir.mkdirs();
         }
         
         File file = new File(dir, USER_DATA_FILE);
         
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(userRepository);
-            System.out.println("사용자 데이터 저장 완료: " + userRepository.size() + "명의 사용자");
         } catch (IOException e) {
-            throw new RuntimeException("사용자 데이터 저장 중 오류 발생: " + e.getMessage());
+            System.err.println("사용자 데이터 저장 중 오류 발생: " + e.getMessage());
         }
     }
 
@@ -92,7 +75,9 @@ public class FileUserRepositoryImplement implements UserRepository {
     @Override
     public boolean deleteUser(UUID userId) {
         boolean removed = userRepository.remove(userId) != null;
-        saveData();
+        if (removed) {
+            saveData();
+        }
         return removed;
     }
 
@@ -110,4 +95,12 @@ public class FileUserRepositoryImplement implements UserRepository {
         saveData();
         return true;
     }
-} 
+    
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.values().stream()
+                .filter(user -> user.getEmail() != null && user.getEmail().equals(email))
+                .findFirst();
+    }
+
+    }

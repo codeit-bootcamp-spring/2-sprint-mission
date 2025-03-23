@@ -1,124 +1,238 @@
 package com.sprint.mission.discodeit.basic.serviceimpl;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.util.ValidationUtil;
-import com.sprint.mission.discodeit.service.ChannelRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapping.ChannelMapping;
+import com.sprint.mission.discodeit.service.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 
+@Service
+
 public class BasicChannelService implements ChannelService {
+
     private final ChannelRepository channelRepository;
-    private final UserChannelService userChannelService;
-    
+    private final MessageRepository messageRepository;
+    private final ReadStatusRepository readStatusRepository;
+    private final UserRepository userRepository;
 
-    private static BasicChannelService instance;
-
-    private BasicChannelService(
-            ChannelRepository channelRepository,
-            UserChannelService userChannelService) {
+    @Autowired
+    public BasicChannelService(
+            @Qualifier("basicChannelRepository") ChannelRepository channelRepository,
+            @Qualifier("basicMessageRepository") MessageRepository messageRepository,
+            @Qualifier("basicReadStatusRepository") ReadStatusRepository readStatusRepository,
+            @Qualifier("basicUserRepository") UserRepository userRepository) {
         this.channelRepository = channelRepository;
-        this.userChannelService = userChannelService;
-    }
-    
-    
-    public static synchronized BasicChannelService getInstance(
-            ChannelRepository channelRepository,
-            UserChannelService userChannelService) {
-        if (instance == null) {
-            instance = new BasicChannelService(channelRepository, userChannelService);
-        }
-        return instance;
+        this.messageRepository = messageRepository;
+        this.readStatusRepository = readStatusRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public void createChannel(String channelName, UUID userId) {
-        ValidationUtil.validateNotEmpty(channelName, "채널 이름");
-        ValidationUtil.validateNotNull(userId, "사용자 ID");
+    public ChannelDto.Response createPrivateChannel(ChannelDto.CreatePrivate dto) {
+        // 채널 생성
+        Channel channel;
+        if (dto.getChannelName() != null && !dto.getChannelName().isEmpty()) {
+            channel = new Channel(dto.getChannelName(), dto.getOwnerId(), dto.getParticipantIds());
+        } else {
+            channel = new Channel(dto.getOwnerId(), dto.getParticipantIds());
+        }
+        
+        channelRepository.register(channel);
+        
+        // 모든 참여자에 대한 ReadStatus 생성
+        for (UUID userId : dto.getParticipantIds()) {
+            ReadStatus readStatus = new ReadStatus(userId, channel.getChannelId(), null);
+            readStatusRepository.register(readStatus);
+        }
+        
+        return ChannelMapping.INSTANCE.channelToResponse(channel);
+    }
 
-
-        checkChannelNameDuplication(channelName);
-        // 채널 객체 생성
-        Channel channel = new Channel(channelName, userId);
-
-        // 채널을 저장소에 등록
+    @Override
+    public ChannelDto.Response createPublicChannel(ChannelDto.CreatePublic dto) {
+        // 채널명 중복 체크
+        checkChannelNameDuplication(dto.getChannelName());
+        
+        // 채널 생성
+        Channel channel;
+        if (dto.getDescription() != null && !dto.getDescription().isEmpty()) {
+            channel = new Channel(dto.getChannelName(), dto.getOwnerId(), dto.getDescription());
+        } else {
+            channel = new Channel(dto.getChannelName(), dto.getOwnerId());
+        }
+        
+        // 채널 저장
         channelRepository.register(channel);
 
-        // 채널 등록 후 사용자를 채널에 추가
-        userChannelService.addUserToChannel(userId, channel);
-        // 채널 생성 메서드
-
-
+        return ChannelMapping.INSTANCE.channelToResponse(channel);
     }
 
     @Override
-    public Set<UUID> findByAllChannel() {
-        return channelRepository.allChannelIdList();
+    public ChannelDto.Response findById(UUID channelId) {
+        // findChannelById -> findById로 변경 (테스트와 일치)
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("Channel not found with ID: " + channelId));
+        
+        // Response 객체 생성
+        ChannelDto.Response response = ChannelMapping.INSTANCE.channelToResponse(channel);
+        
+        // 최근 메시지 시간 정보 추가
+        findLatestMessageTimestamp(channelId).ifPresent(response::setLastMessageTime
+        );
+        
+        return response;
     }
 
     @Override
-    public void setChannelName(UUID channelId, String newChannelName, UUID userId) {
-        ValidationUtil.validateNotNull(channelId, "채널 ID");
-        ValidationUtil.validateNotEmpty(newChannelName, "새 채널 이름");
-        ValidationUtil.validateNotNull(userId, "사용자 ID");
+    public List<ChannelDto.Response> findAllByUserId(UUID userId) {
+        // 모든 채널 ID 목록
+        Set<UUID> allChannelIds = channelRepository.allChannelIdList();
+        List<ChannelDto.Response> result = new ArrayList<>();
         
-        Channel channel = channelRepository.findChannelById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다: " + channelId));
-        
-        // 사용자가 채널 소유자인지 확인
-        if (!channel.getOwnerID().equals(userId)) {
-            throw new IllegalArgumentException("해당 사용자는 채널 소유자가 아닙니다.");
+        for (UUID channelId : allChannelIds) {
+
+            Optional<Channel> channelOpt = channelRepository.findById(channelId);
+            if (channelOpt.isEmpty()) continue;
+            
+            Channel channel = channelOpt.get();
+            
+            // PUBLIC 채널이거나 사용자가 채널 멤버인 경우만 결과에 포함
+            if (channel.isPublic() || channel.getUserList().contains(userId)) {
+                ChannelDto.Response response = ChannelMapping.INSTANCE.channelToResponse(channel);
+                
+                // 최근 메시지 시간 정보 추가
+                findLatestMessageTimestamp(channelId).ifPresent(timestamp -> 
+                    response.setLastMessageTime(timestamp)
+                );
+                
+                result.add(response);
+            }
         }
-        checkChannelNameDuplication(newChannelName);
         
-        channel.setChannelName(newChannelName);
+        return result;
+    }
+
+    @Override
+    public List<ChannelDto.Response> findAllPublicChannels() {
+        Set<UUID> allChannelIds = channelRepository.allChannelIdList();
+        List<ChannelDto.Response> result = new ArrayList<>();
         
-        // 변경된 채널 정보를 저장
+        for (UUID channelId : allChannelIds) {
+            // findChannelById -> findById로 변경 (테스트와 일치)
+            Optional<Channel> channelOpt = channelRepository.findById(channelId);
+            if (!channelOpt.isPresent()) continue;
+            
+            Channel channel = channelOpt.get();
+            
+            if (channel.isPublic()) {
+                ChannelDto.Response response = ChannelMapping.INSTANCE.channelToResponse(channel);
+                
+                // 최근 메시지 시간 정보 추가
+                findLatestMessageTimestamp(channelId).ifPresent(timestamp -> 
+                    response.setLastMessageTime(timestamp)
+                );
+                
+                result.add(response);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public ChannelDto.Response updateChannel(ChannelDto.Update dto) {
+        // findChannelById -> findById로 변경 (테스트와 일치)
+        Channel channel = channelRepository.findById(dto.getChannelId())
+                .orElseThrow(() -> new NoSuchElementException("Channel not found with ID: " + dto.getChannelId()));
+        
+        // PRIVATE 채널은 수정 불가
+        if (channel.isPrivate()) {
+            throw new RuntimeException("PRIVATE 채널은 수정 불가");
+        }
+        
+        // 채널 정보 업데이트
+        if (dto.getChannelName() != null && !dto.getChannelName().isEmpty()) {
+            channel.setChannelName(dto.getChannelName());
+        }
+        
+        if (dto.getDescription() != null) {
+            channel.setDescription(dto.getDescription());
+        }
+        
         channelRepository.updateChannel(channel);
-    }
-
-    //채널 이름 반환
-    @Override
-    public String getChannelName(UUID channelId) {
-        ValidationUtil.validateNotNull(channelId, "채널 ID");
-       Channel channel = channelRepository.findChannelById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다: " + channelId));
-       return channel.getChannelName();
-
-    }
-
-    public Set<UUID> getChannelUserList(UUID channelId) {
-        ValidationUtil.validateNotNull(channelId,"채널 ID");
-        Channel channel = channelRepository.findChannelById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다: " + channelId));
-        return channel.getUserList();
-    }
-    @Override
-    public void joinChannel(UUID channelId, UUID userId) {
-        ValidationUtil.validateNotNull(channelId, "채널 ID");
-        ValidationUtil.validateNotNull(userId, "사용자 ID");
-
-        Channel channel = channelRepository.findChannelById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다: " + channelId));
-
-        userChannelService.addUserToChannel(userId, channel);
-    }
-
-    @Override
-    public void leaveChannel(UUID channelId, UUID userId) {
-        ValidationUtil.validateNotNull(channelId, "채널 ID");
-        ValidationUtil.validateNotNull(userId, "사용자 ID");
         
-        userChannelService.removeUserFromChannel(userId, channelId);
+        return ChannelMapping.INSTANCE.channelToResponse(channel);
     }
+
+    @Override
+    public boolean deleteChannel(UUID channelId) {
+        Optional<Channel> channelOpt = channelRepository.findById(channelId);
+        if (channelOpt.isEmpty()) {
+            return false;
+        }
+        
+        Channel channel = channelOpt.get();
+        
+        // 채널의 메시지 직접 삭제
+        List<Message> messages = messageRepository.findAllByChannelId(channelId);
+        for (Message message : messages) {
+            messageRepository.deleteMessage(message.getId());
+        }
+        
+        // 채널의 읽음 상태 직접 삭제
+        readStatusRepository.deleteAllByChannelId(channelId);
+        
+        // 사용자의 채널 목록에서 해당 채널 제거
+        Set<UUID> userIds = channel.getUserList();
+        for (UUID userId : userIds) {
+            Optional<User> userOpt = userRepository.findByUser(userId);
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
+                user.removeBelongChannel(channelId);
+                userRepository.updateUser(user);
+            }
+        }
+        
+        // 채널 삭제
+        return channelRepository.deleteChannel(channelId);
+    }
+
     // 채널명 중복 체크 로직
     private void checkChannelNameDuplication(String channelName) {
-        Optional<Channel> existingChannel = channelRepository.findChannelByName(channelName);
-
-        if (existingChannel.isPresent()) {
+        // findByName 메서드 사용 (인터페이스와 일치)
+        channelRepository.findByName(channelName).ifPresent(channel -> {
             throw new IllegalArgumentException("이미 존재하는 채널명입니다: " + channelName);
+        });
+    }
+    
+    // 최근 메시지 시간 조회 (헬퍼 메서드)
+    private Optional<ZonedDateTime> findLatestMessageTimestamp(UUID channelId) {
+        // MessageRepository에 findLatestByChannelId 메서드가 있으면 사용, 없으면 직접 구현
+        List<Message> channelMessages = messageRepository.findAllByChannelId(channelId);
+        if (channelMessages.isEmpty()) {
+            return Optional.empty();
+        }
+        
+        return channelMessages.stream()
+                .map(Message::getCreatedAt)
+                .max(ZonedDateTime::compareTo);
+    }
+    
+    // 채널의 모든 메시지 삭제 (헬퍼 메서드)
+    private void deleteAllMessagesByChannelId(UUID channelId) {
+        List<Message> messages = messageRepository.findAllByChannelId(channelId);
+        for (Message message : messages) {
+            messageRepository.deleteMessage(message.getId());
         }
     }
-
 }
 

@@ -7,12 +7,12 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface ChannelRepository {
-    Channel register(Channel channel);
+    boolean register(Channel channel);
+    Optional<Channel> findById(UUID id);
+    Optional<Channel> findByName(String name);
     Set<UUID> allChannelIdList();
-    Optional<Channel> findChannelByName(String channelName);
     Optional<String> findChannelNameById(UUID channelId);
-    Optional<Channel> findChannelById(UUID channelId);
-    boolean deleteChannel(UUID channelId);
+    boolean deleteChannel(UUID id);
     boolean updateChannel(Channel channel);
 }
 

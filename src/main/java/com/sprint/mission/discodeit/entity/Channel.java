@@ -1,72 +1,109 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.service.ChannelType;
+import lombok.Getter;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
+@EntityScan
+@Getter
 public class Channel implements Serializable {
     @Serial
     private static final long serialVersionUID = 102L;
-
     private final UUID channelId; // 채널 ID
-    private final Long createdAt; // 생성시간
-    private Long updateAt; // 업데이트 된 시간
+    private final ZonedDateTime createdAt; // 생성시간
+    private ZonedDateTime updateAt; // 업데이트 된 시간
     private final UUID ownerID; // 채널 생성자의 아이디
     private final Set<UUID> userList = new HashSet<>(); // 가입한 유저 ID 리스트
-    private String channelName;
-    
+    private String channelName; //채널이름
+    private final String channelType; // 채널 타입 (PUBLIC/PRIVATE)
+    private String description; // 채널 설명 (PUBLIC)
+
+    // PUBLIC
     public Channel(String channelName, UUID ownerID) {
-        this.createdAt = new Date().getTime(); // 객체 생성 시간
+        this.createdAt = ZonedDateTime.now();
         this.channelId = UUID.randomUUID();
         this.channelName = channelName;
         this.ownerID = ownerID;
+        this.channelType = ChannelType.PUBLIC;
+        userList.add(ownerID); // 생성자를 채널에 자동 추가
     }
 
-    public UUID getChannelId() {
-        return channelId;
+    // PUBLIC
+    public Channel(String channelName, UUID ownerID, String description) {
+        this(channelName, ownerID);
+        this.description = description;
     }
-    
-    public String getChannelName() {
-        return channelName;
+
+    // PRIVATE 채널 생성자
+    public Channel(UUID ownerID, Set<UUID> participants) {
+        this.createdAt = ZonedDateTime.now();
+        this.channelId = UUID.randomUUID();
+        this.ownerID = ownerID;
+        this.channelType = ChannelType.PRIVATE;
+
+        // 참여자 추가
+        userList.add(ownerID);
+        if (participants != null) {
+            userList.addAll(participants);
+        }
     }
-    
-    public Long getCreatedAt() {
-        return createdAt;
+
+    // PRIVATE 채널 생성자 (이름 포함)
+    public Channel(String channelName, UUID ownerID, Set<UUID> participants) {
+        this(ownerID, participants);
+        this.channelName = channelName;
     }
-    
-    public Set<UUID> getUserList() {
-        return userList;
-    }
-    
+
+    // 채널 참여
     public void joinChannel(UUID userId) {
         this.getUserList().add(userId);
     }
-    
+
+    // 채널 탈퇴
     public void leaveChannel(UUID userId) {
         this.getUserList().remove(userId);
     }
 
+    // 채널명 변경
     public void setChannelName(String newChannelName) {
         this.channelName = newChannelName;
         setUpdateAt();
     }
-    
-    public Long getUpdateAt() {
-        return updateAt;
-    }
-    
-    public void setUpdateAt() {
-        this.updateAt = new Date().getTime();
-    }
-    
-    public void setUpdateAt(Long updateAt) {
-        this.updateAt = updateAt;
+
+    // 설명 변경 (PUBLIC)
+    public void setDescription(String description) {
+        if (isPublic()) {
+            this.description = description;
+            setUpdateAt();
+        }
     }
 
-    public UUID getOwnerID() {
-        return ownerID;
+    // 업데이트 시간 설정
+    public void setUpdateAt() {
+        updateAt = ZonedDateTime.now();
+    }
+
+    // 채널 타입 확인 메서드
+    public boolean isPrivate() {
+        return ChannelType.PRIVATE.equals(this.channelType);
+    }
+
+    public boolean isPublic() {
+        return ChannelType.PUBLIC.equals(this.channelType);
+    }
+
+   
+    public UUID getId() {
+        return this.channelId;
+    }
+
+    public String getName() {
+        return this.channelName;
     }
 }
