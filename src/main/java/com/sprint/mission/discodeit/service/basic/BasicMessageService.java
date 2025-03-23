@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.dto.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -57,18 +58,28 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UUID messageId, String newContent,List<UUID> newAttachmentIds) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
-        message.update(newContent, newAttachmentIds);
+    public Message update(MessageUpdateRequestDto updateRequestDto){
+        Message message = messageRepository.findById(updateRequestDto.getMessageId())
+                .orElseThrow(() -> new NoSuchElementException("Message with id" + updateRequestDto.getMessageId() + "not found" ));
+
+        message.update(updateRequestDto.getNewContent(), updateRequestDto.getNewAttachmentIds());
         return messageRepository.save(message);
+
     }
+
+
 
     @Override
     public void delete(UUID messageId) {
         if (!messageRepository.existsById(messageId)) {
             throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
+
+        List<BinaryContent> attachments = binaryContentRepository.findByMessageId(messageId);
+        for (BinaryContent attachment : attachments) {
+            binaryContentRepository.deleteById(attachment.getId());
+        }
+
         messageRepository.deleteByMessageId(messageId);
     }
 }
