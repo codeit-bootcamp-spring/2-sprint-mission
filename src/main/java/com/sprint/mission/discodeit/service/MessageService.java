@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface MessageService {
     Message create(MessageCreateRequestDto requestDto);
     Message find(UUID messageId);
-    List<Message> findAll();
+    List<Message> findAllByChannelId(UUID channelId);
     Message update(UUID messageId, String newContent, List<UUID> newAttachmentIds);
     void delete(UUID messageId);
 }

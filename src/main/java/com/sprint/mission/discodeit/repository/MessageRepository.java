@@ -10,7 +10,7 @@ import java.time.Instant;
 public interface MessageRepository {
     Message save(Message message);
     Optional<Message> findById(UUID id);
-    List<Message> findAll();
+    List<Message> findAllByChannelId(UUID channelId);
     boolean existsById(UUID id);
     void deleteByMessageId(UUID id);
     void deleteByChannelId(UUID channelId);

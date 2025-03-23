@@ -21,8 +21,10 @@ public class MessageRepositoryImpl implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll(){
-        return new ArrayList<>(messages);
+    public List<Message> findAllByChannelId(UUID channelId){
+        return messages.stream()
+                .filter(m -> m.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
