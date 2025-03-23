@@ -46,6 +46,21 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
+    public Optional<List<Message>> findByChannelId(UUID channelId) {
+        try {
+            List<Message> message = Files.list(directory)
+                    .map(fileUtil::<Message>readObjectFromFile)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .filter(item -> item.getChannelId().equals(channelId))
+                    .toList();
+            return Optional.of(message);
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public void update(Message message) {
         save(message);
     }
@@ -53,5 +68,16 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void delete(UUID id) {
         fileUtil.deleteFile(FilePathUtil.getFilePath(directory, id));
+    }
+
+    @Override
+    public void deleteChannelById(UUID channelId) {
+        findAll().ifPresent(messages -> {
+            messages.stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .forEach(message -> {
+                    fileUtil.deleteFile(FilePathUtil.getFilePath(directory, message.getId()));
+                });
+        });
     }
 }

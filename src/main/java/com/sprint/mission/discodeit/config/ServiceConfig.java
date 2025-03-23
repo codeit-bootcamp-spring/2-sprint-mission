@@ -1,29 +1,39 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.service.basic.*;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class ServiceConfig {
     @Bean
-    public UserService userService(UserRepository userRepository) {
-        return new BasicUserService(userRepository);
+    public BinaryContentService binaryContentService(BinaryContentRepository binaryContentRepository) {
+        return new BasicBinaryContentService(binaryContentRepository);
     }
 
     @Bean
-    public ChannelService channelService(ChannelRepository channelRepository) {
-        return new BasicChannelService(channelRepository);
+    public ChannelService channelService(ChannelRepository channelRepository, MessageRepository messageRepository, ReadStatusRepository readStatusRepository) {
+        return new BasicChannelService(channelRepository, messageRepository, readStatusRepository);
     }
 
     @Bean
-    public MessageService messageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
-        return new BasicMessageService(userService, channelService, messageRepository);
+    public MessageService messageService(UserRepository userRepository, ChannelService channelService, MessageRepository messageRepository) {
+        return new BasicMessageService(userRepository, channelService, messageRepository);
+    }
+
+    @Bean
+    public ReadStatusService readStatusService(ReadStatusRepository readStatusRepository, UserRepository userRepository, ChannelRepository channelRepository) {
+        return new BasicReadStatusService(readStatusRepository, userRepository, channelRepository);
+    }
+
+    @Bean
+    public BasicUserService basicUserService(UserRepository userRepository,UserStatusRepository userStatusRepository, BinaryContentRepository binaryContentRepository, BCryptPasswordEncoder passwordEncoder) {
+        return new BasicUserService(userRepository, userStatusRepository, binaryContentRepository, passwordEncoder);
+    }
+
+    @Bean
+    public BasicUserStatusService basicUserStatusService(UserStatusRepository userStatusRepository) {
+        return new BasicUserStatusService(userStatusRepository);
     }
 }

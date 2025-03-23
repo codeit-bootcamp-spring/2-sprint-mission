@@ -25,8 +25,6 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void save(User user) {
-        Path parentDir = directory.getParent();
-
         fileUtil.<User>writeObjectToFile(user, FilePathUtil.getFilePath(directory, user.getId()));
     }
 
@@ -57,5 +55,21 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void delete(UUID id) {
         fileUtil.deleteFile(FilePathUtil.getFilePath(directory, id));
+    }
+
+    @Override
+    public Optional<User> findByUserName(String username) {
+        return findAll()
+                .flatMap(users -> users.stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst());
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return findAll()
+                .flatMap(users -> users.stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst());
     }
 }

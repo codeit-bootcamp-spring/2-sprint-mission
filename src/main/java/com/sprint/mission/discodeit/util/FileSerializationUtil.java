@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class FileSerializationUtil {
 
-    public <T extends BaseEntity> void writeObjectToFile(T t, Path filePath) {
+    public <T> void writeObjectToFile(T t, Path filePath) {
         if (!Files.exists(filePath.getParent())) {
             try {
                 Files.createDirectories(filePath.getParent());
@@ -27,7 +27,7 @@ public class FileSerializationUtil {
         }
     }
 
-    public <T extends BaseEntity> Optional<T> readObjectFromFile(Path filePath) {
+    public <T> Optional<T> readObjectFromFile(Path filePath) {
         if (!Files.exists(filePath)) {
             return Optional.empty();
         }

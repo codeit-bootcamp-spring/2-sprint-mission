@@ -1,34 +1,38 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.*;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.groups.ChannelType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    private static BasicMessageService messageService;
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final ChannelService channelService;
     private final MessageRepository messageRepository;
 
     @Override
-    public void create(Message message, UUID channelId, UUID authorId) {
-        userService.findById(authorId);
-        channelService.findById(channelId);
+    public void create(MessageCreateDto messageCreateDto) {
+        channelService.findById(messageCreateDto.channelId());
 
-        if (messageRepository.findById(message.getId()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 메세지 입니다: " + message.getId());
+        if (messageRepository.findById(messageCreateDto.id()).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 메세지 입니다: " + messageCreateDto.id());
         }
 
-        messageRepository.save(message);
+        User user = userRepository.findById(messageCreateDto.authorId()).orElseThrow(IllegalArgumentException::new);
+
+        messageRepository.save(new Message(messageCreateDto.id(), Instant.now(), messageCreateDto.content(), messageCreateDto.channelId(), messageCreateDto.authorId(), user.getProfileId()));
     }
 
     @Override
@@ -37,14 +41,16 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll().orElse(Collections.emptyList());
+    public List<Message> findByChannelId(UUID channelId) {
+        return messageRepository
+                .findByChannelId(channelId)
+                .orElse(Collections.emptyList());
     }
 
     @Override
-    public void update(UUID id, String content, UUID channelId, UUID authorId) {
-        Message message = this.findById(id);
-        message.setContent(content);
+    public void update(MessageUpdateDto messageUpdateDto) {
+        Message message = this.findById(messageUpdateDto.id());
+        message.setContent(messageUpdateDto.content());
         messageRepository.update(message);
     }
 

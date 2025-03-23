@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
@@ -32,5 +31,21 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public void delete(UUID id) {
         users.remove(id);
+    }
+
+    @Override
+    public Optional<User> findByUserName(String userName) {
+        return users.values()
+                .stream()
+                .filter( user -> user.getUsername().equals(userName))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return users.values()
+                .stream()
+                .filter( user -> user.getEmail().equals(email))
+                .findFirst();
     }
 }

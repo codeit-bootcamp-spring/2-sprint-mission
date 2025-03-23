@@ -1,16 +1,17 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.UserCreateDto;
+import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.UserUpdateDto;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    void create(User user);
-    User findById(UUID id);
-    List<User> findAll();
-    void update(UUID id, String username, String email) throws IOException;
+    void create(UserCreateDto userCreateDto);
+    UserDto findById(UUID id);
+    List<UserDto> findAll();
+    void update(UserUpdateDto userUpdateDto) throws IOException;
     void delete(UUID id);
 }
