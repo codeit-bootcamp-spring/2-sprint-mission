@@ -23,6 +23,11 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
+    public Map<UUID, Message> getMessageData(){
+        return data;
+    }
+
+    @Override
     public List<Message> findAll(){
         return this.data.values().stream().toList();
     }
@@ -35,5 +40,12 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void delete(UUID messageId){
         this.data.remove(messageId);
+    }
+
+    @Override
+    public Message update(Message message, String newContent){
+        message.update(newContent);
+
+        return message;
     }
 }

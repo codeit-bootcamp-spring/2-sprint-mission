@@ -14,7 +14,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
     private Map<UUID, Message> messageData;
     private static final String MESSAGE_FILE_PATH = "messages.ser";
@@ -57,6 +59,11 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
+    public Map<UUID, Message> getMessageData(){
+        return messageData;
+    }
+
+    @Override
     public List<Message> findAll(){
         return this.messageData.values().stream().toList();
     }
@@ -65,6 +72,13 @@ public class FileMessageRepository implements MessageRepository {
     public Message findById(UUID messageId){
         return Optional.ofNullable(messageData.get(messageId))
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+    }
+
+    public Message update(Message message, String newContent){
+        message.update(newContent);
+
+        dataSave();
+        return message;
     }
 
     @Override

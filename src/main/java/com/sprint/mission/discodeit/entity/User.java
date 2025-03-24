@@ -1,53 +1,36 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.time.Instant;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.io.Serializable;
+import lombok.Getter;
 
+@Getter
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
     //
     private String username;
     private String email;
     private String password;
+    //
+    private UUID profileId;
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
+        this.createdAt = Instant.now();
         //
         this.username = username;
         this.email = email;
         this.password = password;
+        this.profileId = profileId;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void update(String newUsername, String newEmail, String newPassword) {
+    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId ) {
         boolean anyValueUpdated = false;
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
@@ -61,9 +44,12 @@ public class User implements Serializable {
             this.password = newPassword;
             anyValueUpdated = true;
         }
-
+        if(!newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
+            anyValueUpdated = true;
+        }
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
+            this.updatedAt = Instant.ofEpochSecond(Instant.now().getEpochSecond());
         }
     }
 }

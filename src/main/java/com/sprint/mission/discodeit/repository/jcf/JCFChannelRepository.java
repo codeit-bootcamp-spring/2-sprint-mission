@@ -22,6 +22,13 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
+    public Channel update(Channel channel, String newName, String newDescription){
+        channel.update(newName, newDescription);
+
+        return channel;
+    }
+
+    @Override
     public List<Channel> findAll(){
         return this.data.values().stream().toList();
     }
@@ -29,6 +36,11 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public Channel findById(UUID channelId){
         return Optional.ofNullable(data.get(channelId)).orElseThrow(()->new NoSuchElementException("channel with id " + channelId + " not found"));
+    }
+
+    @Override
+    public Map<UUID, Channel> getChannelData(){
+        return this.data;
     }
 
     @Override
