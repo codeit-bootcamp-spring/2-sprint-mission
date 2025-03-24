@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: discodeit
+
+discodeit:
+  repository:
+    type: file   # jcf | file
+    file-directory:
+      binaryContent: ./data/binaryContent
+      channel: ./data/channel
+      message: ./data/message
+      readStatus: ./data/readStatus
+      user: ./data/user
+      userStatus: ./data/userStatus

@@ -1,64 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private final String email;
     private String password;
     private String nickname;
-    private UserStatus status;
+    private UserStatusType status;
     private UserRole role;
-    private static final long serialVersionUID = 1L;
+    private UUID profileId;
 
-    public User(String email, String password, String nickname, UserStatus status, UserRole role) {
+    public User(String email, String password, String nickname, UserStatusType status, UserRole role, UUID profileId) {
         validateUser(email, password, nickname, status, role);
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.status = status;
         this.role = role;
+        this.profileId = profileId;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void update(String password, String nickname, UserStatus status, UserRole role) {
+    public void update(String password, String nickname, UserStatusType status, UserRole role, UUID profileId) {
         boolean isUpdated = false;
 
         if (password != null && !password.equals(this.password)){
@@ -79,6 +54,10 @@ public class User implements Serializable {
             this.role = role;
             isUpdated = true;
         }
+        if (profileId != null) {
+            this.profileId = profileId;
+            isUpdated = true;
+        }
 
         if (isUpdated) {
             updateLastModifiedAt();
@@ -86,7 +65,7 @@ public class User implements Serializable {
     }
 
     private void updateLastModifiedAt() {
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 
     @Override
@@ -101,10 +80,11 @@ public class User implements Serializable {
                 '}';
     }
 
+
     /*******************************
      * Validation check
      *******************************/
-    private void validateUser(String email, String password, String nickname, UserStatus status, UserRole role){
+    private void validateUser(String email, String password, String nickname, UserStatusType status, UserRole role){
         // 1. null check
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("이메일이 없습니다.");

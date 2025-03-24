@@ -1,134 +1,115 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserRole;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.dto.UserCreateDto;
+import com.sprint.mission.discodeit.service.dto.UserResponseDto;
+import com.sprint.mission.discodeit.service.dto.UserUpdateDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Override
+    public void createUser(UserCreateDto createDto) {
+        UUID profileId = null;
+        if(StringUtils.hasText(createDto.filePath())) {
+            profileId = binaryContentRepository.createBinaryContent(createDto.convertDtoToBinaryContent());
+        }
+
+        UUID userId = userRepository.createUser(createDto.convertDtoToUser(profileId));
+        userStatusRepository.createUserStatus(new UserStatus(userId));
     }
 
-    /*
-    private static volatile BasicUserService instance;
-    public static BasicUserService getInstance(UserRepository userRepository) {
-        if (instance == null) {
-            synchronized (BasicUserService.class) {
-                if (instance == null) {
-                    instance = new BasicUserService(userRepository);
-                }
+    @Override
+    public UserResponseDto findById(UUID id) {
+        User user = userRepository.findById(id);
+        boolean isOnline = checkUserOnlineStatus(id);
+
+        return UserResponseDto.convertToResponseDto(user, isOnline);
+    }
+
+    @Override
+    public UserResponseDto findByNickname(String nickname) {
+//        if (nickname == null) {
+//            return Optional.empty();
+//        }
+        User user = userRepository.findByNickname(nickname);
+        boolean isOnline = checkUserOnlineStatus(user.getId());
+
+        return UserResponseDto.convertToResponseDto(user, isOnline);
+    }
+
+    @Override
+    public UserResponseDto findByEmail(String email) {
+//        if (email == null) {
+//            return Optional.empty();
+//        }
+        User user = userRepository.findByEmail(email);
+        boolean isOnline = checkUserOnlineStatus(user.getId());
+
+        return UserResponseDto.convertToResponseDto(user, isOnline);
+    }
+
+    @Override
+    public List<UserResponseDto> findAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(user -> {
+                    boolean isOnline = checkUserOnlineStatus(user.getId());
+                    return UserResponseDto.convertToResponseDto(user, isOnline);
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateUser(UserUpdateDto updateDto) {
+        UUID profileId = null;
+        if (StringUtils.hasText(updateDto.filePath())) {
+            if (updateDto.profileId() != null) {
+                binaryContentRepository.deleteBinaryContent(updateDto.profileId());
             }
+            profileId = binaryContentRepository.createBinaryContent(updateDto.convertDtoToBinaryContent());
+        } else {
+            profileId = updateDto.profileId();
         }
-        return instance;
-    }
-    */
 
-    @Override
-    public void createUser(User user) {
-        //사용자 중복 확인
-        checkUserExists(user);
-        //create
-        userRepository.createUser(user);
-    }
-
-    @Override
-    public Optional<User> selectUserById(UUID id) {
-        return userRepository.selectUserById(id);
-    }
-
-    @Override
-    public Optional<User> selectUserByNickname(String nickname) {
-        if (nickname == null) {
-            return Optional.empty();
-        }
-        return userRepository.selectUserByNickname(nickname);
-    }
-
-    @Override
-    public Optional<User> selectUserByEmail(String email) {
-        if (email == null) {
-            return Optional.empty();
-        }
-        return userRepository.selectUserByEmail(email);
-    }
-
-    @Override
-    public List<User> selectAllUsers() {
-        return userRepository.selectAllUsers();
-    }
-
-    @Override
-    public void updateUser(UUID id, String password, String nickname, UserStatus status, UserRole role) {
-        //id 유효성 확인
-        validateId(id);
-        //사용자 확인
-        User user = findUserOrThrow(id);
-        //사용자 닉네임 확인
-        checkUserNicknameExists(nickname);
-        //update
-        userRepository.updateUser(id, password, nickname, status, role);
+        userRepository.updateUser(updateDto.id(), updateDto.password(), updateDto.nickname(), updateDto.status(), updateDto.role(), profileId);
     }
 
     @Override
     public void deleteUser(UUID id) {
-        //id 유효성 확인
-        validateId(id);
-        //사용자 확인
-        User user = findUserOrThrow(id);
-        //delete
-        userRepository.deleteUser(user.getId());
-    }
+        User user = userRepository.findById(id);
 
-//    @Override
-//    public void clearUsers() {
-//        userRepository.clearUsers();
-//    }
+        userRepository.deleteUser(id);
+        if (user.getProfileId() != null) {
+            binaryContentRepository.deleteBinaryContent(user.getProfileId());
+        }
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
+        userStatusRepository.deleteUserStatus(userStatus.getId());
+    }
 
     /****************************
      * Validation check
      ****************************/
-    private void validateId(UUID id){
-        if (id == null) {
-            throw new IllegalArgumentException("사용자 ID 값이 없습니다.");
-        }
-    }
-
-    private User findUserOrThrow(UUID id) {
-        return selectUserById(id)
-                .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다. : " + id));
-    }
-
-    private void checkUserExists(User user) {
-        checkUserIdExists(user.getId());
-        checkUserEmailExists(user.getEmail());
-        checkUserNicknameExists(user.getNickname());
-    }
-
-    private void checkUserIdExists(UUID id) {
-        if (selectUserById(id).isPresent()) {
-            throw new RuntimeException("이미 존재하는 사용자입니다.");
-        }
-    }
-
-    private void checkUserEmailExists(String email) {
-        if (selectUserByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
-        }
-    }
-
-    private void checkUserNicknameExists(String nickname) {
-        if (selectUserByNickname(nickname).isPresent()) {
-            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
-        }
+    private boolean checkUserOnlineStatus(UUID userId) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId);
+        return userStatus.isOnline();
     }
 
 }

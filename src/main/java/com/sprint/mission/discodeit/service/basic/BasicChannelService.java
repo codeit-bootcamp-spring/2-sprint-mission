@@ -2,108 +2,120 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.dto.ChannelCreateDto;
+import com.sprint.mission.discodeit.service.dto.ChannelResponseDto;
+import com.sprint.mission.discodeit.service.dto.ChannelUpdateDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
+import java.util.stream.Stream;
 
+@Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
-
-    public BasicChannelService(UserService userService, ChannelRepository channelRepository) {
-        this.userService = userService;
-        this.channelRepository = channelRepository;
-    }
-
-    /*
-    private static volatile BasicChannelService instance;
-    public static BasicChannelService getInstance(UserService userService, ChannelRepository channelRepository) {
-        if(instance == null) {
-            synchronized (BasicChannelService.class) {
-                if(instance == null) {
-                    instance = new BasicChannelService(userService, channelRepository);
-                }
-            }
-        }
-        return instance;
-    }
-    */
+    private final MessageRepository messageRepository;
+    private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public void createChannel(Channel channel) {
-        //요청자 확인
-        User user = findUserOrThrow(channel.getUserId());
-        //개설 권한 확인
+    public void createPrivateChannel(ChannelCreateDto createDto) {
+        User user = userRepository.findById(createDto.userId());
         validatePermission(user);
-        //create
+
+        Channel channel = createDto.convertDtoToChannel();
+        UUID channelId = channelRepository.createChannel(channel);
+
+        channel.getUserMembers().stream()
+                .map(channelMemberId -> new ReadStatus(channelMemberId, channelId))
+                .forEach(readStatusRepository::createReadStatus);
+    }
+
+    @Override
+    public void createPublicChannel(ChannelCreateDto createDto) {
+        User user = userRepository.findById(createDto.userId());
+        validatePermission(user);
+
+        Channel channel = createDto.convertDtoToChannel();
         channelRepository.createChannel(channel);
     }
 
     @Override
     public void addMembers(UUID id, Set<UUID> userMembers, UUID userId) {
-        //요청자 확인
-        User user = findUserOrThrow(userId);
-        //멤버 추가 권한 확인
+        User user = userRepository.findById(userId);
         validatePermission(user);
-        //채널 확인
-        Channel channel = findChannelOrThrow(id);
-        //멤버 확인
         validateMembers(userMembers);
-        //addMember
+
         channelRepository.addMembers(id, userMembers, userId);
     }
 
     @Override
     public void removeMembers(UUID id, Set<UUID> userMembers, UUID userId) {
-        //요청자 확인
-        User user = findUserOrThrow(userId);
-        //멤버 삭제 권한 확인
+        User user = userRepository.findById(userId);
         validatePermission(user);
-        //채널 확인
-        Channel channel = findChannelOrThrow(id);
-        //멤버 확인
         validateMembers(userMembers);
-        //removeMember
+
         channelRepository.removeMembers(id, userMembers, userId);
     }
 
     @Override
-    public Optional<Channel> selectChannelById(UUID id) {
-        return channelRepository.selectChannelById(id);
+    public ChannelResponseDto findChannelById(UUID id) {
+        Channel channel = channelRepository.findById(id);
+
+        Instant lastMessageCreatedAt = messageRepository.findLatestCreatedAtByChannelId(id).orElse(null);
+        Set<UUID> channelMembers = channel.getType() == ChannelType.PRIVATE ? channel.getUserMembers() : null;
+
+        return ChannelResponseDto.convertToResponseDto(channel, channelMembers, lastMessageCreatedAt);
     }
 
     @Override
-    public List<Channel> selectAllChannels() {
-        return channelRepository.selectAllChannels();
+    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
+        List<Channel> publicChannelsList = channelRepository.findByType(ChannelType.PUBLIC);
+        List<Channel> privateChannelsList = channelRepository.findByUserIdAndType(userId, ChannelType.PRIVATE);
+        List<Channel> channelsList = Stream.concat(publicChannelsList.stream(), privateChannelsList.stream())
+                .toList();
+
+        List<ChannelResponseDto> resultList = new ArrayList<>();
+        channelsList.stream()
+                .map(channel -> {
+                    Instant lastMessageCreatedAt = messageRepository.findLatestCreatedAtByChannelId(channel.getId()).orElse(null);
+                    Set<UUID> channelMembers = channel.getType() == ChannelType.PRIVATE ? channel.getUserMembers() : null;
+                    return ChannelResponseDto.convertToResponseDto(channel, channelMembers, lastMessageCreatedAt);
+                })
+                .forEach(resultList::add);
+
+        return resultList;
     }
 
     @Override
-    public void updateChannel(UUID id, String name, String category, ChannelType type, UUID userId) {
-        //id 유효성 확인
-        validateId(id);
-        //요청자 확인
-        User user = findUserOrThrow(userId);
-        //수정 권한 확인
+    public void updateChannel(ChannelUpdateDto updateDto) {
+        User user = userRepository.findById(updateDto.userId());
         validatePermission(user);
-        //채널 확인
-        Channel channel = findChannelOrThrow(id);
-        //update
-        channelRepository.updateChannel(id, name, category, type, userId);
+        Channel channel = channelRepository.findById(updateDto.id());
+        if (channel.getType() == ChannelType.PRIVATE){
+            throw new IllegalArgumentException("PRIVATE 채널은 수정할 수 없습니다.");
+        }
+
+        channelRepository.updateChannel(updateDto.id(), updateDto.name(), updateDto.category(), ChannelType.PUBLIC, updateDto.userId());
     }
 
     @Override
     public void deleteChannel(UUID id, UUID userId) {
-        //id 유효성 확인
-        validateId(id);
-        //요청자 확인
-        User user = findUserOrThrow(userId);
-        //삭제 권한 확인
+        User user = userRepository.findById(userId);
         validatePermission(user);
-        //채널 확인
-        Channel channel = findChannelOrThrow(id);
-        //delete
+
+        if (!messageRepository.findAllByChannelId(id).isEmpty()){
+            messageRepository.deleteMessageByChannelId(id);
+        }
+        readStatusRepository.deleteReadStatusByChannelId(id);
+
         channelRepository.deleteChannel(id, userId);
     }
 
@@ -118,25 +130,11 @@ public class BasicChannelService implements ChannelService {
 
     private void validateMembers(Set<UUID> userMembers) {
         for (UUID memberId : userMembers) {
-            userService.selectUserById(memberId)
-                    .orElseThrow(() -> new RuntimeException("해당 ID의 사용자가 존재하지 않습니다: " + memberId));
+            User user = userRepository.findById(memberId);
+            if(user == null){
+                throw new NoSuchElementException("해당 ID의 사용자가 존재하지 않습니다: " + memberId);
+            }
         }
-    }
-
-    private void validateId(UUID id) {
-        if (id == null) {
-            throw new IllegalArgumentException("채널 ID 값이 없습니다.");
-        }
-    }
-
-    private Channel findChannelOrThrow(UUID channelId) {
-        return selectChannelById(channelId)
-                .orElseThrow(() -> new RuntimeException("해당 채널이 존재하지 않습니다. : " + channelId));
-    }
-
-    private User findUserOrThrow(UUID userId) {
-        return userService.selectUserById(userId)
-                .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다. : " + userId));
     }
 
 }

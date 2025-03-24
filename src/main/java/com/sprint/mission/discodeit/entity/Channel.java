@@ -1,71 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashSet;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
 public class Channel implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private ChannelType type;
     private String category;
     private String name;
     private final UUID userId;
     private final Set<UUID> userMembers;
     private UserRole writePermission;
-    private static final long serialVersionUID = 1L;
 
-    public Channel(ChannelType type, String category, String name, UUID userId, UserRole writePermission) {
+    public Channel(ChannelType type, String category, String name, UUID userId, Set<UUID> userMembers, UserRole writePermission) {
         validateChannel(type, category, name, userId, writePermission);
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
         this.type = type;
         this.category = category;
         this.name = name;
         this.userId = userId;
-        this.userMembers = new HashSet<>();
+//        this.userMembers = new HashSet<>();
+        this.userMembers = userMembers;
         this.writePermission = writePermission;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public ChannelType getType() {
-        return type;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public Set<UUID> getUserMembers() {
-        //return members;
-        return Collections.unmodifiableSet(userMembers);
-    }
-
-    public UserRole getWritePermission() {
-        return writePermission;
     }
 
     public void update(String name, String category, ChannelType type) {
@@ -108,7 +75,7 @@ public class Channel implements Serializable {
     }
 
     private void updateLastModifiedAt() {
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 
     @Override

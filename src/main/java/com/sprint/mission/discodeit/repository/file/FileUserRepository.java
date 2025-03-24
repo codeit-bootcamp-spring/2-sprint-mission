@@ -1,93 +1,125 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserRole;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.util.FileUtil;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.stream.Stream;
 
+@Component
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = true)
 public class FileUserRepository implements UserRepository {
 
-    private static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data", "user");
+    private final Path DIRECTORY;
 
-    public FileUserRepository() {
+    public FileUserRepository(RepositoryProperties properties) {
+        this.DIRECTORY = Paths.get(properties.getUser());
         FileUtil.init(DIRECTORY);
     }
 
     @Override
-    public void createUser(User user) {
-        FileUtil.saveToFile(DIRECTORY, user, user.getId());
+    public UUID createUser(User user) {
+        checkUserEmailExists(user.getEmail());
+        checkUserNicknameExists(user.getNickname());
+
+        return FileUtil.saveToFile(DIRECTORY, user, user.getId());
     }
 
     @Override
-    public Optional<User> selectUserById(UUID id) {
-        return FileUtil.loadFromFile(DIRECTORY, id);
+    public User findById(UUID id) {
+        return (User) FileUtil.loadFromFile(DIRECTORY, id)
+                .orElseThrow(() -> new NoSuchElementException("해당 ID의 사용자를 찾을 수 없습니다: " + id));
     }
 
     @Override
-    public Optional<User> selectUserByNickname(String nickname) {
+    public User findByNickname(String nickname) {
         return FileUtil.loadAllFiles(DIRECTORY).stream()
                 .filter(object -> object instanceof User)
                 .map(object -> (User) object)
                 .filter(user -> user.getNickname().equals(nickname))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("해당 닉네임을 가진 사용자를 찾을 수 없습니다: " + nickname));
     }
 
+    public User findByNicknameOrNull(String nickname) {
+        return FileUtil.loadAllFiles(DIRECTORY).stream()
+                .filter(object -> object instanceof User)
+                .map(object -> (User) object)
+                .filter(user -> user.getNickname().equals(nickname))
+                .findFirst()
+                .orElse(null);
+    }
+
+
     @Override
-    public Optional<User> selectUserByEmail(String email) {
+    public User findByEmail(String email) {
         return FileUtil.loadAllFiles(DIRECTORY).stream()
                 .filter(object -> object instanceof User)
                 .map(object -> (User) object)
                 .filter(user -> user.getEmail().equals(email))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("해당 이메일을 가진 사용자를 찾을 수 없습니다: " + email));
+    }
+
+    public User findByEmailOrNull(String email) {
+        return FileUtil.loadAllFiles(DIRECTORY).stream()
+                .filter(object -> object instanceof User)
+                .map(object -> (User) object)
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
-    public List<User> selectAllUsers() {
+    public List<User> findAll() {
         return FileUtil.loadAllFiles(DIRECTORY);
     }
 
     @Override
-    public void updateUser(UUID id, String password, String nickname, UserStatus status, UserRole role) {
-        FileUtil.loadFromFile(DIRECTORY, id).ifPresent(object -> {
-            if (object instanceof User user) {
-                user.update(password, nickname, status, role);
-                FileUtil.saveToFile(DIRECTORY, user, id);
-            } else {
-                throw new IllegalArgumentException("User 타입의 객체가 아닙니다. " + id);
-            }
-        });
+    public void updateUser(UUID id, String password, String nickname, UserStatusType status, UserRole role, UUID profileId) {
+        checkUserExists(id);
+        checkUserNicknameExists(nickname);
+        User user = findById(id);
+
+        user.update(password, nickname, status, role, profileId);
+        FileUtil.saveToFile(DIRECTORY, user, id);
     }
 
     @Override
     public void deleteUser(UUID id) {
+        checkUserExists(id);
+
         FileUtil.deleteFile(DIRECTORY, id);
     }
 
-//    public void clearUsers() {
-//        try (Stream<Path> paths = Files.walk(DIRECTORY)) {
-//            paths.filter(Files::isRegularFile)
-//                    .forEach(path -> {
-//                        try {
-//                            Files.delete(path);  // 파일 삭제
-//                            System.out.println(path + " 파일이 삭제되었습니다.");
-//                        } catch (IOException e) {
-//                            System.err.println("파일 삭제 중 오류 발생: " + e.getMessage());
-//                        }
-//                    });
-//            System.out.println("모든 사용자 데이터가 초기화되었습니다.");
-//        } catch (IOException e) {
-//            System.err.println("파일 접근 중 오류 발생: " + e.getMessage());
-//        }
-//    }
+    /*******************************
+     * Validation check
+     *******************************/
+    private void checkUserExists(UUID id) {
+        if(findById(id) == null){
+            throw new NoSuchElementException("해당 ID의 사용자를 찾을 수 없습니다: " + id);
+        }
+    }
+
+    private void checkUserEmailExists(String email) {
+        if (findByEmailOrNull(email) != null) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
+    }
+
+    private void checkUserNicknameExists(String nickname) {
+        if (findByNicknameOrNull(nickname) != null) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+        }
+    }
 
 }
