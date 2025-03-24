@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.enums;
+package com.sprint.mission.discodeit.menus;
 
 public enum UserMenu {
     CREATE("1", "유저 생성"),

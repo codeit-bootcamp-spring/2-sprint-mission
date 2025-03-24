@@ -1,5 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.DTO.BinaryContentDTO;
+import com.sprint.mission.discodeit.DTO.UserService.UserCreateDTO;
+import com.sprint.mission.discodeit.DTO.UserService.UserFindDTO;
+import com.sprint.mission.discodeit.DTO.UserService.UserUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -13,8 +17,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User create(String userName, String email, String password) {
-        User newUser = new User(userName, email, password);
+    public User create(UserCreateDTO userCreateDTO, BinaryContentDTO binaryContentDTO) {
+        User newUser = userCreateDTO.toEntity();
         userData.put(newUser.getId(), newUser);
         return newUser;
     }
@@ -24,7 +28,12 @@ public class JCFUserService implements UserService {
         User userNullable = userData.get(userId);
 
         return Optional.ofNullable(userNullable)
-        .orElseThrow(() -> new NoSuchElementException("유저 " + userId + "가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("유저 " + userId + "가 존재하지 않습니다."));
+    }
+
+    @Override
+    public UserFindDTO findWithStatus(UUID id) {
+        return null;
     }
 
     @Override
@@ -33,10 +42,15 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, String newUserName, String newEmail, String newPassword) {
-        User userNullable = userData.get(userId);
-        User user = Optional.ofNullable(userNullable).orElseThrow(() -> new NoSuchElementException(userId + "가 존재하지 않습니다."));
-        user.updateUser(newUserName, newEmail, newPassword);
+    public List<UserFindDTO> findAllWithStatus() {
+        return List.of();
+    }
+
+    @Override
+    public User update(UserUpdateDTO userUpdateDTO) {
+        User userNullable = userData.get(userUpdateDTO.id());
+        User user = Optional.ofNullable(userNullable).orElseThrow(() -> new NoSuchElementException(userUpdateDTO.id() + "가 존재하지 않습니다."));
+        user.updateUser(userUpdateDTO.userName(), userUpdateDTO.email(), userUpdateDTO.password());
 
         return user;
     }
@@ -48,7 +62,5 @@ public class JCFUserService implements UserService {
         }
         userData.remove(userId);
     }
-
-
 
 }

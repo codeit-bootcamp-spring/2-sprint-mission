@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.enums;
+package com.sprint.mission.discodeit.menus;
 
 public enum ChannelMenu {
     CREATE("1", "채널 생성"),

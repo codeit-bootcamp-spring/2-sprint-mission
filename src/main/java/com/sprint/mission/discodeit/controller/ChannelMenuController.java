@@ -1,18 +1,19 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.DTO.channelService.ChannelCreateDTO;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.enums.ChannelMenu;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.menus.ChannelMenu;
+import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.UUID;
 
 public class ChannelMenuController {
-    private final JCFChannelService channelService;
+    private final ChannelService channelService;
     private final Scanner scanner;
 
-    public ChannelMenuController(JCFChannelService channelService, Scanner scanner) {
+    public ChannelMenuController(ChannelService channelService, Scanner scanner) {
         this.channelService = channelService;
         this.scanner = scanner;
     }
@@ -27,14 +28,20 @@ public class ChannelMenuController {
 
 
             String choice = scanner.nextLine();
-            ChannelMenu selecedMenu = ChannelMenu.getByCode(choice);
+            ChannelMenu selectedMenu = ChannelMenu.getByCode(choice);
 
-            if (selecedMenu == null) {
+            if (selectedMenu == null) {
                 System.out.println("잘못된 입력입니다.");
                 continue;
             }
 
-            run = execute(selecedMenu);
+            try {
+                run = execute(selectedMenu);
+            }
+            catch (IllegalArgumentException | NoSuchElementException e){
+                System.out.println(e.getMessage());
+            }
+
         }
     }
 
@@ -68,9 +75,8 @@ public class ChannelMenuController {
             System.out.print(description);
             return UUID.fromString(scanner.nextLine());
         }catch (IllegalArgumentException e){
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException("잘못된 입력입니다.");
         }
-        return null;
     }
 
     private String getChannelNameFromInput(String description){
@@ -78,9 +84,8 @@ public class ChannelMenuController {
             System.out.print(description);
             return scanner.nextLine();
         }catch (IllegalArgumentException e){
-            System.out.println(e.getMessage());
+           throw new IllegalArgumentException("잘못된 입력입니다.");
         }
-        return null;
     }
 
     private ChannelType getChannelTypeFromInput(String description){
@@ -100,21 +105,14 @@ public class ChannelMenuController {
         System.out.println("생성할 채널타입, 채널명을 입력해주세요: ");
         ChannelType type = getChannelTypeFromInput("채널타입: ");
         String channelName = getChannelNameFromInput("채널명: ");
-        try {
-            System.out.println("채널 생성 완료: \n" +
-                    channelService.create(type, channelName));
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
-        }
+        ChannelCreateDTO channelCreateDto = new ChannelCreateDTO(type, channelName);
+        System.out.println("채널 생성 완료: \n" + channelService.create(channelCreateDto));
+
     }
 
     private void findChannel() {
         UUID id = getChannelIdFromInput("조회할 채널 ID를 입력해주세요: ");
-        try{
-            System.out.println("조회된 채널: " + channelService.find(id));
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
-        }
+        System.out.println("조회된 채널: " + channelService.find(id));
     }
 
     private void findAllChannel() {
@@ -126,21 +124,13 @@ public class ChannelMenuController {
         System.out.print("변경할 채널 타입, 채널명을 입력해주세요: ");
         ChannelType type =  getChannelTypeFromInput("채널 타입: ");
         String channelName = getChannelNameFromInput("채널명: ");
-        try {
-            System.out.println("업데이트 완료: \n" +
-                    channelService.update(id, channelName, type));
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
-        }
+
+        System.out.println("업데이트 완료: \n" + channelService.update(id, channelName, type));
     }
 
     private void deleteChannel() {
         UUID id = getChannelIdFromInput("삭제할 채널 ID를 입력하세요: ");
-        try {
-            channelService.delete(id);
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
-        }
+        channelService.delete(id);
     }
 }
 

@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> userData = new HashMap<>();
@@ -24,8 +21,17 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findAll(String name) {
+    public List<User> findAll() {
         return userData.values().stream().toList();
+    }
+
+    @Override
+    public User update(UUID id, String newUsername, String newEmail, String newPassword) {
+        User userNullable = userData.get(id);
+        User user = Optional.ofNullable(userNullable).orElseThrow(() -> new NoSuchElementException(id + "가 존재하지 않습니다."));
+        user.updateUser(newUsername, newEmail, newPassword);
+
+        return user;
     }
 
     @Override

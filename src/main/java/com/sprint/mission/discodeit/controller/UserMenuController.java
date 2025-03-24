@@ -1,20 +1,26 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.enums.UserMenu;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.DTO.BinaryContentDTO;
+import com.sprint.mission.discodeit.DTO.UserService.UserCreateDTO;
+import com.sprint.mission.discodeit.DTO.UserService.UserUpdateDTO;
+import com.sprint.mission.discodeit.menus.UserMenu;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.entity.BinaryContentType.IMAGE;
+
 public class UserMenuController {
-    private final JCFUserService userService;
+    private final UserService userService;
     private final Scanner scanner;
 
-    public UserMenuController(JCFUserService userService, Scanner scanner) {
+    public UserMenuController(UserService userService, Scanner scanner) {
         this.userService = userService;
         this.scanner = scanner;
     }
+
 
     public void handleUserMenu() {
         boolean run = true;
@@ -32,7 +38,12 @@ public class UserMenuController {
                 continue;
             }
 
-            run = execute(selectedMenu);
+            try {
+                run = execute(selectedMenu);
+            }
+            catch(NoSuchElementException | IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -66,9 +77,8 @@ public class UserMenuController {
             System.out.print(description);
             return UUID.fromString(scanner.nextLine());
         }catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException("잘못된 입력입니다.");
         }
-        return null;
     }
 
     private String getUserInput(String description) {
@@ -76,9 +86,17 @@ public class UserMenuController {
             System.out.print(description);
             return scanner.nextLine();
         }catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException("잘못된 입력입니다.");
         }
-        return null;
+    }
+
+    private byte[] getBinaryContentInput(String description) {
+        try {
+            System.out.print(description);
+            return scanner.nextLine().getBytes();
+        }catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("잘못된 입력입니다.");
+        }
     }
 
     private void createUser() {
@@ -87,25 +105,34 @@ public class UserMenuController {
         String userName = getUserInput("유저명: ");
         String email = getUserInput("이메일: ");
         String password = getUserInput("비밀번호: ");
-
-        try {
-            System.out.println("유저 생성 완료: \n" +
-                    userService.create(userName, email, password));
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
+        UserCreateDTO userCreateDTO = new UserCreateDTO(userName, email, password);
+        System.out.println("프로필 이미지를 설정하시겠습니까?\n" +
+                            "1. 예\n" +
+                            "2. 아니오");
+        String choice = scanner.nextLine();
+        switch (choice) {
+            case "1", "예":
+                byte[] binaryContent = getBinaryContentInput("이미지를 넣어주세요: ");
+                BinaryContentDTO binaryContentDTO = new BinaryContentDTO(IMAGE, binaryContent);
+                System.out.println("유저 생성 시도: \n" + userService.create(userCreateDTO,binaryContentDTO));
+                return;
+            case "2", "아니오":
+                System.out.println("유저 생성 시도: \n" + userService.create(userCreateDTO,null));
+                return;
+            default:
+                System.out.println("잘못 입력되어 건너뛰었습니다.");
         }
+        System.out.println("유저 생성 시도: \n" + userService.create(userCreateDTO, null));
+
     }
 
     private void findUser() {
         UUID id = getUserIdFromInput("조회할 유저 ID를 입력해주세요: ");
-        try {
-            System.out.println("조회된 유저: " + userService.find(id));
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
-        }
+        System.out.println("조회된 유저: " + userService.findWithStatus(id));
     }
+
     private void findAllUsers() {
-        System.out.println(userService.findAll());
+        System.out.println(userService.findAllWithStatus());
     }
 
     private void updateUser() {
@@ -114,20 +141,31 @@ public class UserMenuController {
         String userName = getUserInput("유저명: ");
         String email = getUserInput("이메일: ");
         String password = getUserInput("비밀번호: ");
-        try {
-            System.out.println("업데이트 완료: \n"
-                    + userService.update(id, userName, email, password));
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
+        UserUpdateDTO userUpdateDTO;
+        System.out.println("프로필 사진을 업데이트 하시겠습니까?\n" +
+                            "1. 예\n" +
+                            "2. 아니오");
+        String choice = scanner.nextLine();
+        switch (choice) {
+            case "1", "예":
+                byte[] binaryContent = getBinaryContentInput("이미지를 넣어주세요: ");
+                userUpdateDTO = new UserUpdateDTO(id, userName, email, password, binaryContent);
+                System.out.println("업데이트 시도: \n" + userService.update(userUpdateDTO));
+                return;
+            case "2", "아니오":
+                userUpdateDTO = new UserUpdateDTO(id, userName, email, password, null);
+                System.out.println("업데이트 시도: \n" + userService.update(userUpdateDTO));
+                return;
+            default:
+                System.out.println("잘못 입력되어 건너뛰었습니다.");
         }
+
+        userUpdateDTO = new UserUpdateDTO(id, userName, email, password, null);
+        System.out.println("업데이트 시도: \n" + userService.update(userUpdateDTO));
     }
 
     private void deleteUser() {
         UUID id = getUserIdFromInput("삭제할 유저ID를 입력하세요: ");
-        try {
-            userService.delete(id);
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
-        }
+        userService.delete(id);
     }
 }

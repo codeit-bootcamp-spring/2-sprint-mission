@@ -1,36 +1,44 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.DTO.MessageService.MessageCreateDTO;
+import com.sprint.mission.discodeit.DTO.UserService.AuthDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.enums.ChannelMenu;
-import com.sprint.mission.discodeit.enums.MessageMenu;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.menus.MessageMenu;
+import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class MassegeMenuController {
-    private final JCFMessageService messageService;
-    private final JCFUserService userService;
-    private final JCFChannelService channelService;
+public class MessageMenuController {
+    private final MessageService messageService;
+    private final UserService userService;
+    private final ChannelService channelService;
+    private final AuthService authService;
     private final Scanner scanner;
     private static User loggedUser;
     private static Channel currentChannel;
 
 
-    public MassegeMenuController(JCFUserService userService, JCFChannelService channelService, JCFMessageService messageService, Scanner scanner) {
+    public MessageMenuController(UserService userService, ChannelService channelService, MessageService messageService,AuthService authService, Scanner scanner) {
         this.messageService = messageService;
         this.userService =  userService;
         this.channelService = channelService;
+        this.authService = authService;
         this.scanner = scanner;
 
     }
 
     public void handleMessageMenu() {
-        if(!logInUser(getIdFromInput("로그인할 유저 ID 입력= "))){
+        String loginUserName = getMessageInput("로그인: ");
+        String loginPassword = getMessageInput("비밀번호: ");
+        AuthDTO authDTO = new AuthDTO(loginUserName, loginPassword);
+        if(!logInUser(authService.login(authDTO)))
+        {
             return;
         }
         if(!currentChannel(getIdFromInput("접속할 채널 ID 입력= "))){
@@ -51,7 +59,11 @@ public class MassegeMenuController {
                 continue;
             }
 
-            run = execute(selectedMenu);
+            try {
+                run = execute(selectedMenu);
+            }catch (NoSuchElementException | IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -88,9 +100,8 @@ public class MassegeMenuController {
             System.out.print(description);
             return UUID.fromString(scanner.nextLine());
         }catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException("잘못된 입력입니다.");
         }
-        return null;
     }
 
     private String getMessageInput(String description){
@@ -98,18 +109,17 @@ public class MassegeMenuController {
             System.out.print(description);
             return scanner.nextLine();
         }catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException("잘못된 입력입니다.");
         }
-        return null;
     }
 
-    private boolean logInUser(UUID loggedInUserId) {
+    private boolean logInUser(User user) {
         try {
-            if(loggedUser == userService.find(loggedInUserId)) {
+            if(loggedUser == user) {
                 System.out.println("이미 로그인 되어있는 유저입니다.");
                 return false;
             }
-            loggedUser = userService.find(loggedInUserId);
+            loggedUser = user;
             return true;
         }catch (NoSuchElementException e){
             System.out.println(e.getMessage());
@@ -135,13 +145,14 @@ public class MassegeMenuController {
 
     private void createMessage(){
         String message = getMessageInput("작성할 메세지: ");
-        messageService.create(message,loggedUser.getId(),currentChannel.getId());
+        MessageCreateDTO messageCreateDTO = new MessageCreateDTO(message,loggedUser.getId(), currentChannel.getId());
+        messageService.create(messageCreateDTO);
     }
 
     private void findMessage(){
         System.out.println("조회할 필터를 선택해주세요.");
         for(MessageFindMenu m : MessageFindMenu.values()){
-            System.out.println(m.toString() + ". " + m.getDescription());
+            System.out.println(m.getCode() + ". " + m.getDescription());
         }
         System.out.print("선택: ");
         String findMenuChoice = scanner.nextLine();
@@ -151,29 +162,15 @@ public class MassegeMenuController {
             System.out.println("잘못된 입력입니다. ");
             return;
         }
-
         switch (findMenu) {
             case USER:
-                try {
-                    System.out.println(messageService.findByUser(loggedUser.getId()));
-                }catch (NoSuchElementException e){
-                    System.out.println(e.getMessage());
-                }
+                System.out.println(messageService.findByUser(loggedUser.getId()));
                 return;
             case CHANNEL:
-                try {
-                    System.out.println(messageService.findByChannel(currentChannel.getId()));
-                }
-                catch (NoSuchElementException e){
-                    System.out.println(e.getMessage());
-                }
+                System.out.println(messageService.findByChannel(currentChannel.getId()));
                 return;
-            case USERANDCHANNEL:
-                try {
-                    System.out.println(messageService.findByUserAndByChannel(loggedUser.getId(), currentChannel.getId()));
-                }catch (NoSuchElementException e){
-                    System.out.println(e.getMessage());
-                }
+            case USER_AND_CHANNEL:
+                System.out.println(messageService.findByUserAndByChannel(loggedUser.getId(), currentChannel.getId()));
                 return;
             default:
                 System.out.println("잘못된 입력입니다.");
@@ -187,20 +184,13 @@ public class MassegeMenuController {
     private void updateMessage(){
         UUID messageId = getIdFromInput("수정할 메세지의 ID를 입력해주세요: ");
         String newMessage = getMessageInput("새로운 메세지: ");
-        try {
-            messageService.update(messageId,newMessage);
-        }catch (NoSuchElementException e){
-            System.out.println(e.getMessage());
-        }
+        messageService.update(messageId,newMessage);
+
     }
 
     private void deleteMessage(){
         UUID id = getIdFromInput("삭제할 메세지ID를 입력하세요: ");
-        try {
-            messageService.delete(id);
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
+        messageService.delete(id);
     }
 
     private void changeChannel(){
@@ -211,7 +201,7 @@ public class MassegeMenuController {
     private enum MessageFindMenu{
         USER("1", "유저"),
         CHANNEL("2", "채널"),
-        USERANDCHANNEL("3", "전부");
+        USER_AND_CHANNEL("3", "전부");
 
         final String code;
         final String description;

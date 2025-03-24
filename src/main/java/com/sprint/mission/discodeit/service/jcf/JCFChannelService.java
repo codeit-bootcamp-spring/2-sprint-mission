@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.DTO.channelService.ChannelCreateDTO;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.HashMap;
@@ -20,8 +21,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(ChannelType type, String name) {
-        Channel channel = new Channel(type, name);
+    public Channel create(ChannelCreateDTO channelCreateDto) {
+        Channel channel = channelCreateDto.toEntity();
         channelData.put(channel.getId(), channel);
         return channel;
     }
