@@ -2,37 +2,31 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
-import java.io.*;
 import java.util.*;
 
+@Repository
 public class FileUserRepository implements UserRepository {
     private final String fileName = "user.ser";
     private final Map<UUID, User> userMap;
+    private final FileDataManager fileDataManager;
 
     public FileUserRepository() {
+        this.fileDataManager = new FileDataManager(fileName);
         this.userMap = loadUserList();
     }
 
     public void saveUserList() {
-        try (FileOutputStream fos = new FileOutputStream(fileName);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(userMap);
-        } catch (IOException e) {
-            throw new RuntimeException("데이터를 저장하는데 실패했습니다.", e);
-        }
+        fileDataManager.saveObjectToFile(userMap);
     }
 
     public Map<UUID, User> loadUserList() {
-        try (FileInputStream fis = new FileInputStream(fileName);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            Object userMap = ois.readObject();
-            return (Map<UUID, User>) userMap;
-        } catch (FileNotFoundException e) {
+        Map<UUID, User> loadedData = fileDataManager.loadObjectFromFile();
+        if (loadedData == null) {
             return new HashMap<>();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("데이터를 불러오는데 실패했습니다", e);
         }
+        return loadedData;
     }
 
     @Override
@@ -53,18 +47,34 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User update(User user) {
-        this.userMap.put(user.getId(), user);
-        saveUserList();
-        return user;
+    public Optional<User> findByUserName(String userName) {
+        return userMap.values().stream()
+                .filter(user -> user.getUserName().equals(userName))
+                .findFirst();
     }
 
     @Override
-    public boolean delete(UUID userId) {
-        boolean removed = userMap.remove(userId) != null;
+    public boolean existsById(UUID id) {
+        return this.userMap.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        boolean removed = this.userMap.remove(id) != null;
         if (removed) {
             saveUserList();
         }
-        return removed;
+    }
+
+    @Override
+    public boolean existsByUserName(String userName) {
+        return userMap.values().stream()
+                .anyMatch(user -> user.getUserName().equals(userName));
+    }
+
+    @Override
+    public boolean existsByUserEmail(String userEmail) {
+        return userMap.values().stream()
+                .anyMatch(user -> user.getUserEmail().equals(userEmail));
     }
 }

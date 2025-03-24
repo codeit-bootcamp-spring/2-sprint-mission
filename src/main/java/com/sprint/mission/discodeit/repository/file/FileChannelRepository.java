@@ -2,37 +2,32 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
-import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private final String fileName = "channel.ser";
     private final Map<UUID, Channel> channelMap;
+    private final FileDataManager fileDataManager;
 
     public FileChannelRepository() {
+        this.fileDataManager = new FileDataManager(fileName);
         this.channelMap = loadChannelList();
     }
 
     public void saveChannelList() {
-        try (FileOutputStream fos = new FileOutputStream(fileName);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(channelMap);
-        } catch (IOException e) {
-            throw new RuntimeException("데이터를 저장하는데 실패했습니다.", e);
-        }
+        fileDataManager.saveObjectToFile(channelMap);
     }
 
     public Map<UUID, Channel> loadChannelList() {
-        try (FileInputStream fis = new FileInputStream(fileName);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            Object channelMap = ois.readObject();
-            return (Map<UUID, Channel>) channelMap;
-        } catch (FileNotFoundException e) {
+        Map<UUID, Channel> loadedData = fileDataManager.loadObjectFromFile();
+        if (loadedData == null) {
             return new HashMap<>();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("데이터를 불러오는데 실패했습니다", e);
         }
+        return loadedData;
     }
 
     @Override
@@ -44,7 +39,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(channelMap.values());
+        return this.channelMap.values().stream().toList();
     }
 
     @Override
@@ -53,18 +48,15 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel update(Channel channel) {
-        this.channelMap.put(channel.getId(), channel);
-        saveChannelList();
-        return channel;
+    public boolean existsById(UUID channelId) {
+        return channelMap.containsKey(channelId);
     }
 
     @Override
-    public boolean delete(UUID channelId) {
+    public void deleteById(UUID channelId) {
         boolean removed = channelMap.remove(channelId) != null;
         if (removed) {
             saveChannelList();
         }
-        return removed;
     }
 }

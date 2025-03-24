@@ -1,76 +1,95 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.MessageUpdateDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.logging.Logger;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    private static BasicMessageService instance;
     private final MessageRepository messageRepository;
-    private final ChannelService channelService;
-    private final UserService userService;
-
-    public BasicMessageService(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
-        this.messageRepository = messageRepository;
-        this.channelService = channelService;
-        this.userService = userService;
-    }
-
-    public static synchronized BasicMessageService getInstance(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
-        if (instance == null) {
-            instance = new BasicMessageService(messageRepository, channelService, userService);
-        }
-        return instance;
-    }
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message create(String content, UUID channelId, UUID userId) {
-        try {
-            channelService.findById(channelId);
-            userService.findById(userId);
-        } catch (NoSuchElementException e) {
-            throw new IllegalArgumentException("유효하지 않은 채널 ID 또는 유저 ID입니다.", e);
+    public Message create(MessageDto messageDto, List<BinaryContentDto> binaryContentDto) {
+        String content = messageDto.content();
+        UUID channelId = messageDto.channelId();
+        UUID authorId = messageDto.authorId();
+
+        if (!userRepository.existsById(authorId)) {
+            throw new IllegalArgumentException("로그인 정보가 존재하지 않습니다.");
         }
-        Message message = new Message(content, channelId, userId);
+        if (!channelRepository.existsById(channelId)) {
+            throw new IllegalArgumentException("해당 채널을 찾을 수 없습니다.");
+        }
+
+        List<UUID> attachmentIds = binaryContentDto.stream()
+                .map(createBinaryContent -> {
+                    String fileName = createBinaryContent.fileName();
+                    String contentType = createBinaryContent.contentType();
+                    byte[] fileData = createBinaryContent.fileData();
+                    Long fileSize = (long) fileData.length;
+
+                    BinaryContent binaryContent = new BinaryContent(fileName, fileData, fileSize, contentType);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .collect(Collectors.toList());
+
+        Message message = new Message(content, authorId, channelId, attachmentIds);
         messageRepository.save(message);
+
         return message;
     }
 
     @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll().stream()
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.findAllByChannelId(channelId).stream().toList();
     }
 
     @Override
     public Message findById(UUID messageId) {
         return messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("해당 메시지를 찾을 수 없습니다 : " + messageId));
+                .orElseThrow(() -> new NoSuchElementException("해당 메시지를 찾을 수 없습니다."));
     }
 
     @Override
-    public Message update(UUID messageId, String newContent) {
-        Message existingMessage = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("해당 메시지를 찾을 수 없습니다 : " + messageId));
-        existingMessage.update(newContent);
-        messageRepository.save(existingMessage);
-        return existingMessage;
+    public Message update(UUID messageId, MessageUpdateDto messageUpdateDto) {
+        String newContent = messageUpdateDto.newContent();
+
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("해당 메시지를 찾을 수 없습니다."));
+
+        message.update(newContent);
+
+        messageRepository.save(message);
+        return message;
     }
 
     @Override
     public void delete(UUID messageId) {
-        if (!messageRepository.delete(messageId)) {
-            throw new NoSuchElementException("해당 메시지를 찾을 수 없습니다 : " + messageId);
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("해당 메시지를 찾을 수 없습니다."));
+
+        if (message.getAttachmentIds() != null && !message.getAttachmentIds().isEmpty()) {
+            for (UUID attachmentId : message.getAttachmentIds()) {
+                binaryContentRepository.deleteById(attachmentId);
+            }
         }
+
+        messageRepository.deleteById(messageId);
     }
 }

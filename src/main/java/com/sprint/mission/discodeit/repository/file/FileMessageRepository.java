@@ -2,37 +2,32 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
     private final String fileName = "message.ser";
     private final Map<UUID, Message> messageMap;
+    private final FileDataManager fileDataManager;
 
     public FileMessageRepository() {
+        this.fileDataManager = new FileDataManager(fileName);
         this.messageMap = loadMessageList();
     }
 
     public void saveMessageList() {
-        try (FileOutputStream fos = new FileOutputStream(fileName);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(messageMap);
-        } catch (IOException e) {
-            throw new RuntimeException("데이터를 저장하는데 실패했습니다.", e);
-        }
+        fileDataManager.saveObjectToFile(messageMap);
     }
 
     public Map<UUID, Message> loadMessageList() {
-        try (FileInputStream fis = new FileInputStream(fileName);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            Object messageMap = ois.readObject();
-            return (Map<UUID, Message>) messageMap;
-        } catch (FileNotFoundException e) {
+        Map<UUID, Message> loadedData = fileDataManager.loadObjectFromFile();
+        if (loadedData == null) {
             return new HashMap<>();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("데이터를 불러오는데 실패했습니다", e);
         }
+        return loadedData;
     }
 
     @Override
@@ -43,8 +38,14 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(messageMap.values());
+    public List<Message> findAllByChannelId(UUID channelId) {
+        List<Message> messages = new ArrayList<>();
+        for (Message message : messageMap.values()) {
+            if (message.getChannelId().equals(channelId)) {
+                messages.add(message);
+            }
+        }
+        return messages;
     }
 
     @Override
@@ -53,18 +54,15 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message update(Message message) {
-        this.messageMap.put(message.getId(), message);
-        saveMessageList();
-        return message;
+    public boolean existsById(UUID messageId) {
+        return messageMap.containsKey(messageId);
     }
 
     @Override
-    public boolean delete(UUID messageId) {
+    public void deleteById(UUID messageId) {
         boolean removed = messageMap.remove(messageId) != null;
         if (removed) {
             saveMessageList();
         }
-        return removed;
     }
 }

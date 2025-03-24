@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> userMap;
 
@@ -24,18 +26,36 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(UUID userId) {
-        return Optional.ofNullable(userMap.get(userId));
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(userMap.get(id));
     }
 
     @Override
-    public User update(User user) {
-        userMap.put(user.getId(), user);
-        return user;
+    public Optional<User> findByUserName(String userName) {
+        return userMap.values().stream()
+                .filter(user -> user.getUserName().equals(userName))
+                .findFirst();
     }
 
     @Override
-    public boolean delete(UUID userId) {
-        return userMap.remove(userId) != null;
+    public boolean existsById(UUID id) {
+        return this.userMap.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.userMap.remove(id);
+    }
+
+    @Override
+    public boolean existsByUserName(String userName) {
+        return userMap.values().stream()
+                .anyMatch(user -> user.getUserName().equals(userName));
+    }
+
+    @Override
+    public boolean existsByUserEmail(String userEmail) {
+        return userMap.values().stream()
+                .anyMatch(user -> user.getUserEmail().equals(userEmail));
     }
 }

@@ -1,32 +1,28 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import lombok.Getter;
 
+import java.io.Serializable;
+import java.util.UUID;
+
+@Getter
 public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String userName;
     private String userEmail;
     private String userPassword;
+    private UUID profileId;
 
-    public User(String userName, String userEmail, String userPassword) {
+    public User(String userName, String userEmail, String userPassword, UUID profileId) {
         super();
         this.userName = userName;
         this.userEmail = userEmail;
         this.userPassword = userPassword;
+        this.profileId = profileId;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public String getUserPassword() {
-        return userPassword;
-    }
-
-    public void update(String newUserName, String newUserEmail, String newUserPassword) {
+    public void update(String newUserName, String newUserEmail, String newUserPassword, UUID newProfileId) {
         boolean anyValueUpdated = false;
         if (newUserName != null && !newUserName.equals(this.userName)) {
             this.userName = newUserName;
@@ -38,6 +34,10 @@ public class User extends BaseEntity implements Serializable {
         }
         if (newUserPassword != null && !newUserPassword.equals(this.userPassword)) {
             this.userPassword = newUserPassword;
+            anyValueUpdated = true;
+        }
+        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {
