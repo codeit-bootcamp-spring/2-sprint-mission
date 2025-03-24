@@ -26,13 +26,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DiscodeitApplicationTest {
     @Autowired
     private UserController userController;
-
     @Autowired
     private ChannelController channelController;
-
     @Autowired
     private MessageController messageController;
-
     private UserDto setUpUser;
     private ChannelDto setUpChannel;
 
