@@ -1,11 +1,6 @@
 package com.sprint.mission.util;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -46,7 +41,7 @@ public final class FileUtils {
                 return (Map<U, T>) object;
             }
 
-            throw new ClassCastException("잘못된 데이터 타입: List를 기대했지만, " + object.getClass() + "을(를) 발견했습니다.");
+            throw new ClassCastException("잘못된 데이터 타입: Map를 기대했지만, " + object.getClass() + "을(를) 발견했습니다.");
         } catch (IOException e) {
             throw new UncheckedIOException("파일을 불러오는 작업을 실패했습니다", e);
         } catch (ClassNotFoundException e) {

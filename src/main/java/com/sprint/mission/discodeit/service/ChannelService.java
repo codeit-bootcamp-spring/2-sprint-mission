@@ -7,15 +7,17 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    ChannelDto addMemberToPrivate(UUID channelId, UUID friendId);
+    ChannelDto createPublic(ChannelRegisterDto channelRegisterDto);
 
-    ChannelDto create(ChannelRegisterDto channelRegisterDto);
+    ChannelDto createPrivate(ChannelRegisterDto channelRegisterDto, List<UUID> channelMemberIds);
+
+    ChannelDto addPrivateChannelMember(UUID channelId, UUID friendId);
 
     ChannelDto findById(UUID id);
 
     List<ChannelDto> findAllByUserId(UUID userId);
 
-    ChannelDto updateName(UUID id, String name);
+    ChannelDto updatePublicChannelName(UUID id, String name);
 
     void delete(UUID channelId);
 }

@@ -2,12 +2,8 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.application.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.application.dto.user.UserDto;
-import com.sprint.mission.discodeit.application.dto.user.UsersDto;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,63 +16,30 @@ import java.util.UUID;
 public class ChannelController {
     private final ChannelService channelService;
     private final UserService userService;
-    private final ReadStatusService readStatusService;
 
-    public ChannelResponseDto create(ChannelRegisterDto channelRegisterDto) {
-        ChannelDto channel = channelService.create(channelRegisterDto);
-
-        if (channel.type().equals(ChannelType.PRIVATE)) {
-            return createPrivateChannelResponse(channel);
-        }
-
-        return ChannelResponseDto.fromEntity(channel, null);
+    public ChannelDto createPublicChannel(ChannelRegisterDto channelRegisterDto) {
+        return channelService.createPublic(channelRegisterDto);
     }
 
-    public List<ChannelResponseDto> findAll(UUID userId) {
-        return channelService.findAllByUserId(userId)
-                .stream()
-                .map(this::createChannelResponse)
-                .toList();
+    public ChannelDto createPrivateChannel(ChannelRegisterDto channelRegisterDto, List<UUID> memberIds) {
+        return channelService.createPrivate(channelRegisterDto, memberIds);
     }
 
-    public ChannelResponseDto updateNameToPublic(UUID channelId, String channelName) {
-        ChannelDto channel = channelService.updateName(channelId, channelName);
-
-        return ChannelResponseDto.fromEntity(channel, null);
+    public List<ChannelDto> findAllByUserId(UUID userId) {
+        return channelService.findAllByUserId(userId);
     }
 
-    public ChannelResponseDto addMemberToPrivate(UUID channelId, String friendEmail) {
+    public ChannelDto updatePublicChannelName(UUID channelId, String channelName) {
+        return channelService.updatePublicChannelName(channelId, channelName);
+    }
+
+    public ChannelDto addPrivateChannelMember(UUID channelId, String friendEmail) {
         UserDto friend = userService.findByEmail(friendEmail);
-        ChannelDto channel = channelService.addMemberToPrivate(channelId, friend.id());
 
-        return createPrivateChannelResponse(channel);
+        return channelService.addPrivateChannelMember(channelId, friend.id());
     }
 
-    public ChannelResponseDto findById(UUID channelId) {
-        ChannelDto channel = channelService.findById(channelId);
-
-        if (channel.type().equals(ChannelType.PRIVATE)) {
-            return createPrivateChannelResponse(channel);
-        }
-
-        return ChannelResponseDto.fromEntity(channel, null);
-    }
-
-    private ChannelResponseDto createChannelResponse(ChannelDto channel) {
-        if (channel.type().equals(ChannelType.PRIVATE)) {
-            return createPrivateChannelResponse(channel);
-        }
-
-        return ChannelResponseDto.fromEntity(channel, null);
-    }
-
-    private ChannelResponseDto createPrivateChannelResponse(ChannelDto channel) {
-        List<UserDto> users = readStatusService.findByChannelId(channel.id())
-                .readStatuses()
-                .stream()
-                .map(readStatus -> userService.findById(readStatus.userId()))
-                .toList();
-
-        return ChannelResponseDto.fromEntity(channel, new UsersDto(users));
+    public ChannelDto findById(UUID channelId) {
+        return channelService.findById(channelId);
     }
 }
