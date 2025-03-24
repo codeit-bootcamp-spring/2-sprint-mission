@@ -1,6 +1,4 @@
-package com.sprint.mission.discodeit.controller;
-
-import com.sprint.mission.discodeit.application.dto.user.UserDto;
+package com.sprint.mission.discodeit.application.dto.user;
 
 import java.util.UUID;
 
