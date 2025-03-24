@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,66 +19,56 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserStatusServiceTest {
+
+    private UserRepository userRepository;
+    private UserStatusRepository userStatusRepository;
+    private UserStatusService userStatusService;
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        userRepository = new JCFUserRepository();
+        userStatusRepository = new JCFUserStatusRepository();
+        userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
+        user = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
+    }
+
     @DisplayName("처음 생성시 유저의 로그인 상태는 false를 반환합니다.")
     @Test
     void create() {
-        UserRepository userRepository = new JCFUserRepository();
-        User user = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
-
-        UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
-        UserStatusService userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
-
         UserStatusDto userStatusDto = userStatusService.create(user.getId());
         assertThat(userStatusDto.isLogin()).isFalse();
     }
 
+    @DisplayName("존재하지 않는 유저 ID로 생성 시 예외를 발생시킨다.")
     @Test
     void create_NotUser() {
-        UserRepository userRepository = new JCFUserRepository();
-        UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
         UUID random = UUID.randomUUID();
         userStatusRepository.save(new UserStatus(random));
-        UserStatusService userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
 
         assertThatThrownBy(() -> userStatusService.create(random)).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("이미 존재하는 유저 상태로 다시 생성 시 예외를 발생시킨다.")
     @Test
     void create_AlreadyUserStatusExist() {
-        UserRepository userRepository = new JCFUserRepository();
-        User user = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
-
-        UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
-        UserStatusService userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
-
         userStatusService.create(user.getId());
 
         assertThatThrownBy(() -> userStatusService.create(user.getId())).isInstanceOf(IllegalArgumentException.class);
     }
 
-
+    @DisplayName("유저 ID로 상태를 조회하면 올바른 상태를 반환한다.")
     @Test
     void findByUserId() {
-        UserRepository userRepository = new JCFUserRepository();
-        User user = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
-
-        UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
-        UserStatusService userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
-
         UserStatusDto userStatusDto = userStatusService.create(user.getId());
         UserStatusDto userStatusDto1 = userStatusService.findByUserId(user.getId());
 
         assertThat(userStatusDto.id()).isEqualTo(userStatusDto1.id());
     }
 
+    @DisplayName("유저 ID로 상태를 업데이트하면 로그인 시간이 갱신된다.")
     @Test
     void updateByUserId() {
-        UserRepository userRepository = new JCFUserRepository();
-        User user = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
-
-        UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
-        UserStatusService userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
-
         UserStatusDto userStatusDto = userStatusService.create(user.getId());
         UserStatusDto updatedUserStatusDto = userStatusService.updateByUserId(user.getId());
 

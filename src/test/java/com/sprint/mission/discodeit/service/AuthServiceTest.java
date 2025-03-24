@@ -23,20 +23,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AuthServiceTest {
     private AuthService authService;
+    private UserService userService;
+    private UserRepository userRepository;
     private UserStatusRepository userStatusRepository;
 
     @BeforeEach
     void setUp() {
-        UserRepository userRepository = new JCFUserRepository();
+        userRepository = new JCFUserRepository();
         userStatusRepository = new JCFUserStatusRepository();
-        UserService userService = new BasicUserService(userRepository, userStatusRepository);
+        userService = new BasicUserService(userRepository, userStatusRepository);
         userService.register(new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
         authService = new BasicAuthService(userRepository, userStatusRepository);
     }
 
-    @DisplayName("로그인을 하면 유저정보를 반환하고 UserStatus를 변경합니다.")
+    @DisplayName("로그인 시 유저 정보를 반환하고 UserStatus가 변경된다.")
     @Test
-    void login() {
+    void loginUpdatesUserStatus() {
         UserLoginDto loginRequestUser = new UserLoginDto(LOGIN_USER.getName(), LOGIN_USER.getPassword());
         UserDto user = authService.login(loginRequestUser);
         UserStatus userStatus = userStatusRepository.findByUserId(user.id()).get();
@@ -44,9 +46,9 @@ class AuthServiceTest {
         assertThat(userStatus.isLogin(ZonedDateTime.now().toInstant())).isTrue();
     }
 
-    @DisplayName("로그인시 등록된 유저가 없으면 예외를 반환합니다.")
+    @DisplayName("등록되지 않은 유저로 로그인 시 예외가 발생한다.")
     @Test
-    void loginException() {
+    void loginThrowsExceptionForUnregisteredUser() {
         UserLoginDto loginRequestUser = new UserLoginDto(OTHER_USER.getName(), OTHER_USER.getPassword());
         assertThatThrownBy(() -> authService.login(loginRequestUser))
                 .isInstanceOf(IllegalArgumentException.class);

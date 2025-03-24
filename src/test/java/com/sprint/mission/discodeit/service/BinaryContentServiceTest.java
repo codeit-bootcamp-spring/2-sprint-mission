@@ -24,21 +24,22 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class BinaryContentServiceTest {
     private BinaryContentService binaryContentService;
+    private BinaryContentRepository binaryContentRepository;
 
     @BeforeEach
     void setUp() {
-        BinaryContentRepository binaryContentRepository = new JCFBinaryContentRepository();
+        binaryContentRepository = new JCFBinaryContentRepository();
         binaryContentService = new BasicBinaryContentService(binaryContentRepository);
     }
 
-    @DisplayName("이미지 파일 저장 후 경로 반환 테스트")
+    private MockMultipartFile createMockImageFile(String content) {
+        return new MockMultipartFile(MediaType.IMAGE_JPEG_VALUE, content.getBytes());
+    }
+
+    @DisplayName("이미지 파일을 저장하면 올바른 경로가 반환된다.")
     @Test
     void createProfileImage() throws IOException {
-        MockMultipartFile file = new MockMultipartFile(
-                MediaType.IMAGE_JPEG_VALUE,
-                MESSAGE_CONTENT.getBytes()
-        );
-
+        MockMultipartFile file = createMockImageFile(MESSAGE_CONTENT);
         UUID profileId = binaryContentService.createProfileImage(file);
         BinaryContentDto binaryContent = binaryContentService.findById(profileId);
 
@@ -46,42 +47,32 @@ class BinaryContentServiceTest {
         assertThat(file.getBytes()).isEqualTo(storedFileBytes);
     }
 
+    @DisplayName("여러 ID로 조회하면 해당하는 모든 바이너리 콘텐츠가 반환된다.")
     @Test
-    void findALLByIdIn() {
-        MockMultipartFile file = new MockMultipartFile(
-                MediaType.IMAGE_JPEG_VALUE,
-                MESSAGE_CONTENT.getBytes()
-        );
+    void findAllByIdIn() {
+        MockMultipartFile file1 = createMockImageFile(MESSAGE_CONTENT);
+        MockMultipartFile file2 = createMockImageFile("두번째 파일");
 
-        MockMultipartFile file2 = new MockMultipartFile(
-                MediaType.IMAGE_JPEG_VALUE,
-                "두번쨰 파일".getBytes()
-        );
-
-        UUID profileId = binaryContentService.createProfileImage(file);
+        UUID profileId1 = binaryContentService.createProfileImage(file1);
         UUID profileId2 = binaryContentService.createProfileImage(file2);
-        BinaryContentsDto binaryContentsDto = binaryContentService.findByIdIn(List.of(profileId, profileId2));
+        BinaryContentsDto binaryContentsDto = binaryContentService.findByIdIn(List.of(profileId1, profileId2));
 
-        BinaryContentDto binaryContentDto = binaryContentsDto.binaryContents().get(0);
-        BinaryContentDto binaryContentDto1 = binaryContentsDto.binaryContents().get(1);
+        BinaryContentDto binaryContentDto1 = binaryContentsDto.binaryContents().get(0);
+        BinaryContentDto binaryContentDto2 = binaryContentsDto.binaryContents().get(1);
 
         assertAll(
-                () -> assertThat(binaryContentDto.id()).isEqualTo(profileId),
-                () -> assertThat(binaryContentDto1.id()).isEqualTo(profileId2)
+                () -> assertThat(binaryContentDto1.id()).isEqualTo(profileId1),
+                () -> assertThat(binaryContentDto2.id()).isEqualTo(profileId2)
         );
     }
 
-
-    @DisplayName("기존 이미지 삭제시 로컬 저장소에도 삭제됩니다.")
+    @DisplayName("이미지를 삭제하면 로컬 저장소에서도 삭제된다.")
     @Test
     void deleteProfileImage() {
-        MockMultipartFile file = new MockMultipartFile(
-                MediaType.IMAGE_JPEG_VALUE,
-                MESSAGE_CONTENT.getBytes()
-        );
-
+        MockMultipartFile file = createMockImageFile(MESSAGE_CONTENT);
         UUID profileId = binaryContentService.createProfileImage(file);
         BinaryContentDto binaryContent = binaryContentService.findById(profileId);
+
         binaryContentService.delete(profileId);
 
         assertAll(

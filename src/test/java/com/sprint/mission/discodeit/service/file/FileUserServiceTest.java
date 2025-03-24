@@ -24,23 +24,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class FileUserServiceTest {
     private Path userPath;
     private UserService userService;
+    private FileUserRepository userRepository;
     private UserDto initializedUser;
 
     @BeforeEach
     void setUp() {
-        setUpTestPath();
-        setUpService();
-        setUpUser();
-    }
-
-    private void setUpService() {
-        FileUserRepository userRepository = new FileUserRepository();
+        userPath = STORAGE_DIRECTORY.resolve(USER_TEST_FILE);
+        userRepository = new FileUserRepository();
         userRepository.changePath(userPath);
         userService = new FileUserService(userRepository);
-    }
-
-    private void setUpTestPath() {
-        userPath = STORAGE_DIRECTORY.resolve(USER_TEST_FILE);
+        setUpUser();
     }
 
     private void setUpUser() {
@@ -53,74 +46,67 @@ class FileUserServiceTest {
         Files.deleteIfExists(userPath);
     }
 
-    @DisplayName("입력받은 유저정보를 서버에 등록한다")
+    @DisplayName("입력받은 유저 정보를 서버에 등록하면 올바르게 저장된다.")
     @Test
-    void register() {
+    void registerUser() {
         assertThat(initializedUser.email()).isEqualTo(LOGIN_USER.getEmail());
     }
 
-    @DisplayName("유저 등록시 서버에 이메일이 같은 이미 등록된 유저가 있을떄 예외를 반환한다")
+    @DisplayName("이미 등록된 이메일로 유저를 등록하면 예외가 발생한다.")
     @Test
-    void registerDuplicateUser() {
+    void registerDuplicateUserThrowsException() {
         UserRegisterDto otherUserWithSameEmail = new UserRegisterDto(OTHER_USER.getName(), LOGIN_USER.getEmail(),
                 OTHER_USER.getPassword());
 
-        assertThatThrownBy(() ->
-                userService.register(otherUserWithSameEmail, null))
+        assertThatThrownBy(() -> userService.register(otherUserWithSameEmail, null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("id가 같은 통해 유저를 반환한다")
+    @DisplayName("ID를 통해 유저를 조회하면 해당 유저를 반환한다.")
     @Test
-    void findById() {
+    void findUserById() {
         UserDto user = userService.findById(initializedUser.id());
-
-        assertThat(initializedUser.email())
-                .isEqualTo(user.email());
+        assertThat(initializedUser.email()).isEqualTo(user.email());
     }
 
-    @DisplayName("찾는 id가 없을이 예외를 반환한다")
+    @DisplayName("존재하지 않는 ID로 유저를 조회하면 예외가 발생한다.")
     @Test
-    void findByIdNoId() {
+    void findByIdThrowsExceptionWhenUserNotFound() {
         UUID id = UUID.randomUUID();
         assertThatThrownBy(() -> userService.findById(id))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("이름으로 유저를 조회한다")
+    @DisplayName("이름으로 유저를 조회하면 해당하는 유저를 반환한다.")
     @Test
-    void findByName() {
-        UserRegisterDto otherUserWithSameEmail = new UserRegisterDto(LOGIN_USER.getName(), OTHER_USER.getEmail(),
-                OTHER_USER.getPassword());
-        userService.register(otherUserWithSameEmail, null);
+    void findUserByName() {
+        UserRegisterDto otherUser = new UserRegisterDto(LOGIN_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword());
+        userService.register(otherUser, null);
 
         UserDto user = userService.findByName(initializedUser.name());
-
         assertThat(user.name()).isEqualTo(LOGIN_USER.getName());
     }
 
-    @DisplayName("이메일이 같은 유저를 반환한다")
+    @DisplayName("이메일을 통해 유저를 조회하면 해당하는 유저를 반환한다.")
     @Test
-    void findByEmail() {
+    void findUserByEmail() {
         UserDto user = userService.findByEmail(LOGIN_USER.getEmail());
-
         assertThat(initializedUser.id()).isEqualTo(user.id());
     }
 
-    @DisplayName("이름을 수정하고 유저를 반환한다")
+    @DisplayName("유저의 이름을 수정하면 변경된 정보가 반영된다.")
     @Test
-    void updateName() {
+    void updateUserName() {
         String userName = "김철수";
         userService.updateName(initializedUser.id(), userName);
 
         UserDto updatedUserInfo = userService.findById(initializedUser.id());
-
         assertThat(initializedUser.name()).isNotEqualTo(updatedUserInfo.name());
     }
 
-    @DisplayName("유저를 삭제한다")
+    @DisplayName("유저를 삭제하면 조회 시 예외가 발생한다.")
     @Test
-    void delete() {
+    void deleteUser() {
         UUID id = initializedUser.id();
         userService.delete(id);
 

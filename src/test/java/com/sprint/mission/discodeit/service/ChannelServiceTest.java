@@ -31,92 +31,89 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ChannelServiceTest {
     private ChannelService channelService;
-    private ChannelDto setUpChannel;
-    private User setUpUser;
     private UserRepository userRepository;
     private MessageRepository messageRepository;
     private ReadStatusRepository readStatusRepository;
+    private JCFChannelRepository channelRepository;
+    private ChannelDto setUpChannel;
+    private User setUpUser;
 
     @BeforeEach
     void setUp() {
         messageRepository = new JCFMessageRepository();
         readStatusRepository = new JCFReadStatusRepository();
-
         userRepository = new JCFUserRepository();
-        setUpUser = userRepository.save(
-                new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
+        channelRepository = new JCFChannelRepository();
+        channelService = new BasicChannelService(channelRepository, readStatusRepository, messageRepository);
 
-        channelService = new BasicChannelService(new JCFChannelRepository(), readStatusRepository, messageRepository);
+        setUpUser = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
+
         ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME,
                 new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null));
         setUpChannel = channelService.create(channelRegisterDto);
     }
 
+    @DisplayName("채널 생성 시 올바른 이름이 설정된다.")
     @Test
-    void 채널_생성() {
+    void createChannel() {
         assertThat(setUpChannel.name()).isEqualTo(CHANNEL_NAME);
     }
 
-    @DisplayName("private 채널 ID로 조회된 채널을 반환합니다")
+    @DisplayName("채널 ID로 조회하면 올바른 채널을 반환한다.")
     @Test
-    void 채널_단건_조회() {
+    void findChannelById() {
         ChannelDto channel = channelService.findById(setUpChannel.id());
         assertThat(setUpChannel.id() + setUpChannel.name()).isEqualTo(channel.id() + channel.name());
     }
 
-    @DisplayName("Public 채널이름을 수정하고 수정된 채널 정보를 반환합니다.")
+    @DisplayName("공개 채널의 이름을 변경하면 변경된 정보가 반환된다.")
     @Test
-    void Public_채널_이름_수정() {
+    void updatePublicChannelName() {
         channelService.updateName(setUpChannel.id(), UPDATED_CHANNEL_NAME);
-
-        assertThat(channelService.findById(setUpChannel.id()).name())
-                .isEqualTo(UPDATED_CHANNEL_NAME);
+        assertThat(channelService.findById(setUpChannel.id()).name()).isEqualTo(UPDATED_CHANNEL_NAME);
     }
 
-    @DisplayName("Private 채널 수정 시도시 예외를 반환합니다.")
+    @DisplayName("비공개 채널의 이름을 변경하려고 하면 예외가 발생한다.")
     @Test
-    void Private_채널_이름_수정_예외() {
-        ChannelRegisterDto setUpUserChannelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
+    void updatePrivateChannelNameThrowsException() {
+        ChannelRegisterDto privateChannelDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
                 new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null));
-        ChannelDto setUpUserPrivateChannel = channelService.create(setUpUserChannelRegisterDto);
+        ChannelDto privateChannel = channelService.create(privateChannelDto);
 
-        assertThatThrownBy(() -> channelService.updateName(setUpUserPrivateChannel.id(), UPDATED_CHANNEL_NAME))
+        assertThatThrownBy(() -> channelService.updateName(privateChannel.id(), UPDATED_CHANNEL_NAME))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("전체 조회시 public 채널과 요청한 유저가 속한 private 채널만 반환합니다.")
+    @DisplayName("전체 채널 조회 시 공개 채널과 사용자가 속한 비공개 채널만 반환된다.")
     @Test
-    void findAll() {
-        User otherUser = userRepository.save(
-                new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
-        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
-                new UserDto(otherUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null));
-        channelService.create(channelRegisterDto);
+    void findAllChannelsForUser() {
+        User otherUser = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
-        ChannelRegisterDto setUpUserChannelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
-                new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null));
-        ChannelDto setUpUserPrivateChannel = channelService.create(setUpUserChannelRegisterDto);
+        ChannelDto otherPrivateChannel = channelService.create(new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
+                new UserDto(otherUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null)));
+
+        ChannelDto userPrivateChannel = channelService.create(new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
+                new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null)));
 
         List<UUID> setUpUserChannelIds = channelService.findAllByUserId(setUpUser.getId())
                 .stream()
                 .map(ChannelDto::id)
                 .toList();
 
-        assertThat(setUpUserChannelIds).containsExactlyInAnyOrder(setUpChannel.id(), setUpUserPrivateChannel.id());
+        assertThat(setUpUserChannelIds).containsExactlyInAnyOrder(setUpChannel.id(), userPrivateChannel.id());
     }
 
-    @DisplayName("채널 삭제시 메세지와 ReadStatus도 삭제합니다")
+    @DisplayName("채널 삭제 시 메시지와 읽음 상태도 함께 삭제된다.")
     @Test
-    void 채널_삭제() {
+    void deleteChannelRemovesMessagesAndReadStatus() {
         UUID channelId = setUpChannel.id();
         channelService.delete(channelId);
-
         assertThatThrownBy(() -> channelService.findById(channelId)).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("채널 삭제시 메세지도 삭제합니다")
+    @DisplayName("채널 삭제 시 메시지도 함께 삭제된다.")
     @Test
-    void 채널_삭제시_메세지삭제() {
+    void deleteChannelRemovesMessages() {
         UUID channelId = setUpChannel.id();
         channelService.delete(channelId);
 
@@ -127,29 +124,27 @@ class ChannelServiceTest {
         assertThat(isExisting).isFalse();
     }
 
-    @DisplayName("Private 채널 삭제시 ReadStatus도 삭제합니다")
+    @DisplayName("비공개 채널 삭제 시 읽음 상태도 함께 삭제된다.")
     @Test
-    void Private_채널_삭제시_ReadStatus_삭제() {
-        ChannelRegisterDto setUpUserChannelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
-                new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null));
-        ChannelDto privateChannel = channelService.create(setUpUserChannelRegisterDto);
+    void deletePrivateChannelRemovesReadStatus() {
+        ChannelDto privateChannel = channelService.create(new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
+                new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null)));
 
         UUID privateChannelId = privateChannel.id();
         channelService.delete(privateChannelId);
 
         boolean isExisting = readStatusRepository.findByChannelId(privateChannelId)
                 .stream()
-                .anyMatch(message -> message.getChannelId().equals(privateChannelId));
+                .anyMatch(status -> status.getChannelId().equals(privateChannelId));
 
         assertThat(isExisting).isFalse();
     }
 
-    @DisplayName("채널조회시 가장 최근 메세지의 시간정보를 반환합니다.")
+    @DisplayName("채널 조회 시 가장 최근 메시지의 생성 시간을 반환한다.")
     @Test
-    void findById() {
+    void findChannelByIdReturnsLastMessageTimestamp() {
         messageRepository.save(new Message(MESSAGE_CONTENT, setUpChannel.id(), setUpUser.getId(), new ArrayList<>()));
-        Message message = messageRepository.save(new Message(MESSAGE_CONTENT + 123, setUpChannel.id(), setUpUser.getId(), new ArrayList<>()));
-
+        Message message = messageRepository.save(new Message(MESSAGE_CONTENT + "123", setUpChannel.id(), setUpUser.getId(), new ArrayList<>()));
 
         ChannelDto channel = channelService.findById(setUpChannel.id());
         assertThat(channel.lastMessageCreatedAt()).isEqualTo(message.getCreatedAt());

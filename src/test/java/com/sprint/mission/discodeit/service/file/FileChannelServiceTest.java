@@ -39,29 +39,27 @@ class FileChannelServiceTest {
     private ChannelService channelService;
     private ChannelDto initializedChannel;
     private ReadStatusRepository readStatusRepository;
+    private FileUserRepository userRepository;
+    private FileChannelRepository channelRepository;
+    private JCFMessageRepository messageRepository;
 
     @BeforeEach
     void setUp() {
-        setUpTestFilePath();
-        setUpService();
-        setUpChannel(setUpUser());
-    }
-
-    private void setUpTestFilePath() {
         userTestFilePath = STORAGE_DIRECTORY.resolve(USER_TEST_FILE);
         channelTestFilePath = STORAGE_DIRECTORY.resolve(CHANNEL_TEST_FILE);
-    }
 
-    private void setUpService() {
-        FileUserRepository userRepository = new FileUserRepository();
+        userRepository = new FileUserRepository();
+        channelRepository = new FileChannelRepository();
+        messageRepository = new JCFMessageRepository();
+        readStatusRepository = new JCFReadStatusRepository();
+
         userRepository.changePath(userTestFilePath);
-
-        FileChannelRepository channelRepository = new FileChannelRepository();
         channelRepository.changePath(channelTestFilePath);
 
         userService = new FileUserService(userRepository);
-        readStatusRepository = new JCFReadStatusRepository();
-        channelService = new FileChannelService(channelRepository, readStatusRepository, new JCFMessageRepository());
+        channelService = new FileChannelService(channelRepository, readStatusRepository, messageRepository);
+
+        setUpChannel(setUpUser());
     }
 
     private void setUpChannel(UserDto loginUser) {
@@ -71,25 +69,19 @@ class FileChannelServiceTest {
     }
 
     private UserDto setUpUser() {
-        UserRegisterDto user = new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(),
-                LOGIN_USER.getPassword());
-
-        return userService.register(user, null);
+        return userService.register(new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(),
+                LOGIN_USER.getPassword()), null);
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        initializeFiles();
-    }
-
-    private void initializeFiles() throws IOException {
         Files.deleteIfExists(userTestFilePath);
         Files.deleteIfExists(channelTestFilePath);
     }
 
-    @DisplayName("친구의 이메일을 통해 같은 채널에 멤버를 추가합니다")
+    @DisplayName("친구의 이메일을 통해 같은 채널에 멤버를 추가하면 멤버 리스트에 포함된다.")
     @Test
-    void addMember() {
+    void addMemberToChannel() {
         UserDto otherUser = userService.register(new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword()), null);
 
@@ -102,34 +94,32 @@ class FileChannelServiceTest {
         assertThat(channelUsers).contains(otherUser.id());
     }
 
-    @DisplayName("로그인된 유저와 채널 이름을 통해 채널 생성합니다")
+    @DisplayName("로그인된 유저가 채널을 생성하면 올바르게 반환된다.")
     @Test
-    void create() {
+    void createChannel() {
         assertThat(initializedChannel.name()).isEqualTo(CHANNEL_NAME);
     }
 
-    @DisplayName("채널 ID를 바탕으로 해당채널을 찾아서 반환합니다")
+    @DisplayName("채널 ID로 조회하면 해당 채널이 반환된다.")
     @Test
-    void findById() {
+    void findChannelById() {
         ChannelDto channel = channelService.findById(initializedChannel.id());
-        assertThat(initializedChannel.id() + initializedChannel.name()).isEqualTo(channel.id() + channel.name());
+        assertThat(channel.id()).isEqualTo(initializedChannel.id());
+        assertThat(channel.name()).isEqualTo(initializedChannel.name());
     }
 
-    @DisplayName("채널 이름을 변경합니다")
+    @DisplayName("채널 이름을 변경하면 수정된 이름이 반환된다.")
     @Test
-    void updateName() {
+    void updateChannelName() {
         channelService.updateName(initializedChannel.id(), UPDATED_CHANNEL_NAME);
-
-        assertThat(channelService.findById(initializedChannel.id()).name())
-                .isEqualTo(UPDATED_CHANNEL_NAME);
+        assertThat(channelService.findById(initializedChannel.id()).name()).isEqualTo(UPDATED_CHANNEL_NAME);
     }
 
-    @DisplayName("채널을 삭제합니다")
+    @DisplayName("채널을 삭제하면 조회 시 예외가 발생한다.")
     @Test
-    void delete() {
+    void deleteChannel() {
         UUID id = initializedChannel.id();
         channelService.delete(id);
-
         assertThatThrownBy(() -> channelService.findById(id))
                 .isInstanceOf(IllegalArgumentException.class);
     }

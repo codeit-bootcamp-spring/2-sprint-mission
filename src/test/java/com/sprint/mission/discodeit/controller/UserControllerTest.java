@@ -50,7 +50,7 @@ class UserControllerTest {
         userController = new UserController(userService, binaryContentService, new BasicUserStatusService(userStatusRepository, userRepository));
     }
 
-    @DisplayName("프로필 사진 저장을 선택하지 않았을떄 profile 아이디를 null을 반환합니다")
+    @DisplayName("프로필 사진 저장을 선택하지 않았을 때 프로필 아이디가 null을 반환한다.")
     @Test
     void registerException() {
         UserRegisterDto userRegisterDto = new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(),
@@ -59,7 +59,7 @@ class UserControllerTest {
         assertThat(user.profileId()).isNull();
     }
 
-    @DisplayName("프로필 사진 저장을 선택했을떄 파일 저장 경로를 반환합니다")
+    @DisplayName("프로필 사진을 저장하면 파일 저장 경로를 반환한다.")
     @Test
     void register() throws IOException {
         byte[] binaryProfileImage = loadImageFileFromResource("dog.jpg");
@@ -78,18 +78,18 @@ class UserControllerTest {
         assertThat(binaryProfileImage).isEqualTo(storedFileBytes);
     }
 
-    @DisplayName("처음 등록시 유저의 로그아웃된 상태를 반환합니다")
+    @DisplayName("처음 등록한 유저의 로그인 상태는 false를 반환한다.")
     @Test
     void registerValidateUserStatus() {
-        UserRegisterDto sameNameUser = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
-        UserDto user = userController.register(sameNameUser, null); // 이러면 어딘가 lastLogin이 있어야되는데
+        UserRegisterDto userRegisterDto = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
+        UserDto user = userController.register(userRegisterDto, null); // UserResponseDto를 통해 로그인 상태를 확인
         UserResponseDto userResponse = userController.findById(user.id());
 
         assertThat(userResponse.isLogin()).isFalse();
     }
 
 
-    @DisplayName("사용자 이미지를 업데이트하고 유저 정보를 반환합니다")
+    @DisplayName("사용자 프로필 이미지를 업데이트하면 변경된 이미지 정보가 반영된다.")
     @Test
     void updateProfileImage() throws IOException {
         byte[] existingProfileImage = loadImageFileFromResource("dog.jpg");
@@ -116,7 +116,7 @@ class UserControllerTest {
         assertThat(updatedProfileImage).isEqualTo(storedFileBytes);
     }
 
-    @DisplayName("유저 삭제시 이미지와 UserStatus가 삭제됩니다.")
+    @DisplayName("유저 삭제 시 프로필 이미지와 UserStatus도 삭제된다.")
     @Test
     void delete() {
         MockMultipartFile file = new MockMultipartFile(

@@ -18,71 +18,67 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserServiceTest {
     private UserService userService;
+    private JCFUserRepository userRepository;
+    private JCFUserStatusRepository userStatusRepository;
     private UserDto setUpUser;
 
     @BeforeEach
     void setUp() {
-        userService = new BasicUserService(new JCFUserRepository(), new JCFUserStatusRepository());
-        setUpUser = userService.register(
-                new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
+        userRepository = new JCFUserRepository();
+        userStatusRepository = new JCFUserStatusRepository();
+        userService = new BasicUserService(userRepository, userStatusRepository);
+        setUpUser = userService.register(new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
     }
 
     @DisplayName("유저 등록시 중복된 이메일이 있을 경우 예외 처리합니다")
     @Test
     void registerDuplicateEmail() {
-        UserRegisterDto sameEmailUser = new UserRegisterDto(OTHER_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword());
-        assertThatThrownBy(() -> {
-            userService.register(sameEmailUser, null);
-        }).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> userService.register(new UserRegisterDto(OTHER_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("유저 등록시 중복된 유저 이름이 있을 경우 예외 처리합니다")
     @Test
     void registerDuplicateUserName() {
-        UserRegisterDto sameNameUser = new UserRegisterDto(LOGIN_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
-        assertThatThrownBy(() -> {
-            userService.register(sameNameUser, null);
-        }).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void 유저_UUID_단건_조회_예외테스트() {
-        UUID id = UUID.randomUUID();
-        assertThatThrownBy(() -> userService.findById(id))
+        assertThatThrownBy(() -> userService.register(new UserRegisterDto(LOGIN_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword()), null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("존재하지 않는 UUID로 유저 조회 시 예외 발생")
     @Test
-    void 유저_UUID_단건_조회() {
-        UUID id = setUpUser.id();
-        UserDto userDto = userService.findById(id);
-
-        assertThat(userDto.id()).isEqualTo(id);
+    void findByIdThrowsExceptionWhenUserNotFound() {
+        assertThatThrownBy(() -> userService.findById(UUID.randomUUID()))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("UUID로 유저 단건 조회")
     @Test
-    void 유저_이름_단건_조회() {
-        UserDto user = userService.findByName(LOGIN_USER.getName());
+    void findByIdReturnsUser() {
+        UserDto userDto = userService.findById(setUpUser.id());
+        assertThat(userDto.id()).isEqualTo(setUpUser.id());
+    }
 
+    @DisplayName("이름으로 유저 단건 조회")
+    @Test
+    void findByNameReturnsUser() {
+        UserDto user = userService.findByName(LOGIN_USER.getName());
         assertThat(user.name()).isEqualTo(LOGIN_USER.getName());
     }
 
+    @DisplayName("유저 이름 수정")
     @Test
-    void 유저_이름_수정() {
-        String userName = "김철수";
-        userService.updateName(setUpUser.id(), userName);
-
+    void updateUserName() {
+        String newUserName = "김철수";
+        userService.updateName(setUpUser.id(), newUserName);
         UserDto updatedUserInfo = userService.findById(setUpUser.id());
-
-        assertThat(setUpUser.name()).isNotEqualTo(updatedUserInfo.name());
+        assertThat(updatedUserInfo.name()).isEqualTo(newUserName);
     }
 
+    @DisplayName("유저 삭제 후 조회 시 예외 발생")
     @Test
-    void 유저_삭제() {
-        UUID id = setUpUser.id();
-        userService.delete(id);
-
-        assertThatThrownBy(() -> userService.findById(id))
+    void deleteUserAndVerifyNotFound() {
+        userService.delete(setUpUser.id());
+        assertThatThrownBy(() -> userService.findById(setUpUser.id()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

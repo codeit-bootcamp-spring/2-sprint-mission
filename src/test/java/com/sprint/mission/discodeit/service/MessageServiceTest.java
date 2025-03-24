@@ -23,56 +23,58 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MessageServiceTest {
     private MessageService messageService;
+    private UserRepository userRepository;
+    private JCFMessageRepository messageRepository;
+    private JCFBinaryContentRepository binaryContentRepository;
     private MessageDto setUpMessage;
     private UUID channelId;
     private User setUpUser;
 
     @BeforeEach
     void setUp() {
-        UserRepository userRepository = new JCFUserRepository();
-        setUpUser = userRepository.save(
-                new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
+        userRepository = new JCFUserRepository();
+        messageRepository = new JCFMessageRepository();
+        binaryContentRepository = new JCFBinaryContentRepository();
+        messageService = new BasicMessageService(messageRepository, userRepository, binaryContentRepository);
 
-        messageService = new BasicMessageService(new JCFMessageRepository(), userRepository, new JCFBinaryContentRepository());
+        setUpUser = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
         channelId = UUID.randomUUID();
         setUpMessage = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, channelId, setUpUser.getId()), new ArrayList<>());
     }
 
+    @DisplayName("메시지 생성 시 내용이 올바르게 설정된다.")
     @Test
-    void 메세지_생성() {
+    void createMessage() {
         assertThat(setUpMessage.context()).isEqualTo(MESSAGE_CONTENT);
     }
 
+    @DisplayName("메시지 ID로 단건 조회 시 올바른 메시지를 반환한다.")
     @Test
-    void 메세지_단건_조회() {
+    void findMessageById() {
         MessageDto message = messageService.findById(setUpMessage.messageId());
-
-        assertThat(message.context())
-                .isEqualTo(MESSAGE_CONTENT);
+        assertThat(message.context()).isEqualTo(MESSAGE_CONTENT);
     }
 
-    @DisplayName("조회시 채널 ID를 받으면 채널에 해당하는 메세지들을 생성 순서에 맞게 반환합니다.")
+    @DisplayName("채널 ID로 메시지들을 조회하면 생성 순서대로 반환한다.")
     @Test
-    void findAllByChannelIdTest() {
+    void findAllMessagesByChannelId() {
         MessageDto messageDto = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, channelId, setUpUser.getId()), new ArrayList<>());
-
         List<MessageDto> messages = messageService.findAllByChannelId(channelId);
         assertThat(messages).containsExactly(setUpMessage, messageDto);
     }
 
+    @DisplayName("메시지 내용을 수정하면 변경된 내용이 반영된다.")
     @Test
-    void 메세지_내용_수정() {
+    void updateMessageContent() {
         MessageDto message = messageService.updateContext(setUpMessage.messageId(), MESSAGE_CONTENT + "123");
-
         assertThat(message.context()).isEqualTo(MESSAGE_CONTENT + "123");
     }
 
+    @DisplayName("메시지를 삭제한 후 조회하면 예외가 발생한다.")
     @Test
-    void 메세지_삭제() {
+    void deleteMessage() {
         messageService.delete(setUpMessage.messageId());
-        UUID initId = setUpMessage.messageId();
-
-        assertThatThrownBy(() -> messageService.findById(initId))
+        assertThatThrownBy(() -> messageService.findById(setUpMessage.messageId()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

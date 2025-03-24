@@ -26,30 +26,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ChannelControllerTest {
     private ChannelController channelController;
     private UserService userService;
+    private ChannelService channelService;
+    private UserRepository userRepository;
+    private UserStatusRepository userStatusRepository;
+    private MessageRepository messageRepository;
+    private ChannelRepository channelRepository;
+    private ReadStatusRepository readStatusRepository;
     private UserDto owner;
 
     @BeforeEach
     void setUp() {
-        UserRepository userRepository = new JCFUserRepository();
-        UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
-        MessageRepository messageRepository = new JCFMessageRepository();
-        ChannelRepository channelRepository = new JCFChannelRepository();
-        ReadStatusRepository readStatusRepository = new JCFReadStatusRepository();
+        userRepository = new JCFUserRepository();
+        userStatusRepository = new JCFUserStatusRepository();
+        messageRepository = new JCFMessageRepository();
+        channelRepository = new JCFChannelRepository();
+        readStatusRepository = new JCFReadStatusRepository();
+
         userService = new BasicUserService(userRepository, userStatusRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository, readStatusRepository, messageRepository);
+        channelService = new BasicChannelService(channelRepository, readStatusRepository, messageRepository);
         channelController = new ChannelController(channelService, userService, new BasicReadStatusService(readStatusRepository, channelRepository, userRepository));
 
-        UserRegisterDto userRegisterDto = new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword());
-        owner = userService.register(userRegisterDto, null);
+        owner = userService.register(new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
     }
 
-    @DisplayName("Private 채널 조회시 유저의 세부 정보를 반환합니다.")
+    @DisplayName("Private 채널 조회 시 유저의 세부 정보를 반환한다.")
     @Test
     void findByIdPrivateChannel() {
-        UserRegisterDto userRegisterDto2 = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword());
-        userService.register(userRegisterDto2, null);
-        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, owner);
-        ChannelResponseDto channel = channelController.create(channelRegisterDto);
+        UserDto otherUser = userService.register(new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
+        ChannelResponseDto channel = createPrivateChannel(owner);
 
         ChannelResponseDto channelResponseDto = channelController.addMemberToPrivate(channel.id(), OTHER_USER.getEmail());
         List<String> userNames = channelResponseDto.usersDto()
@@ -61,14 +65,20 @@ class ChannelControllerTest {
         assertThat(userNames).contains(LOGIN_USER.getName(), OTHER_USER.getName());
     }
 
-
-    @DisplayName("Public 채널 조회시 User모음에 null을 반환합니다.")
+    @DisplayName("Public 채널 조회 시 User 모음에 null을 반환한다.")
     @Test
     void findByIdPublicChannel() {
-        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, owner);
-        ChannelResponseDto channel = channelController.create(channelRegisterDto);
+        ChannelResponseDto channel = createPublicChannel(owner);
         ChannelResponseDto channelResponseDto = channelController.findById(channel.id());
 
         assertThat(channelResponseDto.usersDto()).isNull();
+    }
+
+    private ChannelResponseDto createPrivateChannel(UserDto owner) {
+        return channelController.create(new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, owner));
+    }
+
+    private ChannelResponseDto createPublicChannel(UserDto owner) {
+        return channelController.create(new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, owner));
     }
 }

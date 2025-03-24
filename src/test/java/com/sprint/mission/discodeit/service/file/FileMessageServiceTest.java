@@ -33,34 +33,28 @@ class FileMessageServiceTest {
     private Path messageTestFilePath;
     private UserService userService;
     private MessageService messageService;
+    private FileUserRepository userRepository;
+    private FileMessageRepository messageRepository;
     private MessageDto initializedMessage;
     private UserDto initializedUser;
+    private Channel testChannel;
 
     @BeforeEach
     void setUp() {
-        setUpTestFilePath();
-        setUpService();
-        setUpUser();
-        setUpMessage();
-    }
-
-    private void setUpTestFilePath() {
         userTestFilePath = STORAGE_DIRECTORY.resolve(USER_TEST_FILE);
         messageTestFilePath = STORAGE_DIRECTORY.resolve(MESSAGE_TEST_FILE);
-    }
 
-    private void setUpService() {
-        FileUserRepository userRepository = new FileUserRepository();
+        userRepository = new FileUserRepository();
+        messageRepository = new FileMessageRepository();
         userRepository.changePath(userTestFilePath);
-        FileMessageRepository messageRepository = new FileMessageRepository();
         messageRepository.changePath(messageTestFilePath);
 
         userService = new FileUserService(userRepository);
         messageService = new FileMessageService(messageRepository, userRepository);
-    }
 
-    private void setUpMessage() {
-        initializedMessage = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, UUID.randomUUID(), initializedUser.id()), new ArrayList<>());
+        setUpUser();
+        setUpChannel();
+        setUpMessage();
     }
 
     private void setUpUser() {
@@ -68,59 +62,56 @@ class FileMessageServiceTest {
                 new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
     }
 
-    @AfterEach
-    void tearDown() throws IOException {
-        initializeFiles();
+    private void setUpChannel() {
+        testChannel = new Channel(ChannelType.PUBLIC, "test");
     }
 
-    private void initializeFiles() throws IOException {
+    private void setUpMessage() {
+        initializedMessage = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, testChannel.getId(), initializedUser.id()), new ArrayList<>());
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
         Files.deleteIfExists(userTestFilePath);
         Files.deleteIfExists(messageTestFilePath);
     }
 
-    @DisplayName("메세지 생성")
+    @DisplayName("메시지를 생성하면 올바른 내용이 설정된다.")
     @Test
-    void create() {
+    void createMessage() {
         assertThat(initializedMessage.context()).isEqualTo(MESSAGE_CONTENT);
     }
 
-    @DisplayName("단일 메세지ID로 조회")
+    @DisplayName("메시지 ID로 단건 조회 시 올바른 메시지를 반환한다.")
     @Test
-    void findById() {
+    void findMessageById() {
         MessageDto message = messageService.findById(initializedMessage.messageId());
-
-        assertThat(message.context())
-                .isEqualTo(MESSAGE_CONTENT);
+        assertThat(message.context()).isEqualTo(MESSAGE_CONTENT);
     }
 
-    @DisplayName("같은 채널ID를 가지는 메세지들을 조회합니다")
+    @DisplayName("같은 채널 ID를 가지는 메시지들을 조회하면 생성된 모든 메시지를 반환한다.")
     @Test
-    void findByChannelId() {
-        Channel channel = new Channel(ChannelType.PUBLIC, "test");
-        messageService.create(new MessageCreationDto(MESSAGE_CONTENT, channel.getId(), initializedUser.id()), new ArrayList<>());
-        messageService.create(new MessageCreationDto(MESSAGE_CONTENT + "123", channel.getId(), initializedUser.id()), new ArrayList<>());
+    void findMessagesByChannelId() {
+        messageService.create(new MessageCreationDto(MESSAGE_CONTENT, testChannel.getId(), initializedUser.id()), new ArrayList<>());
+        messageService.create(new MessageCreationDto(MESSAGE_CONTENT + "123", testChannel.getId(), initializedUser.id()), new ArrayList<>());
 
-        List<MessageDto> messages = messageService.findAllByChannelId(channel.getId());
+        List<MessageDto> messages = messageService.findAllByChannelId(testChannel.getId());
 
-        assertThat(messages).hasSize(2);
+        assertThat(messages).hasSize(3); // 기존 메시지 포함 3개
     }
 
-    @DisplayName("메세지의 내용을 업데이트 합니다")
+    @DisplayName("메시지 내용을 업데이트하면 변경된 내용이 반영된다.")
     @Test
-    void updateContext() {
+    void updateMessageContext() {
         messageService.updateContext(initializedMessage.messageId(), MESSAGE_CONTENT + "123");
-
-        assertThat(messageService.findById(initializedMessage.messageId()).context())
-                .isNotEqualTo(MESSAGE_CONTENT);
+        assertThat(messageService.findById(initializedMessage.messageId()).context()).isEqualTo(MESSAGE_CONTENT + "123");
     }
 
-    @DisplayName("메세지를 삭제합니다")
+    @DisplayName("메시지를 삭제하면 조회 시 예외가 발생한다.")
     @Test
-    void delete() {
+    void deleteMessage() {
         UUID initId = initializedMessage.messageId();
         messageService.delete(initId);
-
-        assertThatThrownBy(() -> messageService.findById(initId))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> messageService.findById(initId)).isInstanceOf(IllegalArgumentException.class);
     }
 }

@@ -29,31 +29,34 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class MessageControllerTest {
     private MessageController messageController;
     private BasicBinaryContentService basicBinaryContentService;
+    private MessageService messageService;
+    private BinaryContentRepository binaryContentRepository;
+    private UserRepository userRepository;
     private User setUpUser;
 
     @BeforeEach
     void setUp() {
-        BinaryContentRepository binaryContentRepository = new JCFBinaryContentRepository();
-        UserRepository userRepository = new JCFUserRepository();
+        binaryContentRepository = new JCFBinaryContentRepository();
+        userRepository = new JCFUserRepository();
+        messageService = new BasicMessageService(new JCFMessageRepository(), userRepository, binaryContentRepository);
+        basicBinaryContentService = new BasicBinaryContentService(binaryContentRepository);
+        messageController = new MessageController(messageService, basicBinaryContentService);
+
         setUpUser = userRepository.save(
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
-        MessageService messageservice = new BasicMessageService(new JCFMessageRepository(), userRepository, binaryContentRepository);
-        basicBinaryContentService = new BasicBinaryContentService(binaryContentRepository);
-        messageController = new MessageController(messageservice, basicBinaryContentService);
     }
 
-    @DisplayName("채널에 메세지 생성 테스트")
+    @DisplayName("채널에 메시지를 생성하면 올바른 내용을 반환한다.")
     @Test
-    void 메세지_생성_테스트() {
+    void createMessageTest() {
         MessageDto message = messageController.createMessage(new MessageCreationDto(MESSAGE_CONTENT, UUID.randomUUID(), setUpUser.getId()), new ArrayList<>());
 
         assertThat(message.context()).isEqualTo(MESSAGE_CONTENT);
     }
 
-
-    @DisplayName("메세지 삭제시 첨부파일도 삭제합니다.")
+    @DisplayName("메시지를 삭제하면 첨부 파일도 삭제된다.")
     @Test
-    void 메세지_삭제시_첨부파일도_삭제() {
+    void deleteMessageDeletesAttachments() {
         MockMultipartFile file = new MockMultipartFile(
                 MediaType.IMAGE_JPEG_VALUE,
                 MESSAGE_CONTENT.getBytes()
