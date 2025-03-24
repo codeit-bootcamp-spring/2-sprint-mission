@@ -1,90 +1,93 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserResponse;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    private static BasicUserService instance;
     private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
 
-    private BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserResponse create(UserCreateRequest request) {
+        if (userRepository.findByUsername(request.username()).isPresent() ||
+                userRepository.findByEmail(request.email()).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 username 또는 email입니다.");
+        }
+
+        User user = new User(request.username(), request.email(), request.password());
+        userRepository.save(user);
+
+        if (request.profileImage() != null) {
+            BinaryContent profileImage = new BinaryContent(user.getId(), null);
+            binaryContentRepository.save(profileImage);
+        }
+
+        UserStatus userStatus = new UserStatus(user.getId());
+        userStatusRepository.save(userStatus);
+
+        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), userStatus.isOnline());
     }
 
-    public static synchronized BasicUserService getInstance(UserRepository userRepository) {
-        if (instance == null) {
-            instance = new BasicUserService(userRepository);
-        }
-        return instance;
+    public Optional<UserResponse> find(UUID userId) {
+        return userRepository.findById(userId).map(user -> {
+            boolean isOnline = userStatusRepository.findByUserId(user.getId())
+                    .map(UserStatus::isOnline).orElse(false);
+            return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), isOnline);
+        });
     }
 
-    @Override
-    public void create(User user) {
-        System.out.println("==== 유저 생성 중... ===");
-        if (user == null) {
-            throw new IllegalArgumentException("유저 정보가 NULL입니다.");
-        }
-
-        if (userRepository.find(user.getId()) != null) {
-            throw new RuntimeException("유저가 이미 존재합니다.");
-        }
-        userRepository.create(user);
-        System.out.println("[" + user +"] 유저 생성 완료 " + user.getId());
+    public List<UserResponse> findAll() {
+        return userRepository.findAll().parallelStream()
+                .map(user -> {
+                    boolean isOnline = userStatusRepository.findByUserId(user.getId())
+                            .map(UserStatus::isOnline).orElse(false);
+                    return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), isOnline);
+                }).collect(Collectors.toList());
     }
 
-    @Override
-    public User find(UUID id) {
-        System.out.println("==== 유저(단건) 조회 중... ===");
-        if (id == null) {
-            throw new IllegalArgumentException("ID가 NULL입니다.");
-        }
+    public void update(UserUpdateRequest request) {
+        User user = userRepository.findById(request.id()).orElseThrow(() ->
+                new IllegalArgumentException("존재하지 않는 사용자입니다.")
+        );
 
-        if (userRepository.find(id) == null) {
-            throw new RuntimeException("유저가 존재하지 않습니다.");
+        user.update(request.username(), request.email(), request.password());
+        userRepository.save(user);
+
+        if (request.profileImage() != null) {
+            binaryContentRepository.findByUserId(user.getId())
+                    .forEach(image -> binaryContentRepository.deleteById(image.getId()));
+
+            BinaryContent profileImage = new BinaryContent(user.getId(), null);
+            binaryContentRepository.save(profileImage);
         }
-        System.out.println("선택한 유저를 조회합니다.");
-        return userRepository.find(id);
     }
 
-    @Override
-    public List<User> findAll() {
-        System.out.println("==== 유저(다건) 조회 중... ===");
-        if (userRepository.findAll().isEmpty()) {
-            System.out.println("등록된 유저가 없습니다.");
-        }
-        System.out.println("모든 유저를 조회합니다.");
-        return userRepository.findAll();
-    }
+    public void delete(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new IllegalArgumentException("존재하지 않는 사용자입니다.")
+        );
 
-    @Override
-    public void update(User user) {
-        System.out.println("==== 유저 수정 중... ===");
-        if (user == null) {
-            throw new IllegalArgumentException("유저 정보가 NULL입니다.");
-        }
+        userStatusRepository.findByUserId(userId).ifPresent(status -> userStatusRepository.deleteById(status.getId()));
+        binaryContentRepository.findByUserId(userId).forEach(image -> binaryContentRepository.deleteById(image.getId()));
 
-        if (userRepository.find(user.getId()) == null) {
-            throw new RuntimeException("유저가 존재하지 않습니다.");
-        }
-        userRepository.update(user);
-        System.out.println("[" + user +"] 유저 수정 완료 " + user.getId());
-    }
-
-    @Override
-    public void delete(UUID id) {
-        System.out.println("==== 유저 삭제 중... ===");
-        if (id == null) {
-            throw new IllegalArgumentException("ID가 NULL입니다.");
-        }
-
-        if (userRepository.find(id) == null) {
-            throw new RuntimeException("유저가 존재하지 않습니다.");
-        }
-        userRepository.delete(id);
-        System.out.println("유저 삭제 완료");
+        userRepository.deleteById(userId);
     }
 }
+

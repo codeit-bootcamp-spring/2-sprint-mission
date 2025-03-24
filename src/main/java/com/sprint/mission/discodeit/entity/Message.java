@@ -1,42 +1,42 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-public class Message extends BaseEntity implements Serializable {
-    private User sender;
-    private String content;
-    private Channel channel;
-
-    @Serial
+@Getter
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public Message(User sender, String content, Channel channel) {
-        super();
-        this.sender = sender;
+    private final UUID id;
+    private final Instant createdAt;
+    private Instant updatedAt;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
+
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.content = content;
-        this.channel = channel;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    public User getSender() {
-        return sender;
-    }
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-    public Channel getChannel() {
-        return channel;
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
-
-    public String getContent() {
-        return content;
-    }
-    public void updateContent(String content) {
-        this.content = content;
-        updateUpdatedAt(System.currentTimeMillis());
-    }
-
-    @Override
-    public String toString() {
-        return "[" + channel.getChannelName() + "] " + sender.getName() + " : " + content + " " + getCreatedAt();
-    }
-
 }

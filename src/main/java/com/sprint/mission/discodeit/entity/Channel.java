@@ -1,24 +1,34 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
-public class Channel extends BaseEntity implements Serializable {
-    private String channelName;
+
+@Getter
+public class Channel implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private final UUID id;
+    private final Instant createdAt;
+    private Instant updatedAt;
+    //
+    private ChannelType type;
+    private String name;
+    private String description;
+    //
     private final Set<User> members = new HashSet<>();;
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    public Channel(String channelName) {
-        super();
-        this.channelName = channelName;
-    }
-
-    public Set<User> getMembers() {
-        return members;
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.type = type;
+        this.name = name;
+        this.description = description;
     }
 
     public void addMember(User user) {
@@ -33,16 +43,19 @@ public class Channel extends BaseEntity implements Serializable {
         return members.contains(user);
     }
 
-    public String getChannelName() {
-        return channelName;
-    }
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
 
-    public void updateChannelName(String channelName) {
-        this.channelName = channelName;
-    }
-
-    @Override
-    public String toString() {
-        return channelName;
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
