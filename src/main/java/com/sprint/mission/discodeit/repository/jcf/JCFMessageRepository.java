@@ -10,35 +10,44 @@ public class JCFMessageRepository implements MessageRepository {
     private static final Map<UUID, Message> messages = new HashMap<>();
 
     @Override
-    public void save(Message message) {
+    public void save() {
+    }
+
+    @Override
+    public void addMessage(Message message) {
         messages.put(message.getId(), message);
     }
 
     @Override
-    public Message findById(UUID messageId) {
-        validateMessageExists(messageId);
+    public Message findMessageById(UUID messageId) {
         return messages.get(messageId);
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<Message> findMessageAll() {
         return new ArrayList<>(messages.values());
     }
 
     @Override
-    public void delete(UUID messageId) {
-        validateMessageExists(messageId);
+    public void deleteMessageById(UUID messageId) {
         messages.remove(messageId);
     }
 
     @Override
-    public boolean exists(UUID messageId) {
+    public boolean existsById(UUID messageId) {
         return messages.containsKey(messageId);
     }
 
-    private void validateMessageExists(UUID messageId) {
-        if(!exists(messageId)){
-            throw new IllegalStateException("존재하지 않는 메세지입니다.");
-        }
+    @Override
+    public void deleteMessageByChannelId(UUID channelId) {
+        messages.values().removeIf(message -> message.getChannelId().equals(channelId));
+    }
+
+    @Override
+    public Message findLatestMessageByChannelId(UUID channelId) {
+        return messages.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt))
+                .orElse(null);
     }
 }

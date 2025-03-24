@@ -1,20 +1,21 @@
 package com.sprint.mission.discodeit.service.jcfTest;
 
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 class JCFUserServiceTest {
+    private static final Logger logger = Logger.getLogger(JCFUserServiceTest.class.getName());
     private JCFUserService userService;
     private JCFChannelService channelService;
-    private static final Logger logger = Logger.getLogger(JCFUserServiceTest.class.getName());
 
     @BeforeEach
     void setUp() {
@@ -68,8 +69,8 @@ class JCFUserServiceTest {
                 .filter(c -> c.getChannelName().equals(channelName))
                 .findFirst().orElseThrow(() -> new IllegalStateException("채널을 찾을 수 없습니다."))
                 .getId();
-        channelService.addUserToChannel(channelId, userId);
-        assertTrue(channelService.getChannelById(channelId).getMembers().contains(userId));
+        channelService.addUser(channelId, userId);
+        assertTrue(channelService.findChannelById(channelId).getMembers().contains(userId));
         logger.info("채널 내 유저 추가 확인: " + userId);
     }
 
@@ -85,7 +86,7 @@ class JCFUserServiceTest {
                 .findFirst().orElseThrow(() -> new IllegalStateException("채널을 찾을 수 없습니다."))
                 .getId();
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            channelService.removeUserFromChannel(channelId, userId);
+            channelService.removeUser(channelId, userId);
         });
         logger.info("채널에 없는 유저 삭제 예외 확인: " + exception.getMessage());
         assertEquals("채널에 존재하지 않는 유저입니다.", exception.getMessage());

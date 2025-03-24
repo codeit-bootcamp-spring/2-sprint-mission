@@ -2,69 +2,68 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
-import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
 
-    private static final String FILE_PATH = "src/main/resources/messages.dat";
-    private static Map<UUID, Message> messages = new HashMap<>();
+    private static final String fileName = "messages.dat";
+    private static Map<UUID, Message> messages = new ConcurrentHashMap<>();
+    private final FileStorageManager fileStorageManager;
 
-    public FileMessageRepository() {
-        loadFile();
-    }
-
-    private void loadFile(){
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
-            messages = (Map<UUID, Message>) ois.readObject();
-        } catch (EOFException e) {
-            System.out.println("⚠ messages.dat 파일이 비어 있습니다. 빈 데이터로 유지합니다.");
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("메세지 로드 중 오류 발생", e);
-        }
-    }
-
-    private void saveFile(){
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(messages);
-        } catch (IOException e) {
-            throw new RuntimeException("메세지 저장 중 오류 발생", e);
-        }
+    @Autowired
+    public FileMessageRepository(FileStorageManager fileStorageManager) {
+        this.fileStorageManager = fileStorageManager;
+        messages = fileStorageManager.loadFile(fileName);
     }
 
     @Override
-    public void save(Message message) {
+    public void save() {
+        fileStorageManager.saveFile(fileName, messages);
+    }
+
+    @Override
+    public void addMessage(Message message) {
         messages.put(message.getId(), message);
-        saveFile();
+        save();
     }
 
     @Override
-    public Message findById(UUID messageId) {
-        validateMessageExists(messageId);
+    public Message findMessageById(UUID messageId) {
         return messages.get(messageId);
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<Message> findMessageAll() {
         return new ArrayList<>(messages.values());
     }
 
     @Override
-    public void delete(UUID messageId) {
-        validateMessageExists(messageId);
+    public void deleteMessageById(UUID messageId) {
         messages.remove(messageId);
-        saveFile();
+        save();
     }
 
     @Override
-    public boolean exists(UUID messageId) {
+    public void deleteMessageByChannelId(UUID channelId) {
+        messages.values().removeIf(message -> message.getChannelId().equals(channelId));
+        save();
+    }
+
+    @Override
+    public boolean existsById(UUID messageId) {
         return messages.containsKey(messageId);
     }
 
-    private void validateMessageExists(UUID messageId) {
-        if(!exists(messageId)){
-            throw new IllegalStateException("존재하지 않는 메세지입니다.");
-        }
+    @Override
+    public Message findLatestMessageByChannelId(UUID channelId) {
+        return messages.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt))
+                .orElse(null);
     }
 }

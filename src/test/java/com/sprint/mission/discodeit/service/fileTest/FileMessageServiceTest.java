@@ -1,36 +1,33 @@
 package com.sprint.mission.discodeit.service.fileTest;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FileMessageServiceTest {
+    private static final Logger logger = Logger.getLogger(FileMessageServiceTest.class.getName());
     private FileMessageService messageService;
     private FileUserService userService;
     private FileChannelService channelService;
-    private static final Logger logger = Logger.getLogger(FileMessageServiceTest.class.getName());
 
-    @BeforeEach
-    void setUp(@TempDir Path tempDir) {
-        userService = FileUserService.getInstance();
-        channelService = FileChannelService.getInstance(userService);
-        messageService = FileMessageService.getInstance(userService, channelService);
-    }
+//    @BeforeEach
+//    void setUp(@TempDir Path tempDir) {
+//        userService = FileUserService.getInstance();
+//        channelService = FileChannelService.getInstance(userService);
+//        messageService = FileMessageService.getInstance(userService, channelService);
+//    }
 
     @Test
     @DisplayName("FileMessageService: 여러 개의 메세지 추가 확인")
@@ -47,7 +44,7 @@ class FileMessageServiceTest {
         messageService.createMessage(userId, channelId, "첫 번째 메세지");
         messageService.createMessage(userId, channelId, "두 번째 메세지");
 
-        List<Message> messages = messageService.getChannelMessages(channelId);
+        List<Message> messages = messageService.findChannelMessages(channelId);
         assertEquals(2, messages.size());
     }
 
@@ -96,7 +93,7 @@ class FileMessageServiceTest {
                 .findFirst().get().getId();
 
         messageService.createMessage(userId, channelId, "원본 메세지");
-        Message message = messageService.getChannelMessages(channelId).stream()
+        Message message = messageService.findChannelMessages(channelId).stream()
                 .filter(m -> m.getContent().equals("원본 메세지"))
                 .findFirst().get();
         UUID messageId = message.getId();

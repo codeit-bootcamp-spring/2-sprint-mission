@@ -10,35 +10,31 @@ public class JCFChannelRepository implements ChannelRepository {
     private static final Map<UUID, Channel> channels = new HashMap<>();
 
     @Override
-    public void save(Channel channel) {
+    public void save() {
+    }
+
+    @Override
+    public void addChannel(Channel channel) {
         channels.put(channel.getId(), channel);
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-        validateChannelExists(channelId);
+    public Channel findChannelById(UUID channelId) {
         return channels.get(channelId);
     }
 
     @Override
-    public List<Channel> findAll() {
+    public List<Channel> findAllChannels() {
         return new ArrayList<>(channels.values());
     }
 
     @Override
-    public void deleteById(UUID channelId) {
-        validateChannelExists(channelId);
+    public void deleteChannelById(UUID channelId) {
         channels.remove(channelId);
     }
 
     @Override
-    public boolean exists(UUID channelId) {
+    public boolean existsById(UUID channelId) {
         return channels.containsKey(channelId);
-    }
-
-    public void validateChannelExists(UUID channelId) {
-        if(!channels.containsKey(channelId)){
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
-        }
     }
 }

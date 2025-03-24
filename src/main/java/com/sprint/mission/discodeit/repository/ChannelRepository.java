@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelRepository {
-    void save(Channel channel);
-    Channel findById(UUID channelId);
-    List<Channel> findAll();
-    void deleteById(UUID channelId);
-    boolean exists(UUID channelId);
+    void save();
+    void addChannel(Channel channel);
+    Channel findChannelById(UUID channelId);
+    List<Channel> findAllChannels();
+    void deleteChannelById(UUID channelId);
+    boolean existsById(UUID channelId);
 }

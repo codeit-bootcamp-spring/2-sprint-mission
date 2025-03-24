@@ -2,69 +2,58 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Repository;
 
-import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
 
-    private static final String FILE_PATH = "src/main/resources/channels.dat";
-    private static Map<UUID, Channel> channels = new HashMap<>();
+    private static final String fileName = "channels.dat";
+    private static Map<UUID, Channel> channels = new ConcurrentHashMap<>();
+    private final FileStorageManager fileStorageManager;
 
-    public FileChannelRepository() {
-        loadFile();
-    }
-
-    private void loadFile(){
-        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))){
-            channels = (Map<UUID, Channel>) ois.readObject();
-        }catch (EOFException e) {
-            System.out.println("⚠ channels.dat 파일이 비어 있습니다. 빈 데이터로 유지합니다.");
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("채널 로드 중 오류 발생", e);
-        }
-    }
-
-    private void saveFile(){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))){
-            oos.writeObject(channels);
-        } catch (IOException e) {
-            throw new RuntimeException("채널 저장 중 오류 발생", e);
-        }
+    @Autowired
+    public FileChannelRepository(@Lazy FileStorageManager fileStorageManager) {
+        this.fileStorageManager = fileStorageManager;
+        channels = fileStorageManager.loadFile(fileName);
     }
 
     @Override
-    public void save(Channel channel) {
+    public void save() {
+        fileStorageManager.saveFile(fileName, channels);
+    }
+
+    @Override
+    public void addChannel(Channel channel) {
         channels.put(channel.getId(), channel);
-        saveFile();
+        fileStorageManager.saveFile(fileName, channels);
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-         validateChannelExists(channelId);
+    public Channel findChannelById(UUID channelId) {
         return channels.get(channelId);
     }
 
     @Override
-    public List<Channel> findAll() {
+    public List<Channel> findAllChannels() {
         return new ArrayList<>(channels.values());
     }
 
     @Override
-    public void deleteById(UUID channelId) {
-        validateChannelExists(channelId);
+    public void deleteChannelById(UUID channelId) {
         channels.remove(channelId);
-        saveFile();
+        fileStorageManager.saveFile(fileName, channels);
     }
 
     @Override
-    public boolean exists(UUID channelId) {
+    public boolean existsById(UUID channelId) {
         return channels.containsKey(channelId);
-    }
-
-    private void validateChannelExists(UUID channelId){
-        if(!exists(channelId)){
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
-        }
     }
 }

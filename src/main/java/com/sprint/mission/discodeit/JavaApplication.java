@@ -3,48 +3,13 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class JavaApplication {
-
-    public enum MainMenuOption {
-        CREATE(1, "유저, 채널, 메세지 생성"),
-        SINGLE_LOOKUP(2, "정보 조회(단건)"),
-        MULTIPLE_LOOKUP(3, "정보 조회(다건)"),
-        UPDATE(4, "정보 수정"),
-        DELETE(5, "데이터 삭제"),
-        ALL_LOOKUP(6, "모든 유저 및 채널 조회"),
-        EXIT(7, "종료");
-
-        private final int code;
-        private final String description;
-
-        MainMenuOption(int code, String description) {
-            this.code = code;
-            this.description = description;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public static MainMenuOption fromCode(int code) {
-            for (MainMenuOption option : MainMenuOption.values()) {
-                if (option.getCode() == code) {
-                    return option;
-                }
-            }
-            return null;
-        }
-    }
 
     public static void main(String[] args) {
         // 서비스 초기화
@@ -52,10 +17,10 @@ public class JavaApplication {
 //        ChannelService channelService = JCFChannelService.getInstance(userService);
 //        MessageService  messageService = JCFMessageService.getInstance(userService, channelService);
 
-        UserService userService = FileUserService.getInstance();
-        ChannelService channelService = FileChannelService.getInstance(userService);
-        MessageService messageService = FileMessageService.getInstance(userService, channelService);
-
+        ApplicationContext context = SpringApplication.run(JavaApplication.class, args);
+        UserService userService = context.getBean(UserService.class);
+        ChannelService channelService = context.getBean(ChannelService.class);
+        MessageService messageService = context.getBean(MessageService.class);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -94,6 +59,39 @@ public class JavaApplication {
                     scanner.close();
                     return;
             }
+        }
+    }
+
+    public enum MainMenuOption {
+        CREATE(1, "유저, 채널, 메세지 생성"),
+        SINGLE_LOOKUP(2, "정보 조회(단건)"),
+        MULTIPLE_LOOKUP(3, "정보 조회(다건)"),
+        UPDATE(4, "정보 수정"),
+        DELETE(5, "데이터 삭제"),
+        ALL_LOOKUP(6, "모든 유저 및 채널 조회"),
+        EXIT(7, "종료");
+
+        private final int code;
+        private final String description;
+
+        MainMenuOption(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public static MainMenuOption fromCode(int code) {
+            return Arrays.stream(MainMenuOption.values())
+                    .filter(option -> option.getCode() == code)
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
         }
     }
 }

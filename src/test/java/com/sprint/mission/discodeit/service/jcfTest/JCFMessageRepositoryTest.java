@@ -1,25 +1,27 @@
 package com.sprint.mission.discodeit.service.jcfTest;
 
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.List;
 import java.util.logging.Logger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 class JCFMessageRepositoryTest {
+    private static final Logger logger = Logger.getLogger(JCFMessageRepositoryTest.class.getName());
     private JCFMessageService messageService;
     private JCFUserService userService;
     private JCFChannelService channelService;
-    private static final Logger logger = Logger.getLogger(JCFMessageRepositoryTest.class.getName());
 
     @BeforeEach
     void setUp() {
@@ -45,7 +47,7 @@ class JCFMessageRepositoryTest {
         messageService.createMessage(userId, channelId, "첫 번째 메세지");
         messageService.createMessage(userId, channelId, "두 번째 메세지");
 
-        List<Message> messages = messageService.getChannelMessages(channelId);
+        List<Message> messages = messageService.findChannelMessages(channelId);
         assertEquals(2, messages.size());
     }
 
@@ -94,7 +96,7 @@ class JCFMessageRepositoryTest {
                 .findFirst().get().getId();
 
         messageService.createMessage(userId, channelId, "원본 메세지");
-        Message message = messageService.getChannelMessages(channelId).stream()
+        Message message = messageService.findChannelMessages(channelId).stream()
                 .filter(m -> m.getContent().equals("원본 메세지"))
                 .findFirst().get();
         UUID messageId = message.getId();

@@ -4,41 +4,65 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFUserRepository implements UserRepository {
 
     private static final Map<UUID, User> users = new HashMap<>();
 
     @Override
-    public void save(User user) {
+    public void save() {
+    }
+
+    @Override
+    public void addUser(User user) {
         users.put(user.getId(), user);
     }
 
     @Override
-    public User findById(UUID userId) {
-        validateUserExists(userId);
+    public User findUserById(UUID userId) {
         return users.get(userId);
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findUsersByIds(Set<UUID> userIds) {
+        return users.values().stream()
+                .filter(user -> userIds.contains(user.getId()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public User findUserByName(String username) {
+        return users.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public List<User> findUserAll() {
         return new ArrayList<>(users.values());
     }
 
     @Override
-    public void deleteById(UUID userId) {
-        validateUserExists(userId);
+    public void deleteUserById(UUID userId) {
         users.remove(userId);
     }
 
     @Override
-    public boolean exists(UUID userId) {
+    public boolean existsById(UUID userId) {
         return users.containsKey(userId);
     }
 
-    private void validateUserExists(UUID userId) {
-        if (!exists(userId)) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
-        }
+    @Override
+    public boolean existsByUsername(String username) {
+        return users.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return users.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
     }
 }
