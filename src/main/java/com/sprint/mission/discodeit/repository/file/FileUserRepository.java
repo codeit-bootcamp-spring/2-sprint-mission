@@ -1,25 +1,23 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.UpdateDefinition;
-
+import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FileUserService implements UserService {
+@Repository
+public class FileUserRepository implements UserRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileUserService() {
+    public FileUserRepository() {
         this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
@@ -35,12 +33,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User create(UserCreateRequest userCreateRequest) {
-        User user = new User(
-                userCreateRequest.getUsername(),
-                userCreateRequest.getEmail(),
-                userCreateRequest.getPassword()
-        );
+    public User save(User user) {
         Path path = resolvePath(user.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
@@ -50,14 +43,13 @@ public class FileUserService implements UserService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         return user;
     }
 
     @Override
-    public User find(UUID userId) {
+    public Optional<User> findById(UUID id) {
         User userNullable = null;
-        Path path = resolvePath(userId);
+        Path path = resolvePath(id);
         if (Files.exists(path)) {
             try (
                     FileInputStream fis = new FileInputStream(path.toFile());
@@ -68,9 +60,7 @@ public class FileUserService implements UserService {
                 throw new RuntimeException(e);
             }
         }
-
-        return Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        return Optional.ofNullable(userNullable);
     }
 
     @Override
@@ -95,43 +85,14 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, UpdateDefinition updateDefinition, UUID newProfileId) { // ✅ 인터페이스와 일치하도록 수정
-        User userNullable = null;
-        Path path = resolvePath(userId);
-        if (Files.exists(path)) {
-            try (
-                    FileInputStream fis = new FileInputStream(path.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                userNullable = (User) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        User user = Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-
-        user.update(updateDefinition.getUsername(), updateDefinition.getEmail(), updateDefinition.getPassword());
-
-        try(
-                FileOutputStream fos = new FileOutputStream(path.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-            oos.writeObject(user);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return user;
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
     @Override
-    public void delete(UUID userId) {
-        Path path = resolvePath(userId);
-        if (Files.notExists(path)) {
-            throw new NoSuchElementException("User with id " + userId + " not found");
-        }
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
         try {
             Files.delete(path);
         } catch (IOException e) {
