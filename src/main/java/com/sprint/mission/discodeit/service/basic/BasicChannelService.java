@@ -42,7 +42,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = new Channel(channelRegisterDto.channelType(), channelRegisterDto.name());
         Channel savedChannel = channelRepository.save(channel);
 
-        readStatusRepository.save(new ReadStatus(channelRegisterDto.owner().id(), savedChannel.getId()));
+        readStatusRepository.save(new ReadStatus(channelRegisterDto.logInUserId(), savedChannel.getId()));
         for (UUID memberId : channelMemberIds) {
             readStatusRepository.save(new ReadStatus(memberId, savedChannel.getId()));
         }

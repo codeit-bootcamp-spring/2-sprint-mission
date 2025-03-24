@@ -54,7 +54,7 @@ class ChannelControllerTest {
     @DisplayName("Public 채널 생성")
     @Test
     void createPublicChannel() {
-        ChannelDto channel = channelController.createPublicChannel(new ChannelRegisterDto(ChannelType.PUBLIC, "Public", setUpUser));
+        ChannelDto channel = channelController.createPublicChannel(new ChannelRegisterDto(ChannelType.PUBLIC, "Public", setUpUser.id()));
 
         assertThat(channel.type()).isEqualTo(ChannelType.PUBLIC);
     }
@@ -72,15 +72,12 @@ class ChannelControllerTest {
     @Test
     void findAll() {
         PrivateChannelDto userPrivateChannel = (PrivateChannelDto) createPrivateChannel(setUpUser, new ArrayList<>());
-        ChannelDto userPublicChannel = channelController.createPublicChannel(new ChannelRegisterDto(ChannelType.PUBLIC, "Public", setUpUser));
+        ChannelDto userPublicChannel = channelController.createPublicChannel(new ChannelRegisterDto(ChannelType.PUBLIC, "Public", setUpUser.id()));
         UserDto otherUser = userService.register(new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
         createPrivateChannel(otherUser, new ArrayList<>());
 
 
-        List<UUID> channelIds = channelController.findAllByUserId(setUpUser.id())
-                .stream()
-                .map(ChannelDto::id)
-                .toList();
+        List<UUID> channelIds = channelController.findAllByUserId(setUpUser.id()).stream().map(ChannelDto::id).toList();
 
         assertThat(channelIds).containsExactlyInAnyOrder(userPrivateChannel.id(), userPublicChannel.id());
     }
@@ -96,7 +93,7 @@ class ChannelControllerTest {
         assertThat(privateChannel.privateMemberIds()).containsExactlyInAnyOrder(setUpUser.id(), otherUser.id());
     }
 
-    private ChannelDto createPrivateChannel(UserDto owner, List<UUID> memberIds) {
-        return channelController.createPrivateChannel(new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, owner), memberIds);
+    private ChannelDto createPrivateChannel(UserDto loginUser, List<UUID> memberIds) {
+        return channelController.createPrivateChannel(new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, loginUser.id()), memberIds);
     }
 }
