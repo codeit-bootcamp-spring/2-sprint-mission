@@ -7,8 +7,8 @@ import java.util.List;
 public interface UserRepository {
 
 
-    void save(User user);
+    User save(User user);
     List<User> load();
-    void deleteFromFile(User user);
+    void remove(User user);
 
 }

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,28 +13,30 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
-    private static final Path directory = Paths.get(System.getProperty("user.dir"), "data", "channel");
+    private static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data", "channel");
 
     private final List<Channel> channelData;
 
     public FileChannelRepository() {
         channelData = new ArrayList<>();
+        init();
     }
 
 
     @Override
-    public void save(Channel channel) {
-        init();
+    public Channel save(Channel channel) {
         channelData.add(channel);
-        Path path = directory.resolve(channel.getId() + ".ser");
+        Path path = DIRECTORY.resolve(channel.getId() + ".ser");
         saveToFile(path, channel);
+        return channel;
     }
 
     private void init() {
-        if (!Files.exists(directory)) {
+        if (!Files.exists(DIRECTORY)) {
             try {
-                Files.createDirectories(directory);
+                Files.createDirectories(DIRECTORY);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -55,16 +58,12 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> load() {
-        if (Files.exists(directory)) {
-            try (Stream<Path> path = Files.list(directory)) {
-                return path
-                        .map(this::loadFromFile)
-                        .toList();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return Collections.emptyList();
+        try (Stream<Path> path = Files.list(DIRECTORY)) {
+            return path
+                    .map(this::loadFromFile)
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -79,10 +78,10 @@ public class FileChannelRepository implements ChannelRepository {
 
 
     @Override
-    public void deleteFromFile(Channel channel) {
+    public void remove(Channel channel) {
         try {
-            if (channel != null && Files.exists(directory.resolve(channel.getId() + ".ser"))) {
-                Files.delete(directory.resolve(directory.resolve(channel.getId() + ".ser")));
+            if (channel != null && Files.exists(DIRECTORY.resolve(channel.getId() + ".ser"))) {
+                Files.delete(DIRECTORY.resolve(DIRECTORY.resolve(channel.getId() + ".ser")));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

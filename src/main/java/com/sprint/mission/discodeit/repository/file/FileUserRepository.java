@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,27 +13,29 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Repository
 public class FileUserRepository implements UserRepository {
-    private static final Path directory = Paths.get(System.getProperty("user.dir"), "data", "user");
+    private static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data", "user");
 
     private final List<User> userData;
 
     public FileUserRepository() {
         userData = new ArrayList<>();
+        init();
     }
 
     @Override
-    public void save(User user) {
+    public User save(User user) {
         userData.add(user);
-        init();
-        Path path = directory.resolve(user.getId() + ".ser");
+        Path path = DIRECTORY.resolve(user.getId() + ".ser");
         saveToFile(path, user);
+        return user;
     }
 
     private void init() {
-        if (!Files.exists(directory)) {
+        if (!Files.exists(DIRECTORY)) {
             try {
-                Files.createDirectories(directory);
+                Files.createDirectories(DIRECTORY);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -53,16 +56,12 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<User> load() {
-        if (Files.exists(directory)) {
-            try (Stream<Path> path = Files.list(directory)) {
-                return path
-                        .map(this::loadFromFile)
-                        .toList();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return Collections.emptyList();
+        try (Stream<Path> path = Files.list(DIRECTORY)) {
+            return path
+                    .map(this::loadFromFile)
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -77,10 +76,10 @@ public class FileUserRepository implements UserRepository {
 
 
     @Override
-    public void deleteFromFile(User user) {
+    public void remove(User user) {
         try{
-            if (user != null && Files.exists(directory.resolve(user.getId() + ".ser"))) {
-                Files.delete(directory.resolve(user.getId() + ".ser"));
+            if (user != null && Files.exists(DIRECTORY.resolve(user.getId() + ".ser"))) {
+                Files.delete(DIRECTORY.resolve(user.getId() + ".ser"));
             }
         }catch (Exception e){
             throw new RuntimeException(e);

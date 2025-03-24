@@ -9,16 +9,16 @@ import java.util.List;
 
 public class JCFMessageRepository implements MessageRepository {
 
-    public final List<Message> messageData;
-    public UserService userService;
+    private final List<Message> messageData;
 
     public JCFMessageRepository() {
         messageData = new ArrayList<>();
     }
 
     @Override
-    public void save(Message message) {
+    public Message save(Message message) {
         messageData.add(message);
+        return message;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void deleteFromFile(Message message) {
+    public void remove(Message message) {
         messageData.remove(message);
     }
 }
