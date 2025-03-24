@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageRepository {
-    Message messageSave(UUID channelUUID, UUID userUUID , String content);
+    Message save(Message message);
     Optional<Message> findMessageById(UUID messageUUID);
     List<Message> findAllMessage();
     List<Message> findMessageByChannel(UUID channelUUID);

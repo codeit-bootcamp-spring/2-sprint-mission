@@ -1,122 +1,68 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.custom.AppendObjectOutputStream;
+import com.sprint.mission.discodeit.constant.SubDirectory;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.utils.FileManager;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
-import java.io.*;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
+@Repository
+@RequiredArgsConstructor
 public class FileUserRepository implements UserRepository {
+
+    private final FileManager fileManager;
+
     @Override
-    public User userSave(String nickname, String password) {
-        User user = new User(nickname, password);
-        try {
-            String fileName = "user.ser";
-
-            boolean append = new File(fileName).exists();
-
-            FileOutputStream fos = new FileOutputStream(fileName, true);
-            ObjectOutputStream oos = append ? new AppendObjectOutputStream(fos) : new ObjectOutputStream(fos);
-            oos.writeObject(user);
-
-            oos.close();
-            fos.close();
-
-            return user;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public User save(User user) {
+        fileManager.writeToFile(SubDirectory.USER, user, user.getId());
+        return user;
     }
 
     @Override
     public Optional<User> findUserById(UUID userUUID) {
-        try (FileInputStream fis = new FileInputStream("user.ser");
-             ObjectInputStream ois = new ObjectInputStream(fis);
-        ) {
-            while (true) {
-                try {
-                    User user = (User) ois.readObject();
-                    if (user.getId().equals(userUUID)) return Optional.of(user);
-                } catch (EOFException e) {
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Optional.empty();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return Optional.empty();
+        Optional<User> user = fileManager.readFromFileById(SubDirectory.USER, userUUID, User.class);
+        return user;
+    }
+
+    @Override
+    public Optional<User> findUserByUsername(String username) {
+        return findAllUser().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findAny();
+    }
+
+    @Override
+    public Optional<User> findUserByEmail(String email) {
+        return findAllUser().stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findAny();
     }
 
     @Override
     public List<User> findAllUser() {
-        List<User> userList = new ArrayList<>();
-        try (FileInputStream fis = new FileInputStream("user.ser");
-             ObjectInputStream ois = new ObjectInputStream(fis);
-        ) {
-            while (true) {
-                try {
-                    User user = (User) ois.readObject();
-                    userList.add(user);
-                } catch (EOFException e) {
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        List<User> userList = fileManager.readFromFileAll(SubDirectory.USER, User.class);
         return userList;
     }
 
+
+
     @Override
-    public User updateUserNickname(UUID userUUID, String nickname) {
-        List<User> userList = findAllUser();
-
-        User UpdateUser = userList.stream()
-                .filter(user -> user.getId().equals(userUUID))
-                .findAny()
-                .map(user -> {
-                    user.updateNickname(nickname);
-                    return user;
-                })
-                .orElse(null);
-        try (FileOutputStream fos = new FileOutputStream("user.ser");
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-
-            for (User user : userList) {
-                oos.writeObject(user);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return null;
+    public User update(UUID userUUID, String nickname, UUID profileId) {
+        User user = findUserById(userUUID)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다.: " + userUUID));
+        user.updateNickname(nickname);
+        user.updateProfile(profileId);
+        fileManager.writeToFile(SubDirectory.USER, user, user.getId());
+        return user;
     }
 
     @Override
     public boolean deleteUserById(UUID userUUID) {
-        List<User> userList = findAllUser();
-        boolean removed  = userList.removeIf(user -> user.getId().equals(userUUID));
-        if (!removed) return false;
-        try (FileOutputStream fos = new FileOutputStream("user.ser");
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-
-            for (User user : userList) {
-                oos.writeObject(user);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
+        return fileManager.deleteFileById(SubDirectory.USER, userUUID);
     }
 }

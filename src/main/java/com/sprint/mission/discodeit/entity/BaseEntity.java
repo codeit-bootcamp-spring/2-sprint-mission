@@ -1,27 +1,20 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
+@Getter
 public abstract class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id = UUID.randomUUID();
-    private final Long createdAt = System.currentTimeMillis();
-    private Long updatedAt;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
+    private final Instant createdAt = ZonedDateTime.now().toInstant();
+    private Instant updatedAt = null;
 
     public void updateTime() {
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = ZonedDateTime.now().toInstant();
     }
 }

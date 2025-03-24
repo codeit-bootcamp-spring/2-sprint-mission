@@ -1,15 +1,17 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
-    void createChannel(String channelName);
-    Channel findChannel(UUID id);
-    Optional<List<Channel>> findAllChannel();
-    void updateChannel(UUID uuid, String channelName);
-    void deleteChannel(UUID id);
+    SaveChannelDto createPublicChannel(SaveChannelParamDto saveChannelParamDto);
+    SaveChannelDto createPrivateChannel(SaveChannelParamDto saveChannelParamDto);
+    FindChannelDto findChannel(UUID id);
+    List<FindChannelDto> findAllByUserId(UUID userUUID);
+    UUID joinChannel(UUID channelUUID, UUID userUUID);
+    List<CheckReadStatusDto> checkReadStatusByUserId(UUID userUUID);
+    void updateChannel(UpdateChannelParamDto channelUpdateParamDto);
+    void deleteChannel(UUID channelUUID);
 }

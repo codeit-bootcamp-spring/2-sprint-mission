@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,13 +10,13 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Repository
 public class JCFMessageRepository implements MessageRepository {
 
-    List<Message> messageList = new ArrayList<>();
+    private final List<Message> messageList = new ArrayList<>();
 
     @Override
-    public Message messageSave(UUID userUUID ,UUID channelUUID, String content) {
-        Message message = new Message(userUUID, channelUUID, content);
+    public Message save(Message message) {
         messageList.add(message);
         return message;
     }

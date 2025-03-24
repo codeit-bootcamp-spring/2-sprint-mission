@@ -1,0 +1,10 @@
+spring:
+  application:
+    name:discodeit
+
+
+discodeit:
+  repository:
+    type: file
+    file-directory: \src\main\resources\dir\
+

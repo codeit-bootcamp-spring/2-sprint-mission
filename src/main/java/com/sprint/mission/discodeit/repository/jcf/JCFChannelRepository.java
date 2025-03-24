@@ -3,16 +3,20 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
 
-    List<Channel> channelList = new ArrayList<>();
+    private final List<Channel> channelList = new ArrayList<>();
 
     @Override
-    public Channel channelSave(String channelName) {
-        Channel channel = new Channel(channelName);
+    public Channel save(Channel channel) {
         channelList.add(channel);
         return channel;
     }
