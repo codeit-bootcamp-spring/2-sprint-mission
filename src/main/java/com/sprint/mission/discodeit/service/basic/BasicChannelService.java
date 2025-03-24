@@ -1,28 +1,23 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.ChannelDTO;
+import com.sprint.mission.discodeit.DTO.UserDTO;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-public class JCFChannelService implements ChannelService {
-    private static JCFChannelService instance;
-    private final JCFChannelRepository channelRepository;
-
-    private JCFChannelService() {
-        this.channelRepository = new JCFChannelRepository();
-    }
-
-    public static synchronized JCFChannelService getInstance() {
-        if (instance == null) {
-            instance = new JCFChannelService();
-        }
-        return instance;
-    }
+@Primary
+@Service
+@RequiredArgsConstructor
+public class BasicChannelService implements ChannelService {
+    private final ChannelRepository channelRepository;
 
     @Override
     public Channel createChannel(ChannelDTO channelDTO) {
@@ -43,9 +38,10 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UUID id, String newChannelName) {
-        Channel channel = getChannel(id);
-        channel.updateChannelName(newChannelName);
+    public void updateChannel(UUID id, String newName) {
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
+        channel.updateChannelName(newName);
         channelRepository.save(channel);
     }
 

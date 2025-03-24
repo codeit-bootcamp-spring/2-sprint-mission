@@ -2,10 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Primary
+@Repository
 public class FileMessageRepository implements MessageRepository {
     private static final String FILE_PATH = "messages.ser";
 
@@ -21,12 +25,11 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findById(UUID id) {
-        if (id == null) return null;
+    public Optional<Message> findById(UUID id) {
+        if (id == null) return Optional.empty();
         return readFromFile().stream()
                 .filter(m -> id.equals(m.getId()))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
