@@ -5,65 +5,67 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
-
-    public BasicMessageService(UserRepository userRepository, ChannelRepository channelRepository,
-                               MessageRepository messageRepository) {
-        this.userRepository = userRepository;
-        this.messageRepository = messageRepository;
-        this.channelRepository = channelRepository;
-    }
+    //
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
+    private final BasicBinaryContentService basicBinaryContentService;
 
     @Override
-    public Message getMessage(UUID messageId) {
-        if (messageRepository.messageExists(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
+    public Message create(MessageCreateRequest createRequest,
+                          List<BinaryContentCreateRequest> binaryContentRequestList) {
+        if (!channelRepository.existsById(createRequest.channelId())) {
+            throw new NoSuchElementException(createRequest.channelId() + "에 해당하는 Channel을 찾을 수 없음");
         }
-        return messageRepository.findById(messageId);
-    }
-
-    @Override
-    public List<Message> getAllMessages() {
-        return messageRepository.findAll();
-    }
-
-    @Override
-    public List<Message> getUpdatedMessages() {
-        return messageRepository.findUpdatedMessages();
-    }
-
-    @Override
-    public void registerMessage(UUID channelId, String userName, String messageContent) {
-        if (channelRepository.channelExists(channelId) && userRepository.userExists(userName)) {
-            throw new IllegalArgumentException("존재하지 않는 ID입니다.");
+        if (!userRepository.existsById(createRequest.authorId())) {
+            throw new NoSuchElementException(createRequest.authorId() + "에 해당하는 Author를 찾을 수 없음");
         }
-        messageRepository.createMessage(
-                channelRepository.findById(channelId),
-                userRepository.findByName(userName),
-                messageContent
-        );
+        List<UUID> idList = binaryContentRequestList.stream()
+                .map(request ->
+                        basicBinaryContentService.create(request).getId()).toList();
+
+        Message message = new Message(createRequest.content(), createRequest.channelId(),
+                createRequest.authorId(), idList);
+        return messageRepository.save(message);
     }
 
     @Override
-    public void updateMessage(UUID messageId, String messageContent) {
-        if (messageRepository.messageExists(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
-        }
-        messageRepository.updateMessage(messageId, messageContent);
+    public Message find(UUID messageId) {
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException(messageId + " 에 해당하는 Message를 찾을 수 없음"));
     }
 
     @Override
-    public void deleteMessage(UUID messageId) {
-        if (messageRepository.messageExists(messageId)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지ID입니다.");
-        }
-        messageRepository.deleteMessage(messageId);
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.findAllByChannelId(channelId);
     }
 
+    @Override
+    public Message update(MessageUpdateRequest updateRequest) {
+        Message message = messageRepository.findById(updateRequest.id())
+                .orElseThrow(() -> new NoSuchElementException(updateRequest.id() + " 에 해당하는 Message를 찾을 수 없음"));
+        message.update(updateRequest.newContent());
+        return messageRepository.save(message);
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        Message message = find(messageId);
+        if (message.getAttachmentIds() != null) {
+            message.getAttachmentIds().forEach(basicBinaryContentService::delete);
+        }
+        messageRepository.deleteById(messageId);
+    }
 }

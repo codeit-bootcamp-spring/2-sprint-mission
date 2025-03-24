@@ -1,51 +1,49 @@
 package com.sprint.mission.discodeit.entity;
 
-import static com.sprint.mission.discodeit.entity.Util.formatTime;
-
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+import lombok.Getter;
+import lombok.ToString;
 
-public class Message extends BaseEntity implements Serializable {
+@Getter
+@ToString
+public class Message implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private final Channel channel;
-    private final User user;
-    private String messageContent;
 
-    public Message(Channel channel, User user, String messageContent) {
-        super();
-        this.channel = channel;
-        this.user = user;
-        this.messageContent = messageContent;
+    private final UUID id;
+    private final Instant createdAt;
+    private Instant updatedAt;
+    //
+    private String content;
+    //
+    private final UUID channelId;
+    private final UUID authorId;
+
+    private final List<UUID> attachmentIds;
+
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
+        this.attachmentIds = attachmentIds;
     }
 
-    public Channel getChannel() {
-        return channel;
-    }
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-    public User getUser() {
-        return user;
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
-
-    public String getMessageContent() {
-        return messageContent;
-    }
-
-    public void messageUpdate(String messageContent) {
-        updateTime();
-        this.messageContent = messageContent;
-    }
-
-    @Override
-    public String toString() {
-        return "[mid: " + getId() +
-                ", cid: " + channel.getId() +
-                ", channelName: " + channel.getChannelName() +
-                ", userName: " + user.getUserName() +
-                ", nickName: " + user.getNickName() +
-                "\n\t, messageCreateAt: " + formatTime(getCreatedAt()) +
-                ", messageUpdateAt: " + (getUpdatedAt() == null ? "null" : formatTime(getUpdatedAt())) +
-                ", messageContent: " + messageContent + "]\n";
-    }
-
 }

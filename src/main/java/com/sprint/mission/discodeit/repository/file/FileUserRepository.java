@@ -2,129 +2,67 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
+import com.sprint.mission.discodeit.util.FileUtil;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileUserRepository implements UserRepository {
-    private final Path directory = Paths.get(System.getProperty("user.dir"),
-            "src/main/java/com/sprint/mission/discodeit/data/User");
+    private final Path DIRECTORY;
 
-    public FileUserRepository() {
-        init(directory);
-    }
-
-    private void init(Path directory) {
-        if (!Files.exists(directory)) {
-            try {
-                Files.createDirectories(directory);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public FileUserRepository(
+            @Value("${discodeit.repository.file-directory:file-data-map}") String fileDirectory
+    ) {
+        DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+                User.class.getSimpleName());
+        FileUtil.init(DIRECTORY);
     }
 
     @Override
-    public boolean userExists(String userName) {
-        return !Files.exists(directory.resolve(userName + ".ser"));
-    }
-
-    private void save(String userName, User user) {
-        Path filePath = directory.resolve(userName + ".ser");
-        try (
-                FileOutputStream fos = new FileOutputStream(filePath.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-            oos.writeObject(user);
-        } catch (IOException e) {
-            throw new RuntimeException("유저 저장 실패" + e.getMessage());
-        }
-    }
-
-    private List<User> loadAllUsersFile() {
-        if (!Files.exists(directory)) {
-            throw new IllegalArgumentException("디렉토리가 생성되어 있지 않음.");
-        }
-        try (Stream<Path> paths = Files.list(directory)) {
-            return paths.map(path -> {
-                try (
-                        FileInputStream fis = new FileInputStream(path.toFile());
-                        ObjectInputStream ois = new ObjectInputStream(fis)
-                ) {
-                    return (User) ois.readObject();
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException("파일 로드 실패: " + e.getMessage(), e);
-                }
-            }).collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException("파일 로드 실패" + e.getMessage());
-        }
-    }
-
-    private void deleteUserFile(String userName) {
-        Path filePath = directory.resolve(userName + ".ser");
-        if (Files.exists(filePath)) {
-            try {
-                Files.delete(filePath);
-            } catch (IOException e) {
-                throw new RuntimeException("파일 삭제 불가" + e.getMessage());
-            }
-        }
+    public User save(User user) {
+        return FileUtil.save(DIRECTORY, user, user.getId());
     }
 
     @Override
-    public User findByName(String userName) {
-        Path filePath = directory.resolve(userName + ".ser");
-        try (
-                FileInputStream fis = new FileInputStream(filePath.toFile());
-                ObjectInputStream ois = new ObjectInputStream(fis)
-        ) {
-            return (User) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new IllegalArgumentException("파일 로드 실패: " + e.getMessage(), e);
-        }
+    public Optional<User> findById(UUID id) {
+        return FileUtil.findById(DIRECTORY, id, User.class);
     }
 
     @Override
     public List<User> findAll() {
-        return Optional.ofNullable(loadAllUsersFile())
-                .filter(list -> !list.isEmpty())
-                .orElseThrow(() -> new IllegalArgumentException("데이터가 존재하지 않습니다."));
+        return FileUtil.findAll(DIRECTORY, User.class);
     }
 
     @Override
-    public List<User> findUpdatedUsers() {
-        return loadAllUsersFile().stream()
-                .filter(user -> user.getUpdatedAt() != null)
-                .collect(Collectors.toList());
+    public boolean existsById(UUID id) {
+        return FileUtil.existsById(DIRECTORY, id);
     }
 
     @Override
-    public void createUser(String userName, String nickName) {
-        User user = new User(userName, nickName);
-        save(userName, user);
+    public boolean existsByUsername(String username) {
+        return findAll().stream().anyMatch(u -> u.getUsername().equals(username));
     }
 
     @Override
-    public void updateUser(String oldUserName, String newUserName, String newNickName) {
-        User user = findByName(oldUserName);
-        deleteUserFile(oldUserName);
-        user.userUpdate(newUserName, newNickName);
-        save(newUserName, user);
+    public boolean existsByEmail(String email) {
+        return findAll().stream().anyMatch(u -> u.getEmail().equals(email));
     }
 
     @Override
-    public void deleteUser(String userName) {
-        deleteUserFile(userName);
+    public void deleteById(UUID id) {
+        FileUtil.delete(DIRECTORY, id);
     }
 
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return findAll().stream()
+                .filter(u -> u.getUsername().equals(username)).findFirst();
+    }
 }

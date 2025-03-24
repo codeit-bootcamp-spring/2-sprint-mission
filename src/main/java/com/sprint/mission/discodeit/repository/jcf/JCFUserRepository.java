@@ -2,64 +2,62 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+@Repository
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> userData = new HashMap<>();
-    private final Map<String, UUID> userNameToId = new HashMap<>();
+    private final Map<UUID, User> data;
 
-    @Override
-    public boolean userExists(String userName) {
-        return !userNameToId.containsKey(userName);
+    public JCFUserRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public User findByName(String userName) {
-        return userData.get(userNameToId.get(userName));
+    public User save(User user) {
+        this.data.put(user.getId(), user);
+        return user;
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        if (userData.isEmpty()) {
-            throw new IllegalArgumentException("데이터가 존재하지 않습니다.");
-        }
-        return new ArrayList<>(userData.values());
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public List<User> findUpdatedUsers() {
-        return userData.values().stream()
-                .filter(entry -> entry.getUpdatedAt() != null)
-                .collect(Collectors.toList());
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public void createUser(String userName, String nickName) {
-        User user = new User(userName, nickName);
-        UUID uid = user.getId();
-        userData.put(uid, user);
-        userNameToId.put(userName, uid);
+    public boolean existsByUsername(String username) {
+        return findAll().stream().anyMatch(u -> u.getUsername().equals(username));
     }
 
     @Override
-    public void updateUser(String oldUserName, String newUserName, String newNickName) {
-        UUID uid = userNameToId.get(oldUserName);
-        User user = userData.get(uid);
-        user.userUpdate(newUserName, newNickName);
-        userNameToId.remove(oldUserName);
-        userNameToId.put(newUserName, uid);
+    public boolean existsByEmail(String email) {
+        return findAll().stream().anyMatch(u -> u.getEmail().equals(email));
     }
 
     @Override
-    public void deleteUser(String userName) {
-        UUID uid = userNameToId.get(userName);
-        userData.remove(uid);
-        userNameToId.remove(userName);
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return this.data.values().stream()
+                .filter(u -> u.getUsername().equals(username)).findFirst();
+    }
 }
