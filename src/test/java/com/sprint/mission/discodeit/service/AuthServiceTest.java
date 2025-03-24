@@ -2,17 +2,19 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.application.dto.user.UserDto;
 import com.sprint.mission.discodeit.application.dto.user.UserLoginDto;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicAuthService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
+import java.time.ZonedDateTime;
 
 import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
 import static com.sprint.mission.discodeit.constant.SetUpUserInfo.OTHER_USER;
@@ -21,12 +23,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AuthServiceTest {
     private AuthService authService;
+    private UserStatusRepository userStatusRepository;
 
     @BeforeEach
     void setUp() {
         UserRepository userRepository = new JCFUserRepository();
-        UserStatusRepository userStatusRepository = new JCFUserStatusRepository();
-        userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), UUID.randomUUID()));
+        userStatusRepository = new JCFUserStatusRepository();
+        UserService userService = new BasicUserService(userRepository, userStatusRepository);
+        userService.register(new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
         authService = new BasicAuthService(userRepository, userStatusRepository);
     }
 
@@ -35,7 +39,9 @@ class AuthServiceTest {
     void login() {
         UserLoginDto loginRequestUser = new UserLoginDto(LOGIN_USER.getName(), LOGIN_USER.getPassword());
         UserDto user = authService.login(loginRequestUser);
-        assertThat(user.isLogin()).isTrue();
+        UserStatus userStatus = userStatusRepository.findByUserId(user.id()).get();
+
+        assertThat(userStatus.isLogin(ZonedDateTime.now().toInstant())).isTrue();
     }
 
     @DisplayName("로그인시 등록된 유저가 없으면 예외를 반환합니다.")

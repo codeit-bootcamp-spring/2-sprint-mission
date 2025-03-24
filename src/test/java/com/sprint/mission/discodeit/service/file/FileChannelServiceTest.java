@@ -65,7 +65,8 @@ class FileChannelServiceTest {
     }
 
     private void setUpChannel(UserDto loginUser) {
-        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, new UserDto(loginUser.id(), loginUser.name(), loginUser.email(), null, false));
+        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME,
+                new UserDto(loginUser.id(), loginUser.name(), loginUser.email(), null));
         initializedChannel = channelService.create(channelRegisterDto);
     }
 

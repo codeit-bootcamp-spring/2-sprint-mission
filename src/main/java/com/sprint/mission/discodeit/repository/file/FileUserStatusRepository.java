@@ -68,4 +68,9 @@ public class FileUserStatusRepository implements UserStatusRepository {
         userStatuses.remove(id);
         saveObjectsToFile(STORAGE_DIRECTORY, userStatusPath, userStatuses);
     }
+
+    @Override
+    public void deleteByUserId(UUID id) {
+
+    }
 }

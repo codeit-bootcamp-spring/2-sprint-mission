@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class UserControllerTest {
         binaryContentRepository = new JCFBinaryContentRepository();
         userService = new BasicUserService(userRepository, userStatusRepository);
         binaryContentService = new BasicBinaryContentService(binaryContentRepository);
-        userController = new UserController(userService, binaryContentService);
+        userController = new UserController(userService, binaryContentService, new BasicUserStatusService(userStatusRepository, userRepository));
     }
 
     @DisplayName("프로필 사진 저장을 선택하지 않았을떄 profile 아이디를 null을 반환합니다")
@@ -76,6 +77,17 @@ class UserControllerTest {
         byte[] storedFileBytes = Files.readAllBytes(Path.of(binaryContent.getPath()));
         assertThat(binaryProfileImage).isEqualTo(storedFileBytes);
     }
+
+    @DisplayName("처음 등록시 유저의 로그아웃된 상태를 반환합니다")
+    @Test
+    void registerValidateUserStatus() {
+        UserRegisterDto sameNameUser = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
+        UserDto user = userController.register(sameNameUser, null); // 이러면 어딘가 lastLogin이 있어야되는데
+        UserResponseDto userResponse = userController.findById(user.id());
+
+        assertThat(userResponse.isLogin()).isFalse();
+    }
+
 
     @DisplayName("사용자 이미지를 업데이트하고 유저 정보를 반환합니다")
     @Test

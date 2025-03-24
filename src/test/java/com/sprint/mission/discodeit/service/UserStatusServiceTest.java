@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -17,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserStatusServiceTest {
+    @DisplayName("처음 생성시 유저의 로그인 상태는 false를 반환합니다.")
     @Test
     void create() {
         UserRepository userRepository = new JCFUserRepository();
@@ -26,7 +28,7 @@ class UserStatusServiceTest {
         UserStatusService userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
 
         UserStatusDto userStatusDto = userStatusService.create(user.getId());
-        assertThat(userStatusDto.id()).isNotNull();
+        assertThat(userStatusDto.isLogin()).isFalse();
     }
 
     @Test

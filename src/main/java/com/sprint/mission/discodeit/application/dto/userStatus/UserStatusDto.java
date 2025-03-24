@@ -6,8 +6,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record UserStatusDto(UUID id, UUID userId, Instant lastLoginAt, boolean isLogin) {
-    public static UserStatusDto fromEntity(UserStatus userStatus) {
-        return new UserStatusDto(userStatus.getId(), userStatus.getUserId(), userStatus.getLastLoginAt(), true);
+    public static UserStatusDto fromEntity(UserStatus userStatus, boolean isLogin) {
+        return new UserStatusDto(userStatus.getId(), userStatus.getUserId(), userStatus.getLastLoginAt(), isLogin);
     }
 }
 

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.application.dto.user.UserDto;
 import com.sprint.mission.discodeit.application.dto.user.UserLoginDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -17,10 +18,9 @@ public class BasicAuthService implements AuthService {
     @Override
     public UserDto login(UserLoginDto loginRequestUser) {
         User user = findUserByNameAndValidatePassword(loginRequestUser);
-
-        user.changeUserStatus();
-        userRepository.save(user);
-        userStatusRepository.save(user.getUserStatus());
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저의 상태가 존재하지 않습니다."));
+        userStatus.updateLastLoginAt();
 
         return UserDto.fromEntity(user);
     }

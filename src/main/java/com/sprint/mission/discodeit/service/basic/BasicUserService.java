@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.application.dto.user.UserDto;
 import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -32,7 +33,7 @@ public class BasicUserService implements UserService {
                 userRegisterDto.password(),
                 profileId)
         );
-        userStatusRepository.save(savedUser.getUserStatus());
+        userStatusRepository.save(new UserStatus(savedUser.getId()));
 
         return UserDto.fromEntity(savedUser);
     }
@@ -99,7 +100,7 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent() + 11));
 
         userRepository.delete(userId);
-        userStatusRepository.delete(user.getUserStatus().getId());
+        userStatusRepository.deleteByUserId(user.getId());
     }
 
     private void validateDuplicateUserName(String name) {

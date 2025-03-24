@@ -47,7 +47,8 @@ class ChannelServiceTest {
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
         channelService = new BasicChannelService(new JCFChannelRepository(), readStatusRepository, messageRepository);
-        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME, new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
+        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PUBLIC, CHANNEL_NAME,
+                new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null));
         setUpChannel = channelService.create(channelRegisterDto);
     }
 
@@ -75,7 +76,8 @@ class ChannelServiceTest {
     @DisplayName("Private 채널 수정 시도시 예외를 반환합니다.")
     @Test
     void Private_채널_이름_수정_예외() {
-        ChannelRegisterDto setUpUserChannelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
+        ChannelRegisterDto setUpUserChannelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
+                new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null));
         ChannelDto setUpUserPrivateChannel = channelService.create(setUpUserChannelRegisterDto);
 
         assertThatThrownBy(() -> channelService.updateName(setUpUserPrivateChannel.id(), UPDATED_CHANNEL_NAME))
@@ -87,10 +89,12 @@ class ChannelServiceTest {
     void findAll() {
         User otherUser = userRepository.save(
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
-        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, new UserDto(otherUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
+        ChannelRegisterDto channelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
+                new UserDto(otherUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null));
         channelService.create(channelRegisterDto);
 
-        ChannelRegisterDto setUpUserChannelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
+        ChannelRegisterDto setUpUserChannelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
+                new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null));
         ChannelDto setUpUserPrivateChannel = channelService.create(setUpUserChannelRegisterDto);
 
         List<UUID> setUpUserChannelIds = channelService.findAllByUserId(setUpUser.getId())
@@ -126,7 +130,8 @@ class ChannelServiceTest {
     @DisplayName("Private 채널 삭제시 ReadStatus도 삭제합니다")
     @Test
     void Private_채널_삭제시_ReadStatus_삭제() {
-        ChannelRegisterDto setUpUserChannelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null, false));
+        ChannelRegisterDto setUpUserChannelRegisterDto = new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME,
+                new UserDto(setUpUser.getId(), LOGIN_USER.getName(), LOGIN_USER.getEmail(), null));
         ChannelDto privateChannel = channelService.create(setUpUserChannelRegisterDto);
 
         UUID privateChannelId = privateChannel.id();

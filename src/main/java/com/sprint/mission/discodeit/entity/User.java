@@ -17,7 +17,6 @@ public class User implements Serializable {
     private String email;
     private String password;
     private UUID profileId;
-    private UserStatus userStatus;
 
     public User(String name, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
@@ -27,7 +26,6 @@ public class User implements Serializable {
         this.email = email;
         this.password = password;
         this.profileId = profileId;
-        this.userStatus = new UserStatus(this.id);
     }
 
     public void updateName(String name) {
@@ -50,10 +48,6 @@ public class User implements Serializable {
 
     public boolean isSamePassword(String password) {
         return this.password.equals(password);
-    }
-
-    public void changeUserStatus() {
-        this.userStatus.isLogin(ZonedDateTime.now().toInstant());
     }
 
     private void updateLastModified() {
