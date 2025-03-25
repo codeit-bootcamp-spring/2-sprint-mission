@@ -44,15 +44,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     private BinaryContentDTO binaryContentEntityToDTO(BinaryContent binaryContent) {
-        return BinaryContentDTO.builder()
-                .createdAt(binaryContent.getCreatedAt())
-                .id(binaryContent.getId())
-                .filename(binaryContent.getFilename())
-                .type(binaryContent.getType())
-                .size(binaryContent.getSize())
-                .path(binaryContent.getPath())
-                .bytes(binaryContent.getBytes())
-                .build();
+        return new BinaryContentDTO(binaryContent.getId(), binaryContent.getCreatedAt(), binaryContent.getFilename(), binaryContent.getPath(), binaryContent.getSize(), binaryContent.getType(), binaryContent.getBytes());
     }
 
     private BinaryContent createBinaryContentEntity(CreateBinaryContentParam createBinaryContentParam) {

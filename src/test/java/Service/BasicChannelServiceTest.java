@@ -59,12 +59,7 @@ public class BasicChannelServiceTest {
 
     @Test
     void 공개_채널생성_성공() {
-        CreateChannelParam createChannelParam = CreateChannelParam.builder()
-                .description("publicTesting")
-                .name("publicTest")
-                .type(ChannelType.PUBLIC)
-                .build();
-
+        CreateChannelParam createChannelParam = new CreateChannelParam(ChannelType.PUBLIC, "publicTest", "publicTesting");
         when(channelRepository.save(any(Channel.class))).thenReturn(mockPublicChannel);
 
 
@@ -79,8 +74,7 @@ public class BasicChannelServiceTest {
 
     @Test
     void 공개_채널생성_필드없음_실패() {
-        CreateChannelParam createChannelParam = CreateChannelParam.builder()
-                .build();
+        CreateChannelParam createChannelParam = new  CreateChannelParam(null, null, null);
 
         assertThatThrownBy(() -> basicChannelService.createPublicChannel(createChannelParam))
                 .isInstanceOf(RestException.class)
@@ -96,12 +90,7 @@ public class BasicChannelServiceTest {
                 UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()
         );
 
-        CreateChannelParam createChannelParam = CreateChannelParam.builder()
-                .description("privateTesting")
-                .name("privateTest")
-                .type(ChannelType.PRIVATE)
-                .build();
-
+        CreateChannelParam createChannelParam = new CreateChannelParam(ChannelType.PRIVATE, "privateTest", "privateTesting");
 
         ChannelDTO channelDTO = basicChannelService.createPrivateChannel(userIds, createChannelParam);
 
@@ -119,8 +108,7 @@ public class BasicChannelServiceTest {
                 UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()
         );
 
-        CreateChannelParam createChannelParam = CreateChannelParam.builder()
-                .build();
+        CreateChannelParam createChannelParam = new CreateChannelParam(null, null, null);
 
 
         assertThatThrownBy(() -> basicChannelService.createPrivateChannel(userIds, createChannelParam))
@@ -149,9 +137,7 @@ public class BasicChannelServiceTest {
 
     @Test
     void 채널찾기_공개채널_실패() {
-        CreateChannelParam createChannelParam = CreateChannelParam.builder()
-                .type(ChannelType.PUBLIC)
-                .build();
+        CreateChannelParam createChannelParam = new CreateChannelParam(ChannelType.PRIVATE,null, null);
 
         assertThatThrownBy(() -> basicChannelService.createPublicChannel(createChannelParam))
                 .isInstanceOf(RestException.class)
@@ -178,9 +164,7 @@ public class BasicChannelServiceTest {
 
     @Test
     void 채널찾기_비밀채널_실패() {
-        CreateChannelParam createChannelParam = CreateChannelParam.builder()
-                .type(ChannelType.PRIVATE)
-                .build();
+        CreateChannelParam createChannelParam = new CreateChannelParam(ChannelType.PRIVATE, null, null);
         List<UUID> userIds = List.of();
 
         assertThatThrownBy(() -> basicChannelService.createPrivateChannel(userIds, createChannelParam))

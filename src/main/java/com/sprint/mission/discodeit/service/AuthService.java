@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository;
+package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.service.auth.LoginParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;

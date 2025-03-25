@@ -65,6 +65,7 @@ public class BasicChannelService implements ChannelService {
                 .toList();
     }
 
+
     @Override
     public UUID update(UpdateChannelParam updateChannelParam) {
         Channel channel = findChannelById(updateChannelParam.id());
@@ -105,36 +106,19 @@ public class BasicChannelService implements ChannelService {
     }
 
     private ChannelDTO channelEntityToDTO(Channel channel) {
-        return ChannelDTO.builder()
-                .id(channel.getId())
-                .updatedAt(channel.getUpdatedAt())
-                .createdAt(channel.getCreatedAt())
-                .description(channel.getDescription())
-                .name(channel.getName())
-                .type(channel.getType())
-                .build();
+        return new ChannelDTO(channel.getId(),channel.getCreatedAt(),channel.getUpdatedAt(),channel.getType(), channel.getName(), channel.getDescription());
     }
 
     private void createReadStatusesForUsers(List<UUID> userIds, UUID channelId) {
         List<CreateReadStatusParam> createReadStatusParams = userIds.stream()
-                        .map(userId -> CreateReadStatusParam.builder()
-                                .userId(userId)
-                                .channelId(channelId) // userId와 channelId를 사용하여 createReadStatus DTO 생성
-                                .build())
+                        .map(userId -> new CreateReadStatusParam(userId, channelId)) // userId와 channelId를 사용하여 createReadStatus DTO 생성
                         .toList();
         // DTO를 이용해 readStatus 생성
         createReadStatusParams.forEach(cr -> readStatusService.create(cr));
     }
 
     private FindChannelDTO channelEntityToFindDTO(Channel channel, Instant latestMessageTime, List<UUID> userIds) {
-        return FindChannelDTO.builder()
-                .id(channel.getId())
-                .description(channel.getDescription())
-                .name(channel.getName())
-                .type(channel.getType())
-                .lastMessageAt(latestMessageTime)
-                .userIds(userIds)
-                .build();
+        return new FindChannelDTO(channel.getId(), channel.getType(), channel.getName(), channel.getDescription(), latestMessageTime, userIds);
     }
 
     // PRIVATE 채널일때만 userId 가져오고 아닐떈 빈리스트 반환

@@ -81,12 +81,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     private UserStatusDTO userStatusEntityToDTO(UserStatus userStatus) {
-        return UserStatusDTO.builder()
-                .cratedAt(userStatus.getCreatedAt())
-                .id(userStatus.getUserId())
-                .updatedAt(userStatus.getUpdatedAt())
-                .userId(userStatus.getUserId())
-                .build();
+        return new UserStatusDTO(userStatus.getId(), userStatus.getUserId(), userStatus.getCreatedAt(), userStatus.getUpdatedAt());
     }
 
     private UserStatus findUserStatusById(UUID id) {

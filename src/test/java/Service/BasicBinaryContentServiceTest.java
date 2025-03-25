@@ -40,12 +40,8 @@ public class BasicBinaryContentServiceTest {
 
     @Test
     void 파일생성_성공() {
-        CreateBinaryContentParam createBinaryContentParam = CreateBinaryContentParam.builder()
-                .type("jpeg")
-                .size(500)
-                .path("www.image1.com")
-                .filename("testImage")
-                .build();
+        CreateBinaryContentParam createBinaryContentParam = new CreateBinaryContentParam("testImage", "www.image1.com", 500, "jpeg", null);
+
 
         when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(mockBinaryContent);
 

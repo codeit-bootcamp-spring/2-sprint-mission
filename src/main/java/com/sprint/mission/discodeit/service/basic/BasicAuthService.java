@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.RestExceptions;
-import com.sprint.mission.discodeit.repository.AuthService;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.util.UserMapper;

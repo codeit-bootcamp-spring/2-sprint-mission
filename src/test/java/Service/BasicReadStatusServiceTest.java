@@ -48,10 +48,7 @@ public class BasicReadStatusServiceTest {
         userId = UUID.randomUUID();
         channelId = UUID.randomUUID();
 
-        createReadStatusParam = CreateReadStatusParam.builder()
-                .userId(userId)
-                .channelId(channelId)
-                .build();
+        createReadStatusParam = new CreateReadStatusParam(userId, channelId);
 
         mockReadStatus = ReadStatus.builder()
                 .userId(userId)

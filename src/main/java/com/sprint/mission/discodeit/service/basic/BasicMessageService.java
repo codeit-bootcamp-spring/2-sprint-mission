@@ -90,15 +90,7 @@ public class BasicMessageService implements MessageService {
     }
 
     private MessageDTO messageEntityToDTO(Message message) {
-        return MessageDTO.builder()
-                .id(message.getId())
-                .updatedAt(message.getUpdatedAt())
-                .createdAt(message.getCreatedAt())
-                .attachmentIds(message.getAttachmentIds())
-                .authorId(message.getAuthorId())
-                .channelId(message.getChannelId())
-                .content(message.getContent())
-                .build();
+        return new MessageDTO(message.getId(), message.getCreatedAt(), message.getUpdatedAt(), message.getAttachmentIds(), message.getContent(), message.getChannelId(), message.getAuthorId());
     }
 
     private Message findMessageById(UUID id) {
