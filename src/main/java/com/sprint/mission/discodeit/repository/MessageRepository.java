@@ -10,6 +10,8 @@ public interface MessageRepository {
     void save(Message message);
     Optional<Message> findById(UUID id);
     Optional<List<Message>> findAll();
+    Optional<List<Message>> findByChannelId(UUID channelId);
     void update(Message message);
     void delete(UUID id);
+    void deleteChannelById(UUID id);
 }

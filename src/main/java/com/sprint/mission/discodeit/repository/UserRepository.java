@@ -12,4 +12,6 @@ public interface UserRepository {
     Optional<List<User>> findAll();
     void update(User user);
     void delete(UUID id);
+    Optional<User> findByUserName(String username);
+    Optional<User> findByEmail(String email);
 }
