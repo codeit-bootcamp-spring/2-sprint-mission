@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -35,7 +36,7 @@ class ChannelServiceTest {
     private UserRepository userRepository;
     private MessageRepository messageRepository;
     private ReadStatusRepository readStatusRepository;
-    private JCFChannelRepository channelRepository;
+    private ChannelRepository channelRepository;
     private ChannelDto setUpChannel;
     private User setUpUser;
 

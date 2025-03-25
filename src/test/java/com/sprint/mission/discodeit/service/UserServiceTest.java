@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.application.dto.user.UserDto;
 import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
@@ -18,8 +20,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserServiceTest {
     private UserService userService;
-    private JCFUserRepository userRepository;
-    private JCFUserStatusRepository userStatusRepository;
+    private UserRepository userRepository;
+    private UserStatusRepository userStatusRepository;
     private UserDto setUpUser;
 
     @BeforeEach

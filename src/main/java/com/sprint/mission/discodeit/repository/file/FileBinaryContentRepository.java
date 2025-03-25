@@ -11,17 +11,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
-import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadAndSaveConsumer;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileBinaryContentRepository implements BinaryContentRepository {
+    private final Path binaryContentPath;
 
-    @Value("${discodeit.repository.file-directory.binary-content-path}")
-    private Path binaryContentPath = STORAGE_DIRECTORY.resolve("binaryContent" + SER_EXTENSION);
+    public FileBinaryContentRepository(@Value("${discodeit.repository.file-directory.binary-content-path}") Path binaryContentPath) {
+        this.binaryContentPath = binaryContentPath;
+    }
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {

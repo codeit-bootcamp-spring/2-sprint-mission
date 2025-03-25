@@ -12,17 +12,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
-import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.*;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
+    private final Path channelPath;
 
-    @Value("${discodeit.repository.file-directory.channel-path}")
-    private Path channelPath = STORAGE_DIRECTORY.resolve("channel" + SER_EXTENSION);
-
+    public FileChannelRepository(@Value("${discodeit.repository.file-directory.channel-path}") Path channelPath) {
+        this.channelPath = channelPath;
+    }
 
     @Override
     public Channel save(Channel channel) {

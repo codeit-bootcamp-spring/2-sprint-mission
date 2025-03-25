@@ -12,16 +12,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
-import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.*;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserStatusRepository implements UserStatusRepository {
+    private final Path userStatusPath;
 
-    @Value("${discodeit.repository.file-directory.user-status-path}")
-    private Path userStatusPath = STORAGE_DIRECTORY.resolve("userStatus" + SER_EXTENSION);
+    public FileUserStatusRepository(@Value("${discodeit.repository.file-directory.user-status-path}") Path userStatusPath) {
+        this.userStatusPath = userStatusPath;
+    }
 
     @Override
     public UserStatus save(UserStatus userStatus) {

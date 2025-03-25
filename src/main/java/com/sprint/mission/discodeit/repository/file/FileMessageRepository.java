@@ -10,16 +10,16 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 
-import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
-import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.*;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
+    private final Path messagePath;
 
-    @Value("${discodeit.repository.file-directory.message-path}")
-    private Path messagePath = STORAGE_DIRECTORY.resolve("message" + SER_EXTENSION);
+    public FileMessageRepository(@Value("${discodeit.repository.file-directory.message-path}") Path messagePath) {
+        this.messagePath = messagePath;
+    }
 
     @Override
     public Message save(Message message) {
