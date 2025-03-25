@@ -1,4 +1,4 @@
 discodeit:
   repository:
     type: jcf   # jcf | file
-    file-directory: src/main/resources
+    file-directory: src/main/resources/data/
