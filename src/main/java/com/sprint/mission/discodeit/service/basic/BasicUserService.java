@@ -30,8 +30,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-        String username = userCreateRequest.username();
-        String email = userCreateRequest.email();
+        String username = userCreateRequest.getUsername();
+        String email = userCreateRequest.getEmail();
 
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("User with email " + email + " already exists");
@@ -42,20 +42,32 @@ public class BasicUserService implements UserService {
 
         UUID nullableProfileId = optionalProfileCreateRequest
                 .map(profileRequest -> {
-                    String fileName = profileRequest.fileName();
-                    String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
+                    String fileName = profileRequest.getFileName();
+                    String contentType = profileRequest.getContentType();
+                    byte[] bytes = profileRequest.getBytes();
+                    BinaryContent binaryContent = BinaryContent.builder()
+                            .fileName(fileName)
+                            .size((long)bytes.length)
+                            .contentType(contentType)
+                            .bytes(bytes).build();
                     return binaryContentRepository.save(binaryContent).getId();
                 })
                 .orElse(null);
-        String password = userCreateRequest.password();
+        String password = userCreateRequest.getPassword();
 
-        User user = new User(username, email, password, nullableProfileId);
+        User user = User.builder()
+                .username(username)
+                .email(email)
+                .password(password)
+                .profileId(nullableProfileId)
+                .build();
         User createdUser = userRepository.save(user);
 
         Instant now = Instant.now();
-        UserStatus userStatus = new UserStatus(createdUser.getId(), now);
+        UserStatus userStatus = UserStatus.builder()
+                .userId(createdUser.getId())
+                .lastActiveAt(now)
+                .build();
         userStatusRepository.save(userStatus);
 
         return createdUser;
@@ -81,8 +93,8 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-        String newUsername = userUpdateRequest.newUsername();
-        String newEmail = userUpdateRequest.newEmail();
+        String newUsername = userUpdateRequest.getNewUsername();
+        String newEmail = userUpdateRequest.getNewEmail();
         if (userRepository.existsByEmail(newEmail)) {
             throw new IllegalArgumentException("User with email " + newEmail + " already exists");
         }
@@ -95,15 +107,19 @@ public class BasicUserService implements UserService {
                     Optional.ofNullable(user.getProfileId())
                                     .ifPresent(binaryContentRepository::deleteById);
 
-                    String fileName = profileRequest.fileName();
-                    String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    String fileName = profileRequest.getFileName();
+                    String contentType = profileRequest.getContentType();
+                    byte[] bytes = profileRequest.getBytes();
+                    BinaryContent binaryContent = BinaryContent.builder()
+                            .fileName(fileName)
+                            .size((long)bytes.length)
+                            .contentType(contentType)
+                            .bytes(bytes).build();
                     return binaryContentRepository.save(binaryContent).getId();
                 })
                 .orElse(null);
 
-        String newPassword = userUpdateRequest.newPassword();
+        String newPassword = userUpdateRequest.getNewPassword();
         user.update(newUsername, newEmail, newPassword, nullableProfileId);
 
         return userRepository.save(user);

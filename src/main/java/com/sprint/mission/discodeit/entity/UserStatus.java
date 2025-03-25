@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -17,10 +18,10 @@ public class UserStatus implements Serializable {
     private UUID userId;
     private Instant lastActiveAt;
 
+    @Builder
     public UserStatus(UUID userId, Instant lastActiveAt) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        //
         this.userId = userId;
         this.lastActiveAt = lastActiveAt;
     }

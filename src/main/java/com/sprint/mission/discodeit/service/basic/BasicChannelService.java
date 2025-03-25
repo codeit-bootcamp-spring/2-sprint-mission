@@ -22,15 +22,18 @@ import java.util.*;
 @Service
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
-    //
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
 
     @Override
     public Channel create(PublicChannelCreateRequest request) {
-        String name = request.name();
-        String description = request.description();
-        Channel channel = new Channel(ChannelType.PUBLIC, name, description);
+        String name = request.getName();
+        String description = request.getDescription();
+        Channel channel = Channel.builder()
+                .type(ChannelType.PUBLIC)
+                .name(name)
+                .description(description)
+                .build();
 
         return channelRepository.save(channel);
     }
@@ -40,7 +43,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         Channel createdChannel = channelRepository.save(channel);
 
-        request.participantIds().stream()
+        request.getParticipantIds().stream()
                 .map(userId -> new ReadStatus(userId, createdChannel.getId(), Instant.MIN))
                 .forEach(readStatusRepository::save);
 
@@ -71,8 +74,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel update(UUID channelId, PublicChannelUpdateRequest request) {
-        String newName = request.newName();
-        String newDescription = request.newDescription();
+        String newName = request.getNewName();
+        String newDescription = request.getNewDescription();
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
         if (channel.getType().equals(ChannelType.PRIVATE)) {

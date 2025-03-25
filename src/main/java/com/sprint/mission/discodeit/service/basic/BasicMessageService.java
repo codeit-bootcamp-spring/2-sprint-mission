@@ -28,8 +28,8 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests) {
-        UUID channelId = messageCreateRequest.channelId();
-        UUID authorId = messageCreateRequest.authorId();
+        UUID channelId = messageCreateRequest.getChannelId();
+        UUID authorId = messageCreateRequest.getAuthorId();
 
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
@@ -40,9 +40,9 @@ public class BasicMessageService implements MessageService {
 
         List<UUID> attachmentIds = binaryContentCreateRequests.stream()
                 .map(attachmentRequest -> {
-                    String fileName = attachmentRequest.fileName();
-                    String contentType = attachmentRequest.contentType();
-                    byte[] bytes = attachmentRequest.bytes();
+                    String fileName = attachmentRequest.getFileName();
+                    String contentType = attachmentRequest.getContentType();
+                    byte[] bytes = attachmentRequest.getBytes();
 
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
                     BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
@@ -50,13 +50,13 @@ public class BasicMessageService implements MessageService {
                 })
                 .toList();
 
-        String content = messageCreateRequest.content();
-        Message message = new Message(
-                content,
-                channelId,
-                authorId,
-                attachmentIds
-        );
+        String content = messageCreateRequest.getContent();
+        Message message = Message.builder()
+                .content(content)
+                .channelId(channelId)
+                .authorId(authorId)
+                .attachmentIds(attachmentIds)
+                .build();
         return messageRepository.save(message);
     }
 
@@ -74,7 +74,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message update(UUID messageId, MessageUpdateRequest request) {
-        String newContent = request.newContent();
+        String newContent = request.getNewContent();
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
         message.update(newContent);

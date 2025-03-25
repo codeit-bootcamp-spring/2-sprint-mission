@@ -16,8 +16,8 @@ public class BasicAuthService implements AuthService {
 
     @Override
     public User login(LoginRequest loginRequest) {
-        String username = loginRequest.username();
-        String password = loginRequest.password();
+        String username = loginRequest.getUsername();
+        String password = loginRequest.getPassword();
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("User with username " + username + " not found"));
