@@ -7,7 +7,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-@Repository
 public interface UserStatusRepository {
     UUID createUserStatus(UserStatus userStatus);
     UserStatus findById(UUID id);
