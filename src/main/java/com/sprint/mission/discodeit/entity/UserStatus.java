@@ -8,37 +8,38 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class UserStatus extends BaseEntity implements Serializable {
+public class UserStatus implements Serializable {
     private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
     private UUID userId;
-    private Instant lastOnlineTime;
+    private Instant lastActiveAt;
 
-    public UserStatus(UUID userId, Instant lastOnlineTime) {
+    public UserStatus(UUID userId, Instant lastActiveAt) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.userId = userId;
-        this.lastOnlineTime = lastOnlineTime;
+        this.lastActiveAt = lastActiveAt;
     }
 
-    public boolean isOnline() {
-        return lastOnlineTime.isAfter(Instant.now().minus(Duration.ofMinutes(5)));
-    }
-
-    public void updateUserStatus(Instant lastOnlineTime, Instant updateAt) {
+    public void update(Instant lastActiveAt) {
         boolean anyValueUpdated = false;
-        if (lastOnlineTime != null && !lastOnlineTime.equals(this.lastOnlineTime)) {
-            this.lastOnlineTime = lastOnlineTime;
+        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+            this.lastActiveAt = lastActiveAt;
             anyValueUpdated = true;
         }
 
         if (anyValueUpdated) {
-            updateUpdatedAt(updateAt);
+            this.updatedAt = Instant.now();
         }
     }
 
-    @Override
-    public String toString() {
-        return "UserStatus{" +
-                "userId=" + userId +
-                ", lastOnlineTime=" + lastOnlineTime +
-                "} " + super.toString();
+    public Boolean isOnline() {
+        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+
+        return lastActiveAt.isAfter(instantFiveMinutesAgo);
     }
 }

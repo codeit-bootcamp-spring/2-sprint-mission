@@ -13,45 +13,45 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     private final Map<UUID, UserStatus> data;
 
     public JCFUserStatusRepository() {
-        data = new HashMap<>();
+        this.data = new HashMap<>();
     }
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        data.put(userStatus.getId(), userStatus);
+        this.data.put(userStatus.getId(), userStatus);
         return userStatus;
     }
 
     @Override
-    public Optional<UserStatus> findById(UUID userStatusId) {
-        return Optional.ofNullable(data.get(userStatusId));
+    public Optional<UserStatus> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
-        return data.values().stream()
+        return this.findAll().stream()
                 .filter(userStatus -> userStatus.getUserId().equals(userId))
                 .findFirst();
     }
 
     @Override
     public List<UserStatus> findAll() {
-        return new ArrayList<>(data.values());
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public boolean existsById(UUID userStatusId) {
-        return data.containsKey(userStatusId);
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public void deleteById(UUID userStatusId) {
-        data.remove(userStatusId);
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 
     @Override
     public void deleteByUserId(UUID userId) {
-        findByUserId(userId)
-                .ifPresent(userStatus -> data.remove(userStatus.getId()));
+        this.findByUserId(userId)
+                .ifPresent(userStatus -> this.deleteByUserId(userStatus.getId()));
     }
 }

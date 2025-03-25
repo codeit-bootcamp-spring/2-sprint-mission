@@ -18,42 +18,42 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        data.put(readStatus.getId(), readStatus);
+        this.data.put(readStatus.getId(), readStatus);
         return readStatus;
     }
 
     @Override
-    public Optional<ReadStatus> findById(UUID readStatusId) {
-        return Optional.ofNullable(data.get(readStatusId));
+    public Optional<ReadStatus> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return data.values().stream()
-                .filter(rs -> rs.getUserId().equals(userId))
+        return this.data.values().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
                 .toList();
     }
 
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        return data.values().stream()
-                .filter(rs -> rs.getChannelId().equals(channelId))
+        return this.data.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                 .toList();
     }
 
     @Override
-    public boolean existsById(UUID readStatusId) {
-        return data.containsKey(readStatusId);
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public void deleteById(UUID readStatusId) {
-        data.remove(readStatusId);
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 
     @Override
     public void deleteAllByChannelId(UUID channelId) {
-        findAllByChannelId(channelId)
-                .forEach(readStatus -> deleteAllByChannelId(readStatus.getId()));
+        this.findAllByChannelId(channelId)
+                .forEach(readStatus -> this.deleteById(readStatus.getId()));
     }
 }

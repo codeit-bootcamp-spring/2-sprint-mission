@@ -7,36 +7,34 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class ReadStatus extends BaseEntity implements Serializable {
+public class ReadStatus implements Serializable {
     private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
     private UUID userId;
     private UUID channelId;
     private Instant lastReadAt;
 
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.userId = userId;
         this.channelId = channelId;
         this.lastReadAt = lastReadAt;
     }
 
-    public void updateReadStatus(Instant lastReadAt, Instant updateAt) {
+    public void update(Instant newLastReadAt) {
         boolean anyValueUpdated = false;
-        if (lastReadAt != null && !lastReadAt.equals(this.lastReadAt)) {
-            this.lastReadAt = lastReadAt;
+        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = newLastReadAt;
             anyValueUpdated = true;
         }
 
         if (anyValueUpdated) {
-            super.updateUpdatedAt(updateAt);
+            this.updatedAt = Instant.now();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "ReadStatus{" +
-                "userId=" + userId +
-                ", channelId=" + channelId +
-                ", lastReadAt=" + lastReadAt +
-                "} " + super.toString();
     }
 }
