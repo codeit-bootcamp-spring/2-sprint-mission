@@ -15,11 +15,11 @@ public record BinaryContent(
         this(UUID.randomUUID(), Instant.now(), referenceId, extractFileName(filePath), determineFileType(filePath), filePath);
     }
 
-    private static String extractFileName(String filePath) {
+    public static String extractFileName(String filePath) {
         return filePath.substring(filePath.lastIndexOf("/") + 1);
     }
 
-    private static String determineFileType(String filePath) {
+    public static String determineFileType(String filePath) {
         return filePath.substring(filePath.lastIndexOf(".") + 1);
     }
 }
