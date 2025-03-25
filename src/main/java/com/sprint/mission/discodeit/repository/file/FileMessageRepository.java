@@ -2,10 +2,15 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.time.Instant;
 import java.util.*;
 
+@Repository
+@Primary
 public class FileMessageRepository implements MessageRepository {
     private static final String FILE_PATH = "messages.ser";
 
@@ -42,7 +47,22 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public boolean exists(UUID messageId) {
-        return false;
+        Map<UUID, Message> messages = loadMessages();
+        return messages.containsKey(messageId);
+    }
+
+    @Override
+    public Instant findLatestMessageTimeByChannelId(UUID channelId) {
+        return loadMessages().values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .map(Message::getCreatedAt)
+                .max(Instant::compareTo)
+                .orElse(null);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+
     }
 
     private Map<UUID, Message> loadMessages() {

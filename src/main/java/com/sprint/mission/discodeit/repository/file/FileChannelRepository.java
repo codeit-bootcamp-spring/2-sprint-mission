@@ -2,11 +2,15 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
-public class FileChannelrepository implements ChannelRepository {
+@Repository
+@Primary
+public class FileChannelRepository implements ChannelRepository {
     private static final String FILE_PATH = "channels.ser";
 
     @Override
@@ -42,6 +46,12 @@ public class FileChannelrepository implements ChannelRepository {
 
     @Override
     public boolean exists(UUID channelId) {
+        Map<UUID, Channel> channels = loadChannels();
+        return channels.containsKey(channelId);
+    }
+
+    @Override
+    public boolean existsById(UUID channelId) {
         Map<UUID, Channel> channels = loadChannels();
         return channels.containsKey(channelId);
     }

@@ -2,9 +2,13 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;
 
@@ -19,10 +23,10 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID userId) {
+    public Optional<User> findById(UUID userId) {
         User userNullable = this.data.get(userId);
-        return Optional.ofNullable(userNullable)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        return Optional.ofNullable(Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found")));
     }
 
     @Override
@@ -40,7 +44,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(UUID userId) {
+    public void delete(User userId) {
         if (!this.data.containsKey(userId)) {
             throw new NoSuchElementException("User with id " + userId + " not found");
         }
@@ -51,4 +55,35 @@ public class JCFUserRepository implements UserRepository {
     public boolean exists(UUID userId) {
         return this.data.containsKey(userId);
     }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        for (User user : this.data.values()) {
+            if ((user.getUsername().equals(username))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        for (User user : this.data.values()) {
+            if ((user.getEmail().equals(email))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean existsByUsernameOrEmail(String username, String email) {
+        for (User user : this.data.values()) {
+            if ((user.getUsername().equals(username)) || (user.getEmail().equals(email))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
