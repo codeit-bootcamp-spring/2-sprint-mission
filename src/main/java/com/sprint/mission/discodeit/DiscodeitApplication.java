@@ -4,33 +4,27 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-@SpringBootApplication
+@SpringBootApplication(exclude={DataSourceAutoConfiguration.class})
 public class DiscodeitApplication {
 	static User setupUser(UserService userService) {
 		UserCreateRequest request = new UserCreateRequest("woody", "woody@codeit.com", "woody1234");
 		User user = userService.create(request, Optional.empty());
+
 		return user;
 	}
 
@@ -40,11 +34,11 @@ public class DiscodeitApplication {
 		return channel;
 	}
 
-	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+	/*static void messageCreateTest(MessageService messageService, Channel channel, User author) {
 		MessageCreateRequest request = new MessageCreateRequest("안녕하세요.", channel.getId(), author.getId());
 		Message message = messageService.create(request, new ArrayList<>());
 		System.out.println("메시지 생성: " + message.getId());
-	}
+	}*/
 
 	public static void main(String[] args) {
 
@@ -54,9 +48,13 @@ public class DiscodeitApplication {
 		ChannelService channelService = context.getBean(ChannelService.class);
 		MessageService messageService = context.getBean(MessageService.class);
 
+		List<UUID> idList = userService.findAll().stream()
+		.map(dto->{return dto.id();})
+				.toList();
+		System.out.println(idList);
 		// 셋업
-		User user = setupUser(userService);
-		Channel channel = setupChannel(channelService);
+		//User user = setupUser(userService);
+		//Channel channel = setupChannel(channelService);
 		// 테스트
 
 	}

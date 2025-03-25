@@ -24,7 +24,7 @@ public class BinaryContentController {
     @GetMapping("/find")
     public ResponseEntity<BinaryContent> getImage(@PathVariable UUID imageId) {
         BinaryContent binaryContent = binaryContentService.find(imageId);
-
+        buildImageResponse(binaryContent);
         return ResponseEntity.ok(binaryContent);
     }
 
