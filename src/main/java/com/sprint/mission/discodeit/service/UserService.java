@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.DeleteUserRequestDto;
 import com.sprint.mission.discodeit.dto.FindUserDto;
 import com.sprint.mission.discodeit.dto.SaveUserParamDto;
 import com.sprint.mission.discodeit.dto.UpdateUserParamDto;
@@ -12,5 +13,5 @@ public interface UserService {
     FindUserDto findByUser(UUID uuid);
     List<FindUserDto> findAllUser();
     void update(UpdateUserParamDto updateUserDto);
-    void delete(UUID uuid);
+    void delete(DeleteUserRequestDto deleteUserRequestDto);
 }

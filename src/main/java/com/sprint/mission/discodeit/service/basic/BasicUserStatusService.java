@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.SaveUserStatusParamDto;
+import com.sprint.mission.discodeit.dto.UpdateUserStatusByUserIdParamDto;
 import com.sprint.mission.discodeit.dto.UpdateUserStatusParamDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -42,9 +43,9 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void updateByUserId(UUID userUUID) {
+    public void updateByUserId(UpdateUserStatusByUserIdParamDto updateUserStatusByUserIdParamDto) {
         userStatusRepository.findAll().stream()
-                .filter(userStatus -> userStatus.getUserUUID().equals(userUUID))
+                .filter(userStatus -> userStatus.getUserUUID().equals(updateUserStatusByUserIdParamDto.id()))
                 .findAny()
                 .ifPresent(userStatus -> {
                     userStatusRepository.update(userStatus.getId());

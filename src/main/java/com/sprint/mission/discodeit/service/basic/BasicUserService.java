@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.DeleteUserRequestDto;
 import com.sprint.mission.discodeit.dto.FindUserDto;
 import com.sprint.mission.discodeit.dto.SaveUserParamDto;
 import com.sprint.mission.discodeit.dto.UpdateUserParamDto;
@@ -27,13 +28,11 @@ public class BasicUserService implements UserService {
     @Override
     public void save(SaveUserParamDto saveUserParamDto) {
         if (userRepository.findUserByUsername(saveUserParamDto.username()).isPresent()) {
-            System.out.println("[실패] 회원아이디 중복");
-            return;
+            throw new IllegalArgumentException("사용자 이름 중복");
         }
 
         if (userRepository.findUserByEmail(saveUserParamDto.email()).isPresent()) {
-            System.out.println("[실패] 회원이메일 중복");
-            return;
+            throw new IllegalArgumentException("이메일 중복");
         }
 
         User user = new User(
@@ -45,13 +44,6 @@ public class BasicUserService implements UserService {
                 .userUUID(user.getId())
                 .build();
         userStatusRepository.save(userStatus);
-
-        if (user == null) {
-            System.out.println("[실패] 저장 실패.");
-            return;
-        }
-
-        System.out.println("[성공] 회원가입 성공");
     }
 
     @Override
@@ -87,18 +79,17 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void delete(UUID userUUID) {
-        User user = userRepository.findUserById(userUUID)
-                .orElseThrow(NullPointerException::new);
-        binaryContentRepository.delete(user.getProfile());
+    public void delete(DeleteUserRequestDto deleteUserRequestDto) {
+        User user = userRepository.findUserById(deleteUserRequestDto.id())
+                .orElseThrow(() -> new NullPointerException("사용자가 존재하지 않습니다."));
+
+        if(user.getProfile() != null) {
+            binaryContentRepository.delete(user.getProfile());
+        }
+
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자 상태 오류"));
         userStatusRepository.delete(userStatus.getId());
-        boolean isDeleted = userRepository.deleteUserById(user.getId());
-        if (!isDeleted) {
-            System.out.println("삭제 실패");
-            return;
-        }
-        System.out.println("[성공]");
+        userRepository.deleteUserById(user.getId());
     }
 }
