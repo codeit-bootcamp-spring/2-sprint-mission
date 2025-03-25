@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.*;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.exception.DuplicateResourceException;
+import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -83,19 +85,19 @@ public class BasicUserService implements UserService {
 
     private User getUserBy(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
+                .orElseThrow(() -> new ResourceNotFoundException("해당 유저 없음"));
     }
 
 
     private void validateEmailDuplicate(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("동일 email 이미 존재함");
+            throw new DuplicateResourceException("동일 email 이미 존재함");
         }
     }
 
     private void validateUsernameDuplicate(String username) {
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("동일 username 이미 존재함");
+            throw new DuplicateResourceException("동일 username 이미 존재함");
         }
     }
 
