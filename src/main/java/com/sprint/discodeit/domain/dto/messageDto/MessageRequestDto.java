@@ -5,5 +5,5 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public record MessageRequestDto(String content, UUID channelId, UUID authorId, List<BinaryContent> file) {
+public record MessageRequestDto(String content, UUID authorId, List<BinaryContent> file) {
 }

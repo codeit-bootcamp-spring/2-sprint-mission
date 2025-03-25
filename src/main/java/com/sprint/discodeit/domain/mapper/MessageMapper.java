@@ -7,11 +7,11 @@ import java.util.UUID;
 
 public class MessageMapper {
 
-    public static Message toMessage(MessageRequestDto messageRequestDto, List<UUID> binaryContentId) {
+    public static Message toMessage(MessageRequestDto messageRequestDto, List<UUID> binaryContentId, UUID channelId) {
         return Message.builder()
                 .content(messageRequestDto.content())
                 .content(messageRequestDto.content())
-                .channelId(messageRequestDto.channelId())
+                .channelId(channelId)
                 .authorId(messageRequestDto.authorId())
                 .attachmentIds(binaryContentId)
                 .build();

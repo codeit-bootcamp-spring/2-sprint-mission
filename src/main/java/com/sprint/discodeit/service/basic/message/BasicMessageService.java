@@ -26,11 +26,11 @@ public class BasicMessageService implements MessageServiceV1 {
 
 
     @Override
-    public Message create(MessageRequestDto messageRequestDto) {
+    public Message create(UUID channelId, MessageRequestDto messageRequestDto) {
         List<BinaryContent> binaryContents = binaryContentService.convertToBinaryContents(messageRequestDto.file());
         binaryContentService.saveBinaryContents(binaryContents);
         List<UUID> uuids = binaryContentService.convertToUUIDs(binaryContents);
-        Message message = MessageMapper.toMessage(messageRequestDto, uuids);
+        Message message = MessageMapper.toMessage(messageRequestDto, uuids, channelId);
         fileMessageRepository.save(message);
         return message;
     }
@@ -38,6 +38,11 @@ public class BasicMessageService implements MessageServiceV1 {
     @Override
     public Message find(UUID messageId) {
         Message message = fileMessageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));
+        return message;
+    }
+
+    public List<Message> findChannel(UUID channelId) {
+        List<Message> message = fileMessageRepository.findByChannelId(channelId).orElseThrow(() -> new NoSuchElementException(channelId + " 없는 채널 입니다"));
         return message;
     }
 
@@ -51,8 +56,8 @@ public class BasicMessageService implements MessageServiceV1 {
     }
 
     @Override
-    public Message update(MessageUpdateRequestDto messageUpdateRequestDto) {
-        Message message = fileMessageRepository.findById(messageUpdateRequestDto.messageId()).orElseThrow(() -> new NoSuchElementException(messageUpdateRequestDto.messageId() + " 없는 회원 입니다"));
+    public Message update(UUID messageId, MessageUpdateRequestDto messageUpdateRequestDto) {
+        Message message = fileMessageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));
         message.update(messageUpdateRequestDto.newContent());
         return message;
     }

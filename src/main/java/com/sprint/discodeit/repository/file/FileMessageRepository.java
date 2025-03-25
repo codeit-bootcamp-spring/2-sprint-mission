@@ -20,10 +20,9 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
 
     @Override
     public Optional<Message> findById(UUID messageId) {
-        Map<UUID, Message> users = loadAll();
-        return  Optional.ofNullable(users.get(UUID.fromString(messageId.toString())));
+        Map<UUID, Message> messageMap = loadAll();
+        return Optional.ofNullable(messageMap.get(messageId));
     }
-
 
     @Override
     public List<Message> findByAll() {
@@ -54,5 +53,12 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
         return messageMap.values().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .collect(Collectors.toList());
+    }
+
+    public Optional<List<Message>> findByChannelId(UUID channelId) {
+        Map<UUID, Message> messageMap = loadAll();
+        return Optional.of(messageMap.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .collect(Collectors.toList()));
     }
 }
