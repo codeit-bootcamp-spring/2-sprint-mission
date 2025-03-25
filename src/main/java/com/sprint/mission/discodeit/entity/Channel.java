@@ -22,21 +22,13 @@ id, createdAt은 final로 선언해서 불변 객체 유지
 public class Channel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-
     private final UUID id;
     private final Instant createdAt; //Long -> Instant로 변경, 가독성이 뛰어나며, 시간대(Time Zone) 변환과 정밀한 시간 연산이 가능해 확장성이 높습니다.
-
     private Instant updatedAt;
+
     private ChannelType type;
     private String name;
     private String description;
-
-    // 추가 필드의 setter 메소드 (조회 시 값을 채워 넣기 위해 사용)
-    // 추가 필드: 가장 최근 메시지 시간, PRIVATE 채널의 참여자 ID 목록
-    @Setter
-    private Instant lastMessageTime;
-    @Setter
-    private List<UUID> participantUserIds;
 
     public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
@@ -47,7 +39,7 @@ public class Channel implements Serializable {
         this.description = description;
     }
 
-    public void updateChannelInfo(String newName, String newDescription) {
+    public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
         if (newName != null && !newName.equals(this.name)) {
             this.name = newName;
@@ -68,15 +60,6 @@ public class Channel implements Serializable {
             this.updatedAt = Instant.now();
         }
     }
-
-//    // 추가 필드의 setter 메소드 (조회 시 값을 채워 넣기 위해 사용) @Setter로 대체
-//    public void setLastMessageTime(Instant lastMessageTime) {
-//        this.lastMessageTime = lastMessageTime;
-//    }
-//
-//    public void setParticipantUserIds(List<UUID> participantUserIds) {
-//        this.participantUserIds = participantUserIds;
-//    }
 
     @Override
     public String toString() {

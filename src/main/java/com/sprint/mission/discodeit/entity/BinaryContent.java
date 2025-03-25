@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,19 +13,23 @@ import java.util.UUID;
  */
 
 @Getter
-public class BinaryContent {
+public class BinaryContent implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final UUID id;
     private final Instant createdAt;
 //    private Instant updatedAt; //수정 불가능한 도메인이어서, updatedAt 필요 없음.
 
-    private final byte[] content; // 이미지가 아니라 영상일 수도 있으니까
-    private final String type; // 프로필 이미지인지, 메세지 첨부파일 이미지인지
+    private String fileName;
+    private Long size;
+    private String contentType; // 프로필 이미지인지, 메세지 첨부파일 이미지인지
+    private byte[] bytes; // 이미지가 아니라 영상일 수도 있으니까
 
-
-    public BinaryContent(byte[] content, String type) {
+    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        this.content = content;
-        this.type = type;
+        this.fileName = fileName;
+        this.size = size;
+        this.contentType = contentType;
+        this.bytes = bytes;
     }
 }

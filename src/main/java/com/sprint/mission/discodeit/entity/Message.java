@@ -13,7 +13,7 @@ public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
-    private Instant createdAt;
+    private final Instant createdAt;
     private Instant updatedAt;
     //
     private String content;
@@ -32,31 +32,7 @@ public class Message implements Serializable {
         this.attachmentIds = attachmentIds;
     }
 
-    //    public UUID getId() {
-//        return id;
-//    }
-//
-//    public Long getCreatedAt() {
-//        return createdAt;
-//    }
-//
-//    public Long getUpdatedAt() {
-//        return updatedAt;
-//    }
-//
-//    public String getContent() {
-//        return content;
-//    }
-//
-//    public UUID getChannelId() {
-//        return channelId;
-//    }
-//
-//    public UUID getAuthorId() {
-//        return authorId;
-//    }
-
-    public void updateContent(String newContent) {
+    public void update(String newContent) {
         boolean anyValueUpdated = false;
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
