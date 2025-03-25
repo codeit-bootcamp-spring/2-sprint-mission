@@ -22,10 +22,10 @@ public interface ServerService {
 
     Server findById(UUID serverId);
 
-    List<Server> findServerAll(UUID ownerId);
+    List<Server> findServerAll(UUID userId);
 
-    UUID update(UUID serverId, UpdateServerRequestDTO updateServerRequestDTO);
+    UUID update(UUID serverId, UUID userId, UpdateServerRequestDTO updateServerRequestDTO);
 
-    void delete(UUID serverId);
+    void delete(UUID serverId, UUID userId);
 
 }

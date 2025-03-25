@@ -18,6 +18,8 @@ public interface UserService {
 
     UserFindDTO findById(UUID userId);
 
+    boolean existsById(UUID userId);
+
     List<UserFindDTO> listAllUsers();
 
     void delete(UUID userId);

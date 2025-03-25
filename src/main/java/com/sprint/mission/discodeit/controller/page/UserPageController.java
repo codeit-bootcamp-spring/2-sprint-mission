@@ -12,7 +12,7 @@ public class UserPageController {
 
     @GetMapping("/users")
     public String getUserListPage() {
-        return "users";
+        return "user-list";
     }
 
     @GetMapping("/register")

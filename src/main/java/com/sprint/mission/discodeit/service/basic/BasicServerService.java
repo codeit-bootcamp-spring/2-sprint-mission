@@ -6,8 +6,10 @@ import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.ServerRepository;
+import com.sprint.mission.discodeit.repository.TokenStore;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ServerService;
+import com.sprint.mission.discodeit.util.CommonUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +21,7 @@ import java.util.UUID;
 public class BasicServerService implements ServerService {
     private final UserRepository userRepository;
     private final ServerRepository serverRepository;
+    private final TokenStore tokenStore;
 
     @Override
     public void reset(boolean adminAuth) {
@@ -30,6 +33,8 @@ public class BasicServerService implements ServerService {
     @CustomLogging
     @Override
     public Server create(CreateServerRequestDTO createServerRequestDTO) {
+        String toekn = tokenStore.getToekn(createServerRequestDTO.userId());
+        CommonUtils.checkValidToken(toekn);
 
         User owner = userRepository.findById(createServerRequestDTO.userId());
         Server server = new Server(owner.getId(), createServerRequestDTO.name());
@@ -59,20 +64,24 @@ public class BasicServerService implements ServerService {
 
     @Override
     public Server findById(UUID serverId) {
-        Server server = serverRepository.findById(serverId);
-        return server;
+        return serverRepository.findById(serverId);
 
     }
 
     @Override
-    public List<Server> findServerAll(UUID ownerId) {
-        List<Server> serverList = serverRepository.findAllByUserId(ownerId);
+    public List<Server> findServerAll(UUID userId) {
+        String toekn = tokenStore.getToekn(userId);
+        CommonUtils.checkValidToken(toekn);
+
+        List<Server> serverList = serverRepository.findAllByUserId(userId);
         return serverList;
 
     }
 
     @Override
-    public UUID update(UUID serverId, UpdateServerRequestDTO updateServerRequestDTO) {
+    public UUID update(UUID serverId, UUID userId, UpdateServerRequestDTO updateServerRequestDTO) {
+        String toekn = tokenStore.getToekn(userId);
+        CommonUtils.checkValidToken(toekn);
 
         Server server = serverRepository.findById(serverId);
         Server update = serverRepository.update(server, updateServerRequestDTO);
@@ -81,7 +90,10 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public void delete(UUID serverId) {
+    public void delete(UUID serverId, UUID userId) {
+        String toekn = tokenStore.getToekn(userId);
+        CommonUtils.checkValidToken(toekn);
+
         serverRepository.remove(serverId);
     }
 

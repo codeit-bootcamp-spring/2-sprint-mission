@@ -7,5 +7,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface AuthService {
 
-    boolean loginUser(UserLoginRequestDTO userLoginDTO);
+    String loginUser(UserLoginRequestDTO userLoginDTO);
 }

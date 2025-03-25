@@ -10,10 +10,13 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.Valid.DuplicateUserException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.TokenStore;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.util.CommonUtils;
 import lombok.RequiredArgsConstructor;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    private final TokenStore tokenStore;
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
 
@@ -36,13 +40,16 @@ public class BasicUserService implements UserService {
 
     @CustomLogging
     @Override
-    public UUID create(CreateUserRequestDTO userCreateDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+    public UUID create(CreateUserRequestDTO requestDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
 
-        checkDuplicate(userCreateDTO.name(), userCreateDTO.email());
+        checkDuplicate(requestDTO.name(), requestDTO.email());
+        String hashedPassword = BCrypt.hashpw(requestDTO.password(), BCrypt.gensalt());
 
-        User user = new User(userCreateDTO.name(), userCreateDTO.email(), userCreateDTO.password());
+        User user = new User(requestDTO.name(), requestDTO.email(), hashedPassword);
+
         UUID profileId = makeBinaryContent(binaryContentDTO);
         user.setProfileId(profileId);
+
         userRepository.save(user);
 
         UserStatus userStatus = new UserStatus(user.getId());
@@ -88,6 +95,9 @@ public class BasicUserService implements UserService {
     @CustomLogging
     @Override
     public UUID update(UUID userId, UpdateUserRequestDTO updateUserRequestDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+        String toekn = tokenStore.getToekn(userId);
+        CommonUtils.checkValidToken(toekn);
+
         User user = userRepository.findById(userId);
         UUID profileId = user.getProfileId();
         if (profileId != null) {
@@ -103,6 +113,9 @@ public class BasicUserService implements UserService {
     @CustomLogging
     @Override
     public void delete(UUID userId) {
+        String toekn = tokenStore.getToekn(userId);
+        CommonUtils.checkValidToken(toekn);
+
         User findUser = userRepository.findById(userId);
         userRepository.remove(findUser);
         userStatusRepository.delete(findUser.getId());
@@ -110,6 +123,12 @@ public class BasicUserService implements UserService {
         Optional.ofNullable(findUser.getProfileId())
                 .ifPresent(binaryContentRepository::delete);
 
+    }
+
+    @Override
+    public boolean existsById(UUID userId) {
+        boolean b = userRepository.existId(userId);
+        return b;
     }
 
     private UUID makeBinaryContent(Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {

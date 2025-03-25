@@ -7,8 +7,12 @@ import com.sprint.mission.discodeit.dto.create.CreateServerRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.dto.result.CreateServerResult;
 import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.repository.TokenStore;
 import com.sprint.mission.discodeit.service.ServerService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,14 +21,16 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users/{userId}/servers")
+@RequestMapping("/api/servers")
 public class ServerController {
     private final ServerService serverService;
 
     @PostMapping("/create")
     @ResponseBody
-    public ResponseEntity<CreateServerResult> createServer(@PathVariable UUID userId, @RequestBody CreateServerNameDTO createServerNameDTO) {
-        CreateServerRequestDTO createServerRequestDTO = new CreateServerRequestDTO(userId, createServerNameDTO.name());
+    public ResponseEntity<CreateServerResult> createServer(@RequestBody CreateServerNameDTO requestDTO, HttpServletRequest httpRequest) {
+        UUID userId = (UUID) httpRequest.getAttribute("userId");
+
+        CreateServerRequestDTO createServerRequestDTO = new CreateServerRequestDTO(userId, requestDTO.name());
         Server server = serverService.create(createServerRequestDTO);
         return ResponseEntity.ok(new CreateServerResult(server.getServerId()));
     }
@@ -43,7 +49,8 @@ public class ServerController {
 //    }
 
     @GetMapping
-    public ResponseEntity<ServerDisplayList> findAll(@PathVariable UUID userId) {
+    public ResponseEntity<ServerDisplayList> findAll(HttpServletRequest httpRequest) {
+        UUID userId = (UUID) httpRequest.getAttribute("userId");
         List<Server> servers = serverService.findServerAll(userId);
         List<ServerDisplayItem> list = servers.stream().map(s ->
                 new ServerDisplayItem(s.getServerId(), s.getName(), s.getCreatedAt(), s.getUpdatedAt())).toList();
@@ -51,16 +58,18 @@ public class ServerController {
     }
 
     @PutMapping("/update/{serverId}")
-    public ResponseEntity<UUID> update(@PathVariable UUID serverId, @RequestBody UpdateServerRequestDTO updateServerRequestDTO) {
-        UUID update = serverService.update(serverId, updateServerRequestDTO);
+    public ResponseEntity<UUID> update(@PathVariable UUID serverId, @RequestBody UpdateServerRequestDTO updateServerRequestDTO, HttpServletRequest httpRequest) {
+        UUID userId = (UUID) httpRequest.getAttribute("userId");
+        UUID update = serverService.update(serverId, userId, updateServerRequestDTO);
 
         return ResponseEntity.ok(update);
     }
 
-    @DeleteMapping("/{serverId}")
-    public ResponseEntity<String> delete(@PathVariable UUID serverId) {
-        serverService.delete(serverId);
+    @DeleteMapping("/delete/{serverId}")
+    public ResponseEntity<String> delete(@PathVariable UUID serverId, HttpServletRequest httpRequest) {
+        UUID userId = (UUID) httpRequest.getAttribute("userId");
 
+        serverService.delete(serverId, userId);
         return ResponseEntity.ok("Delete successful");
 
     }
