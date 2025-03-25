@@ -85,23 +85,13 @@ public class BasicUserService implements UserServiceV1 {
     @Override
     public List<User> findAll() {
         List<User> userAll = fileUserRepository.findByAll();
-        Map<UUID, UserStatus> byAllAndUser = baseUserStatusRepository.findByAllAndUser(userAll);
-        System.out.println(byAllAndUser);
         return userAll;
-//        userAll.stream().map(user -> {
-//            UserStatus userStatus = byAllAndUser.get(user.getUserStatusId().toString());
-//
-//            //  상태 판별 수행
-//            String status = userStatusEvaluator.determineUserStatus(userStatus.getLastLoginTime())
-//                    : StatusType.Inactive.getExplanation();
-//        })
-//        return fileUserRepository.findByAll();
     }
 
     @Override
-    public UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto) {
+    public UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, String userId) {
         //조회
-        User user = fileUserRepository.findById(userUpdateRequestDto.userId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
+        User user = fileUserRepository.findById(UUID.fromString(userId)).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
 
         //가공
         BinaryContent profileImage = binaryGenerator.createProfileImage(userUpdateRequestDto.profileImg());
@@ -112,14 +102,14 @@ public class BasicUserService implements UserServiceV1 {
         user.update(userUpdateRequestDto.newUsername(), userUpdateRequestDto.newEmail(), userUpdateRequestDto.newPassword());
         fileUserRepository.save(user);
 
-        return new UserResponseDto(user.getProfileId(), userUpdateRequestDto.newUsername(), userUpdateRequestDto.newEmail(), StatusType.Active.toString());
+        return new UserResponseDto(user.getProfileId(),user.getUsername(), user.getEmail() , StatusType.Active.toString());
     }
 
     @Override
     public void delete(UUID userId) {
         Optional<User> user = fileUserRepository.findById(userId);
         if (user.isPresent()) {
-            user.get().isDeleted();
+            user.get().softDelete();
             UserStatus userStatus = new UserStatus(Instant.now(), StatusType.Inactive.getExplanation());
             baseUserStatusRepository.save(userStatus);
             fileUserRepository.save(user.get());
