@@ -8,6 +8,7 @@ import com.sprint.discodeit.domain.entity.Channel;
 import com.sprint.discodeit.domain.entity.ReadStatus;
 import com.sprint.discodeit.domain.mapper.ChannelMapper;
 import com.sprint.discodeit.repository.ChannelRepository;
+import com.sprint.discodeit.repository.file.FileChannelRepository;
 import com.sprint.discodeit.repository.file.ReadStatusRepository;
 import com.sprint.discodeit.service.ChannelServiceV1;
 import com.sprint.discodeit.service.basic.users.ReadStatusService;
@@ -25,6 +26,7 @@ public class BasicChannelService implements ChannelServiceV1 {
     private final ChannelRepository channelRepository;
     private final ReadStatusService readStatusService;
     private final ReadStatusRepository readStatusRepository;
+    private final FileChannelRepository fileChannelRepository;
 
     @Override
     public ChannelResponseDto create(ChannelCreateRequestDto channelCreateRequestDto) {
@@ -32,9 +34,6 @@ public class BasicChannelService implements ChannelServiceV1 {
         Channel channelMapper = ChannelMapper.toChannelMapper(channelCreateRequestDto);
         ReadStatus readStatus = readStatusService.dispatchChannelCreation(channelMapper.getName(),
                 channelCreateRequestDto.userId(), channelMapper.getId());
-
-        List<UUID> userIds = new ArrayList<>();
-
         // 저장
         channelRepository.save(channelMapper);
         if(readStatus != null){
@@ -45,8 +44,8 @@ public class BasicChannelService implements ChannelServiceV1 {
 
 
     @Override
-    public Channel update(ChannelUpdateRequestDto channelUpdateRequestDto) {
-        Channel channel = channelRepository.findById(channelUpdateRequestDto.channelId()).orElseThrow(() -> new NoSuchElementException(channelUpdateRequestDto.channelId() + " 없는 채널 입니다"));
+    public Channel update(String channelId, ChannelUpdateRequestDto channelUpdateRequestDto) {
+        Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElseThrow(() -> new NoSuchElementException(channelId + " 없는 채널 입니다"));
         if (channel.getType() == ChannelType.PUBLIC) {
             channel.update(channelUpdateRequestDto.newName(), channelUpdateRequestDto.newDescription());
         }else{
@@ -61,4 +60,12 @@ public class BasicChannelService implements ChannelServiceV1 {
         readStatusRepository.delete(channelId);
         channelRepository.delete(channelId);
     }
+
+    @Override
+    public List<Channel> find(ChannelType channelType) {
+        List<Channel> chnnelType = fileChannelRepository.findByChnnelType(channelType);
+        return chnnelType;
+    }
+
+
 }

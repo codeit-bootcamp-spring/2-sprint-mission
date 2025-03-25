@@ -30,13 +30,16 @@ public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> imp
     }
 
     @Override
-    public void delete(UUID uuId) {
+    public void delete(UUID channelId) {
         Map<UUID, ReadStatus> readStatusMap = loadAll();
-        Optional<ReadStatus> readStatusOptional = readStatusMap.values().stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(uuId))
-                .findFirst();
-        readStatusMap.remove(readStatusOptional.get().getId());
-        writeToFile(readStatusMap);
+
+        readStatusMap.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .findFirst()
+                .ifPresent(readStatus -> {
+                    readStatusMap.remove(readStatus.getId());
+                    writeToFile(readStatusMap);
+                });
     }
 
 
