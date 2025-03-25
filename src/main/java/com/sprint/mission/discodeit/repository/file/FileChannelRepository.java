@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.constant.FilePath.CHANNEL_TEST_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
@@ -19,11 +20,10 @@ import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
-    private Path channelPath = CHANNEL_TEST_FILE;
 
-    public void changePath(Path path) {
-        this.channelPath = path;
-    }
+    @Value("${discodeit.repository.file-directory.channel-path}")
+    private Path channelPath = STORAGE_DIRECTORY.resolve("channel" + SER_EXTENSION);
+    ;
 
     @Override
     public Channel save(Channel channel) {

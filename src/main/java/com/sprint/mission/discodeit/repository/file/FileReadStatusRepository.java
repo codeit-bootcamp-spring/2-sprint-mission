@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.constant.FilePath.READ_STATUS_TEST_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
@@ -19,7 +20,9 @@ import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileReadStatusRepository implements ReadStatusRepository {
-    private Path readStatusPath = READ_STATUS_TEST_FILE;
+
+    @Value("${discodeit.repository.file-directory.readStatus-path}")
+    private Path readStatusPath = STORAGE_DIRECTORY.resolve("readStatus" + SER_EXTENSION);
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {

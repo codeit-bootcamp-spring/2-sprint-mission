@@ -367,7 +367,7 @@ public static void main(String[]args){
           type: jcf   # jcf | file
   ~~~ 
 
-- [ ]  File*Repository 구현체의 파일을 저장할 디렉토리 경로를 application.yaml 설정 값을 통해 제어해보세요.
+- [x]  File*Repository 구현체의 파일을 저장할 디렉토리 경로를 application.yaml 설정 값을 통해 제어해보세요.
   ~~~yaml
   # application.yaml
   discodeit:
@@ -382,9 +382,10 @@ public static void main(String[]args){
 
 - [ ] 로직이 어디까지 컨트롤러에 있고 서비스에 있어야되는가
 - [ ] 스프링테스트와 통합테스트 공부
-- [ ] FileRepository에 Path Setter없애기
+- [x] FileRepository에 Path Setter없애기, 테스트 파일에서의 경로와 소스코드 파일에서의 경로 분리하기
 - [ ] 바이너리 Path -> URL로 변경
-- [ ] 채널 조회에 컨트롤러러 인터페이스 표시 부분 잘 동작하나 확인하기
+- [ ] 채널 조회에 컨트롤러러 인터페이스 부분 잘 동작하나 확인하기
+ 
 
 ### 파일 저장소 미션
 

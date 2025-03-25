@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +10,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 
-import static com.sprint.mission.discodeit.constant.FilePath.MESSAGE_TEST_FILE;
+import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
@@ -17,11 +18,9 @@ import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
-    private Path messagePath = MESSAGE_TEST_FILE;
 
-    public void changePath(Path path) {
-        this.messagePath = path;
-    }
+    @Value("${discodeit.repository.file-directory.message-path}")
+    private Path messagePath = STORAGE_DIRECTORY.resolve("message" + SER_EXTENSION);
 
     @Override
     public Message save(Message message) {

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -11,19 +12,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.discodeit.constant.FilePath.USER_TEST_FILE;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
 import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserRepository implements UserRepository {
-    private Path userPath = USER_TEST_FILE;
 
-    public void changePath(Path path) {
-        this.userPath = path;
-    }
+    @Value("${discodeit.repository.file-directory.user-path}")
+    private Path userPath = STORAGE_DIRECTORY.resolve("user" + SER_EXTENSION);
 
     @Override
     public User save(User requestUser) {
