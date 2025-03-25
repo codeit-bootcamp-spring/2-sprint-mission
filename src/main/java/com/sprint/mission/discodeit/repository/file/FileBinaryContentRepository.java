@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -11,6 +12,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@ConditionalOnProperty(
+        name = "discordit.repository.type",
+        havingValue = "file",
+        matchIfMissing = true)
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
     private static final String fileName = "binaryContent.dat";

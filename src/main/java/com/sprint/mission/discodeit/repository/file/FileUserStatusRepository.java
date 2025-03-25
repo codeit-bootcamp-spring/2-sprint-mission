@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -12,6 +13,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@ConditionalOnProperty(
+        name = "discordit.repository.type",
+        havingValue = "file",
+        matchIfMissing = true)
 public class FileUserStatusRepository implements UserStatusRepository {
     private static final String fileName = "userStatus.dat";
     private static Map<UUID, UserStatus> userStatusMap = new ConcurrentHashMap<>();
