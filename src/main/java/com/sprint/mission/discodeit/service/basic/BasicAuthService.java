@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.LoginRequestDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,25 +14,20 @@ import org.springframework.stereotype.Service;
 public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User login(String username, String password) {
-        User userInfo = userRepository.findUserByUsername(username)
-                .orElseGet(() -> {
-                    System.out.println("사용자를 찾을 수 없습니다.");
-                    return null;
-                });
+    public void login(LoginRequestDto loginRequestDto) {
+        User userInfo = userRepository.findUserByUsername(loginRequestDto.username())
+                .orElseThrow(() -> new IllegalArgumentException("회원정보가 일치하지 않음"));
 
-        if (userInfo == null) {
-            return null;
+        if (!userInfo.getPassword().equals(loginRequestDto.password())) {
+            throw new IllegalArgumentException("회원정보가 일치하지 않음");
         }
 
-        if (!userInfo.getPassword().equals(password)) {
-            System.out.println("[실패]비밀번호가 일치하지 않습니다.");
-            return null;
-        }
+        UserStatus userStatus = userStatusRepository.findByUserId(userInfo.getId())
+                .orElseThrow(() -> new IllegalArgumentException("회원상태 업데이트 에러"));
 
-        System.out.println("[성공] 로그인 완료");
-        return userInfo;
+        userStatusRepository.update(userStatus.getId());
     }
 }
