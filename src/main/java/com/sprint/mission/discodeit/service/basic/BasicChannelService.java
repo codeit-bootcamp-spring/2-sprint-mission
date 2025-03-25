@@ -24,6 +24,11 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    public Channel createByPrivate(ChannelCreateDTO channelCreateDto) {
+        return null;
+    }
+
+    @Override
     public Channel find(UUID channelId) {
        return channelRepository.findById(channelId);
     }

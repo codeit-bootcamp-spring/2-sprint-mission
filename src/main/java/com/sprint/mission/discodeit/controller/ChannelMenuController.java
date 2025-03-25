@@ -1,20 +1,26 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.DTO.channelService.ChannelCreateByPrivateDTO;
 import com.sprint.mission.discodeit.DTO.channelService.ChannelCreateDTO;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.menus.ChannelMenu;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.UUID;
 
 public class ChannelMenuController {
     private final ChannelService channelService;
+    private final UserService userService;
     private final Scanner scanner;
 
-    public ChannelMenuController(ChannelService channelService, Scanner scanner) {
+    public ChannelMenuController(ChannelService channelService,UserService userService, Scanner scanner) {
         this.channelService = channelService;
+        this.userService = userService;
         this.scanner = scanner;
     }
 
@@ -106,8 +112,16 @@ public class ChannelMenuController {
         ChannelType type = getChannelTypeFromInput("채널타입: ");
         String channelName = getChannelNameFromInput("채널명: ");
         ChannelCreateDTO channelCreateDto = new ChannelCreateDTO(type, channelName);
-        System.out.println("채널 생성 완료: \n" + channelService.create(channelCreateDto));
+        if(type.equals(ChannelType.PUBLIC)) {
+            System.out.println("채널 생성 완료: \n" + channelService.create(channelCreateDto));
+        } else{
+            System.out.println("privte 서버에 초대할 유저들을 넣어주세요: " + userService.findAll());
 
+
+            ChannelCreateByPrivateDTO channelCreateByPrivateDTO = new ChannelCreateByPrivateDTO();
+
+
+        }
     }
 
     private void findChannel() {

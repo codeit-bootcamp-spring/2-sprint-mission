@@ -27,6 +27,10 @@ public class JCFChannelService implements ChannelService {
         return channel;
     }
 
+    @Override
+    public Channel createByPrivate(ChannelCreateDTO channelCreateDto) {
+        return null;
+    }
 
     @Override
     public Channel find(UUID channelId) {

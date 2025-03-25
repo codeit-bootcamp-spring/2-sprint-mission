@@ -48,6 +48,11 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
+    public Channel createByPrivate(ChannelCreateDTO channelCreateDto) {
+        return null;
+    }
+
+    @Override
     public Channel find(UUID channelId) {
         Channel channelNullable = channelData.get(channelId);
 

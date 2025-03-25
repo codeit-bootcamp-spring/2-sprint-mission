@@ -16,8 +16,8 @@ import java.util.UUID;
 
 public class MessageMenuController {
     private final MessageService messageService;
-    private final UserService userService;
     private final ChannelService channelService;
+    private final UserService userService;
     private final AuthService authService;
     private final Scanner scanner;
     private static User loggedUser;
@@ -26,8 +26,8 @@ public class MessageMenuController {
 
     public MessageMenuController(UserService userService, ChannelService channelService, MessageService messageService,AuthService authService, Scanner scanner) {
         this.messageService = messageService;
-        this.userService =  userService;
         this.channelService = channelService;
+        this.userService = userService;
         this.authService = authService;
         this.scanner = scanner;
 

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.menus.MainMenu;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -13,11 +14,11 @@ public class MainMenuController {
     private final ChannelMenuController channelMenuController;
     private final MessageMenuController messageMenuController;
 
-    public MainMenuController(Scanner scanner, UserService jcfUserService, ChannelService jcfChannelService, MessageService jcfMessageService) {
+    public MainMenuController(Scanner scanner, UserService userService, ChannelService channelService, MessageService messageService, AuthService authService ) {
         this.scanner = scanner;
-        this.userMenuController = new UserMenuController(jcfUserService,scanner);
-        this.channelMenuController = new ChannelMenuController(jcfChannelService, scanner);
-        this.messageMenuController = new MessageMenuController(jcfUserService,jcfChannelService,jcfMessageService, scanner);
+        this.userMenuController = new UserMenuController(userService,scanner);
+        this.channelMenuController = new ChannelMenuController(channelService, userService, scanner);
+        this.messageMenuController = new MessageMenuController(userService, channelService, messageService,authService,scanner);
     }
 
     public void run(){
