@@ -12,8 +12,7 @@ import java.util.*;
 
 import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
-import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
+import static com.sprint.mission.util.FileUtils.*;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
@@ -24,10 +23,9 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message save(Message message) {
-        Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
-
-        messages.put(message.getId(), message);
-        saveObjectsToFile(STORAGE_DIRECTORY, messagePath, messages);
+        loadAndSaveConsumer(messagePath, (Map<UUID, Message> messages) ->
+                messages.put(message.getId(), message)
+        );
 
         return message;
     }
@@ -50,34 +48,26 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message updateContext(UUID id, String context) {
-        Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
-        messages.get(id)
-                .updateContext(context);
-
-        saveObjectsToFile(STORAGE_DIRECTORY, messagePath, messages);
-
-        return (Message) loadObjectsFromFile(messagePath).get(id);
+        return loadAndSave(messagePath, (Map<UUID, Message> messages) -> {
+                    Message message = messages.get(id);
+                    message.updateContext(context);
+                    return message;
+                }
+        );
     }
 
     @Override
     public void delete(UUID id) {
-        Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
-        messages.remove(id);
-        saveObjectsToFile(STORAGE_DIRECTORY, messagePath, messages);
+        loadAndSaveConsumer(messagePath, (Map<UUID, Message> messages) ->
+                messages.remove(id)
+        );
     }
 
     @Override
     public void deleteByChannelId(UUID channelId) {
-        Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
-        List<UUID> sameChannelMessageIds = messages.values()
-                .stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .map(Message::getId)
-                .toList();
-
-        for (UUID messageId : sameChannelMessageIds) {
-            messages.remove(messageId);
-        }
+        loadAndSaveConsumer(messagePath, (Map<UUID, Message> messages) ->
+                messages.values().removeIf(message -> message.getChannelId().equals(channelId))
+        );
     }
 
 

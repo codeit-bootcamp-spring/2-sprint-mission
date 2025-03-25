@@ -385,7 +385,6 @@ public static void main(String[]args){
 - [x] FileRepository에 Path Setter없애기, 테스트 파일에서의 경로와 소스코드 파일에서의 경로 분리하기
 - [ ] 바이너리 Path -> URL로 변경
 - [ ] 채널 조회에 컨트롤러러 인터페이스 부분 잘 동작하나 확인하기
- 
 
 ### 파일 저장소 미션
 
@@ -395,7 +394,7 @@ public static void main(String[]args){
 
 - [ ] DI에 대하여 심층적으로 탐구해보기 [싱글톤, 팩터리메서드, 서비스로케이터, 레지스터리]
 - [ ] 전체적인 예외처리 [커스템 예외]
-- [ ] File*Repository에서 loadSave 중복되는 부분 개선하기[일반화, 템플릿 메서드 패턴, 전략패턴]
+- [x] File*Repository에서 loadSave 중복되는 부분 개선하기[일반화, 템플릿 메서드 패턴, 전략패턴]
 
 ### 1차 멘토님 피드백
 

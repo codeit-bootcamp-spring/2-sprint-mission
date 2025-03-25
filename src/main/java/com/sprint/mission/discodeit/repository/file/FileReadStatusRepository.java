@@ -14,8 +14,7 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
-import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
+import static com.sprint.mission.util.FileUtils.*;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
@@ -26,10 +25,8 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        Map<UUID, ReadStatus> readStatuses = loadObjectsFromFile(readStatusPath);
-        readStatuses.put(readStatus.getId(), readStatus);
-
-        saveObjectsToFile(STORAGE_DIRECTORY, readStatusPath, readStatuses);
+        loadAndSave(readStatusPath, (Map<UUID, ReadStatus> readStatuses) ->
+                readStatuses.put(readStatus.getId(), readStatus));
 
         return readStatus;
     }
@@ -53,6 +50,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public List<ReadStatus> findByUserId(UUID userId) {
         Map<UUID, ReadStatus> readStatuses = loadObjectsFromFile(readStatusPath);
+
         return readStatuses.values()
                 .stream()
                 .filter(readStatus -> readStatus.getUserId().equals(userId))
@@ -61,35 +59,26 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus updateLastReadTime(UUID readStatusId) {
-        Map<UUID, ReadStatus> readStatuses = loadObjectsFromFile(readStatusPath);
-        ReadStatus readStatus = readStatuses.get(readStatusId);
-        readStatus.updateLastReadTime();
-        saveObjectsToFile(STORAGE_DIRECTORY, readStatusPath, readStatuses);
-
-        return readStatus;
+        return loadAndSave(readStatusPath, (Map<UUID, ReadStatus> readStatuses) -> {
+                    ReadStatus readStatus = readStatuses.get(readStatusId);
+                    readStatus.updateLastReadTime();
+                    return readStatus;
+                }
+        );
     }
 
     @Override
     public void delete(UUID readStatusId) {
-        Map<UUID, ReadStatus> readStatuses = loadObjectsFromFile(readStatusPath);
-        readStatuses.remove(readStatusId);
-        saveObjectsToFile(STORAGE_DIRECTORY, readStatusPath, readStatuses);
+        loadAndSaveConsumer(readStatusPath, (Map<UUID, ReadStatus> readStatuses) ->
+                readStatuses.remove(readStatusId)
+        );
     }
 
     @Override
     public void deleteByChannelId(UUID channelId) {
-        Map<UUID, ReadStatus> readStatuses = loadObjectsFromFile(readStatusPath);
-
-        List<UUID> readStatusIdWithSameChannel = readStatuses.values()
-                .stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .map(ReadStatus::getId)
-                .toList();
-
-        for (UUID readStatusId : readStatusIdWithSameChannel) {
-            readStatuses.remove(readStatusId);
-        }
-
-        saveObjectsToFile(STORAGE_DIRECTORY, readStatusPath, readStatuses);
+        loadAndSaveConsumer(readStatusPath, (Map<UUID, ReadStatus> readStatuses) ->
+                readStatuses.values()
+                        .removeIf(readStatus -> readStatus.getChannelId().equals(channelId))
+        );
     }
 }

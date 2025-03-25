@@ -14,8 +14,7 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
-import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
+import static com.sprint.mission.util.FileUtils.*;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
@@ -26,10 +25,9 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        Map<UUID, UserStatus> userStatuses = loadObjectsFromFile(userStatusPath);
-        userStatuses.put(userStatus.getId(), userStatus);
-
-        saveObjectsToFile(STORAGE_DIRECTORY, userStatusPath, userStatuses);
+        loadAndSave(userStatusPath, (Map<UUID, UserStatus> userStatuses) ->
+                userStatuses.put(userStatus.getId(), userStatus)
+        );
 
         return userStatus;
     }
@@ -37,6 +35,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public Optional<UserStatus> findById(UUID id) {
         Map<UUID, UserStatus> userStatuses = loadObjectsFromFile(userStatusPath);
+
         return Optional.ofNullable(userStatuses.get(id));
     }
 
@@ -53,6 +52,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public List<UserStatus> findAll() {
         Map<UUID, UserStatus> userStatuses = loadObjectsFromFile(userStatusPath);
+
         return userStatuses.values()
                 .stream()
                 .toList();
@@ -60,23 +60,25 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public UserStatus update(UUID userStatusId) {
-        Map<UUID, UserStatus> userStatuses = loadObjectsFromFile(userStatusPath);
-        UserStatus userStatus = userStatuses.get(userStatusId);
-        userStatus.updateLastLoginAt();
-        saveObjectsToFile(STORAGE_DIRECTORY, userStatusPath, userStatuses);
-
-        return userStatus;
+        return loadAndSave(userStatusPath, (Map<UUID, UserStatus> userStatuses) -> {
+            UserStatus userStatus = userStatuses.get(userStatusId);
+            userStatus.updateLastLoginAt();
+            return userStatus;
+        });
     }
 
     @Override
     public void delete(UUID id) {
-        Map<UUID, UserStatus> userStatuses = loadObjectsFromFile(userStatusPath);
-        userStatuses.remove(id);
-        saveObjectsToFile(STORAGE_DIRECTORY, userStatusPath, userStatuses);
+        loadAndSaveConsumer(userStatusPath, (Map<UUID, UserStatus> userStatuses) ->
+                userStatuses.remove(id)
+        );
     }
 
     @Override
-    public void deleteByUserId(UUID id) {
-
+    public void deleteByUserId(UUID userId) {
+        loadAndSaveConsumer(userStatusPath, (Map<UUID, UserStatus> userStatuses) ->
+                userStatuses.values()
+                        .removeIf(userStatus -> userStatus.getUserId().equals(userId))
+        );
     }
 }

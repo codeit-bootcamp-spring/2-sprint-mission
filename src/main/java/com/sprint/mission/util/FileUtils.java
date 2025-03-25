@@ -5,25 +5,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public final class FileUtils {
     private FileUtils() {
     }
 
-    public static <U, T> void saveObjectsToFile(Path directory, Path filePath, Map<U, T> objects) {
-        init(directory);
-        serializeObjectToFile(filePath, objects);
+    public static <U, T> T loadAndSave(Path objectPath, Function<Map<U, T>, T> operation) {
+        Map<U, T> objects = loadObjectsFromFile(objectPath);
+        T result = operation.apply(objects);
+        saveObjectsToFile(objectPath, objects);
+        return result;
     }
 
-    private static <U, T> void serializeObjectToFile(Path filePath, Map<U, T> objects) {
-        try (
-                FileOutputStream fileOutputStream = new FileOutputStream(filePath.toFile());
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)
-        ) {
-            objectOutputStream.writeObject(objects);
-        } catch (IOException e) {
-            throw new UncheckedIOException("파일에 저장하는 작업을 실패했습니다.", e);
-        }
+    public static <U, T> void loadAndSaveConsumer(Path objectPath, Consumer<Map<U, T>> operation) {
+        Map<U, T> objects = loadObjectsFromFile(objectPath);
+        operation.accept(objects);
+        saveObjectsToFile(objectPath, objects);
     }
 
     public static <U, T> Map<U, T> loadObjectsFromFile(Path filePath) {
@@ -32,6 +31,15 @@ public final class FileUtils {
         }
 
         return deserializeFromFile(filePath);
+    }
+
+    public static void init(Path filePath) {
+        Path parentDir = filePath.getParent();
+        if (parentDir == null && Files.exists(filePath)) {
+            return;
+        }
+
+        creatDirectory(parentDir);
     }
 
     private static <U, T> Map<U, T> deserializeFromFile(Path filePath) {
@@ -49,13 +57,22 @@ public final class FileUtils {
         }
     }
 
-    public static void init(Path directory) {
-        if (Files.exists(directory)) {
-            return;
-        }
-
-        creatDirectory(directory);
+    private static <U, T> void saveObjectsToFile(Path filePath, Map<U, T> objects) {
+        init(filePath);
+        serializeObjectToFile(filePath, objects);
     }
+
+    private static <U, T> void serializeObjectToFile(Path filePath, Map<U, T> objects) {
+        try (
+                FileOutputStream fileOutputStream = new FileOutputStream(filePath.toFile());
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)
+        ) {
+            objectOutputStream.writeObject(objects);
+        } catch (IOException e) {
+            throw new UncheckedIOException("파일에 저장하는 작업을 실패했습니다.", e);
+        }
+    }
+
 
     private static void creatDirectory(Path directory) {
         try {

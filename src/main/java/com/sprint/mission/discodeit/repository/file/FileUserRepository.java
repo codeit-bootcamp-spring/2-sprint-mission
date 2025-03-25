@@ -14,8 +14,8 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.util.FileUtils.loadAndSaveConsumer;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
-import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
@@ -26,10 +26,9 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User save(User requestUser) {
-        Map<UUID, User> users = loadObjectsFromFile(userPath);
-        users.put(requestUser.getId(), requestUser);
-
-        saveObjectsToFile(STORAGE_DIRECTORY, userPath, users);
+        loadAndSaveConsumer(userPath, (Map<UUID, User> users) ->
+                users.put(requestUser.getId(), requestUser)
+        );
 
         return requestUser;
     }
@@ -72,20 +71,17 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void updateName(UUID id, String name) {
-        Map<UUID, User> users = loadObjectsFromFile(userPath);
-
-        User user = users.get(id);
-        user.updateName(name);
-
-        saveObjectsToFile(STORAGE_DIRECTORY, userPath, users);
+        loadAndSaveConsumer(userPath, (Map<UUID, User> users) -> {
+                    User user = users.get(id);
+                    user.updateName(name);
+                }
+        );
     }
 
     @Override
     public void delete(UUID id) {
-        Map<UUID, User> users = loadObjectsFromFile(userPath);
-
-        users.remove(id);
-
-        saveObjectsToFile(STORAGE_DIRECTORY, userPath, users);
+        loadAndSaveConsumer(userPath, (Map<UUID, User> users) ->
+                users.remove(id)
+        );
     }
 }

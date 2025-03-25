@@ -31,7 +31,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         }
 
         Path imageFile = IMAGE_STORAGE_DIRECTORY.resolve(UUID.randomUUID() + JPG_EXTENSION);
-        saveImageFileToPath(multipartFile, IMAGE_STORAGE_DIRECTORY, imageFile);
+        saveImageFileToPath(multipartFile, imageFile);
 
         BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(imageFile));
 
@@ -72,9 +72,9 @@ public class BasicBinaryContentService implements BinaryContentService {
         }
     }
 
-    private void saveImageFileToPath(MultipartFile multipartFile, Path directoryPath, Path imageFilePath) {
+    private void saveImageFileToPath(MultipartFile multipartFile, Path imageFilePath) {
         try {
-            init(directoryPath);
+            init(imageFilePath);
             Files.write(imageFilePath, multipartFile.getBytes());
         } catch (IOException e) {
             throw new UncheckedIOException("프로필이미지 파일을 저장할 수 없습니다.", e);

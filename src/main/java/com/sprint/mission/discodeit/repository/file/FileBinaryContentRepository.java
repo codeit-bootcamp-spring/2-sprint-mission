@@ -13,8 +13,8 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
+import static com.sprint.mission.util.FileUtils.loadAndSaveConsumer;
 import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
-import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
@@ -25,10 +25,9 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        Map<UUID, BinaryContent> binaryContents = loadObjectsFromFile(binaryContentPath);
-        binaryContents.put(binaryContent.getId(), binaryContent);
-
-        saveObjectsToFile(STORAGE_DIRECTORY, binaryContentPath, binaryContents);
+        loadAndSaveConsumer(binaryContentPath, (Map<UUID, BinaryContent> binaryContents) ->
+                binaryContents.put(binaryContent.getId(), binaryContent)
+        );
 
         return binaryContent;
     }
@@ -41,8 +40,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void delete(UUID id) {
-        Map<UUID, BinaryContent> binaryContents = loadObjectsFromFile(binaryContentPath);
-        binaryContents.remove(id);
-        saveObjectsToFile(STORAGE_DIRECTORY, binaryContentPath, binaryContents);
+        loadAndSaveConsumer(binaryContentPath, (Map<UUID, BinaryContent> binaryContents) ->
+                binaryContents.remove(id)
+        );
     }
 }

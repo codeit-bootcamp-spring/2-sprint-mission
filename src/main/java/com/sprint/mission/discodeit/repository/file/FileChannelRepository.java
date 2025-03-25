@@ -14,8 +14,7 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.FilePath.SER_EXTENSION;
 import static com.sprint.mission.discodeit.constant.FilePath.STORAGE_DIRECTORY;
-import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
-import static com.sprint.mission.util.FileUtils.saveObjectsToFile;
+import static com.sprint.mission.util.FileUtils.*;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
@@ -23,14 +22,13 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Value("${discodeit.repository.file-directory.channel-path}")
     private Path channelPath = STORAGE_DIRECTORY.resolve("channel" + SER_EXTENSION);
-    ;
+
 
     @Override
     public Channel save(Channel channel) {
-        Map<UUID, Channel> channels = loadObjectsFromFile(channelPath);
-        channels.put(channel.getId(), channel);
-
-        saveObjectsToFile(STORAGE_DIRECTORY, channelPath, channels);
+        loadAndSaveConsumer(channelPath, (Map<UUID, Channel> channels) ->
+                channels.put(channel.getId(), channel)
+        );
 
         return channel;
     }
@@ -53,20 +51,18 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel updateName(UUID id, String name) {
-        Map<UUID, Channel> channels = loadObjectsFromFile(channelPath);
-        Channel channel = channels.get(id);
-        channel.updateName(name);
-
-        saveObjectsToFile(STORAGE_DIRECTORY, channelPath, channels);
-
-        return channel;
+        return loadAndSave(channelPath, (Map<UUID, Channel> channels) -> {
+                    Channel channel = channels.get(id);
+                    channel.updateName(name);
+                    return channel;
+                }
+        );
     }
 
     @Override
     public void delete(UUID id) {
-        Map<UUID, Channel> channels = loadObjectsFromFile(channelPath);
-        channels.remove(id);
-
-        saveObjectsToFile(STORAGE_DIRECTORY, channelPath, channels);
+        loadAndSaveConsumer(channelPath, (Map<UUID, Channel> channels) ->
+                channels.remove(id)
+        );
     }
 }
