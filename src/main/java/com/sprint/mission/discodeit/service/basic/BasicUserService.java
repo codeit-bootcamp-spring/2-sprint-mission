@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -82,13 +83,12 @@ public class BasicUserService implements UserService {
     public void delete(DeleteUserRequestDto deleteUserRequestDto) {
         User user = userRepository.findUserById(deleteUserRequestDto.id())
                 .orElseThrow(() -> new NullPointerException("사용자가 존재하지 않습니다."));
-
-        if(user.getProfile() != null) {
+        if(Objects.nonNull(user.getProfile())) {
             binaryContentRepository.delete(user.getProfile());
         }
-
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자 상태 오류"));
+
         userStatusRepository.delete(userStatus.getId());
         userRepository.deleteUserById(user.getId());
     }
