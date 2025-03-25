@@ -1,46 +1,63 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.UserStatusCreateRequestDTO;
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Optional;
 
 @SpringBootApplication
 public class DiscodeitApplication {
-	public static void main(String[] args) {
-		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+	static User setupUser(UserService userService) {
+		UserCreateRequest request = new UserCreateRequest("woody", "woody@codeit.com", "woody1234");
+		User user = userService.create(request, Optional.empty());
+		return user;
+	}
 
+	static Channel setupChannel(ChannelService channelService) {
+		PublicChannelCreateRequest request = new PublicChannelCreateRequest("공지", "공지 채널입니다.");
+		Channel channel = channelService.create(request);
+		return channel;
+	}
+
+	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+		MessageCreateRequest request = new MessageCreateRequest("안녕하세요.", channel.getId(), author.getId());
+		Message message = messageService.create(request, new ArrayList<>());
+		System.out.println("메시지 생성: " + message.getId());
+	}
+
+	public static void main(String[] args) {
+
+		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+		// 서비스 초기화
 		UserService userService = context.getBean(UserService.class);
 		ChannelService channelService = context.getBean(ChannelService.class);
 		MessageService messageService = context.getBean(MessageService.class);
 
-		// 기존 JavaApplication 테스트 코드
+		// 셋업
 		User user = setupUser(userService);
-		Channel channel = setUpChannel(channelService);
+		Channel channel = setupChannel(channelService);
+		// 테스트
 		messageCreateTest(messageService, channel, user);
-	}
-
-	private static User setupUser(UserService userService) {
-		User user = userService.create("woody", "woody@codeit.com", "woody1234");
-		System.out.println("유저 생성됨: " + user.getId() + " / 이메일: " + user.getEmail() + " / 패스워드: " + user.getPassword());
-		return user;
-	}
-
-	private static Channel setUpChannel(ChannelService channelService) {
-		Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
-		System.out.println("채널 생성됨: " + channel.getId() + " / 이름: " + channel.getName());
-		return channel;
-	}
-
-	private static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-		Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
-		System.out.println("메시지 생성: " + message.getId());
 	}
 }

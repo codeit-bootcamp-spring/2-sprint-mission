@@ -17,7 +17,7 @@ public class User implements Serializable {
     private String username;
     private String email;
     private String password;
-    private UUID profileId;
+    private UUID profileId;     // BinaryContent
 
     public User(String username, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
@@ -43,7 +43,6 @@ public class User implements Serializable {
             this.password = newPassword;
             anyValueUpdated = true;
         }
-
         if (newProfileId != null && !newProfileId.equals(this.profileId)) {
             this.profileId = newProfileId;
             anyValueUpdated = true;
