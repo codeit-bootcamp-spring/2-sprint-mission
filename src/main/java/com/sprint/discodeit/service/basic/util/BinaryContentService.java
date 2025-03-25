@@ -40,18 +40,20 @@ public class BinaryContentService {
     }
 
 
-
-
-
     public List<BinaryContent> convertToBinaryContents(List<BinaryContent> binaryContent) {
         List<BinaryContent> binaryContentList = new ArrayList<>();
-        if (binaryContent == null || binaryContent.size() == 0) {
-            for(BinaryContent file : binaryContent){
-                binaryContentList.add(new BinaryContent(file.getFileType(), file.getFilePath()));
-            }
+
+        // null 또는 빈 리스트일 경우 그대로 비어있는 결과 반환
+        if (binaryContent == null || binaryContent.isEmpty()) {
+            return binaryContentList;
         }
+        for (BinaryContent file : binaryContent) {
+            binaryContentList.add(new BinaryContent(file.getFileType(), file.getFilePath()));
+        }
+
         return binaryContentList;
     }
+
     public void saveBinaryContents(List<BinaryContent> binaryContent) {
         for(BinaryContent file : binaryContent){
             baseBinaryContentRepository.save(file);
