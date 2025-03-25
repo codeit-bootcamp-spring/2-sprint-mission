@@ -10,7 +10,7 @@ import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreat
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusParam;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusRequest;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,8 +29,9 @@ public class BasicUserService implements UserService {
     @Override
     public User create(UserCreateRequest createRequest,
                        Optional<BinaryContentCreateRequest> binaryContentRequestNullable) {
-        duplicateUsername(createRequest.username());
-        duplicateEmail(createRequest.email());
+        validDuplicateUsername(createRequest.username());
+        validDuplicateEmail(createRequest.email());
+
         UUID binaryContentId = binaryContentRequestNullable
                 .map(basicBinaryContentService::create).map(BinaryContent::getId).orElse(null);
 
@@ -38,7 +39,7 @@ public class BasicUserService implements UserService {
                 , createRequest.password(), binaryContentId);
         User userSave = userRepository.save(user);
         Instant now = Instant.now();
-        UserStatusParam statusParam = new UserStatusParam(user.getId(), now);
+        UserStatusRequest statusParam = new UserStatusRequest(user.getId());
         userStatusService.create(statusParam);
 
         return userSave;
@@ -77,10 +78,12 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new NoSuchElementException(
                         updateRequest.id() + " 에 해당하는 userStatus를 찾을 수 없음"));
 
-        String newUsername = updateRequest.newUsername().orElse(user.getUsername());
-        String newEmail = updateRequest.newEemail().orElse(user.getEmail());
-        duplicateUsername(newUsername);
-        duplicateEmail(newEmail);
+        String username = (updateRequest.newUsername() == null) ? user.getUsername() : updateRequest.newUsername();
+        String email = (updateRequest.newEmail() == null) ? user.getEmail() : updateRequest.newEmail();
+        String password = (updateRequest.newPassword() == null) ? user.getPassword() : updateRequest.newPassword();
+
+        validDuplicateUsername(username);
+        validDuplicateEmail(email);
 
         UUID binaryContentId = binaryContentRequestNullable
                 .map(request -> {
@@ -90,13 +93,7 @@ public class BasicUserService implements UserService {
                     return basicBinaryContentService.create(request);
                 }).map(BinaryContent::getId).orElse(null);
 
-        user.update(
-                updateRequest.newUsername().orElse(user.getUsername()),
-                updateRequest.newEemail().orElse(user.getEmail()),
-                updateRequest.newPassword().orElse(user.getPassword()),
-                binaryContentId
-        );
-
+        user.update(username, email, password, binaryContentId);
         return userRepository.save(user);
     }
 
@@ -118,13 +115,13 @@ public class BasicUserService implements UserService {
         return userRepository.findByUsername(username);
     }
 
-    private void duplicateUsername(String username) {
+    private void validDuplicateUsername(String username) {
         if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException(username + " 은 중복된 username.");
         }
     }
 
-    private void duplicateEmail(String email) {
+    private void validDuplicateEmail(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException(email + " 은 중복된 email.");
         }

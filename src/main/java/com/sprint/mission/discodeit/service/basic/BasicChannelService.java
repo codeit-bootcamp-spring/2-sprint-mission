@@ -12,7 +12,7 @@ import com.sprint.mission.discodeit.service.dto.channel.ChannelByIdResponse;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PublicChannelRequest;
-import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusCreateParam;
+import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusCreateRequest;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -28,16 +28,16 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
 
     @Override
-    public Channel create(PrivateChannelRequest privateParam) {
-        Channel channel = new Channel(privateParam.type(), null, null);
+    public Channel create(PrivateChannelRequest privateRequest) {
+        Channel channel = new Channel(privateRequest.type(), null, null);
         Channel channelSave = channelRepository.save(channel);
-        readStatusService.create(new ReadStatusCreateParam(privateParam.userIds(), channel.getId()));
+        readStatusService.create(new ReadStatusCreateRequest(privateRequest.userIds(), channel.getId()));
         return channelSave;
     }
 
     @Override
-    public Channel create(PublicChannelRequest publicParam) {
-        Channel channel = new Channel(publicParam.type(), publicParam.name(), publicParam.description());
+    public Channel create(PublicChannelRequest publicRequest) {
+        Channel channel = new Channel(publicRequest.type(), publicRequest.name(), publicRequest.description());
         return channelRepository.save(channel);
     }
 
@@ -47,17 +47,25 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException(channelId + " 에 해당하는 Channel이 없음"));
         Instant lastMessageTime = findLastMessageTime(channel.getId());
+
+        String name;
+        String description;
+        List<UUID> userIds;
+
         if (channel.getType() == ChannelType.PRIVATE) {
-            return new ChannelByIdResponse(
-                    channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                    channel.getType(), null, null,
-                    readStatusService.findAllUserByChannelId(channelId), lastMessageTime
-            );
+            name = null;
+            description = null;
+            userIds = readStatusService.findAllUserByChannelId(channelId);
+        } else {
+            name = channel.getName();
+            description = channel.getDescription();
+            userIds = null;
         }
+
         return new ChannelByIdResponse(
                 channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                channel.getType(), channel.getName(), channel.getDescription(),
-                null, lastMessageTime
+                channel.getType(), name, description,
+                userIds, lastMessageTime
         );
     }
 
@@ -70,18 +78,24 @@ public class BasicChannelService implements ChannelService {
                         channel.getType().equals(ChannelType.PUBLIC) || joinedChannelIds.contains(channel.getId()))
                 .map(channel -> {
                     Instant lastMessageTime = findLastMessageTime(channel.getId());
+
+                    String name;
+                    String description;
+                    List<UUID> userIds;
+
                     if (channel.getType() == ChannelType.PRIVATE) {
-                        List<UUID> userIdsInChannel = readStatusService.findAllUserByChannelId(channel.getId());
-                        return new ChannelByIdResponse(
-                                channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                                channel.getType(), null, null,
-                                userIdsInChannel, lastMessageTime
-                        );
+                        name = null;
+                        description = null;
+                        userIds = readStatusService.findAllUserByChannelId(channel.getId());
+                    } else {
+                        name = channel.getName();
+                        description = channel.getDescription();
+                        userIds = null;
                     }
+
                     return new ChannelByIdResponse(
                             channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                            channel.getType(), channel.getName(), channel.getDescription(),
-                            null, lastMessageTime
+                            channel.getType(), name, description, userIds, lastMessageTime
                     );
                 }).toList();
     }
@@ -93,10 +107,12 @@ public class BasicChannelService implements ChannelService {
         if (channel.getType() == ChannelType.PRIVATE) {
             throw new IllegalArgumentException("비공개 채널은 수정 불가능");
         }
-        channel.update(
-                updateRequest.newName().orElse(channel.getName()),
-                updateRequest.newDescription().orElse(channel.getDescription())
-        );
+
+        String name = (updateRequest.newName() == null) ? channel.getName() : updateRequest.newName();
+        String description =
+                (updateRequest.newDescription() == null) ? channel.getDescription() : updateRequest.newDescription();
+
+        channel.update(name, description);
         return channelRepository.save(channel);
     }
 

@@ -18,15 +18,15 @@ public class UserStatus implements Serializable {
 
     private final UUID userId;
 
-    public UserStatus(UUID userId, Instant createdAt) {
+    public UserStatus(UUID userId) {
         this.id = UUID.randomUUID();
-        this.createdAt = createdAt;
-        this.updatedAt = createdAt;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.userId = userId;
     }
 
-    public void update(Instant time) {
-        this.updatedAt = time;
+    public void update() {
+        this.updatedAt = Instant.now();
     }
 
     public UserStatusType isOnline() {

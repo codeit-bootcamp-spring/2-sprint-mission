@@ -7,20 +7,20 @@ import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreat
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
-    public BinaryContent create(BinaryContentCreateRequest request) {
+    public BinaryContent create(BinaryContentCreateRequest createRequest) {
         BinaryContent binaryContent = new BinaryContent(
-                request.fileName(),
-                request.type(),
-                request.bytes().length,
-                request.bytes()
+                createRequest.fileName(),
+                createRequest.type(),
+                createRequest.bytes().length,
+                createRequest.bytes()
         );
         return binaryContentRepository.save(binaryContent);
     }

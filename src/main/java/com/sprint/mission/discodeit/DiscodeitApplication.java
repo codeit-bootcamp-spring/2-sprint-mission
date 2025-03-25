@@ -8,13 +8,19 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.service.dto.channel.ChannelByIdResponse;
+import com.sprint.mission.discodeit.service.dto.channel.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PublicChannelRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
+import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -29,7 +35,7 @@ public class DiscodeitApplication {
         MessageService messageService = context.getBean(MessageService.class);
 
         // User 테스트
-        /*
+
         try {
             UserCreateRequest request1 = new UserCreateRequest("hye", "hye@gmail.com", "hyehyehye");
             userService.create(request1, Optional.empty());
@@ -37,7 +43,6 @@ public class DiscodeitApplication {
             System.out.println(e.getMessage());
         }
 
-        /*
         // username 중복 테스트
         try {
             UserCreateRequest request = new UserCreateRequest("hye", "lin@gmail.com", "hyehye");
@@ -54,15 +59,14 @@ public class DiscodeitApplication {
             System.out.println(e.getMessage());
         }
 
-
         // update & find, delete & findAll 테스트
         try {
 
             UserCreateRequest request = new UserCreateRequest("tree", "tree@gmail.com", "treee");
             User user = userService.create(request, Optional.empty());
 
-            UserUpdateRequest userUpdateRequest = new UserUpdateRequest(user.getId(), Optional.of("newhye"),
-                    Optional.of("newhye@g.com"), Optional.of("newpass"));
+            UserUpdateRequest userUpdateRequest = new UserUpdateRequest(user.getId(), "newhye", "newhye@g.com",
+                    "newpass");
             userService.update(userUpdateRequest, Optional.empty());
 
             System.out.println("\n<update 결과 출력>");
@@ -78,8 +82,6 @@ public class DiscodeitApplication {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
-
 
         // Channel 테스트
         // Public/Private channel create & find 테스트
@@ -105,13 +107,12 @@ public class DiscodeitApplication {
         try {
             PublicChannelRequest publicRequest = new PublicChannelRequest(ChannelType.PUBLIC, "공개채널2", "공개된 채널2");
             Channel channel = channelService.create(publicRequest);
-            System.out.println(\n"<update 전 출력>");
+            System.out.println("\n<update 전 출력>");
             System.out.println(channelService.find(channel.getId()));
 
-            ChannelUpdateRequest updateRequest = new ChannelUpdateRequest(channel.getId(), Optional.of("[변경]공개채널2"),
-                    Optional.of("바꿨지롱"));
+            ChannelUpdateRequest updateRequest = new ChannelUpdateRequest(channel.getId(), "[변경]공개채널2", "바꿨지롱");
             Channel updateChannel = channelService.update(updateRequest);
-            System.out.println(\n"<update 후 출력>");
+            System.out.println("\n<update 후 출력>");
             System.out.println(channelService.find(updateChannel.getId()));
 
             channelService.delete(updateChannel.getId());
@@ -141,7 +142,7 @@ public class DiscodeitApplication {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        */
+
         // Message 테스트
         try {
             UserCreateRequest userRequest = new UserCreateRequest("metest", "metest@gmail.com", "metest11");

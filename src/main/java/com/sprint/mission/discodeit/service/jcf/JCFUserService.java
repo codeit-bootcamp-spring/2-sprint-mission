@@ -10,8 +10,7 @@ import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreat
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusParam;
-import java.time.Instant;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,13 +32,13 @@ public class JCFUserService implements UserService {
     @Override
     public User create(UserCreateRequest createRequest,
                        Optional<BinaryContentCreateRequest> binaryContentRequestNullable) {
-        duplicateUsername(createRequest.username());
-        duplicateEmail(createRequest.email());
+        validDuplicateUsername(createRequest.username());
+        validDuplicateEmail(createRequest.email());
         UUID binaryContentId = binaryContentRequestNullable
                 .map(basicBinaryContentService::create).map(BinaryContent::getId).orElse(null);
         User user = new User(createRequest.username(), createRequest.email(), createRequest.password(),
                 binaryContentId);
-        UserStatusParam statusParam = new UserStatusParam(user.getId(), Instant.now());
+        UserStatusRequest statusParam = new UserStatusRequest(user.getId());
         userStatusService.create(statusParam);
 
         this.data.put(user.getId(), user);
@@ -82,10 +81,14 @@ public class JCFUserService implements UserService {
             throw new NoSuchElementException("User with id " + updateRequest.id() + " not found");
         }
 
-        String newUsername = updateRequest.newUsername().orElse(userNullable.getUsername());
-        String newEmail = updateRequest.newEemail().orElse(userNullable.getEmail());
-        duplicateUsername(newUsername);
-        duplicateEmail(newEmail);
+        String username =
+                (updateRequest.newUsername() == null) ? userNullable.getUsername() : updateRequest.newUsername();
+        String email = (updateRequest.newEmail() == null) ? userNullable.getEmail() : updateRequest.newEmail();
+        String password =
+                (updateRequest.newPassword() == null) ? userNullable.getPassword() : updateRequest.newPassword();
+
+        validDuplicateUsername(username);
+        validDuplicateEmail(email);
 
         UUID binaryContentId = binaryContentRequestNullable
                 .map(request -> {
@@ -95,13 +98,7 @@ public class JCFUserService implements UserService {
                     return basicBinaryContentService.create(request);
                 }).map(BinaryContent::getId).orElse(null);
 
-        userNullable.update(
-                updateRequest.newUsername().orElse(userNullable.getUsername()),
-                updateRequest.newEemail().orElse(userNullable.getEmail()),
-                updateRequest.newPassword().orElse(userNullable.getPassword()),
-                binaryContentId
-        );
-
+        userNullable.update(username, email, password, binaryContentId);
         this.data.put(userNullable.getId(), userNullable);
         return userNullable;
     }
@@ -124,23 +121,23 @@ public class JCFUserService implements UserService {
                 .filter(u -> u.getUsername().equals(username)).findFirst();
     }
 
-    private void duplicateUsername(String username) {
+    private void validDuplicateUsername(String username) {
         if (existsByUsername(username)) {
             throw new IllegalArgumentException(username + " 은 중복된 username.");
         }
     }
 
-    private void duplicateEmail(String email) {
+    private void validDuplicateEmail(String email) {
         if (existsByEmail(email)) {
             throw new IllegalArgumentException(email + " 은 중복된 email.");
         }
     }
 
     private boolean existsByUsername(String username) {
-        return findAll().stream().anyMatch(u -> u.getUsername().equals(username));
+        return findAll().stream().anyMatch(u -> u.username().equals(username));
     }
 
     private boolean existsByEmail(String email) {
-        return findAll().stream().anyMatch(u -> u.getEmail().equals(email));
+        return findAll().stream().anyMatch(u -> u.email().equals(email));
     }
 }

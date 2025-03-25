@@ -43,7 +43,6 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public void deleteById(UUID id) {
         FileUtil.delete(DIRECTORY, id);
-        FileUtil.delete(DIRECTORY.resolve("File"), id);
     }
 
 }

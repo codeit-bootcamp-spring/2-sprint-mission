@@ -11,7 +11,7 @@ import com.sprint.mission.discodeit.service.dto.channel.ChannelByIdResponse;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PublicChannelRequest;
-import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusCreateParam;
+import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusCreateRequest;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,9 +46,9 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(PrivateChannelRequest privateParam) {
-        Channel channel = new Channel(privateParam.type(), null, null);
-        readStatusService.create(new ReadStatusCreateParam(privateParam.userIds(), channel.getId()));
+    public Channel create(PrivateChannelRequest privateRequest) {
+        Channel channel = new Channel(privateRequest.type(), null, null);
+        readStatusService.create(new ReadStatusCreateRequest(privateRequest.userIds(), channel.getId()));
         Path path = resolvePath(channel.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
@@ -63,8 +63,8 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(PublicChannelRequest publicParam) {
-        Channel channel = new Channel(publicParam.type(), publicParam.name(), publicParam.description());
+    public Channel create(PublicChannelRequest publicRequest) {
+        Channel channel = new Channel(publicRequest.type(), publicRequest.name(), publicRequest.description());
         Path path = resolvePath(channel.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
@@ -160,10 +160,11 @@ public class FileChannelService implements ChannelService {
             throw new IllegalArgumentException("비공개 채널은 수정 불가능");
         }
 
-        channel.update(
-                updateRequest.newName().orElse(channel.getName()),
-                updateRequest.newDescription().orElse(channel.getDescription())
-        );
+        String name = (updateRequest.newName() == null) ? channel.getName() : updateRequest.newName();
+        String description =
+                (updateRequest.newDescription() == null) ? channel.getDescription() : updateRequest.newDescription();
+
+        channel.update(name, description);
 
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());

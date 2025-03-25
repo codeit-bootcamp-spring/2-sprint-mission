@@ -10,7 +10,7 @@ import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreat
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusParam;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusRequest;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,7 +19,6 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -49,14 +48,14 @@ public class FileUserService implements UserService {
     @Override
     public User create(UserCreateRequest createRequest,
                        Optional<BinaryContentCreateRequest> binaryContentRequestNullable) {
-        duplicateUsername(createRequest.username());
-        duplicateEmail(createRequest.email());
+        validDuplicateUsername(createRequest.username());
+        validDuplicateEmail(createRequest.email());
         UUID binaryContentId = binaryContentRequestNullable
                 .map(basicBinaryContentService::create).map(BinaryContent::getId).orElse(null);
         User user = new User(createRequest.username(), createRequest.email()
                 , createRequest.password(), binaryContentId);
 
-        UserStatusParam statusParam = new UserStatusParam(user.getId(), Instant.now());
+        UserStatusRequest statusParam = new UserStatusRequest(user.getId());
         userStatusService.create(statusParam);
 
         Path path = resolvePath(user.getId());
@@ -148,10 +147,12 @@ public class FileUserService implements UserService {
         User user = Optional.ofNullable(userNullable)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + updateRequest.id() + " not found"));
 
-        String newUsername = updateRequest.newUsername().orElse(user.getUsername());
-        String newEmail = updateRequest.newEemail().orElse(user.getEmail());
-        duplicateUsername(newUsername);
-        duplicateEmail(newEmail);
+        String username = (updateRequest.newUsername() == null) ? user.getUsername() : updateRequest.newUsername();
+        String email = (updateRequest.newEmail() == null) ? user.getEmail() : updateRequest.newEmail();
+        String password = (updateRequest.newPassword() == null) ? user.getPassword() : updateRequest.newPassword();
+
+        validDuplicateUsername(username);
+        validDuplicateEmail(email);
         UUID binaryContentId = binaryContentRequestNullable
                 .map(request -> {
                     if (user.getProfileId() != null) {
@@ -160,12 +161,7 @@ public class FileUserService implements UserService {
                     return basicBinaryContentService.create(request);
                 }).map(BinaryContent::getId).orElse(null);
 
-        user.update(
-                updateRequest.newUsername().orElse(user.getUsername()),
-                updateRequest.newEemail().orElse(user.getEmail()),
-                updateRequest.newPassword().orElse(user.getPassword()),
-                binaryContentId
-        );
+        user.update(username, email, password, binaryContentId);
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
@@ -222,20 +218,20 @@ public class FileUserService implements UserService {
     }
 
     private boolean existsByUsername(String username) {
-        return findAll().stream().anyMatch(u -> u.getUsername().equals(username));
+        return findAll().stream().anyMatch(u -> u.username().equals(username));
     }
 
     private boolean existsByEmail(String email) {
-        return findAll().stream().anyMatch(u -> u.getEmail().equals(email));
+        return findAll().stream().anyMatch(u -> u.email().equals(email));
     }
 
-    private void duplicateUsername(String username) {
+    private void validDuplicateUsername(String username) {
         if (existsByUsername(username)) {
             throw new IllegalArgumentException(username + " 은 중복된 username.");
         }
     }
 
-    private void duplicateEmail(String email) {
+    private void validDuplicateEmail(String email) {
         if (existsByEmail(email)) {
             throw new IllegalArgumentException(email + " 은 중복된 email.");
         }
