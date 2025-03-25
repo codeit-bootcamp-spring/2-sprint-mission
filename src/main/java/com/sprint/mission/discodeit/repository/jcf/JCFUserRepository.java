@@ -7,54 +7,50 @@ import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
 
-    private final Map<UUID,User> userdata;
-    private static JCFUserRepository instance = null;
+    private final Map<UUID, User> userData;
 
-    public static JCFUserRepository getInstance() {
-        if (instance == null) {
-            instance = new JCFUserRepository();
-        }
-        return instance;
-    }
-
-    private JCFUserRepository() {
-        this.userdata=new HashMap<>();
+    public JCFUserRepository() {
+        this.userData = new HashMap<>();
     }
 
     @Override
-    public void save(User user) {
-        userdata.put(user.getId(), user);
+    public User save(User user) {
+        userData.put(user.getId(), user);
+        return user;
     }
 
     @Override
-    public User findById(UUID id) {
-        return userdata.get(id);
+    public Optional<User> findById(UUID userId) {
+        return Optional.ofNullable(this.userData.get(userId));
+    }
+
+    @Override
+    public Optional<User> findByUserName(String userName) {
+        return userData.values().stream()
+                .filter(user -> user.getUserName().equals(userName)) // username 비교
+                .findFirst();
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userData.values().stream()
+                .filter(user -> user.getEmail().equals(email)) // email 비교
+                .findFirst();
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(userdata.values());
+        return new ArrayList<>(userData.values());
+    }
+
+
+    @Override
+    public boolean existsById(UUID userId) {
+        return userData.containsKey(userId);
     }
 
     @Override
-    public void delete(UUID id) {
-        userdata.remove(id);
-    }
-
-    @Override
-    public void update(User user) {
-        user.updateTime(System.currentTimeMillis());
-        userdata.put(user.getId(), user);
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
-        return userdata.containsKey(id);
-    }
-
-    @Override
-    public boolean existsByUsername(String username) {
-        return userdata.values().stream()
-                .anyMatch(user -> user.getUsername().equals(username));
+    public void delete(UUID userId) {
+        this.userData.remove(userId);
     }
 }

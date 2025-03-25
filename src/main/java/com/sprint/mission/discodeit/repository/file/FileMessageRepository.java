@@ -2,72 +2,79 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
-    private static final Path directoryPath = Paths.get("data/messages");
-    private static FileMessageRepository instance = null;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    public static synchronized FileMessageRepository getInstance() {
-        if (instance == null) {
-            instance = new FileMessageRepository();
-        }
-        return instance;
-    }
-
-    private FileMessageRepository() {
-        try {
-            Files.createDirectories(directoryPath); // 디렉토리 생성
-        } catch (IOException e) {
-            throw new RuntimeException("디렉토리를 생성할 수 없습니다: " + e.getMessage());
+    public FileMessageRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY); // 디렉토리 생성
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     private Path getFilePath(UUID messageId) {
-        return directoryPath.resolve("message-" + messageId + ".data");
+        return DIRECTORY.resolve("message-" + messageId + EXTENSION);
     }
 
-    private Message loadMessage(Path filePath) {
-        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
-            return (Message) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("메시지 데이터 읽기 실패: " + filePath, e);
-        }
-    }
-
-    @Override
-    public void save(Message message) {
-        Path filePath = getFilePath(message.getId());
-        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
+    public void serialize(Message message) {
+        Path path = getFilePath(message.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
             oos.writeObject(message);
         } catch (IOException e) {
-            throw new RuntimeException("메시지 저장 실패: " + message.getId(), e);
+            throw new RuntimeException("메세지 데이터를 저장하는 중 오류 발생: " + path, e);
+        }
+    }
+
+    public Message deserialize(Path path) {
+        try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)) {
+            return (Message) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("메세지 파일을 읽는 중 오류 발생: " + path, e);
         }
     }
 
     @Override
-    public Message findById(UUID id) {
-        Path filePath = getFilePath(id);
-        if (Files.exists(filePath)) {
-            return loadMessage(filePath);
+    public Message save(Message message) {
+        serialize(message);
+        return message;
+    }
+
+    @Override
+    public Optional<Message> findById(UUID messageId) {
+        Path path = getFilePath(messageId);
+        if (Files.notExists(path)) {
+            return Optional.empty();
         }
-        return null;
+        return Optional.of(deserialize(path));
     }
 
     @Override
     public List<Message> findAll() {
         try {
-            return Files.list(directoryPath)
-                    .filter(Files::isRegularFile)
-                    .map(this::loadMessage)
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> deserialize(path))
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException("메세지 목록을 불러오는 중 오류 발생", e);
@@ -75,24 +82,18 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        Path filePath = getFilePath(id);
-        try {
-            Files.deleteIfExists(filePath);
-            System.out.println(id + " 메시지 삭제 완료되었습니다.");
-        } catch (IOException e) {
-            throw new RuntimeException("메시지 삭제 실패: " + id, e);
-        }
+    public boolean existsById(UUID messageId) {
+        return Files.exists(getFilePath(messageId));
     }
 
     @Override
-    public void update(Message message) {
-        message.updateTime(System.currentTimeMillis());
-        save(message);
-        System.out.println(message.getId() + " 메시지 업데이트 완료되었습니다.");
-    }
-    @Override
-    public boolean existsById(UUID id) {
-        return Files.exists(getFilePath(id));
+    public void delete(UUID messageId) {
+        Path path = getFilePath(messageId);
+        try {
+            Files.delete(path);
+            System.out.println(messageId + " 메시지 삭제 완료되었습니다.");
+        } catch (IOException e) {
+            throw new RuntimeException("메시지 삭제 실패: " + messageId, e);
+        }
     }
 }

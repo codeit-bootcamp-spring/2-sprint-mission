@@ -1,78 +1,83 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> data;
-    private static JCFChannelService instance = null;
 
-    public static JCFChannelService getInstance() {
-        if (instance == null) {
-            instance = new JCFChannelService();
-        }
-        return instance;
-    }
-
-    private JCFChannelService() {
+    public JCFChannelService() {
         this.data = new HashMap<>();
     }
 
     @Override
-    public UUID createChannel() {
-        Channel channel = new Channel();
+    public Channel createChannel(ChannelType type, String channelName, String description) {
+        Channel channel = new Channel(type, channelName, description);
         data.put(channel.getId(), channel);
         System.out.println("채널이 생성되었습니다: \n" + channel);
-        return channel.getId();
+        return channel;
     }
 
     @Override
-    public void searchChannel(UUID id) {
-        if (!data.containsKey(id)) {
-            System.out.println("조회하신 채널이 존재하지 않습니다.");
-            return;
-        }
-        System.out.println("CHANNEL: " + data.get(id));
-
+    public Channel searchChannel(UUID channelId) {
+        Channel channel = findChannel(channelId);
+        System.out.println("CHANNEL: " + channel);
+        return channel;
     }
 
+
     @Override
-    public void searchAllChannels() {
+    public List<Channel> searchAllChannels() {
         if (data.isEmpty()) {
-            System.out.println("등록된 채널이 존재하지 않습니다.");
-            return;
+            throw new NoSuchElementException("등록된 채널이 존재하지 않습니다.");
         }
-        for (Channel channel : data.values()) {
+        List<Channel> channels = new ArrayList<>(data.values());
+        for (Channel channel : channels) {
             System.out.println("CHANNEL: " + channel);
         }
+        return channels;
     }
 
     @Override
-    public void updateChannel(UUID id) {
-        if (!data.containsKey(id)) {
-            System.out.println("업데이트할 채널이 존재하지 않습니다.");
-            return;
-        }
-        data.get(id).updateTime(System.currentTimeMillis());
-        System.out.println(id + " 채널 업데이트 완료되었습니다.");
+    public Channel updateAll(UUID channelId, String channelName, String description) {
+        Channel channel = findChannel(channelId);
+        channel.updateAll(channelName, description);
+        System.out.println(channelId + " 채널 업데이트 완료되었습니다.");
+        return channel;
+    }
+
+    @Override
+    public Channel updateChannelName(UUID channelId, String channelName) {
+        Channel channel = findChannel(channelId);
+        channel.updateChannelName(channelName);
+        System.out.println(channelId + " 채널 이름이 업데이트 완료되었습니다.");
+        return channel;
 
     }
 
     @Override
-    public void deleteChannel(UUID id) {
-        if (!data.containsKey(id)) {
-            System.out.println("삭제할 채널이 존재하지 않습니다.");
-            return;
-        }
-        data.remove(id);
-        System.out.println(id + " 채널 삭제 완료되었습니다.");
-
+    public Channel updateChannelDescription(UUID channelId, String description) {
+        Channel channel = findChannel(channelId);
+        channel.updateChannelDescription(description);
+        System.out.println(channelId + " 채널 설명이 업데이트 완료되었습니다.");
+        return channel;
     }
-    public boolean existChannel(UUID id) {
-        return data.containsKey(id);
+
+    @Override
+    public void deleteChannel(UUID channelId) {
+        findChannel(channelId);
+        data.remove(channelId);
+        System.out.println(channelId + " 채널 삭제 완료되었습니다.");
+    }
+
+    public Channel findChannel(UUID channelId) {
+        Channel channel = data.get(channelId);
+        if (channel == null) {
+            throw new NoSuchElementException("해당 채널이 존재하지 않습니다.");
+        }
+        return channel;
     }
 }

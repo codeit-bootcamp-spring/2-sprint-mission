@@ -8,27 +8,20 @@ import java.util.*;
 public class JCFMessageRepository implements MessageRepository {
 
     private final Map<UUID, Message> messageData;
-    private static JCFMessageRepository instance = null;
 
-    public static JCFMessageRepository getInstance() {
-        if (instance == null) {
-            instance = new JCFMessageRepository();
-        }
-        return instance;
-    }
-
-    private JCFMessageRepository() {
+    public JCFMessageRepository() {
         this.messageData = new HashMap<>();
     }
 
     @Override
-    public void save(Message message) {
+    public Message save(Message message) {
         messageData.put(message.getId(), message);
+        return message;
     }
 
     @Override
-    public Message findById(UUID id) {
-        return messageData.get(id);
+    public Optional<Message> findById(UUID messageId) {
+        return Optional.ofNullable(messageData.get(messageId));
     }
 
     @Override
@@ -37,19 +30,12 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        messageData.remove(id);
+    public boolean existsById(UUID messageId) {
+        return messageData.containsKey(messageId);
     }
 
     @Override
-    public void update(Message message) {
-        // 시간 갱신 (혹은 다른 필드 변경 시 필요한 로직)
-        message.updateTime(System.currentTimeMillis());
-        messageData.put(message.getId(), message);  // 변경된 데이터를 다시 저장
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
-        return messageData.containsKey(id);
+    public void delete(UUID messageId) {
+        this.messageData.remove(messageId);
     }
 }

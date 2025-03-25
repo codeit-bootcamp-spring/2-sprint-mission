@@ -8,27 +8,20 @@ import java.util.*;
 public class JCFChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> channelData;
-    private static JCFChannelRepository instance = null;
 
-    public static JCFChannelRepository getInstance() {
-        if (instance == null) {
-            instance = new JCFChannelRepository();
-        }
-        return instance;
-    }
-
-    private JCFChannelRepository() {
+    public JCFChannelRepository() {
         this.channelData = new HashMap<>();
     }
 
     @Override
-    public void save(Channel channel) {
-        channelData.put(channel.getId(), channel);
+    public Channel save(Channel channel) {
+        this.channelData.put(channel.getId(), channel);
+        return channel;
     }
 
     @Override
-    public Channel findById(UUID id) {
-        return channelData.get(id);
+    public Optional<Channel> findById(UUID channelId) {
+        return Optional.ofNullable(this.channelData.get(channelId));
     }
 
     @Override
@@ -37,18 +30,12 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        channelData.remove(id);
+    public boolean existsById(UUID channelId) {
+        return channelData.containsKey(channelId);
     }
 
     @Override
-    public void update(Channel channel) {
-        channel.updateTime(System.currentTimeMillis());
-        channelData.put(channel.getId(), channel);
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
-       return channelData.containsKey(id);
+    public void delete(UUID channelId) {
+        this.channelData.remove(channelId);
     }
 }

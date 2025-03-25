@@ -5,116 +5,133 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
 import java.nio.file.*;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class FileUserService implements UserService {
-    private static final Path directoryPath= Paths.get("data/users");
-    private static FileUserService instance = null;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    public static synchronized FileUserService getInstance() {
-        if(instance == null) {
-            instance= new FileUserService();
-        }
-        return instance;
-    }
-    private FileUserService() {
-        try{
-            Files.createDirectories(directoryPath);
-        }catch(IOException e){
-            throw new RuntimeException("디렉토리를 생성할 수 없습니다."+ e.getMessage());
+    public FileUserService() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
-    public void saveUser(User user){
-        Path filePath= getFilePath(user.getId());
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))){
+
+    private Path getFilePath(UUID userId) {
+        return DIRECTORY.resolve("user-" + userId + EXTENSION);
+    }
+
+    private void serializeUser(User user, Path path) {
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
             oos.writeObject(user);
-        }catch(IOException e){
-            throw new RuntimeException("사용자 저장 실패:" +user.getId(),e);
+        } catch (IOException e) {
+            throw new RuntimeException("사용자 데이터를 저장하는 중 오류 발생: " + path, e);
         }
     }
-    public User loadUser(Path filePath){
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
+
+    private User deserializeUser(Path path) {
+        try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+        ) {
             return (User) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("사용자 데이터 읽기 실패: " + filePath, e);
+            throw new RuntimeException("사용자 파일을 읽는 중 오류 발생: " + path, e);
         }
     }
-    public Path getFilePath(UUID userid){
-        return directoryPath.resolve("user-" + userid + ".data");
-    }
+
     @Override
-    public UUID createUser(String username) {
-        if (existUser(username)) {
-            throw new RuntimeException("이미 존재하는 사용자 이름입니다: " + username);
-        }
-        User user = new User (username);
-        saveUser(user);
+    public User createUser(String userName, String email, String password) {
+        User user = new User(userName, email, password);
+        serializeUser(user, getFilePath(user.getId()));
         System.out.println("사용자가 생성되었습니다: \n" + user);
-        return user.getId();
+        return user;
     }
 
     @Override
-    public void searchUser(UUID id) {
-        Path filePath= getFilePath(id);
-        if (!Files.exists(filePath)) {
-            System.out.println("조회하신 사용자가 존재하지 않습니다.");
-            return;
-        }
-        User user = loadUser(filePath);
-        System.out.println("USER: " + user);
-
+    public User searchUser(UUID userId) {
+        return deserializeUser(getFilePath(userId));
     }
 
     @Override
-    public void searchAllUsers() {
-        try{
-            Files.list(directoryPath)
-                    .filter(Files::isRegularFile)
-                    .forEach(path->{
-                        User user = loadUser(path);
-                        System.out.println("USER: " + user);
-                    });
-        }catch (IOException e){
-            throw new RuntimeException("사용자 목록 읽기 실패"+e);
-        }
-    }
-
-    @Override
-    public void updateUser(UUID id) {
-        Path filePath= getFilePath(id);
-        if(!Files.exists(filePath)) {
-            System.out.println("업데이트할 사용자가 존재하지 않습니다.");
-            return;
-        }
-        User user = loadUser(filePath);
-        user.updateTime(System.currentTimeMillis());
-        saveUser(user);
-        System.out.println(id + " 사용자 업데이트 완료되었습니다.");
-    }
-
-    @Override
-    public void deleteUser(UUID id) {
-        Path filePath= getFilePath(id);
+    public List<User> searchAllUsers() {
         try {
-            Files.deleteIfExists(filePath); // 사용자 파일 삭제
-            System.out.println(id + " 사용자 삭제 완료되었습니다.");
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> deserializeUser(path))
+                    .toList();
         } catch (IOException e) {
-            throw new RuntimeException("사용자 삭제 실패: " + id, e);
+            throw new RuntimeException(e);
         }
     }
-    public boolean existUser(UUID id) {
-        return Files.exists(getFilePath(id));
+
+    @Override
+    public User updateAll(UUID userId, String userName, String email, String password) {
+        existUser(userId);
+        Path path = getFilePath(userId);
+        User user = deserializeUser(path);
+        user.updateAll(userName, email, password);
+        serializeUser(user, path);
+        return user;
     }
-    public boolean existUser(String username) {
+
+    @Override
+    public User updateUserName(UUID userId, String userName) {
+        existUser(userId);
+        Path path = getFilePath(userId);
+        User user = deserializeUser(path);
+        user.updateUserName(userName);
+        serializeUser(user, path);
+        return user;
+    }
+
+    @Override
+    public User updateEmail(UUID userId, String email) {
+        existUser(userId);
+        Path path = getFilePath(userId);
+        User user = deserializeUser(path);
+        user.updateEmail(email);
+        serializeUser(user, path);
+        return user;
+    }
+
+    @Override
+    public User updatePassword(UUID userId, String password) {
+        existUser(userId);
+        Path path = getFilePath(userId);
+        User user = deserializeUser(path);
+        user.updatePassword(password);
+        serializeUser(user, path);
+        return user;
+    }
+
+    @Override
+    public void deleteUser(UUID userId) {
+        existUser(userId);
+        Path path = getFilePath(userId);
         try {
-            return Files.list(directoryPath)
-                    .filter(Files::isRegularFile)
-                    .anyMatch(path -> {
-                        User user = loadUser(path); // 파일에서 User 객체 로드
-                        return user.getUsername().equals(username); // 이름이 일치하는지 확인
-                    });
+            Files.delete(path);
+            System.out.println(userId + " 사용자 삭제 완료되었습니다.");
         } catch (IOException e) {
-            throw new RuntimeException("사용자 이름 확인 중 오류 발생: " + e.getMessage());
+            throw new RuntimeException("사용자 삭제 실패: " + userId, e);
         }
+    }
+
+    public boolean existUser(UUID userId) {
+        Path path = getFilePath(userId);
+        if (!Files.exists(path)) {
+            throw new NoSuchElementException("사용자가 존재하지 않습니다: " + userId);
+        }
+        return true;
     }
 }
