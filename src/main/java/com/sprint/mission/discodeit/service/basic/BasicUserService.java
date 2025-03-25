@@ -10,12 +10,14 @@ import com.sprint.mission.discodeit.entity.Status;
 import com.sprint.mission.discodeit.entity.User;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.UserNotFound;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -32,15 +34,17 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest) {
         // username과 email이 중복되지 않도록 검사
         if (userRepository.existsByUsernameOrEmail(userCreateRequest.username(), userCreateRequest.email())) {
-            throw new RuntimeException("Username or email already exists");
+            throw new UserNotFound("Username or email already exists");
         }
 
-        User newUser = new User(userCreateRequest.username(), userCreateRequest.email(), userCreateRequest.password());
+        String hashedPassword = passwordEncoder.encode(userCreateRequest.password());
+        User newUser = new User(userCreateRequest.username(), userCreateRequest.email(), hashedPassword);
 
         // 프로필 이미지를 등록할 경우
         profileCreateRequest.ifPresent(request -> {
@@ -108,7 +112,7 @@ public class BasicUserService implements UserService {
     @Override
     public void delete(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow();
-        userRepository.delete(user);
+        userRepository.delete(userId);
 
         // 관련된 도메인 삭제
         if (user.getProfileId() != null) {
@@ -121,6 +125,4 @@ public class BasicUserService implements UserService {
     public boolean exists(UUID authorId) {
         return userRepository.findById(authorId).isPresent();
     }
-
 }
-

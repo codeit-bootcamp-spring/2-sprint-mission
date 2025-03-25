@@ -38,9 +38,9 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(User user) {
+    public void delete(UUID userId) {
         Map<UUID, User> users = loadUsers();
-        users.remove(user.getId());
+        users.remove(userId);
         saveUsers(users);
     }
 

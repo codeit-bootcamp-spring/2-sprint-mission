@@ -4,25 +4,22 @@ import com.sprint.mission.discodeit.DTO.Channel.ChannelDetailsDto;
 import com.sprint.mission.discodeit.DTO.Channel.CreatePublicChannelDto;
 import com.sprint.mission.discodeit.DTO.Message.CreateMessageDto;
 import com.sprint.mission.discodeit.DTO.Message.MessageDto;
-import com.sprint.mission.discodeit.DTO.Message.UpdateMessageDto;
 import com.sprint.mission.discodeit.DTO.User.UserCreateRequest;
 import com.sprint.mission.discodeit.DTO.User.UserDto;
-import com.sprint.mission.discodeit.DTO.User.UserUpdateRequest;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {UserDetailsServiceAutoConfiguration .class})
 public class DiscodeitApplication {
 
 	public static void main(String[] args) {
