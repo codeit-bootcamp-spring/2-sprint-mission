@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record ChannelFindResponseDto(
+public record ChannelFindResponse(
         UUID id,
         Instant createdAt,
         Instant updatedAt,
@@ -18,8 +18,8 @@ public record ChannelFindResponseDto(
         List<UUID> participantIds
 
 ) {
-    public static ChannelFindResponseDto fromEntity(Channel channel, Instant latestMessageAt, List<UUID> participantIds) {
-        return new ChannelFindResponseDto(
+    public static ChannelFindResponse fromEntity(Channel channel, Instant latestMessageAt, List<UUID> participantIds) {
+        return new ChannelFindResponse(
                 channel.getId(),
                 channel.getCreatedAt(),
                 channel.getUpdatedAt(),

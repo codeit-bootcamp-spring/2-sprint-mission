@@ -5,22 +5,24 @@ import com.sprint.mission.discodeit.entity.user.User;
 import java.time.Instant;
 import java.util.UUID;
 
-public record UserUpdateResponseDto(
+public record UserResponse(
         UUID id,
         Instant createdAt,
         Instant updatedAt,
         String username,
         String email,
-        UUID profileId
+        UUID profileId,
+        boolean isOnline
 ) {
-    public static UserUpdateResponseDto fromEntity(User user) {
-        return new UserUpdateResponseDto(
+    public static UserResponse fromEntity(User user, boolean isOnline) {
+        return new UserResponse(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getProfileId()
+                user.getProfileId(),
+                isOnline
         );
     }
 }

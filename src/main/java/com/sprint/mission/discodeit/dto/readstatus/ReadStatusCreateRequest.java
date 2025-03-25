@@ -2,7 +2,8 @@ package com.sprint.mission.discodeit.dto.readstatus;
 
 import java.util.UUID;
 
-public record ReadStatusUpdateRequestDto(
-        UUID id
+public record ReadStatusCreateRequest(
+        UUID userId,
+        UUID channelId
 ) {
 }

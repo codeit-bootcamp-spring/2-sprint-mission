@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.user.User;
 import java.time.Instant;
 import java.util.UUID;
 
-public record UserCreateResponseDto(
+public record UserCreateResponse(
         UUID id,
         Instant createdAt,
         Instant updatedAt,
@@ -13,8 +13,8 @@ public record UserCreateResponseDto(
         String email,
         UUID profileId
 ) {
-    public static UserCreateResponseDto fromEntity(User user) {
-        return new UserCreateResponseDto(
+    public static UserCreateResponse fromEntity(User user) {
+        return new UserCreateResponse(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),

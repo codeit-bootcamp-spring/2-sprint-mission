@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.user.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -21,7 +21,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserStatus create(UserStatusCreateRequestDto requestDto) {
+    public UserStatus create(UserStatusCreateRequest requestDto) {
         User user = userRepository.findById(requestDto.userId())
                     .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
 
@@ -51,7 +51,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus update(UserStatusUpdateRequestDto requestDto) {
+    public UserStatus update(UserStatusUpdateRequest requestDto) {
         UserStatus userStatus = userStatusRepository.findById(requestDto.id())
                 .orElseThrow(() -> new NoSuchElementException("해당 유저 상태 없음"));
 

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.*;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -22,7 +22,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public UserCreateResponseDto create(UserCreateRequestDto requestDto) {
+    public UserCreateResponse create(UserCreateRequest requestDto) {
         validateUsernameDuplicate(requestDto.username());
         validateEmailDuplicate(requestDto.email());
 
@@ -30,27 +30,27 @@ public class BasicUserService implements UserService {
                 requestDto.email(), requestDto.password(), requestDto.profileId());
         userRepository.save(user);
 
-        userStatusService.create(new UserStatusCreateRequestDto(user.getId()));
+        userStatusService.create(new UserStatusCreateRequest(user.getId()));
 
-        return UserCreateResponseDto.fromEntity(user);
+        return UserCreateResponse.fromEntity(user);
     }
 
     @Override
-    public UserResponseDto find(UUID userId) {
+    public UserResponse find(UUID userId) {
         User user = getUserBy(userId);
 
-        return UserResponseDto.fromEntity(user, isOnline(userId));
+        return UserResponse.fromEntity(user, isOnline(userId));
     }
 
     @Override
-    public List<UserResponseDto> findAll() {
+    public List<UserResponse> findAll() {
         return userRepository.findAll().stream()
-                .map(user -> UserResponseDto.fromEntity(user, isOnline(user.getId())))
+                .map(user -> UserResponse.fromEntity(user, isOnline(user.getId())))
                 .toList();
     }
 
     @Override
-    public UserUpdateResponseDto update(UserUpdateRequestDto requestDto) {
+    public UserUpdateResponse update(UserUpdateRequest requestDto) {
         User user = getUserBy(requestDto.id());
 
         if (!user.getUsername().equals(requestDto.username())) {
@@ -65,7 +65,7 @@ public class BasicUserService implements UserService {
                  requestDto.password(), requestDto.profileId());
         userRepository.save(user);
 
-        return UserUpdateResponseDto.fromEntity(user);
+        return UserUpdateResponse.fromEntity(user);
     }
 
     @Override

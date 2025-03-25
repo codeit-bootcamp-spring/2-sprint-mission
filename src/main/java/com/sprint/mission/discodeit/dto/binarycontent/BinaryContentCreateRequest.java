@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.binarycontent;
 
-public record BinaryContentCreateRequestDto(
+public record BinaryContentCreateRequest(
         String resourceLink
 ) {
 }

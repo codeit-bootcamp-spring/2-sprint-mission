@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequestDto;
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
@@ -24,7 +24,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public ReadStatus create(ReadStatusCreateRequestDto requestDto) {
+    public ReadStatus create(ReadStatusCreateRequest requestDto) {
         User user = userRepository.findById(requestDto.userId())
                 .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
         Channel channel = channelRepository.findById(requestDto.channelId())
@@ -50,7 +50,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(ReadStatusUpdateRequestDto requestDto) {
+    public ReadStatus update(ReadStatusUpdateRequest requestDto) {
         ReadStatus readStatus = readStatusRepository.findById(requestDto.id())
                 .orElseThrow(() -> new NoSuchElementException("해당 ReadStatus 없음"));
 
