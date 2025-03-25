@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class ChannelUpdateDto {
+public class UpdateChannelDto {
     UUID channelId;
     String channelName;
     String description;

@@ -35,7 +35,7 @@ public class ChatSystemMenu {
                 executeSafely("유저 생성 중 오류 발생", () -> {
                     System.out.print("생성할 유저 이름 입력: ");
                     String username = scanner.nextLine();
-                    userService.createUser(username);
+                    // userService.createUser(username);
                     System.out.printf("유저 '%s'가 생성되었습니다.%n", username);
                 });
                 break;
@@ -43,7 +43,7 @@ public class ChatSystemMenu {
                 executeSafely("채널 생성 중 오류 발생", () -> {
                     System.out.print("생성할 채널 이름 입력: ");
                     String channelName = scanner.nextLine();
-                    channelService.createChannel(channelName);
+                    //channelService.(channelName);
                     System.out.printf("채널 '%s'이 생성되었습니다.%n", channelName);
                 });
                 break;
@@ -65,7 +65,7 @@ public class ChatSystemMenu {
                     UUID channelId = parseUUID(scanner.nextLine());
                     System.out.print("메세지 입력: ");
                     String messageContent = scanner.nextLine();
-                    messageService.createMessage(userId, channelId, messageContent);
+                    //messageService.createMessage(userId, channelId, messageContent);
                     System.out.println("메세지가 정상적으로 전송되었습니다. 발신자: '" + userService.getUserNameById(userId) + "', 채널: '" + channelService.findChannelNameById(channelId) + "', 내용: '" + messageContent + "'");
                 });
                 break;
@@ -164,7 +164,7 @@ public class ChatSystemMenu {
                     UUID userId = parseUUID(scanner.nextLine());
                     System.out.print("새로운 유저 이름 입력: ");
                     String newUsername = scanner.nextLine();
-                    userService.updateUsername(userId, newUsername);
+                    //userService.updateUsername(userId, newUsername);
                     System.out.printf("유저 이름이 '%s'으로 수정되었습니다.%n", newUsername);
                 });
                 break;
@@ -174,7 +174,7 @@ public class ChatSystemMenu {
                     UUID channelId = parseUUID(scanner.nextLine());
                     System.out.print("새로운 채널 이름 입력: ");
                     String newChannelName = scanner.nextLine();
-                    channelService.updateChannelName(channelId, newChannelName);
+                    //channelService.updateChannelName(channelId, newChannelName);
                     System.out.printf("채널 이름이 '%s'으로 수정되었습니다.%n", newChannelName);
                 });
                 break;
@@ -184,7 +184,7 @@ public class ChatSystemMenu {
                     UUID messageId = UUID.fromString(scanner.nextLine());
                     System.out.print("새로운 메세지 내용 입력: ");
                     String newMessageContent = scanner.nextLine();
-                    messageService.updateMessage(messageId, newMessageContent);
+                    //messageService.updateMessage(messageId, newMessageContent);
                     System.out.printf("메세지 내용이 수정되었습니다: %s%n", newMessageContent);
                 });
                 break;

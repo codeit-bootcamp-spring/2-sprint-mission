@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class MessageUpdateDto {
+public class UpdateMessageDto {
     private UUID messageId;
     private String content;
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
-public class MessageCreateDto {
+public class CreateMessageDto {
     private UUID userId;
     private UUID channelId;
     private String content;

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.UserCreateDto;
-import com.sprint.mission.discodeit.dto.UserFindDto;
-import com.sprint.mission.discodeit.dto.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.CreateUserDto;
+import com.sprint.mission.discodeit.dto.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.UserInfoDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -33,7 +33,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User createUser(UserCreateDto dto) {
+    public User createUser(CreateUserDto dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("이미 존재하는 Email입니다");
         }
@@ -54,7 +54,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserFindDto getUserById(UUID userId) {
+    public UserInfoDto getUserById(UUID userId) {
         return mapToUserFindDto(userRepository.findUserById(userId));
     }
 
@@ -64,14 +64,14 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserFindDto> findUsersByIds(Set<UUID> userIds) {
+    public List<UserInfoDto> findUsersByIds(Set<UUID> userIds) {
         return userRepository.findUsersByIds(userIds).stream()
                 .map(this::mapToUserFindDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<UserFindDto> getAllUsers() {
+    public List<UserInfoDto> getAllUsers() {
         return userRepository.findUserAll().stream()
                 .map(this::mapToUserFindDto)
                 .collect(Collectors.toList());
@@ -86,7 +86,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateUser(UserUpdateDto dto) {
+    public void updateUser(UpdateUserDto dto) {
         validateUserExists(dto.getUserid());
         User user = userRepository.findUserById(dto.getUserid());
 
@@ -128,8 +128,8 @@ public class BasicUserService implements UserService {
         }
     }
 
-    private UserFindDto mapToUserFindDto(User user) {
-        UserFindDto dto = new UserFindDto();
+    private UserInfoDto mapToUserFindDto(User user) {
+        UserInfoDto dto = new UserInfoDto();
         dto.setUserid(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ChannelFindDto;
-import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.ChannelInfoDto;
 import com.sprint.mission.discodeit.dto.CreatePrivateChannelDto;
 import com.sprint.mission.discodeit.dto.CreatePublicChannelDto;
+import com.sprint.mission.discodeit.dto.UpdateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -59,7 +59,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public ChannelFindDto findChannelById(UUID channelId) {
+    public ChannelInfoDto findChannelById(UUID channelId) {
         validateChannelExists(channelId);
 
         Channel channel = channelRepository.findChannelById(channelId);
@@ -74,7 +74,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelFindDto> getAllChannels() {
+    public List<ChannelInfoDto> getAllChannels() {
         List<Channel> channels = channelRepository.findAllChannels();
 
         return channels.stream()
@@ -83,15 +83,15 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelFindDto> findAllByUserId(UUID userId) {
+    public List<ChannelInfoDto> findAllByUserId(UUID userId) {
         userService.validateUserExists(userId);
 
-        List<ChannelFindDto> publicChannels = channelRepository.findAllChannels().stream()
+        List<ChannelInfoDto> publicChannels = channelRepository.findAllChannels().stream()
                 .filter(channel -> channel.getType() == ChannelType.PUBLIC)
                 .map(this::mapToDto)
                 .toList();
 
-        List<ChannelFindDto> privateChannels = channelRepository.findAllChannels().stream()
+        List<ChannelInfoDto> privateChannels = channelRepository.findAllChannels().stream()
                 .filter(channel -> channel.getType() == ChannelType.PRIVATE)
                 .filter(channel -> channel.getMembers().contains(userId))
                 .map(this::mapToDto)
@@ -102,7 +102,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(ChannelUpdateDto dto) {
+    public void updateChannel(UpdateChannelDto dto) {
         validateChannelExists(dto.getChannelId());
         Channel channel = channelRepository.findChannelById(dto.getChannelId());
 
@@ -167,8 +167,8 @@ public class BasicChannelService implements ChannelService {
         }
     }
 
-    private ChannelFindDto mapToDto(Channel channel) {
-        return new ChannelFindDto(
+    private ChannelInfoDto mapToDto(Channel channel) {
+        return new ChannelInfoDto(
                 channel.getId(),
                 channel.getChannelName(),
                 channel.getDescription(),

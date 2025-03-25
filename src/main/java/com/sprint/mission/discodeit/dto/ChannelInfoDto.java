@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
-public class ChannelFindDto {
+public class ChannelInfoDto {
     private UUID channelId;
     private String channelName;
     private String description;
     private Instant lastMessageTime;
     private List<UUID> participantsUserIds;
 
-    public ChannelFindDto(UUID channelId, String channelName, String description, Instant lastMessageTime, List<UUID> participantsUserIds) {
+    public ChannelInfoDto(UUID channelId, String channelName, String description, Instant lastMessageTime, List<UUID> participantsUserIds) {
         this.channelId = channelId;
         this.channelName = channelName;
         this.description = description;

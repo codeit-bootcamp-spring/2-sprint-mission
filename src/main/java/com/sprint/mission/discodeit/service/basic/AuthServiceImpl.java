@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.AuthDto;
-import com.sprint.mission.discodeit.dto.UserFindDto;
+import com.sprint.mission.discodeit.dto.LoginRequestDto;
+import com.sprint.mission.discodeit.dto.UserInfoDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -16,21 +16,21 @@ import java.util.NoSuchElementException;
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
 
-    public UserFindDto login(AuthDto authDto) {
-        User user = userRepository.findUserByName(authDto.getUsername());
+    public UserInfoDto login(LoginRequestDto loginRequestDto) {
+        User user = userRepository.findUserByName(loginRequestDto.getUsername());
         if (user == null) {
             throw new NoSuchElementException("존재하지 않는 유저입니다.");
         }
 
-        if (!user.getPassword().equals(authDto.getPassword())) {
+        if (!user.getPassword().equals(loginRequestDto.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         return mapToUserFindDto(user);
     }
 
-    private UserFindDto mapToUserFindDto(User user) {
-        UserFindDto dto = new UserFindDto();
+    private UserInfoDto mapToUserFindDto(User user) {
+        UserInfoDto dto = new UserInfoDto();
         dto.setUserid(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());

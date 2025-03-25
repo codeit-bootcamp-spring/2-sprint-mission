@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ReadStatusCreateDto;
-import com.sprint.mission.discodeit.dto.ReadStatusUpdateDto;
+import com.sprint.mission.discodeit.dto.CreateReadStatusDto;
+import com.sprint.mission.discodeit.dto.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -24,7 +24,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
         this.channelRepository = channelRepository;
     }
 
-    public void createReadStatus(ReadStatusCreateDto dto) {
+    public void createReadStatus(CreateReadStatusDto dto) {
         if (!channelRepository.existsById(dto.getChannelId())) {
             throw new IllegalArgumentException("Channel " + dto.getChannelId() + "이 존재하지 않습니다.");
         }
@@ -54,7 +54,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
         return readStatusRepository.findAllReadStatus();
     }
 
-    public void updateReadStatus(ReadStatusUpdateDto dto) {
+    public void updateReadStatus(UpdateReadStatusDto dto) {
         ReadStatus readStatus = readStatusRepository.findReadStatusById(dto.getId());
         if (readStatus == null) {
             throw new IllegalArgumentException("ReadStatus " + dto.getId() + "을 찾을 수 없습니다.");
@@ -67,7 +67,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
         readStatusRepository.addReadStatus(readStatus);
     }
 
-    public void updateByUserId(ReadStatusUpdateDto dto) {
+    public void updateByUserId(UpdateReadStatusDto dto) {
         readStatusRepository.updateTime(dto.getChannelId(), dto.getUserId());
     }
 

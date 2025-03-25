@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class BinaryContentCreateDto {
+public class CreateBinaryContentDto {
     private UUID referenceId;
     private String filePath;
 }

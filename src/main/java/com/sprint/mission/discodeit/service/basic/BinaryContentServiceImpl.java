@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.dto.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -15,7 +15,7 @@ import java.util.UUID;
 public class BinaryContentServiceImpl implements BinaryContentService {
     BinaryContentRepository binaryContentRepository;
 
-    public void createBinaryContent(BinaryContentCreateDto dto) {
+    public void createBinaryContent(CreateBinaryContentDto dto) {
         binaryContentRepository.addBinaryContent(new BinaryContent(dto.getReferenceId(), dto.getFilePath()));
     }
 
