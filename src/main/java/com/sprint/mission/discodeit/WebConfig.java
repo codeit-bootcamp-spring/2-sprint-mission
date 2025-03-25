@@ -16,9 +16,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtAuthInterceptor)
-                .addPathPatterns("/api/servers/create", "/api/servers/delete/**", "/api/servers/update/**")
-                .addPathPatterns("/api/channels/create", "/api/channels/delete/**", "/api/channels/update/**")
-                .addPathPatterns("/api/messages/create", "/api/messages/delete/**", "/api/messages/update/**")
+                .addPathPatterns("/api/servers/**")
+                .addPathPatterns("/api/channels/**")
+                .addPathPatterns("/api/messages/**")
                 .excludePathPatterns("/api/users/register", "/api/users/login"); // 인증 제외 경로
     }
 }

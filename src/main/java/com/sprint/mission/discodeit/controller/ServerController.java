@@ -29,7 +29,6 @@ public class ServerController {
     @ResponseBody
     public ResponseEntity<CreateServerResult> createServer(@RequestBody CreateServerNameDTO requestDTO, HttpServletRequest httpRequest) {
         UUID userId = (UUID) httpRequest.getAttribute("userId");
-
         CreateServerRequestDTO createServerRequestDTO = new CreateServerRequestDTO(userId, requestDTO.name());
         Server server = serverService.create(createServerRequestDTO);
         return ResponseEntity.ok(new CreateServerResult(server.getServerId()));
@@ -51,26 +50,29 @@ public class ServerController {
     @GetMapping
     public ResponseEntity<ServerDisplayList> findAll(HttpServletRequest httpRequest) {
         UUID userId = (UUID) httpRequest.getAttribute("userId");
+        System.out.println("TokenStore 조회 요청 userId: " + userId);
+
         List<Server> servers = serverService.findServerAll(userId);
+
         List<ServerDisplayItem> list = servers.stream().map(s ->
                 new ServerDisplayItem(s.getServerId(), s.getName(), s.getCreatedAt(), s.getUpdatedAt())).toList();
         return ResponseEntity.ok(new ServerDisplayList(list));
     }
-
-    @PutMapping("/update/{serverId}")
-    public ResponseEntity<UUID> update(@PathVariable UUID serverId, @RequestBody UpdateServerRequestDTO updateServerRequestDTO, HttpServletRequest httpRequest) {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
-        UUID update = serverService.update(serverId, userId, updateServerRequestDTO);
-
-        return ResponseEntity.ok(update);
-    }
-
-    @DeleteMapping("/delete/{serverId}")
-    public ResponseEntity<String> delete(@PathVariable UUID serverId, HttpServletRequest httpRequest) {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
-
-        serverService.delete(serverId, userId);
-        return ResponseEntity.ok("Delete successful");
-
-    }
+//
+//    @PutMapping("/update/{serverId}")
+//    public ResponseEntity<UUID> update(@PathVariable UUID serverId, @RequestBody UpdateServerRequestDTO updateServerRequestDTO, HttpServletRequest httpRequest) {
+//        UUID userId = (UUID) httpRequest.getAttribute("userId");
+//        UUID update = serverService.update(serverId, userId, updateServerRequestDTO);
+//
+//        return ResponseEntity.ok(update);
+//    }
+//
+//    @DeleteMapping("/delete/{serverId}")
+//    public ResponseEntity<String> delete(@PathVariable UUID serverId, HttpServletRequest httpRequest) {
+//        UUID userId = (UUID) httpRequest.getAttribute("userId");
+//
+//        serverService.delete(serverId, userId);
+//        return ResponseEntity.ok("Delete successful");
+//
+//    }
 }

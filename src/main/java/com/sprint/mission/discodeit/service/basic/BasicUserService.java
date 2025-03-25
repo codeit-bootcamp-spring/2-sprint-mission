@@ -8,13 +8,14 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.Valid.DuplicateUserException;
+import com.sprint.mission.discodeit.exception.Valid.InvalidTokenException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.TokenStore;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.util.CommonUtils;
+import com.sprint.mission.discodeit.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    private final UserRepository userRepository;
     private final TokenStore tokenStore;
+    private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
 
@@ -95,8 +97,8 @@ public class BasicUserService implements UserService {
     @CustomLogging
     @Override
     public UUID update(UUID userId, UpdateUserRequestDTO updateUserRequestDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
-        String toekn = tokenStore.getToekn(userId);
-        CommonUtils.checkValidToken(toekn);
+        String toekn = tokenStore.getToken(userId);
+        checkValidToken(toekn);
 
         User user = userRepository.findById(userId);
         UUID profileId = user.getProfileId();
@@ -113,8 +115,8 @@ public class BasicUserService implements UserService {
     @CustomLogging
     @Override
     public void delete(UUID userId) {
-        String toekn = tokenStore.getToekn(userId);
-        CommonUtils.checkValidToken(toekn);
+        String toekn = tokenStore.getToken(userId);
+        checkValidToken(toekn);
 
         User findUser = userRepository.findById(userId);
         userRepository.remove(findUser);
@@ -148,6 +150,14 @@ public class BasicUserService implements UserService {
     private void checkDuplicate(String name, String email) {
         if (userRepository.existName(name) || userRepository.existEmail(email)) {
             throw new DuplicateUserException("동일한 유저가 존재합니다.");
+        }
+    }
+
+    private void checkValidToken(String token) {
+        Boolean validated = jwtUtil.validateToken(token);
+        System.out.println(validated);
+        if (!validated) {
+            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
         }
     }
 }

@@ -14,7 +14,8 @@ public class TokenStore {
         tokenStore.put(id, token);
     }
 
-    public String getToekn(UUID id) {
+    public String getToken(UUID id) {
+        System.out.println(tokenStore.keySet());
         return tokenStore.get(id);
     }
 

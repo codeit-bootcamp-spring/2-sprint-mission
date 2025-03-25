@@ -4,12 +4,13 @@ import com.sprint.mission.discodeit.dto.create.CreateServerRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.Valid.InvalidTokenException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.ServerRepository;
 import com.sprint.mission.discodeit.repository.TokenStore;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ServerService;
-import com.sprint.mission.discodeit.util.CommonUtils;
+import com.sprint.mission.discodeit.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -19,9 +20,10 @@ import java.util.UUID;
 @Repository
 @RequiredArgsConstructor
 public class BasicServerService implements ServerService {
+    private final TokenStore tokenStore;
+    private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final ServerRepository serverRepository;
-    private final TokenStore tokenStore;
 
     @Override
     public void reset(boolean adminAuth) {
@@ -33,8 +35,9 @@ public class BasicServerService implements ServerService {
     @CustomLogging
     @Override
     public Server create(CreateServerRequestDTO createServerRequestDTO) {
-        String toekn = tokenStore.getToekn(createServerRequestDTO.userId());
-        CommonUtils.checkValidToken(toekn);
+        System.out.println(createServerRequestDTO.userId());
+        String toekn = tokenStore.getToken(createServerRequestDTO.userId());
+        checkValidToken(toekn);
 
         User owner = userRepository.findById(createServerRequestDTO.userId());
         Server server = new Server(owner.getId(), createServerRequestDTO.name());
@@ -70,8 +73,9 @@ public class BasicServerService implements ServerService {
 
     @Override
     public List<Server> findServerAll(UUID userId) {
-        String toekn = tokenStore.getToekn(userId);
-        CommonUtils.checkValidToken(toekn);
+        System.out.println("TokenStore 조회 요청 userId: " + userId);
+        String toekn = tokenStore.getToken(userId);
+        checkValidToken(toekn);
 
         List<Server> serverList = serverRepository.findAllByUserId(userId);
         return serverList;
@@ -80,8 +84,8 @@ public class BasicServerService implements ServerService {
 
     @Override
     public UUID update(UUID serverId, UUID userId, UpdateServerRequestDTO updateServerRequestDTO) {
-        String toekn = tokenStore.getToekn(userId);
-        CommonUtils.checkValidToken(toekn);
+        String toekn = tokenStore.getToken(userId);
+        checkValidToken(toekn);
 
         Server server = serverRepository.findById(serverId);
         Server update = serverRepository.update(server, updateServerRequestDTO);
@@ -91,10 +95,16 @@ public class BasicServerService implements ServerService {
 
     @Override
     public void delete(UUID serverId, UUID userId) {
-        String toekn = tokenStore.getToekn(userId);
-        CommonUtils.checkValidToken(toekn);
+        String toekn = tokenStore.getToken(userId);
+        checkValidToken(toekn);
 
         serverRepository.remove(serverId);
     }
 
+    private void checkValidToken(String token) {
+        Boolean validated = jwtUtil.validateToken(token);
+        if (!validated) {
+            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
+        }
+    }
 }

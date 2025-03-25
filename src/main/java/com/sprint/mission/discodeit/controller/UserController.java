@@ -59,8 +59,9 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResultDTO> login(@RequestBody UserLoginRequestDTO userLoginDTO) {
-        String token = authService.loginUser(userLoginDTO);
-        return ResponseEntity.ok(new LoginResultDTO(true, token));
+        LoginResultDTO loginResultDTO = authService.loginUser(userLoginDTO);
+        System.out.println("전달 토큰 : " + loginResultDTO.token());
+        return ResponseEntity.ok(loginResultDTO);
     }
 
     @GetMapping("/findAll")

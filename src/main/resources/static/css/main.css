@@ -36,6 +36,7 @@ a {
     font-weight: bold;
 }
 
+/* 일반 링크 hover 효과 */
 a:hover {
     background-color: #0056b3;
 }
@@ -48,4 +49,18 @@ a[href="/"] {
 
 a[href="/"]:hover {
     background-color: #5a6268;
+}
+
+/* 서버 관리 버튼 wrapper */
+#serverLinkWrapper {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#serverLinkWrapper a {
+    background-color: #28a745;
+}
+
+#serverLinkWrapper a:hover {
+    background-color: #218838;
 }

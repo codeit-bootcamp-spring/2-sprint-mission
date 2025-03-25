@@ -9,17 +9,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.UUID;
 
 @Controller
-@RequestMapping("/users/{userId}/servers")
 public class ServerPageController {
-    @GetMapping
-    public String getServerPage(@PathVariable UUID userId, Model model) {
-        model.addAttribute("userId", userId);
-        return "servers";
+    @GetMapping("/server-index")
+    public String getServerIndexPage() {
+        return "server-index";
     }
 
-    @GetMapping("/create")
-    public String getCreateServerForm(@PathVariable UUID userId, Model model) {
-        model.addAttribute("userId", userId);
-        return "create-server";
+    @GetMapping("/server-create")
+    public String getCreateServerForm() {
+        return "server-create";
+    }
+
+    @GetMapping("/servers")
+    public String getServersPage() {
+        return "servers";
     }
 }

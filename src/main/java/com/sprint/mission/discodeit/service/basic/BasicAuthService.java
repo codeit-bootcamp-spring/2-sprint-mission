@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.result.LoginResultDTO;
 import com.sprint.mission.discodeit.dto.update.UserLoginRequestDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFound.UserNotFoundException;
@@ -25,7 +26,7 @@ public class BasicAuthService implements AuthService {
 
     @CustomLogging
     @Override
-    public String loginUser(UserLoginRequestDTO requestDTO) {
+    public LoginResultDTO loginUser(UserLoginRequestDTO requestDTO) {
         List<User> list = userRepository.findAll();
         User user = CommonUtils.findByName(list, requestDTO.userName(), User::getName)
                 .orElseThrow(() -> new UserNotFoundException("로그인 실패: 해당 유저를 찾지 못했습니다."));
@@ -35,6 +36,6 @@ public class BasicAuthService implements AuthService {
         }
         String token = jwtUtil.generateToken(user.getId().toString());
         tokenStore.save(user.getId(), token);
-        return token;
+        return new LoginResultDTO(user.getId(), token);
     }
 }

@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.dto.result;
 
+import java.util.UUID;
+
 public record LoginResultDTO(
-        boolean success,
+        UUID id,
         String token
 ) {
 }

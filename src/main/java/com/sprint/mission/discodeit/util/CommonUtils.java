@@ -26,12 +26,4 @@ public class CommonUtils {
     public static <T> void checkUserDuplicate(List<T> list, String data, Function<T, String> function) {
         list.stream().filter(t->function.apply(t).equals(data)).findFirst().ifPresent(t -> {throw new DuplicateUserException("중복된 유저가 존재합니다.");});
     }
-
-    public static void checkValidToken(String token) {
-        JwtUtil jwtUtil = new JwtUtil();
-        Boolean validated = jwtUtil.validateToken(token);
-        if (!validated) {
-            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
-        }
-    }
 }
