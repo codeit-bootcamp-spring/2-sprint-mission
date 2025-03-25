@@ -18,7 +18,7 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.FilePath.IMAGE_STORAGE_DIRECTORY;
 import static com.sprint.mission.discodeit.constant.FilePath.JPG_EXTENSION;
-import static com.sprint.mission.util.FileUtils.init;
+import static com.sprint.mission.util.FileUtils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -62,22 +62,5 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         deleteImageFileFromPath(Path.of(binaryContent.getPath()));
         binaryContentRepository.delete(id);
-    }
-
-    private void deleteImageFileFromPath(Path imageFilePath) {
-        try {
-            Files.deleteIfExists(imageFilePath);
-        } catch (IOException e) {
-            throw new UncheckedIOException("프로필이미지 파일을 삭제할 수 없습니다.", e);
-        }
-    }
-
-    private void saveImageFileToPath(MultipartFile multipartFile, Path imageFilePath) {
-        try {
-            init(imageFilePath);
-            Files.write(imageFilePath, multipartFile.getBytes());
-        } catch (IOException e) {
-            throw new UncheckedIOException("프로필이미지 파일을 저장할 수 없습니다.", e);
-        }
     }
 }

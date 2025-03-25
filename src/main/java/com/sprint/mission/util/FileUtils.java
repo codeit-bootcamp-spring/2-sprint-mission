@@ -1,5 +1,7 @@
 package com.sprint.mission.util;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,6 +42,23 @@ public final class FileUtils {
         }
 
         creatDirectory(parentDir);
+    }
+
+    public static void deleteImageFileFromPath(Path imageFilePath) {
+        try {
+            Files.deleteIfExists(imageFilePath);
+        } catch (IOException e) {
+            throw new UncheckedIOException("프로필이미지 파일을 삭제할 수 없습니다.", e);
+        }
+    }
+
+    public static void saveImageFileToPath(MultipartFile multipartFile, Path imageFilePath) {
+        try {
+            init(imageFilePath);
+            Files.write(imageFilePath, multipartFile.getBytes());
+        } catch (IOException e) {
+            throw new UncheckedIOException("프로필이미지 파일을 저장할 수 없습니다.", e);
+        }
     }
 
     private static <U, T> Map<U, T> deserializeFromFile(Path filePath) {
