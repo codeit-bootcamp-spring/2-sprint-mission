@@ -1,7 +1,7 @@
-package main.com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
-import main.com.sprint.mission.discodeit.entity.User;
-import main.com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
@@ -25,8 +25,12 @@ public class JCFUserService implements UserService {
         return Optional.ofNullable(userList).orElse(Collections.emptyList());
     }
     @Override
-    public Optional<User> getOneUser(UUID id){
-        return Optional.ofNullable(usermap.get(id));
+    public User getOneUser(UUID id){
+        User user = usermap.get(id);
+        if (user == null) {
+            throw new NoSuchElementException("User not found with id: " + id);
+        }
+        return user;
     }
     // Update - 수정
 

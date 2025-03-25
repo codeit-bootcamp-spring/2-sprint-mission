@@ -1,7 +1,10 @@
-package main.com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity;
+
+import java.io.Serializable;
 
 // 채팅방을 관리하는 클래스
-public class Channel extends BaseEntity {
+public class Channel extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 10L;
     // 채널 이름
     private String name;
     // 채널 주제

@@ -1,6 +1,6 @@
-package main.com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service;
 
-import main.com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Channel;
 
 import java.util.List;
 import java.util.Optional;
