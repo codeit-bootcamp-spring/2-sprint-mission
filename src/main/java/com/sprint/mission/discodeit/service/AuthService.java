@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -14,16 +15,18 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserDto login(String email, String password) {
         Optional<User> optionalUser = userRepository.findAll().stream()
-                .filter(user -> user.getEmail().equals(email) &&
-                        user.getPassword().equals(password))
+                .filter(user -> user.getEmail().equals(email))
                 .findFirst();
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            return UserDto.fromUser(user, new UserStatus(user.getId(), Status.ONLINE ));
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                return UserDto.fromUser(user, new UserStatus(user.getId(), Status.ONLINE));
+            }
         }
         throw new IllegalArgumentException("Invalid email or password.");
     }
