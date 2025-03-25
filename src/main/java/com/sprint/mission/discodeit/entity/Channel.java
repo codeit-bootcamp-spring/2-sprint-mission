@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-
 @Getter
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -26,16 +25,6 @@ public class Channel implements Serializable {
         this.name = name;
         this.description = description;
     }
-
-    public Channel(ChannelType type) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.type = type;
-        this.name = "anonymity";
-        this.description = "anonymity";
-    }
-
-
 
     public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;

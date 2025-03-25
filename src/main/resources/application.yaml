@@ -1,4 +1,8 @@
+spring:
+  application:
+    name: discodeit
+
 discodeit:
   repository:
-    type: jcf   # jcf | file
-    file-directory: .discodeit  # FileRepository가 사용할 디렉토리
+    type: file   # jcf | file
+    file-directory: .discodeit

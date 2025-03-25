@@ -2,43 +2,50 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFBinaryContentRepository implements BinaryContentRepository {
-    private final Map<UUID, BinaryContent> storage = new ConcurrentHashMap<>();
+    private final Map<UUID, BinaryContent> data;
+
+    public JCFBinaryContentRepository() {
+        this.data = new HashMap<>();
+    }
 
     @Override
-    public BinaryContent save(BinaryContent entity) {
-        if (entity.getId() == null) {
-            entity.setId(UUID.randomUUID());
-        }
-        storage.put(entity.getId(), entity);
-        return entity;
+    public BinaryContent save(BinaryContent binaryContent) {
+        this.data.put(binaryContent.getId(), binaryContent);
+        return binaryContent;
     }
 
     @Override
     public Optional<BinaryContent> findById(UUID id) {
-        return Optional.ofNullable(storage.get(id));
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public List<BinaryContent> findAllById(List<UUID> ids) {
-        return StreamSupport.stream(ids.spliterator(), false)
-                .map(storage::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+    public Optional<BinaryContent> findByFilename(String filename) {
+        return Optional.ofNullable(this.data.get(UUID.fromString(filename)));
     }
 
+    @Override
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        return this.data.values().stream()
+                .filter(content -> ids.contains(content.getId()))
+                .toList();
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
 
     @Override
     public void deleteById(UUID id) {
-        storage.remove(id);
+        this.data.remove(id);
     }
 }
