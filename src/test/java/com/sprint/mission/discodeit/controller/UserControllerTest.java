@@ -89,7 +89,6 @@ class UserControllerTest {
         assertThat(userResponse.isLogin()).isFalse();
     }
 
-
     @DisplayName("사용자 프로필 이미지를 업데이트하면 변경된 이미지 정보가 반영된다.")
     @Test
     void updateProfileImage() throws IOException {

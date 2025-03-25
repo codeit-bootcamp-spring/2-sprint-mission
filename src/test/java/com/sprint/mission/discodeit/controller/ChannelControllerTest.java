@@ -82,7 +82,7 @@ class ChannelControllerTest {
         assertThat(channelIds).containsExactlyInAnyOrder(userPrivateChannel.id(), userPublicChannel.id());
     }
 
-    @DisplayName("Private채널에 맴퍼를 추가한다")
+    @DisplayName("Private채널에 맴버를 추가한다")
     @Test
     void findByIdPrivateChannel_MemberTogether() {
         UserDto otherUser = userService.register(new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);

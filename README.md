@@ -382,9 +382,9 @@ public static void main(String[]args){
 
 - [ ] 로직이 어디까지 컨트롤러에 있고 서비스에 있어야되는가
 - [ ] 스프링테스트와 통합테스트 공부
-- [x] 채널 생성시 private과 public 완전 분리하기
-- [x] 채널 등록시 멤버들도 같이 등록하기
 - [ ] FileRepository에 Path Setter없애기
+- [ ] 바이너리 Path -> URL로 변경
+- [ ] 채널 조회에 컨트롤러러 인터페이스 표시 부분 잘 동작하나 확인하기
 
 ### 파일 저장소 미션
 
