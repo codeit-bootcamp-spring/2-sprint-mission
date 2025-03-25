@@ -1,37 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Channel extends Entity {
-    private String name;
+@Getter
+public class Channel implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
     private ChannelType type;
+    private String name;
     private String description;
 
-    public Channel(UUID uuid, String name, ChannelType type, String description) {
-        super();
-        this.name = name;
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.type = type;
+        this.name = name;
         this.description = description;
     }
 
-    public String getName() { return name; }
-    public void updateName(String name) {
-        if(name!=null) {
-            this.name = name;
-            this.updatedAt = System.currentTimeMillis();
-        }else return;;
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
 
-    }
-    public ChannelType getType() { return type; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) {
-        if(description!=null) {
-            this.description = description;
-        }else return;;
-    }
-    public void setType(ChannelType type) {
-        if(type!=null) {
-            this.type = type;
-        }else return;;
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }

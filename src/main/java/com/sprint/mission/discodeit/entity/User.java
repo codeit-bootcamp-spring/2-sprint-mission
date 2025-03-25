@@ -1,41 +1,55 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.Date;
+import lombok.Getter;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class User extends Entity {
+@Getter
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
     private String username;
-    private String password;
     private String email;
+    private String password;
+    private UUID profileId;     // BinaryContent
 
-    public User(UUID uuid, String username, String password, String email) {
-        super();
+    public User(String username, String email, String password, UUID profileId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.username = username;
-        this.password = password;
         this.email = email;
-
+        this.password = password;
+        this.profileId = profileId;
     }
 
-    public String getUsername() { return username; }
-    public void updateUsername(String username) {
-        if(username != null){
-            this.username = username;
-            this.updatedAt = System.currentTimeMillis();
-        }else return;
-    }
-    public void setPassword(String password) {
-        if(password != null){
-            this.password = password;
-            this.updatedAt = System.currentTimeMillis();
-        }else return;;
+    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
+            anyValueUpdated = true;
+        }
 
-    }
-    public String getPassword() { return password; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) {
-        if(email != null){
-            this.email = email;
-            this.updatedAt = System.currentTimeMillis();
-        }else return;;
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
