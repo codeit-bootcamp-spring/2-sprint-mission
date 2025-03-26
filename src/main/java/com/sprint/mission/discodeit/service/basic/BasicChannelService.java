@@ -143,7 +143,8 @@ public class BasicChannelService implements ChannelService {
             throw new IllegalArgumentException("비공개 채널은 수정할 수 없습니다.");
         }
 
-        channelRepository.updateChannelChannelName(channelUpdateParamDto.channelUUID(), channelUpdateParamDto.channelName());
+        channel.updateChannelName(channelUpdateParamDto.channelName());
+        channelRepository.save(channel);
     }
 
     @Override
@@ -161,6 +162,6 @@ public class BasicChannelService implements ChannelService {
 
         messageRepository.deleteMessageById(channelUUID);
 
-        channelRepository.deleteChannelById(channelUUID);
+        channelRepository.delete(channelUUID);
     }
 }

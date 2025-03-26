@@ -36,16 +36,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel updateChannelChannelName(UUID channelUUID, String channelName) {
-        Channel channel = findChannelById(channelUUID)
-                .orElseThrow(() -> new IllegalArgumentException("채널 찾을 수 없습니다.: " + channelUUID));
-        channel.updateChannelName(channelName);
-        fileManager.writeToFile(SubDirectory.CHANNEL, channel, channel.getId());
-        return channel;
-    }
-
-    @Override
-    public boolean deleteChannelById(UUID channelUUID) {
-        return fileManager.deleteFileById(SubDirectory.CHANNEL, channelUUID);
+    public void delete(UUID channelUUID) {
+        fileManager.deleteFileById(SubDirectory.CHANNEL, channelUUID);
     }
 }
