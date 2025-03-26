@@ -6,7 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFMessageRepository implements MessageRepository {
 
     private final Map<UUID, Message> data;
@@ -32,14 +36,14 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findByChannelId(UUID channelId) {
+    public List<Message> findAllByChannelId(UUID channelId) {
         return data.values().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .toList();
     }
 
     @Override
-    public List<Message> findByAuthorId(UUID authorId) {
+    public List<Message> findAllByAuthorId(UUID authorId) {
         return data.values().stream()
                 .filter(message -> message.getAuthorId().equals(authorId))
                 .toList();
