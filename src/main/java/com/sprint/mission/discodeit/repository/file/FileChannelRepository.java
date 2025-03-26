@@ -2,34 +2,32 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
-    private static final FileChannelRepository instance = new FileChannelRepository();
-    private static final String FILE_PATH = "channels.ser";
+    private final String filePath;
     private final Map<UUID, Channel> data;
 
-    private FileChannelRepository() {
+    public FileChannelRepository(@Value("${discodeit.repository.file-directory}") String baseDir) {
+        this.filePath = baseDir + "/channels.ser";
         this.data = loadData();
     }
 
-    public static FileChannelRepository getInstance() {
-        return instance;
-    }
-
-    public void saveData() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+    public void saveData() throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(data);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
     public Map<UUID, Channel> loadData() {
-        File file = new File(FILE_PATH);
+        File file = new File(filePath);
         if (!file.exists()) {
             return new HashMap<>();
         }
@@ -44,7 +42,11 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void save(Channel channel) {
         data.put(channel.getId(), channel);
-        saveData();
+        try {
+            saveData();
+        } catch (IOException e) {
+            throw new RuntimeException("채널 저장 중 오류 발생", e);
+        }
     }
 
     @Override
@@ -60,6 +62,10 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void deleteChannel(UUID ChannelId) {
         data.remove(ChannelId);
-        saveData();
+        try {
+            saveData();
+        } catch (IOException e) {
+            throw new RuntimeException("채널 삭제 후 저장 중 오류 발생", e);
+        }
     }
 }
