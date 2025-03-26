@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public interface UserService {
     // CRUD(생성, 읽기, 모두 읽기, 수정, 삭제)
-    User createUser(UUID userId, CreateUserRequest request); //유저 생성
+    User createUser(CreateUserRequest request); //유저 생성
 
     UserInfoDto getUserById(UUID userId); //유저 조회(UUID)
 

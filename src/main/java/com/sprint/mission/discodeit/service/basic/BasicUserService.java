@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.CreateUserDto;
-import com.sprint.mission.discodeit.dto.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.UserInfoDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,23 +34,20 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User createUser(CreateUserDto dto) {
-        if (userRepository.existsByEmail(dto.getEmail())) {
+    public User createUser(CreateUserRequest request) {
+        String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
+
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("이미 존재하는 Email입니다");
         }
-        if (userRepository.existsByUsername(dto.getUsername())) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("이미 존재하는 Username입니다");
         }
 
-        User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword());
+        User user = new User(request.getUsername(), request.getEmail(), hashedPassword);
         userRepository.addUser(user);
         userStatusRepository.addUserStatus(new UserStatus(user.getId()));
 
-        String filePath = dto.getProfilePicturePath();
-        if (filePath != null) {
-            BinaryContent profile = new BinaryContent(user.getId(), filePath);
-            binaryContentRepository.addBinaryContent(profile);
-        }
         return user;
     }
 
@@ -86,23 +84,23 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateUser(UpdateUserDto dto) {
-        validateUserExists(dto.getUserid());
-        User user = userRepository.findUserById(dto.getUserid());
-
-        if (dto.getUsername() != null) user.updateUsername(dto.getUsername());
-        if (dto.getPassword() != null) user.updatePassword(dto.getPassword());
-        if (dto.getEmail() != null) user.updateEmail(dto.getEmail());
-        String filePath = dto.getProfilePicturePath();
-        if (filePath != null) {
-            BinaryContent profile = new BinaryContent(user.getId(), filePath);
-            binaryContentRepository.addBinaryContent(profile);
-        }
+    public void updateProfile(UUID userId, UUID profileId) {
+        userRepository.findUserById(userId).updateProfile(profileId);
     }
 
     @Override
-    public void addChannel(UUID userID, UUID channelId) {
-        User user = userRepository.findUserById(userID);
+    public void updateUser(UUID userId, UpdateUserRequest request) {
+        validateUserExists(userId);
+        User user = userRepository.findUserById(userId);
+
+        if (request.getUsername() != null) user.updateUsername(request.getUsername());
+        if (request.getPassword() != null) user.updatePassword(request.getPassword());
+        if (request.getEmail() != null) user.updateEmail(request.getEmail());
+    }
+
+    @Override
+    public void addChannel(UUID userId, UUID channelId) {
+        User user = userRepository.findUserById(userId);
         user.addJoinedChannel(channelId);
         saveUser();
     }
@@ -111,7 +109,7 @@ public class BasicUserService implements UserService {
     public void deleteUser(UUID userId) {
         userRepository.deleteUserById(userId);
         userStatusRepository.deleteUserStatusById(userId);
-        binaryContentRepository.deleteBinaryContent(userId);
+        binaryContentRepository.deleteBinaryContentById(userId);
     }
 
     @Override

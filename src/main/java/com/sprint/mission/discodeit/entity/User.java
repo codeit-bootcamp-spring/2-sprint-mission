@@ -16,6 +16,7 @@ public class User extends BaseEntity implements Serializable {
     private String password;
     private UUID profileId;
 
+
     public User(String username, String email, String password) {
         super();
         this.username = username;
@@ -43,6 +44,10 @@ public class User extends BaseEntity implements Serializable {
         this.joinedChannels.add(channelId);
         updateTimestamp();
 
+    }
+
+    public void updateProfile(UUID profileId) {
+        this.profileId = profileId;
     }
 
     public void removeJoinedChannel(UUID channelId) {
