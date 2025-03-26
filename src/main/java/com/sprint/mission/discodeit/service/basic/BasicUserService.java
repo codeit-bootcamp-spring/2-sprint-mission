@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.service.binaryContent.CreateBinaryConten
 import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
+import com.sprint.mission.discodeit.dto.service.userStatus.UserStatusDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -14,6 +15,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.util.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
+    private final UserStatusService userStatusService;
     private final BinaryContentService binaryContentService;
 
 
@@ -48,15 +50,14 @@ public class BasicUserService implements UserService {
         User user = createUserEntity(createUserParam, binaryContent);
         userRepository.save(user);
         UserStatus userStatus = new UserStatus(user.getId());
-        userStatusRepository.save(userStatus);
+        userStatusService.create(userStatus);
         return UserMapper.userEntityToDTO(user, userStatus);
     }
 
     @Override
     public UserDTO find(UUID userId) {
         User findUser = findUserById(userId);
-        UserStatus findUserStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> RestExceptions.USER_STATUS_NOT_FOUND);
+        UserStatus findUserStatus = userStatusService.findById(userId);
         return UserMapper.userEntityToDTO(findUser, findUserStatus);
     }
 
@@ -66,7 +67,7 @@ public class BasicUserService implements UserService {
         // UserDTO에 isLogin 정보를 담기 위함
         // UserStatusMap을 만들고, User와 해당하는 UserStatus 객체를 userEntityToDTO 메서드에 넘겨줌
         // userEntityDTO에서 userStatus.isLoginUser() 메서드를 실행시켜 isLogin에 대한 정보를 생성
-        Map<UUID, UserStatus> userStatusMap = userStatusRepository.findAll().stream()
+        Map<UUID, UserStatus> userStatusMap = userStatusService.findAll().stream()
                 .collect(Collectors.toMap(userStatus -> userStatus.getUserId(), userStatus -> userStatus));
         return users.stream()
                 .map(user -> UserMapper.userEntityToDTO(user, userStatusMap.get(user.getId())))
@@ -98,7 +99,7 @@ public class BasicUserService implements UserService {
         if (!user.getProfileId().equals(User.DEFAULT_PROFILE_ID)) {
            binaryContentService.delete(user.getProfileId());
         }
-        userStatusRepository.deleteByUserId(userId);
+        userStatusService.delete(userId);
     }
 
     private void validateUserField(CreateUserParam createUserParam) {

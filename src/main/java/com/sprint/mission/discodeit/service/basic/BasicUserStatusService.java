@@ -21,26 +21,22 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserStatusDTO create(CreatedUserStatusParam createdUserStatusParam) {
-        checkUserExists(createdUserStatusParam);
-        checkDuplicateUser(createdUserStatusParam);
-        UserStatus userStatus = createUserStatusEntity(createdUserStatusParam);
-        userStatusRepository.save(userStatus);
-        return userStatusEntityToDTO(userStatus);
+    public UserStatus create(UserStatus userStatus) {
+        checkUserExists(userStatus);
+        checkDuplicateUser(userStatus);
+        return userStatusRepository.save(userStatus);
     }
 
     @Override
-    public UserStatusDTO findById(UUID id) {
+    public UserStatus findById(UUID id) {
         UserStatus userStatus = findUserStatusById(id);
-        return userStatusEntityToDTO(userStatus);
+        return userStatus;
     }
 
     @Override
-    public List<UserStatusDTO> findAll() {
+    public List<UserStatus> findAll() {
         List<UserStatus> userStatuses = userStatusRepository.findAll();
-        return userStatuses.stream()
-                .map(us -> userStatusEntityToDTO(us))
-                .toList();
+        return userStatuses;
     }
 
     @Override
@@ -63,26 +59,17 @@ public class BasicUserStatusService implements UserStatusService {
         userStatusRepository.deleteById(id);
     }
 
-    private void checkUserExists(CreatedUserStatusParam createdUserStatusParam) {
-        userRepository.findById(createdUserStatusParam.userId())
+    private void checkUserExists(UserStatus userStatus) {
+        userRepository.findById(userStatus.getUserId())
                 .orElseThrow(() -> RestExceptions.USER_NOT_FOUND);
     }
 
-    private void checkDuplicateUser(CreatedUserStatusParam createdUserStatusParam) {
-        if (userStatusRepository.existsByUserId(createdUserStatusParam.userId())) {
+    private void checkDuplicateUser(UserStatus userStatus) {
+        if (userStatusRepository.existsByUserId(userStatus.getUserId())) {
             throw RestExceptions.DUPLICATE_USER_STATUS;
         }
     }
 
-    private UserStatus createUserStatusEntity(CreatedUserStatusParam createdUserStatusParam) {
-        return UserStatus.builder()
-                .userId(createdUserStatusParam.userId())
-                .build();
-    }
-
-    private UserStatusDTO userStatusEntityToDTO(UserStatus userStatus) {
-        return new UserStatusDTO(userStatus.getId(), userStatus.getUserId(), userStatus.getCreatedAt(), userStatus.getUpdatedAt());
-    }
 
     private UserStatus findUserStatusById(UUID id) {
         return userStatusRepository.findById(id)
