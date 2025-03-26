@@ -40,7 +40,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     public void save(User user) {
         Map<UUID, User> users = loadAll();
         if (users.containsKey(user.getId())) {
-            System.out.println("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + user.getId());
+            throw new IllegalArgumentException("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + user.getId());
         } else {
             users.put(user.getId(), user);
             writeToFile(users);

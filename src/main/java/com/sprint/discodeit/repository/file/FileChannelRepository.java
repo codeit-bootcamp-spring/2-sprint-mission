@@ -36,7 +36,7 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
     public void save(Channel channel) {
         Map<UUID, Channel> channelMap = loadAll();
         if (channelMap.containsKey(channel.getId())) {
-            System.out.println("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + channel.getId());
+            throw new IllegalArgumentException("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + channel.getId());
         }
         channelMap.put(channel.getId(), channel);
         writeToFile(channelMap);

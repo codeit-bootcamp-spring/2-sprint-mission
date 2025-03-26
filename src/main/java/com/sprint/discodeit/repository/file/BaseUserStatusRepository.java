@@ -45,7 +45,7 @@ public class BaseUserStatusRepository extends AbstractFileRepository<UserStatus>
     public void save(UserStatus userStatus) {
         Map<UUID, UserStatus> userStatusMap = loadAll();
         if (userStatusMap.containsKey(userStatus.getId())) {
-            System.out.println("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + userStatus.getId());
+            throw new IllegalArgumentException("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + userStatus.getId());
         }
         userStatusMap.put(userStatus.getId(), userStatus);
         writeToFile(userStatusMap);

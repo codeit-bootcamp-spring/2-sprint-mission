@@ -22,7 +22,7 @@ public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> imp
     public void save(ReadStatus readStatus) {
         Map<UUID, ReadStatus> readStatusMap = loadAll();
         if (readStatusMap.containsKey(readStatus.getId())) {
-            System.out.println("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + readStatus.getId());
+            throw new IllegalArgumentException("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + readStatus.getId());
         } else {
             readStatusMap.put(readStatus.getId(), readStatus);
             writeToFile(readStatusMap);

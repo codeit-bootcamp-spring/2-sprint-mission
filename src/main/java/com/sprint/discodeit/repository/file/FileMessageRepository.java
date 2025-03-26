@@ -34,7 +34,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
     public void save(Message message) {
         Map<UUID, Message> messageMap = loadAll();
         if (messageMap.containsKey(message.getId())) {
-            System.out.println("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + message.getId());
+            throw new IllegalArgumentException("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + message.getId());
         } else {
             messageMap.put(message.getId(), message);
             writeToFile(messageMap);

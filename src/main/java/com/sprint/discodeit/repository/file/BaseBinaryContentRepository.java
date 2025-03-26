@@ -23,7 +23,7 @@ public class BaseBinaryContentRepository extends AbstractFileRepository<BinaryCo
     public void save(BinaryContent binaryContent) {
         Map<UUID, BinaryContent> binaryContentMap = loadAll();
         if (binaryContentMap.containsKey(binaryContent.getId())) {
-            System.out.println("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + binaryContent.getId());
+            throw new IllegalArgumentException("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + binaryContent.getId());
         } else {
             binaryContentMap.put(binaryContent.getId(), binaryContent);
             writeToFile(binaryContentMap);
