@@ -1,6 +1,6 @@
 spring:
   application:
-    name:discodeit
+    name: discodeit
 
 discodeit:
   repository:

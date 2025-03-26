@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-@ConditionalOnProperty(name = "repository.type", havingValue = "jcf", matchIfMissing = true)
+@ConditionalOnProperty(name = "repository.type", havingValue = "jcf")
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data;
 
@@ -23,10 +23,8 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-        Channel channelNullable = this.data.get(channelId);
-        return Optional.ofNullable(channelNullable)
-                .orElseThrow(()-> new NoSuchElementException("Channel with id " + channelId + " not found"));
+    public Optional<Channel> findById(UUID channelId) {
+        return Optional.ofNullable(this.data.get(channelId));
     }
 
     @Override
@@ -49,11 +47,6 @@ public class JCFChannelRepository implements ChannelRepository {
             throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
         this.data.remove(channelId);
-    }
-
-    @Override
-    public boolean exists(UUID channelId) {
-        return this.data.containsKey(channelId);
     }
 
     @Override

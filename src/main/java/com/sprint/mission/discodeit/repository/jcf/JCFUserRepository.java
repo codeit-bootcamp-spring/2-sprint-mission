@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-@ConditionalOnProperty(name = "repository.type", havingValue = "jcf", matchIfMissing = true)
+@ConditionalOnProperty(name = "repository.type", havingValue = "jcf")
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;
 

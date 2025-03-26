@@ -34,10 +34,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelDetailsDto createPrivateChannel(CreatePrivateChannelDto dto) {
-        Channel newChannel = new Channel(ChannelType.PRIVATE, null, null); // name과 description 생략
+        Channel newChannel = new Channel(ChannelType.PRIVATE, null, null);
         newChannel = channelRepository.save(newChannel);
 
-        // ReadStatus 생성 및 저장
         for (UUID userId : dto.userIds()) {
             ReadStatus readStatus = new ReadStatus(userId, newChannel.getId());
             readStatusRepository.save(readStatus);
@@ -48,7 +47,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelDetailsDto find(UUID channelId) {
-        Channel channel = channelRepository.findById(channelId);
+        Channel channel = channelRepository.findById(channelId).orElseThrow();
 
         Instant latestMessageTime = messageRepository.findLatestMessageTimeByChannelId(channelId);
 
@@ -82,14 +81,14 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void update(UUID channelId, String newName, String newDescription) {
-        Channel existingChannel = channelRepository.findById(channelId);
+        Channel existingChannel = channelRepository.findById(channelId).orElseThrow();
 
         if (existingChannel.getType() == ChannelType.PRIVATE) {
             throw new UnsupportedOperationException("PRIVATE 채널은 수정할 수 없습니다.");
         }
 
         existingChannel.update(newName, newDescription);
-        channelRepository.update(existingChannel);
+        channelRepository.save(existingChannel);
     }
 
     @Override
