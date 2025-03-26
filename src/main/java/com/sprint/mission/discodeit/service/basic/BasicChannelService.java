@@ -31,14 +31,14 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
 
     @Override
-    public Channel createPublicChannel(PublicChannelCreateRequest requestDto) {
-        Channel channel = new Channel(ChannelType.PUBLIC, requestDto.name(), requestDto.description());
+    public Channel createPublicChannel(PublicChannelCreateRequest request) {
+        Channel channel = new Channel(ChannelType.PUBLIC, request.name(), request.description());
         return channelRepository.save(channel);
     }
 
     @Override
-    public Channel createPrivateChannel(PrivateChannelCreateRequest requestDto) {
-        List<UUID> participantIds = requestDto.participantIds();
+    public Channel createPrivateChannel(PrivateChannelCreateRequest request) {
+        List<UUID> participantIds = request.participantIds();
         validateParticipantExistence(participantIds);
 
         Channel channel = new Channel(ChannelType.PRIVATE);
@@ -82,15 +82,15 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(ChannelUpdateRequest requestDto) {
-        Channel channel = channelRepository.findById(requestDto.id())
+    public Channel update(ChannelUpdateRequest request) {
+        Channel channel = channelRepository.findById(request.id())
                 .orElseThrow(() -> new NoSuchElementException("해당 채널 없음"));
 
         if (channel.getType() == ChannelType.PRIVATE) {
             throw new IllegalArgumentException("PRIVATE 채널 수정 불가");
         }
 
-        channel.update(requestDto.name(), requestDto.description());
+        channel.update(request.name(), request.description());
         return channelRepository.save(channel);
     }
 

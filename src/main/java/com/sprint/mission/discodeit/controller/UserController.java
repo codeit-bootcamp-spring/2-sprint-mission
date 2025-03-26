@@ -67,4 +67,6 @@ public class UserController {
         ApiResponse<UserStatusUpdateResponse> apiResponse = new ApiResponse<>("사용자 온라인 상태 업데이트 성공", response);
         return ResponseEntity.ok(apiResponse);
     }
+
+
 }
