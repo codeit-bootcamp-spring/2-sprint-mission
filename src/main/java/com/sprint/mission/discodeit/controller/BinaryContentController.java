@@ -22,8 +22,8 @@ public class BinaryContentController {
     private final BinaryContentService binaryContentService;
     private final FileStorageService fileStorageService;
 
-    @PostMapping("/upload")
-    public ResponseEntity<ApiResponse<BinaryContentUploadResponse>> upload(@RequestParam("file") MultipartFile file) {
+    @PostMapping("/uploadSingle")
+    public ResponseEntity<ApiResponse<BinaryContentUploadResponse>> uploadSingleFile(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(
                     new ApiResponse<>(false, "파일이 선택되지 않았습니다.", null)
