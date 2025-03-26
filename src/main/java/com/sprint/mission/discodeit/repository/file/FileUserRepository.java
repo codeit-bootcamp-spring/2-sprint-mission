@@ -49,20 +49,8 @@ public class FileUserRepository implements UserRepository {
         return userList;
     }
 
-
-
     @Override
-    public User update(UUID userUUID, String nickname, UUID profileId) {
-        User user = findUserById(userUUID)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다.: " + userUUID));
-        user.updateNickname(nickname);
-        user.updateProfile(profileId);
-        fileManager.writeToFile(SubDirectory.USER, user, user.getId());
-        return user;
-    }
-
-    @Override
-    public boolean deleteUserById(UUID userUUID) {
-        return fileManager.deleteFileById(SubDirectory.USER, userUUID);
+    public void delete(UUID userUUID) {
+        fileManager.deleteFileById(SubDirectory.USER, userUUID);
     }
 }

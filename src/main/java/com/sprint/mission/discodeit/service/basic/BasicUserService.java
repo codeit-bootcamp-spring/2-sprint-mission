@@ -76,7 +76,9 @@ public class BasicUserService implements UserService {
     public void update(UpdateUserParamDto updateUserDto) {
         User user = userRepository.findUserById(updateUserDto.userUUID()).
                 orElseThrow(() -> new NullPointerException("사용자가 존재하지 않습니다."));
-        userRepository.update(updateUserDto.userUUID(), updateUserDto.nickname(), updateUserDto.profileId());
+        user.updateNickname(updateUserDto.nickname());
+        user.updateProfile(updateUserDto.profileId());
+        userRepository.save(user);
     }
 
     @Override
@@ -90,6 +92,6 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자 상태 오류"));
 
         userStatusRepository.delete(userStatus.getId());
-        userRepository.deleteUserById(user.getId());
+        userRepository.delete(user.getId());
     }
 }
