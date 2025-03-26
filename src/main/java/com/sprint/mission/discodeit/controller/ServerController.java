@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.dto.create.CreateServerNameDTO;
 import com.sprint.mission.discodeit.dto.create.ServerCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.display.ServerDisplayItem;
 import com.sprint.mission.discodeit.dto.display.ServerDisplayList;
-import com.sprint.mission.discodeit.dto.result.CreateServerResult;
+import com.sprint.mission.discodeit.dto.result.ServerCreateResult;
 import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -24,12 +24,12 @@ public class ServerController {
 
     @PostMapping("/create")
     @ResponseBody
-    public ResponseEntity<CreateServerResult> createServer(@PathVariable UUID userId, @RequestBody CreateServerNameDTO requestDTO) {
+    public ResponseEntity<ServerCreateResult> createServer(@PathVariable UUID userId, @RequestBody CreateServerNameDTO requestDTO) {
 
 
         ServerCreateRequestDTO serverCreateRequestDTO = new ServerCreateRequestDTO(userId, requestDTO.name());
         Server server = serverService.create(serverCreateRequestDTO);
-        return ResponseEntity.ok(new CreateServerResult(server.getServerId()));
+        return ResponseEntity.ok(new ServerCreateResult(server.getServerId()));
     }
 
     @PostMapping("/join/{serverId}")

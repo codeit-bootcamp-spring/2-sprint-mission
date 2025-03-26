@@ -12,31 +12,27 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/readstatus")
+@RequestMapping("/api/{userId}/{channelId}/readstatus")
 public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createReadStatus(@RequestBody ReadStatusCreateRequestDTO requestDTO) {
-        readStatusService.create(requestDTO);
+    public ResponseEntity<ReadStatus> createReadStatus(@PathVariable UUID userId, @PathVariable UUID channelId, @RequestBody ReadStatusCreateRequestDTO requestDTO) {
+        ReadStatus status = readStatusService.create(userId, channelId, requestDTO);
 
-        return ResponseEntity.ok("success");
+        return ResponseEntity.ok(status);
     }
 
-    @PutMapping("/update/{channelId}")
-    public ResponseEntity<String> update(@PathVariable UUID channelId,@RequestBody ReadStatusUpdateRequestDTO requestDTO) {
-        readStatusService.update(channelId, requestDTO);
-        return ResponseEntity.ok("success");
+    @PutMapping("/update")
+    public ResponseEntity<ReadStatus> update(@PathVariable UUID channelId, @RequestBody ReadStatusUpdateRequestDTO requestDTO) {
+        ReadStatus status = readStatusService.update(channelId, requestDTO);
+        return ResponseEntity.ok(status);
     }
 
-    @GetMapping("/find/{userId}")
-    public ResponseEntity<String> find(@PathVariable UUID userId) {
+    @GetMapping("/find")
+    public ResponseEntity<ReadStatus> find(@PathVariable UUID userId) {
         ReadStatus readStatus = readStatusService.findByUserId(userId);
-        if (readStatus != null) {
-            return ResponseEntity.ok("success");
-        } else {
-            return ResponseEntity.status(404).body("fail");
-        }
+        return ResponseEntity.ok(readStatus);
     }
 
 }

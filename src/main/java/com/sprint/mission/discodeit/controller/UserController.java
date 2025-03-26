@@ -4,7 +4,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.create.BinaryContentCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.create.UserCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.display.UserDisplayList;
-import com.sprint.mission.discodeit.dto.result.CreateUserResult;
+import com.sprint.mission.discodeit.dto.result.UserCreateResult;
 import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UserLoginRequestDTO;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -30,7 +30,7 @@ public class UserController {
     private final AuthService authService;
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CreateUserResult> register(
+    public ResponseEntity<UserCreateResult> register(
             @RequestPart("user") UserCreateRequestDTO userCreateRequestDTO,
             @RequestPart(value = "profileImage", required = false) MultipartFile file
     ) throws IOException {
@@ -47,7 +47,7 @@ public class UserController {
 
         UUID id = userService.create(userCreateRequestDTO, binaryContentRequest);
 
-        return ResponseEntity.ok(new CreateUserResult(id));
+        return ResponseEntity.ok(new UserCreateResult(id));
     }
 
     @PostMapping("/login")

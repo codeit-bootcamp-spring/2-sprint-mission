@@ -4,6 +4,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.create.PublicChannelCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.display.ChannelDisplayList;
+import com.sprint.mission.discodeit.dto.result.ChannelCreateResult;
 import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -21,9 +22,9 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @PostMapping("/create")
-    public ResponseEntity<UUID> create(@PathVariable UUID userId,@PathVariable UUID serverId, @RequestBody PublicChannelCreateRequestDTO channelCreateDTO) {
+    public ResponseEntity<ChannelCreateResult> create(@PathVariable UUID userId, @PathVariable UUID serverId, @RequestBody PublicChannelCreateRequestDTO channelCreateDTO) {
         Channel channel = channelService.create(userId, serverId, channelCreateDTO);
-        return ResponseEntity.ok(channel.getChannelId());
+        return ResponseEntity.ok(new ChannelCreateResult(channel.getChannelId()));
     }
 
     @GetMapping
@@ -48,7 +49,7 @@ public class ChannelController {
     }
 
     @PutMapping("/update/{channelId}")
-    public ResponseEntity<UUID> update(@PathVariable UUID userId, @PathVariable UUID channelId, @RequestBody UpdateChannelDTO updateChannelDTO) {
+    public ResponseEntity<UUID> update( @PathVariable UUID channelId, @RequestBody UpdateChannelDTO updateChannelDTO) {
         UUID update = channelService.update(channelId, updateChannelDTO);
         return ResponseEntity.ok(update);
     }
@@ -57,6 +58,5 @@ public class ChannelController {
     public ResponseEntity<String> delete(@PathVariable UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity.ok("Delete successful");
-
     }
 }

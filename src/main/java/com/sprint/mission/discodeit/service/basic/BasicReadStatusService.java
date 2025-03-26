@@ -26,10 +26,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @CustomLogging
     @Override
-    public UUID create(ReadStatusCreateRequestDTO readStatusCreateRequestDTO) {
-        UUID channelId = readStatusCreateRequestDTO.channelId();
-        UUID userId = readStatusCreateRequestDTO.userId();
-
+    public ReadStatus create(UUID userId, UUID channelId, ReadStatusCreateRequestDTO readStatusCreateRequestDTO) {
         //채널, 유저가 있는지 체크
         checkValid(channelId, userId);
 
@@ -39,7 +36,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
         readStatusRepository.save(status);
 
-        return status.getReadStatusId();
+        return status;
     }
 
     @Override
@@ -58,9 +55,10 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public void update(UUID channelId, ReadStatusUpdateRequestDTO requestDTO) {
+    public ReadStatus update(UUID channelId, ReadStatusUpdateRequestDTO requestDTO) {
         ReadStatus readStatus = readStatusRepository.findByChannelId(channelId);
         readStatus.update(requestDTO.newLastReadAt());
+        return readStatus;
     }
 
     @CustomLogging

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.NotFound.MessageNotFoundException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -47,15 +48,13 @@ public class BasicMessageService implements MessageService {
 
         Message message = new Message(user.getId(), user.getName(), channel.getChannelId(), messageWriteDTO.text(),binaryContentIdList);
 
-        messageRepository.save(channel, message);
+        messageRepository.save(message);
         return message;
     }
 
     @Override
     public MessageFindDTO find(UUID messageId) {
-        Message message = messageRepository.find(messageId);
-
-        return MessageFindDTO.create(message);
+        return MessageFindDTO.create(messageRepository.findById(messageId).orElseThrow(()->new MessageNotFoundException("메시지를 찾을 수 없습니다.")));
     }
 
     @Override
@@ -68,7 +67,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public UUID update(UUID messageId, UpdateMessageDTO updateMessageDTO) {
 
-        Message message = messageRepository.find(messageId);
+        Message message = messageRepository.findById(messageId).orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
 
         Message update = messageRepository.update(message, updateMessageDTO);
 
@@ -79,9 +78,9 @@ public class BasicMessageService implements MessageService {
     @Override
     public void delete(UUID messageId) {
 
-        Message message = messageRepository.find(messageId);
+        Message message = messageRepository.findById(messageId).orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
 
-        messageRepository.remove(messageId);
+        messageRepository.deleteById(messageId);
         message.getAttachmentIds().forEach(binaryContentRepository::delete);
     }
 

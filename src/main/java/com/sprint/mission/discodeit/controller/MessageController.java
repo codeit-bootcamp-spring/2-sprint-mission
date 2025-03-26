@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.MessageFindDTO;
 import com.sprint.mission.discodeit.dto.create.BinaryContentCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.create.MessageCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.display.MessageDisplayList;
+import com.sprint.mission.discodeit.dto.result.MessageCreateResult;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -26,7 +27,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Message> create(
+    public ResponseEntity<MessageCreateResult> create(
             @PathVariable UUID userId,@PathVariable UUID channelId,
             @RequestPart("message") MessageCreateRequestDTO messageDTO,
             @RequestPart(value = "profileImage", required = false) List<MultipartFile> files) throws IOException {
@@ -46,7 +47,7 @@ public class MessageController {
         }
 
         Message message = messageService.create(userId, channelId, messageDTO, list);
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(new MessageCreateResult(message.getMessageId()));
     }
 
     @GetMapping
@@ -58,7 +59,7 @@ public class MessageController {
     @PutMapping("/update/{messageId}")
     public ResponseEntity<UUID> update(
             @PathVariable UUID messageId,
-            @RequestParam("message") UpdateMessageDTO updateMessageDTO) {
+            @RequestBody UpdateMessageDTO updateMessageDTO) {
 
         UUID update = messageService.update(messageId, updateMessageDTO);
         return ResponseEntity.ok(update);

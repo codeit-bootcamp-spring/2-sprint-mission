@@ -4,10 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -17,8 +14,8 @@ import java.util.*;
 public class BinaryController {
     private final BinaryContentService binaryContentService;
 
-    @GetMapping("/find")
-    public ResponseEntity<Map<String,String>> findBinaryContent(@RequestParam UUID binaryContentId) {
+    @GetMapping("/find/{binaryContentId}")
+    public ResponseEntity<Map<String,String>> findBinaryContent(@PathVariable UUID binaryContentId) {
         BinaryContent content = binaryContentService.findById(binaryContentId);
 
         if (content == null) {
@@ -34,7 +31,7 @@ public class BinaryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/find/some")
+    @GetMapping("/find/more")
     public ResponseEntity<List<Map<String,String>>> findBinaryContents(@RequestParam List<UUID> binaryContentIds) {
         Map<String, String> tempResponse = new HashMap<>();
         List<Map<String, String>> response = new ArrayList<>();

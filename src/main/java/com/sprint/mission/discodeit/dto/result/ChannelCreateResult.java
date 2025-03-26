@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.dto.result;
 
 import java.util.UUID;
 
-public record CreateServerResult (
+public record ChannelCreateResult(
         UUID id
 ) {
 }

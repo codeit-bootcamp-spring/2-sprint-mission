@@ -11,7 +11,7 @@ import java.util.UUID;
 @Service
 public interface ReadStatusService {
 
-    UUID create(ReadStatusCreateRequestDTO readStatusCreateRequestDTO);
+    ReadStatus create(UUID userId, UUID channelId, ReadStatusCreateRequestDTO readStatusCreateRequestDTO);
 
     ReadStatus find(UUID readStatusId);
 
@@ -19,7 +19,7 @@ public interface ReadStatusService {
 
     List<ReadStatus> findAllByUserId(UUID userId);
 
-    void update(UUID channelId, ReadStatusUpdateRequestDTO requestDTO);
+    ReadStatus update(UUID channelId, ReadStatusUpdateRequestDTO requestDTO);
 
     void delete(UUID readStatusId);
 }
