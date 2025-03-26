@@ -18,7 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/attachments")
 @RequiredArgsConstructor
-public class BinaryContentController {
+public class AttachmentsController {
     private final BinaryContentService binaryContentService;
     private final FileStorageService fileStorageService;
 
