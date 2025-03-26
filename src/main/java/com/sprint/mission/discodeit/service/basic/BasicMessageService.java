@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.UpdateMessageDto;
+import com.sprint.mission.discodeit.dto.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -32,14 +32,14 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(CreateMessageDto dto) {
-        UUID channelId = dto.getChannelId();
-        Message message = new Message(dto.getUserId(), channelId, dto.getContent());
+    public Message createMessage(UUID userId, CreateMessageRequest request) {
+        UUID channelId = request.getChannelId();
+        Message message = new Message(userId, channelId, request.getContent());
 
         channelService.addMessage(channelId, message.getId());
 
-        for (String path : dto.getFilePath()) {
-            BinaryContent binaryContent = new BinaryContent(channelId, path);
+        for (String path : request.getFilePath()) {
+            BinaryContent binaryContent = new BinaryContent(path);
             binaryContentRepository.addBinaryContent(binaryContent);
             message.addAttachment(binaryContent.id());
         }
@@ -92,18 +92,25 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(UpdateMessageDto dto) {
-        Message message = messageRepository.findMessageById(dto.getMessageId());
-        message.updateContent(dto.getContent());
+    public void updateMessage(UUID userId, UUID messageId, UpdateMessageRequest request) {
+        Message message = messageRepository.findMessageById(request.getMessageId());
+        if (!message.getSenderId().equals(userId)) {
+            throw new RuntimeException("본인의 메시지만 수정할 수 있습니다.");
+        }
+        message.updateContent(request.getContent());
         saveMessageData();
     }
 
     @Override
-    public void deleteMessage(UUID messageId) {
+    public void deleteMessage(UUID userId, UUID messageId) {
         Message message = messageRepository.findMessageById(messageId);
 
+        if (!message.getSenderId().equals(userId)) {
+            throw new RuntimeException("본인의 메시지만 수정할 수 있습니다.");
+        }
+
         channelService.removeMessage(message.getChannelId(), messageId);
-        binaryContentRepository.deleteBinaryContent(messageId);
+        binaryContentRepository.deleteBinaryContentById(messageId);
 
         messageRepository.deleteMessageById(messageId);
     }

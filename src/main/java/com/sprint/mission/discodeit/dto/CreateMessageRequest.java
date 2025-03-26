@@ -7,7 +7,6 @@ import java.util.UUID;
 
 @Data
 public class CreateMessageRequest {
-    private UUID userId;
     private UUID channelId;
     private String content;
     private List<String> filePath;

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface MessageService {
     // CRUD(생성, 읽기, 모두 읽기, 수정, 삭제)
-    Message createMessage(CreateMessageRequest request);
+    Message createMessage(UUID userId, CreateMessageRequest request);
 
     Message getMessageById(UUID messageId); // 메세지 조회
 
@@ -22,9 +22,9 @@ public interface MessageService {
 
     List<Message> findallByUserId(UUID senderId); // 유저의 모든 메세지 확인
 
-    void updateMessage(UpdateMessageRequest request); // 메세지 내용 수정
+    void updateMessage(UUID userId, UUID messageId, UpdateMessageRequest request); // 메세지 내용 수정
 
-    void deleteMessage(UUID messageId); // 메세지 삭제
+    void deleteMessage(UUID userId, UUID messageId); // 메세지 삭제
 
     void validateMessageExists(UUID messageId); // 메세지 존재 확인
 }
