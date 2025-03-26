@@ -40,9 +40,10 @@ public class BasicChannelService implements ChannelService {
         this.channelRepository.add(newChannel);
         this.readStatusRepository.addChannelIdMap(newChannel.getId());
         // for 문이 transaction 처리가 간편하다 하여 stream 사용X
-        for(UserReadResponse user : privateChannelCreateRequest.users()) {
-            this.readStatusRepository.add(new ReadStatus(user.userId(), newChannel.getId()));
-            newChannel.addParticipant(user.userId());
+        for(UUID userId : privateChannelCreateRequest.users()) {
+            UserService.validateUserId(userId, userRepository);             // privateChannelCreateRequest의 userId들에 대한 검증 (따로 앞쪽에 빼는게 좋나?)
+            this.readStatusRepository.add(new ReadStatus(userId, newChannel.getId()));
+            newChannel.addParticipant(userId);
         }
 
         this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
