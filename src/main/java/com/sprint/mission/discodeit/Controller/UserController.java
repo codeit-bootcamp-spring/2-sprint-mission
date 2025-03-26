@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.Controller;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final UserStatusService userStatusService;
 
     @PostMapping(value="", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> createUser(@RequestPart("user") UserCreateRequest userCreateRequest,
@@ -69,7 +72,7 @@ public class UserController {
         return ResponseEntity.ok(updatedUserDto);
     }
 
-    @DeleteMapping("{/userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<UserDto> deleteUser(@PathVariable("userId") UUID userId) {
         userService.delete(userId);
         return ResponseEntity.noContent().build();
@@ -79,6 +82,15 @@ public class UserController {
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.findAll();
         return ResponseEntity.ok(users);
+    }
+
+    @PutMapping("/{userId}/status")
+    public ResponseEntity<UserDto> updateUserStatus(@PathVariable("userId")UUID userId,
+                                                    @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
+        userStatusService.updateByUserId(userId, userStatusUpdateRequest);
+
+        UserDto updatedUserDto = userService.find(userId);
+        return ResponseEntity.ok(updatedUserDto);
     }
 
 }
