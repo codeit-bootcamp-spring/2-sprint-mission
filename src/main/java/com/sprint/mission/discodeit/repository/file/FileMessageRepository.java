@@ -1,22 +1,32 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
-    private static final String FILE_NAME = "message.sar";
+    private static final String FILE_NAME = "message.ser";
     private final Map<UUID, Message> data = new HashMap<>();
+    private final String filePath;
+
+    public FileMessageRepository(String directory) {
+        this.filePath = directory + "/" + FILE_NAME;
+        loadFromFile();
+    }
 
     @Override
     public Message save(Message message) {
         data.put(message.getUuid(), message);
         saveToFile();
+
         return data.get(message.getUuid());
     }
 
@@ -32,27 +42,18 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findByChannelKey(UUID channelKey) {
-        return data.values().stream()
-                .filter(m -> m.getChannelKey().equals(channelKey))
-                .findFirst()
-                .orElse(null);
+    public List<Message> findAll() {
+        return data.values().stream().toList();
+    }
+
+    @Override
+    public boolean existsByKey(UUID messageKey) {
+        return data.containsKey(messageKey);
     }
 
     @Override
     public List<Message> findAllByChannelKey(UUID channelKey) {
-        return data.values().stream()
-                .filter(m -> m.getChannelKey().equals(channelKey))
-                .toList();
-    }
-
-    @Override
-    public UUID findKeyByMessageId(int messageId) {
-        return data.values().stream()
-                .filter(m -> m.getMessageId() == messageId)
-                .map(Message::getUuid)
-                .findFirst()
-                .orElse(null);
+        return data.values().stream().filter(m -> m.getChannelKey().equals(channelKey)).toList();
     }
 
     private void saveToFile() {
@@ -64,9 +65,9 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     private void loadFromFile() {
-        File file = new File(FILE_NAME);
+        File file = new File(filePath);
         if (!file.exists()) return;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             Object obj = ois.readObject();
             if (obj instanceof Map<?, ?> map) {
                 for (Map.Entry<?, ?> entry : map.entrySet()) {

@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
@@ -10,6 +12,7 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         data.put(user.getUuid(), user);
+
         return user;
     }
 
@@ -19,13 +22,18 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findAllByKeys(List<UUID> userKeys) {
-        return userKeys.stream().map(data::get).toList();
+    public boolean existsByKey(UUID userKey) {
+        return data.containsKey(userKey);
     }
 
     @Override
-    public boolean existsByKey(UUID userKey) {
-        return data.containsKey(userKey);
+    public boolean existsByName(String userName) {
+        return data.values().stream().anyMatch(user -> user.getName().equals(userName));
+    }
+
+    @Override
+    public boolean existsByEmail(String userEmail) {
+        return data.values().stream().anyMatch(user -> user.getEmail().equals(userEmail));
     }
 
     @Override
@@ -34,30 +42,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public String findUserName(UUID userKey) {
-        return data.get(userKey).getName();
+    public List<User> findAll() {
+        return data.values().stream().toList();
     }
-
-    @Override
-    public String findUserId(UUID userKey) {
-        return data.get(userKey).getId();
-    }
-
-    @Override
-    public UUID findUserKeyById(String userId) {
-        return data.values().stream()
-                .filter(u -> u.getId().equals(userId))
-                .map(User::getUuid)
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public List<UUID> findUserKeyByIds(List<String> userIds) {
-        return data.values().stream()
-                .filter(u -> userIds.contains(u.getId()))
-                .map(User::getUuid)
-                .toList();
-    }
-
 }

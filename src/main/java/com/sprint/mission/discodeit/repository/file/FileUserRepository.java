@@ -2,15 +2,18 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
 public class FileUserRepository implements UserRepository {
-    private static final String FILE_NAME = "users.sar";
+    private static final String FILE_NAME = "users.ser";
     private final Map<UUID, User> data = new HashMap<>();
+    private final String filePath;
 
-    public FileUserRepository() {
+    public FileUserRepository(String directory) {
+        this.filePath = directory + "/" + FILE_NAME;
         loadFromFile();
     }
 
@@ -18,6 +21,7 @@ public class FileUserRepository implements UserRepository {
     public User save(User user) {
         data.put(user.getUuid(), user);
         saveToFile();
+
         return data.get(user.getUuid());
     }
 
@@ -27,8 +31,8 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findAllByKeys(List<UUID> userKeys) {
-        return userKeys.stream().map(data::get).toList();
+    public List<User> findAll() {
+        return data.values().stream().toList();
     }
 
     @Override
@@ -37,36 +41,19 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public boolean existsByName(String userName) {
+        return data.values().stream().anyMatch(user -> user.getName().equals(userName));
+    }
+
+    @Override
+    public boolean existsByEmail(String userEmail) {
+        return data.values().stream().anyMatch(user -> user.getEmail().equals(userEmail));
+    }
+
+    @Override
     public void delete(User user) {
         data.remove(user.getUuid());
         saveToFile();
-    }
-
-    @Override
-    public String findUserName(UUID userKey) {
-        return data.get(userKey).getName();
-    }
-
-    @Override
-    public String findUserId(UUID userKey) {
-        return data.get(userKey).getId();
-    }
-
-    @Override
-    public UUID findUserKeyById(String userId) {
-        return data.values().stream()
-                .filter(u -> u.getId().equals(userId))
-                .map(User::getUuid)
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public List<UUID> findUserKeyByIds(List<String> userIds) {
-        return data.values().stream()
-                .filter(u -> userIds.contains(u.getId()))
-                .map(User::getUuid)
-                .toList();
     }
 
     private void saveToFile() {
@@ -78,9 +65,9 @@ public class FileUserRepository implements UserRepository {
     }
 
     private void loadFromFile() {
-        File file = new File(FILE_NAME);
+        File file = new File(filePath);
         if (!file.exists()) return;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             Object obj = ois.readObject();
             if (obj instanceof Map<?, ?> map) {
                 for (Map.Entry<?, ?> entry : map.entrySet()) {

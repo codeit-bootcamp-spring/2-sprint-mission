@@ -1,67 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.UUID;
 
+@Getter
 public class User extends SharedEntity implements Serializable{
-    private String id;
-    private final String name;
+    private String name;
     private String pwd;
     private String email;
-    private String phone;
-
-    public User(String id, String name, String pwd, String email, String phone) {
+    private final UUID profileId;
+    public User(String name, String pwd, String email, UUID profileId) {
         super();
-        this.id = id;
         this.name = name;
         this.pwd = pwd;
         this.email = email;
-        this.phone = phone;
+        this.profileId = profileId;
     }
 
-    public String getId() {
-        return id;
-    }
+    public void updateName(String name) {
+        this.name = name;
+        setUpdatedAt(Instant.now());
 
-    public void updateId(String id) {
-        this.id = id;
-        setUpdatedAt(Instant.now().toEpochMilli());
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPwd() {
-        return pwd;
-    }
-
     public void updatePwd(String pwd) {
         this.pwd = pwd;
-        setUpdatedAt(Instant.now().toEpochMilli());
-    }
-
-    public String getEmail() {
-        return email;
+        setUpdatedAt(Instant.now());
     }
 
     public void updateEmail(String email) {
         this.email = email;
-        setUpdatedAt(Instant.now().toEpochMilli());
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void updatePhone(String phone) {
-        this.phone = phone;
-        setUpdatedAt(Instant.now().toEpochMilli());
+        setUpdatedAt(Instant.now());
     }
 
     @Override
     public String toString() {
-        return String.format("\n uuid: %s\n userId: %s\n userName: %s\n userPwd: %s\n userEmail: %s\n userPhone: %s\n createdAt= %s\n updatedAt= %s\n",
-                uuid, id, name, pwd, email, phone, createdAt, updatedAt);
+        return String.format("\n uuid: %s\n userPwd: %s\n userEmail: %s\n createdAt= %s\n updatedAt= %s\n",
+                uuid, pwd, email, createdAt, updatedAt);
     }
 }
