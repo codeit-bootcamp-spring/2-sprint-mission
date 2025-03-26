@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.constant.SubDirectory;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -41,7 +40,7 @@ public class FileChannelRepository implements ChannelRepository {
         Channel channel = findChannelById(channelUUID)
                 .orElseThrow(() -> new IllegalArgumentException("채널 찾을 수 없습니다.: " + channelUUID));
         channel.updateChannelName(channelName);
-        fileManager.writeToFile(SubDirectory.USER, channel, channel.getId());
+        fileManager.writeToFile(SubDirectory.CHANNEL, channel, channel.getId());
         return channel;
     }
 

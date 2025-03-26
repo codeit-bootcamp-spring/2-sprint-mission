@@ -23,6 +23,7 @@ public class Channel extends BaseEntity implements Serializable {
         return "Channel{" +
                 "UUID= " + getId() +
                 ", channelName='" + channelName +
+                ", ChannelType=" + channelType +
                 ", createdAt: " + getCreatedAt() +
                 ", updatedAt: " + getUpdatedAt() +
                 '}';

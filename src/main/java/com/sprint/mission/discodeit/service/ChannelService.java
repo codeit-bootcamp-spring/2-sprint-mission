@@ -9,7 +9,7 @@ public interface ChannelService {
     SaveChannelDto createPublicChannel(SaveChannelParamDto saveChannelParamDto);
     SaveChannelDto createPrivateChannel(SaveChannelParamDto saveChannelParamDto);
     FindChannelDto findChannel(UUID id);
-    List<FindChannelDto> findAllByUserId(UUID userUUID);
+    List<FindChannelDto> findAllByUserId(FindAllByUserIdRequestDto findAllByUserIDRequestDto);
     UUID joinChannel(UUID channelUUID, UUID userUUID);
     List<CheckReadStatusDto> checkReadStatusByUserId(UUID userUUID);
     void updateChannel(UpdateChannelParamDto channelUpdateParamDto);

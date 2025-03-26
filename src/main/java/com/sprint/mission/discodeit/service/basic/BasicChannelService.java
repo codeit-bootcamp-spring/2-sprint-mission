@@ -76,8 +76,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<FindChannelDto> findAllByUserId(UUID userUUID) {
-        List<ReadStatus> readStatusFindByUserId = readStatusRepository.findByUserId(userUUID);
+    public List<FindChannelDto> findAllByUserId(FindAllByUserIdRequestDto findAllByUserIDRequestDto) {
+        List<ReadStatus> readStatusFindByUserId = readStatusRepository.findByUserId(findAllByUserIDRequestDto.id());
 
         Set<UUID> privateChannelIdSet = readStatusFindByUserId.stream()
                 .map(ReadStatus::getChannelId)
@@ -109,11 +109,7 @@ public class BasicChannelService implements ChannelService {
         return readStatusRepository.findByUserId(userUUID).stream()
                 .map(readStatus -> {
                     Channel channel = channelRepository.findChannelById(readStatus.getChannelId())
-                            .orElse(null);
-
-                    if (channel == null) {
-                        return null;
-                    }
+                            .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다"));
 
                     List<Message> messageList = messageRepository.findMessageByChannel(channel.getId());
 
@@ -141,14 +137,13 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void updateChannel(UpdateChannelParamDto channelUpdateParamDto) {
         Channel channel = channelRepository.findChannelById(channelUpdateParamDto.channelUUID())
-                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NullPointerException("채널을 찾을 수 없습니다."));
 
         if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
             throw new IllegalArgumentException("비공개 채널은 수정할 수 없습니다.");
         }
 
-        channel = channelRepository.updateChannelChannelName(channelUpdateParamDto.channelUUID(), channelUpdateParamDto.channelName());
-        System.out.println("[성공]" + channel);
+        channelRepository.updateChannelChannelName(channelUpdateParamDto.channelUUID(), channelUpdateParamDto.channelName());
     }
 
     @Override
@@ -161,14 +156,11 @@ public class BasicChannelService implements ChannelService {
 
         readStatusRepository.findByChannelId(channelUUID)
                 .forEach(readStatus -> {
-                    readStatusRepository.delete(readStatus.getChannelId());
+                    readStatusRepository.delete(readStatus.getId());
                 });
 
         messageRepository.deleteMessageById(channelUUID);
 
-        boolean isDeleted = channelRepository.deleteChannelById(channelUUID);
-
-
-        System.out.println("[성공] 채널 삭제 완료");
+        channelRepository.deleteChannelById(channelUUID);
     }
 }

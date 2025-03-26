@@ -11,7 +11,7 @@ public record SaveChannelParamDto(
     List<UUID> userList
 ) {
     public SaveChannelParamDto {
-        if (channelType == ChannelType.PUBLIC && userList != null && !userList.isEmpty()) {
+        if (channelType.equals(ChannelType.PUBLIC) && userList != null && !userList.isEmpty()) {
             throw new IllegalArgumentException("PUBLIC 채널에서는 사용자 리스트를 설정할 수 없음");
         }
     }
