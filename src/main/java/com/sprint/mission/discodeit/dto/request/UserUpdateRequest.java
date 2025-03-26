@@ -5,4 +5,7 @@ public record UserUpdateRequest(
         String newEmail,
         String newPassword
 ) {
+    public boolean online() {
+        return false;
+    }
 }
