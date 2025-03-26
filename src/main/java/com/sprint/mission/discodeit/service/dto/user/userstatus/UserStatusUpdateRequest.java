@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.dto.user.userstatus;
 
-import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateDataRequest;
+import com.sprint.mission.discodeit.controller.dto.user.UserStatusUpdateDataRequest;
 import java.util.UUID;
 
 public record UserStatusUpdateRequest(
