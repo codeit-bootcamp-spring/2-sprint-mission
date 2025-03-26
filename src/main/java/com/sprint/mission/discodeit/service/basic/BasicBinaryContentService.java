@@ -18,7 +18,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public UUID create(BinaryContentCreateRequest binaryContentCreateRequest) {
-        BinaryContent newBinaryContent = new BinaryContent(binaryContentCreateRequest.filePath(), binaryContentCreateRequest.fileName(), binaryContentCreateRequest.fileType(), binaryContentCreateRequest.fileSize());
+        BinaryContent newBinaryContent = new BinaryContent(binaryContentCreateRequest.fileId(), binaryContentCreateRequest.filePath(), binaryContentCreateRequest.fileName(), binaryContentCreateRequest.fileType(), binaryContentCreateRequest.fileSize());
         this.binaryContentRepository.add(newBinaryContent);
         return newBinaryContent.getId();
     }
