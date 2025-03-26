@@ -27,7 +27,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<ApiResponse<UserCreateResponse>> create(@Valid @RequestBody UserCreateRequest request) {
         UserCreateResponse response = userService.create(request);
-        ApiResponse<UserCreateResponse> apiResponse = new ApiResponse<>("유저 생성 성송", response);
+        ApiResponse<UserCreateResponse> apiResponse = new ApiResponse<>("유저 생성 성공", response);
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
@@ -45,7 +45,7 @@ public class UserController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{userId}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID userId) {
         userService.delete(userId);
         ApiResponse<Void> apiResponse = new ApiResponse<>("유저 삭제 성공", null);
