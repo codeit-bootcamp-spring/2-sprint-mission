@@ -60,5 +60,10 @@ public class MessageController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/channel/{channelId}")
+    public ResponseEntity <List<Message>> getAllMessageChannel(@PathVariable ("channelId") UUID channelId){
+        List<Message> messages = messageService.findAllByChannelId(channelId);
+        return ResponseEntity.ok(messages);
+    }
 
 }
