@@ -8,6 +8,7 @@ import com.sprint.discodeit.repository.file.BaseUserStatusRepository;
 import com.sprint.discodeit.repository.file.FileUserRepository;
 import com.sprint.discodeit.repository.file.ReadStatusRepository;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,13 +57,14 @@ public class ReadStatusService {
 
 
 
-    public ReadStatus dispatchChannelCreation(String channelName, List<UUID> userUUid, UUID channelId) {
-        for(UUID u : userUUid) {
-            if ("PRIVATE".equalsIgnoreCase(channelName)) {
-                return createPrivateChannel(u, channelId);
-            }
+    public List<ReadStatus> createReadStatusesForPrivateChannel(List<UUID> userIds, UUID channelId) {
+        List<ReadStatus> readStatuses = new ArrayList<>();
+
+        for (UUID userId : userIds) {
+            readStatuses.add(createPrivateChannel(userId, channelId));
         }
-        return null;
+
+        return readStatuses;
     }
 
     public ReadStatus createPrivateChannel(UUID userUUid, UUID channelId) {

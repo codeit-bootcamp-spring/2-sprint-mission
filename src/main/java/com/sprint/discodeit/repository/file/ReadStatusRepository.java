@@ -29,6 +29,21 @@ public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> imp
         }
     }
 
+    public void saveAll(List<ReadStatus> readStatusList) {
+        Map<UUID, ReadStatus> readStatusMap = loadAll();
+
+        for (ReadStatus readStatus : readStatusList) {
+            UUID id = readStatus.getId();
+            if (readStatusMap.containsKey(id)) {
+                throw new IllegalArgumentException("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + id);
+            }
+            readStatusMap.put(id, readStatus);
+        }
+
+        writeToFile(readStatusMap);
+    }
+
+
     @Override
     public void delete(UUID channelId) {
         Map<UUID, ReadStatus> readStatusMap = loadAll();
