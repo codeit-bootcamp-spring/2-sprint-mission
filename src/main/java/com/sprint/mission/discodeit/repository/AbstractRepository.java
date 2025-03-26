@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.BaseEntity;
+import com.sprint.mission.discodeit.exception.common.NoSuchIdException;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -34,7 +35,7 @@ public abstract class AbstractRepository <T extends BaseEntity> implements Repos
     @Override
     public T findById(UUID id) {
         if (!existsById(id)) {
-            throw new NoSuchElementException("해당 ID를 가진 " + entityClass.getSimpleName() + "가 존재하지 않습니다.");
+            throw new NoSuchIdException("해당 ID를 가진 " + entityClass.getSimpleName() + "가 존재하지 않습니다.");
         }
         return this.storage.get(id);
     }
