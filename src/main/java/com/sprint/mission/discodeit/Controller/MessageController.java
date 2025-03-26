@@ -48,7 +48,7 @@ public class MessageController {
 
     }
 
-    @PutMapping(value = "/{messageId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{messageId}")
     public ResponseEntity<Message> updateMessage(@PathVariable("messageId") UUID messageId, @RequestBody MessageUpdateRequest updateRequest) {
         Message updatedMessage = messageService.update(messageId, updateRequest);
         return ResponseEntity.ok(updatedMessage);
