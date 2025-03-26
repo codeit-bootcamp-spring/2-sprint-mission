@@ -60,7 +60,9 @@ public class BasicUserService implements UserService {
                 findUser.getUserName(),
                 findUser.getUserEmail(),
                 findUser.getProfileId(),
-                findUserStatus.isOnline());
+                findUserStatus.isOnline(),
+                findUser.getCreatedAt(),
+                findUser.getUpdatedAt());
     }
 
     @Override
@@ -72,7 +74,9 @@ public class BasicUserService implements UserService {
                                 user.getUserName(),
                                 user.getUserEmail(),
                                 user.getProfileId(),
-                                this.userStatusRepository.findUserStatusByUserId(user.getId()).isOnline()
+                                this.userStatusRepository.findUserStatusByUserId(user.getId()).isOnline(),
+                                user.getCreatedAt(),
+                                user.getUpdatedAt()
                         )
                 )
                 .collect(Collectors.toList());
