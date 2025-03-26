@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
@@ -42,6 +43,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public List<Message> readMessageListByChannelId(UUID channelId) {
+        ChannelService.validateChannelId(channelId, this.jcfChannelRepository);
         return jcfMessageRepository.findMessageListByChannelId(channelId);
     }
 
@@ -61,3 +63,4 @@ public class JCFChannelService implements ChannelService {
         jcfChannelRepository.deleteById(channelId);
     }
 }
+*/

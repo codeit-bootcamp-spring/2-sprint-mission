@@ -1,59 +1,78 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository {
-    private static volatile FileMessageRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
+    private Map<UUID, NavigableSet<Message>> channelIdMessages;       // channelId를 Key로 가지는 TreeSet<Message> / List가 아니라 NavigatbaleSet을 사용하는 이유는 구간조회가 빠르기 때문
 
-    private FileMessageRepository() {
-        super(Message.class, Paths.get(System.getProperty("user.dir")).resolve("src\\main\\java\\com\\sprint\\mission\\discodeit\\repository\\file\\messagedata"));
+    public FileMessageRepository(RepositoryProperties repositoryProperties) {
+        super(Message.class, Paths.get(repositoryProperties.getFileDirectory()).resolve("MessageData"));
+        channelIdMessages = new HashMap<>();
     }
 
-    public static FileMessageRepository getInstance() {
-        // 첫 번째 null 체크 (성능 최적화)
-        if (instance == null) {
-            synchronized (FileMessageRepository.class) {
-                // 두 번째 null 체크 (동기화 구간 안에서 중복 생성 방지)
-                if (instance == null) {
-                    instance = new FileMessageRepository();
-                }
-            }
+    @Override
+    public void addChannelIdToChannelIdMessage(UUID channelId) {
+        if (channelIdMessages.containsKey(channelId)) {         // 자체적인 무결성 확보
+            throw new IllegalArgumentException("이미 존재하는 채널입니다: " + channelId);
         }
-        return instance;
+        channelIdMessages.put(channelId, new TreeSet<>(Comparator.comparing(Message::getCreatedAt)
+                                                                .thenComparing(Message::getId)));
     }
 
     @Override
     public void add(Message newMessage) {
         super.add(newMessage);
         super.saveToFile(super.directory.resolve(newMessage.getId().toString() + ".ser"), newMessage);
+        channelIdMessages.get(newMessage.getChannelId()).add(newMessage);
     }
 
     // existsById(),findById(), getAll()  굳이 file을 탐색할 필요 없다고 생각해 storage를 통해 정보 확인, -> 상속 받은걸 사용
 
     @Override
-    public void deleteById(UUID messageId) {
-        super.deleteById(messageId);
-        super.deleteFile(messageId);
-    }
-
     public List<Message> findMessageListByChannelId(UUID channelId) {   //해당 channelID를 가진 message가 없을 때, 빈 리스트 반환
-        if (channelId == null) {
-            throw new IllegalArgumentException("input channelId is null!!!");
+        if (channelIdMessages.get(channelId) == null) {         // channelService에서 createChannel을 할때 항상 addChannelIdToChannelIdMessage가 호출되어 확인할 필요 없지만 자체적인 검증로직 필요?
+            throw new NullPointerException("해당 channelId를 가진 채널이 아직 생성되지 않았습니다. " + channelId);
         }
-        return super.storage.values().stream()
-                .filter((m) -> Objects.equals(channelId, m.getChannelId()))
-                .collect(Collectors.toList());
+        return new ArrayList<>(channelIdMessages.get(channelId));
     }
 
     @Override
     public void updateMessageContent(UUID messageId, String newContent) {
         if (existsById(messageId)) {
             super.storage.get(messageId).updateContent(newContent);
+            super.saveToFile(super.directory.resolve(messageId.toString() + ".ser"), super.findById(messageId));
         }
+    }
+
+    @Override
+    public void updateAttachmentIds(UUID messageId, List<UUID> attachmentIds) {
+        if (existsById(messageId)) {
+            super.storage.get(messageId).updateAttachmentIds(attachmentIds);
+            super.saveToFile(super.directory.resolve(messageId.toString() + ".ser"), super.findById(messageId));
+        }
+    }
+
+    @Override
+    public void deleteAttachment(UUID messageId, UUID attachmentId) {
+        if (existsById(messageId)) {
+            super.storage.get(messageId).deleteAttachment(attachmentId);
+            super.saveToFile(super.directory.resolve(messageId.toString() + ".ser"), super.findById(messageId));
+        }
+    }
+
+    @Override
+    public void deleteById(UUID messageId) {
+        channelIdMessages.get(super.findById(messageId).getChannelId()).remove(super.findById(messageId));
+        super.deleteById(messageId);
+        super.deleteFile(messageId);
     }
 }

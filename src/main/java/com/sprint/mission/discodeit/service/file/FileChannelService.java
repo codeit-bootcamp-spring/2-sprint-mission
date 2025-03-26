@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
@@ -42,6 +43,7 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public List<Message> readMessageListByChannelId(UUID channelId) {
+        ChannelService.validateChannelId(channelId, this.fileChannelRepository);
         return fileMessageRepository.findMessageListByChannelId(channelId);
     }
 
@@ -61,3 +63,4 @@ public class FileChannelService implements ChannelService {
         fileChannelRepository.deleteById(channelId);
     }
 }
+*/

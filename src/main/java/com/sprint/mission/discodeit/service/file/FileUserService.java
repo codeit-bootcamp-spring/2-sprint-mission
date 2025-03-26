@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
@@ -46,3 +47,4 @@ public class FileUserService implements UserService {
         fileUserRepository.deleteById(userId);
     }
 }
+*/

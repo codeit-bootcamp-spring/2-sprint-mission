@@ -3,35 +3,37 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.AbstractRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 public class JCFUserRepository extends AbstractRepository<User> implements UserRepository {
-    private static volatile JCFUserRepository instance;         // volatile을 사용하여 변수의 값을 JVM이 캐시하지 않도록 보장
+    private Map<String, User> usernames;
+    private Map<String, User> emails;
 
     private JCFUserRepository() {
         super(User.class, new ConcurrentHashMap<>());
+        usernames = new HashMap<>();
+        emails = new HashMap<>();
     }
 
-    public static JCFUserRepository getInstance() {
-        // 첫 번째 null 체크 (성능 최적화)
-        if (instance == null) {
-            synchronized (JCFUserRepository.class) {
-                // 두 번째 null 체크 (동기화 구간 안에서 중복 생성 방지)
-                if (instance == null) {
-                    instance = new JCFUserRepository();
-                }
-            }
-        }
-        return instance;
+    @Override
+    public void add(User newUser) {
+        super.add(newUser);
+        usernames.put(newUser.getUserName(), newUser);
+        emails.put(newUser.getUserEmail(), newUser);
     }
 
     @Override
     public void updateUserName(UUID userId, String newUserName) {
-        if (existsById(userId)) {
-            super.storage.get(userId).updateUserName(newUserName);
-        }
+        User findUser = super.findById(userId);
+        findUser.updateUserName(newUserName);
+        usernames.remove(findUser.getUserName());
+        usernames.put(newUserName, findUser);
     }
 
     @Override
@@ -39,5 +41,50 @@ public class JCFUserRepository extends AbstractRepository<User> implements UserR
         if (existsById(userId)) {
             super.storage.get(userId).updateUserPassword(newPassword);
         }
+    }
+
+    @Override
+    public void updateProfileId(UUID userId, UUID newProfileId) {
+        User findUser = super.findById(userId);
+        findUser.updateProfileId(newProfileId);
+    }
+
+    @Override
+    public boolean existsByUserName(String userName) {
+        if (userName == null) {
+            throw new NullPointerException("userName is null");
+        }
+        return usernames.containsKey(userName);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        if (email == null) {
+            throw new NullPointerException("email is null");
+        }
+        return emails.containsKey(email);
+    }
+
+    @Override
+    public User findByUserName(String userName) {
+        if (!existsByUserName(userName)) {
+            throw new NoSuchElementException("해당 userName을 가진 user 가 존재하지 않습니다.");
+        }
+        return usernames.get(userName);
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        if (!existsByEmail(email)) {
+            throw new NoSuchElementException("해당 email을 가진 user 가 존재하지 않습니다.");
+        }
+        return emails.get(email);
+    }
+
+    @Override
+    public void deleteById(UUID userId) {
+        usernames.remove(super.findById(userId).getUserName());
+        emails.remove(super.findById(userId).getUserName());
+        super.deleteById(userId);
     }
 }

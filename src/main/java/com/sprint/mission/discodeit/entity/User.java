@@ -1,14 +1,19 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import lombok.Getter;
 
+import java.io.Serializable;
+import java.util.UUID;
+
+@Getter
 public class User extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private String userName;
     private String userEmail;
     private String password;
+    private UUID profileId;
 
-    public User(String userName, String userEmail, String password) {
+    public User(String userName, String userEmail, String password, UUID profileId) {
         super();
         validateUserName(userName);
         validateUserEmail(userEmail);
@@ -16,18 +21,7 @@ public class User extends BaseEntity implements Serializable {
         this.userName = userName;
         this.userEmail = userEmail;
         this.password = password;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public String getPassword() {
-        return password;
+        this.profileId = profileId;
     }
 
     public void updateUserName(String newUserName) {
@@ -39,6 +33,11 @@ public class User extends BaseEntity implements Serializable {
     public void updateUserPassword(String newPassword) {
         validatePassword(newPassword);
         this.password = newPassword;
+        super.updateUpdatedAt();
+    }
+
+    public void updateProfileId(UUID profileId) {
+        this.profileId = profileId;
         super.updateUpdatedAt();
     }
 
@@ -82,6 +81,7 @@ public class User extends BaseEntity implements Serializable {
                 + "userName: " + userName + '\n'
                 + "userEmail: " + userEmail + '\n'
                 + "password: " + password + '\n'
+                + "profileId: " + profileId + '\n'
                 + "id: " + super.getId() + '\n'
                 + "createdAt: " + super.getCreatedAt() + '\n'
                 + "updatedAt: " + super.getUpdatedAt() + '\n';

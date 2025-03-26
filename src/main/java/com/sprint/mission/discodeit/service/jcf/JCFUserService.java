@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
@@ -46,3 +47,4 @@ public class JCFUserService implements UserService {
         jcfUserRepository.deleteById(userId);
     }
 }
+*/

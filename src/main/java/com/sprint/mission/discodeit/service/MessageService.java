@@ -1,17 +1,20 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.util.Map;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public interface MessageService {
-    Message createMessage(UUID senderId, String content, UUID channelId);
+    UUID createMessage(MessageCreateRequest messageCreateRequest);
     Message readMessage(UUID messageId);
-    Map<UUID, Message> readAllMessages();
-    void updateMessageContent(UUID messageId, String newContent);
+    List<Message> findAllByChannelId(UUID channelId);
+    void updateMessage(MessageUpdateRequest messageUpdateRequest);
+    void deleteBinaryContentInMessage(UUID messageId, UUID binaryContentId);
     void deleteMessage(UUID messageId);
     static void validateMessageId(UUID messageId, MessageRepository jcfMessageRepository) {
         if (!jcfMessageRepository.existsById(messageId)) {

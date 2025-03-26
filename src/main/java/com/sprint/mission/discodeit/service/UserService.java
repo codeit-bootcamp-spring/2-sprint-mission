@@ -1,16 +1,18 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserReadResponse;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
 
 public interface UserService {
-    User createUser(String userName, String userEmail, String password);
-    User readUser(UUID id);
-    Map<UUID, User> readAllUsers();
-    void updateUserName(UUID id, String newUserName);
-    void updatePassword(UUID id, String newPassword);
+    UUID createUser(UserCreateRequest userCreateRequest);
+    UserReadResponse readUser(UUID id);
+    List<UserReadResponse> readAllUsers();
+    void updateUser(UserUpdateRequest userUpdateRequest);
     void deleteUser(UUID id);
     static void validateUserId(UUID userId, UserRepository jcfUserRepository) {
         if (!jcfUserRepository.existsById(userId)) {
