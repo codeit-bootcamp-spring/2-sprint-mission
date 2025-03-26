@@ -5,9 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="597bb6db-7c87-4cad-9d78-3eb04818a41f" name="Changes" comment="최종완성">
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/checksums/checksums.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10/checksums/md5-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/checksums/md5-checksums.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/checksums/sha1-checksums.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.10/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.10/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.10/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/fileHashes/fileHashes.bin" afterDir="false" />
@@ -15,71 +12,10 @@
       <change beforePath="$PROJECT_DIR$/.gradle/8.10/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/example/discodeit/DiscodeitApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/JavaApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/BinaryContent.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/BinaryContent.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/Channel.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/Channel.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/Message.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/Message.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/ReadStatus.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/ReadStatus.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/UserStatus.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/UserStatus.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/BinaryContentRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/BinaryContentRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/MessageRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/MessageRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/ReadStatusRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/ReadStatusRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/UserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/UserRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/UserStatusRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/UserStatusRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/config/RepositoryConfig.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileBinaryContentRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileBinaryContentRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileChannelRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileChannelRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileMessageRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileMessageRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileReadStatusRepository$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileReadStatusRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileReadStatusRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileUserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileUserRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileUserStatusRepository$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileUserStatusRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileUserStatusRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFBinaryContentRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFBinaryContentRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFChannelRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFChannelRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFMessageRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFMessageRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFReadStatusRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFReadStatusRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFUserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFUserRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFUserStatusRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFUserStatusRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/BinaryDto/BinaryContentCreateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/ChannelService.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/ChannelService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/MessageService.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/MessageService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/ReadStatusDto/ReadStatusCreateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/ReadStatusDto/ReadStatusUpdateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/UserService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/UserStatusDto/UserStatusCreateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/UserStatusDto/UserStatusUpdateByUserRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/UserStatusDto/UserStatusUpdateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/AuthService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicChannelService.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicChannelService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicMessageService.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicMessageService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicUserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicUserService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BinaryContentService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/ReadStatusService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/UserStatusService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/channelDto/ChannelResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/channelDto/ChannelUpdateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/channelDto/PrivateChannelCreateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/channelDto/PublicChannelCreateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/messageDto/MessageCreateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/messageDto/MessageResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/messageDto/MessageUpdateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/userDto/AuthLoginRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/userDto/AuthResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/userDto/UserRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/userDto/UserResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/userDto/UserUpdateRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/resources/main/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/DiscodeitApplication.class.uniqueId0" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" afterPath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/DiscodeitApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/DiscodeitApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/BinaryContentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/BinaryContentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/GlobalExceptionHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/UserController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -384,6 +320,11 @@
     <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="d8243fba-fe19-46f1-b6cf-80f87342eb73" value="TOOL_WINDOW" />
+      </map>
+    </option>
     <option name="RECENT_FILTERS">
       <map>
         <entry key="Branch">
@@ -436,6 +377,11 @@
                 </map>
               </option>
             </State>
+          </value>
+        </entry>
+        <entry key="d8243fba-fe19-46f1-b6cf-80f87342eb73">
+          <value>
+            <State />
           </value>
         </entry>
       </map>
