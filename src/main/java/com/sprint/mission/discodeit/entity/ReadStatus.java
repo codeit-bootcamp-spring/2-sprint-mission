@@ -14,7 +14,7 @@ public class ReadStatus implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private UUID readStatusId;
+    private final UUID readStatusId;
     private final UUID userId;
     private final UUID channelId;
 
@@ -32,6 +32,7 @@ public class ReadStatus implements Serializable {
         this.channelId = channelId;
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
+        this.lastReadAt = lastReadAt;
     }
 
     public void update(Instant lastReadAt) {

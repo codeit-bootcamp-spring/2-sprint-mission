@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.Empty.EmptyChannelListException;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.exception.NotFound.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.NotFound.SaveFileNotFoundException;

@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.display.MessageDisplayList;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +21,15 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/{channelId}/messages")
+@RequestMapping("/api/messages")
 public class MessageController {
     private final MessageService messageService;
 
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Message> create(
             @RequestPart("message") MessageCreateRequestDTO messageDTO,
-            @RequestPart(value = "profileImage", required = false) List<MultipartFile> files,
-            HttpServletRequest httpRequest
+            @RequestPart(value = "profileImage", required = false) List<MultipartFile> files
             ) throws IOException {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
 
         List<Optional<BinaryContentCreateRequestDTO>> list = new ArrayList<>();
         if (files != null) {
@@ -49,12 +46,11 @@ public class MessageController {
             }
         }
 
-        Message message = messageService.create(userId, messageDTO, list);
+        Message message = messageService.create(messageDTO, list);
         return ResponseEntity.ok(message);
     }
 
-
-    @GetMapping
+    @GetMapping("/{channelId}")
     public ResponseEntity<MessageDisplayList> findAll(@PathVariable UUID channelId) {
         List<MessageFindDTO> list = messageService.findAllByChannelId(channelId);
         return ResponseEntity.ok(new MessageDisplayList(list));

@@ -15,7 +15,7 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFBinaryContentRepository implements BinaryContentRepository {
-    private List<BinaryContent> binaryContentList = new LinkedList<>();
+    private final List<BinaryContent> binaryContentList = new LinkedList<>();
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
@@ -25,9 +25,8 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent findById(UUID binaryId) {
-        BinaryContent content = CommonUtils.findById(binaryContentList, binaryId, BinaryContent::getId)
+        return CommonUtils.findById(binaryContentList, binaryId, BinaryContent::getId)
                 .orElseThrow(() -> new BinaryContentNotFoundException("바이너리 데이터를 찾을 수 없습니다."));
-        return content;
     }
 
     @Override

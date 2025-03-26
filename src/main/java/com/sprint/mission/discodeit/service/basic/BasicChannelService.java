@@ -5,8 +5,6 @@ import com.sprint.mission.discodeit.dto.create.PrivateChannelCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.create.PublicChannelCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.exception.Empty.EmptyMessageListException;
-import com.sprint.mission.discodeit.exception.NotFound.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.Valid.ChannelModificationNotAllowedException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.*;
@@ -31,7 +29,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void reset(boolean adminAuth) {
-        if (adminAuth == true) {
+        if (adminAuth) {
             channelRepository.reset();
         }
     }

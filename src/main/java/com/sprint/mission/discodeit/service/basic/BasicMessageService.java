@@ -32,15 +32,15 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void reset(boolean adminAuth) {
-        if (adminAuth == true) {
+        if (adminAuth) {
             messageRepository.reset();
         }
     }
 
     @CustomLogging
     @Override
-    public Message create(UUID userId, MessageCreateRequestDTO messageWriteDTO, List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
-        User user = userRepository.findById(userId);
+    public Message create(MessageCreateRequestDTO messageWriteDTO, List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
+        User user = userRepository.findById(messageWriteDTO.userId());
         Channel channel = channelRepository.find(messageWriteDTO.channelId());
 
         List<UUID> binaryContentIdList = makeBinaryContent(binaryContentDTOs);
@@ -86,18 +86,17 @@ public class BasicMessageService implements MessageService {
     }
 
     private List<UUID> makeBinaryContent(List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
-        List<UUID> collect = binaryContentDTOs.stream()
+        return binaryContentDTOs.stream()
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .map(this::saveBinaryContent)
                 .collect(Collectors.toList());
-        return collect;
     }
 
     private UUID saveBinaryContent(BinaryContentCreateRequestDTO binaryContentCreateDTO) {
         BinaryContent content = new BinaryContent(
                 binaryContentCreateDTO.fileName(),
-                (long) binaryContentCreateDTO.bytes().length,
+                binaryContentCreateDTO.bytes().length,
                 binaryContentCreateDTO.contentType(),
                 binaryContentCreateDTO.bytes()
         );

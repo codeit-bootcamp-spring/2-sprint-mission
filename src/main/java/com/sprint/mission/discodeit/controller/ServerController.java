@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ServerService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,37 +18,39 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/servers")
+@RequestMapping("/api/{userId}/servers")
 public class ServerController {
     private final ServerService serverService;
 
     @PostMapping("/create")
     @ResponseBody
-    public ResponseEntity<CreateServerResult> createServer(@RequestBody CreateServerNameDTO requestDTO, HttpServletRequest httpRequest) {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
+    public ResponseEntity<CreateServerResult> createServer(@PathVariable UUID userId, @RequestBody CreateServerNameDTO requestDTO) {
+
+
         ServerCreateRequestDTO serverCreateRequestDTO = new ServerCreateRequestDTO(userId, requestDTO.name());
         Server server = serverService.create(serverCreateRequestDTO);
         return ResponseEntity.ok(new CreateServerResult(server.getServerId()));
     }
 
     @PostMapping("/{serverId}/join")
-    public ResponseEntity<String> join(@PathVariable UUID serverId,HttpServletRequest httpRequest ) {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
+    public ResponseEntity<String> join(@PathVariable UUID userId, @PathVariable UUID serverId) {
+
+
         User join = serverService.join(serverId, userId);
         return ResponseEntity.ok(join.getName() + " has entered the server");
     }
 
     @PutMapping("/{serverId}/quit")
-    public ResponseEntity<String> quit(@PathVariable UUID serverId,HttpServletRequest httpRequest) {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
+    public ResponseEntity<String> quit(@PathVariable UUID userId, @PathVariable UUID serverId) {
+
+
         User quit = serverService.quit(serverId, userId);
         return ResponseEntity.ok(quit.getName() + " has quit the server");
     }
 
     @GetMapping
-    public ResponseEntity<ServerDisplayList> findAll(HttpServletRequest httpRequest) {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
-        System.out.println("TokenStore 조회 요청 userId: " + userId);
+    public ResponseEntity<ServerDisplayList> findAll(@PathVariable UUID userId) {
+
 
         List<Server> servers = serverService.findServerAll(userId);
 
@@ -59,16 +60,16 @@ public class ServerController {
     }
 
     @PutMapping("/{serverId}/update")
-    public ResponseEntity<UUID> update(@PathVariable UUID serverId, @RequestBody UpdateServerRequestDTO updateServerRequestDTO, HttpServletRequest httpRequest) {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
+    public ResponseEntity<UUID> update(@PathVariable UUID userId, @PathVariable UUID serverId, @RequestBody UpdateServerRequestDTO updateServerRequestDTO) {
+
         UUID update = serverService.update(serverId, userId, updateServerRequestDTO);
 
         return ResponseEntity.ok(update);
     }
 
     @DeleteMapping("/{serverId}/delete")
-    public ResponseEntity<String> delete(@PathVariable UUID serverId, HttpServletRequest httpRequest) {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
+    public ResponseEntity<String> delete(@PathVariable UUID userId, @PathVariable UUID serverId) {
+
 
         serverService.delete(serverId, userId);
         return ResponseEntity.ok("Delete successful");

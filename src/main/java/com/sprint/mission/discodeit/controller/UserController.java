@@ -1,19 +1,17 @@
 package com.sprint.mission.discodeit.controller;
 
 
-import com.sprint.mission.discodeit.dto.display.UserDisplayList;
 import com.sprint.mission.discodeit.dto.create.BinaryContentCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.create.UserCreateRequestDTO;
-import com.sprint.mission.discodeit.dto.result.LoginResultDTO;
-import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.display.UserDisplayList;
 import com.sprint.mission.discodeit.dto.result.CreateUserResult;
+import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UserLoginRequestDTO;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -66,39 +64,34 @@ public class UserController {
         return ResponseEntity.ok(displayList);
     }
 
-    @DeleteMapping
-    public ResponseEntity<String> delete(HttpServletRequest httpRequest) {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> delete(@PathVariable UUID userId) {
+
         userService.delete(userId);
         return ResponseEntity.ok("Delete successful");
     }
 
-    @PutMapping("/online")
-    public ResponseEntity<UUID> online(HttpServletRequest httpRequest) {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
-
+    @PutMapping("/{userId}/online")
+    public ResponseEntity<UUID> online(@PathVariable UUID userId) {
         UserStatus userStatus = userStatusService.findByUserId(userId);
         userStatus.updatedTime();
 
         return ResponseEntity.ok(userStatus.getUserStatusId());
     }
 
-    @PutMapping("/offline")
-    public ResponseEntity<UUID> offline(HttpServletRequest httpRequest) {
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
-
+    @PutMapping("/{userId}/offline")
+    public ResponseEntity<UUID> offline(@PathVariable UUID userId) {
         UserStatus userStatus = userStatusService.findByUserId(userId);
         userStatus.setOffline();
 
         return ResponseEntity.ok(userStatus.getUserStatusId());
     }
 
-    @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UUID> update(@RequestPart("user") UpdateUserRequestDTO updateUserRequestDTO,
-                                       @RequestPart(value = "profileImage", required = false) MultipartFile file,
-                                       HttpServletRequest httpRequest) throws IOException {
+    @PostMapping(value = "/{userId}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UUID> update(@PathVariable UUID userId,
+                                       @RequestPart("user") UpdateUserRequestDTO updateUserRequestDTO,
+                                       @RequestPart(value = "profileImage", required = false) MultipartFile file) throws IOException {
 
-        UUID userId = (UUID) httpRequest.getAttribute("userId");
 
         Optional<BinaryContentCreateRequestDTO> binaryContentRequest = Optional.empty();
 

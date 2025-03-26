@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.Valid.DuplicateUserException;
-import com.sprint.mission.discodeit.exception.Valid.InvalidTokenException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -31,7 +30,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void reset(boolean adminAuth) {
-        if (adminAuth == true) {
+        if (adminAuth) {
             userRepository.reset();
         }
     }
@@ -61,9 +60,8 @@ public class BasicUserService implements UserService {
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId);
         boolean online = userStatus.isOnline();
-        UserFindDTO userFindDTO = UserFindDTO.create(user, online);
 
-        return userFindDTO;
+        return UserFindDTO.create(user, online);
     }
 
     @Override
@@ -120,7 +118,7 @@ public class BasicUserService implements UserService {
             String fileName = contentDTO.fileName();
             String contentType = contentDTO.contentType();
             byte[] bytes = contentDTO.bytes();
-            long size = (long) bytes.length;
+            long size = bytes.length;
 
             BinaryContent content = new BinaryContent(fileName, size, contentType, bytes);
             binaryContentRepository.save(content);

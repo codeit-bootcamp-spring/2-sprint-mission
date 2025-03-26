@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.create.ServerCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.Valid.InvalidTokenException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.ServerRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -23,7 +22,7 @@ public class BasicServerService implements ServerService {
 
     @Override
     public void reset(boolean adminAuth) {
-        if (adminAuth == true) {
+        if (adminAuth) {
             serverRepository.reset();
         }
     }

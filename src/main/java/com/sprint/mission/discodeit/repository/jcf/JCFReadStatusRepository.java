@@ -1,22 +1,20 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.Empty.EmptyReadStatusListException;
-import com.sprint.mission.discodeit.exception.NotFound.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.util.CommonUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFReadStatusRepository implements ReadStatusRepository {
     private final Map<UUID, ReadStatus> readStatusList = new ConcurrentHashMap<>();
-
-//    private final List<ReadStatus> readStatusList = new ArrayList<>();
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
