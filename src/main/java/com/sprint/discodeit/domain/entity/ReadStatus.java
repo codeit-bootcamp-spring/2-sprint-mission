@@ -27,11 +27,6 @@ public class ReadStatus implements Serializable {
         this.channelId = channelId;
     }
 
-    public void markAsRead(Instant newReadTime) {
-        this.lastReadMessageTime = newReadTime;
-        this.readCheck = true;
-    }
-
     public void readUpdate(UUID channelId, Boolean readCheck, UUID userId) {
         if(channelId != null || readCheck != null || userId != null) {
             this.channelId = channelId;
