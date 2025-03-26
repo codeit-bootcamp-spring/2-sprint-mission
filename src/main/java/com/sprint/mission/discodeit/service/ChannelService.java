@@ -23,7 +23,7 @@ public interface ChannelService {
 
     List<ChannelInfoDto> findAllByUserId(UUID userId);
 
-    void updateChannel(UpdateChannelRequest request);
+    void updateChannel(UUID channelId, UpdateChannelRequest request);
 
     void addUser(UUID channelId, UUID userId); //유저 추가
 

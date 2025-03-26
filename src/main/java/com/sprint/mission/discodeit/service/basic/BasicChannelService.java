@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelInfoDto;
-import com.sprint.mission.discodeit.dto.CreatePrivateChannelDto;
-import com.sprint.mission.discodeit.dto.CreatePublicChannelDto;
-import com.sprint.mission.discodeit.dto.UpdateChannelDto;
+import com.sprint.mission.discodeit.dto.CreatePrivateChannelRequest;
+import com.sprint.mission.discodeit.dto.CreatePublicChannelRequest;
+import com.sprint.mission.discodeit.dto.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -35,12 +35,12 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createPrivateChannel(CreatePrivateChannelDto dto) {
+    public Channel createPrivateChannel(CreatePrivateChannelRequest request) {
         Channel channel = new Channel(ChannelType.PRIVATE, "", "");
         UUID channelId = channel.getId();
         ReadStatus readStatus = new ReadStatus(channelId);
         readStatusRepository.addReadStatus(readStatus);
-        dto.getUsers().forEach(userId -> {
+        request.getUsers().forEach(userId -> {
             if (!userRepository.existsById(userId)) {
                 throw new IllegalArgumentException("User " + userId + " 는 존재하지 않습니다.");
             }
@@ -51,8 +51,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createPublicChannel(CreatePublicChannelDto dto) {
-        Channel channel = new Channel(ChannelType.PUBLIC, dto.getChannelName(), dto.getDescription());
+    public Channel createPublicChannel(CreatePublicChannelRequest request) {
+        Channel channel = new Channel(ChannelType.PUBLIC, request.getChannelName(), request.getDescription());
         channelRepository.addChannel(channel);
         return channel;
     }
@@ -102,16 +102,16 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UpdateChannelDto dto) {
-        validateChannelExists(dto.getChannelId());
-        Channel channel = channelRepository.findChannelById(dto.getChannelId());
+    public void updateChannel(UUID channelId, UpdateChannelRequest request) {
+        validateChannelExists(channelId);
+        Channel channel = channelRepository.findChannelById(channelId);
 
         if (channel.getType() == ChannelType.PRIVATE) {
             throw new UnsupportedOperationException("PRIVATE 채널은 수정할 수 없습니다.");
         }
 
-        if (dto.getChannelName() != null) channel.updateChannelName(dto.getChannelName());
-        if (dto.getDescription() != null) channel.updateDescription(dto.getDescription());
+        if (request.getChannelName() != null) channel.updateChannelName(request.getChannelName());
+        if (request.getDescription() != null) channel.updateDescription(request.getDescription());
 
         saveChannelData();
     }
