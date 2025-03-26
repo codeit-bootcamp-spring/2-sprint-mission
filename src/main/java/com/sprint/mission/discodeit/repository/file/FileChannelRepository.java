@@ -4,6 +4,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.FileRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,25 +16,15 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository, FileRepository<Channel> {
-    private static volatile FileChannelRepository instance;
-    private final Path directory = Paths.get(System.getProperty("user.dir"), "data", "channels");
-
-    // 조회할 떄 마다 파일 I/O를 이용해 로드하기 vs Map을 이용해 메모리에 저장해놓고 꺼내쓰기
+    private final Path directory;
     private final Map<UUID, Channel> channelMap;
 
-    public static FileChannelRepository getInstance() {
-        if (instance == null) {
-            synchronized (FileChannelRepository.class) {
-                if (instance == null) {
-                    instance = new FileChannelRepository();
-                }
-            }
-        }
-        return instance;
-    }
-
-    private FileChannelRepository() {
+    // Map을 ConcurrentHashMap으로 초기화해주고싶으므로 @RequiredArgsConstructor는 안쓰고 직접 생성자 만듦
+    public FileChannelRepository(@Value("${discodeit.repository.file-directory}") String fileDir) {
+        this.directory = Paths.get(System.getProperty("user.dir"), fileDir, "channels");
         SerializationUtil.init(directory);
         channelMap = new ConcurrentHashMap<>(); // 멀티쓰레드 환경 고려
         loadCacheFromFile(); // 서버 메모리와 파일 동기화
@@ -40,25 +33,25 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
 
     @Override
     public Channel save(Channel channel) {
-        channelMap.put(channel.getId(), channel); // 메모리에 업데이트
         saveToFile(channel);
+        channelMap.put(channel.getId(), channel); // 메모리에 업데이트
         return channel;
     }
 
     @Override
-    public Optional<Channel> findById(UUID channelId) {
-        return Optional.ofNullable(channelMap.get(channelId));
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(channelMap.get(id));
     }
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(channelMap.values());
+        return channelMap.values().stream().toList();
     }
 
     @Override
-    public void deleteById(UUID channelId) {
-        channelMap.remove(channelId);
-        deleteFileById(channelId);
+    public void deleteById(UUID id) {
+        deleteFileById(id);
+        channelMap.remove(id);
     }
 
     @Override
@@ -75,8 +68,8 @@ public class FileChannelRepository implements ChannelRepository, FileRepository<
     }
 
     @Override
-    public void deleteFileById(UUID channelId) {
-        Path filePath = directory.resolve(channelId + ".ser");
+    public void deleteFileById(UUID id) {
+        Path filePath = directory.resolve(id + ".ser");
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
