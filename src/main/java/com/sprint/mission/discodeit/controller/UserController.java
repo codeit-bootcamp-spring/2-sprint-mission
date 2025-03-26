@@ -1,15 +1,15 @@
-package com.sprint.mission.discodeit.controller.user;
+package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateDataRequest;
-import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateResponse;
-import com.sprint.mission.discodeit.controller.dto.UserUpdateDataRequest;
+import com.sprint.mission.discodeit.controller.dto.user.UserIdResponse;
+import com.sprint.mission.discodeit.controller.dto.user.UserStatusUpdateDataRequest;
+import com.sprint.mission.discodeit.controller.dto.user.UserStatusUpdateResponse;
+import com.sprint.mission.discodeit.controller.dto.user.UserUpdateDataRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserIdResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
@@ -32,18 +32,6 @@ public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-    /*
-     @RequestMapping만 사용해 구현 - @RequestMapping(value = "/example", method = RequestMethod.GET) 요로코롬.
-     웹 API의 예외를 전역으로 처리하세요.
-
-    사용자 관리
-        [ ] 사용자를 등록할 수 있다. [O]
-        [ ] 사용자 정보를 수정할 수 있다.
-        [ ] 사용자를 삭제할 수 있다.
-        [ ] 모든 사용자를 조회할 수 있다. [O]
-        [ ] 사용자의 온라인 상태를 업데이트할 수 있다.
-      오류는 전역에서 관리하고, ErrorResponse를 따로 만들자.
-     */
     // 사용자 등록
     @RequestMapping(method = RequestMethod.POST, consumes = "multipart/form-data")
     public ResponseEntity<UserIdResponse> create(
@@ -53,7 +41,6 @@ public class UserController {
         BinaryContentCreateRequest fileData = (file != null) ? new BinaryContentCreateRequest(file) : null;
         User user = userService.create(userRequest, fileData);
         UserIdResponse response = new UserIdResponse(true, user.getId());
-
         return ResponseEntity.ok(response);
     }
 
