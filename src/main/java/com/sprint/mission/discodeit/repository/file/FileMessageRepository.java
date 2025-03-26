@@ -62,7 +62,9 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void deleteByChannelId(UUID channelId) {
-
+        Map<UUID, Message> messages = loadMessages();
+        messages.entrySet().removeIf(entry -> entry.getValue().getChannelId().equals(channelId));
+        saveMessages(messages);
     }
 
     private Map<UUID, Message> loadMessages() {
