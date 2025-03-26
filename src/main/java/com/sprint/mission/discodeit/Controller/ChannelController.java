@@ -32,4 +32,16 @@ public class ChannelController {
         return ResponseEntity.ok(channeldto);
     }
 
+    @PutMapping(value ="/{channelId}", consumes = "application/json")
+    public ResponseEntity<ChannelDto> updateChannel(@PathVariable("channelId") UUID channelId, @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest){
+        Channel updatedChannel = channelService.update(channelId,publicChannelUpdateRequest);
+        ChannelDto channeldto = channelService.find(updatedChannel.getId());
+
+        return ResponseEntity.ok(channeldto);
+    }
+
+
+
+
+}
 
