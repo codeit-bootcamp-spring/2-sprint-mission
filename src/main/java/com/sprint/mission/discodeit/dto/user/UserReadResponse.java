@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.user;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public record UserReadResponse (
@@ -7,6 +8,8 @@ public record UserReadResponse (
         String userName,
         String userEmail,
         UUID profileId,
-        boolean online
+        boolean online,
+        Instant createdAt,
+        Instant updatedAt
 ){
 }
