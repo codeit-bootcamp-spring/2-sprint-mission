@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -43,6 +44,12 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return userStatusRepository.findByUserId(userId);
+    }
+
+
+    @Override
     public List<UserStatus> findAll() {
         return userStatusRepository.findAll().stream()
                 .toList();
@@ -61,12 +68,9 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
-        Instant newLastActiveAt = request.newLastActiveAt();
-
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("UserStatus with userId " + userId + " not found"));
-        userStatus.update(newLastActiveAt);
-
+        userStatus.update(request.newLastActiveAt());
         return userStatusRepository.save(userStatus);
     }
 

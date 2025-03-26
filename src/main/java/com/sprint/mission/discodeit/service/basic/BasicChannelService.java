@@ -60,13 +60,26 @@ public class BasicChannelService implements ChannelService {
             mySubscribedChannelIds.add(status.getChannelId());
         }
 
-        List<ChannelDto> result = new ArrayList<>();
-        for (Channel channel : channelRepository.findAll()) {
-            if (channel.getType().equals(ChannelType.PUBLIC)
-                    || mySubscribedChannelIds.contains(channel.getId())) {
-                result.add(toDto(channel));
+        List<Channel> allChannels = channelRepository.findAll();
+        List<Channel> publicChannels = new ArrayList<>();
+        List<Channel> privateChannels = new ArrayList<>();
+
+        for (Channel channel : allChannels) {
+            if (channel.getType() == ChannelType.PUBLIC) {
+                publicChannels.add(channel);
+            } else if (channel.getType() == ChannelType.PRIVATE && mySubscribedChannelIds.contains(channel.getId())) {
+                privateChannels.add(channel);
             }
         }
+
+        List<ChannelDto> result = new ArrayList<>();
+        for (Channel channel : publicChannels) {
+            result.add(toDto(channel));
+        }
+        for (Channel channel : privateChannels) {
+            result.add(toDto(channel));
+        }
+
         return result;
     }
 

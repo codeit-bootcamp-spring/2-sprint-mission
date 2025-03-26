@@ -69,11 +69,8 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserDto> findAll() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::toDto)
-                .toList();
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
     @Override
@@ -81,8 +78,8 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-        String newUsername = userUpdateRequest.newUsername();
-        String newEmail = userUpdateRequest.newEmail();
+        String newUsername = userUpdateRequest.getNewUsername();
+        String newEmail = userUpdateRequest.getNewEmail();
         if (userRepository.existsByEmail(newEmail)) {
             throw new IllegalArgumentException("User with email " + newEmail + " already exists");
         }
@@ -103,7 +100,7 @@ public class BasicUserService implements UserService {
                 })
                 .orElse(null);
 
-        String newPassword = userUpdateRequest.newPassword();
+        String newPassword = userUpdateRequest.getNewPassword();
         user.update(newUsername, newEmail, newPassword, nullableProfileId);
 
         return userRepository.save(user);
