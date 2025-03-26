@@ -75,14 +75,17 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void updateMessage(UpdateMessageParamDto updateMessageParamDto) {
-        messageRepository.updateMessage(updateMessageParamDto.messageUUID(), updateMessageParamDto.content());
+        Message message = messageRepository.findMessageById(updateMessageParamDto.messageUUID())
+                .orElseThrow(() -> new NoSuchElementException(updateMessageParamDto.messageUUID().toString() + "를 찾을 수 업습니다."));
+        message.updateContent(updateMessageParamDto.content());
+        messageRepository.save(message);
     }
 
     @Override
     public void deleteMessageById(UUID messageUUID) {
         Message message = messageRepository.findMessageById(messageUUID)
-                        .orElseThrow(NullPointerException::new);
+                .orElseThrow(NullPointerException::new);
         message.getAttachmentList().forEach(binaryContentRepository::delete);
-        messageRepository.deleteMessageById(message.getId());
+        messageRepository.delete(message.getId());
     }
 }

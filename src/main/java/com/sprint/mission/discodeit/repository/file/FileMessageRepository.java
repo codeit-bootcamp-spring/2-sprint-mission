@@ -42,16 +42,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message updateMessage(UUID messageUUID, String content) {
-        Message message = findMessageById(messageUUID)
-                .orElseThrow(() -> new IllegalArgumentException("메세지를 찾을 수 없습니다.: " + messageUUID));
-        message.updateContent(content);
-        fileManager.writeToFile(SubDirectory.MESSAGE, message, message.getId());
-        return message;
-    }
-
-    @Override
-    public boolean deleteMessageById(UUID messageUUID) {
-        return fileManager.deleteFileById(SubDirectory.MESSAGE, messageUUID);
+    public void delete(UUID messageUUID) {
+        fileManager.deleteFileById(SubDirectory.MESSAGE, messageUUID);
     }
 }

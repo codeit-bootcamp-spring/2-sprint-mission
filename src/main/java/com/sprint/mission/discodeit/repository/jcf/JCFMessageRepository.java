@@ -4,56 +4,38 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Repository
 public class JCFMessageRepository implements MessageRepository {
 
-    private final List<Message> messageList = new ArrayList<>();
+    private final Map<UUID, Message> messageList = new HashMap<>();
 
     @Override
     public Message save(Message message) {
-        messageList.add(message);
+        messageList.put(message.getId(), message);
         return message;
     }
 
     @Override
     public Optional<Message> findMessageById(UUID messageUUID) {
-        return messageList.stream()
-                .filter(message -> message.getId().equals(messageUUID))
-                .findAny();
+        return Optional.of(messageList.get(messageUUID));
     }
 
     @Override
     public List<Message> findAllMessage() {
-        return messageList;
+        return messageList.values().stream().toList();
     }
 
     @Override
     public List<Message> findMessageByChannel(UUID channelUUID) {
-        return messageList.stream()
+        return messageList.values().stream()
                 .filter(message -> message.getChannelUUID().equals(channelUUID))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
-    public Message updateMessage(UUID messageUUID, String content) {
-        return messageList.stream()
-                .filter(message -> message.getId().equals(messageUUID))
-                .findAny()
-                .map(message -> {
-                    message.updateContent(content);
-                    return message;
-                })
-                .orElse(null);
-    }
-
-    @Override
-    public boolean deleteMessageById(UUID messageUUID) {
-        return messageList.removeIf(message -> message.getId().equals(messageUUID));
+    public void delete(UUID messageUUID) {
+        messageList.remove(messageUUID);
     }
 }
