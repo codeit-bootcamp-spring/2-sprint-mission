@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusFindResponse;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.DuplicateUserIdException;
+import com.sprint.mission.discodeit.exception.user.DuplicateUserIdException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
