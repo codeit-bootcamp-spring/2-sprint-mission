@@ -29,8 +29,9 @@ public class ChannelController {
     }
 
     @GetMapping
-    public ResponseEntity<ChannelDisplayList> findAll(@PathVariable UUID serverId) {
-        List<ChannelFindDTO> list = channelService.findAllByServerAndUser(serverId);
+    public ResponseEntity<ChannelDisplayList> findAll(HttpServletRequest httpRequest) {
+        UUID userId = (UUID)httpRequest.getAttribute("userId");
+        List<ChannelFindDTO> list = channelService.findAllByUserId(userId);
         return ResponseEntity.ok(new ChannelDisplayList(list));
     }
     @PutMapping("/{channelId}/join")

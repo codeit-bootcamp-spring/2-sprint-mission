@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
@@ -91,30 +92,23 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findAllByServerId(UUID serverId) {
-        if (channelList.isEmpty()) {
-            throw new EmptyChannelListException("Repository 에 저장된 채널 리스트가 없습니다.");
-        }
-        List<Channel> channels = channelList.get(serverId);
+    public List<Channel> findAll() {
+        return channelList.values().stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
 
-        if (channels.isEmpty()) {
-            throw new EmptyChannelListException("해당 서버에 저장된 채널 리스트가 없습니다.");
-        }
+    @Override
+    public List<Channel> findAllByServerId(UUID serverId) {
+        List<Channel> channels = channelList.get(serverId);
         return channels;
     }
 
     @Override
     public List<Channel> findAllByChannelId(UUID channelId) {
-        if (channelList.isEmpty()) {
-            throw new EmptyChannelListException("Repository 에 저장된 채널 리스트가 없습니다.");
-        }
         List<Channel> channels = channelList.values().stream()
                 .flatMap(List::stream)
                 .filter(channel -> channel.getChannelId().equals(channelId)).toList();
-        if (channels.isEmpty()) {
-            throw new EmptyChannelListException("해당 서버에 저장된 채널 리스트가 없습니다.");
-        }
-
         return channels;
     }
 

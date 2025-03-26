@@ -27,15 +27,15 @@ public interface ChannelService {
 
     ChannelFindDTO find(UUID channelId);
 
-    List<ChannelFindDTO> findAllByServerAndUser(UUID serverId );
+    List<ChannelFindDTO> findAllByUserId(UUID userID);
 
     UUID update(UUID channelId,UpdateChannelDTO requestDTO);
 
     void delete(UUID channelId);
 
-    void printChannels(UUID serverId);
+//    void printChannels(UUID serverId);
 
-    void printUsersInChannel(UUID channelId);
+//    void printUsersInChannel(UUID channelId);
 
 
 }

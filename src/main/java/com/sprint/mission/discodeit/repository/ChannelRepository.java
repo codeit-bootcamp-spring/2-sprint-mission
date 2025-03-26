@@ -21,6 +21,8 @@ public interface ChannelRepository {
 
     Channel find(UUID channelId);
 
+    List<Channel> findAll();
+
     List<Channel> findAllByChannelId(UUID channelId);
 
     List<Channel> findAllByServerId(UUID serverId);

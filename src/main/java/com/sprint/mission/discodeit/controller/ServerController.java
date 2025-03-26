@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.display.ServerDisplayItem;
-import com.sprint.mission.discodeit.dto.display.ServerDisplayList;
 import com.sprint.mission.discodeit.dto.create.CreateServerNameDTO;
 import com.sprint.mission.discodeit.dto.create.ServerCreateRequestDTO;
-import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
+import com.sprint.mission.discodeit.dto.display.ServerDisplayItem;
+import com.sprint.mission.discodeit.dto.display.ServerDisplayList;
 import com.sprint.mission.discodeit.dto.result.CreateServerResult;
+import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ServerService;

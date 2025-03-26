@@ -35,17 +35,15 @@ public class BasicServerService implements ServerService {
     @CustomLogging
     @Override
     public Server create(ServerCreateRequestDTO serverCreateRequestDTO) {
-        System.out.println(serverCreateRequestDTO.userId());
         String toekn = tokenStore.getToken(serverCreateRequestDTO.userId());
         checkValidToken(toekn);
 
         User owner = userRepository.findById(serverCreateRequestDTO.userId());
         Server server = new Server(owner.getId(), serverCreateRequestDTO.name());
+
         serverRepository.save(server, owner);
-        serverRepository.join(server, owner);
 
         return server;
-
     }
 
     @Override
@@ -73,7 +71,6 @@ public class BasicServerService implements ServerService {
 
     @Override
     public List<Server> findServerAll(UUID userId) {
-        System.out.println("TokenStore 조회 요청 userId: " + userId);
         String toekn = tokenStore.getToken(userId);
         checkValidToken(toekn);
 

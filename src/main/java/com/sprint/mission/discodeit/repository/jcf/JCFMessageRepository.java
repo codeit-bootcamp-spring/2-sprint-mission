@@ -43,14 +43,7 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        if (messageList.isEmpty()) {
-            throw new EmptyMessageListException("Repository 에 저장된 메시지 리스트가 없습니다.");
-        }
         List<Message> messages = messageList.get(channelId);
-
-        if (messages.isEmpty()) {
-            throw new EmptyMessageListException("해당 채널에 저장된 메시지 리스트가 없습니다.");
-        }
         return messages;
     }
 

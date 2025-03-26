@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,11 +68,8 @@ public class BasicChannelService implements ChannelService {
     public void join(UUID channelId, UUID userId) {
         Channel findChannel = channelRepository.find(channelId);
         User user = userRepository.findById(userId);
-        User join = channelRepository.join(findChannel, user);
+        channelRepository.join(findChannel, user);
 
-//        if (findChannel.getType() == ChannelType.PRIVATE) {
-//            createReadStatus(user, findChannel);
-//        }
     }
 
     @CustomLogging
@@ -79,44 +77,43 @@ public class BasicChannelService implements ChannelService {
     public void quit(UUID channelId, UUID userId) {
         Channel findChannel = channelRepository.find(channelId);
         User user = userRepository.findById(userId);
+        channelRepository.quit(findChannel, user);
 
-        User quit = channelRepository.quit(findChannel, user);
     }
 
     @Override
     public ChannelFindDTO find(UUID channelId) {
         Channel channel = channelRepository.find(channelId);
-        Instant lastMessageTime = null;
 
-        try {
-            List<Message> messageList = messageRepository.findAllByChannelId(channelId);
-            Message message = messageList.get(messageList.size() - 1);
-            lastMessageTime = message.createdAt;
-        } catch (EmptyMessageListException e) {
+        Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getChannelId())
+                .stream()
+                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+                .map(Message::getCreatedAt)
+                .limit(1)
+                .findFirst()
+                .orElse(Instant.MIN);
 
-        } catch (MessageNotFoundException e) {
-
+        List<UUID> userIdList = new ArrayList<>();
+        if (channel.getType().equals(ChannelType.PRIVATE)) {
+            readStatusRepository.findAllByChannelId(channelId)
+                    .stream().map(ReadStatus::getUserId)
+                    .forEach(userIdList::add);
         }
 
-        if (channel.getType() == ChannelType.PUBLIC) {
-            return new ChannelFindDTO(channel.getChannelId(), channel.getName(), null, lastMessageTime);
-        } else {
-            List<User> userList = channel.getUserList();
-            List<UUID> userIdList = userList.stream().map(User::getId).toList();
-            return new ChannelFindDTO(channel.getChannelId(), channel.getName(), userIdList, lastMessageTime);
-        }
+        return ChannelFindDTO.create(channel, userIdList, lastMessageAt);
+
     }
 
     @Override
-    public List<ChannelFindDTO> findAllByServerAndUser(UUID serverId) {
-        List<Channel> channelList = channelRepository.findAllByServerId(serverId);
-        List<ChannelFindDTO> findDTOList = new ArrayList<>();
+    public List<ChannelFindDTO> findAllByUserId(UUID userId) {
+        List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+                .map(ReadStatus::getChannelId)
+                .toList();
 
-        for (Channel channel : channelList) {
-            ChannelFindDTO channelFindDTO = find(channel.getChannelId());
-            findDTOList.add(channelFindDTO);
-        }
-        return findDTOList;
+        return channelRepository.findAll().stream()
+                .filter(channel -> channel.getType().equals(ChannelType.PUBLIC) || mySubscribedChannelIds.contains(channel.getChannelId()))
+                .map(channel -> find(channel.getChannelId()))
+                .toList();
     }
 
     @CustomLogging
@@ -136,33 +133,10 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void delete(UUID channelId) {
-
         channelRepository.remove(channelId);
         deleteAllMessage(channelId);
         deleteAllReadStatus(channelId);
     }
-
-    @Override
-    public void printChannels(UUID serverId) {
-
-        List<Channel> channels = channelRepository.findAllByServerId(serverId);
-        channels.forEach(System.out::println);
-
-    }
-
-    @Override
-    public void printUsersInChannel(UUID channelId) {
-        Channel channel = channelRepository.find(channelId);
-        List<User> list = channel.getUserList();
-        list.forEach(System.out::println);
-
-    }
-
-//
-//    private void createReadStatus(User user, Channel channel) {
-//        ReadStatus readStatus = new ReadStatus(user.getId(), channel.getChannelId());
-//        readStatusRepository.save(readStatus);
-//    }
 
     private void deleteAllMessage(UUID channelId) {
         List<Message> list = messageRepository.findAllByChannelId(channelId);
@@ -177,4 +151,28 @@ public class BasicChannelService implements ChannelService {
             readStatusRepository.delete(status.getReadStatusId());
         }
     }
+
+
+//    @Override
+//    public void printChannels(UUID serverId) {
+//
+//        List<Channel> channels = channelRepository.findAllByServerId(serverId);
+//        channels.forEach(System.out::println);
+//
+//    }
+//
+//    @Override
+//    public void printUsersInChannel(UUID channelId) {
+//        Channel channel = channelRepository.find(channelId);
+//        List<User> list = channel.getUserList();
+//        list.forEach(System.out::println);
+//
+//    }
+
+//
+//    private void createReadStatus(User user, Channel channel) {
+//        ReadStatus readStatus = new ReadStatus(user.getId(), channel.getChannelId());
+//        readStatusRepository.save(readStatus);
+//    }
+
 }
