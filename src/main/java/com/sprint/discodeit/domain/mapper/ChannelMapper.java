@@ -5,7 +5,7 @@ import com.sprint.discodeit.domain.entity.Channel;
 
 public class ChannelMapper {
 
-    public static Channel toChannelMapper(ChannelCreateRequestDto channelCreateRequestDto) {
+    public static Channel toChannel(ChannelCreateRequestDto channelCreateRequestDto) {
         return Channel.builder()
                 .type(channelCreateRequestDto.type())
                 .name(channelCreateRequestDto.name())

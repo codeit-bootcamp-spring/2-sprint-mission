@@ -12,7 +12,6 @@ import com.sprint.discodeit.repository.file.FileChannelRepository;
 import com.sprint.discodeit.repository.file.ReadStatusRepository;
 import com.sprint.discodeit.service.ChannelServiceV1;
 import com.sprint.discodeit.service.basic.users.ReadStatusService;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -31,7 +30,7 @@ public class BasicChannelService implements ChannelServiceV1 {
     @Override
     public ChannelResponseDto create(ChannelCreateRequestDto channelCreateRequestDto) {
 
-        Channel channelMapper = ChannelMapper.toChannelMapper(channelCreateRequestDto);
+        Channel channelMapper = ChannelMapper.toChannel(channelCreateRequestDto);
         ReadStatus readStatus = readStatusService.dispatchChannelCreation(channelMapper.getName(),
                 channelCreateRequestDto.userId(), channelMapper.getId());
         // 저장

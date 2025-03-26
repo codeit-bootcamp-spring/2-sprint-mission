@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository {
 
     public FileMessageRepository() {
-        super(FilePathUtil.Message.getPath());
+        super(FilePathUtil.MESSAGE.getPath());
     }
 
     @Override

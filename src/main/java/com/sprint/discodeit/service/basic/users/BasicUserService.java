@@ -18,7 +18,6 @@ import com.sprint.discodeit.service.basic.util.BinaryGenerator;
 import com.sprint.discodeit.service.basic.util.UserStatusEvaluator;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +54,7 @@ public class BasicUserService implements UserServiceV1 {
         BinaryContent profileImage = binaryGenerator.createProfileImage(userProfileImgResponseDto.imgUrl());
 
         //dto를 엔티티로 변환
-        User userMapper = UserMapper.toUserMapper(userRequestDto);
+        User userMapper = UserMapper.toUser(userRequestDto);
 
         UserStatus userStatus = new UserStatus(userMapper.getCreatedAt(), StatusType.Active.getExplanation());
 

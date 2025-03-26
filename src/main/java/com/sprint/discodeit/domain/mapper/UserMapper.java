@@ -5,7 +5,7 @@ import com.sprint.discodeit.domain.entity.User;
 
 public class UserMapper {
 
-    public static User toUserMapper(UserRequestDto userRequestDto) {
+    public static User toUser(UserRequestDto userRequestDto) {
         return User.builder()
                 .email(userRequestDto.email())
                 .password(userRequestDto.password())
