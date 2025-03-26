@@ -17,25 +17,35 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @GetMapping("/create-public")
-    public ResponseEntity<SaveChannelDto> createPublic(@RequestBody SaveChannelParamDto saveChannelParamDto) {
-        SaveChannelDto saveChannelDto = channelService.createPublicChannel(saveChannelParamDto);
+    public ResponseEntity<SaveChannelDto> createPublic(
+            @RequestParam String channelName
+    ) {
+        SaveChannelDto saveChannelDto = channelService.createPublicChannel(SaveChannelParamDto.createPublic(channelName));
         return ResponseEntity.ok().body(saveChannelDto);
     }
 
     @GetMapping("/create-private")
-    public ResponseEntity<SaveChannelDto> createPrivate(@RequestBody SaveChannelParamDto saveChannelParamDto) {
-        SaveChannelDto saveChannelDto = channelService.createPrivateChannel(saveChannelParamDto);
+    public ResponseEntity<SaveChannelDto> createPrivate(
+            @RequestParam String channelName,
+            @RequestParam List<UUID> userList
+    ) {
+        SaveChannelDto saveChannelDto = channelService.createPrivateChannel(SaveChannelParamDto.createPrivate(channelName, userList));
         return ResponseEntity.ok().body(saveChannelDto);
     }
 
     @GetMapping("/update")
-    public ResponseEntity<?> update(@RequestBody UpdateChannelParamDto updateChannelParamDto) {
-        channelService.updateChannel(updateChannelParamDto);
+    public ResponseEntity<?> update(
+            @RequestParam UUID channelUUID,
+            @RequestParam String channelName
+    ) {
+        channelService.updateChannel(new UpdateChannelParamDto(channelUUID, channelName));
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/delete{id}")
-    public ResponseEntity<?> delete(@RequestParam UUID channelUUID) {
+    @GetMapping("/delete")
+    public ResponseEntity<?> delete(
+            @RequestParam UUID channelUUID
+    ) {
         channelService.deleteChannel(channelUUID);
         return ResponseEntity.ok().build();
     }
