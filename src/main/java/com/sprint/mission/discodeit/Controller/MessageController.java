@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.Controller;
 
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import javax.print.attribute.standard.Media;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/message")
@@ -45,4 +47,12 @@ public class MessageController {
         return ResponseEntity.ok(createdMessage);
 
     }
+
+    @PutMapping(value = "/{messageId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Message> updateMessage(@PathVariable("messageId") UUID messageId, @RequestBody MessageUpdateRequest updateRequest) {
+        Message updatedMessage = messageService.update(messageId, updateRequest);
+        return ResponseEntity.ok(updatedMessage);
+    }
+
+
 }
