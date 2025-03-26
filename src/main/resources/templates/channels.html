@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>채널 목록</title>
+</head>
+<body>
+
+<h1>채널 목록</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>채널 ID</th>
+        <th>이름</th>
+        <th>참여 유저 수</th>
+        <th>마지막 메시지</th>
+    </tr>
+    </thead>
+    <tbody id="channelTableBody">
+    <!-- JS로 채널 목록 삽입 예정 -->
+    </tbody>
+</table>
+
+<br>
+<a id="createChannelLink" href="#"></a>
+<br>
+
+<a id="backLink" href="#">← 채널 관리 페이지로</a>
+
+<script>
+    function getParams() {
+        const params = new URLSearchParams(location.search);
+        return {
+            token: params.get("token"),
+            serverId: params.get("serverId")
+        };
+    }
+
+    function setLinks() {
+        const { token, serverId } = getParams();
+
+        const createLink = document.getElementById("createChannelLink");
+        const backLink = document.getElementById("backLink");
+
+        createLink.href = `/channels/create?serverId=${serverId}&token=${token}`;
+        backLink.href = `/channel-index?serverId=${serverId}&token=${token}`;
+    }
+
+    function loadChannels() {
+        const { token, serverId } = getParams();
+
+        fetch(`/api/servers/${serverId}/channels`, {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("채널 목록 불러오기 실패");
+                return res.json();
+            })
+            .then(data => {
+                const tbody = document.getElementById("channelTableBody");
+                tbody.innerHTML = '';
+
+                data.channels.forEach(channel => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+          <td>${channel.channelId}</td>
+          <td>
+            <a href="/messages?serverId=${serverId}&channelId=${channel.channelId}&token=${token}">
+              ${channel.name || '(비공개 채널)'}
+            </a>
+          </td>
+          <td>${channel.userIdList ? channel.userIdList.length : 0}명</td>
+          <td>${channel.lastMessageAt ? new Date(channel.lastMessageAt).toLocaleString() : '-'}</td>
+        `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(err => {
+                console.error("채널 목록 불러오기 실패:", err);
+                alert("채널 목록을 불러오지 못했습니다.");
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        setLinks();
+        loadChannels();
+    });
+</script>
+
+</body>
+</html>
+

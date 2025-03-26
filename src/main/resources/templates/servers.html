@@ -15,6 +15,7 @@
         <th>서버 이름</th>
         <th>생성일</th>
         <th>수정일</th>
+        <th>참여</th> <!-- ✅ 추가 -->
     </tr>
     </thead>
     <tbody id="serverTableBody">
@@ -53,11 +54,14 @@
             data.servers.forEach(server => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
-          <td>${server.id}</td>
-          <td>${server.name}</td>
-          <td>${new Date(server.createdAt).toLocaleString()}</td>
-          <td>${new Date(server.updatedAt).toLocaleString()}</td>
-        `;
+              <td>${server.id}</td>
+              <td>${server.name}</td>
+              <td>${new Date(server.createdAt).toLocaleString()}</td>
+              <td>${new Date(server.updatedAt).toLocaleString()}</td>
+              <td>
+                <button onclick="joinServer('${server.id}')">참여</button>
+              </td>
+            `;
                 tableBody.appendChild(row);
             });
         } catch (err) {
@@ -65,6 +69,34 @@
             alert("서버 목록을 불러오지 못했습니다.");
         }
     }
+
+    async function joinServer(serverId) {
+        if (!token) {
+            alert("토큰이 없습니다. 로그인해주세요.");
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/servers/${serverId}/join`, {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            });
+
+            if (!res.ok) {
+                throw new Error("서버 참여 실패");
+            }
+
+            alert("서버에 참여했습니다!");
+            // window.location.href = `/servers/${serverId}/channels?token=${encodeURIComponent(token)}`;
+            window.location.href = `/channel-index?token=${encodeURIComponent(token)}&serverId=${serverId}`;
+        } catch (err) {
+            console.error("참여 에러:", err);
+            alert("참여 중 오류가 발생했습니다.");
+        }
+    }
+
 
     document.addEventListener("DOMContentLoaded", loadServers);
 

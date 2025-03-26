@@ -39,8 +39,8 @@ public class BasicMessageService implements MessageService {
 
     @CustomLogging
     @Override
-    public Message create(CreateMessageRequestDTO messageWriteDTO, List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs) {
-        User user = userRepository.findById(messageWriteDTO.userId());
+    public Message create(UUID userId, CreateMessageRequestDTO messageWriteDTO, List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs) {
+        User user = userRepository.findById(userId);
         Channel channel = channelRepository.find(messageWriteDTO.channelId());
 
         Message message = new Message(user.getId(), user.getName(), channel.getChannelId(), messageWriteDTO.text());
@@ -79,6 +79,16 @@ public class BasicMessageService implements MessageService {
 
     @CustomLogging
     @Override
+    public UUID update(UUID messageId, UpdateMessageDTO updateMessageDTO) {
+
+        Message message = messageRepository.find(messageId);
+
+        Message update = messageRepository.update(message, updateMessageDTO);
+        return update.getMessageId();
+    }
+
+    @CustomLogging
+    @Override
     public void delete(UUID messageId) {
 
         Message message = messageRepository.find(messageId);
@@ -90,16 +100,6 @@ public class BasicMessageService implements MessageService {
                 binaryContentRepository.delete(attachmentId);
             }
         }
-    }
-
-    @CustomLogging
-    @Override
-    public UUID update(UUID messageId, UpdateMessageDTO updateMessageDTO) {
-
-        Message message = messageRepository.find(messageId);
-
-        Message update = messageRepository.update(message, updateMessageDTO);
-        return update.getMessageId();
     }
 
     private List<UUID> makeBinaryContent(List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs) {

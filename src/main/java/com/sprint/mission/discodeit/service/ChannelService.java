@@ -15,22 +15,23 @@ public interface ChannelService {
 
     void reset(boolean adminAuth);
 
-    UUID create(CreateChannelRequestDTO channelCreateDTO);
+    UUID create(UUID userId, CreateChannelRequestDTO channelCreateDTO);
 
-//    UserFindDTO join(JoinQuitChannelRequestDTO channelJoinQuitDTO);
-//
-//    UserFindDTO quit(JoinQuitChannelRequestDTO channelJoinQuitDTO);
+    void join(UUID channelId, UUID userId);
+
+    void quit( UUID channelId, UUID userId);
 
     ChannelFindDTO find(UUID channelId);
 
     List<ChannelFindDTO> findAllByServerAndUser(UUID serverId );
 
+    UUID update(UUID channelId,UpdateChannelDTO updateChannelDTO);
+
+    void delete(UUID channelId);
+
     void printChannels(UUID serverId);
 
     void printUsersInChannel(UUID channelId);
 
-    void delete(UUID channelId);
-
-    UUID update(UUID channelId, UpdateChannelDTO updateChannelDTO);
 
 }

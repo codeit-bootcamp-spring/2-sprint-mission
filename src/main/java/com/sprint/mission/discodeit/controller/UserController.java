@@ -77,26 +77,31 @@ public class UserController {
         return ResponseEntity.ok("Delete successful");
     }
 
-//    @PutMapping
-//    public ResponseEntity<UUID> online(@PathVariable UUID userId) {
-//        UserStatus userStatus = userStatusService.findByUserId(userId);
-//        userStatus.updatedTime();
-//
-//        return ResponseEntity.ok(userStatus.getUserStatusId());
-//    }
-//
-//    @PutMapping
-//    public ResponseEntity<UUID> offline(@PathVariable UUID userId) {
-//        UserStatus userStatus = userStatusService.findByUserId(userId);
-//        userStatus.setOffline();
-//
-//        return ResponseEntity.ok(userStatus.getUserStatusId());
-//    }
+    @PutMapping("/online")
+    public ResponseEntity<UUID> online(HttpServletRequest httpRequest) {
+        UUID userId = (UUID) httpRequest.getAttribute("userId");
+
+        UserStatus userStatus = userStatusService.findByUserId(userId);
+        userStatus.updatedTime();
+
+        return ResponseEntity.ok(userStatus.getUserStatusId());
+    }
+
+    @PutMapping("/offline")
+    public ResponseEntity<UUID> offline(HttpServletRequest httpRequest) {
+        UUID userId = (UUID) httpRequest.getAttribute("userId");
+
+        UserStatus userStatus = userStatusService.findByUserId(userId);
+        userStatus.setOffline();
+
+        return ResponseEntity.ok(userStatus.getUserStatusId());
+    }
 
     @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UUID> update(@RequestPart("user") UpdateUserRequestDTO updateUserRequestDTO,
                                        @RequestPart(value = "profileImage", required = false) MultipartFile file,
                                        HttpServletRequest httpRequest) throws IOException {
+
         UUID userId = (UUID) httpRequest.getAttribute("userId");
 
         Optional<CreateBinaryContentRequestDTO> binaryContentRequest = Optional.empty();

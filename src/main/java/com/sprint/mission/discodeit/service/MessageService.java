@@ -17,7 +17,7 @@ public interface MessageService {
 
     void reset(boolean adminAuth);
 
-    Message create(CreateMessageRequestDTO messageWriteDTO, List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs);
+    Message create(UUID userId, CreateMessageRequestDTO messageWriteDTO, List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs);
 
     MessageFindDTO find(UUID messageId);
 

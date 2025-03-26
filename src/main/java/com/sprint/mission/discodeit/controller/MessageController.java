@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.display.MessageDisplayList;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +28,12 @@ public class MessageController {
 
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Message> create(
-            @PathVariable UUID serverId,
-            @PathVariable UUID channelId,
             @RequestPart("message") CreateMessageRequestDTO messageDTO,
-            @RequestPart(value = "profileImage", required = false) List<MultipartFile> files
+            @RequestPart(value = "profileImage", required = false) List<MultipartFile> files,
+            HttpServletRequest httpRequest
     ) throws IOException {
+        UUID userId = (UUID) httpRequest.getAttribute("userId");
+
         List<Optional<CreateBinaryContentRequestDTO>> list = new ArrayList<>();
         if (files != null) {
             for (MultipartFile file : files) {
@@ -47,7 +49,7 @@ public class MessageController {
             }
         }
 
-        Message message = messageService.create(messageDTO, list);
+        Message message = messageService.create(userId, messageDTO, list);
         return ResponseEntity.ok(message);
     }
 
@@ -58,10 +60,8 @@ public class MessageController {
         return ResponseEntity.ok(new MessageDisplayList(list));
     }
 
-    @PutMapping(value = "/update/{messageId}")
+    @PutMapping(value = "/{messageId}/update")
     public ResponseEntity<UUID> update(
-            @PathVariable String serverId,
-            @PathVariable String channelId,
             @PathVariable UUID messageId,
             @RequestParam("message") UpdateMessageDTO updateMessageDTO) {
 
@@ -69,7 +69,7 @@ public class MessageController {
         return ResponseEntity.ok(update);
     }
 
-    @DeleteMapping("/delete/{messageId}")
+    @DeleteMapping("/{messageId}/delete")
     public ResponseEntity<String> delete(@PathVariable UUID messageId) {
         messageService.delete(messageId);
         return ResponseEntity.ok("Delete successful");

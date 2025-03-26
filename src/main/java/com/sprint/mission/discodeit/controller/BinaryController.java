@@ -36,8 +36,5 @@ public class BinaryController {
         response.put("bytes", base64);
 
         return ResponseEntity.ok(response);
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.valueOf(content.getContentType()))
-//                .body(content.getBytes());
     }
 }
