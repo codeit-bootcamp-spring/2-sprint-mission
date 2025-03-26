@@ -23,7 +23,7 @@ public class BinaryContent implements Serializable {
     }
 
     public void update(String fileType, String filePath) {
-        if(fileType == null || filePath == null) {
+        if(fileType != null && filePath != null) {
             this.filePath = filePath;
             this.fileType = fileType;
         }
