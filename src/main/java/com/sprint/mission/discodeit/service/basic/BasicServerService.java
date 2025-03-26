@@ -1,186 +1,88 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.Factory.CreateChannalFactory;
-import com.sprint.mission.discodeit.Repository.ServerRepository;
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.create.CreateServerRequestDTO;
+import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
+import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.logging.CustomLogging;
+import com.sprint.mission.discodeit.repository.ServerRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ServerService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
+@Repository
+@RequiredArgsConstructor
 public class BasicServerService implements ServerService {
-    private final Map<UUID, ServerRepository> serverTable = new HashMap<>();
-    private final ServerRepository repository;
+    private final UserRepository userRepository;
+    private final ServerRepository serverRepository;
 
-    //생성될 때 어떤 repository 를 쓸 지 결정함
-    public BasicServerService(ServerRepository repository) {
-        this.repository = repository;
-    }
-
-
-    private ServerRepository getServerRepository(UUID id) {
-        ServerRepository serverRepository = serverTable.get(id);
-        if (serverRepository == null) {
-            serverTable.put(id, repository);
-            serverRepository = repository;
+    @Override
+    public void reset(boolean adminAuth) {
+        if (adminAuth == true) {
+            serverRepository.reset();
         }
-        return serverRepository;
     }
 
-
+    @CustomLogging
     @Override
-    public Channel createChannel(String name) {
-        return CreateChannalFactory.getInstance().create(name);
-    }
+    public Server create(CreateServerRequestDTO createServerRequestDTO) {
 
-    @Override
-    public void addChannel(UUID serverId, String name) {
-        ServerRepository serverRepository = getServerRepository(serverId);
-        Channel channel = CreateChannalFactory.getInstance().create(name);
-        serverRepository.save(channel);
+        User owner = userRepository.findById(createServerRequestDTO.userId());
+        Server server = new Server(owner.getId(), createServerRequestDTO.name());
+        serverRepository.save(server, owner);
+        serverRepository.join(server, owner);
 
-        //로그
-        System.out.println(channel.getName() + " 채널 추가 성공");
+        return server;
+
     }
 
     @Override
-    public void addChannel(UUID serverId, Channel channel) {
-        ServerRepository serverRepository = getServerRepository(serverId);
-        serverRepository.save(channel);
-
-        //로그
-        System.out.println(channel.getName() + " 채널 추가 성공");
+    @CustomLogging
+    public User join(UUID serverId, UUID userId) {
+        Server server = serverRepository.findById(serverId);
+        User user = userRepository.findById(userId);
+        serverRepository.join(server, user);
+        return user;
     }
 
     @Override
-    public Channel getChannel(UUID serverId, String name) {
-        ServerRepository serverRepository = getServerRepository(serverId);
-        List<Channel> channelList = serverRepository.getContainerList();
-        Channel channel = channelList.stream().filter(c -> c.getName().equals(name))
-                .findFirst().orElse(null);
-        if (channel != null) {
-            //로그
-            System.out.println(channel.getName() + " 이(가) 반환됩니다.");
-            return channel;
-        }
-        //로그
-        System.out.println("존재하지 않습니다.");
-        return null;
+    public User quit(UUID serverId, UUID userId) {
+        Server server = serverRepository.findById(serverId);
+        User user = userRepository.findById(userId);
+        serverRepository.quit(server, user);
+        return user;
     }
 
     @Override
-    public void printChannel(UUID serverId) {
-        ServerRepository serverRepository = getServerRepository(serverId);
-        List<Channel> channelList = serverRepository.getContainerList();
-        printChannel(channelList);
-    }
+    public Server findById(UUID serverId) {
+        Server server = serverRepository.findById(serverId);
+        return server;
 
-
-    private void printChannel(List<Channel> list) {
-        System.out.println("\n=========채널 목록==========");
-        list.forEach(c -> System.out.println(c.getId() + " : " + c.getName()));
-        System.out.println("=========================\n");
     }
 
     @Override
-    public boolean removeChannel(UUID serverId) {
-        ServerRepository serverRepository = getServerRepository(serverId);
-        List<Channel> channelList = serverRepository.getContainerList();
-        if (channelList == null) {
-            System.out.println("채널 삭제 실패 : list null값");
-            return false;
-        }
-        Scanner sc = new Scanner(System.in);
-        System.out.print("삭제할 채널 이름을 입력하시오. : ");
-        String targetName = sc.nextLine();
+    public List<Server> findServerAll(UUID ownerId) {
+        List<Server> serverList = serverRepository.findAllByUserId(ownerId);
+        return serverList;
 
-        return removeChannel(channelList, targetName, serverRepository);
     }
 
     @Override
-    public boolean removeChannel(UUID serverId, String targetName) {
-        ServerRepository serverRepository = getServerRepository(serverId);
-        List<Channel> channelList = serverRepository.getContainerList();
-        if (channelList == null) {
-            System.out.println("채널 삭제 실패 : list null값");
-            return false;
-        }
+    public UUID update(UUID serverId, UpdateServerRequestDTO updateServerRequestDTO) {
 
-        return removeChannel(channelList, targetName, serverRepository);
-    }
+        Server server = serverRepository.findById(serverId);
+        Server update = serverRepository.update(server, updateServerRequestDTO);
+        return update.getServerId();
 
-
-    private boolean removeChannel(List<Channel> list, String targetName, ServerRepository serverRepository) {
-        Channel targetChannel = list.stream().filter(c -> c.getName().equals(targetName))
-                .findFirst().orElse(null);
-        if (targetChannel == null) {
-            System.out.println("삭제할 채널이 존재하지 않습니다.");
-            return false;
-        }
-        System.out.println(targetChannel.getName() + " 이(가) 삭제됩니다.");
-        list.remove(targetChannel);
-
-        //삭제한 내용 적용
-        serverRepository.updateContainerList(list);
-
-        return true;
     }
 
     @Override
-    public boolean updateChannel(UUID serverId) {
-        ServerRepository serverRepository = getServerRepository(serverId);
-        List<Channel> channelList = serverRepository.getContainerList();
-
-        Scanner sc = new Scanner(System.in);
-        System.out.print("바꿀려고 하는 채널의 이름을 입력하시오. : ");
-        String targetName = sc.nextLine();
-
-        return updateChannel(serverId, channelList, targetName);
+    public void delete(UUID serverId) {
+        serverRepository.remove(serverId);
     }
-
-    @Override
-    public boolean updateChannel(UUID serverId, String targetName) {
-        ServerRepository serverRepository = getServerRepository(serverId);
-        List<Channel> channelList = serverRepository.getContainerList();
-
-        Scanner sc = new Scanner(System.in);
-        System.out.print("채널 이름을 무엇으로 바꾸시겠습니까? : ");
-        String replaceName = sc.nextLine();
-
-        return updateChannel(serverId, channelList, targetName, replaceName);
-    }
-
-    @Override
-    public boolean updateChannel(UUID serverId, String targetName, String replaceName) {
-        ServerRepository serverRepository = getServerRepository(serverId);
-        List<Channel> channelList = serverRepository.getContainerList();
-
-        return updateChannel(serverId, channelList, targetName, replaceName);
-    }
-
-
-    private boolean updateChannel(UUID serverId, List<Channel> list, String targetName) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("채널 이름을 무엇으로 바꾸시겠습니까? : ");
-        String replaceName = sc.nextLine();
-
-        return updateChannel(serverId, list, targetName, replaceName);
-
-    }
-
-
-    private boolean updateChannel(UUID serverId, List<Channel> list, String targetName, String replaceName) {
-        ServerRepository serverRepository = getServerRepository(serverId);
-        Channel targetChannel = list.stream().filter(c -> c.getName().equals(targetName))
-                .findFirst().orElse(null);
-        if (targetChannel != null) {
-            targetChannel.setName(replaceName);
-            serverRepository.updateContainerList(list);
-            System.out.println(targetName + " 이름이 " + targetChannel.getName() + " 이(가) 됩니다.");
-            return true;
-        }
-        System.out.println("업데이트할 채널이 존재하지 않습니다.");
-        return false;
-    }
-
 
 }

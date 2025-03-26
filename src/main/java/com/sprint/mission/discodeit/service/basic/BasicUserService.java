@@ -1,175 +1,134 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.Factory.CreateServerFactory;
-import com.sprint.mission.discodeit.Repository.UserRepository;
-import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.dto.UserFindDTO;
+import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
+import com.sprint.mission.discodeit.dto.create.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.Valid.DuplicateUserException;
+import com.sprint.mission.discodeit.logging.CustomLogging;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    private final Map<UUID, UserRepository> userTable = new HashMap<>();
-    private final UserRepository repository;
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
 
-    //생성될 때 어떤 repository 를 쓸 지 결정함
-    public BasicUserService(UserRepository repository) {
-        this.repository = repository;
-    }
-
-    //레포지토리 생성
-    private UserRepository getUserRepository(UUID id) {
-        UserRepository userRepository = userTable.get(id);
-        if (userRepository == null) {
-            userTable.put(id, repository);
-            userRepository = repository;
+    @Override
+    public void reset(boolean adminAuth) {
+        if (adminAuth == true) {
+            userRepository.reset();
         }
-        return userRepository;
+    }
+
+    @CustomLogging
+    @Override
+    public UUID create(CreateUserRequestDTO userCreateDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+
+        checkDuplicate(userCreateDTO.name(), userCreateDTO.email());
+
+        User user = new User(userCreateDTO.name(), userCreateDTO.email(), userCreateDTO.password());
+        UUID profileId = makeBinaryContent(binaryContentDTO);
+        user.setProfileId(profileId);
+        userRepository.save(user);
+
+        UserStatus userStatus = new UserStatus(user.getId());
+        userStatusRepository.save(userStatus);
+
+        return user.getId();
     }
 
     @Override
-    public Server createServer(String name) {
-        return CreateServerFactory.getInstance().create(name);
+    public UserFindDTO findById(UUID userId) {
+        User user = userRepository.findById(userId);
+
+        UserStatus userStatus = userStatusRepository.findByUserId(userId);
+        boolean online = userStatus.isOnline();
+        UserFindDTO userFindDTO = new UserFindDTO(
+                user.getId(),
+                user.getProfileId(),
+                user.getName(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                online
+        );
+
+        return userFindDTO;
     }
 
     @Override
-    public void addServer(UUID userId, String name) {
-        UserRepository userRepository = getUserRepository(userId);
-        Server server = createServer(name);
-        userRepository.save(server);
+    public List<UserFindDTO> listAllUsers() {
+        List<User> userList = userRepository.findAll();
 
-        //로그
-        System.out.println("저장 시점 name :" + server.getId());
+        return userList.stream().map(user -> new UserFindDTO(
+                user.getId(),
+                user.getProfileId(),
+                user.getName(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                userStatusRepository.findByUserId(user.getId()).isOnline()
+        )).toList();
     }
 
+    @CustomLogging
     @Override
-    public void addServer(UUID userId, Server server) {
-        UserRepository userRepository = getUserRepository(userId);
-        userRepository.save(server);
-
-        //로그
-        System.out.println("저장 시점 server:" + server.getId());
-    }
-
-    @Override
-    public Server getServer(UUID userId, String name) {
-        UserRepository userRepository = getUserRepository(userId);
-        List<Server> serverList = userRepository.getServerList();
-        return serverList.stream().filter(s -> s.getName().equals(name)).findFirst().orElse(null);
-    }
-
-    @Override
-    public void printServer(UUID userId) {
-        UserRepository userRepository = getUserRepository(userId);
-        List<Server> list = userRepository.getServerList();
-        printServer(list);
-    }
-
-    @Override
-    public void printServer(List<Server> list) {
-        System.out.println("\n=========서버 목록==========");
-        list.forEach(s -> System.out.println(s.getId() + " : " + s.getName()));
-        System.out.println("=========================\n");
-    }
-
-    @Override
-    public boolean removeServer(UUID userId) {
-        UserRepository userRepository = getUserRepository(userId);
-        List<Server> list = userRepository.getServerList();
-        if (list == null) {
-            System.out.println("서버 삭제 실패 : list null값");
-            return false;
+    public UUID update(UUID userId, UpdateUserRequestDTO updateUserRequestDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+        User user = userRepository.findById(userId);
+        UUID profileId = user.getProfileId();
+        if (profileId != null) {
+            binaryContentRepository.delete(profileId);
         }
+        UUID newProfileId = makeBinaryContent(binaryContentDTO);
 
-        Scanner sc = new Scanner(System.in);
-        System.out.print("삭제할 서버 이름을 입력하시오. : ");
-        String targetName = sc.nextLine();
+        User update = userRepository.update(user, updateUserRequestDTO, newProfileId);
 
-        return removeServer(list, targetName, userRepository);
+        return update.getId();
     }
 
+    @CustomLogging
     @Override
-    public boolean removeServer(UUID userId, String targetName) {
-        UserRepository userRepository = getUserRepository(userId);
-        List<Server> list = userRepository.getServerList();
-        if (list == null) {
-            System.out.println("서버 삭제 실패 : list null값");
-            return false;
+    public void delete(UUID userId) {
+        User findUser = userRepository.findById(userId);
+        userRepository.remove(findUser);
+        userStatusRepository.delete(findUser.getId());
+
+        Optional.ofNullable(findUser.getProfileId())
+                .ifPresent(binaryContentRepository::delete);
+
+    }
+
+    private UUID makeBinaryContent(Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+
+        return binaryContentDTO.map(contentDTO -> {
+            String fileName = contentDTO.fileName();
+            String contentType = contentDTO.contentType();
+            byte[] bytes = contentDTO.bytes();
+            long size = (long) bytes.length;
+
+            BinaryContent content = new BinaryContent(fileName, size, contentType, bytes);
+            binaryContentRepository.save(content);
+            return content.getId();
+        }).orElse(null);
+    }
+
+    private void checkDuplicate(String name, String email) {
+        if (userRepository.existName(name) || userRepository.existEmail(email)) {
+            throw new DuplicateUserException("동일한 유저가 존재합니다.");
         }
-        return removeServer(list, targetName, userRepository);
-
-    }
-
-    private boolean removeServer(List<Server> list, String targetName, UserRepository userRepository) {
-        Server targetServer = list.stream().filter(server -> server.getName().equals(targetName))
-                .findFirst().orElse(null);
-        if (targetServer == null) {
-            System.out.println("삭제할 서버가 존재하지 않습니다.");
-            return false;
-        }
-        //서버 리스트를 가져와서 목표한 서버를 삭제한 뒤
-        list.remove(targetServer);
-
-        //서버를 다시 저장한다.
-        userRepository.updateServerList(list);
-
-        //로그
-        System.out.println(targetServer.getName() + " 이(가) 삭제됩니다.");
-        return true;
-    }
-
-
-    @Override
-    public boolean updateServer(UUID userId) {
-        UserRepository userRepository = getUserRepository(userId);
-        List<Server> list = userRepository.getServerList();
-
-        Scanner sc = new Scanner(System.in);
-        System.out.print("바꿀려고 하는 서버의 이름을 입력하시오. : ");
-        String targetName = sc.nextLine();
-
-        return updateServer(userId, list, targetName);
-    }
-
-    @Override
-    public boolean updateServer(UUID userId, String targetName) {
-        UserRepository userRepository = getUserRepository(userId);
-        List<Server> list = userRepository.getServerList();
-        Scanner sc = new Scanner(System.in);
-        System.out.print("서버 이름을 무엇으로 바꾸시겠습니까? : ");
-        String replaceName = sc.nextLine();
-
-        return updateServer(userId, list, targetName, replaceName);
-    }
-
-    @Override
-    public boolean updateServer(UUID userId, String targetName, String replaceName) {
-        UserRepository userRepository = getUserRepository(userId);
-        List<Server> list = userRepository.getServerList();
-
-        return updateServer(userId, list, targetName, replaceName);
-    }
-
-    private boolean updateServer(UUID userId, List<Server> list, String targetName) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("서버 이름을 무엇으로 바꾸시겠습니까? : ");
-        String replaceName = sc.nextLine();
-        return updateServer(userId, list, targetName, replaceName);
-    }
-
-    private boolean updateServer(UUID userId, List<Server> list, String targetName, String replaceName) {
-        UserRepository userRepository = getUserRepository(userId);
-        Server targetServer = list.stream().filter(server -> server.getName().equals(targetName))
-                .findFirst().orElse(null);
-        if (targetServer != null) {
-            targetServer.setName(replaceName);
-            userRepository.updateServerList(list);
-
-            //로그
-            System.out.println(targetName + " 이름이 " + targetServer.getName() + " 이(가) 됩니다.");
-
-            return true;
-        }
-        System.out.println("업데이트할 서버가 존재하지 않습니다.");
-        return false;
     }
 }

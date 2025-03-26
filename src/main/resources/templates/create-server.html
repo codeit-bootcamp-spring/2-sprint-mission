@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>서버 생성</title>
+  <script>
+    function submitForm(event) {
+      event.preventDefault();
+
+      const userId = document.getElementById("userId").value;
+      const name = document.getElementById("serverName").value;
+
+      fetch(`/api/users/${userId}/servers/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      })
+              .then(res => {
+                if (!res.ok) return res.text().then(msg => { throw new Error(msg); });
+                return res.json();
+              })
+              .then(data => {
+                alert(`서버 생성 완료! ID: ${data.id}`);
+                window.location.href = `/users/${userId}/servers`;
+              })
+              .catch(err => {
+                console.error(err);
+                alert("서버 생성 실패: " + err.message);
+              });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("createForm").addEventListener("submit", submitForm);
+    });
+  </script>
+</head>
+<body>
+<h1>서버 생성</h1>
+
+<form id="createForm">
+  <input type="hidden" id="userId" th:value="${userId}" />
+  <label>서버 이름:</label>
+  <input type="text" id="serverName" required />
+  <button type="submit">생성</button>
+</form>
+
+<br/>
+<a th:href="@{/users}">← 유저 목록으로</a>
+</body>
+</html>

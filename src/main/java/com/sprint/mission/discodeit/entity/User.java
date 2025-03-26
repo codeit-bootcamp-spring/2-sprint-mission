@@ -1,62 +1,62 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.ToString;
+
+import java.io.Serial;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
+@ToString
+@Getter
 public class User implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
-    private final UUID id;
-    public final Long createdAt;
-    public Long updatedAt;
-    protected final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
+
+    private UUID id;
+    public UUID profileId;
 
     private String name;
+    private String email;
+    @ToString.Exclude
     private String password;
 
-    public User(String name, String password) {
-        this(UUID.randomUUID(), System.currentTimeMillis(), name, password);
+    public final Instant createdAt;
+    public Instant updatedAt;
+
+
+    public User(String name, String email, String password) {
+        this(UUID.randomUUID(), null, Instant.now(), name, email, password);
     }
 
-    public User(UUID id, Long createdAt, String name, String password) {
+    public User(UUID id, UUID profileId, Instant createdAt, String name, String email, String password) {
         this.id = id;
+        this.profileId = profileId;
         this.createdAt = createdAt;
+        this.updatedAt = createdAt;
         this.name = name;
+        this.email = email;
         this.password = password;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+        updatedAt = Instant.now();
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-    public String getName() {
-        return name;
+        updatedAt = Instant.now();
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id='" + this.getId() + '\'' +
-                "name='" + name + '\'' +
-                "creadAt='" + format.format(new Date(createdAt)) + '\'' +
-                '}';
+    public void setEmail(String email) {
+        this.email = email;
+        updatedAt = Instant.now();
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Long getCreatedAt() {
-        System.out.println("생성 시각: " + format.format(new Date(createdAt)));
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        System.out.println("수정 시각: " + format.format(new Date(updatedAt)));
-        return updatedAt;
+    public void setProfileId(UUID profileId) {
+        this.profileId = profileId;
+        updatedAt = Instant.now();
     }
 }

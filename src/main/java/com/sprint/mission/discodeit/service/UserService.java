@@ -1,37 +1,27 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.dto.UserFindDTO;
+import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
+import com.sprint.mission.discodeit.dto.create.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+
 public interface UserService {
-    //생성
-    public abstract Server createServer(String name);
 
-    //주입
-    public abstract void addServer(UUID userId, String name);
+    void reset(boolean adminAuth);
 
-    public abstract void addServer(UUID userId, Server server);
+    UUID create(CreateUserRequestDTO userCreateDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO);
 
-    //단건 조회
-    public abstract Server getServer(UUID userId, String name);
+    UserFindDTO findById(UUID userId);
 
-    // 출력
-    public abstract void printServer(UUID userId);
+    List<UserFindDTO> listAllUsers();
 
-    public abstract void printServer(List<Server> list);
+    void delete(UUID userId);
 
-    // 삭제
-    public abstract boolean removeServer(UUID userId);
-
-    public abstract boolean removeServer(UUID userId, String targetName);
-
-    //업데이트
-    public abstract boolean updateServer(UUID userId);
-
-    public abstract boolean updateServer(UUID userId, String targetName);
-
-    public abstract boolean updateServer(UUID userId, String targetName, String replaceName);
+    UUID update(UUID userId, UpdateUserRequestDTO updateUserRequestDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO);
 
 }

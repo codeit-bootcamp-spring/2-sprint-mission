@@ -1,33 +1,31 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.create.CreateServerRequestDTO;
+import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
+import com.sprint.mission.discodeit.entity.Server;
+import com.sprint.mission.discodeit.entity.User;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
+@Service
 public interface ServerService {
-    public abstract Channel createChannel(String name);
 
-    //주입
-    public abstract void addChannel(UUID serverId, String name);
+    void reset(boolean adminAuth);
 
-    public abstract void addChannel(UUID serverId, Channel channel);
+    Server create(CreateServerRequestDTO createServerRequestDTO);
 
-    //단건 조회
-    public abstract Channel getChannel(UUID serverId, String name);
+    User join(UUID serverId, UUID userId);
 
-    //출력
-    public abstract void printChannel(UUID serverId);
+    User quit(UUID serverId, UUID userId);
 
-    //삭제
-    public abstract boolean removeChannel(UUID serverId);
+    Server findById(UUID serverId);
 
-    public abstract boolean removeChannel(UUID serverId, String targetName);
+    List<Server> findServerAll(UUID ownerId);
 
-    //업데이트
-    public abstract boolean updateChannel(UUID serverId);
+    UUID update(UUID serverId, UpdateServerRequestDTO updateServerRequestDTO);
 
-    public abstract boolean updateChannel(UUID serverId, String targetName);
-
-    public abstract boolean updateChannel(UUID serverId, String targetName, String replaceName);
+    void delete(UUID serverId);
 
 }

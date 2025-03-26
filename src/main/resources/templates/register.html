@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>회원가입</title>
+  <script>
+    function submitRegisterForm(event) {
+      event.preventDefault();
+
+      const form = document.getElementById('registerForm');
+      const formData = new FormData(form);  // form 전체에서 모든 필드 추출
+
+      // ✅ JSON 형태로 사용자 정보 묶기
+      const jsonData = JSON.stringify({
+        name: formData.get("name"),
+        email: formData.get("email"),
+        password: formData.get("password")
+      });
+
+      // ✅ 원래 텍스트 필드 제거
+      formData.delete("name");
+      formData.delete("email");
+      formData.delete("password");
+
+      // ✅ JSON 형태를 user라는 이름으로 추가
+      formData.append("user", new Blob([jsonData], { type: "application/json" }));
+
+      // 이제 profileImage는 그대로 들어가 있으므로 수정 필요 없음
+      fetch('/api/users/register', {
+        method: 'POST',
+        body: formData
+      })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('회원가입 실패');
+                }
+                return response.json();
+              })
+              .then(data => {
+                alert(`회원가입 성공! 사용자 ID: ${data.id}`);
+                form.reset();
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert('회원가입에 실패했습니다.');
+              });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('registerForm').addEventListener('submit', submitRegisterForm);
+    });
+  </script>
+
+</head>
+<body>
+<h1>회원가입</h1>
+<form id="registerForm" enctype="multipart/form-data">
+  <label for="name">이름:</label><br/>
+  <input type="text" id="name" name="name" required /><br/><br/>
+
+  <label for="email">이메일:</label><br/>
+  <input type="email" id="email" name="email" required /><br/><br/>
+
+  <label for="password">비밀번호:</label><br/>
+  <input type="password" id="password" name="password" required /><br/><br/>
+
+  <label for="profileImage">프로필 이미지:</label><br/>
+  <input type="file" id="profileImage" name="profileImage" accept="image/*" /><br/><br/>
+
+  <button type="submit">회원가입</button>
+</form>
+<a href="/">🏠 유저 페이지로</a>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>채널 생성</title>
+</head>
+<body>
+
+<h1>채널 생성</h1>
+
+<!-- 숨겨진 ID들 -->
+<input type="hidden" id="serverId" th:value="${serverId}" />
+<input type="hidden" id="userId" th:value="${userId}" />
+
+<form id="channelForm">
+  <label>채널 이름:</label><br/>
+  <input type="text" id="channelName" name="channelName" required><br/><br/>
+
+  <label>채널 타입:</label><br/>
+  <select id="channelType" name="channelType">
+    <option value="PUBLIC">PUBLIC</option>
+    <option value="PRIVATE">PRIVATE</option>
+  </select><br/><br/>
+
+  <button type="submit">생성</button>
+</form>
+
+<br/>
+<a th:href="@{/users/{userId}/servers/{serverId}(userId=${userId}, serverId=${serverId})}">
+  ← 채널 목록으로 돌아가기
+</a>
+
+<script>
+  document.getElementById("channelForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const serverId = document.getElementById("serverId").value;
+    const userId = document.getElementById("userId").value;
+    const name = document.getElementById("channelName").value;
+    const type = document.getElementById("channelType").value;
+
+    fetch(`/api/servers/${serverId}/channels/create`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        serverId: serverId,
+        userId: userId,
+        name: name,
+        type: type
+      })
+    })
+            .then(res => {
+              if (!res.ok) throw new Error("채널 생성 실패");
+              return res.json();
+            })
+            .then(data => {
+              alert(`채널 생성 완료! ID: ${data}`);
+              window.location.href = `/users/${userId}/servers/${serverId}`;
+            })
+            .catch(err => {
+              console.error("에러:", err);
+              alert("채널 생성에 실패했습니다.");
+            });
+  });
+</script>
+
+</body>
+</html>
