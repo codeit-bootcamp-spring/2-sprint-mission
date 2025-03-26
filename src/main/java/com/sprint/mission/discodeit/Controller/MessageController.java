@@ -54,5 +54,11 @@ public class MessageController {
         return ResponseEntity.ok(updatedMessage);
     }
 
+    @DeleteMapping("/{messageId}")
+    public ResponseEntity<Message> deleteMessage(@PathVariable("messageId") UUID messageId) {
+        messageService.delete(messageId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
