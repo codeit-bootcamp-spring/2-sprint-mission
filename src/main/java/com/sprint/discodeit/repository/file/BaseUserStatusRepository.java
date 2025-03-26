@@ -54,5 +54,7 @@ public class BaseUserStatusRepository extends AbstractFileRepository<UserStatus>
 
     @Override
     public void delete(UUID uuId) {
+        Map<UUID, UserStatus> userStatusMap = loadAll();
+        userStatusMap.remove(uuId);
     }
 }
