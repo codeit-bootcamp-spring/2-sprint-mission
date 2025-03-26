@@ -1,26 +1,50 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-// 채팅방을 관리하는 클래스
-public class Channel extends BaseEntity implements Serializable {
-    private static final long serialVersionUID = 10L;
-    // 채널 이름
+@Setter
+@Getter
+@NoArgsConstructor
+public class Channel implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private ChannelType type;
     private String name;
-    // 채널 주제
-    private String topic;
+    private String description;
 
-    public Channel(String name, String topic){
-        super();
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.type = type;
         this.name = name;
-        this.topic = topic;
+        this.description = description;
     }
 
-    public String getName() { return name; }
-    public String getTopic() { return topic; }
-    public void updateChannel(String name, String topic){
-        this.name = name;
-        this.topic = topic;
-        updateTimestamp();
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        // 이름이 다를 경우
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        // 설명이 다를 경우
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+        // update
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }

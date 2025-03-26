@@ -1,30 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-public class Message extends BaseEntity implements Serializable {
-    private static final long serialVersionUID = 100L;
-    // 메시지 내용
-    private String content;
-    // 메시지 작성자 id
-    private UUID userid;
-    // 메시지 작성 채널 id
-    private UUID channelid;
+@Getter
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    // id를 받는 간접 참조
-    public Message(String content, UUID userid, UUID channelid){
-        super();
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
+    // BinaryContent
+    private List<UUID> attachmentIds;
+
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.ofEpochSecond(Instant.now().getEpochSecond());
+        //
         this.content = content;
-        this.userid = userid;
-        this.channelid = channelid;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    public String getContent() { return content; }
-    public UUID getUser() { return userid; }
-    public UUID getChannel() { return channelid; }
-    public void updateMessage(String content){
-        this.content = content;
-        updateTimestamp();
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        // 메시지 내용이 달라졌을 경우
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+        // update
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.ofEpochSecond(Instant.now().getEpochSecond());
+        }
     }
 }
