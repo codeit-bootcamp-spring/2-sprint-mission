@@ -4,6 +4,7 @@ import com.sprint.discodeit.domain.ChannelType;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelResponseDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelUpdateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.PrivateChannelCreateRequestDto;
+import com.sprint.discodeit.domain.dto.channelDto.PublicChannelCreateRequestDto;
 import com.sprint.discodeit.domain.entity.Channel;
 import com.sprint.discodeit.service.ChannelServiceV1;
 import java.util.List;
@@ -33,6 +34,13 @@ public class ChannelController {
         ChannelResponseDto channel = channelService.createPrivateChannel(requestDto);
         return ResponseEntity.ok(channel);
     }
+
+    @PostMapping("/public")
+    public ResponseEntity<ChannelResponseDto> createPublicChannel(@RequestBody PublicChannelCreateRequestDto requestDto) {
+        ChannelResponseDto channel = channelService.createPublicChannel(requestDto);
+        return ResponseEntity.ok(channel);
+    }
+
 
 
     @PutMapping("/{channelId}")

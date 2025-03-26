@@ -28,21 +28,6 @@ public class BasicChannelService implements ChannelServiceV1 {
     private final ReadStatusRepository readStatusRepository;
     private final FileChannelRepository fileChannelRepository;
 
-//    @Override
-//    public ChannelResponseDto create(ChannelCreateRequestDto channelCreateRequestDto) {
-//
-//        Channel channelMapper = ChannelMapper.toChannel(channelCreateRequestDto);
-//        ReadStatus readStatus = readStatusService.dispatchChannelCreation(channelMapper.getName(),
-//                channelCreateRequestDto.userId(), channelMapper.getId());
-//        // 저장
-//        channelRepository.save(channelMapper);
-//        if(readStatus != null){
-//            readStatusRepository.save(readStatus);
-//        }
-//        return new ChannelResponseDto(channelMapper.getId(), channelMapper.getName(), channelMapper.getCreatedAt() ,channelMapper.getType());
-//    }
-
-
     @Override
     public ChannelResponseDto createPrivateChannel(PrivateChannelCreateRequestDto requestDto) {
         List<UUID> userIds = requestDto.userIds();
@@ -54,8 +39,10 @@ public class BasicChannelService implements ChannelServiceV1 {
     }
 
     @Override
-    public Channel createPublicChannel(PublicChannelCreateRequestDto requestDto) {
-        return null;
+    public ChannelResponseDto createPublicChannel(PublicChannelCreateRequestDto requestDto) {
+        Channel channel = ChannelMapper.toPublicChannel(requestDto);
+        channelRepository.save(channel);
+        return new ChannelResponseDto(channel.getId(), channel.getName(), channel.getCreatedAt(), ChannelType.PUBLIC);
     }
 
     @Override
