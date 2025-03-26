@@ -48,13 +48,18 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    public ReadStatus findByUserId(UUID userId) {
+        return readStatusRepository.findByUserId(userId);
+    }
+
+    @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(userId);
     }
 
     @Override
-    public void update(UUID channelId, UUID userId ,ReadStatusUpdateRequestDTO requestDTO) {
-        ReadStatus readStatus = readStatusRepository.findByUserAndChannelId(userId, channelId);
+    public void update(UUID channelId, ReadStatusUpdateRequestDTO requestDTO) {
+        ReadStatus readStatus = readStatusRepository.findByChannelId(channelId);
         readStatus.update(requestDTO.newLastReadAt());
     }
 

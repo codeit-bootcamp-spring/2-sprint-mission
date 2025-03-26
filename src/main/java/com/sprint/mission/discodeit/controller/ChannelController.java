@@ -4,7 +4,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.create.PublicChannelCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.display.ChannelDisplayList;
-import com.sprint.mission.discodeit.dto.update.ReadStatusUpdateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -60,15 +59,5 @@ public class ChannelController {
         channelService.delete(channelId);
         return ResponseEntity.ok("Delete successful");
 
-    }
-
-    @PutMapping("/{channelId}/read-status")
-    public ResponseEntity<Void> updateReadStatus(
-            @PathVariable UUID userId,
-            @PathVariable UUID channelId,
-            @RequestBody ReadStatusUpdateRequestDTO dto
-    ) {
-        readStatusService.update(channelId, userId, dto);
-        return ResponseEntity.ok().build();
     }
 }

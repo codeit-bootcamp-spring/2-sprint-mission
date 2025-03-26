@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UserLoginRequestDTO;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
-    private final BinaryContentService binaryContentService;
     private final UserStatusService userStatusService;
     private final AuthService authService;
 
@@ -87,7 +85,7 @@ public class UserController {
         return ResponseEntity.ok(userStatus.getUserStatusId());
     }
 
-    @PostMapping(value = "/{userId}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{userId}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UUID> update(@PathVariable UUID userId,
                                        @RequestPart("user") UpdateUserRequestDTO updateUserRequestDTO,
                                        @RequestPart(value = "profileImage", required = false) MultipartFile file) throws IOException {
