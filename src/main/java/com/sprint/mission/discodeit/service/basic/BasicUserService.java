@@ -83,7 +83,7 @@ public class BasicUserService implements UserService {
     public void updateUser(UserUpdateRequest userUpdateRequest) {
         User findUser = this.userRepository.findById(userUpdateRequest.userId());
         List<UserUpdater> applicableUpdaters = userUpdaterProvider.getApplicableUpdaters(findUser, userUpdateRequest);
-        applicableUpdaters.forEach(updater -> updater.update(findUser, userUpdateRequest, this.userRepository));
+        applicableUpdaters.forEach(updater -> updater.update(userUpdateRequest, this.userRepository));
     }
 
     @Override
