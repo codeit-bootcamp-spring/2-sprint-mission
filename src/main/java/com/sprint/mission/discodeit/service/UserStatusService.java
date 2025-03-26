@@ -1,14 +1,15 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusRequest;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface UserStatusService {
-    void create(UserStatusRequest statusParam);
+    UserStatus create(UserStatusCreateRequest statusParam);
 
     UserStatus find(UUID id);
 
@@ -16,7 +17,7 @@ public interface UserStatusService {
 
     UserStatus findByUserId(UUID userId);
 
-    UserStatus update(UserStatusRequest statusParam);
+    UserStatus update(UserStatusUpdateRequest statusParam);
 
     UserStatus updateByUserId(UUID userId);
 

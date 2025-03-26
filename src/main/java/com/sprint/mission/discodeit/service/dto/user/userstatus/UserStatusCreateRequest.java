@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.dto.user.userstatus;
 
 import java.util.UUID;
 
-public record UserStatusRequest(
+public record UserStatusCreateRequest(
         UUID userId
 ) {
 }

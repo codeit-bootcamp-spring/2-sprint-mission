@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -10,8 +9,7 @@ import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreat
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusRequest;
-import java.time.Instant;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusCreateRequest;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -28,21 +26,21 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(UserCreateRequest createRequest,
-                       Optional<BinaryContentCreateRequest> binaryContentRequestNullable) {
+                       BinaryContentCreateRequest binaryData) {
         validDuplicateUsername(createRequest.username());
         validDuplicateEmail(createRequest.email());
 
-        UUID binaryContentId = binaryContentRequestNullable
-                .map(basicBinaryContentService::create).map(BinaryContent::getId).orElse(null);
+        UUID binaryContentId = (binaryData != null)
+                ? basicBinaryContentService.create(binaryData).getId()
+                : null;
 
         User user = new User(createRequest.username(), createRequest.email()
                 , createRequest.password(), binaryContentId);
-        User userSave = userRepository.save(user);
-        Instant now = Instant.now();
-        UserStatusRequest statusParam = new UserStatusRequest(user.getId());
+        userRepository.save(user);
+        UserStatusCreateRequest statusParam = new UserStatusCreateRequest(user.getId());
         userStatusService.create(statusParam);
 
-        return userSave;
+        return user;
     }
 
     @Override
@@ -51,9 +49,7 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음"));
         UserStatus userStatus = userStatusService.findByUserId(user.getId());
 
-        return new UserInfoResponse(user.getId(),
-                user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
-                user.getEmail(), user.getProfileId(), userStatus.isOnline());
+        return UserInfoResponse.of(user, userStatus);
     }
 
     @Override
@@ -62,37 +58,30 @@ public class BasicUserService implements UserService {
         return userList.stream()
                 .map(user -> {
                     UserStatus userStatus = userStatusService.findByUserId(user.getId());
-                    return new UserInfoResponse(
-                            user.getId(), user.getCreatedAt(),
-                            user.getUpdatedAt(), user.getUsername(),
-                            user.getEmail(), user.getProfileId(),
-                            userStatus.isOnline()
-                    );
+                    return UserInfoResponse.of(user, userStatus);
                 }).toList();
     }
 
     @Override
     public User update(UserUpdateRequest updateRequest,
-                       Optional<BinaryContentCreateRequest> binaryContentRequestNullable) {
+                       BinaryContentCreateRequest binaryData) {
         User user = userRepository.findById(updateRequest.id())
                 .orElseThrow(() -> new NoSuchElementException(
                         updateRequest.id() + " 에 해당하는 userStatus를 찾을 수 없음"));
+        validDuplicateUsername(updateRequest.newUsername());
+        validDuplicateEmail(updateRequest.newEmail());
 
         String username = (updateRequest.newUsername() == null) ? user.getUsername() : updateRequest.newUsername();
         String email = (updateRequest.newEmail() == null) ? user.getEmail() : updateRequest.newEmail();
         String password = (updateRequest.newPassword() == null) ? user.getPassword() : updateRequest.newPassword();
 
-        validDuplicateUsername(username);
-        validDuplicateEmail(email);
-
-        UUID binaryContentId = binaryContentRequestNullable
-                .map(request -> {
-                    if (user.getProfileId() != null) {
-                        basicBinaryContentService.delete(user.getProfileId());
-                    }
-                    return basicBinaryContentService.create(request);
-                }).map(BinaryContent::getId).orElse(null);
-
+        UUID binaryContentId = null;
+        if (binaryData != null) {
+            if (user.getProfileId() != null) {
+                basicBinaryContentService.delete(user.getProfileId());
+            }
+            binaryContentId = basicBinaryContentService.create(binaryData).getId();
+        }
         user.update(username, email, password, binaryContentId);
         return userRepository.save(user);
     }

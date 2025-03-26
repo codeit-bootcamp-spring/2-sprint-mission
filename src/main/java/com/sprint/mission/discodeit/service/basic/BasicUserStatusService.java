@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusRequest;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -18,16 +20,16 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public void create(UserStatusRequest statusParam) {
+    public UserStatus create(UserStatusCreateRequest statusParam) {
         if (!userRepository.existsById(statusParam.userId())) {
             throw new IllegalArgumentException(statusParam.userId() + " 에 해당하는 사용자를 찾을 수 없음");
         }
 
         if (userStatusRepository.existsByUserId(statusParam.userId())) {
-            throw new IllegalStateException(statusParam.userId() + " 에 해당하는 UserStatus를 이미 존재함");
+            throw new IllegalArgumentException(statusParam.userId() + " 에 해당하는 UserStatus를 이미 존재함");
         }
         UserStatus userStatus = new UserStatus(statusParam.userId());
-        userStatusRepository.save(userStatus);
+        return userStatusRepository.save(userStatus);
     }
 
     @Override
@@ -48,23 +50,29 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus update(UserStatusRequest statusParam) {
+    public UserStatus update(UserStatusUpdateRequest statusParam) {
+        if (!userRepository.existsById(statusParam.userId())) {
+            throw new IllegalArgumentException(statusParam.userId() + "에 해당하는 User를 찾을 수 없음");
+        }
         UserStatus userStatus = findByUserId(statusParam.userId());
-        userStatus.update();
+        userStatus.update(UserStatusType.fromString(statusParam.status()));
+
         return userStatusRepository.save(userStatus);
     }
 
     @Override
     public UserStatus updateByUserId(UUID userId) {
         UserStatus userStatus = findByUserId(userId);
-        userStatus.update();
+        if (userStatus.getStatus() == UserStatusType.OFFLINE) {
+            userStatus.update(UserStatusType.ONLINE);
+        }
         return userStatusRepository.save(userStatus);
     }
 
     @Override
     public void delete(UUID id) {
         if (!userStatusRepository.existsById(id)) {
-            throw new IllegalStateException(id + " 에 해당하는 UserStatus를 찾을 수 없음");
+            throw new IllegalArgumentException(id + " 에 해당하는 UserStatus를 찾을 수 없음");
         }
         userStatusRepository.deleteById(id);
     }

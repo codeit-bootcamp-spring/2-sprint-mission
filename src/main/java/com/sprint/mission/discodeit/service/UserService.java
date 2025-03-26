@@ -10,13 +10,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    User create(UserCreateRequest createParam, Optional<BinaryContentCreateRequest> binaryContentRequestNullable);
+    User create(UserCreateRequest createRequest,
+                BinaryContentCreateRequest binaryData);
 
     UserInfoResponse find(UUID userId);
 
     List<UserInfoResponse> findAll();
 
-    User update(UserUpdateRequest updateParam, Optional<BinaryContentCreateRequest> binaryContentRequestNullable);
+    User update(UserUpdateRequest updateRequest, BinaryContentCreateRequest binaryData);
 
     void delete(UUID userId);
 
