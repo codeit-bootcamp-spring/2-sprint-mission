@@ -1,7 +1,6 @@
 package com.sprint.discodeit.domain.mapper;
 
 import com.sprint.discodeit.domain.ChannelType;
-import com.sprint.discodeit.domain.dto.channelDto.ChannelCreateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.PrivateChannelCreateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.PublicChannelCreateRequestDto;
 import com.sprint.discodeit.domain.entity.Channel;
