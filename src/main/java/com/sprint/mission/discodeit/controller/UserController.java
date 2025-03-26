@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.common.ApiResponse;
 import com.sprint.mission.discodeit.dto.user.*;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final UserStatusService userStatusService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserCreateResponse>> register(@Valid @RequestBody UserCreateRequest request) {
@@ -45,4 +48,19 @@ public class UserController {
                 .body(response);
     }
 
+    @PostMapping("/read")
+    public ResponseEntity<ApiResponse<UserReadResponse>> read(@Valid @RequestBody UserReadRequest request) {
+        UserReadResponse readResponse = userService.readUser(request.userId());
+        ApiResponse<UserReadResponse> response = new ApiResponse<>(true, "유저 읽기 성공", readResponse);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @PostMapping("/status")
+    public ResponseEntity<ApiResponse<Void>> updateStatus(@Valid @RequestBody UserStatusUpdateByUserIdRequest request) {
+        userStatusService.updateUserStatusByUserId(request);
+        ApiResponse<Void> response = new ApiResponse<>(true, "유저 접속시간 업데이트 성공", null);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
 }
