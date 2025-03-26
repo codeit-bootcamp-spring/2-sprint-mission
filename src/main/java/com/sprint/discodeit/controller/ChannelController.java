@@ -69,4 +69,11 @@ public class ChannelController {
         List<ChannelSummaryResponseDto> channels = channelService.findAllByUserId(userId);
         return ResponseEntity.ok(channels);
     }
+
+    @GetMapping("/public")
+    public ResponseEntity<List<ChannelSummaryResponseDto>> getAllPublicChannels() {
+        List<ChannelSummaryResponseDto> channels = channelService.findAll();
+        return ResponseEntity.ok(channels);
+    }
+
 }

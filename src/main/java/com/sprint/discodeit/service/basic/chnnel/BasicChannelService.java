@@ -83,6 +83,8 @@ public class BasicChannelService implements ChannelServiceV1 {
         return new ChannelFindResponseDto(channel.getId(), channel.getName(), latestMessageTime, channel.getType(), participantUserIds);
     }
 
+
+
     public List<ChannelSummaryResponseDto> findAllByUserId(UUID userId) {
         List<Channel> publicChannels = fileChannelRepository.findByChannelType(ChannelType.PRIVATE);
 
@@ -95,6 +97,14 @@ public class BasicChannelService implements ChannelServiceV1 {
 
         return allChannels.stream()
                 .map(this::toChannelSummaryDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ChannelSummaryResponseDto> findAll() {
+        List<Channel> publicChannels = fileChannelRepository.findByChannelType(ChannelType.PRIVATE);
+        return publicChannels.stream()
+                .map(this::toChannelSummaryDto) // 이미 분리한 변환 메서드 사용
                 .collect(Collectors.toList());
     }
 

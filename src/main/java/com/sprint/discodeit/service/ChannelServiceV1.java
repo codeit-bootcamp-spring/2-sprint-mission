@@ -16,4 +16,5 @@ public interface ChannelServiceV1 {
     void delete(UUID channelId);
     ChannelFindResponseDto findChannelById(UUID channelId);
     List<ChannelSummaryResponseDto> findAllByUserId(UUID userId);
+    List<ChannelSummaryResponseDto> findAll();
 }
