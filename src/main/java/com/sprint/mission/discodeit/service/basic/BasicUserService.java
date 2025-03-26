@@ -5,10 +5,10 @@ import com.sprint.mission.discodeit.dto.user.UserReadResponse;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.DuplicateEmailException;
-import com.sprint.mission.discodeit.exception.DuplicateUserNameException;
+import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
+import com.sprint.mission.discodeit.exception.user.DuplicateUserNameException;
+import com.sprint.mission.discodeit.exception.binarycontent.FileIdNotFoundException;
 import com.sprint.mission.discodeit.provider.UserUpdaterProvider;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -40,8 +40,10 @@ public class BasicUserService implements UserService {
         if (userRepository.existsByEmail(userCreateRequest.userEmail())) {
             throw new DuplicateEmailException(userCreateRequest.userEmail());
         }
-        UUID profileImageId = this.binaryContentService.create(userCreateRequest.profileImage());
-        User newUser = new User(userCreateRequest.userName(), userCreateRequest.userEmail(), userCreateRequest.password(), profileImageId); //각 요소에 대한 유효성 검증은 User 생성자에게 맡긴다
+        if (!binaryContentService.existsById(userCreateRequest.profileId())) {
+            throw new FileIdNotFoundException(userCreateRequest.profileId());
+        }
+        User newUser = new User(userCreateRequest.userName(), userCreateRequest.userEmail(), userCreateRequest.password(), userCreateRequest.profileId()); //각 요소에 대한 유효성 검증은 User 생성자에게 맡긴다
         this.userRepository.add(newUser);
         this.readStatusRepository.addUserIdMap(newUser.getId());
         UserStatus newUserStatus = new UserStatus(newUser.getId());
