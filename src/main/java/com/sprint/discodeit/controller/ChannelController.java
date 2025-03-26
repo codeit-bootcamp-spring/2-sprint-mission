@@ -1,15 +1,14 @@
 package com.sprint.discodeit.controller;
 
 import com.sprint.discodeit.domain.ChannelType;
-import com.sprint.discodeit.domain.dto.channelDto.ChannelCreateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelResponseDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelUpdateRequestDto;
+import com.sprint.discodeit.domain.dto.channelDto.PrivateChannelCreateRequestDto;
 import com.sprint.discodeit.domain.entity.Channel;
 import com.sprint.discodeit.service.ChannelServiceV1;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,10 +28,10 @@ public class ChannelController {
     private final ChannelServiceV1 channelService;
 
 
-    @PostMapping
-    public ResponseEntity<ChannelResponseDto> createChannel(@RequestBody ChannelCreateRequestDto requestDto) {
-        ChannelResponseDto responseDto = channelService.create(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    @PostMapping("/private")
+    public ResponseEntity<ChannelResponseDto> createPrivateChannel(@RequestBody PrivateChannelCreateRequestDto requestDto) {
+        ChannelResponseDto channel = channelService.createPrivateChannel(requestDto);
+        return ResponseEntity.ok(channel);
     }
 
 

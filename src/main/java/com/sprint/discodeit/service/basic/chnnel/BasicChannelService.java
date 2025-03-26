@@ -1,9 +1,10 @@
 package com.sprint.discodeit.service.basic.chnnel;
 
 import com.sprint.discodeit.domain.ChannelType;
-import com.sprint.discodeit.domain.dto.channelDto.ChannelCreateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelResponseDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelUpdateRequestDto;
+import com.sprint.discodeit.domain.dto.channelDto.PrivateChannelCreateRequestDto;
+import com.sprint.discodeit.domain.dto.channelDto.PublicChannelCreateRequestDto;
 import com.sprint.discodeit.domain.entity.Channel;
 import com.sprint.discodeit.domain.entity.ReadStatus;
 import com.sprint.discodeit.domain.mapper.ChannelMapper;
@@ -27,20 +28,35 @@ public class BasicChannelService implements ChannelServiceV1 {
     private final ReadStatusRepository readStatusRepository;
     private final FileChannelRepository fileChannelRepository;
 
-    @Override
-    public ChannelResponseDto create(ChannelCreateRequestDto channelCreateRequestDto) {
+//    @Override
+//    public ChannelResponseDto create(ChannelCreateRequestDto channelCreateRequestDto) {
+//
+//        Channel channelMapper = ChannelMapper.toChannel(channelCreateRequestDto);
+//        ReadStatus readStatus = readStatusService.dispatchChannelCreation(channelMapper.getName(),
+//                channelCreateRequestDto.userId(), channelMapper.getId());
+//        // 저장
+//        channelRepository.save(channelMapper);
+//        if(readStatus != null){
+//            readStatusRepository.save(readStatus);
+//        }
+//        return new ChannelResponseDto(channelMapper.getId(), channelMapper.getName(), channelMapper.getCreatedAt() ,channelMapper.getType());
+//    }
 
-        Channel channelMapper = ChannelMapper.toChannel(channelCreateRequestDto);
-        ReadStatus readStatus = readStatusService.dispatchChannelCreation(channelMapper.getName(),
-                channelCreateRequestDto.userId(), channelMapper.getId());
-        // 저장
-        channelRepository.save(channelMapper);
-        if(readStatus != null){
-            readStatusRepository.save(readStatus);
-        }
-        return new ChannelResponseDto(channelMapper.getId(), channelMapper.getName(), channelMapper.getCreatedAt() ,channelMapper.getType());
+
+    @Override
+    public ChannelResponseDto createPrivateChannel(PrivateChannelCreateRequestDto requestDto) {
+        List<UUID> userIds = requestDto.userIds();
+        Channel channel = ChannelMapper.toPrviateChannel(requestDto);
+        channelRepository.save(channel);
+        List<ReadStatus> readStatuses = readStatusService.createReadStatusesForPrivateChannel(userIds, channel.getId());
+        readStatusRepository.saveAll(readStatuses);
+        return new ChannelResponseDto(channel.getId(), channel.getName(), channel.getCreatedAt(), ChannelType.PRIVATE);
     }
 
+    @Override
+    public Channel createPublicChannel(PublicChannelCreateRequestDto requestDto) {
+        return null;
+    }
 
     @Override
     public Channel update(String channelId, ChannelUpdateRequestDto channelUpdateRequestDto) {
