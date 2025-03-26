@@ -1,40 +1,48 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.service.TimeFormatter;
+import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-public class Channel extends BaseEntity implements Serializable {
+@Getter
+public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    private ChannelType type;
     private String name;
+    private String description;
 
-    public Channel(String name) {
-        super();
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.type = type;
         this.name = name;
+        this.description = description;
     }
 
-    public String getName() {
-        return name;
+    public Channel(ChannelType type) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.type = type;
     }
 
-    public void setName(String newName) {
+    public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
-        if(newName != null && !newName.equals(this.name)){
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
             anyValueUpdated = true;
         }
-        if(anyValueUpdated){
-            this.name = newName;
-            setUpdatedAt();
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
         }
-    }
 
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", createdAt=" + TimeFormatter.format(createdAt, "yyyy-MM-dd HH:mm:ss") +
-                ", updatedAt=" + TimeFormatter.format(updatedAt, "yyyy-MM-dd HH:mm:ss") +
-                '}';
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
