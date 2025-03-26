@@ -24,7 +24,7 @@ public class BasicUserStatusService implements UserStatusService {
         if (userRepository.findByKey(dto.userKey()) == null) {
             throw new IllegalArgumentException("[Error] user is null");
         }
-        if (userStatusRepository.existsByUserKey(dto.userKey())) {
+        if (userStatusRepository.findByUserKey(dto.userKey()) != null) {
             throw new IllegalArgumentException("[Error] userStatus is already exists");
         }
         UserStatus userStatus= new UserStatus(dto.userKey(), Instant.now());

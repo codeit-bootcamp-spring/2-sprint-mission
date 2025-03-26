@@ -2,51 +2,88 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileUserStatusRepository implements UserStatusRepository {
-    private final Map<UUID, UserStatus> data = new HashMap<>();
-    private static final String FILE_NAME = "userStatus.ser";
-    private final String filePath;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    public FileUserStatusRepository(String directory) {
-        this.filePath = directory + "/" + FILE_NAME;
-        loadFromFile();
+    public FileUserStatusRepository(
+            @Value("${discodeit.repository.file-dir:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, UserStatus.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        data.put(userStatus.getUserKey(), userStatus);
-        saveToFile();
-
+        Path path = resolvePath(userStatus.getUuid());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(userStatus);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return userStatus;
     }
 
     @Override
     public void delete(UUID userStatusKey) {
-        data.remove(userStatusKey);
-        saveToFile();
+        Path path = resolvePath(userStatusKey);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<UserStatus> findAll() {
-        return data.values().stream().toList();
-    }
-
-    @Override
-    public boolean existsByUserKey(UUID userKey) {
-        return data.values().stream().anyMatch(userStatus -> userStatus.getUserKey().equals(userKey));
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (UserStatus) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public UserStatus findByUserKey(UUID userKey) {
-        return data.values().stream()
+        return findAll().stream()
                 .filter(userStatus -> userStatus.getUserKey().equals(userKey))
                 .findFirst()
                 .orElse(null);
@@ -54,31 +91,19 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public UserStatus findByKey(UUID userStatusKey) {
-        return data.get(userStatusKey);
-    }
-
-    private void saveToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
-            oos.writeObject(data);
-        } catch (IOException e) {
-            System.err.println("[Error] 사용자 데이터를 저장하는 중 문제가 발생했습니다.");
-        }
-    }
-
-    private void loadFromFile() {
-        File file = new File(filePath);
-        if (!file.exists()) return;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            Object obj = ois.readObject();
-            if (obj instanceof Map<?, ?> map) {
-                for (Map.Entry<?, ?> entry : map.entrySet()) {
-                    if (entry.getKey() instanceof UUID key && entry.getValue() instanceof UserStatus value) {
-                        data.put(key, value);
-                    }
-                }
+        UserStatus userStatus = null;
+        Path path = resolvePath(userStatusKey);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userStatus = (UserStatus) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("[Error] 사용자 데이터를 불러오는 중 문제가 발생했습니다.");
         }
+        return userStatus;
     }
+
 }

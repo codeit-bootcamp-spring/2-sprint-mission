@@ -39,7 +39,7 @@ public class BasicUserService implements UserService {
             profileImageKey = binaryContentRepository.findByKey(dto.profileImageKey()).getUuid();
         }
 
-        User user = new User(dto.userName(), dto.pwd(), dto.email(), dto.profileImageKey());
+        User user = new User(dto.userName(), dto.pwd(), dto.email(), profileImageKey);
         userRepository.save(user);
 
         UserStatus userStatus = new UserStatus(user.getUuid(), Instant.EPOCH);
@@ -117,10 +117,10 @@ public class BasicUserService implements UserService {
         if (user == null) {
             throw new IllegalStateException("[Error] 유저가 존재하지 않습니다.");
         }
-        UUID profileId = user.getProfileId();
-
-        binaryContentRepository.delete(profileId);
-        userStatusService.deleteByUserKey(user.getUuid());
-        userRepository.delete(user);
+        if (user.getProfileId() != null) {
+            binaryContentRepository.delete(user.getProfileId());
+        }
+        userStatusService.deleteByUserKey(userKey);
+        userRepository.delete(userKey);
     }
 }

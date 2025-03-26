@@ -53,14 +53,11 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ReadChannelResponseDto> readAllByUserKey(UUID userKey) {
-        List<Channel> publicChannels = channelRepository.findAll().stream()
-                .filter(publicChannel -> publicChannel.getType() == ChannelType.PUBLIC)
-                .toList();
         List<UUID> privateChannelKeys = readStatusRepository.findAllByUserKey(userKey).stream()
                 .map(ReadStatus::getChannelKey)
                 .toList();
-        List<Channel> privateChannels = channelRepository.findAllByKeys(privateChannelKeys);
-        return Stream.concat(publicChannels.stream(), privateChannels.stream())
+        return channelRepository.findAll().stream()
+                .filter(channel -> channel.getType().equals(ChannelType.PUBLIC) || privateChannelKeys.contains(channel.getUuid()))
                 .map(this::createReadChannelResponse)
                 .toList();
     }
