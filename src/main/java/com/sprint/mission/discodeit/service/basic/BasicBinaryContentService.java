@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.util.FileUtil;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -15,12 +16,19 @@ import org.springframework.stereotype.Service;
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
-    public BinaryContent create(BinaryContentCreateRequest createRequest) {
+
+    @Override
+    public BinaryContent create(BinaryContentCreateRequest request) {
+        String originalFilename = request.file().getOriginalFilename();
+        String type = request.file().getContentType();
+        long size = request.file().getSize();
+
+        if (!FileUtil.isAllowedExtension(originalFilename)) {
+            throw new IllegalArgumentException("허용하지 않는 파일");
+        }
+        String filePath = binaryContentRepository.saveFile(request.file());
         BinaryContent binaryContent = new BinaryContent(
-                createRequest.fileName(),
-                createRequest.type(),
-                createRequest.bytes().length,
-                createRequest.bytes()
+                originalFilename, type, size, filePath
         );
         return binaryContentRepository.save(binaryContent);
     }
@@ -38,9 +46,10 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public void delete(UUID id) {
-        if (!binaryContentRepository.existsById(id)) {
-            throw new IllegalArgumentException(id + " 에 해당하는 BinaryContent를 찾을 수 없음");
-        }
-        binaryContentRepository.deleteById(id);
+        BinaryContent binaryContent = findById(id);
+
+        binaryContentRepository.deleteById(binaryContent);
+        // d
     }
+
 }

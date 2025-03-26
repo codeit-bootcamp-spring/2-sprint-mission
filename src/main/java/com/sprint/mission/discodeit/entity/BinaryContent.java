@@ -17,14 +17,14 @@ public class BinaryContent implements Serializable {
     private final String originalFileName;
     private final String type;
     private final Long fileSize;
-    private final byte[] bytes;
+    private final String filePath;
 
-    public BinaryContent(String originalFileName, String type, long fileSize, byte[] bytes) {
+    public BinaryContent(String originalFileName, String type, long fileSize, String filePath) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.originalFileName = originalFileName;
         this.type = type;
         this.fileSize = fileSize;
-        this.bytes = bytes;
+        this.filePath = filePath;
     }
 }
