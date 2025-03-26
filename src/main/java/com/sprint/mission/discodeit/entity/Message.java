@@ -1,55 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.service.TimeFormatter;
+import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-public class Message extends BaseEntity implements Serializable {
+@Getter
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final UUID channelId;
-    private final UUID userId;
-    private String text;
 
-    public Message(UUID channelId, UUID UserId, String text) {
-        super();
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    private String content;
+    private UUID channelId;
+    private UUID authorId;
+    private List<UUID> attachmentIds;
+
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.content = content;
         this.channelId = channelId;
-        this.userId = UserId;
-        this.text = text;
+        this.authorId = authorId;
     }
 
-    public UUID getChannelId() {
-        return channelId;
+    public void setAttachmentIds(List<UUID> attachmentIds) {
+        this.attachmentIds = attachmentIds;
+        this.updatedAt = Instant.now();
     }
 
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String newText) {
+    public void update(String newContent) {
         boolean anyValueUpdated = false;
-        if(newText != null && !newText.equals(this.text)){
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
             anyValueUpdated = true;
         }
-        if(anyValueUpdated){
-            this.text = newText;
-            setUpdatedAt();
-        }
-    }
 
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", channelId=" + channelId +
-                ", userId=" + userId +
-                ", text='" + text + '\'' +
-                ", createdAt=" + TimeFormatter.format(createdAt, "yyyy-MM-dd HH:mm:ss") +
-                ", updatedAt=" + TimeFormatter.format(updatedAt, "yyyy-MM-dd HH:mm:ss") +
-                '}';
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
