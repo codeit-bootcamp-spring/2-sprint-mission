@@ -1,52 +1,35 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-// Message 도메인 객체는 직렬화 인터페이스의 구현체 (그래야 직렬화 가능), 객체(데이터)가 스트림 형태여야지만 파일에 저장하든 네트워크로 DB로 전송할 수 있음.
+@Getter
 public class Message implements Serializable {
-    private static final long serialVersionUID = 3L;
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
+    private static final long serialVersionUID = 1L;
+
+    private final UUID id;
+    private final Instant createdAt;
+    private Instant updatedAt;
     //
     private String content;
     //
-    private UUID channelId;
-    private UUID authorId;
+    private final UUID channelId;
+    private final UUID authorId;
+    private final List<UUID> attachmentIds;
 
-    public Message(String content, UUID channelId, UUID authorId) {
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
-        this.updatedAt = Instant.now().getEpochSecond();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public UUID getAuthorId() {
-        return authorId;
+        this.attachmentIds = attachmentIds;
     }
 
     public void update(String newContent) {
@@ -57,7 +40,7 @@ public class Message implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
+            this.updatedAt = Instant.now();
         }
     }
 
