@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.DTO.User.UserUpdateRequest;
 import com.sprint.mission.discodeit.DTO.UserStatus.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.user.UserExceptionAdvice;
 import com.sprint.mission.discodeit.exception.user.UserNotFound;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;

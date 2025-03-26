@@ -1,5 +1,6 @@
-package com.sprint.mission.discodeit.exception.user;
+package com.sprint.mission.discodeit.exception.global;
 
+import com.sprint.mission.discodeit.exception.dto.ResponseErrorBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -10,22 +11,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class UserExceptionAdvice {
+public class GlobalExceptionHandler {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    @ExceptionHandler(UserNotFound.class)
-    public ResponseEntity<ResponseErrorBody> handleUserNotFound(UserNotFound e) {
-        logger.error("{} handled by UserExceptionAdvice", e.getMessage());
-        e.printStackTrace();
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ResponseErrorBody(e.getMessage()));
-    }
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseErrorBody> handleAllExceptions(Exception e) {
-        logger.error("{} handled by UserExceptionAdvice", e.getMessage());
+        logger.error("{} handled by GlobalExceptionHandler", e.getMessage());
         e.printStackTrace();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -34,7 +26,7 @@ public class UserExceptionAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseErrorBody> handleValidationException(MethodArgumentNotValidException e) {
-        logger.error("{} handled by UserExceptionAdvice", e.getMessage());
+        logger.error("{} handled by GlobalExceptionHandler", e.getMessage());
         e.printStackTrace();
 
         StringBuilder errorMessage = new StringBuilder();

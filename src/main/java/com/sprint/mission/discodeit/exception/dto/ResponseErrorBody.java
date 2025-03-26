@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.exception.user;
+package com.sprint.mission.discodeit.exception.dto;
 
 public record ResponseErrorBody(
     String message
