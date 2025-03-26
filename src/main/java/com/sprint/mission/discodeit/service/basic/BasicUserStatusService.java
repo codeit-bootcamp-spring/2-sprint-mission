@@ -48,7 +48,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void updateUserStatus(UserStatusUpdateRequest userStatusUpdateRequest) {
-        this.userStatusRepository.updateTimeByUserId(userStatusUpdateRequest.readStatusId(), userStatusUpdateRequest.updateTime());
+        this.userStatusRepository.updateTimeByUserId(userStatusUpdateRequest.userStatusId(), userStatusUpdateRequest.updateTime());
     }
 
     @Override
