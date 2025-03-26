@@ -3,17 +3,14 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.display.ServerDisplayItem;
 import com.sprint.mission.discodeit.dto.display.ServerDisplayList;
 import com.sprint.mission.discodeit.dto.create.CreateServerNameDTO;
-import com.sprint.mission.discodeit.dto.create.CreateServerRequestDTO;
+import com.sprint.mission.discodeit.dto.create.ServerCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.dto.result.CreateServerResult;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.TokenStore;
 import com.sprint.mission.discodeit.service.ServerService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,8 +27,8 @@ public class ServerController {
     @ResponseBody
     public ResponseEntity<CreateServerResult> createServer(@RequestBody CreateServerNameDTO requestDTO, HttpServletRequest httpRequest) {
         UUID userId = (UUID) httpRequest.getAttribute("userId");
-        CreateServerRequestDTO createServerRequestDTO = new CreateServerRequestDTO(userId, requestDTO.name());
-        Server server = serverService.create(createServerRequestDTO);
+        ServerCreateRequestDTO serverCreateRequestDTO = new ServerCreateRequestDTO(userId, requestDTO.name());
+        Server server = serverService.create(serverCreateRequestDTO);
         return ResponseEntity.ok(new CreateServerResult(server.getServerId()));
     }
 

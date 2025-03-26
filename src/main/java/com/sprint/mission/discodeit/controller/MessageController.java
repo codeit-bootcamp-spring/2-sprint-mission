@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.MessageFindDTO;
-import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
-import com.sprint.mission.discodeit.dto.create.CreateMessageRequestDTO;
+import com.sprint.mission.discodeit.dto.create.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.create.MessageCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.display.MessageDisplayList;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
@@ -28,18 +28,18 @@ public class MessageController {
 
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Message> create(
-            @RequestPart("message") CreateMessageRequestDTO messageDTO,
+            @RequestPart("message") MessageCreateRequestDTO messageDTO,
             @RequestPart(value = "profileImage", required = false) List<MultipartFile> files,
             HttpServletRequest httpRequest
     ) throws IOException {
         UUID userId = (UUID) httpRequest.getAttribute("userId");
 
-        List<Optional<CreateBinaryContentRequestDTO>> list = new ArrayList<>();
+        List<Optional<BinaryContentCreateRequestDTO>> list = new ArrayList<>();
         if (files != null) {
             for (MultipartFile file : files) {
-                Optional<CreateBinaryContentRequestDTO> binaryContentRequest = Optional.empty();
+                Optional<BinaryContentCreateRequestDTO> binaryContentRequest = Optional.empty();
                 if (file != null && !file.isEmpty()) {
-                    binaryContentRequest = Optional.of(new CreateBinaryContentRequestDTO(
+                    binaryContentRequest = Optional.of(new BinaryContentCreateRequestDTO(
                             file.getOriginalFilename(),
                             file.getContentType(),
                             file.getBytes()

@@ -28,4 +28,8 @@ public interface ChannelRepository {
     Channel update(Channel channel, UpdateChannelDTO updateChannelDTO);
 
     void remove(UUID channelId);
+
+    boolean existId(UUID id);
+
+    boolean existName(String name);
 }

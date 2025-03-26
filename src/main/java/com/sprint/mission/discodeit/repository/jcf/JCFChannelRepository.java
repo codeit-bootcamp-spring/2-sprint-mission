@@ -112,4 +112,14 @@ public class JCFChannelRepository implements ChannelRepository {
         List<Channel> list = channelList.get(serverId);
         list.remove(channel);
     }
+
+    @Override
+    public boolean existId(UUID id) {
+        return channelList.keySet().stream().anyMatch(u -> u.equals(id));
+    }
+
+    @Override
+    public boolean existName(String name) {
+        return channelList.values().stream().flatMap(List::stream).anyMatch(c -> c.getName().equalsIgnoreCase(name));
+    }
 }

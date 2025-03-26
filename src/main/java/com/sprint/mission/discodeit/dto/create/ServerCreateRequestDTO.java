@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.dto.create;
 
 import java.util.UUID;
 
-public record CreateReadStatusRequestDTO(
+public record ServerCreateRequestDTO(
         UUID userId,
-        UUID channelId
+        String name
 ) {
 }

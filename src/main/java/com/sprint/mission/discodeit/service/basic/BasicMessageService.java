@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.MessageFindDTO;
-import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
-import com.sprint.mission.discodeit.dto.create.CreateMessageRequestDTO;
+import com.sprint.mission.discodeit.dto.create.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.create.MessageCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -39,7 +39,7 @@ public class BasicMessageService implements MessageService {
 
     @CustomLogging
     @Override
-    public Message create(UUID userId, CreateMessageRequestDTO messageWriteDTO, List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs) {
+    public Message create(UUID userId, MessageCreateRequestDTO messageWriteDTO, List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
         User user = userRepository.findById(userId);
         Channel channel = channelRepository.find(messageWriteDTO.channelId());
 
@@ -102,7 +102,7 @@ public class BasicMessageService implements MessageService {
         }
     }
 
-    private List<UUID> makeBinaryContent(List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs) {
+    private List<UUID> makeBinaryContent(List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
         List<UUID> collect = binaryContentDTOs.stream()
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -111,7 +111,7 @@ public class BasicMessageService implements MessageService {
         return collect;
     }
 
-    private UUID saveBinaryContent(CreateBinaryContentRequestDTO binaryContentCreateDTO) {
+    private UUID saveBinaryContent(BinaryContentCreateRequestDTO binaryContentCreateDTO) {
         BinaryContent content = new BinaryContent(
                 binaryContentCreateDTO.fileName(),
                 (long) binaryContentCreateDTO.bytes().length,

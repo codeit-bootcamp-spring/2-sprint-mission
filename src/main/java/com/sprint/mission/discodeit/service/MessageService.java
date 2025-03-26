@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.MessageFindDTO;
-import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
-import com.sprint.mission.discodeit.dto.create.CreateMessageRequestDTO;
+import com.sprint.mission.discodeit.dto.create.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.create.MessageCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateMessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public interface MessageService {
 
     void reset(boolean adminAuth);
 
-    Message create(UUID userId, CreateMessageRequestDTO messageWriteDTO, List<Optional<CreateBinaryContentRequestDTO>> binaryContentDTOs);
+    Message create(UUID userId, MessageCreateRequestDTO messageWriteDTO, List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs);
 
     MessageFindDTO find(UUID messageId);
 

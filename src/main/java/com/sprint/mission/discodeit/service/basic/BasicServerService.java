@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.create.CreateServerRequestDTO;
+import com.sprint.mission.discodeit.dto.create.ServerCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -34,13 +34,13 @@ public class BasicServerService implements ServerService {
 
     @CustomLogging
     @Override
-    public Server create(CreateServerRequestDTO createServerRequestDTO) {
-        System.out.println(createServerRequestDTO.userId());
-        String toekn = tokenStore.getToken(createServerRequestDTO.userId());
+    public Server create(ServerCreateRequestDTO serverCreateRequestDTO) {
+        System.out.println(serverCreateRequestDTO.userId());
+        String toekn = tokenStore.getToken(serverCreateRequestDTO.userId());
         checkValidToken(toekn);
 
-        User owner = userRepository.findById(createServerRequestDTO.userId());
-        Server server = new Server(owner.getId(), createServerRequestDTO.name());
+        User owner = userRepository.findById(serverCreateRequestDTO.userId());
+        Server server = new Server(owner.getId(), serverCreateRequestDTO.name());
         serverRepository.save(server, owner);
         serverRepository.join(server, owner);
 

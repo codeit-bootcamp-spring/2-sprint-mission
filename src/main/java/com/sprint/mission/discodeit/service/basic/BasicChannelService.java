@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
-import com.sprint.mission.discodeit.dto.create.CreateChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.create.PrivateChannelCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.create.PublicChannelCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.Empty.EmptyMessageListException;
@@ -36,23 +37,30 @@ public class BasicChannelService implements ChannelService {
 
     @CustomLogging
     @Override
-    public UUID create(UUID userId, CreateChannelRequestDTO channelCreateDTO) {
+    public Channel create(UUID userId, PublicChannelCreateRequestDTO channelCreateDTO) {
         User user = userRepository.findById(userId);
         Server findServer = serverRepository.findById(channelCreateDTO.serverId());
         Channel channel;
 
-        if (channelCreateDTO.type() == ChannelType.PRIVATE) {
-            channel = new Channel(findServer.getServerId(), user.getId(), null, ChannelType.PRIVATE);
-            createReadStatus(user, channel);
-        } else {
-            channel = new Channel(findServer.getServerId(), user.getId(), channelCreateDTO.name());
-        }
+        channel = new Channel(findServer.getServerId(), user.getId(), channelCreateDTO.name());
 
         channelRepository.save(findServer, channel);
         channelRepository.join(channel, user);
 
-        return channel.getChannelId();
+        return channel;
+    }
 
+    @Override
+    public Channel create(UUID userId, PrivateChannelCreateRequestDTO requestDTO) {
+        Channel channel = new Channel(requestDTO.serverId(), userId, null);
+        Server findServer = serverRepository.findById(requestDTO.serverId());
+        Channel createdChannel = channelRepository.save(findServer, channel);
+
+        requestDTO.participantIds().stream()
+                .map(u -> new ReadStatus(u, createdChannel.getChannelId(), Instant.MIN))
+                .forEach(readStatusRepository::save);
+
+        return createdChannel;
     }
 
     @Override
@@ -61,11 +69,9 @@ public class BasicChannelService implements ChannelService {
         User user = userRepository.findById(userId);
         User join = channelRepository.join(findChannel, user);
 
-        if (findChannel.getType() == ChannelType.PRIVATE) {
-            createReadStatus(user, findChannel);
-        }
-
-        return new UserFindDTO(join.getId(),join.getProfileId(),join.getName(),join.getEmail(),join.getCreatedAt(),join.getUpdatedAt());
+//        if (findChannel.getType() == ChannelType.PRIVATE) {
+//            createReadStatus(user, findChannel);
+//        }
     }
 
     @CustomLogging
@@ -75,8 +81,6 @@ public class BasicChannelService implements ChannelService {
         User user = userRepository.findById(userId);
 
         User quit = channelRepository.quit(findChannel, user);
-
-        return new UserFindDTO(quit.getId(),quit.getProfileId(),quit.getName(),quit.getEmail(),quit.getCreatedAt(),quit.getUpdatedAt());
     }
 
     @Override
@@ -154,11 +158,11 @@ public class BasicChannelService implements ChannelService {
 
     }
 
-
-    private void createReadStatus(User user, Channel channel) {
-        ReadStatus readStatus = new ReadStatus(user.getId(), channel.getChannelId());
-        readStatusRepository.save(readStatus);
-    }
+//
+//    private void createReadStatus(User user, Channel channel) {
+//        ReadStatus readStatus = new ReadStatus(user.getId(), channel.getChannelId());
+//        readStatusRepository.save(readStatus);
+//    }
 
     private void deleteAllMessage(UUID channelId) {
         List<Message> list = messageRepository.findAllByChannelId(channelId);

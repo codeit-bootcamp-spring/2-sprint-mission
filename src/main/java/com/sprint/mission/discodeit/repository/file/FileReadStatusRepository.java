@@ -12,17 +12,16 @@ import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
-    private final FileRepositoryImpl<List<ReadStatus>> fileRepository;
     private final Path path = Paths.get(System.getProperty("user.dir"), "data", "ReadStatusList.ser");
 
-    private List<ReadStatus> readStatusList = new ArrayList<>();
+    private  Map<UUID, ReadStatus> readStatusList = new ConcurrentHashMap<>();
+    private final FileRepositoryImpl<Map<UUID, ReadStatus>> fileRepository;
 
     public FileReadStatusRepository() {
         this.fileRepository = new FileRepositoryImpl<>(path);
@@ -35,16 +34,14 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        readStatusList.add(readStatus);
+        readStatusList.put(readStatus.getReadStatusId(), readStatus);
         fileRepository.save(readStatusList);
         return readStatus;
     }
 
     @Override
-    public ReadStatus find(UUID readStatusId) {
-        ReadStatus status = CommonUtils.findById(readStatusList, readStatusId, ReadStatus::getReadStatusId)
-                .orElseThrow(() -> new ReadStatusNotFoundException("읽기 상태를 찾을 수 없습니다."));
-        return status;
+    public Optional<ReadStatus> find(UUID readStatusId) {
+        return Optional.ofNullable(this.readStatusList.get(readStatusId));
     }
 
     @Override
@@ -52,7 +49,10 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         if (readStatusList.isEmpty()) {
             throw new EmptyReadStatusListException("Repository 에 저장된 읽기 상태 리스트가 없습니다.");
         }
-        List<ReadStatus> list = CommonUtils.findAllById(readStatusList, userID, ReadStatus::getUserId);
+
+        List<ReadStatus> list = this.readStatusList.values().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userID))
+                .toList();
 
         if (list.isEmpty()) {
             throw new EmptyReadStatusListException("해당 서버에 저장된 읽기 상태 리스트가 없습니다.");
@@ -66,7 +66,9 @@ public class FileReadStatusRepository implements ReadStatusRepository {
             throw new EmptyReadStatusListException("Repository 에 저장된 읽기 상태 리스트가 없습니다.");
         }
 
-        List<ReadStatus> list = CommonUtils.findAllById(readStatusList, channelId, ReadStatus::getChannelId);
+        List<ReadStatus> list = this.readStatusList.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .toList();
 
         if (list.isEmpty()) {
             throw new EmptyReadStatusListException("해당 서버에 저장된 읽기 상태 리스트가 없습니다.");
@@ -74,19 +76,9 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         return list;
     }
 
-//    @Override
-//    public ReadStatus update(ReadStatus readStatus, ReadStatusCRUDDTO readStatusCRUDDTO) {
-//        if (readStatusCRUDDTO.readStatusId() != null) {
-//            readStatus.setReadStatusId(readStatusCRUDDTO.readStatusId());
-//        }
-//        fileRepository.save(readStatusList);
-//        return readStatus;
-//    }
-
     @Override
     public void delete(UUID readStatusId) {
-        ReadStatus status = find(readStatusId);
-        readStatusList.remove(status);
+        readStatusList.remove(readStatusId);
         fileRepository.save(readStatusList);
     }
 }

@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.service;
 
 
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
-import com.sprint.mission.discodeit.dto.create.CreateChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.create.PrivateChannelCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.create.PublicChannelCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
+import com.sprint.mission.discodeit.entity.Channel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +17,9 @@ public interface ChannelService {
 
     void reset(boolean adminAuth);
 
-    UUID create(UUID userId, CreateChannelRequestDTO channelCreateDTO);
+    Channel create(UUID userId, PublicChannelCreateRequestDTO requestDTO);
+
+    Channel create( UUID userId, PrivateChannelCreateRequestDTO requestDTO);
 
     void join(UUID channelId, UUID userId);
 
@@ -25,7 +29,7 @@ public interface ChannelService {
 
     List<ChannelFindDTO> findAllByServerAndUser(UUID serverId );
 
-    UUID update(UUID channelId,UpdateChannelDTO updateChannelDTO);
+    UUID update(UUID channelId,UpdateChannelDTO requestDTO);
 
     void delete(UUID channelId);
 

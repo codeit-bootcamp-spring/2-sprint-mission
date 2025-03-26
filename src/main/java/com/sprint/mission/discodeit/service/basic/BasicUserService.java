@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.UserFindDTO;
-import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
-import com.sprint.mission.discodeit.dto.create.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.create.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.create.UserCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -42,7 +42,7 @@ public class BasicUserService implements UserService {
 
     @CustomLogging
     @Override
-    public UUID create(CreateUserRequestDTO requestDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+    public UUID create(UserCreateRequestDTO requestDTO, Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
 
         checkDuplicate(requestDTO.name(), requestDTO.email());
         String hashedPassword = BCrypt.hashpw(requestDTO.password(), BCrypt.gensalt());
@@ -96,7 +96,7 @@ public class BasicUserService implements UserService {
 
     @CustomLogging
     @Override
-    public UUID update(UUID userId, UpdateUserRequestDTO updateUserRequestDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+    public UUID update(UUID userId, UpdateUserRequestDTO updateUserRequestDTO, Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
         String toekn = tokenStore.getToken(userId);
         checkValidToken(toekn);
 
@@ -133,7 +133,7 @@ public class BasicUserService implements UserService {
         return b;
     }
 
-    private UUID makeBinaryContent(Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+    private UUID makeBinaryContent(Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
 
         return binaryContentDTO.map(contentDTO -> {
             String fileName = contentDTO.fileName();

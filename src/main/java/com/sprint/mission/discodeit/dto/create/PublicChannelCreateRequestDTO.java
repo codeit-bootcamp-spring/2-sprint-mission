@@ -4,9 +4,8 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.UUID;
 
-public record CreateChannelRequestDTO(
+public record PublicChannelCreateRequestDTO(
         UUID serverId,
-        String name,
-        ChannelType type
+        String name
 ) {
 }

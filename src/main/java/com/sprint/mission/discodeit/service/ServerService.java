@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.create.CreateServerRequestDTO;
+import com.sprint.mission.discodeit.dto.create.ServerCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -14,7 +14,7 @@ public interface ServerService {
 
     void reset(boolean adminAuth);
 
-    Server create(CreateServerRequestDTO createServerRequestDTO);
+    Server create(ServerCreateRequestDTO serverCreateRequestDTO);
 
     User join(UUID serverId, UUID userId);
 

@@ -74,7 +74,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public boolean existName(String name) {
-        return userList.stream().anyMatch(u -> u.getName().equals(name));
+        return userList.stream().anyMatch(u -> u.getName().equalsIgnoreCase(name));
     }
 
     @Override

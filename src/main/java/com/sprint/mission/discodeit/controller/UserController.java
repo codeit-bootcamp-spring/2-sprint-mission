@@ -1,17 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
 
-import com.sprint.mission.discodeit.dto.UserFindDTO;
 import com.sprint.mission.discodeit.dto.display.UserDisplayList;
-import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
-import com.sprint.mission.discodeit.dto.create.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.create.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.create.UserCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.result.LoginResultDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.dto.result.CreateUserResult;
 import com.sprint.mission.discodeit.dto.update.UserLoginRequestDTO;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.TokenStore;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -38,21 +35,21 @@ public class UserController {
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CreateUserResult> register(
-            @RequestPart("user") CreateUserRequestDTO createUserRequestDTO,
+            @RequestPart("user") UserCreateRequestDTO userCreateRequestDTO,
             @RequestPart(value = "profileImage", required = false) MultipartFile file
     ) throws IOException {
 
-        Optional<CreateBinaryContentRequestDTO> binaryContentRequest = Optional.empty();
+        Optional<BinaryContentCreateRequestDTO> binaryContentRequest = Optional.empty();
 
         if (file != null && !file.isEmpty()) {
-            binaryContentRequest = Optional.of(new CreateBinaryContentRequestDTO(
+            binaryContentRequest = Optional.of(new BinaryContentCreateRequestDTO(
                     file.getOriginalFilename(),
                     file.getContentType(),
                     file.getBytes()
             ));
         }
 
-        UUID id = userService.create(createUserRequestDTO, binaryContentRequest);
+        UUID id = userService.create(userCreateRequestDTO, binaryContentRequest);
 
         return ResponseEntity.ok(new CreateUserResult(id));
     }
@@ -104,10 +101,10 @@ public class UserController {
 
         UUID userId = (UUID) httpRequest.getAttribute("userId");
 
-        Optional<CreateBinaryContentRequestDTO> binaryContentRequest = Optional.empty();
+        Optional<BinaryContentCreateRequestDTO> binaryContentRequest = Optional.empty();
 
         if (file != null && !file.isEmpty()) {
-            binaryContentRequest = Optional.of(new CreateBinaryContentRequestDTO(
+            binaryContentRequest = Optional.of(new BinaryContentCreateRequestDTO(
                     file.getOriginalFilename(),
                     file.getContentType(),
                     file.getBytes()

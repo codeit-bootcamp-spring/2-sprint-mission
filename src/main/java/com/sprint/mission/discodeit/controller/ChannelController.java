@@ -3,8 +3,9 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.display.ChannelDisplayList;
-import com.sprint.mission.discodeit.dto.create.CreateChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.create.PublicChannelCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +22,10 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @PostMapping("/create")
-    public ResponseEntity<UUID> create(@RequestBody CreateChannelRequestDTO channelCreateDTO, HttpServletRequest httpRequest ) {
+    public ResponseEntity<UUID> create(@RequestBody PublicChannelCreateRequestDTO channelCreateDTO, HttpServletRequest httpRequest ) {
         UUID userId = (UUID)httpRequest.getAttribute("userId");
-        UUID id = channelService.create(userId,channelCreateDTO);
-        return ResponseEntity.ok(id);
+        Channel channel = channelService.create(userId, channelCreateDTO);
+        return ResponseEntity.ok(channel.getChannelId());
     }
 
     @GetMapping
