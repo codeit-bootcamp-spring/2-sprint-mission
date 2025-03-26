@@ -3,6 +3,7 @@ package com.sprint.discodeit.controller;
 import com.sprint.discodeit.domain.ChannelType;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelFindResponseDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelResponseDto;
+import com.sprint.discodeit.domain.dto.channelDto.ChannelSummaryResponseDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelUpdateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.PrivateChannelCreateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.PublicChannelCreateRequestDto;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -62,5 +62,11 @@ public class ChannelController {
     public ResponseEntity<ChannelFindResponseDto> findChannel(@PathVariable String channelId) {
         ChannelFindResponseDto response = channelService.findChannelById(UUID.fromString(channelId));
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me/{userId}")
+    public ResponseEntity<List<ChannelSummaryResponseDto>> getChannelsForUser(@PathVariable UUID userId) {
+        List<ChannelSummaryResponseDto> channels = channelService.findAllByUserId(userId);
+        return ResponseEntity.ok(channels);
     }
 }

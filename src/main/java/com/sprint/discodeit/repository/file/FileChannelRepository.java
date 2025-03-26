@@ -7,6 +7,7 @@ import com.sprint.discodeit.repository.ChannelRepository;
 import com.sprint.discodeit.repository.util.FilePathUtil;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,6 +54,22 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
         Map<UUID, Channel> channelMap = loadAll();
         return channelMap.values().stream()
                 .filter(channel -> channel.getType().equals(channelType))
+                .collect(Collectors.toList());
+    }
+
+    public List<Channel> findByChannelType(ChannelType channelType){
+        Map<UUID, Channel> channelMap = loadAll();
+        return channelMap.values().stream()
+                .filter(channel -> channel.getType().equals(channelType))
+                .collect(Collectors.toList());
+    }
+
+    public List<Channel> findByIdAll(List<UUID> privateChannelIds) {
+        Map<UUID, Channel> channelMap = loadAll();
+
+        return privateChannelIds.stream()
+                .map(channelMap::get)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 }

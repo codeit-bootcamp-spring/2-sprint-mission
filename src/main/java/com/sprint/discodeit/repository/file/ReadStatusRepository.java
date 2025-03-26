@@ -79,4 +79,11 @@ public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> imp
                 .collect(Collectors.toList());
     }
 
+    public List<UUID> findChannelIdsByUserIdAll(UUID userId) {
+        Map<UUID, ReadStatus> readStatusMap = loadAll();
+        return readStatusMap.values().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .map(ReadStatus::getChannelId)
+                .collect(Collectors.toList());
+    }
 }

@@ -3,6 +3,7 @@ package com.sprint.discodeit.service.basic.chnnel;
 import com.sprint.discodeit.domain.ChannelType;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelFindResponseDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelResponseDto;
+import com.sprint.discodeit.domain.dto.channelDto.ChannelSummaryResponseDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelUpdateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.PrivateChannelCreateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.PublicChannelCreateRequestDto;
@@ -16,9 +17,12 @@ import com.sprint.discodeit.repository.file.ReadStatusRepository;
 import com.sprint.discodeit.service.ChannelServiceV1;
 import com.sprint.discodeit.service.basic.users.ReadStatusService;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -78,5 +82,42 @@ public class BasicChannelService implements ChannelServiceV1 {
         }
         return new ChannelFindResponseDto(channel.getId(), channel.getName(), latestMessageTime, channel.getType(), participantUserIds);
     }
+
+    public List<ChannelSummaryResponseDto> findAllByUserId(UUID userId) {
+        List<Channel> publicChannels = fileChannelRepository.findByChannelType(ChannelType.PRIVATE);
+
+        List<UUID> privateChannelIds = readStatusRepository.findChannelIdsByUserIdAll(userId);
+        List<Channel> privateChannels = fileChannelRepository.findByIdAll(privateChannelIds);
+
+        List<Channel> allChannels = new ArrayList<>();
+        allChannels.addAll(publicChannels);
+        allChannels.addAll(privateChannels);
+
+        return allChannels.stream()
+                .map(this::toChannelSummaryDto)
+                .collect(Collectors.toList());
+    }
+
+    private ChannelSummaryResponseDto toChannelSummaryDto(Channel channel) {
+        Instant latestMessageAt = fileMessageRepository.findLatestMessageTimeByChannelId(channel.getId());
+        if (latestMessageAt == null) {
+            latestMessageAt = channel.getCreatedAt();
+        }
+
+        List<UUID> participantUserIds = null;
+        if (channel.getType() == ChannelType.PRIVATE) {
+            participantUserIds = readStatusRepository.findByUserIdAndChannelId(channel.getId());
+        }
+
+        return new ChannelSummaryResponseDto(
+                channel.getId(),
+                channel.getName(),
+                channel.getDescription(),
+                channel.getType(),
+                latestMessageAt,
+                participantUserIds
+        );
+    }
+
 
 }
