@@ -23,10 +23,10 @@ public interface MessageService {
 
     List<MessageFindDTO> findAllByChannelId(UUID channelId);
 
-    void print(UUID channelId);
+    UUID update(UUID messageId, UpdateMessageDTO updateMessageDTO );
 
     void delete(UUID messageId);
 
-    UUID update(UUID messageId, UpdateMessageDTO updateMessageDTO );
+//    void print(UUID channelId);
 
 }

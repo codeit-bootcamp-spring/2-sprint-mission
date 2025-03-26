@@ -43,10 +43,9 @@ public class BasicMessageService implements MessageService {
         User user = userRepository.findById(userId);
         Channel channel = channelRepository.find(messageWriteDTO.channelId());
 
-        Message message = new Message(user.getId(), user.getName(), channel.getChannelId(), messageWriteDTO.text());
-
         List<UUID> binaryContentIdList = makeBinaryContent(binaryContentDTOs);
-        message.setAttachmentIds(binaryContentIdList);
+
+        Message message = new Message(user.getId(), user.getName(), channel.getChannelId(), messageWriteDTO.text(),binaryContentIdList);
 
         messageRepository.save(channel, message);
         return message;
@@ -55,26 +54,14 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageFindDTO find(UUID messageId) {
         Message message = messageRepository.find(messageId);
-        MessageFindDTO messageFindDTO = new MessageFindDTO(message.getUserName(), message.text, message.createdAt);
 
-        return messageFindDTO;
+        return MessageFindDTO.create(message);
     }
 
     @Override
     public List<MessageFindDTO> findAllByChannelId(UUID channelId) {
         List<Message> list = messageRepository.findAllByChannelId(channelId);
-        List<MessageFindDTO> messageFindDTOS = list.stream().map(message -> new MessageFindDTO(message.getUserName(), message.text, message.createdAt)).toList();
-        return messageFindDTOS;
-    }
-
-    @Override
-    public void print(UUID channelId) {
-        Channel channel = channelRepository.find(channelId);
-        System.out.println(channel.getName());
-        List<Message> messages = messageRepository.findAllByChannelId(channel.getChannelId());
-        for (Message message : messages) {
-            System.out.println(message.getUserName() + " : " + message.getText());
-        }
+        return list.stream().map(MessageFindDTO::create).toList();
     }
 
     @CustomLogging
@@ -84,6 +71,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.find(messageId);
 
         Message update = messageRepository.update(message, updateMessageDTO);
+
         return update.getMessageId();
     }
 
@@ -94,12 +82,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.find(messageId);
 
         messageRepository.remove(messageId);
-        if (message.getAttachmentIds().isEmpty() == false) {
-            List<UUID> attachmentIds = message.getAttachmentIds();
-            for (UUID attachmentId : attachmentIds) {
-                binaryContentRepository.delete(attachmentId);
-            }
-        }
+        message.getAttachmentIds().forEach(binaryContentRepository::delete);
     }
 
     private List<UUID> makeBinaryContent(List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
@@ -121,4 +104,14 @@ public class BasicMessageService implements MessageService {
         binaryContentRepository.save(content);
         return content.getId();
     }
+
+//    @Override
+//    public void print(UUID channelId) {
+//        Channel channel = channelRepository.find(channelId);
+//        System.out.println(channel.getName());
+//        List<Message> messages = messageRepository.findAllByChannelId(channel.getChannelId());
+//        for (Message message : messages) {
+//            System.out.println(message.getUserName() + " : " + message.getText());
+//        }
+//    }
 }

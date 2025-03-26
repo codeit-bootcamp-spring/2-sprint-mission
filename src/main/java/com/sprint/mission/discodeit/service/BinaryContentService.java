@@ -17,5 +17,5 @@ public interface BinaryContentService {
 
     List<BinaryContent> findAllByIdIn();
 
-    boolean delete(UUID binaryId);
+    void delete(UUID binaryId);
 }

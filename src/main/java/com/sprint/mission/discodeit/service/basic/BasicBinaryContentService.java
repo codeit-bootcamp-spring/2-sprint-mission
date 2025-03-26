@@ -20,25 +20,21 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContent create(BinaryContentCreateRequestDTO binaryContentCreateRequestDTO) {
         BinaryContent binaryContent = new BinaryContent(binaryContentCreateRequestDTO.fileName(),(long) binaryContentCreateRequestDTO.bytes().length, binaryContentCreateRequestDTO.contentType(), binaryContentCreateRequestDTO.bytes());
-        binaryContentRepository.save(binaryContent);
-        return binaryContent;
+        return binaryContentRepository.save(binaryContent);
     }
 
     @Override
     public BinaryContent findById(UUID binaryId) {
-        BinaryContent binaryContent = binaryContentRepository.findById(binaryId);
-        return binaryContent;
+        return binaryContentRepository.findById(binaryId);
     }
     @Override
     public List<BinaryContent> findAllByIdIn() {
-        List<BinaryContent> contentList = binaryContentRepository.findAllByIdIn();
-        return contentList;
+        return binaryContentRepository.findAllByIdIn();
     }
 
     @CustomLogging
     @Override
-    public boolean delete(UUID binaryId) {
-        boolean delete = binaryContentRepository.delete(binaryId);
-        return delete;
+    public void delete(UUID binaryId) {
+        binaryContentRepository.delete(binaryId);
     }
 }

@@ -28,10 +28,14 @@ public class Message implements Serializable {
     public String text;
 
     public Message(UUID userId, String userName, UUID channelId, String text) {
-        this(userId, userName, channelId, UUID.randomUUID(), Instant.now(), text);
+        this(userId, userName, channelId, UUID.randomUUID(), Instant.now(), text,null);
     }
 
-    public Message(UUID userId, String userName, UUID channelId, UUID messageId, Instant createdAt, String text) {
+    public Message(UUID userId, String userName, UUID channelId, String text, List<UUID> attachmentIds) {
+        this(userId, userName, channelId, UUID.randomUUID(), Instant.now(), text,attachmentIds);
+    }
+
+    public Message(UUID userId, String userName, UUID channelId, UUID messageId, Instant createdAt, String text, List<UUID> attachmentIds) {
         this.userId = userId;
         this.userName = userName;
         this.channelId = channelId;
@@ -39,6 +43,7 @@ public class Message implements Serializable {
         this.createdAt = createdAt;
         this.updatedAt = createdAt;
         this.text = text;
+        this.attachmentIds = attachmentIds;
     }
 
     public void setText(String text) {
