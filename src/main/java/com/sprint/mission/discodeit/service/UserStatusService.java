@@ -20,5 +20,7 @@ public interface UserStatusService {
 
     UUID update(UUID userId);
 
-    void delete(UUID userStatusId);
+    void deleteById(UUID userStatusId);
+
+    void deleteByUserId(UUID userId);
 }

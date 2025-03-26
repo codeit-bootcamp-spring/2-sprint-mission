@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.Empty.EmptyUserStatusListException;
-import com.sprint.mission.discodeit.exception.NotFound.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -25,22 +23,19 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public UserStatus findByUserId(UUID userId) {
         UserStatus status = userStatusList.stream().filter(userStatus -> userStatus.getUserId().equals(userId))
-                .findFirst().orElseThrow(() -> new UserStatusNotFoundException("유저 상태를 찾지 못했습니다."));
+                .findFirst().orElse(null);
         return status;
     }
 
     @Override
     public UserStatus findByStatusId(UUID userStatusId) {
         UserStatus status = userStatusList.stream().filter(userStatus -> userStatus.getUserStatusId().equals(userStatusId))
-                .findFirst().orElseThrow(() -> new UserStatusNotFoundException("유저 상태를 찾지 못했습니다."));
+                .findFirst().orElse(null);
         return status;
     }
 
     @Override
     public List<UserStatus> findAll() {
-        if (userStatusList.isEmpty()) {
-            throw new EmptyUserStatusListException("Repository 내 유저 상태 리스트가 비어있습니다.");
-        }
         return userStatusList;
     }
 
@@ -51,8 +46,14 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void delete(UUID userStatusId) {
+    public void deleteById(UUID userStatusId) {
         UserStatus userStatus = findByStatusId(userStatusId);
+        userStatusList.remove(userStatus);
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        UserStatus userStatus = findByUserId(userId);
         userStatusList.remove(userStatus);
     }
 }

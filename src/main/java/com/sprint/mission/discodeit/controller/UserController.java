@@ -69,7 +69,7 @@ public class UserController {
         return ResponseEntity.ok("Delete successful");
     }
 
-    @PutMapping("/{userId}/online")
+    @PutMapping("/online/{userId}")
     public ResponseEntity<UUID> online(@PathVariable UUID userId) {
         UserStatus userStatus = userStatusService.findByUserId(userId);
         userStatus.updatedTime();
@@ -77,7 +77,7 @@ public class UserController {
         return ResponseEntity.ok(userStatus.getUserStatusId());
     }
 
-    @PutMapping("/{userId}/offline")
+    @PutMapping("/offline/{userId}")
     public ResponseEntity<UUID> offline(@PathVariable UUID userId) {
         UserStatus userStatus = userStatusService.findByUserId(userId);
         userStatus.setOffline();
@@ -85,7 +85,7 @@ public class UserController {
         return ResponseEntity.ok(userStatus.getUserStatusId());
     }
 
-    @PutMapping(value = "/{userId}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/update/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UUID> update(@PathVariable UUID userId,
                                        @RequestPart("user") UpdateUserRequestDTO updateUserRequestDTO,
                                        @RequestPart(value = "profileImage", required = false) MultipartFile file) throws IOException {

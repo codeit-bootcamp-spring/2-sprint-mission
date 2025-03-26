@@ -18,5 +18,7 @@ public interface UserStatusRepository {
 
     UserStatus update(UserStatus userStatus);
 
-    void delete(UUID userStatusId);
+    void deleteById(UUID userStatusId);
+
+    void deleteByUserId(UUID userStatusId);
 }

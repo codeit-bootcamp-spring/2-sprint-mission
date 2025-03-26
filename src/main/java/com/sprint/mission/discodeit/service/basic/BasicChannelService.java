@@ -36,9 +36,9 @@ public class BasicChannelService implements ChannelService {
 
     @CustomLogging
     @Override
-    public Channel create(UUID userId, PublicChannelCreateRequestDTO channelCreateDTO) {
+    public Channel create(UUID userId, UUID serverId,PublicChannelCreateRequestDTO channelCreateDTO) {
         User user = userRepository.findById(userId);
-        Server findServer = serverRepository.findById(channelCreateDTO.serverId());
+        Server findServer = serverRepository.findById(serverId);
         Channel channel;
 
         channel = new Channel(findServer.getServerId(), user.getId(), channelCreateDTO.name());
@@ -50,9 +50,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(UUID userId, PrivateChannelCreateRequestDTO requestDTO) {
-        Channel channel = new Channel(requestDTO.serverId(), userId, null);
-        Server findServer = serverRepository.findById(requestDTO.serverId());
+    public Channel create(UUID userId, UUID serverId,PrivateChannelCreateRequestDTO requestDTO) {
+        Channel channel = new Channel(serverId, userId, null);
+        Server findServer = serverRepository.findById(serverId);
         Channel createdChannel = channelRepository.save(findServer, channel);
 
         requestDTO.participantIds().stream()

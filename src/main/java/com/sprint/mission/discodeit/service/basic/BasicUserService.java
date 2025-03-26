@@ -11,8 +11,8 @@ import com.sprint.mission.discodeit.exception.Valid.DuplicateUserException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -24,9 +24,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
+    private final UserStatusService userStatusService;
+
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final UserStatusRepository userStatusRepository;
+
 
     @Override
     public void reset(boolean adminAuth) {
@@ -41,15 +43,12 @@ public class BasicUserService implements UserService {
 
         checkDuplicate(requestDTO.name(), requestDTO.email());
 
-
         UUID profileId = makeBinaryContent(binaryContentDTO);
         String hashedPassword = BCrypt.hashpw(requestDTO.password(), BCrypt.gensalt());
         User user = new User(profileId, requestDTO.name(), requestDTO.email(), hashedPassword);
         userRepository.save(user);
 
-
-        UserStatus userStatus = new UserStatus(user.getId());
-        userStatusRepository.save(userStatus);
+        userStatusService.create(user.getId());
 
         return user.getId();
     }
@@ -58,7 +57,7 @@ public class BasicUserService implements UserService {
     public UserFindDTO findById(UUID userId) {
         User user = userRepository.findById(userId);
 
-        UserStatus userStatus = userStatusRepository.findByUserId(userId);
+        UserStatus userStatus = userStatusService.findByUserId(userId);
         boolean online = userStatus.isOnline();
 
         return UserFindDTO.create(user, online);
@@ -70,7 +69,7 @@ public class BasicUserService implements UserService {
 
         return userList.stream().map(user -> UserFindDTO.create(
                 user,
-                userStatusRepository.findByUserId(user.getId()).isOnline())
+                userStatusService.findByUserId(user.getId()).isOnline())
         ).toList();
     }
 
@@ -102,7 +101,7 @@ public class BasicUserService implements UserService {
         Optional.ofNullable(findUser.getProfileId())
                 .ifPresent(binaryContentRepository::delete);
 
-        userStatusRepository.delete(findUser.getId());
+        userStatusService.deleteById(findUser.getId());
 
         userRepository.remove(findUser);
 

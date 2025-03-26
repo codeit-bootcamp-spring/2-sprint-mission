@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.display.ChannelDisplayList;
 import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,14 +16,13 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/{userId}/channels")
+@RequestMapping("/api/{userId}/{serverId}")
 public class ChannelController {
     private final ChannelService channelService;
-    private final ReadStatusService readStatusService;
 
     @PostMapping("/create")
-    public ResponseEntity<UUID> create(@PathVariable UUID userId, @RequestBody PublicChannelCreateRequestDTO channelCreateDTO) {
-        Channel channel = channelService.create(userId, channelCreateDTO);
+    public ResponseEntity<UUID> create(@PathVariable UUID userId,@PathVariable UUID serverId, @RequestBody PublicChannelCreateRequestDTO channelCreateDTO) {
+        Channel channel = channelService.create(userId, serverId, channelCreateDTO);
         return ResponseEntity.ok(channel.getChannelId());
     }
 
@@ -34,27 +32,28 @@ public class ChannelController {
         List<ChannelFindDTO> list = channelService.findAllByUserId(userId);
         return ResponseEntity.ok(new ChannelDisplayList(list));
     }
-    @PutMapping("/{channelId}/join")
+
+    @PutMapping("/join/{channelId}")
     public ResponseEntity<String> join(@PathVariable UUID userId, @PathVariable UUID channelId) {
         channelService.join(channelId,userId);
 
         return ResponseEntity.ok("Success");
     }
 
-    @PutMapping("/{channelId}/quit")
+    @PutMapping("/quit/{channelId}")
     public ResponseEntity<String> quit(@PathVariable UUID userId, @PathVariable UUID channelId) {
         channelService.quit(channelId,userId);
 
         return ResponseEntity.ok("Success");
     }
 
-    @PutMapping("/{channelId}/update")
+    @PutMapping("/update/{channelId}")
     public ResponseEntity<UUID> update(@PathVariable UUID userId, @PathVariable UUID channelId, @RequestBody UpdateChannelDTO updateChannelDTO) {
         UUID update = channelService.update(channelId, updateChannelDTO);
         return ResponseEntity.ok(update);
     }
 
-    @DeleteMapping("/{channelId}/delete")
+    @DeleteMapping("/delete/{channelId}")
     public ResponseEntity<String> delete(@PathVariable UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity.ok("Delete successful");

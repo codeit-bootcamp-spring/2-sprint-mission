@@ -17,9 +17,9 @@ public interface ChannelService {
 
     void reset(boolean adminAuth);
 
-    Channel create(UUID userId, PublicChannelCreateRequestDTO requestDTO);
+    Channel create(UUID userId, UUID serverId, PublicChannelCreateRequestDTO requestDTO);
 
-    Channel create( UUID userId, PrivateChannelCreateRequestDTO requestDTO);
+    Channel create( UUID userId, UUID serverId,PrivateChannelCreateRequestDTO requestDTO);
 
     void join(UUID channelId, UUID userId);
 

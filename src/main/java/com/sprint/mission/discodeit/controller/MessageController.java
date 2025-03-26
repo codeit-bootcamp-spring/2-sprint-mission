@@ -21,16 +21,15 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/messages")
+@RequestMapping("/api/{userId}/{serverId}/{channelId}")
 public class MessageController {
     private final MessageService messageService;
 
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Message> create(
+            @PathVariable UUID userId,@PathVariable UUID channelId,
             @RequestPart("message") MessageCreateRequestDTO messageDTO,
-            @RequestPart(value = "profileImage", required = false) List<MultipartFile> files
-            ) throws IOException {
-
+            @RequestPart(value = "profileImage", required = false) List<MultipartFile> files) throws IOException {
         List<Optional<BinaryContentCreateRequestDTO>> list = new ArrayList<>();
         if (files != null) {
             for (MultipartFile file : files) {
@@ -46,17 +45,17 @@ public class MessageController {
             }
         }
 
-        Message message = messageService.create(messageDTO, list);
+        Message message = messageService.create(userId, channelId, messageDTO, list);
         return ResponseEntity.ok(message);
     }
 
-    @GetMapping("/{channelId}")
+    @GetMapping
     public ResponseEntity<MessageDisplayList> findAll(@PathVariable UUID channelId) {
         List<MessageFindDTO> list = messageService.findAllByChannelId(channelId);
         return ResponseEntity.ok(new MessageDisplayList(list));
     }
 
-    @PutMapping("/{messageId}/update")
+    @PutMapping("/update/{messageId}")
     public ResponseEntity<UUID> update(
             @PathVariable UUID messageId,
             @RequestParam("message") UpdateMessageDTO updateMessageDTO) {
@@ -65,7 +64,7 @@ public class MessageController {
         return ResponseEntity.ok(update);
     }
 
-    @DeleteMapping("/{messageId}/delete")
+    @DeleteMapping("/delete/{messageId}")
     public ResponseEntity<String> delete(@PathVariable UUID messageId) {
         messageService.delete(messageId);
         return ResponseEntity.ok("Delete successful");

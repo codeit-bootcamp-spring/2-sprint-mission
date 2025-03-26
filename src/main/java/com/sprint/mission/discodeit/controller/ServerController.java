@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/{userId}/servers")
+@RequestMapping("/api/{userId}")
 public class ServerController {
     private final ServerService serverService;
 
@@ -32,7 +32,7 @@ public class ServerController {
         return ResponseEntity.ok(new CreateServerResult(server.getServerId()));
     }
 
-    @PostMapping("/{serverId}/join")
+    @PostMapping("/join/{serverId}")
     public ResponseEntity<String> join(@PathVariable UUID userId, @PathVariable UUID serverId) {
 
 
@@ -40,7 +40,7 @@ public class ServerController {
         return ResponseEntity.ok(join.getName() + " has entered the server");
     }
 
-    @PutMapping("/{serverId}/quit")
+    @PutMapping("/quit/{serverId}")
     public ResponseEntity<String> quit(@PathVariable UUID userId, @PathVariable UUID serverId) {
 
 
@@ -59,7 +59,7 @@ public class ServerController {
         return ResponseEntity.ok(new ServerDisplayList(list));
     }
 
-    @PutMapping("/{serverId}/update")
+    @PutMapping("/update/{serverId}")
     public ResponseEntity<UUID> update(@PathVariable UUID userId, @PathVariable UUID serverId, @RequestBody UpdateServerRequestDTO updateServerRequestDTO) {
 
         UUID update = serverService.update(serverId, userId, updateServerRequestDTO);
@@ -67,7 +67,7 @@ public class ServerController {
         return ResponseEntity.ok(update);
     }
 
-    @DeleteMapping("/{serverId}/delete")
+    @DeleteMapping("/delete/{serverId}")
     public ResponseEntity<String> delete(@PathVariable UUID userId, @PathVariable UUID serverId) {
 
 

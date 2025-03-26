@@ -16,8 +16,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
-    private UserRepository userRepository;
-    private UserStatusRepository userStatusRepository;
+    private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
 
     @Override
     @CustomLogging
@@ -66,7 +66,15 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @CustomLogging
-    public void delete(UUID userStatusId) {
-        userStatusRepository.delete(userStatusId);
+    public void deleteById(UUID userStatusId) {
+        userStatusRepository.deleteByUserId(userStatusId);
     }
+
+    @Override
+    @CustomLogging
+    public void deleteByUserId(UUID userId) {
+        userStatusRepository.deleteByUserId(userId);
+    }
+
+
 }

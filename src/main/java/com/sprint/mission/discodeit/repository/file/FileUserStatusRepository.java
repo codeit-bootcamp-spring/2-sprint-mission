@@ -70,8 +70,16 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void delete(UUID userStatusId) {
+    public void deleteById(UUID userStatusId) {
         UserStatus userStatus = findByStatusId(userStatusId);
+        userStatusList.remove(userStatus);
+        fileRepository.save(userStatusList);
+    }
+
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        UserStatus userStatus = findByUserId(userId);
         userStatusList.remove(userStatus);
         fileRepository.save(userStatusList);
     }

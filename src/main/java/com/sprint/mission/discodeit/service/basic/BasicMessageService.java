@@ -39,9 +39,9 @@ public class BasicMessageService implements MessageService {
 
     @CustomLogging
     @Override
-    public Message create(MessageCreateRequestDTO messageWriteDTO, List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
-        User user = userRepository.findById(messageWriteDTO.userId());
-        Channel channel = channelRepository.find(messageWriteDTO.channelId());
+    public Message create(UUID userId, UUID channelId, MessageCreateRequestDTO messageWriteDTO, List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
+        User user = userRepository.findById(userId);
+        Channel channel = channelRepository.find(channelId);
 
         List<UUID> binaryContentIdList = makeBinaryContent(binaryContentDTOs);
 
