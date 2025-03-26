@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exceptions.InvalidInputException;
+import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -35,17 +37,18 @@ public class BasicReadStatusService implements ReadStatusService {
         User matchingUser = userList.stream()
                 .filter(m -> m.getId().equals(readStatusCreateDto.userId()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
         Channel matchingChannel = channelList.stream()
                 .filter(m->m.getId().equals(readStatusCreateDto.channelId()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("Channel not found"));
+                .orElseThrow(() -> new NotFoundException("Channel not found"));
         Optional<ReadStatus> matchingReadStatus = readStatusList.stream()
                 .filter(m->m.getUserId().equals(readStatusCreateDto.userId()) && m.getChannelId().equals(readStatusCreateDto.channelId()))
                 .findAny();
         if(matchingReadStatus.isPresent()){
-            throw new IllegalArgumentException("Read status already exists");
+            throw new InvalidInputException("Read status already exists");
         }
+
         ReadStatus readStatus = new ReadStatus(matchingUser.getId(), matchingChannel.getId());
         readStatusRepository.save(readStatus);
         return readStatus;
@@ -58,7 +61,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusRepository.load().stream()
                 .filter(r->r.getId().equals(readStatusFindDto.Id()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("readStatus not found"));
+                .orElseThrow(() -> new NotFoundException("readStatus not found"));
     }
 
 
@@ -75,7 +78,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus matchingReadStatus = readStatusRepository.load().stream()
                 .filter(m->m.getUserId().equals(readStatusUpdateDto.userId()) && m.getChannelId().equals(readStatusUpdateDto.channelId()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("readStatus not found"));
+                .orElseThrow(() -> new NotFoundException("readStatus not found"));
         matchingReadStatus.readStatusUpdate();
         return readStatusRepository.save(matchingReadStatus);
     }
@@ -86,7 +89,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus matchingReadStatus = readStatusRepository.load().stream()
                 .filter(m->m.getId().equals(readStatusDeleteDto.Id()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("readStatus not found"));
+                .orElseThrow(() -> new NotFoundException("readStatus not found"));
         readStatusRepository.remove(matchingReadStatus);
     }
 }

@@ -26,8 +26,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        binaryContentsData.add(binaryContent);
-        Path path = DIRECTORY.resolve(binaryContent.getId() + ".jpg");
+//        binaryContentsData.add(binaryContent);
+        Path path = DIRECTORY.resolve(binaryContent.getId() + ".ser");
         saveToFile(path, binaryContent);
         return binaryContent;
     }
@@ -81,8 +81,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public void remove(BinaryContent binaryContent) {
         try {
-            if (binaryContent != null && Files.exists(DIRECTORY.resolve(binaryContent.getId() + ".jpg"))) {
-                Files.delete(DIRECTORY.resolve(binaryContent.getId() + ".jpg"));
+            if (binaryContent != null && Files.exists(DIRECTORY.resolve(binaryContent.getId() + ".ser"))) {
+                Files.delete(DIRECTORY.resolve(binaryContent.getId() + ".ser"));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

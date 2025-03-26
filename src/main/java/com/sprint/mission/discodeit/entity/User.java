@@ -13,11 +13,12 @@ public class User extends BaseEntity {
     private String password;
     private UUID profileId;
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, UUID profileId) {
         super();
         this.name = name;
         this.email = email;
         this.password = password;
+        this.profileId = profileId;
     }
 
 
@@ -31,7 +32,7 @@ public class User extends BaseEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, email, password);
+        return Objects.hash(getId());
     }
 
     @Override

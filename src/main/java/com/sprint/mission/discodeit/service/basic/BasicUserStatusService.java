@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -31,7 +32,7 @@ public class BasicUserStatusService implements UserStatusService {
                 .filter(u -> u.getId().equals(userStatusCreateDto.userId()))
                 .findAny();
         if (validateName.isEmpty()) {
-            throw new IllegalArgumentException("User does not exist.");
+            throw new NotFoundException("User does not exist.");
         }
         Instant currentTime = Instant.now();
         UserStatus userStatus = new UserStatus(userStatusCreateDto.userId(), currentTime);
@@ -45,7 +46,7 @@ public class BasicUserStatusService implements UserStatusService {
         Optional<UserStatus> userStatus = userStatusRepository.load().stream()
                 .filter(u -> u.getUserId().equals(userStatusFindDto.userId()))
                 .findAny();
-        return userStatus.orElseThrow(() -> new NoSuchElementException("User does not exist."));
+        return userStatus.orElseThrow(() -> new NotFoundException("User does not exist."));
     }
 
 
@@ -53,7 +54,7 @@ public class BasicUserStatusService implements UserStatusService {
     public List<UserStatus> getAllUser() {
         List<UserStatus> userStatusList = userStatusRepository.load();
         if (userStatusList.isEmpty()) {
-            throw new NoSuchElementException("Profile not found.");
+            throw new NotFoundException("Profile not found.");
         }
         return userStatusList;
     }
@@ -64,7 +65,7 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus matchingUserStatus = userStatusRepository.load().stream()
                 .filter(u -> u.getUserId().equals(userStatusUpdateDto.userId()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("User does not exist."));
+                .orElseThrow(() -> new NotFoundException("User does not exist."));
         Instant currentTime = Instant.now();
         matchingUserStatus.updateLastConnectionTime(currentTime);
         userStatusRepository.save(matchingUserStatus);
@@ -77,7 +78,7 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus matchingUserStatus = userStatusRepository.load().stream()
                 .filter(u -> u.getUserId().equals(userStatusDeleteDto.userId()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("User does not exist."));
+                .orElseThrow(() -> new NotFoundException("User does not exist."));
         userStatusRepository.remove(matchingUserStatus);
     }
 }

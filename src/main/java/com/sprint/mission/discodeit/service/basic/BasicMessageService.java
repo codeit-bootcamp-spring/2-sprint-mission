@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exceptions.NotFoundException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -12,8 +17,9 @@ import com.sprint.mission.discodeit.service.dto.messagedto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Path;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +28,12 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentService binaryContentService;
 
 
     @Override
-    public Message create(MessageCreateDto messageCreateDto) {
+    public Message create(MessageCreateDto messageCreateDto, List<BinaryContentCreateDto> binaryContentCreateDtoList) {
         List<User> userList = userRepository.load();
         List<Channel> channelList = channelRepository.load();
         Optional<User> user = userList.stream()
@@ -36,25 +43,24 @@ public class BasicMessageService implements MessageService {
                 .filter(c -> c.getId().equals(messageCreateDto.channelId()))
                 .findAny();
         if (user.isEmpty()) {
-            throw new IllegalArgumentException("User not found.");
+            throw new NotFoundException("User not found.");
         }
         if (channel.isEmpty()) {
-            throw new IllegalArgumentException("Channel not found.");
+            throw new NotFoundException("Channel not found.");
         }
 
-        List<UUID> binaryContentUuidList = new ArrayList<>();
-        for (Path path : messageCreateDto.attachmentPath()) {
-            BinaryContentCreateDto binaryContentCreateDto = new BinaryContentCreateDto(path);
-            BinaryContent binaryContent = binaryContentService.create(binaryContentCreateDto);
-            if (binaryContent == null) {
-                binaryContentUuidList.add(null);
-            } else{
-                binaryContentUuidList.add(binaryContent.getId());
-            }
-        }
+        List<UUID> attachmentIds = binaryContentCreateDtoList.stream()
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+                    return createdBinaryContent.getId();
+                })
+                .toList();
 
-        Message messages = new Message(messageCreateDto.message(), messageCreateDto.channelId(), messageCreateDto.senderId());
-        messages.updateMessage(messageCreateDto.message(), binaryContentUuidList);
+        Message messages = new Message(messageCreateDto.message(), messageCreateDto.channelId(), messageCreateDto.senderId(), attachmentIds);
         messageRepository.save(messages);
 
         return messages;
@@ -66,7 +72,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.load().stream()
                 .filter(m -> m.getId().equals(messageFindRequestDto.messageId()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("Message does not exist."));
+                .orElseThrow(() -> new NotFoundException("Message does not exist."));
         return MessageFindResponseDto.fromMessage(message);
     }
 
@@ -85,25 +91,9 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.load().stream()
                 .filter(m -> m.getId().equals(messageUpdateDto.messageId()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("Message does not exist."));
-
-        List<UUID> binaryContentUuidList = new ArrayList<>();
-        for (Path path : messageUpdateDto.attachmentPath()) {
-            BinaryContentCreateDto binaryContentCreateDto = new BinaryContentCreateDto(path);
-            BinaryContent binaryContent = binaryContentService.create(binaryContentCreateDto);
-            if (binaryContent == null) {
-                binaryContentUuidList.add(null);
-            } else{
-                binaryContentUuidList.add(binaryContent.getId());
-            }
-        }
-
-        for (UUID oldProfiles : message.getAttachmentIds()) {
-            BinaryContentDeleteDto binaryContentDeleteDto = new BinaryContentDeleteDto(oldProfiles);
-            binaryContentService.delete(binaryContentDeleteDto);
-        }
-
-        message.updateMessage(messageUpdateDto.changeMessage(), binaryContentUuidList);
+                .orElseThrow(() -> new NotFoundException("Message does not exist."));
+        
+        message.updateMessage(messageUpdateDto.changeMessage());
         return messageRepository.save(message);
     }
 
@@ -113,7 +103,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.load().stream()
                 .filter(m -> m.getId().equals(messageDeleteDto.messageId()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("Message does not exist."));
+                .orElseThrow(() -> new NotFoundException("Message does not exist."));
 
         for (UUID oldProfiles : message.getAttachmentIds()) {
             BinaryContentDeleteDto binaryContentDeleteDto = new BinaryContentDeleteDto(oldProfiles);

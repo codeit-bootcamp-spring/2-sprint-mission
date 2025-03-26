@@ -7,8 +7,7 @@ public record UserUpdateDto(
         UUID userId,
         String changeName,
         String changeEmail,
-        String changePassword,
-        Path path
+        String changePassword
 ) {
 
 }

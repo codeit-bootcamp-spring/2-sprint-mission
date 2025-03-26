@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exceptions.InvalidInputException;
+import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -27,12 +29,12 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public Channel createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
+    public Channel createPrivate(ChannelCreateDto channelCreatePrivateDto) {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         Channel createdPirvateChannel = channelRepository.save(channel);
         System.out.println(createdPirvateChannel);
 
-        // Read Status를 생성
+        // Read Status 생성
         ReadStatusCreateDto readStatusCreateDto = new ReadStatusCreateDto(channelCreatePrivateDto.userId(), createdPirvateChannel.getId());
         ReadStatus createdReadStatus = readStatusService.create(readStatusCreateDto);
         System.out.println(createdReadStatus);
@@ -41,13 +43,13 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public Channel createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
+    public Channel createPublic(ChannelCreateDto channelCreatePublicDto) {
         Channel channel = new Channel(ChannelType.PUBLIC, channelCreatePublicDto.channelName(), channelCreatePublicDto.description());
         Optional<Channel> ChannelList = channelRepository.load().stream()
                 .filter(c -> c.getChannelName().equals(channelCreatePublicDto.channelName()))
                 .findAny();
         if (ChannelList.isPresent()) {
-            throw new IllegalArgumentException("A channel already exists.");
+            throw new InvalidInputException("A channel already exists.");
         }
         Channel createdPublicChannel = channelRepository.save(channel);
         System.out.println(createdPublicChannel);
@@ -102,9 +104,9 @@ public class BasicChannelService implements ChannelService {
         Channel matchingChannel = channelRepository.load().stream()
                 .filter(c -> c.getId().equals(channelUpdateDto.channelId()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("A channel does not exist"));
+                .orElseThrow(() -> new NotFoundException("A channel does not exist"));
         if (matchingChannel.getType().equals(ChannelType.PRIVATE)) {
-            throw new IllegalStateException("Private channels cannot be changed.");
+            throw new InvalidInputException("Private channels cannot be changed.");
         }
         matchingChannel.updateChannel(channelUpdateDto.changeChannel(), channelUpdateDto.changeDescription());
         channelRepository.save(matchingChannel);
@@ -118,7 +120,7 @@ public class BasicChannelService implements ChannelService {
         Channel matchingChannel = channelRepository.load().stream()
                 .filter(c -> c.getId().equals(channelDeleteDto.channelId()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("A channel does not exist"));
+                .orElseThrow(() -> new NotFoundException("A channel does not exist"));
 
         List<Message> messageList = messageRepository.load().stream()
                 .filter(m -> m.getChannelId().equals(channelDeleteDto.channelId()))

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.dto.userdto;
 
+import com.sprint.mission.discodeit.entity.CurrentStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
@@ -12,7 +13,7 @@ public record UserFindResponseDto(
         String email,
         UUID profileId,
         Instant createdAt,
-        String userStatus
+        CurrentStatus userStatus
 ) {
     public static UserFindResponseDto UserFindResponse(User user, UserStatus userStatus) {
         return new UserFindResponseDto(

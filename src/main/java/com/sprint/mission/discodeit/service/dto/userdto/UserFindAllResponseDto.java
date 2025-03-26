@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.dto.userdto;
 
+import com.sprint.mission.discodeit.entity.CurrentStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
@@ -14,7 +15,7 @@ public record UserFindAllResponseDto(
         String email,
         UUID profileId,
         Instant createdAt,
-        String userStatus
+        CurrentStatus userStatus
 ) {
     public static List<UserFindAllResponseDto> UserFindAllResponse(List<User> users, List<UserStatus> userStatuses) {
         List<UserFindAllResponseDto> FindAllResponse = new ArrayList<>();
