@@ -14,7 +14,7 @@ public class UserProfileIdUpdater implements UserUpdater {
     }
 
     @Override
-    public void update(User user, UserUpdateRequest request, UserRepository userRepository) {
-        userRepository.updateProfileId(user.getId(), request.profileId());
+    public void update(UserUpdateRequest request, UserRepository userRepository) {
+        userRepository.updateProfileId(request.userId(), request.profileId());
     }
 }

@@ -6,5 +6,5 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 
 public interface UserUpdater {
     boolean supports(User user, UserUpdateRequest userUpdateRequest);
-    void update(User user, UserUpdateRequest request, UserRepository userRepository);
+    void update(UserUpdateRequest request, UserRepository userRepository);
 }

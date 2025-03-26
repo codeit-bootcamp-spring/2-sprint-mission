@@ -13,7 +13,7 @@ public class UserPasswordUpdater implements UserUpdater {
     }
 
     @Override
-    public void update(User user, UserUpdateRequest request, UserRepository userRepository) {
-        userRepository.updatePassword(user.getId(), request.password());
+    public void update(UserUpdateRequest request, UserRepository userRepository) {
+        userRepository.updatePassword(request.userId(), request.password());
     }
 }

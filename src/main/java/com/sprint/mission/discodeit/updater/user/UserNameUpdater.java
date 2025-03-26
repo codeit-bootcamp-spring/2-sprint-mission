@@ -13,7 +13,7 @@ public class UserNameUpdater implements UserUpdater {
     }
 
     @Override
-    public void update(User user, UserUpdateRequest request, UserRepository userRepository) {
-        userRepository.updateUserName(user.getId(), request.userName());
+    public void update(UserUpdateRequest request, UserRepository userRepository) {
+        userRepository.updateUserName(request.userId(), request.userName());
     }
 }
