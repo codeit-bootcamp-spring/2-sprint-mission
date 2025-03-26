@@ -1,6 +1,7 @@
 package com.sprint.discodeit.controller;
 
 import com.sprint.discodeit.domain.ChannelType;
+import com.sprint.discodeit.domain.dto.channelDto.ChannelFindResponseDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelResponseDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelUpdateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.PrivateChannelCreateRequestDto;
@@ -57,9 +58,9 @@ public class ChannelController {
         return ResponseEntity.ok("채널방 삭제되었습니다");
     }
 
-    @GetMapping("/user/getChannelType")
-    public ResponseEntity<List<Channel>> getChannelsForUser(@RequestParam ChannelType channelType) {
-        List<Channel> channels = channelService.find(channelType);
-        return ResponseEntity.ok(channels);
+    @GetMapping("/{channelId}")
+    public ResponseEntity<ChannelFindResponseDto> findChannel(@PathVariable String channelId) {
+        ChannelFindResponseDto response = channelService.findChannelById(UUID.fromString(channelId));
+        return ResponseEntity.ok(response);
     }
 }

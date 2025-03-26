@@ -21,9 +21,9 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
     }
 
     @Override
-    public Optional<Channel> findById(UUID uuId) {
+    public Optional<Channel> findById(UUID channelId) {
         Map<UUID, Channel> channelMap = loadAll();
-        return Optional.ofNullable(channelMap.get(uuId));
+        return Optional.ofNullable(channelMap.get(channelId));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.sprint.discodeit.service.basic.chnnel;
 
 import com.sprint.discodeit.domain.ChannelType;
+import com.sprint.discodeit.domain.dto.channelDto.ChannelFindResponseDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelResponseDto;
 import com.sprint.discodeit.domain.dto.channelDto.ChannelUpdateRequestDto;
 import com.sprint.discodeit.domain.dto.channelDto.PrivateChannelCreateRequestDto;
@@ -13,6 +14,7 @@ import com.sprint.discodeit.repository.file.FileChannelRepository;
 import com.sprint.discodeit.repository.file.ReadStatusRepository;
 import com.sprint.discodeit.service.ChannelServiceV1;
 import com.sprint.discodeit.service.basic.users.ReadStatusService;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -64,10 +66,14 @@ public class BasicChannelService implements ChannelServiceV1 {
     }
 
     @Override
-    public List<Channel> find(ChannelType channelType) {
-        List<Channel> chnnelType = fileChannelRepository.findByChnnelType(channelType);
-        return chnnelType;
+    public ChannelFindResponseDto findChannelById(UUID channelId) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
+        List<UUID> participantUserIds = null;
+        if (channel.getType() == ChannelType.PRIVATE) {
+            participantUserIds = readStatusRepository.findByUserIdAndChannelId(channelId);
+        }
+        return new ChannelFindResponseDto(channel.getId(), channel.getName(), channel.getCreatedAt(), channel.getType(), participantUserIds);
     }
-
 
 }

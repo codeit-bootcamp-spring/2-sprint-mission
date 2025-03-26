@@ -78,4 +78,5 @@ public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> imp
                 .map(ReadStatus::getUserId)
                 .collect(Collectors.toList());
     }
+
 }
