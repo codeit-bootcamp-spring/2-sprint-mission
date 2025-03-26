@@ -6,6 +6,6 @@ import java.util.Set;
 import java.util.UUID;
 
 @Data
-public class CreatePrivateChannelDto {
+public class CreatePrivateChannelRequest {
     private Set<UUID> users;
 }

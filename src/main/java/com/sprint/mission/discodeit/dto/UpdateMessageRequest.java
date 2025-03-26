@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class CreateReadStatusDto {
-    private UUID channelId;
-    private UUID userId;
+public class UpdateMessageRequest {
+    private UUID messageId;
+    private String content;
 }

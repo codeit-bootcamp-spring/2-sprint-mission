@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.UpdateMessageDto;
+import com.sprint.mission.discodeit.dto.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 
@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface MessageService {
     // CRUD(생성, 읽기, 모두 읽기, 수정, 삭제)
-    Message createMessage(CreateMessageDto dto);
+    Message createMessage(CreateMessageRequest request);
 
     Message getMessageById(UUID messageId); // 메세지 조회
 
@@ -22,7 +22,7 @@ public interface MessageService {
 
     List<Message> findallByUserId(UUID senderId); // 유저의 모든 메세지 확인
 
-    void updateMessage(UpdateMessageDto dto); // 메세지 내용 수정
+    void updateMessage(UpdateMessageRequest request); // 메세지 내용 수정
 
     void deleteMessage(UUID messageId); // 메세지 삭제
 

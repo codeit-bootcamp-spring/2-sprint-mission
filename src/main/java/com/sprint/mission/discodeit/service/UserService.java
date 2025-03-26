@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.CreateUserDto;
-import com.sprint.mission.discodeit.dto.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.UserInfoDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public interface UserService {
     // CRUD(생성, 읽기, 모두 읽기, 수정, 삭제)
-    User createUser(CreateUserDto dto); //유저 생성
+    User createUser(UUID userId, CreateUserRequest request); //유저 생성
 
     UserInfoDto getUserById(UUID userId); //유저 조회(UUID)
 
@@ -24,9 +24,11 @@ public interface UserService {
 
     List<UserInfoDto> getAllUsers();   //모든 유저 조회
 
-    void updateUser(UpdateUserDto dto);
+    void updateProfile(UUID userId, UUID profileId);
 
-    void addChannel(UUID userID, UUID channelId);  //유저 채널 추가 (UUID 기반)
+    void updateUser(UUID userId, UpdateUserRequest request);
+
+    void addChannel(UUID userId, UUID channelId);  //유저 채널 추가 (UUID 기반)
 
     void deleteUser(UUID userId);   //유저 삭제 (UUID 기반)
 
