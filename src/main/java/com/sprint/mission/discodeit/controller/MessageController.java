@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/servers/{serverId}/channels/{channelId}/messages")
+@RequestMapping("/api/{channelId}/messages")
 public class MessageController {
     private final MessageService messageService;
 
@@ -31,7 +31,7 @@ public class MessageController {
             @RequestPart("message") MessageCreateRequestDTO messageDTO,
             @RequestPart(value = "profileImage", required = false) List<MultipartFile> files,
             HttpServletRequest httpRequest
-    ) throws IOException {
+            ) throws IOException {
         UUID userId = (UUID) httpRequest.getAttribute("userId");
 
         List<Optional<BinaryContentCreateRequestDTO>> list = new ArrayList<>();
@@ -60,7 +60,7 @@ public class MessageController {
         return ResponseEntity.ok(new MessageDisplayList(list));
     }
 
-    @PutMapping(value = "/{messageId}/update")
+    @PutMapping("/{messageId}/update")
     public ResponseEntity<UUID> update(
             @PathVariable UUID messageId,
             @RequestParam("message") UpdateMessageDTO updateMessageDTO) {
