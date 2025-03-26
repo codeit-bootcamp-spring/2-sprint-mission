@@ -4,6 +4,8 @@ import com.sprint.discodeit.domain.entity.Message;
 import com.sprint.discodeit.repository.util.AbstractFileRepository;
 import com.sprint.discodeit.repository.MessageRepository;
 import com.sprint.discodeit.repository.util.FilePathUtil;
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,5 +62,13 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
         return Optional.of(messageMap.values().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .collect(Collectors.toList()));
+    }
+
+    public Instant findLatestMessageTimeByChannelId(UUID channelId) {
+        Map<UUID, Message> messageMap = loadAll();
+        return messageMap.values().stream().filter( message -> message.getChannelId().equals(channelId))
+                .map(Message::getCreatedAt)
+                .max(Comparator.naturalOrder())
+                .orElse(null);
     }
 }

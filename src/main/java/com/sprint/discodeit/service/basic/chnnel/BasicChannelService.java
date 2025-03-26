@@ -11,6 +11,7 @@ import com.sprint.discodeit.domain.entity.ReadStatus;
 import com.sprint.discodeit.domain.mapper.ChannelMapper;
 import com.sprint.discodeit.repository.ChannelRepository;
 import com.sprint.discodeit.repository.file.FileChannelRepository;
+import com.sprint.discodeit.repository.file.FileMessageRepository;
 import com.sprint.discodeit.repository.file.ReadStatusRepository;
 import com.sprint.discodeit.service.ChannelServiceV1;
 import com.sprint.discodeit.service.basic.users.ReadStatusService;
@@ -29,6 +30,7 @@ public class BasicChannelService implements ChannelServiceV1 {
     private final ReadStatusService readStatusService;
     private final ReadStatusRepository readStatusRepository;
     private final FileChannelRepository fileChannelRepository;
+    private final FileMessageRepository fileMessageRepository;
 
     @Override
     public ChannelResponseDto createPrivateChannel(PrivateChannelCreateRequestDto requestDto) {
@@ -69,11 +71,12 @@ public class BasicChannelService implements ChannelServiceV1 {
     public ChannelFindResponseDto findChannelById(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
+        Instant latestMessageTime = fileMessageRepository.findLatestMessageTimeByChannelId(channel.getId());
         List<UUID> participantUserIds = null;
         if (channel.getType() == ChannelType.PRIVATE) {
             participantUserIds = readStatusRepository.findByUserIdAndChannelId(channelId);
         }
-        return new ChannelFindResponseDto(channel.getId(), channel.getName(), channel.getCreatedAt(), channel.getType(), participantUserIds);
+        return new ChannelFindResponseDto(channel.getId(), channel.getName(), latestMessageTime, channel.getType(), participantUserIds);
     }
 
 }
