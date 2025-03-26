@@ -16,7 +16,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.updater.ChannelUpdater;
+import com.sprint.mission.discodeit.updater.channel.ChannelUpdater;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

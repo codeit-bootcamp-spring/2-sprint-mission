@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.updater;
+package com.sprint.mission.discodeit.updater.channel;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;

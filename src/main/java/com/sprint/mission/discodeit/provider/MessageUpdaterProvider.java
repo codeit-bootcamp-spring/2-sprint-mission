@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.provider;
 
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.updater.MessageUpdater;
+import com.sprint.mission.discodeit.updater.message.MessageUpdater;
 
 import java.util.List;
 

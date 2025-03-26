@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.updater;
+package com.sprint.mission.discodeit.updater.user;
 
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
