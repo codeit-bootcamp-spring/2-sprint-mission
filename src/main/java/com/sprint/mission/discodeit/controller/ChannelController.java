@@ -4,9 +4,11 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.display.ChannelDisplayList;
 import com.sprint.mission.discodeit.dto.create.PublicChannelCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.update.ReadStatusUpdateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +19,10 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/servers/{serverId}/channels")
+@RequestMapping("/api/{serverId}/channels")
 public class ChannelController {
     private final ChannelService channelService;
+    private final ReadStatusService readStatusService;
 
     @PostMapping("/create")
     public ResponseEntity<UUID> create(@RequestBody PublicChannelCreateRequestDTO channelCreateDTO, HttpServletRequest httpRequest ) {
@@ -65,5 +68,17 @@ public class ChannelController {
         channelService.delete(channelId);
         return ResponseEntity.ok("Delete successful");
 
+    }
+
+    @PutMapping("/{channelId}/read-status")
+    public ResponseEntity<Void> updateReadStatus(
+            @PathVariable UUID channelId,
+            @RequestBody ReadStatusUpdateRequestDTO dto,
+            HttpServletRequest request
+    ) {
+        UUID userId = (UUID) request.getAttribute("userId");
+
+        readStatusService.update(channelId, userId, dto);
+        return ResponseEntity.ok().build();
     }
 }

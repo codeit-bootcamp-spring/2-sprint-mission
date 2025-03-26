@@ -14,9 +14,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -46,7 +44,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus find(UUID readStatusId) {
-        return readStatusRepository.find(readStatusId).orElseThrow(() -> new ReadStatusNotFoundException("읽기 상태를 찾을 수 없습니다."));
+        return readStatusRepository.findById(readStatusId).orElseThrow(() -> new ReadStatusNotFoundException("읽기 상태를 찾을 수 없습니다."));
     }
 
     @Override
@@ -55,8 +53,8 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public void update(UUID readStatusId, ReadStatusUpdateRequestDTO requestDTO) {
-        ReadStatus readStatus = find(readStatusId);
+    public void update(UUID channelId, UUID userId ,ReadStatusUpdateRequestDTO requestDTO) {
+        ReadStatus readStatus = readStatusRepository.findByUserAndChannelId(userId, channelId);
         readStatus.update(requestDTO.newLastReadAt());
     }
 

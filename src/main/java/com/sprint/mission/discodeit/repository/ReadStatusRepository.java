@@ -11,7 +11,13 @@ import java.util.UUID;
 public interface ReadStatusRepository {
     ReadStatus save(ReadStatus readStatus);
 
-    Optional<ReadStatus> find(UUID readStatusId);
+    Optional<ReadStatus> findById(UUID readStatusId);
+
+    ReadStatus findByUserId(UUID userId);
+
+    ReadStatus findByChannelId(UUID channelId);
+
+    ReadStatus findByUserAndChannelId(UUID userId, UUID channelId);
 
     List<ReadStatus> findAllByUserId(UUID userID);
 

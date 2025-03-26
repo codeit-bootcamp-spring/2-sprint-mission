@@ -40,39 +40,40 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public Optional<ReadStatus> find(UUID readStatusId) {
+    public Optional<ReadStatus> findById(UUID readStatusId) {
         return Optional.ofNullable(this.readStatusList.get(readStatusId));
     }
 
     @Override
-    public List<ReadStatus> findAllByUserId(UUID userID) {
-        if (readStatusList.isEmpty()) {
-            throw new EmptyReadStatusListException("Repository 에 저장된 읽기 상태 리스트가 없습니다.");
-        }
+    public ReadStatus findByUserId(UUID userID) {
+        return readStatusList.values().stream().filter(readStatus -> readStatus.getUserId().equals(userID)).findFirst().orElse(null);
+    }
 
+    @Override
+    public ReadStatus findByChannelId(UUID channelId) {
+        return readStatusList.values().stream().filter(readStatus -> readStatus.getChannelId().equals(channelId)).findFirst().orElse(null);
+    }
+
+
+    @Override
+    public ReadStatus findByUserAndChannelId(UUID userId, UUID channelId) {
+        return readStatusList.values().stream().filter(readStatus ->readStatus.getUserId().equals(userId) && readStatus.getChannelId().equals(channelId)).findFirst().orElse(null);
+    }
+
+
+    @Override
+    public List<ReadStatus> findAllByUserId(UUID userID) {
         List<ReadStatus> list = this.readStatusList.values().stream()
                 .filter(readStatus -> readStatus.getUserId().equals(userID))
                 .toList();
-
-        if (list.isEmpty()) {
-            throw new EmptyReadStatusListException("해당 서버에 저장된 읽기 상태 리스트가 없습니다.");
-        }
         return list;
     }
 
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        if (readStatusList.isEmpty()) {
-            throw new EmptyReadStatusListException("Repository 에 저장된 읽기 상태 리스트가 없습니다.");
-        }
-
         List<ReadStatus> list = this.readStatusList.values().stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                 .toList();
-
-        if (list.isEmpty()) {
-            throw new EmptyReadStatusListException("해당 서버에 저장된 읽기 상태 리스트가 없습니다.");
-        }
         return list;
     }
 

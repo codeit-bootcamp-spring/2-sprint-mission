@@ -53,7 +53,7 @@
       const name = document.getElementById("channelName").value;
       const type = document.getElementById("channelType").value;
 
-      fetch(`/api/servers/${serverId}/channels/create`, {
+      fetch(`/api/${serverId}/channels/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
