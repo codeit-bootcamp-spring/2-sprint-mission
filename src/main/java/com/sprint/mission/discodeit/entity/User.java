@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -30,7 +31,7 @@ public class User implements Serializable {
         this.createdAt = Instant.now();
         this.username = username;
         this.email = email;
-        this.password = password;
+        this.password = BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
 
@@ -45,7 +46,7 @@ public class User implements Serializable {
             anyValueUpdated = true;
         }
         if (newPassword != null && !newPassword.equals(this.password)) {
-            this.password = newPassword;
+            this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
             anyValueUpdated = true;
         }
 

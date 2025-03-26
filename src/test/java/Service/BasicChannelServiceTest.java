@@ -68,6 +68,7 @@ public class BasicChannelServiceTest {
         assertEquals(channelDTO.name(), createChannelParam.name());
         assertEquals(channelDTO.type(), createChannelParam.type());
         assertEquals(channelDTO.description(), createChannelParam.description());
+        any(String.class);
 
         verify(channelRepository, times(1)).save(any(Channel.class));
     }

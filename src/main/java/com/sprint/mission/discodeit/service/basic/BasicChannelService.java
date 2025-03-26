@@ -90,6 +90,7 @@ public class BasicChannelService implements ChannelService {
         }
     }
 
+
     private Channel createPublicChannelEntity(CreateChannelParam createChannelParam) {
         return Channel.builder()
                 .type(createChannelParam.type())

@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.util.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
@@ -39,7 +40,7 @@ public class BasicAuthService implements AuthService {
     }
 
     private void checkPassword(User user, LoginParam loginParam) {
-        if (!StringUtils.equals(user.getPassword(), loginParam.password())) {
+        if (!BCrypt.checkpw(user.getPassword(), loginParam.password())) {
             throw RestExceptions.INVALID_PASSWORD;
         }
     }
