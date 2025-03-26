@@ -1,70 +1,64 @@
 package com.sprint.mission.discodeit.entity.channel;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.UpdatableEntity;
+import jakarta.annotation.Nullable;
+import lombok.Getter;
+import lombok.ToString;
 
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Channel extends BaseEntity {
-    private UUID ownerId;
-    private String title;
-    private String description;
+@Getter
+public class Channel extends UpdatableEntity {
+    private final ChannelType type;
 
-    public Channel(UUID ownerId, String title, String description) {
+    @Nullable
+    private String name; //PUBLIC 전용
+    @Nullable
+    private String description; //PUBLIC 전용
+
+
+    //Private Channel 만들때 호출
+    public Channel(ChannelType type) {
+        this(type, null, null);
+    }
+
+    //Public Channel 만들때 호출
+    public Channel(ChannelType type, String name, String description) {
         super();
-        updateFields(ownerId, title, description);
-    }
+        this.type = type;
 
-    private void setOwnerId(UUID ownerId) {
-        if (ownerId == null) {
-            throw new IllegalArgumentException("유효하지 않은 오너입니다.");
-        }
-        this.ownerId = ownerId;
-    }
-
-    private void setTitle(String title) {
-        if (title == null || title.isEmpty()) {
-            throw new IllegalArgumentException("유효하지 않은 서버 이름입니다.");
-        }
-        this.title = title;
-    }
-
-    private void setDescription(String description) {
-        if (description == null) {
-            throw new IllegalArgumentException("유효하지 않은 서버 설명입니다.");
-        }
+        //PUBLIC 전용
+        this.name = name;
         this.description = description;
     }
 
-    public UUID getOwnerId() {
-        return ownerId;
-    }
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void update(UUID ownerId, String title, String description) {
-        updateFields(ownerId, title, description);
-        updateModifiedAt();
-    }
-
-    private void updateFields(UUID ownerId, String title, String description) {
-        setOwnerId(ownerId);
-        setTitle(title);
-        setDescription(description);
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
     @Override
     public String toString() {
         return "Channel{" +
-                "title='" + title + '\'' +
+                "type=" + type +
+                ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", ownerId=" + ownerId +
-                super.toString() +
+                ", updatedAt=" + updatedAt +
+                ", id=" + id +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }

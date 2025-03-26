@@ -1,83 +1,72 @@
 package com.sprint.mission.discodeit.entity.user;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.UpdatableEntity;
+import lombok.Getter;
+import lombok.ToString;
 
-public class User extends BaseEntity {
-    private String nickname;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
+
+@Getter
+public class User extends UpdatableEntity {
+    private String username;
     private String email;
-    private String avatar = "";
-    private String status = "";
+    private String password;
+    //
+    private UUID profileId;
 
+    public User(String username, String email, String password) {
+        this(username, email, password, null);
+    }
 
-    public User(String nickname, String email, String avatar, String status) {
+    public User(String username, String email, String password, UUID profileId) {
         super();
-        setEmail(email);
-        updateProfile(nickname, avatar, status);
-    }
 
-    private void setNickname(String nickname) {
-        if (nickname == null || nickname.isEmpty() || nickname.length() > 32) {
-            throw new IllegalArgumentException("유효하지 않은 닉네임입니다.");
-        }
-        this.nickname = nickname;
-    }
-
-    private void setEmail(String email) {
-        if (email == null || !email.contains("@")) {
-            throw new IllegalArgumentException("유효하지 않은 이메일입니다.");
-        }
+        this.username = username;
         this.email = email;
+        this.password = password;
+        this.profileId = profileId;
     }
 
-    private void setAvatar(String avatar) {
-        if (avatar == null) {
-            throw new IllegalArgumentException("유효하지 않은 아바타(사진)입니다.");
+    public void update(String newUsername, String newEmail, String newPassword, UUID profileId) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
         }
-        this.avatar = avatar;
-    }
-
-    private void setStatus(String status) {
-        if (status == null || status.length() > 100) {
-            throw new IllegalArgumentException("유효하지 않은 상태메세지입니다.");
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
         }
-        this.status = status;
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if (profileId != null && !profileId.equals(this.profileId)) {
+            this.profileId = profileId;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
-    public String getNickname() {
-        return nickname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void update(String nickname, String avatar, String status) {
-        updateProfile(nickname, avatar, status);
-        updateModifiedAt();
-    }
-
-    public void updateProfile(String nickname, String avatar, String status) {
-        setNickname(nickname);
-        setAvatar(avatar);
-        setStatus(status);
+    public boolean hasProfile() {
+        return this.profileId != null;
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "nickname='" + nickname + '\'' +
+                "username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", status='" + status + '\'' +
-                super.toString() +
+                ", password='" + password + '\'' +
+                ", profileId=" + profileId +
+                ", updatedAt=" + updatedAt +
+                ", id=" + id +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }

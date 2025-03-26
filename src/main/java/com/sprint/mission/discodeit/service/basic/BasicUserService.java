@@ -1,80 +1,105 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.user.*;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.exception.DuplicatedUserException;
-import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
-// JCFUserService, FileUserService, BasicUserService 전부 동일합니다. 최종적으로는 BasicUserService 사용합니다 (스프린트 요구 사항으로 남겨두었습니다.)
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    private static volatile BasicUserService instance;
-
     private final UserRepository userRepository;
+    private final UserStatusService userStatusService;
+    private final BinaryContentRepository binaryContentRepository;
 
-    private BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Override
+    public UserCreateResponseDto create(UserCreateRequestDto requestDto) {
+        validateUsernameDuplicate(requestDto.username());
+        validateEmailDuplicate(requestDto.email());
+
+        User user = new User(requestDto.username(),
+                requestDto.email(), requestDto.password(), requestDto.profileId());
+        userRepository.save(user);
+
+        userStatusService.create(new UserStatusCreateRequestDto(user.getId()));
+
+        return UserCreateResponseDto.fromEntity(user);
     }
 
-    public static BasicUserService getInstance(UserRepository userRepository) {
-        if (instance == null) {
-            synchronized (BasicUserService.class) {
-                if (instance == null) {
-                    instance = new BasicUserService(userRepository);
-                }
-            }
+    @Override
+    public UserResponseDto find(UUID userId) {
+        User user = getUserBy(userId);
+
+        return UserResponseDto.fromEntity(user, isOnline(userId));
+    }
+
+    @Override
+    public List<UserResponseDto> findAll() {
+        return userRepository.findAll().stream()
+                .map(user -> UserResponseDto.fromEntity(user, isOnline(user.getId())))
+                .toList();
+    }
+
+    @Override
+    public UserUpdateResponseDto update(UserUpdateRequestDto requestDto) {
+        User user = getUserBy(requestDto.id());
+
+        if (!user.getUsername().equals(requestDto.username())) {
+            validateUsernameDuplicate(requestDto.username());
         }
-        return instance;
+
+        if (!user.getEmail().equals(requestDto.email())) {
+            validateEmailDuplicate(requestDto.email());
+        }
+
+        user.update(requestDto.username(), requestDto.email(),
+                 requestDto.password(), requestDto.profileId());
+        userRepository.save(user);
+
+        return UserUpdateResponseDto.fromEntity(user);
     }
 
     @Override
-    public User createUser(String nickname, String email, String avatar, String status) {
-        validateUniqueEmail(email);
-        return userRepository.save(new User(nickname, email, avatar, status));
+    public void delete(UUID userId) {
+        User user = getUserBy(userId);
+
+        if(user.hasProfile()) {
+            binaryContentRepository.deleteById(user.getProfileId());
+        }
+
+        userStatusService.deleteByUserId(userId);
+
+        userRepository.deleteById(userId);
     }
 
-    @Override
-    public User getUserByUserId(UUID userId) {
-        validateUserId(userId);
-        return userRepository.findById(userId);
+    private User getUserBy(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
     }
 
-    @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
 
-    @Override
-    public User updateUser(UUID userId, String nickname, String avatar, String status) {
-        validateUserId(userId);
-        User user = getUserByUserId(userId);
-        user.update(nickname, avatar, status);
-        return userRepository.save(user);
-    }
-
-    @Override
-    public void deleteUserById(UUID userId) {
-        validateUserId(userId);
-        userRepository.delete(userId);
-    }
-
-    @Override
-    public void validateUserId(UUID userId) {
-        if (!userRepository.exists(userId)) {
-            throw new UserNotFoundException("해당 유저가 없습니다.");
+    private void validateEmailDuplicate(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("동일 email 이미 존재함");
         }
     }
 
-    private void validateUniqueEmail(String email) {
-        if (hasUserByEmail(email)) {
-            throw new DuplicatedUserException("이메일 중복입니다.");
+    private void validateUsernameDuplicate(String username) {
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("동일 username 이미 존재함");
         }
     }
 
-    private boolean hasUserByEmail(String email) {
-        return userRepository.findByEmail(email) != null;
+    private boolean isOnline(UUID userId) {
+        return userStatusService.findByUserId(userId).isOnline();
     }
-
 }

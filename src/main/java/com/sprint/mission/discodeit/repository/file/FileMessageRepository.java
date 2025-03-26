@@ -1,97 +1,81 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.message.Message;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
+import java.util.Comparator;
 
-public class FileMessageRepository implements MessageRepository {
-    private static volatile FileMessageRepository instance;
+@Repository
+@ConditionalOnProperty(value = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
+public class FileMessageRepository extends AbstractFileRepository<Map<UUID, Message>> implements MessageRepository {
 
-    private final Path path;
-    private Map<UUID, Message> messages;
+    private Map<UUID, Message> data;
 
-    private FileMessageRepository(Path path) {
-        messages = new HashMap<>();
-        this.path = path;
-        init(path.getParent());
-        loadMessageData();
+    public FileMessageRepository(@Value("${discodeit.repository.file-directory}") String directory) {
+        super(directory, Message.class.getSimpleName()+".ser");
+        this.data = loadData();
     }
 
-    public static FileMessageRepository getInstance(Path path) {
-        if (instance == null) {
-            synchronized (FileMessageRepository.class) {
-                if (instance == null) {
-                    instance = new FileMessageRepository(path);
-                }
-            }
-        }
-        return instance;
+    @Override
+    protected Map<UUID, Message> getEmptyData() {
+        return new HashMap<>();
     }
 
     @Override
     public Message save(Message message) {
-        messages.put(message.getId(), message);
-        saveMessageData();
+        data.put(message.getId(), message);
+        saveData(data);
         return message;
     }
 
     @Override
-    public Message findById(UUID messageId) {
-        return messages.get(messageId);
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
     public List<Message> findAll() {
-        return new ArrayList<>(messages.values());
+        return new ArrayList<>(data.values());
     }
 
     @Override
-    public void delete(UUID messageId) {
-        messages.remove(messageId);
-        saveMessageData();
+    public boolean existsById(UUID id) {
+        return data.containsKey(id);
     }
 
     @Override
-    public boolean exists(UUID messageId) {
-        return messages.containsKey(messageId);
+    public void deleteById(UUID id) {
+        data.remove(id);
+        saveData(data);
     }
 
-    private void init(Path directory) {
-        if (!Files.exists(directory)) {
-            try {
-                Files.createDirectories(directory);
-            } catch (IOException e) {
-                throw new RuntimeException("디렉토리 생성 안 됨");
-            }
-        }
+    @Override
+    public Optional<Message> findLatestMessageByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt));
     }
 
-    @SuppressWarnings("unchecked")
-    private void loadMessageData() {
-        if (Files.exists(path)) {
-            try (InputStream is = Files.newInputStream(path);
-                 ObjectInputStream ois = new ObjectInputStream(is)) {
-                Object messageDataObject = ois.readObject();
-
-                if (messageDataObject instanceof Map) {
-                    messages = (Map<UUID, Message>) messageDataObject;
-                }
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException("메세지 데이터 로드 실패");
-            }
-        }
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
-    private void saveMessageData() {
-        try (OutputStream os = Files.newOutputStream(path);
-             ObjectOutputStream oos = new ObjectOutputStream(os)) {
-            oos.writeObject(messages);
-        } catch (IOException e) {
-            throw new RuntimeException("메세지 데이터 저장 실패");
-        }
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        List<UUID> keysToRemove = data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .map(Message::getId)
+                .toList();
+        keysToRemove.forEach(data::remove);
+        saveData(data);
     }
 }

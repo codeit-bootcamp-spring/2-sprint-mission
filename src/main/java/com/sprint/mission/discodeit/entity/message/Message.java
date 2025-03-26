@@ -1,46 +1,72 @@
 package com.sprint.mission.discodeit.entity.message;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.UpdatableEntity;
+import lombok.Getter;
+import lombok.ToString;
 
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-public class Message extends BaseEntity {
-    private final UUID senderId;
+@Getter
+public class Message extends UpdatableEntity {
     private String content;
-    private final UUID channelId;
 
-    public Message(UUID senderId, String content, UUID channelId) {
+    private UUID channelId;
+    private UUID authorId;
+    private List<UUID> attachmentIds;
+
+    public Message(String content, UUID channelId, UUID authorId) {
+        this(content, channelId, authorId, new ArrayList<>());
+    }
+
+    public Message(String content,UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         super();
-        this.senderId = senderId;
-        this.channelId = channelId;
-        setContent(content);
-    }
 
-    private void setContent(String content) {
-        if (content == null || content.isEmpty()) {
-            throw new IllegalArgumentException("유효하지 않은 메세지입니다.");
-        }
         this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
+        this.attachmentIds = new ArrayList<>(attachmentIds);
     }
 
-    public UUID getSenderId() {
-        return senderId;
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
-    public void update(String content) {
-        setContent(content);
-        updateModifiedAt();
+    public void addAttachment(UUID attachmentId) {
+        if (attachmentId == null) {
+            throw new IllegalArgumentException("attachmentId가 null입니다.");
+        }
+        attachmentIds.add(attachmentId);
+        updatedAt = Instant.now();
     }
 
-    public UUID getChannelId() {
-        return channelId;
+    public void removeAttachment(UUID attachmentId) {
+        if (this.attachmentIds.remove(attachmentId)) {
+            this.updatedAt = Instant.now();
+        }
     }
 
     @Override
     public String toString() {
-        return "sender=" + senderId +
-                ", content='" + content + '\'' +
-                super.toString();
+        return "Message{" +
+                "content='" + content + '\'' +
+                ", channelId=" + channelId +
+                ", authorId=" + authorId +
+                ", attachmentIds=" + attachmentIds +
+                ", updatedAt=" + updatedAt +
+                ", id=" + id +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
-

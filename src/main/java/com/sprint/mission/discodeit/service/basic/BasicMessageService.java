@@ -1,84 +1,91 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.message.Message;
-import com.sprint.mission.discodeit.exception.MessageNotFoundException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
-// JCFMessageService, FileMessageService, BasicMessageService 전부 동일합니다. 최종적으로는 BasicMessageService 사용합니다 (스프린트 요구 사항으로 남겨두었습니다.)
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    private static volatile BasicMessageService instance;
-
-    private UserService userService;
-    private ChannelService channelService;
-    private MessageRepository messageRepository;
-
-    private BasicMessageService(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
-        this.userService = userService;
-        this.channelService = channelService;
-        this.messageRepository = messageRepository;
-    }
-
-    public static BasicMessageService getInstance(UserService userService, ChannelService channelService, MessageRepository messageRepository) {
-        if (instance == null) {
-            synchronized (BasicMessageService.class) {
-                if (instance == null) {
-                    instance = new BasicMessageService(userService, channelService, messageRepository);
-                }
-            }
-        }
-        return instance;
-    }
+    private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message sendMessage(UUID senderId, String content, UUID channelId) {
-        channelService.validateChannelId(channelId);
-        userService.validateUserId(senderId);
-        if (!channelService.isChannelMember(channelId, senderId)) {
-            return null;
-        }
-        Message message = new Message(senderId, content, channelId);
-        messageRepository.save(message);
-        return message;
-    }
+    public Message create(MessageCreateRequestDto requestDto) {
+        validateChannelExistence(requestDto.channelId());
+        validateUserExistence(requestDto.authorId());
 
+        List<UUID> attachmentIds = requestDto.attachmentIds() != null ? requestDto.attachmentIds() : List.of();
 
-    @Override
-    public List<Message> getAllMessages() {
-        return messageRepository.findAll();
-    }
-
-
-    @Override
-    public Message getMessageById(UUID messageId) {
-        validateMessageId(messageId);
-        return messageRepository.findById(messageId);
-    }
-
-    @Override
-    public Message updateMessage(UUID messageId, String content) {
-        validateMessageId(messageId);
-        Message message = getMessageById(messageId);
-        message.update(content);
+        Message message = new Message(requestDto.content(), requestDto.channelId(), requestDto.authorId(), attachmentIds);
 
         return messageRepository.save(message);
     }
 
     @Override
-    public void deleteMessage(UUID messageId) {
-        validateMessageId(messageId);
-        Message message = messageRepository.findById(messageId);
-        messageRepository.delete(messageId);
+    public Message find(UUID messageId) {
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
-    private void validateMessageId(UUID messageId) {
-        if (!messageRepository.exists(messageId)) {
-            throw new MessageNotFoundException("해당 메세지 없음");
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        validateChannelExistence(channelId);
+        return messageRepository.findAllByChannelId(channelId);
+    }
+
+    @Override
+    public Message update(MessageUpdateRequestDto requestDto) {
+        Message message = getMessage(requestDto.id());
+        message.update(requestDto.content());
+        return messageRepository.save(message);
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        Message message = getMessage(messageId);
+
+        if (message.getAttachmentIds().isEmpty()) {
+            messageRepository.deleteById(messageId);
+            return;
+        }
+
+        message.getAttachmentIds()
+                .forEach(attachmentId -> {
+                    if (binaryContentRepository.existsById(attachmentId)) {
+                        binaryContentRepository.deleteById(attachmentId);
+                    }
+                });
+        messageRepository.deleteById(messageId);
+    }
+
+    private Message getMessage(UUID messageId) {
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("해당 메세지 없음"));
+    }
+
+    private void validateUserExistence(UUID authorId) {
+        if (!userRepository.existsById(authorId)) {
+            throw new NoSuchElementException("해당 유저 없음");
+        }
+    }
+
+    private void validateChannelExistence(UUID channelId) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("해당 채널 없음");
         }
     }
 }
