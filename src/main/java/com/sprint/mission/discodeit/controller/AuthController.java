@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.service.auth.LoginParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import com.sprint.mission.discodeit.mapper.AuthMapper;
 import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
     private final AuthMapper authMapper;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO) {
         LoginParam loginParam = authMapper.toLoginParam(loginRequestDTO);
         UserDTO userDTO = authService.login(loginParam);
         LoginResponseDTO loginResponseDTO = authMapper.toLoginResponseDTO(userDTO);
