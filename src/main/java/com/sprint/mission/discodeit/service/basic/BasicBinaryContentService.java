@@ -17,11 +17,12 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     // BinaryContentService는 Controller에서 호출되는 것이 아닌, MessageService나 UserService에서 호출되는 구조
-    // => 서비스간 호출이므로 엔티티를 받아도 상관없다
+    // => 서비스간 호출이므로 엔티티를 받거나 반환해도 상관없다
+    // <-> find같은 경우는 원하는 스펙이 다를 수 있으므로, DTO로 반환
     @Override
-    public BinaryContentDTO create(BinaryContent binaryContent) {
+    public BinaryContent create(BinaryContent binaryContent) {
         binaryContentRepository.save(binaryContent);
-        return binaryContentEntityToDTO(binaryContent);
+        return binaryContent;
     }
 
     @Override

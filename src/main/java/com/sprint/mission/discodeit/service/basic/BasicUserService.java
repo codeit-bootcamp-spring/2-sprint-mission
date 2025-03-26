@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.service.binaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.service.binaryContent.CreateBinaryContentParam;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
@@ -73,11 +74,17 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UUID update(UUID userId, UpdateUserParam updateUserParam) {
+    public UUID update(UUID userId, UpdateUserParam updateUserParam, MultipartFile multipartFile) {
         User findUser = findUserById(userId);
         findUser.updateUserInfo(updateUserParam.username(), updateUserParam.email(), updateUserParam.password());
-        if (updateUserParam.profileId() != null) { // 프로필 변경 요청이 있을 때만 업데이트
-            findUser.updateProfile(updateUserParam.profileId());
+        if (multipartFile != null) { // 프로필 변경 요청이 있을 때만 업데이트
+            // 기본 프로필 ID가 아닐 때만 기존 이미지 삭제
+            if (!findUser.getProfileId().equals(User.DEFAULT_PROFILE_ID)) {
+                binaryContentService.delete(findUser.getProfileId());
+            }
+            BinaryContent binaryContent = createBinaryContentEntity(multipartFile);
+            BinaryContent createdBinaryContent = binaryContentService.create(binaryContent);
+            findUser.updateProfile(createdBinaryContent.getId());
         }
         userRepository.save(findUser);
         return userId;
@@ -143,13 +150,5 @@ public class BasicUserService implements UserService {
             throw new RuntimeException("파일 저장 중 오류 발생: " + e.getMessage(), e);
         }
     }
-
-    private CreateBinaryContentParam binaryContentToParam(BinaryContent binaryContent) {
-        return new CreateBinaryContentParam(binaryContent.getFilename(),
-                binaryContent.getSize(),
-                binaryContent.getContentType(),
-                binaryContent.getBytes());
-    }
-
 
 }

@@ -13,6 +13,6 @@ public interface UserService {
     UserDTO create(CreateUserParam createUserParam, MultipartFile multipartFile) throws IOException;
     UserDTO find(UUID userId);
     List<UserDTO> findAll();
-    UUID update(UUID userId, UpdateUserParam updateUserParam);
+    UUID update(UUID userId, UpdateUserParam updateUserParam, MultipartFile multipartFile);
     void delete(UUID userId);;
 }
