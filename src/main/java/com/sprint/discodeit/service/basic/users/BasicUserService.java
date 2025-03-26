@@ -54,21 +54,21 @@ public class BasicUserService implements UserServiceV1 {
         BinaryContent profileImage = binaryGenerator.createProfileImage(userProfileImgResponseDto.imgUrl());
 
         //dto를 엔티티로 변환
-        User userMapper = UserMapper.toUser(userRequestDto);
+        User user = UserMapper.toUser(userRequestDto);
 
-        UserStatus userStatus = new UserStatus(userMapper.getCreatedAt(), StatusType.Active.getExplanation());
+        UserStatus userStatus = new UserStatus(user.getCreatedAt(), StatusType.Active.getExplanation());
 
         //연관관계 메소드로 상태 정보 주입
-        userMapper.associateStatus(userStatus);
-        userMapper.associateProfileId(profileImage);
+        user.associateStatus(userStatus);
+        user.associateProfileId(profileImage);
 
         // 저장
         baseUserStatusRepository.save(userStatus);
-        fileUserRepository.save(userMapper);
+        fileUserRepository.save(user);
         baseBinaryContentRepository.save(profileImage);
 
         // User -> UserNameResponse 변환
-        return new UserNameStatusResponseDto(userMapper.getUsername(), userStatus.getStatusType(), userMapper.getId());
+        return new UserNameStatusResponseDto(user.getUsername(), userStatus.getStatusType(), user.getId());
     }
 
 
