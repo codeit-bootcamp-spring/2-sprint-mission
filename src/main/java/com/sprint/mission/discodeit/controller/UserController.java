@@ -35,13 +35,13 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/findAll")
+    @GetMapping("/find-all")
     public ResponseEntity<List<FindUserDto>> findAll() {
         List<FindUserDto> findUserDtoList = userService.findAllUser();
         return ResponseEntity.ok().body(findUserDtoList);
     }
 
-    @PostMapping("/updateUserStatus")
+    @PostMapping("/update-user-status")
     public ResponseEntity<?> updateUserStatus(@RequestBody UpdateUserStatusByUserIdParamDto updateUserStatusByUserIdParamDto) {
         userStatusService.updateByUserId(updateUserStatusByUserIdParamDto);
         return ResponseEntity.ok().build();

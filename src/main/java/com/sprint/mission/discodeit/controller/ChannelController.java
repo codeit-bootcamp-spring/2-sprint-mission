@@ -16,13 +16,13 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
-    @GetMapping("/createPublic")
+    @GetMapping("/create-public")
     public ResponseEntity<SaveChannelDto> createPublic(@RequestBody SaveChannelParamDto saveChannelParamDto) {
         SaveChannelDto saveChannelDto = channelService.createPublicChannel(saveChannelParamDto);
         return ResponseEntity.ok().body(saveChannelDto);
     }
 
-    @GetMapping("/createPrivate")
+    @GetMapping("/create-private")
     public ResponseEntity<SaveChannelDto> createPrivate(@RequestBody SaveChannelParamDto saveChannelParamDto) {
         SaveChannelDto saveChannelDto = channelService.createPrivateChannel(saveChannelParamDto);
         return ResponseEntity.ok().body(saveChannelDto);
@@ -40,7 +40,7 @@ public class ChannelController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/findMyChannel")
+    @PostMapping("/find-my-channel")
     public ResponseEntity<?> findMyChannel(@RequestBody FindAllByUserIdRequestDto findAllByUserIDRequestDto) {
         List<FindChannelDto> findMyChannelList = channelService.findAllByUserId(findAllByUserIDRequestDto);
         return ResponseEntity.ok().body(findMyChannelList);
