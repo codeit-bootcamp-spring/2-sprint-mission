@@ -1,42 +1,57 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
 
-public class User extends BaseEntity {
-    private String nickname;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
+
+@Getter
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String username;
     private String email;
     private String password;
+    private UUID profileId;
 
-    public User(String nickname, String email, String password) {
-        this.nickname = nickname;
+    public User(String username, String email, String password, UUID profileId) {
+        this.username = username;
         this.email = email;
         this.password = password;
+        this.profileId = profileId;
     }
 
-    public String getNickname() {
-        return nickname;
-    }
+    public void updateUser(String newUsername, String newEmail, String newPassword, UUID newProfileId, Instant updateAt) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if(profileId != null && !newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
+            anyValueUpdated = true;
+        }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void update(String nickname, String email, String password, Long updateAt) {
-        this.nickname = nickname;
-        this.email = email;
-        this.password = password;
-        super.updateUpdatedAt(updateAt);
+        if (anyValueUpdated) {
+           super.updateUpdatedAt(updateAt);
+        }
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "nickname='" + nickname + '\'' +
+                "username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ", profileId=" + profileId +
                 "} " + super.toString();
     }
 }

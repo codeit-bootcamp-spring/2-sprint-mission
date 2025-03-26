@@ -2,31 +2,23 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+@Repository
 public class JCFUserRepository implements UserRepository {
-    private static volatile JCFUserRepository instance;
     private final Map<UUID, User> data;
 
     private JCFUserRepository() {
         this.data = new HashMap<>();
     }
 
-    public static JCFUserRepository getInstance() {
-        if (instance == null) {
-            synchronized (JCFUserRepository.class) {
-                if (instance == null) {
-                    instance = new JCFUserRepository();
-                }
-            }
-        }
-        return instance;
-    }
-
     @Override
-    public void save(User user) {
+    public User save(User user) {
         data.put(user.getId(), user);
+        return user;
     }
 
     @Override
@@ -35,20 +27,36 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByUsername(String username) {
+        return findAll().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
+    @Override
     public List<User> findAll() {
         return new ArrayList<>(data.values());
     }
 
     @Override
-    public void delete(UUID userId) {
+    public boolean existsById(UUID userId) {
+        return data.containsKey(userId);
+    }
+
+    @Override
+    public void deleteById(UUID userId) {
         data.remove(userId);
     }
 
     @Override
-    public void update(UUID userId, String nickname, String email, String password) {
-        findById(userId).ifPresent(user -> {
-            user.update(nickname, email, password, System.currentTimeMillis());
-            save(user);
-        });
+    public boolean existsByUsername(String username) {
+        return data.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return data.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
     }
 }

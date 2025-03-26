@@ -1,43 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
 
-import com.sprint.mission.discodeit.ChannelType;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-public class Channel extends BaseEntity {
-    private ChannelType channelType;
-    private String name;
+@Getter
+public class Channel extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private final UUID id;
+    private String title;
     private String description;
+    private ChannelType channelType;
 
-    public Channel(ChannelType channelType, String name, String description) {
+    public Channel(ChannelType channelType, String title, String description) {
+        this.id = UUID.randomUUID();
+        this.title = title;
+        this.description = description;
         this.channelType = channelType;
-        this.name = name;
-        this.description = description;
     }
 
-    public ChannelType getChannelType() {
-        return channelType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void update(String name, String description, Long updateAt) {
-        this.name = name;
-        this.description = description;
-        super.updateUpdatedAt(updateAt);
+    public void updateChannel(String newTitle, String newDescription, Instant updateAt) {
+        boolean isChanged = false;
+        if (!newTitle.equals(this.title)) {
+            this.title = newTitle;
+            isChanged = true;
+        }
+        if (!newDescription.equals(this.description)) {
+            this.description = newDescription;
+            isChanged = true;
+        }
+        if (isChanged) {
+            super.updateUpdatedAt(updateAt);
+        }
     }
 
     @Override
     public String toString() {
-        return "Channel{" +
-                "channelType=" + channelType +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                "} " + super.toString();
+        return "Channel{id:" + id + ",title:" + title +  ",createdAt:" + getCreatedAt() + ",updatedAt:" + getUpdatedAt() + "}";
     }
+
 }
