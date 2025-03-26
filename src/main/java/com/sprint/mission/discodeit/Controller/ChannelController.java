@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -44,6 +45,12 @@ public class ChannelController {
     public ResponseEntity<ChannelDto> deleteChannel(@PathVariable("channelId") UUID channelId){
         channelService.delete(channelId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ChannelDto>> getAllChannelUser(@PathVariable("userId") UUID userId){
+        List<ChannelDto> channels = channelService.findAllByUserId(userId);
+        return ResponseEntity.ok(channels);
     }
 
 
