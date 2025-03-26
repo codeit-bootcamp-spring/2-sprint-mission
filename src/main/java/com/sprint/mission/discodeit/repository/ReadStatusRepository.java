@@ -13,16 +13,11 @@ public interface ReadStatusRepository {
 
     List<ReadStatus> findAllByUserId(UUID userId);
 
-    Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
-
-    void deleteById(UUID readStatusId);
+    List<ReadStatus> findAllByChannelId(UUID channelId);
 
     boolean existsById(UUID readStatusId);
 
+    void deleteById(UUID readStatusId);
+
+    void deleteAllByChannelId(UUID channelId);
 }
-/*@Override
-public List<ReadStatus> findByUserId(UUID userId) {
-    return readStatusList.stream()
-            .filter(readStatus -> readStatus.getUserId().equals(userId))
-            .toList();
-}*/

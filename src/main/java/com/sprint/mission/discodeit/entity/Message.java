@@ -16,15 +16,14 @@ public class Message implements Serializable {
     private Instant updatedAt;
 
     private String text;
-    private List<UUID> attachmentIds;
 
     private UUID userId;
     private UUID channelId;
+    private List<UUID> attachmentIds;
 
     public Message(String text, UUID userId, UUID channelId, List<UUID> attachmentIds) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        this.updatedAt = createdAt;
 
         this.text = text;
         this.userId = userId;
@@ -32,9 +31,16 @@ public class Message implements Serializable {
         this.attachmentIds = attachmentIds;
     }
 
-    public void updateText(String text) {
-        this.text = text;
-        updatedAt = Instant.now();
+    public void updateText(String newText) {
+        boolean anyValueUpdated = false;
+        if (newText != null && !newText.equals(this.text)) {
+            this.text = newText;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
     public String toString() {

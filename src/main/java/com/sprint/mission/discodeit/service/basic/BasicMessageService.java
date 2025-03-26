@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDTO;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -25,14 +27,35 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message createMessage(CreateMessageDTO dto) {
-        if (!userRepository.existsById(dto.userId())) {
+    public Message createMessage(CreateMessageDTO dto, List<BinaryContentDTO> binaryContentDto) {
+        UUID channelId = dto.channelId();
+        UUID userId = dto.userId();
+
+        if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("존재하지 않는 사용자 입니다. 메세지를 생성할 수 없습니다.");
         }
-        if (!channelRepository.existsById(dto.channelId())) {
+        if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("존재하지 않는 채널 입니다. 메세지를 생성할 수 없습니다.");
         }
-        Message message = new Message(dto.text(), dto.userId(), dto.channelId(), dto.attachmentIds());
+        List<UUID> attachmentIds = binaryContentDto.stream()
+                .map(attachmentRequest -> {
+                    String fileName = attachmentRequest.fileName();
+                    String contentType = attachmentRequest.contentType();
+                    byte[] bytes = attachmentRequest.bytes();
+
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+                    return createdBinaryContent.getId();
+                })
+                .toList();
+
+        String content = dto.text();
+        Message message = new Message(
+                content,
+                userId,
+                channelId,
+                attachmentIds
+        );
 
         return messageRepository.save(message);
     }
@@ -44,13 +67,15 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<Message> searchAllByChannelId(UUID channelId) {
-        return messageRepository.findByChannelId(channelId);
+        return messageRepository.findAllByChannelId(channelId).stream()
+                .toList();
     }
 
     @Override
-    public Message updateMessage(UpdateMessageDTO dto) {
-        Message message = getMessage(dto.messageId());
-        message.updateText(dto.text());
+    public Message updateMessage(UUID messageId, UpdateMessageDTO dto) {
+        String newText = dto.text();
+        Message message = getMessage(messageId);
+        message.updateText(newText);
         return messageRepository.save(message);
     }
 
@@ -58,11 +83,10 @@ public class BasicMessageService implements MessageService {
     public void deleteMessage(UUID messageId) {
         Message message = getMessage(messageId);
 
-        List<UUID> attachmentIds = message.getAttachmentIds();
-        if (attachmentIds != null && !attachmentIds.isEmpty()) {
-            binaryContentRepository.deleteAllById(attachmentIds); // 첨부파일 삭제 (배치 삭제)
-        }
-        messageRepository.delete(messageId);
+        message.getAttachmentIds()
+                .forEach(binaryContentRepository::deleteById);
+
+        messageRepository.deleteById(messageId);
     }
 
     private Message getMessage(UUID messageId) {
