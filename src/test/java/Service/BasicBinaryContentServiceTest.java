@@ -31,26 +31,22 @@ public class BasicBinaryContentServiceTest {
     BasicBinaryContentService binaryContentService;
 
     BinaryContent mockBinaryContent = BinaryContent.builder()
-            .type("jpeg")
+            .contentType("jpeg")
             .size(500)
-            .path("www.image1.com")
             .filename("testImage")
             .build();
 
 
     @Test
     void 파일생성_성공() {
-        CreateBinaryContentParam createBinaryContentParam = new CreateBinaryContentParam("testImage", "www.image1.com", 500, "jpeg", null);
-
 
         when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(mockBinaryContent);
 
-        BinaryContentDTO binaryContentDTO = binaryContentService.create(createBinaryContentParam);
+        BinaryContentDTO binaryContentDTO = binaryContentService.create(mockBinaryContent);
 
-        assertEquals(binaryContentDTO.size(), createBinaryContentParam.size());
-        assertEquals(binaryContentDTO.path(), createBinaryContentParam.path());
-        assertEquals(binaryContentDTO.type(), createBinaryContentParam.type());
-        assertEquals(binaryContentDTO.filename(), createBinaryContentParam.filename());
+        assertEquals(binaryContentDTO.size(), mockBinaryContent.getSize());
+        assertEquals(binaryContentDTO.ContentType(), mockBinaryContent.getContentType());
+        assertEquals(binaryContentDTO.filename(), mockBinaryContent.getFilename());
 
         verify(binaryContentRepository, times(1)).save(any(BinaryContent.class));
     }
@@ -62,8 +58,7 @@ public class BasicBinaryContentServiceTest {
         BinaryContentDTO binaryContentDTO = binaryContentService.find(mockBinaryContent.getId());
 
         assertEquals(binaryContentDTO.filename(), mockBinaryContent.getFilename());
-        assertEquals(binaryContentDTO.type(), mockBinaryContent.getType());
-        assertEquals(binaryContentDTO.path(), mockBinaryContent.getPath());
+        assertEquals(binaryContentDTO.ContentType(), mockBinaryContent.getContentType());
         assertEquals(binaryContentDTO.size(), mockBinaryContent.getSize());
 
         verify(binaryContentRepository, times(1)).findById(mockBinaryContent.getId());
@@ -86,9 +81,9 @@ public class BasicBinaryContentServiceTest {
         byte[] bytes = {(byte)0xAB, (byte)0xCD};
 
         List<BinaryContent> mockBinaryContentList = List.of(
-                new BinaryContent("testImage2", "www.testImage2.com", 400, "jpeg", bytes),
-                new BinaryContent("testImage3", "www.testImage3.com", 600, "jpeg", bytes),
-                new BinaryContent("testImage4", "www.testImage4.com", 800, "jpeg", bytes)
+                new BinaryContent("testImage2", 400, "jpeg", bytes),
+                new BinaryContent("testImage3", 600, "jpeg", bytes),
+                new BinaryContent("testImage4", 800, "jpeg", bytes)
         );
 
         when(binaryContentRepository.findById(mockBinaryContentList.get(0).getId())).thenReturn(Optional.of(mockBinaryContentList.get(0)));

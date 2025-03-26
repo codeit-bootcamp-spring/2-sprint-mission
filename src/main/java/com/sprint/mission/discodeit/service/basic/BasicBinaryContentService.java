@@ -16,9 +16,10 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
+    // BinaryContentService는 Controller에서 호출되는 것이 아닌, MessageService나 UserService에서 호출되는 구조
+    // => 서비스간 호출이므로 엔티티를 받아도 상관없다
     @Override
-    public BinaryContentDTO create(CreateBinaryContentParam createBinaryContentParam) {
-        BinaryContent binaryContent = createBinaryContentEntity(createBinaryContentParam);
+    public BinaryContentDTO create(BinaryContent binaryContent) {
         binaryContentRepository.save(binaryContent);
         return binaryContentEntityToDTO(binaryContent);
     }
@@ -44,15 +45,14 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     private BinaryContentDTO binaryContentEntityToDTO(BinaryContent binaryContent) {
-        return new BinaryContentDTO(binaryContent.getId(), binaryContent.getCreatedAt(), binaryContent.getFilename(), binaryContent.getPath(), binaryContent.getSize(), binaryContent.getType(), binaryContent.getBytes());
+        return new BinaryContentDTO(binaryContent.getId(), binaryContent.getCreatedAt(), binaryContent.getFilename(), binaryContent.getSize(), binaryContent.getContentType(), binaryContent.getBytes());
     }
 
     private BinaryContent createBinaryContentEntity(CreateBinaryContentParam createBinaryContentParam) {
         return BinaryContent.builder()
                 .filename(createBinaryContentParam.filename())
-                .path(createBinaryContentParam.path())
                 .size(createBinaryContentParam.size())
-                .type(createBinaryContentParam.type())
+                .contentType(createBinaryContentParam.contentType())
                 .bytes(createBinaryContentParam.bytes())
                 .build();
     }

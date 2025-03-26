@@ -1,19 +1,24 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.service.binaryContent.CreateBinaryContentParam;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -27,15 +32,19 @@ import java.util.stream.Stream;
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
-    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentService binaryContentService;
 
 
     @Override
-    public UserDTO create(CreateUserParam createUserParam) {
+    public UserDTO create(CreateUserParam createUserParam, MultipartFile multipartFile) {
         validateUserField(createUserParam);
         checkDuplicateUsername(createUserParam);
         checkDuplicateEmail(createUserParam);
-        User user = createUserEntity(createUserParam);
+        BinaryContent binaryContent = createBinaryContentEntity(multipartFile);
+        if (binaryContent != null) {
+            binaryContentService.create(binaryContent);
+        }
+        User user = createUserEntity(createUserParam, binaryContent);
         userRepository.save(user);
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
@@ -67,7 +76,9 @@ public class BasicUserService implements UserService {
     public UUID update(UUID userId, UpdateUserParam updateUserParam) {
         User findUser = findUserById(userId);
         findUser.updateUserInfo(updateUserParam.username(), updateUserParam.email(), updateUserParam.password());
-        findUser.updateProfile(updateUserParam.profileId());
+        if (updateUserParam.profileId() != null) { // 프로필 변경 요청이 있을 때만 업데이트
+            findUser.updateProfile(updateUserParam.profileId());
+        }
         userRepository.save(findUser);
         return userId;
     }
@@ -76,7 +87,10 @@ public class BasicUserService implements UserService {
     public void delete(UUID userId) {
         User user = findUserById(userId);
         userRepository.deleteById(userId);
-        binaryContentRepository.deleteById(user.getProfileId());
+        // 기본 프로필 ID가 아닐 때만 삭제
+        if (!user.getProfileId().equals(User.DEFAULT_PROFILE_ID)) {
+           binaryContentService.delete(user.getProfileId());
+        }
         userStatusRepository.deleteByUserId(userId);
     }
 
@@ -94,23 +108,47 @@ public class BasicUserService implements UserService {
     }
 
     private void checkDuplicateEmail(CreateUserParam createUserParam) {
-        if(userRepository.existsByEmail(createUserParam.email())) {
+        if (userRepository.existsByEmail(createUserParam.email())) {
             throw RestExceptions.DUPLICATE_EMAIL;
         }
     }
 
-    public static User createUserEntity(CreateUserParam createUserParam) {
+    public static User createUserEntity(CreateUserParam createUserParam, BinaryContent binaryContent) {
         return User.builder()
                 .username(createUserParam.username())
                 .password(createUserParam.password())
                 .email(createUserParam.email())
-                .profileId(createUserParam.profileId())
+                .profileId(binaryContent != null ? binaryContent.getId() : User.DEFAULT_PROFILE_ID)
                 .build();
     }
 
     private User findUserById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() ->RestExceptions.USER_NOT_FOUND);
+                .orElseThrow(() -> RestExceptions.USER_NOT_FOUND);
+    }
+
+    private BinaryContent createBinaryContentEntity(MultipartFile multipartFile) {
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            return null;  // 파일이 없으면 BinaryContent를 생성하지 않음
+        }
+
+        try {
+            return BinaryContent.builder()
+                    .contentType(multipartFile.getContentType())
+                    .bytes(multipartFile.getBytes())
+                    .size(multipartFile.getSize())
+                    .filename(multipartFile.getOriginalFilename())
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException("파일 저장 중 오류 발생: " + e.getMessage(), e);
+        }
+    }
+
+    private CreateBinaryContentParam binaryContentToParam(BinaryContent binaryContent) {
+        return new CreateBinaryContentParam(binaryContent.getFilename(),
+                binaryContent.getSize(),
+                binaryContent.getContentType(),
+                binaryContent.getBytes());
     }
 
 

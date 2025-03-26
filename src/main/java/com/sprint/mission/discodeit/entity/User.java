@@ -19,7 +19,7 @@ public class User implements Serializable {
     private String email;
     private String password;
 
-    private static final UUID DEFAULT_PROFILE_ID = UUID.fromString("00000000-0000-0000-0000-000000000000"); // 기본 프로필 이미지 ID
+    public static final UUID DEFAULT_PROFILE_ID = UUID.fromString("00000000-0000-0000-0000-000000000000"); // 기본 프로필 이미지 ID
 
     // 클래스가 아니라 생성자에 붙여야 해당 값들에 대해 build가 가능
     // 클래스에 붙이면 모든 필드에 대해 build를 해줘야함 (안하면 null)
