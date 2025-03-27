@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.DTO.MessageService.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.MessageService.MessageCreateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -45,15 +45,15 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message create(MessageCreateDTO messageCreateDTO) {
+    public Message create(MessageCreateRequest messageCreateRequest) {
         try{
-            channelService.find(messageCreateDTO.channelId());
-            userService.find(messageCreateDTO.userId());
+            channelService.find(messageCreateRequest.channelId());
+            userService.find(messageCreateRequest.userId());
         }catch (NoSuchElementException e){
             throw new IllegalArgumentException("채널 혹은 유저가 존재하지 않습니다.");
         }
 
-        Message message = messageCreateDTO.toEntity();
+        Message message = messageCreateRequest.toEntity();
         messageData.put(message.getId(), message);
         saveData();
         return message;

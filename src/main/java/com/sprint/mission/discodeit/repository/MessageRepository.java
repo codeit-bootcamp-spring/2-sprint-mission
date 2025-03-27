@@ -13,5 +13,7 @@ public interface MessageRepository {
     List<Message> findAll();
     Message update(UUID id, String newMessage);
     void delete(UUID id);
+    void deleteAllByChannelId(UUID channelId);
+    void deleteAllByUserId(UUID userId);
 
 }

@@ -1,16 +1,16 @@
-package com.sprint.mission.discodeit.DTO.MessageService;
+package com.sprint.mission.discodeit.dto.MessageService;
 
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.UUID;
 
-public record MessageCreateDTO(
+public record MessageCreateRequest(
         String message,
         UUID userId,
         UUID channelId
 ) {
-    public static MessageCreateDTO toDTO(Message message) {
-        return new MessageCreateDTO(message.getMessage(), message.getUserId(), message.getChannelId());
+    public static MessageCreateRequest toDTO(Message message) {
+        return new MessageCreateRequest(message.getMessage(), message.getUserId(), message.getChannelId());
     }
 
     public Message toEntity() {

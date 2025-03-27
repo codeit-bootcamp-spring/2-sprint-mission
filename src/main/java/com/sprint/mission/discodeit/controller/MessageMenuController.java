@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.DTO.MessageService.MessageCreateDTO;
-import com.sprint.mission.discodeit.DTO.UserService.AuthDTO;
+import com.sprint.mission.discodeit.dto.MessageService.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.UserService.AuthRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.menus.MessageMenu;
-import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.basic.BasicAuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -18,17 +18,17 @@ public class MessageMenuController {
     private final MessageService messageService;
     private final ChannelService channelService;
     private final UserService userService;
-    private final AuthService authService;
+    private final BasicAuthService basicAuthService;
     private final Scanner scanner;
     private static User loggedUser;
     private static Channel currentChannel;
 
 
-    public MessageMenuController(UserService userService, ChannelService channelService, MessageService messageService,AuthService authService, Scanner scanner) {
+    public MessageMenuController(UserService userService, ChannelService channelService, MessageService messageService, BasicAuthService basicAuthService, Scanner scanner) {
         this.messageService = messageService;
         this.channelService = channelService;
         this.userService = userService;
-        this.authService = authService;
+        this.basicAuthService = basicAuthService;
         this.scanner = scanner;
 
     }
@@ -36,8 +36,8 @@ public class MessageMenuController {
     public void handleMessageMenu() {
         String loginUserName = getMessageInput("로그인: ");
         String loginPassword = getMessageInput("비밀번호: ");
-        AuthDTO authDTO = new AuthDTO(loginUserName, loginPassword);
-        if(!logInUser(authService.login(authDTO)))
+        AuthRequest authRequest = new AuthRequest(loginUserName, loginPassword);
+        if(!logInUser(basicAuthService.login(authRequest)))
         {
             return;
         }
@@ -145,8 +145,8 @@ public class MessageMenuController {
 
     private void createMessage(){
         String message = getMessageInput("작성할 메세지: ");
-        MessageCreateDTO messageCreateDTO = new MessageCreateDTO(message,loggedUser.getId(), currentChannel.getId());
-        messageService.create(messageCreateDTO);
+        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(message,loggedUser.getId(), currentChannel.getId());
+        messageService.create(messageCreateRequest);
     }
 
     private void findMessage(){

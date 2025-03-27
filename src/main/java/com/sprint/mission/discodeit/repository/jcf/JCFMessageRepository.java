@@ -17,7 +17,7 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findByUser(UUID userId) {
         List<Message> messages = messageData.values().stream().filter(m -> m.getUserId().equals(userId)).toList();
-        if(messages.isEmpty() || messages == null){
+        if(messages.isEmpty()){
             throw new NoSuchElementException("유저 " + userId + "가 존재하지 않습니다.");
         }
         return messages;
@@ -26,7 +26,7 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findByChannel(UUID channelId) {
         List<Message> messages = messageData.values().stream().filter(m -> m.getChannelId().equals(channelId)).toList();
-        if(messages.isEmpty() || messages == null){
+        if(messages.isEmpty()){
             throw new NoSuchElementException("채널 " + channelId + "가 존재하지 않습니다.");
         }
         return messages;
@@ -35,7 +35,7 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findByUserAndByChannel(UUID userId, UUID channelId) {
         List<Message> messages = messageData.values().stream().filter(m -> m.getUserId().equals(userId) && m.getChannelId().equals(channelId)).toList();
-        if (messages.isEmpty() || messages == null) {
+        if (messages.isEmpty()) {
             throw new NoSuchElementException("유저 " + userId + " 혹은 채널 " + channelId + "가 존재하지 않습니다.");
         }
         return messages;
@@ -58,5 +58,15 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void delete(UUID id) {
         messageData.remove(id);
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+
+    }
+
+    @Override
+    public void deleteAllByUserId(UUID userId) {
+
     }
 }

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.DTO.BinaryContentDTO;
-import com.sprint.mission.discodeit.DTO.UserService.UserCreateDTO;
-import com.sprint.mission.discodeit.DTO.UserService.UserFindDTO;
-import com.sprint.mission.discodeit.DTO.UserService.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.UserService.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.UserService.UserFindDto;
+import com.sprint.mission.discodeit.dto.UserService.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -41,8 +41,8 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User create(UserCreateDTO userCreateDTO, BinaryContentDTO binaryContentDTO) {
-        User newUser = userCreateDTO.toEntity();
+    public User create(UserCreateRequest userCreateRequest, BinaryContentDTO binaryContentDTO) {
+        User newUser = userCreateRequest.toEntity();
         userData.put(newUser.getId(), newUser);
         saveData();
         return newUser;
@@ -57,7 +57,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public UserFindDTO findWithStatus(UUID id) {
+    public UserFindDto findWithStatus(UUID id) {
         return null;
     }
 
@@ -67,15 +67,15 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public List<UserFindDTO> findAllWithStatus() {
+    public List<UserFindDto> findAllWithStatus() {
         return List.of();
     }
 
     @Override
-    public User update(UserUpdateDTO userUpdateDTO) {
-        User userNullable = userData.get(userUpdateDTO.id());
-        User user = Optional.ofNullable(userNullable).orElseThrow(() -> new NoSuchElementException(userUpdateDTO.id() + "가 존재하지 않습니다."));
-        user.updateUser(userUpdateDTO.userName(), userUpdateDTO.email(), userUpdateDTO.password());
+    public User update(UserUpdateRequest userUpdateRequest) {
+        User userNullable = userData.get(userUpdateRequest.id());
+        User user = Optional.ofNullable(userNullable).orElseThrow(() -> new NoSuchElementException(userUpdateRequest.id() + "가 존재하지 않습니다."));
+        user.updateUser(userUpdateRequest.userName(), userUpdateRequest.email(), userUpdateRequest.password());
         saveData();
 
         return user;

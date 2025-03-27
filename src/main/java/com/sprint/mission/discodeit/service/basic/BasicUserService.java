@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.BinaryContentDTO;
-import com.sprint.mission.discodeit.DTO.UserService.UserCreateDTO;
-import com.sprint.mission.discodeit.DTO.UserService.UserFindDTO;
-import com.sprint.mission.discodeit.DTO.UserService.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.UserService.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.UserService.UserFindDto;
+import com.sprint.mission.discodeit.dto.UserService.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContentType;
 import com.sprint.mission.discodeit.entity.User;
@@ -28,15 +28,15 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public User create(UserCreateDTO userCreateDTO, BinaryContentDTO binaryContentDTO) {
+    public User create(UserCreateRequest userCreateRequest, BinaryContentDTO binaryContentDTO) {
         for (User user1 : userRepository.findAll()) {
-            if (user1.getEmail().equals(userCreateDTO.email()) ||
-                    user1.getUserName().equals(userCreateDTO.userName())) {
+            if (user1.getEmail().equals(userCreateRequest.email()) ||
+                    user1.getUserName().equals(userCreateRequest.userName())) {
                 System.out.println("이메일이나 닉네임이 이미 존재합니다.");
                 return null;
             }
         }
-        User user = userCreateDTO.toEntity();
+        User user = userCreateRequest.toEntity();
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
         if(binaryContentDTO != null){
@@ -53,10 +53,10 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserFindDTO findWithStatus(UUID id) {
+    public UserFindDto findWithStatus(UUID id) {
         User user = userRepository.findById(id);
         UserStatus userStatus = userStatusRepository.findById(id);
-        return new UserFindDTO(user, userStatus);
+        return new UserFindDto(user, userStatus);
     }
 
     @Override
@@ -65,33 +65,33 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserFindDTO> findAllWithStatus() {
+    public List<UserFindDto> findAllWithStatus() {
         List<User> userList = userRepository.findAll();
-        List<UserFindDTO> userFindDTOList = new ArrayList<>();
+        List<UserFindDto> userFindDtoList = new ArrayList<>();
 
         userList.forEach(user -> {
-           userFindDTOList.add(findWithStatus(user.getId()));
+           userFindDtoList.add(findWithStatus(user.getId()));
         });
 
-        return userFindDTOList;
+        return userFindDtoList;
     }
 
     @Override
-    public User update(UserUpdateDTO userUpdateDTO) {
-        if(userUpdateDTO.photo() != null){
-            binaryContentRepository.delete(userRepository.findById(userUpdateDTO.id()).getProfileId());
-            BinaryContent binaryContent = new BinaryContent(BinaryContentType.IMAGE, userUpdateDTO.photo());
+    public User update(UserUpdateRequest userUpdateRequest) {
+        if(userUpdateRequest.photo() != null){
+            binaryContentRepository.delete(userRepository.findById(userUpdateRequest.id()).getProfileId());
+            BinaryContent binaryContent = new BinaryContent(BinaryContentType.IMAGE, userUpdateRequest.photo());
             binaryContentRepository.save(binaryContent);
-            userRepository.findById(userUpdateDTO.id()).useProfileId(binaryContent.getId());
+            userRepository.findById(userUpdateRequest.id()).useProfileId(binaryContent.getId());
         }
         for (User user1 : userRepository.findAll()) {
-            if (user1.getEmail().equals(userUpdateDTO.email()) ||
-                    user1.getUserName().equals(userUpdateDTO.userName())) {
+            if (user1.getEmail().equals(userUpdateRequest.email()) ||
+                    user1.getUserName().equals(userUpdateRequest.userName())) {
                 System.out.println("이메일이나 닉네임이 이미 존재합니다.");
                 return null;
             }
         }
-        return userRepository.update(userUpdateDTO.id(),userUpdateDTO.userName(),userUpdateDTO.email(),userUpdateDTO.password());
+        return userRepository.update(userUpdateRequest.id(), userUpdateRequest.userName(), userUpdateRequest.email(), userUpdateRequest.password());
     }
 
     @Override

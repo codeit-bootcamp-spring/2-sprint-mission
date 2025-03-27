@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.DTO.MessageService.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.MessageService.MessageCreateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -21,15 +21,15 @@ public class JCFMessageService implements MessageService {
 
 
     @Override
-    public Message create(MessageCreateDTO messageCreateDTO) {
+    public Message create(MessageCreateRequest messageCreateRequest) {
         try{
-            channelService.find(messageCreateDTO.channelId());
-            userService.find(messageCreateDTO.userId());
+            channelService.find(messageCreateRequest.channelId());
+            userService.find(messageCreateRequest.userId());
         }catch (NoSuchElementException e){
             throw new IllegalArgumentException("채널 혹은 유저가 존재하지 않습니다.");
         }
 
-        Message message = messageCreateDTO.toEntity();
+        Message message = messageCreateRequest.toEntity();
         messageData.put(message.getId(), message);
         return message;
     }
@@ -37,7 +37,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> findByUser(UUID userId) {
         List<Message> messages = messageData.values().stream().filter(m -> m.getUserId().equals(userId)).toList();
-        if(messages.isEmpty() || messages == null){
+        if(messages.isEmpty()){
             throw new NoSuchElementException("유저 " + userId + "가 존재하지 않습니다.");
         }
         return messages;
@@ -46,7 +46,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> findByChannel(UUID channelId) {
         List<Message> messages = messageData.values().stream().filter(m -> m.getChannelId().equals(channelId)).toList();
-        if(messages.isEmpty() || messages == null){
+        if(messages.isEmpty()){
             throw new NoSuchElementException("채널 " + channelId + "가 존재하지 않습니다.");
         }
         return messages;
@@ -55,7 +55,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> findByUserAndByChannel(UUID userId, UUID channelId) {
         List<Message> messages = messageData.values().stream().filter(m -> m.getUserId().equals(userId) && m.getChannelId().equals(channelId)).toList();
-        if (messages.isEmpty() || messages == null) {
+        if (messages.isEmpty()) {
             throw new NoSuchElementException("유저 " + userId + " 혹은 채널 " + channelId + "가 존재하지 않습니다.");
         }
         return messages;
