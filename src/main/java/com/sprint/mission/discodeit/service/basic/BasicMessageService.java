@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -21,7 +22,6 @@ import java.util.UUID;
 @Service
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
-    //
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
@@ -38,17 +38,16 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("Author with id " + authorId + " does not exist");
         }
 
-        List<UUID> attachmentIds = binaryContentCreateRequests.stream()
-                .map(attachmentRequest -> {
-                    String fileName = attachmentRequest.fileName();
-                    String contentType = attachmentRequest.contentType();
-                    byte[] bytes = attachmentRequest.bytes();
+        List<UUID> attachmentIds = new ArrayList<>();
+        for (BinaryContentCreateRequest attachmentRequest : binaryContentCreateRequests) {
+            String fileName = attachmentRequest.fileName();
+            String contentType = attachmentRequest.contentType();
+            byte[] bytes = attachmentRequest.bytes();
 
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
-                    return createdBinaryContent.getId();
-                })
-                .toList();
+            BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+            BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+            attachmentIds.add(createdBinaryContent.getId());
+        }
 
         String content = messageCreateRequest.content();
         Message message = new Message(
@@ -68,8 +67,12 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannelId(channelId).stream()
-                .toList();
+        List<Message> allMessages = messageRepository.findAllByChannelId(channelId);
+        List<Message> result = new ArrayList<>();
+        for (Message message : allMessages) {
+            result.add(message);
+        }
+        return result;
     }
 
     @Override
@@ -86,8 +89,9 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
 
-        message.getAttachmentIds()
-                .forEach(binaryContentRepository::deleteById);
+        for (UUID attachmentId : message.getAttachmentIds()) {
+            binaryContentRepository.deleteById(attachmentId);
+        }
 
         messageRepository.deleteById(messageId);
     }

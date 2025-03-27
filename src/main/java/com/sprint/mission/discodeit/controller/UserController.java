@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -50,12 +51,13 @@ public class UserController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<UserResponseDto>> findAll() {
         List<User> users = userService.findAll();
-        List<UserResponseDto> response = users.stream()
-                .map(user -> {
-                    UserStatus status = userStatusService.findByUserId(user.getId()).orElse(null);
-                    return new UserResponseDto(user, status);
-                })
-                .collect(Collectors.toList());
+        List<UserResponseDto> response = new ArrayList<>();
+
+        for (User user : users) {
+            UserStatus status = userStatusService.findByUserId(user.getId()).orElse(null);
+            response.add(new UserResponseDto(user, status));
+        }
+
         return ResponseEntity.ok(response);
     }
 

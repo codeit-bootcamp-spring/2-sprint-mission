@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -38,9 +39,16 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-        return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
-                .toList();
+        List<BinaryContent> result = new java.util.ArrayList<>();
+        for (UUID id : binaryContentIds) {
+            Optional<BinaryContent> optionalContent = binaryContentRepository.findById(id);
+            if (optionalContent.isPresent()) {
+                result.add(optionalContent.get());
+            }
+        }
+        return result;
     }
+
 
     @Override
     public void delete(UUID binaryContentId) {
