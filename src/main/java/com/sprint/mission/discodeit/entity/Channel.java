@@ -8,7 +8,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class Channel implements Serializable {
+@Builder
+public class Channel implements Serializable, Identifiable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
     private final Instant createdAt;
@@ -17,20 +18,25 @@ public class Channel implements Serializable {
     private String name;
     private String description;
 
-    @Builder
-    public Channel(ChannelType type, String name, String description) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.type = type;
-        this.name = name;
-        this.description = description;
+
+    public static Channel ofPublic(ChannelType type, String name, String description) {
+       return Channel.builder()
+               .id(UUID.randomUUID())
+               .type(type)
+               .name(name)
+               .description(description)
+               .createdAt(Instant.now())
+               .updatedAt(Instant.now())
+               .build();
     }
 
-    @Builder
-    public Channel(ChannelType type) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.type = type;
+    public static Channel ofPrivate(ChannelType type) {
+        return Channel.builder()
+                .id(UUID.randomUUID())
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .type(type)
+                .build();
     }
 
 
