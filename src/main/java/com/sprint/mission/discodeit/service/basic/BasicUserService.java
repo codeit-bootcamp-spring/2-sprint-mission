@@ -27,13 +27,11 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(UserCreateRequestDto dto) {
-        Map<UUID, User> userData = userRepository.getUserData();
-
-        if (userData.values().stream()
+        if (userRepository.findAll().stream()
                 .anyMatch(user -> user.getUsername().equals(dto.getUsername()))) {
             throw new IllegalArgumentException("같은 이름을 가진 사람이 있습니다.");
         }
-        if (userData.values().stream()
+        if (userRepository.findAll().stream()
                 .anyMatch(user -> user.getEmail().equals(dto.getEmail()))) {
             throw new IllegalArgumentException("같은 메일을 가진 사람이 있습니다.");
         }
@@ -71,9 +69,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public User update(UserUpdateRequestDto dto) {
-        Map<UUID, User> userData = userRepository.getUserData();
-
-        User user = Optional.ofNullable(userData.get(dto.getUserID()))
+        User user = Optional.ofNullable(userRepository.findById(dto.getUserID()))
                 .orElseThrow(() -> new NoSuchElementException("User with id " + dto.getUserID() + " not found"));
 
         return userRepository.update(user, dto.getNewUserName(), dto.getNewEmail(), dto.getNewPassword(), dto.getNewProfileID());
@@ -81,10 +77,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        Map<UUID, User> userData = userRepository.getUserData();
-        if (!userData.containsKey(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " not found");
-        }
+        userRepository.findById(userId);
+
         userRepository.delete(userId);
         userStatusRepository.delete(userStatusRepository.findByUserId(userId).getId());
         binaryContentRepository.delete(binaryContentRepository.getBinaryContentByUserId(userId).getId());
