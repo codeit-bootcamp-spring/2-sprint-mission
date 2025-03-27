@@ -10,6 +10,5 @@ import org.springframework.stereotype.Component;
 @Setter
 @ConfigurationProperties(prefix = "discodeit.repository")
 public class RepositoryProperties {
-    private String type;
     private String fileDirectory;
 }
