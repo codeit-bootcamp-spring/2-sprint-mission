@@ -7,11 +7,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BinaryContentRepository {
-
-    BinaryContent getBinaryContentByUserId(UUID userId);
-    Map<UUID, BinaryContent> getBinaryContentData();
-    void delete(UUID binaryContentId);
-    List<BinaryContent> findAll();
-    BinaryContent findById(UUID binaryContentId);
     BinaryContent save(BinaryContent binaryContent);
+
+    BinaryContent findById(UUID binaryContentId);
+
+    List<BinaryContent> findAll();
+
+    void delete(UUID binaryContentId);
 }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -77,10 +78,14 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        userRepository.findById(userId);
+        User user = userRepository.findById(userId);
 
         userRepository.delete(userId);
         userStatusRepository.delete(userStatusRepository.findByUserId(userId).getId());
-        binaryContentRepository.delete(binaryContentRepository.getBinaryContentByUserId(userId).getId());
+
+        if (user.getProfileId() != null) {
+            BinaryContent binaryContent = binaryContentRepository.findById(user.getProfileId());
+            binaryContentRepository.delete(binaryContent.getId());
+        }
     }
 }

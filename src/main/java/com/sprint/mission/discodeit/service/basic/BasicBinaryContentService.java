@@ -13,9 +13,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent create(String filePath){
-        Map<UUID, BinaryContent> binaryContentData = binaryContentRepository.getBinaryContentData();
-
-        if(binaryContentData.values().stream()
+        if(binaryContentRepository.findAll().stream()
                 .anyMatch(binaryContent ->
                         (binaryContent.getFilePath().equals(filePath)))) {
             throw new IllegalArgumentException("관련된 객체가 이미 존재합니다.");
