@@ -18,7 +18,7 @@ import java.util.UUID;
 @Repository
 public class FileChannelRepository implements ChannelRepository {
     private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
+    private static final String EXTENSION = ".ser";
 
     public FileChannelRepository() {
 //        @Value("${discodeit.repository.file-directory:data}") String fileDirectory

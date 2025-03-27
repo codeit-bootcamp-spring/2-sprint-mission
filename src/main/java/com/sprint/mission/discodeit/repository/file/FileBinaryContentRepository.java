@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
+    private static final String EXTENSION = ".ser";
 
     public FileBinaryContentRepository(
 //            @Value("${discodeit.repository.file-directory:data}") String fileDirectory

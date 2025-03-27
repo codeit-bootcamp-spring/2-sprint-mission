@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 @Repository
 public class FileMessageRepository implements MessageRepository {
     private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
+    private static final String EXTENSION = ".ser";
 
     public FileMessageRepository(
 //            @Value("${discodeit.repository.file-directory:data}") String fileDirectory

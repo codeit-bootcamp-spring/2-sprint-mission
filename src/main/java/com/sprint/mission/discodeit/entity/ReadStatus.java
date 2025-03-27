@@ -37,13 +37,8 @@ public class ReadStatus implements Serializable {
      * 사용자가 마지막으로 읽은 메시지 시간 업데이트
      */
     public void update(Instant newLastReadAt) {
-        boolean anyValueUpdated = false;
         if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
             this.lastReadAt = newLastReadAt;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
             this.updatedAt = Instant.now();
         }
     }

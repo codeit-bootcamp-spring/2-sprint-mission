@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.user.LoginRequest;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.user.UserStatusUpdateRequest;
@@ -12,6 +13,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.List;
@@ -27,9 +29,27 @@ public class UserController {
 
     // 사용자 등록 (회원가입)
     @PostMapping
-    public ResponseEntity<UserCreateResponse> createUser(@RequestBody UserCreateRequest request) {
+    public ResponseEntity<UserCreateResponse> createUser(
+            @RequestPart("user") UserCreateRequest request,
+            @RequestPart(value = "profileImg", required = false) MultipartFile profileFile
+    ) {
         System.out.println("회원가입 API 요청 들어옴.");
-        return ResponseEntity.ok(userService.register(request, Optional.empty()));
+
+        // 파일이 null이면 Optional.empty()
+        Optional<BinaryContentCreateRequest> optionalProfile = Optional.ofNullable(profileFile)
+                .map(file -> {
+                    try {
+                        return new BinaryContentCreateRequest(
+                                file.getOriginalFilename(),
+                                file.getContentType(),
+                                file.getBytes()
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException("프로필 파일 처리 실패", e);
+                    }
+                });
+
+        return ResponseEntity.ok(userService.register(request, optionalProfile));
     }
 
     // 사용자 정보 수정, @PathVariable - URL경로 일부 {}
@@ -58,18 +78,13 @@ public class UserController {
     }
 
     // 사용자 온라인 상태 업데이트, Patch로 리소스의 일부분만 업데이트
-    // 프론트가 있어야 UserStatusUpate가 가능하지 않나? API 도구로 현재 시간 전달 불가능/불편
-    @PatchMapping("/{userId}/status")
+    @PatchMapping("/status/{userId}")
     public ResponseEntity<String> updateUserStatus(
             @PathVariable UUID userId,
-            @RequestBody boolean isOnline
+            @RequestBody UserStatusUpdateRequest request
     ) {
         System.out.println("사용자 온라인 상태 업데이트 API 요청 들어옴.");
-        Instant newLastActiveAt = isOnline ? Instant.now() : null;
-
-        UserStatusUpdateRequest request = new UserStatusUpdateRequest(newLastActiveAt);
         userStatusService.updateByUserId(userId, request);
-
         return ResponseEntity.ok("온라인 상태 업데이트 성공");
     }
 }
