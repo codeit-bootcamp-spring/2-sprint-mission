@@ -21,19 +21,20 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public void create(ReadStatusCreateRequest param) {
-        param.userIds().forEach(userId -> {
-            if (!userRepository.existsById(userId)) {
-                throw new IllegalArgumentException(userId + " 에 해당하는 User을 찾을 수 없음");
-            }
-            boolean isDuplicate = readStatusRepository.findAllByUserId(userId)
-                    .stream().anyMatch(readStatus -> readStatus.getChannelId().equals(param.channelId()));
-            if (isDuplicate) {
-                throw new IllegalArgumentException("중복된 객체 존재");
-            }
+    public ReadStatus create(UUID channelId, ReadStatusCreateRequest param) {
+        UUID userId = param.userId();
+        if (!userRepository.existsById(userId)) {
+            throw new IllegalArgumentException(userId + " 에 해당하는 User을 찾을 수 없음");
+        }
+        boolean isDuplicate = readStatusRepository.findAllByUserId(userId)
+                .stream().anyMatch(readStatus -> readStatus.getChannelId().equals(channelId));
+        if (isDuplicate) {
+            throw new IllegalArgumentException("중복된 객체 존재");
+        }
 
-            readStatusRepository.save(new ReadStatus(userId, param.channelId()));
-        });
+        ReadStatus status = new ReadStatus(userId, channelId, param.lastReadAt());
+        readStatusRepository.save(status);
+        return status;
     }
 
     @Override
@@ -69,10 +70,11 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public void update(ReadStatusUpdateRequest param) {
-        ReadStatus readStatus = find(param.id());
-        readStatus.update();
+    public ReadStatus update(UUID id, ReadStatusUpdateRequest param) {
+        ReadStatus readStatus = find(id);
+        readStatus.update(param.lastReadAt());
         readStatusRepository.save(readStatus);
+        return readStatus;
     }
 
     @Override

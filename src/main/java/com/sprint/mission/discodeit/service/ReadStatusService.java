@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
-    void create(ReadStatusCreateRequest param);
+    ReadStatus create(UUID channelId, ReadStatusCreateRequest param);
 
     ReadStatus find(UUID id);
 
@@ -17,7 +17,7 @@ public interface ReadStatusService {
 
     List<UUID> findAllByChannelId(UUID channelId);
 
-    void update(ReadStatusUpdateRequest param);
+    ReadStatus update(UUID id, ReadStatusUpdateRequest param);
 
     void delete(UUID id);
 }
