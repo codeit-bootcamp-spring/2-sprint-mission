@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -82,7 +83,7 @@ public class BasicChannelService implements ChannelService {
                         .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                         .map(ReadStatus::getUserId)
                         .toList()
-                : null;
+                : List.of();
 
         return new ChannelDto(channel, lastMessageAt, userIds);
     }
@@ -94,28 +95,37 @@ public class BasicChannelService implements ChannelService {
                 .map(ReadStatus::getChannelId)
                 .toList();
 
-        return channels.stream()
-                .filter(channel ->
-                        channel.getType().equals(ChannelType.PRIVATE) ||
-                                joinedChannelIds.contains(channel.getId())
-                )
+        // PRIVATE 채널 중 가입한 것만
+        List<ChannelDto> privateChannels = channels.stream()
+                .filter(channel -> channel.getType().equals(ChannelType.PRIVATE) &&
+                        joinedChannelIds.contains(channel.getId()))
                 .map(channel -> {
-                    Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId())
-                            .stream().max(Comparator.comparing(Message::getCreatedAt)).map(Message::getCreatedAt)
-                            .orElse(null);
-
-                    boolean isPrivate = channel.getType().equals(ChannelType.PRIVATE);
-
-                    List<UUID> userIds = isPrivate ?
-                            readStatusService.findAll().stream()
-                                    .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
-                                    .map(ReadStatus::getUserId)
-                                    .toList()
-                            : null;
-
+                    Instant lastMessageAt = findLastMessageAt(channel.getId());
+                    List<UUID> userIds = readStatusService.findAll().stream()
+                            .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
+                            .map(ReadStatus::getUserId)
+                            .toList();
                     return new ChannelDto(channel, lastMessageAt, userIds);
                 })
                 .toList();
+
+        // PUBLIC 채널
+        List<ChannelDto> publicChannels = channels.stream()
+                .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
+                .map(channel -> {
+                    Instant lastMessageAt = findLastMessageAt(channel.getId());
+                    return new ChannelDto(channel, lastMessageAt, List.of());
+                })
+                .toList();
+
+        return Stream.concat(privateChannels.stream(), publicChannels.stream()).toList();
+    }
+
+    private Instant findLastMessageAt(UUID channelId) {
+        return messageRepository.findAllByChannelId(channelId).stream()
+                .max(Comparator.comparing(Message::getCreatedAt))
+                .map(Message::getCreatedAt)
+                .orElse(null);
     }
 
     @Override
