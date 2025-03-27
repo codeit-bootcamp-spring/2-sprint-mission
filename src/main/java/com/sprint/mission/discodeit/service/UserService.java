@@ -28,11 +28,7 @@ public interface UserService {
 
     void updateUser(UUID userId, UpdateUserRequest request);
 
-    void addChannel(UUID userId, UUID channelId);  //유저 채널 추가 (UUID 기반)
-
     void deleteUser(UUID userId);   //유저 삭제 (UUID 기반)
-
-    void removeChannel(UUID userId, UUID channelId);   //유저 채널 삭제 (UUID 기반)
 
     void validateUserExists(UUID userId);   //유저 존재 확인(UUID)
 }

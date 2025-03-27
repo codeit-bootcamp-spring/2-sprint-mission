@@ -99,24 +99,10 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void addChannel(UUID userId, UUID channelId) {
-        User user = userRepository.findUserById(userId);
-        user.addJoinedChannel(channelId);
-        saveUser();
-    }
-
-    @Override
     public void deleteUser(UUID userId) {
         userRepository.deleteUserById(userId);
         userStatusRepository.deleteUserStatusById(userId);
         binaryContentRepository.deleteBinaryContentById(userId);
-    }
-
-    @Override
-    public void removeChannel(UUID userId, UUID channelId) {
-        User user = userRepository.findUserById(userId);
-        user.removeJoinedChannel(channelId);
-        saveUser();
     }
 
     @Override

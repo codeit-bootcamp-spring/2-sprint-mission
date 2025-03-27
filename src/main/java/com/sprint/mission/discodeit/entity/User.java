@@ -3,14 +3,11 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
 public class User extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final Set<UUID> joinedChannels;
     private String username;
     private String email;
     private String password;
@@ -22,7 +19,6 @@ public class User extends BaseEntity implements Serializable {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.joinedChannels = new HashSet<>();
     }
 
     public void updateEmail(String email) {
@@ -40,24 +36,10 @@ public class User extends BaseEntity implements Serializable {
         updateTimestamp();
     }
 
-    public void addJoinedChannel(UUID channelId) {
-        this.joinedChannels.add(channelId);
-        updateTimestamp();
-
-    }
-
     public void updateProfile(UUID profileId) {
         this.profileId = profileId;
     }
 
-    public void removeJoinedChannel(UUID channelId) {
-        this.joinedChannels.remove(channelId);
-        updateTimestamp();
-    }
-
-    public boolean isJoinedChannel(UUID channelId) {
-        return this.joinedChannels.contains(channelId);
-    }
 
     @Override
     public String toString() {
@@ -65,7 +47,6 @@ public class User extends BaseEntity implements Serializable {
                 "userId=" + getId() +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", joinedChannels=" + joinedChannels + '\'' +
                 ", lastUpdateTime= " + getUpdatedAt() +
                 '}';
     }
