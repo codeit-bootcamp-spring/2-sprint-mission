@@ -25,7 +25,7 @@ public class BasicAuthService implements AuthService {
     public UserDTO login(LoginParam loginParam) {
         User user = findUserByUsername(loginParam);
         checkPassword(user, loginParam);
-        UserStatus userStatus = findUserStatusByUserId(user.getId());
+        UserStatus userStatus = updateLoginAt(user);
         return UserMapper.userEntityToDTO(user, userStatus);
     }
 
@@ -40,8 +40,14 @@ public class BasicAuthService implements AuthService {
     }
 
     private void checkPassword(User user, LoginParam loginParam) {
-        if (!BCrypt.checkpw(user.getPassword(), loginParam.password())) {
+        if (!BCrypt.checkpw(loginParam.password(), user.getPassword())) {
             throw RestExceptions.INVALID_PASSWORD;
         }
+    }
+
+    private UserStatus updateLoginAt (User user) {
+        UserStatus userStatus = findUserStatusByUserId(user.getId());
+        userStatus.updateUserStatus();
+        return userStatusRepository.save(userStatus);
     }
 }
