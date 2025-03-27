@@ -13,6 +13,5 @@ public interface ReadStatusRepository {
     List<ReadStatus> findAll();
     void delete(UUID readStatusID);
     ReadStatus save(ReadStatus readStatus);
-    Map<UUID, ReadStatus> getReadStatusData();
     ReadStatus update(UUID id);
 }

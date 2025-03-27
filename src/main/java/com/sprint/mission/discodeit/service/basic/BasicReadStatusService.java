@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,17 +25,13 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus create(ReadStatusCreateRequestDto dto) {
-        Map<UUID, User> userData = userRepository.getUserData();
-        Map<UUID, Channel> channelData = channelRepository.getChannelData();
-        Map<UUID, ReadStatus> readStatusData = readStatusRepository.getReadStatusData();
-
-        User user = Optional.ofNullable(userData.get(dto.getUserID()))
+        User user = Optional.ofNullable(userRepository.findById(dto.getUserID()))
                 .orElseThrow(() -> new NoSuchElementException("User with id " + dto.getUserID() + " not found"));
 
-        Channel channel = Optional.ofNullable(channelData.get(dto.getChannelID()))
+        Channel channel = Optional.ofNullable(channelRepository.findById(dto.getChannelID()))
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + dto.getChannelID() + " not found"));
 
-        if(readStatusData.values().stream()
+        if(readStatusRepository.findAll().stream()
                 .anyMatch(readStatus ->
                         (readStatus.getUserId().equals(user.getId()))&&(readStatus.getChannelId().equals(channel.getId())))) {
             throw new IllegalArgumentException("관련된 객체가 이미 존재합니다.");
@@ -49,9 +44,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus findById(UUID id) {
-        Map<UUID, ReadStatus> readStatusData = readStatusRepository.getReadStatusData();
-
-        return Optional.ofNullable(readStatusData.get(id))
+        return Optional.ofNullable(readStatusRepository.findById(id))
                 .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + id + " not found"));
     }
 
@@ -64,9 +57,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus update(ReadStatusUpdateRequestDto dto){
-        Map<UUID, ReadStatus> readStatusData = readStatusRepository.getReadStatusData();
-
-        ReadStatus readStatus = readStatusData.get(dto.getReadStatusId());
+        ReadStatus readStatus = readStatusRepository.findById(dto.getReadStatusId());
         if (readStatus == null) {
             throw new NoSuchElementException("UserStatus with id " + dto.getReadStatusId() + " not found");
         }

@@ -20,8 +20,6 @@ public class BasicAuthService implements AuthService {
 
     @Override
     public AuthResponseDto login(AuthLoginRequestDto dto) {
-        Map<UUID, User> userData = userRepository.getUserData();
-
         Optional<User> matchingUser = userRepository.findAll()
                 .stream()
                 .filter(user -> Objects.equals(user.getUsername(), dto.getUsername())

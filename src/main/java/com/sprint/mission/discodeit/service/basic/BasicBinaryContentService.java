@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
+@Service
 public class BasicBinaryContentService implements BinaryContentService {
     BinaryContentRepository binaryContentRepository;
 

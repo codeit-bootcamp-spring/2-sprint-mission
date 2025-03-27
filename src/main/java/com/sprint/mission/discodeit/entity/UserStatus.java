@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.entity;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.UUID;
 import lombok.Getter;
 
@@ -41,9 +39,7 @@ public class UserStatus implements Serializable {
     }
 
     public boolean isOnline() {
-        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-
-        Duration duration = Duration.between(activatedAt, now);
+        Duration duration = Duration.between(activatedAt, Instant.now());
         if (duration.toMinutes() <= 5) {
             if (type != UserStatusType.ONLINE) {
                 type = UserStatusType.ONLINE;
