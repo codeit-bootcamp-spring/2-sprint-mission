@@ -1,14 +1,22 @@
 package com.sprint.mission.discodeit.dto.message;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 import java.util.UUID;
 
 public record MessageCreateRequest(
+        @NotNull
         UUID senderId,
+
+        @NotBlank
         String content,
+
+        @NotNull
         UUID channelId,
-        List<BinaryContentCreateRequest> requests
+
+        @NotNull
+        List<UUID> attachmentIds
 ) {
 }
