@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.service.binaryContent;
+package com.sprint.mission.discodeit.dto.service.binarycontent;
 
 public record CreateBinaryContentParam(
         String filename,

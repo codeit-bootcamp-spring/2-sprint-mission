@@ -1,19 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.service.binaryContent.BinaryContentDTO;
-import com.sprint.mission.discodeit.dto.service.binaryContent.CreateBinaryContentParam;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserDTO;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
-import com.sprint.mission.discodeit.dto.service.userStatus.UserStatusDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.RestExceptions;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -26,10 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @Service

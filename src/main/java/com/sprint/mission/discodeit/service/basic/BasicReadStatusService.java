@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusParam;
 import com.sprint.mission.discodeit.dto.service.readStatus.ReadStatusDTO;
+import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusDTO;
 import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusParam;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.RestException;
@@ -59,11 +60,11 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public UUID update(UpdateReadStatusParam updateReadStatusParam) {
+    public UpdateReadStatusDTO update(UpdateReadStatusParam updateReadStatusParam) {
         ReadStatus readStatus = findReadStatusById(updateReadStatusParam.id());
         readStatus.updateReadStatus();
         readStatusRepository.save(readStatus);
-        return readStatus.getId();
+        return new UpdateReadStatusDTO(updateReadStatusParam.id(), readStatus.getUpdatedAt());
     }
 
     @Override
@@ -107,7 +108,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     private ReadStatusDTO readStatusEntityToDTO(ReadStatus readStatus) {
-        return new ReadStatusDTO(readStatus.getId(), readStatus.getUserId(), readStatus.getChannelId());
+        return new ReadStatusDTO(readStatus.getId(), readStatus.getUserId(), readStatus.getChannelId(), readStatus.getUpdatedAt());
     }
 
 
