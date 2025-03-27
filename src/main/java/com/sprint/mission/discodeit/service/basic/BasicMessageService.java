@@ -29,11 +29,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
     private final BinaryContentService binaryContentService;
 
 
     @Override
     public MessageDTO create(CreateMessageParam createMessageParam, List<MultipartFile> multipartFiles) {
+        // 유저와 채널이 실제로 존재하는지 검증
+        findUserById(createMessageParam.authorId());
+        findChannelById(createMessageParam.channelId());
         List<BinaryContent> binaryContentList = createBinaryContentList(multipartFiles);
         if(!binaryContentList.isEmpty()) {
             binaryContentList.forEach(binaryContentService::create);
@@ -59,11 +64,10 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public UpdateMessageDTO update(UUID id, UpdateMessageParam updateMessageParam, List<MultipartFile> multipartFiles) {
+        // 유저와 채널이 실제로 존재하는지 검증
         Message message = findMessageById(id);
         message.updateMessageInfo(updateMessageParam.content());
-        if(!multipartFiles.isEmpty()) {
-            replaceMessageAttachments(message, multipartFiles);
-        }
+        replaceMessageAttachments(message, multipartFiles);
         Message updatedMessage = messageRepository.save(message);
         return entityToMessageDTO(updatedMessage);
     }
@@ -80,6 +84,11 @@ public class BasicMessageService implements MessageService {
 
     // multipartFiles 있을 시 원래 있던 binaryContent 삭제 후 수정 내용으로 재생성
     private void replaceMessageAttachments(Message message, List<MultipartFile> multipartFiles) {
+        // 디버깅 했을 때, multipartFile이 없어도 filename ="", size=0으로 들어오는 것을 발견하여, 이 경우 처리 X
+        // 들어온 multipartFile이 없다면, 처리가 안될 것이고, 기존에 있던 이미지 유지
+        if(multipartFiles.get(0).getSize() == 0) {
+            return;
+        }
         message.getAttachmentIds().forEach(binaryContentService::delete);
 
         List<BinaryContent> binaryContentList = createBinaryContentList(multipartFiles);
@@ -87,7 +96,7 @@ public class BasicMessageService implements MessageService {
 
         List<UUID> binaryContentIdList = binaryContentList.stream()
                 .map(BinaryContent::getId)
-                .toList();
+                .collect(Collectors.toList());
 
         message.updateMessageAttachment(binaryContentIdList);
     }
@@ -133,5 +142,13 @@ public class BasicMessageService implements MessageService {
 
         private UpdateMessageDTO entityToMessageDTO(Message message) {
         return new UpdateMessageDTO(message.getId(), message.getUpdatedAt(), message.getAttachmentIds(), message.getContent(), message.getChannelId(), message.getAuthorId());
+        }
+
+        private void findUserById(UUID userId) {
+            userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
+        }
+
+        private void findChannelById(UUID channelId) {
+            channelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
         }
     }

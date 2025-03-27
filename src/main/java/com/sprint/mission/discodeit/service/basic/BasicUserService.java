@@ -144,7 +144,7 @@ public class BasicUserService implements UserService {
     }
 
     private BinaryContent createBinaryContentEntity(MultipartFile multipartFile) {
-        if (multipartFile == null || multipartFile.isEmpty()) {
+        if (multipartFile.getSize() == 0 ) {
             return null;  // 파일이 없으면 BinaryContent를 생성하지 않음
         }
         try {
