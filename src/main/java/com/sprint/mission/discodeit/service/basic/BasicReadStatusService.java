@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusFindResponse;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusReadResponse;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.readstatus.DuplicateReadStatusException;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -45,20 +44,27 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusFindResponse findReadStatus(UUID readStatusId) {
+    public ReadStatusReadResponse findReadStatusById(UUID readStatusId) {
         ReadStatus readStatus = this.readStatusRepository.findById(readStatusId);
-        return new ReadStatusFindResponse(readStatus.getId());
+        return new ReadStatusReadResponse(readStatus.getUserId(), readStatus.getChannelId(), readStatus.getReadTime());
     }
 
     @Override
-    public List<ReadStatusFindResponse> findAllReadStatusByUserId(UUID userId) {
+    public ReadStatusReadResponse findReadStatusByUserIdChannelID(UUID userId, UUID channelId) {
+        ReadStatus readStatus = this.readStatusRepository.findByUserIdChannelId(userId, channelId)
+                                                        .orElseThrow(()->new NoSuchReadStatusException("해당 readStatus가 존재하지 않습니다"));
+        return new ReadStatusReadResponse(readStatus.getUserId(), readStatus.getChannelId(), readStatus.getReadTime());
+    }
+
+    @Override
+    public List<ReadStatusReadResponse> findAllReadStatusByUserId(UUID userId) {
         UserService.validateUserId(userId, this.userRepository);
         List<ReadStatus> readStatuses = this.readStatusRepository.findByUserId(userId);
-        List<ReadStatusFindResponse> readStatusFindResponses = new ArrayList<>();
+        List<ReadStatusReadResponse> readStatusReadResponses = new ArrayList<>();
         for (ReadStatus readStatus : readStatuses) {
-            readStatusFindResponses.add(new ReadStatusFindResponse(readStatus.getId()));
+            readStatusReadResponses.add(new ReadStatusReadResponse(readStatus.getUserId(), readStatus.getChannelId(), readStatus.getReadTime()));
         }
-        return readStatusFindResponses;
+        return readStatusReadResponses;
     }
 
     // 이 메서드는 언제 호출해야 하는가? 메세지를 작성할 때? 채널에 접속할 때? 채널에 접속해서 스크롤을 내려 메세지를 확인할 때?
