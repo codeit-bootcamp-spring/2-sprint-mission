@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class ChannelNameUpdater implements ChannelUpdater {
     @Override
@@ -13,7 +15,7 @@ public class ChannelNameUpdater implements ChannelUpdater {
     }
 
     @Override
-    public void update(Channel channel, ChannelUpdateRequest request, ChannelRepository channelRepository) {
-        channelRepository.updateChannelName(channel.getId(), request.channelName());
+    public void update(UUID channelId, ChannelUpdateRequest request, ChannelRepository channelRepository) {
+        channelRepository.updateChannelName(channelId, request.channelName());
     }
 }
