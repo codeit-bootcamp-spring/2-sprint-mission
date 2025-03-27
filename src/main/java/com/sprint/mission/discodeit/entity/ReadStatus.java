@@ -3,29 +3,23 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 import java.time.Instant;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class ReadStatus extends BaseEntity {
     private final UUID channelId;
-    private final Map<UUID, Instant> userIds = new ConcurrentHashMap<>();
+    private final UUID userId;
+    private Instant readTime;
+    //private final Map<UUID, Instant> userIds = new ConcurrentHashMap<>();
 
-    public ReadStatus(UUID channelId) {
+    public ReadStatus(UUID userId, UUID channelId) {
+        this.userId = userId;
         this.channelId = channelId;
+        this.readTime = Instant.now();
     }
 
-    public void addUser(UUID userId) {
-        userIds.put(userId, Instant.now());
-    }
-
-    public void removeUser(UUID userId) {
-        userIds.remove(userId);
-    }
-
-    public void updateLastAccessTime(UUID userId) {
-        userIds.put(userId, Instant.now());
+    public void updateLastAccessTime() {
+        this.readTime = Instant.now();
     }
 
     @Override
@@ -33,7 +27,8 @@ public class ReadStatus extends BaseEntity {
         return "ReadStatus{" +
                 "id=" + getId() +
                 ", channelId=" + channelId +
-                ", userIds=" + userIds +
+                ", userIds=" + userId +
+                ", readTime=" + readTime +
                 '}';
     }
 }

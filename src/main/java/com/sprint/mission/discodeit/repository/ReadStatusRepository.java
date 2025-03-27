@@ -10,13 +10,9 @@ public interface ReadStatusRepository {
 
     void addReadStatus(ReadStatus readStatus);
 
-    void addUser(UUID channelId, UUID userId);
-
-    ReadStatus findReadStatusById(UUID id);
+    ReadStatus findReadStatusById(UUID channelId, UUID userId);
 
     List<ReadStatus> findAllReadStatus();
-
-    void updateTime(UUID channelId, UUID userId);
 
     void deleteReadStatusById(UUID id);
 

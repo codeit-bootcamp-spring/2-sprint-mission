@@ -6,6 +6,5 @@ import java.util.UUID;
 
 @Data
 public class CreateReadStatusRequest {
-    private UUID channelId;
     private UUID userId;
 }
