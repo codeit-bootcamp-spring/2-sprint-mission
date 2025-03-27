@@ -12,12 +12,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class UserStatusServiceImpl implements UserStatusService {
+public class BasicUserStatusService implements UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
 
-    public UserStatusServiceImpl(UserStatusRepository userStatusRepository, UserRepository userRepository) {
+    public BasicUserStatusService(UserStatusRepository userStatusRepository, UserRepository userRepository) {
         this.userStatusRepository = userStatusRepository;
         this.userRepository = userRepository;
     }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.CreateBinaryContentDto;
+import com.sprint.mission.discodeit.dto.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -12,11 +12,11 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class BinaryContentServiceImpl implements BinaryContentService {
+public class BasicBinaryContentService implements BinaryContentService {
     BinaryContentRepository binaryContentRepository;
 
-    public void createBinaryContent(CreateBinaryContentDto dto) {
-        binaryContentRepository.addBinaryContent(new BinaryContent(dto.getReferenceId(), dto.getFilePath()));
+    public void createBinaryContent(CreateBinaryContentRequest request) {
+        binaryContentRepository.addBinaryContent(new BinaryContent(request.getReferenceId(), request.getFilePath()));
     }
 
     public BinaryContent findBinaryContent(UUID binaryContentId) {
@@ -28,6 +28,6 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     }
 
     public void deleteBinaryContent(UUID binaryContentId) {
-        binaryContentRepository.deleteBinaryContent(binaryContentId);
+        binaryContentRepository.deleteBinaryContentById(binaryContentId);
     }
 }

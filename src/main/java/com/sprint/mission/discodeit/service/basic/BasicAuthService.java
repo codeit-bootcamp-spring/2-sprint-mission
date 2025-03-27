@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService {
+public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
     private final UserService userService;
