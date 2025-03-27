@@ -6,7 +6,6 @@ import java.util.UUID;
 
 public record CreateMessageParam(
         String content,
-        List<UUID> attachmentsId,
         UUID channelId,
         UUID authorId
 ) {

@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,17 +32,21 @@ public class Message implements Serializable, Identifiable {
         this.authorId = authorId;
     }
 
-
     public void updateMessageInfo(String newContent) {
         boolean anyValueUpdated = false;
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
             anyValueUpdated = true;
         }
-
         if (anyValueUpdated) {
             this.updatedAt = Instant.now();
         }
+    }
+
+    public void updateMessageAttachment(List<UUID> attachmentIds) {
+        this.attachmentIds.clear();
+        this.attachmentIds.addAll(attachmentIds);
+        this.updatedAt = Instant.now();
     }
 
 }

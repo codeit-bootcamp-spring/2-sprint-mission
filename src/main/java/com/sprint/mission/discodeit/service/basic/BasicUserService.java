@@ -147,7 +147,6 @@ public class BasicUserService implements UserService {
         if (multipartFile == null || multipartFile.isEmpty()) {
             return null;  // 파일이 없으면 BinaryContent를 생성하지 않음
         }
-
         try {
             return BinaryContent.builder()
                     .contentType(multipartFile.getContentType())
