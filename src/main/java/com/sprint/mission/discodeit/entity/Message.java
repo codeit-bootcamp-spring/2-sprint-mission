@@ -10,7 +10,7 @@ import java.util.UUID;
 
 
 @Getter
-public class Message implements Serializable {
+public class Message implements Serializable, Identifiable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
     private final Instant createdAt;

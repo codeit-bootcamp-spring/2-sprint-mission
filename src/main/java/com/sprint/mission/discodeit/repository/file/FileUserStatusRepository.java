@@ -21,20 +21,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileUserStatusRepository implements UserStatusRepository, FileRepository<UserStatus> {
+public class FileUserStatusRepository implements UserStatusRepository {
     private final Path directory;
     private final Map<UUID, UserStatus> userStatusMap;
+    private final FileRepository<UserStatus> fileRepository;
 
-    public FileUserStatusRepository(@Value("${discodeit.repository.file-directory}") String fileDir) {
+    public FileUserStatusRepository(@Value("${discodeit.repository.file-directory}") String fileDir, FileRepository<UserStatus> fileRepository) {
         this.directory = Paths.get(System.getProperty("user.dir"), fileDir, "userstatuses");
         SerializationUtil.init(directory);
+        this.fileRepository = fileRepository;
         this.userStatusMap = new ConcurrentHashMap<>();
         loadCacheFromFile();
     }
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        saveToFile(userStatus);
+        fileRepository.saveToFile(userStatus, directory);
         userStatusMap.put(userStatus.getUserId(), userStatus);
         return userStatus;
     }
@@ -58,7 +60,7 @@ public class FileUserStatusRepository implements UserStatusRepository, FileRepos
 
     @Override
     public void deleteById(UUID id) {
-        deleteFileById(id);
+        fileRepository.deleteFileById(id, directory);
         userStatusMap.remove(id);
     }
 
@@ -73,30 +75,9 @@ public class FileUserStatusRepository implements UserStatusRepository, FileRepos
         return findByUserId(userId).isPresent();
     }
 
-    @Override
-    public void saveToFile(UserStatus userStatus) {
-        Path filePath = directory.resolve(userStatus.getId() + ".ser");
-        SerializationUtil.init(directory);
-        SerializationUtil.serialization(filePath, userStatus);
-    }
-
-    @Override
-    public List<UserStatus> loadAllFromFile() {
-        return SerializationUtil.reverseSerialization(directory);
-    }
-
-    @Override
-    public void deleteFileById(UUID id) {
-        Path filePath = directory.resolve(id + ".ser");
-        try {
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            System.out.println("유저상태 파일 삭제 예외 발생 : " + e.getMessage());
-        }
-    }
 
     private void loadCacheFromFile() {
-        List<UserStatus> userStatuses = loadAllFromFile();
+        List<UserStatus> userStatuses = fileRepository.loadAllFromFile(directory);
         for (UserStatus userStatus : userStatuses) {
             userStatusMap.put(userStatus.getId(), userStatus);
         }

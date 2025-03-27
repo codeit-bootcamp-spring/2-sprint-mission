@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class User implements Serializable {
+public class User implements Serializable, Identifiable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
     private UUID profileId;

@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class BinaryContent implements Serializable {
+public class BinaryContent implements Serializable, Identifiable {
     private final UUID id;
     private final Instant createdAt;
     private final String filename;

@@ -21,20 +21,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileBinaryContentRepository implements BinaryContentRepository, FileRepository<BinaryContent> {
+public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Path directory;
     private final Map<UUID, BinaryContent> binaryContentMap;
+    private final FileRepository<BinaryContent> fileRepository;
 
-    public FileBinaryContentRepository(@Value("${discodeit.repository.file-directory}") String fileDir) {
+    public FileBinaryContentRepository(@Value("${discodeit.repository.file-directory}") String fileDir, FileRepository<BinaryContent> fileRepository) {
         this.directory = Paths.get(System.getProperty("user.dir"), fileDir, "binarycontents");
         SerializationUtil.init(directory);
+        this.fileRepository = fileRepository;
         this.binaryContentMap = new ConcurrentHashMap<>();
         loadCacheFromFile();
     }
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        saveToFile(binaryContent);
+        fileRepository.saveToFile(binaryContent, directory);
         binaryContentMap.put(binaryContent.getId(), binaryContent);
         return binaryContent;
     }
@@ -51,34 +53,12 @@ public class FileBinaryContentRepository implements BinaryContentRepository, Fil
 
     @Override
     public void deleteById(UUID id) {
-        deleteFileById(id);
+        fileRepository.deleteFileById(id, directory);
         binaryContentMap.remove(id);
     }
 
-    @Override
-    public void saveToFile(BinaryContent binaryContent) {
-        Path filePath = directory.resolve(binaryContent.getId() + ".ser");
-        SerializationUtil.init(directory);
-        SerializationUtil.serialization(filePath, binaryContent);
-    }
-
-    @Override
-    public List<BinaryContent> loadAllFromFile() {
-        return SerializationUtil.reverseSerialization(directory);
-    }
-
-    @Override
-    public void deleteFileById(UUID id) {
-        Path filePath = directory.resolve(id + ".ser");
-        try {
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            System.out.println("binaryContent 삭제 예외 발생 : " + e.getMessage());
-        }
-    }
-
     private void loadCacheFromFile() {
-        List<BinaryContent> binaryContents = loadAllFromFile();
+        List<BinaryContent> binaryContents = fileRepository.loadAllFromFile(directory);
         for(BinaryContent binaryContent : binaryContents) {
             binaryContentMap.put(binaryContent.getId(), binaryContent);
         }
