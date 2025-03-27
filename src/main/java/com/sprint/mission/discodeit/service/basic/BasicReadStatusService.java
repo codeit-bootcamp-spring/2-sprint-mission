@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusFindResponse;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.readstatus.DuplicateReadStatusException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -24,12 +25,21 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final ReadStatusService readStatusService;
 
     @Override
     public UUID createReadStatus(ReadStatusCreateRequest readStatusCreateRequest) {
-        UserService.validateUserId(readStatusCreateRequest.userId(), this.userRepository);
-        ChannelService.validateChannelId(readStatusCreateRequest.channelId(), this.channelRepository);
-        ReadStatus newReadStatus = new ReadStatus(readStatusCreateRequest.userId(), readStatusCreateRequest.channelId());
+        UUID userId = readStatusCreateRequest.userId();
+        UUID channelId = readStatusCreateRequest.channelId();
+
+        UserService.validateUserId(userId, this.userRepository);
+        ChannelService.validateChannelId(channelId, this.channelRepository);
+        if (readStatusRepository.findByUserId(userId).stream()
+                .anyMatch(readStatus -> readStatus.getChannelId().equals(channelId))) {
+            throw new DuplicateReadStatusException("해당 userId( " + userId + ")와 channeld(" + channelId + ")를 가진 readStatus가 이미 존재합니다");
+        }
+
+        ReadStatus newReadStatus = new ReadStatus(userId, channelId);
         readStatusRepository.add(newReadStatus);
         return newReadStatus.getId();
     }
