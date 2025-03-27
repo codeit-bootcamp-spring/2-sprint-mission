@@ -25,11 +25,8 @@ public class MessageController {
     }
 
     @GetMapping("/update")
-    public ResponseEntity<?> update(
-            @RequestParam UUID messageUUID,
-            @RequestParam String content
-    ) {
-        messageService.updateMessage(new UpdateMessageParamDto(messageUUID, content));
+    public ResponseEntity<?> update(@ModelAttribute UpdateMessageParamDto updateMessageParamDto) {
+        messageService.updateMessage(updateMessageParamDto);
         return ResponseEntity.ok().build();
     }
 
