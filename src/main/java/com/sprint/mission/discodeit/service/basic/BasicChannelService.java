@@ -90,36 +90,6 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<CheckReadStatusDto> checkReadStatusByUserId(UUID userUUID) {
-        return readStatusRepository.findByUserId(userUUID).stream()
-                .map(readStatus -> {
-                    Channel channel = channelRepository.findChannelById(readStatus.getChannelId())
-                            .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다"));
-
-                    List<Message> messageList = messageRepository.findMessageByChannel(channel.getId());
-
-                    Message lastMessage = messageList.stream()
-                            .max(Comparator.comparing(Message::getCreatedAt))
-                            .orElse(null);
-
-                    if (lastMessage == null || lastMessage.getCreatedAt() == null) {
-                        return null;
-                    }
-
-                    if (!readStatus.isRead(lastMessage.getCreatedAt())) {
-                        return new CheckReadStatusDto(
-                                channel.getId(),
-                                channel.getChannelName(),
-                                lastMessage.getCreatedAt()
-                        );
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public void updateChannel(UpdateChannelParamDto channelUpdateParamDto) {
         Channel channel = channelRepository.findChannelById(channelUpdateParamDto.channelUUID())
                 .orElseThrow(() -> new NullPointerException("채널을 찾을 수 없습니다."));

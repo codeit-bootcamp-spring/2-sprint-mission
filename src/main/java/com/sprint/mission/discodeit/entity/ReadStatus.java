@@ -18,7 +18,7 @@ public class ReadStatus extends BaseEntity implements Serializable {
     private UUID userId;
     private UUID channelId;
     @Builder.Default
-    private Instant lastReadAt = ZonedDateTime.now().toInstant();
+    private Instant lastReadAt = Instant.now();
 
     public void updateLastReadAt() {
         lastReadAt = ZonedDateTime.now(ZoneId.systemDefault()).toInstant();
