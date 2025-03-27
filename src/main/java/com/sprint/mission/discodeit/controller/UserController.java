@@ -39,7 +39,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, path = "{/userId}")
+    @RequestMapping(method = RequestMethod.DELETE, path = "/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
         return ResponseEntity.ok().build();
