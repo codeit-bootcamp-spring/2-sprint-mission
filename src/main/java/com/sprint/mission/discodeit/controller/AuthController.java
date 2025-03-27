@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.dto.user.UserIdResponse;
+import com.sprint.mission.discodeit.controller.dto.IdResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.dto.user.LoginRequest;
@@ -19,9 +19,9 @@ public class AuthController {
 
     // 로그인
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<UserIdResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<IdResponse> login(@RequestBody LoginRequest request) {
         User user = authService.login(request);
-        UserIdResponse response = new UserIdResponse(true, user.getId());
+        IdResponse response = new IdResponse(true, user.getId());
         return ResponseEntity.ok(response);
     }
 }

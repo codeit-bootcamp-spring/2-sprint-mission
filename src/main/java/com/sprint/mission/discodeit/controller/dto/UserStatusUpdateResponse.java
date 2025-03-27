@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller.dto.user;
+package com.sprint.mission.discodeit.controller.dto;
 
 import com.sprint.mission.discodeit.entity.UserStatusType;
 

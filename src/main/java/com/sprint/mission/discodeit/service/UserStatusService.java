@@ -17,7 +17,7 @@ public interface UserStatusService {
 
     UserStatus findByUserId(UUID userId);
 
-    UserStatus update(UserStatusUpdateRequest statusParam);
+    UserStatus update(UUID userId, UserStatusUpdateRequest statusParam);
 
     UserStatus updateByUserId(UUID userId);
 

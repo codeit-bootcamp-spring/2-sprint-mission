@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.dto.user.UserIdResponse;
-import com.sprint.mission.discodeit.controller.dto.user.UserStatusUpdateDataRequest;
-import com.sprint.mission.discodeit.controller.dto.user.UserStatusUpdateResponse;
-import com.sprint.mission.discodeit.controller.dto.user.UserUpdateDataRequest;
+import com.sprint.mission.discodeit.controller.dto.IdResponse;
+import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
@@ -34,26 +32,26 @@ public class UserController {
 
     // 사용자 등록
     @RequestMapping(method = RequestMethod.POST, consumes = "multipart/form-data")
-    public ResponseEntity<UserIdResponse> create(
+    public ResponseEntity<IdResponse> create(
             @RequestPart("userDto") UserCreateRequest userRequest,
             @RequestPart(value = "fileDto", required = false) MultipartFile file
     ) {
         BinaryContentCreateRequest fileData = (file != null) ? new BinaryContentCreateRequest(file) : null;
         User user = userService.create(userRequest, fileData);
-        UserIdResponse response = new UserIdResponse(true, user.getId());
+        IdResponse response = new IdResponse(true, user.getId());
         return ResponseEntity.ok(response);
     }
 
     // 사용자 정보 수정
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = "multipart/form-data")
-    public ResponseEntity<UserIdResponse> update(
+    public ResponseEntity<IdResponse> update(
             @PathVariable("id") UUID userId,
-            @RequestPart("userUpdateDt0") UserUpdateDataRequest request,
+            @RequestPart("userUpdateDt0") UserUpdateRequest request,
             @RequestPart(value = "fileDto", required = false) MultipartFile file
     ) {
         BinaryContentCreateRequest fileData = (file != null) ? new BinaryContentCreateRequest(file) : null;
-        User user = userService.update(UserUpdateRequest.of(userId, request), fileData);
-        UserIdResponse response = new UserIdResponse(true, user.getId());
+        User user = userService.update(userId, request, fileData);
+        IdResponse response = new IdResponse(true, user.getId());
 
         return ResponseEntity.ok(response);
     }
@@ -76,9 +74,9 @@ public class UserController {
     // 사용자 온라인 상태 변경
     @RequestMapping(value = "/status/{id}", method = RequestMethod.PUT)
     public ResponseEntity<UserStatusUpdateResponse> updateStatus(
-            @PathVariable("id") UUID userId, @RequestBody UserStatusUpdateDataRequest request
+            @PathVariable("id") UUID userId, @RequestBody UserStatusUpdateRequest request
     ) {
-        UserStatus userStatus = userStatusService.update(UserStatusUpdateRequest.of(userId, request));
+        UserStatus userStatus = userStatusService.update(userId, request);
         UserStatusUpdateResponse response = new UserStatusUpdateResponse(true, userStatus.getStatus());
         return ResponseEntity.ok(response);
     }

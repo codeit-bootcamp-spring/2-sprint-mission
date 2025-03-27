@@ -50,11 +50,11 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus update(UserStatusUpdateRequest statusParam) {
-        if (!userRepository.existsById(statusParam.userId())) {
-            throw new IllegalArgumentException(statusParam.userId() + "에 해당하는 User를 찾을 수 없음");
+    public UserStatus update(UUID userId, UserStatusUpdateRequest statusParam) {
+        if (!userRepository.existsById(userId)) {
+            throw new IllegalArgumentException(userId + "에 해당하는 User를 찾을 수 없음");
         }
-        UserStatus userStatus = findByUserId(statusParam.userId());
+        UserStatus userStatus = findByUserId(userId);
         userStatus.update(UserStatusType.fromString(statusParam.status()));
 
         return userStatusRepository.save(userStatus);

@@ -21,6 +21,6 @@ public enum UserStatusType {
                 return type;
             }
         }
-        throw new IllegalArgumentException("Unknown status: " + status);
+        throw new IllegalArgumentException("잘못된 UserStatusType: " + status);
     }
 }

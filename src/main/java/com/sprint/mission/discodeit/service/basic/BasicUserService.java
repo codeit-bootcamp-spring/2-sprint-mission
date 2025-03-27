@@ -63,11 +63,11 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateRequest updateRequest,
+    public User update(UUID userId, UserUpdateRequest updateRequest,
                        BinaryContentCreateRequest binaryData) {
-        User user = userRepository.findById(updateRequest.id())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException(
-                        updateRequest.id() + " 에 해당하는 userStatus를 찾을 수 없음"));
+                        userId + " 에 해당하는 userStatus를 찾을 수 없음"));
         validDuplicateUsername(updateRequest.newUsername());
         validDuplicateEmail(updateRequest.newEmail());
 

@@ -17,7 +17,7 @@ public interface UserService {
 
     List<UserInfoResponse> findAll();
 
-    User update(UserUpdateRequest updateRequest, BinaryContentCreateRequest binaryData);
+    User update(UUID userId, UserUpdateRequest updateRequest, BinaryContentCreateRequest binaryData);
 
     void delete(UUID userId);
 
