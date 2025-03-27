@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -78,7 +78,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("")
+    @GetMapping("/findall")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.findAll();
         return ResponseEntity.ok(users);
