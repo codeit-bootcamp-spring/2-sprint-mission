@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.status.CreateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.status.ReadStatusResponse;
 import com.sprint.mission.discodeit.dto.status.UpdateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -50,14 +51,30 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public Optional<ReadStatus> findById(UUID readStatusId) {
-        return readStatusRepository.getById(readStatusId);
+    public Optional<ReadStatusResponse> findById(UUID readStatusId) {
+        return readStatusRepository.getById(readStatusId)
+                .map(status -> new ReadStatusResponse(
+                        status.getId(),
+                        status.getUserId(),
+                        status.getChannelId(),
+                        status.getLastReadAt(),
+                        status.getCreatedAt(),
+                        status.getUpdatedAt()
+                ));
     }
 
     @Override
-    public List<ReadStatus> findAllByUserId(UUID userId) {
+    public List<ReadStatusResponse> findAllByUserId(UUID userId) {
         return readStatusRepository.getAll().stream()
                 .filter(status -> status.getUserId().equals(userId))
+                .map(status -> new ReadStatusResponse(
+                        status.getId(),
+                        status.getUserId(),
+                        status.getChannelId(),
+                        status.getLastReadAt(),
+                        status.getCreatedAt(),
+                        status.getUpdatedAt()
+                ))
                 .toList();
     }
 
