@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.dto.userstatus;
 
-import java.time.Instant;
-import java.util.UUID;
+import com.sprint.mission.discodeit.model.UserStatusType;
 
 public record UserStatusUpdateByUserIdRequest(
-        UUID userId,
-        Instant updateTime
+        UserStatusType type
 ) {
 }
