@@ -23,29 +23,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChannelController {
     private final ChannelService channelService;
 
-    /*
-    채널 관리
-        [ ] 공개 채널을 생성할 수 있다.
-        [ ] 비공개 채널을 생성할 수 있다.
-        [ ] 공개 채널의 정보를 수정할 수 있다.
-        [ ] 채널을 삭제할 수 있다.
-        [ ] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
-     */
-
     // 공개 채널 생성
     @RequestMapping(value = "/public", method = RequestMethod.POST)
     public ResponseEntity<IdResponse> createPublic(@RequestBody PublicChannelRequest request) {
         Channel channel = channelService.create(request);
-        IdResponse response = new IdResponse(true, channel.getId());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(IdResponse.of(true, channel.getId()));
     }
 
     // 비공개 채널 생성
     @RequestMapping(value = "/private", method = RequestMethod.POST)
     public ResponseEntity<IdResponse> createPrivate(@RequestBody PrivateChannelRequest request) {
         Channel channel = channelService.create(request);
-        IdResponse response = new IdResponse(true, channel.getId());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(IdResponse.of(true, channel.getId()));
     }
 
     // 공개 채널 정보 수정
@@ -53,8 +42,7 @@ public class ChannelController {
     public ResponseEntity<IdResponse> updatePublic(@PathVariable UUID id,
                                                    @RequestBody ChannelUpdateRequest request) {
         Channel channel = channelService.update(id, request);
-        IdResponse response = new IdResponse(true, channel.getId());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(IdResponse.of(true, channel.getId()));
     }
 
     // 채널 삭제

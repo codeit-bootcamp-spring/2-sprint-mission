@@ -5,4 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 public record BinaryContentCreateRequest(
         MultipartFile file
 ) {
+    public static BinaryContentCreateRequest of(MultipartFile file) {
+        return new BinaryContentCreateRequest(file);
+    }
 }

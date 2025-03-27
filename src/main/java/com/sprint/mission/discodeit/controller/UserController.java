@@ -38,8 +38,7 @@ public class UserController {
     ) {
         BinaryContentCreateRequest fileData = (file != null) ? new BinaryContentCreateRequest(file) : null;
         User user = userService.create(userRequest, fileData);
-        IdResponse response = new IdResponse(true, user.getId());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(IdResponse.of(true, user.getId()));
     }
 
     // 사용자 정보 수정
@@ -51,9 +50,7 @@ public class UserController {
     ) {
         BinaryContentCreateRequest fileData = (file != null) ? new BinaryContentCreateRequest(file) : null;
         User user = userService.update(userId, request, fileData);
-        IdResponse response = new IdResponse(true, user.getId());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(IdResponse.of(true, user.getId()));
     }
 
     // 사용자 삭제
@@ -67,7 +64,6 @@ public class UserController {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<UserInfoResponse>> findAll() {
         List<UserInfoResponse> response = userService.findAll();
-
         return ResponseEntity.ok(response);
     }
 
