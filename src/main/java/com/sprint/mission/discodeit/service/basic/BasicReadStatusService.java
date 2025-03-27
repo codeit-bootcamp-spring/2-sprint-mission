@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.CreateReadStatusDto;
-import com.sprint.mission.discodeit.dto.UpdateReadStatusDto;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -22,14 +22,14 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatus create(CreateReadStatusDto dto) {
-        if (userRepository.findByKey(dto.userKey()) == null) {
+    public ReadStatus create(ReadStatusCreateRequest request) {
+        if (userRepository.findByKey(request.userKey()) == null) {
             throw new IllegalArgumentException("[Error] user is null");
         }
-        if (channelRepository.findByKey(dto.channelKey()) == null) {
+        if (channelRepository.findByKey(request.channelKey()) == null) {
             throw new IllegalArgumentException("[Error] channel is null");
         }
-        ReadStatus readStatus = new ReadStatus(dto.userKey(), dto.channelKey(), Instant.now());
+        ReadStatus readStatus = new ReadStatus(request.userKey(), request.channelKey(), Instant.now());
         readStatusRepository.save(readStatus);
 
         return readStatus;
@@ -56,15 +56,15 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public UpdateReadStatusDto update(UpdateReadStatusDto dto) {
-        ReadStatus readStatus = readStatusRepository.findByKey(dto.readStatusKey());
+    public ReadStatus update(ReadStatusUpdateRequest request) {
+        ReadStatus readStatus = readStatusRepository.findByKey(request.readStatusKey());
         if (readStatus == null) {
             throw new IllegalArgumentException("[Error] readStatus is null");
         }
         readStatus.updateLastReadAt(Instant.now());
         readStatusRepository.save(readStatus);
 
-        return new UpdateReadStatusDto(readStatus.getUuid(), readStatus.getLastReadAt());
+        return readStatus;
     }
 
     @Override

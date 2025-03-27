@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.CreateUserDto;
-import com.sprint.mission.discodeit.dto.ReadUserDto;
-import com.sprint.mission.discodeit.dto.UpdateUserRequestDto;
-import com.sprint.mission.discodeit.dto.UpdateUserResponseDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -27,28 +25,28 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(CreateUserDto dto) {
+    public UserDto create(UserCreateRequest request) {
         UUID profileImageKey = null;
-        if (userRepository.existsByName(dto.userName())) {
+        if (userRepository.existsByName(request.username())) {
             throw new IllegalStateException("[Error] 동일한 name");
         }
-        if (userRepository.existsByEmail(dto.email())) {
+        if (userRepository.existsByEmail(request.email())) {
             throw new IllegalStateException("[Error] 동일한 email");
         }
-        if (dto.profileImageKey() != null) {
-            profileImageKey = binaryContentRepository.findByKey(dto.profileImageKey()).getUuid();
+        if (request.profileImageKey() != null) {
+            profileImageKey = binaryContentRepository.findByKey(request.profileImageKey()).getUuid();
         }
 
-        User user = new User(dto.userName(), dto.pwd(), dto.email(), profileImageKey);
+        User user = new User(request.username(), request.password(), request.email(), profileImageKey);
         userRepository.save(user);
 
         UserStatus userStatus = new UserStatus(user.getUuid(), Instant.EPOCH);
         userStatusRepository.save(userStatus);
 
-        return user;
+        return new UserDto(user.getUuid(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), user.getProfileId(), userStatus.isOnline());
     }
     @Override
-    public ReadUserDto read(UUID userKey) {
+    public UserDto read(UUID userKey) {
         User user = userRepository.findByKey(userKey);
         UserStatus userStatus = userStatusRepository.findByUserKey(user.getUuid());
         boolean isOnline = userStatus.isOnline();
@@ -57,57 +55,52 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("[Error] 조회할 사용자가 존재하지 않습니다.");
         }
 
-        return new ReadUserDto(user.getUuid(), user.getName(), user.getEmail(), isOnline);
+        return new UserDto(user.getUuid(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), user.getProfileId(), userStatus.isOnline());
     }
 
     @Override
-    public List<ReadUserDto> readAll() {
+    public List<UserDto> readAll() {
         List<User> users = userRepository.findAll();
-
         if (users.isEmpty()) {
             throw new IllegalArgumentException("[Error] 조회할 사용자가 존재하지 않습니다.");
         }
-
         return users.stream().map(user -> {
                     UserStatus userStatus = userStatusRepository.findByUserKey(user.getUuid());
-                    boolean isOnline = userStatus.isOnline();
-                    return new ReadUserDto(user.getUuid(), user.getName(), user.getEmail(), isOnline);
+                    return new UserDto(user.getUuid(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), user.getProfileId(), userStatus.isOnline());
                 })
                 .toList();
     }
 
     @Override
-    public UpdateUserResponseDto update(UpdateUserRequestDto request) {
+    public User update(UserUpdateRequest request) {
         User user = userRepository.findByKey(request.userKey());
 
         if (user == null) {
             throw new IllegalStateException("[Error] user not found");
         }
-        if (!request.userName().isEmpty()) {
-            user.updatePwd(request.userName());
+        if (!request.newUsername().isEmpty()) {
+            user.updatePwd(request.newUsername());
         }
-        if (!request.pwd().isEmpty()) {
-            user.updatePwd(request.pwd());
+        if (!request.newPassword().isEmpty()) {
+            user.updatePwd(request.newPassword());
         }
-        if (!request.email().isEmpty()) {
-            user.updateEmail(request.email());
+        if (!request.newEmail().isEmpty()) {
+            user.updateEmail(request.newEmail());
         }
-
-        userRepository.save(user);
 
         UUID updatedProfileImageKey = user.getProfileId();
 
-        if (request.profileKey() != null && !request.profileKey().equals(user.getProfileId())) {
-            if (!binaryContentRepository.existsByKey(request.profileKey())) {
+        if (request.newProfileKey() != null && !request.newProfileKey().equals(user.getProfileId())) {
+            if (!binaryContentRepository.existsByKey(request.newProfileKey())) {
                 throw new IllegalArgumentException("[Error] 존재하지 않는 프로필 이미지입니다.");
             }
             if (updatedProfileImageKey != null) {
                 binaryContentRepository.delete(updatedProfileImageKey);
             }
-            updatedProfileImageKey = request.profileKey();
+            updatedProfileImageKey = request.newProfileKey();
         }
 
-        return new UpdateUserResponseDto(user.getName(), user.getPwd(), user.getEmail(), updatedProfileImageKey);
+        return userRepository.save(user);
     }
 
     @Override
