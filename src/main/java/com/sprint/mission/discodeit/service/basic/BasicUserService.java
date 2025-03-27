@@ -64,8 +64,6 @@ public class BasicUserService implements UserService {
     public List<UserResponseDTO> findAll() {
         List<User> users = userRepository.findAll();
         return users.stream().map(user -> {
-            //UserStatus status = userStatusRepository.findByUserId(user.getId())
-                    //.orElseThrow(() -> new NoSuchElementException("User with id " + user.getId() + " not found"));
             Optional<UserStatus> optionalStatus = userStatusRepository.findByUserId(user.getId());
             boolean online = optionalStatus.map(UserStatus::isLogin).orElse(false);
             // status != null && status.isLogin();
@@ -74,7 +72,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDTO update(UpdateUserDTO updateUserDTO) {
+    public void update(UpdateUserDTO updateUserDTO) {
         User user = userRepository.findById(updateUserDTO.getUserId())
                 .orElseThrow(() -> new NoSuchElementException("User with id " + updateUserDTO.getUserId() + " not found"));
         user.update(user.getUsername(), user.getEmail(), user.getPassword());
@@ -96,7 +94,6 @@ public class BasicUserService implements UserService {
         UserStatus status = userStatusRepository.findByUserId(user.getId())
                 .orElseThrow(()->new NoSuchElementException("User with id " + finalUser.getId() + " not found"));
         boolean online = status != null && status.isLogin();
-        return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail(), online);
     }
 
     @Override

@@ -41,6 +41,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 UUID.randomUUID(),
                 readStatusDTO.getUserId(),
                 readStatusDTO.getChannelId(),
+                Instant.now(),
                 lastRead
         );
         readStatusRepository.save(readStatus);
@@ -62,12 +63,11 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(UpdateReadStatusDTO updateReadStatusDTO){
+    public void update(UpdateReadStatusDTO updateReadStatusDTO){
         ReadStatus readStatus = readStatusRepository.findById(updateReadStatusDTO.getId());
         Optional.ofNullable(readStatus).orElseThrow(()-> new NoSuchElementException("ReadStatus not found"));
         readStatus.setLastRead(updateReadStatusDTO.getLastReadAt());
         readStatusRepository.save(readStatus);
-        return readStatus;
     }
 
     @Override

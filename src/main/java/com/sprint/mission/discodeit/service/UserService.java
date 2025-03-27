@@ -19,7 +19,7 @@ public interface UserService {
     List<UserResponseDTO> findAll();
 
     // User update(UUID userId, String newUsername, String newEmail, String newPassword);
-    UserResponseDTO update(UpdateUserDTO updateUserDTO);
+    void update(UpdateUserDTO updateUserDTO);
 
     void delete(UUID userId);
 }

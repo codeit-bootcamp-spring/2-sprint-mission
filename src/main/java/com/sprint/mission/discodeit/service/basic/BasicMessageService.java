@@ -36,10 +36,12 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("Author not found with authorId");
         }
 
-        Message message = new Message(createMessageDTO.getMessage(), createMessageDTO.getChannelId(), createMessageDTO.getUserId());
-        messageRepository.save(message);
         BinaryContent binaryContent = binaryContentRepository.findByUserId(createMessageDTO.getUserId())
                 .orElseThrow(()-> new NoSuchElementException("BinaryContent not found with userId"));
+
+        Message message = new Message(createMessageDTO.getMessage(), createMessageDTO.getChannelId(), createMessageDTO.getUserId());
+        messageRepository.save(message);
+
         // update가 안된다고 하기에 삭제하고 id만 set한 후에 다시 저장
         binaryContentRepository.delete(binaryContent);
         binaryContent.setMessageId(message.getId());
@@ -62,12 +64,12 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UpdateMessageDTO updateMessageDTO) {
+    public void update(UpdateMessageDTO updateMessageDTO) {
         Message message = messageRepository.findById(updateMessageDTO.getMessageId())
                 .orElseThrow(() -> new NoSuchElementException
                         ("Message with id " + updateMessageDTO.getMessageId() + " not found"));
         message.update(updateMessageDTO.getNewMessage());
-        return messageRepository.save(message);
+        messageRepository.save(message);
     }
 
     @Override

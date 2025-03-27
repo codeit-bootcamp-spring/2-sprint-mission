@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -11,9 +12,17 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ReadStatus {
+public class ReadStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
     private UUID id;
     private UUID userId;
     private UUID channelId;
+    //
+    private Instant createAt;
     private Instant lastRead;
+
+    //
+    public void update(Instant newLastReadAt){
+        lastRead = newLastReadAt;
+    }
 }

@@ -55,12 +55,11 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus update(UpdateUserStatusDTO userStatusDTO) {
+    public void update(UpdateUserStatusDTO userStatusDTO) {
         UserStatus userStatus = userStatusRepository.findByUserId(userStatusDTO.getId())
                 .orElseThrow(()-> new NoSuchElementException("User not found"));
         userStatus.setLastLogin(userStatusDTO.getLastModified());
         userStatusRepository.save(userStatus);
-        return userStatus;
     }
 
     @Override
