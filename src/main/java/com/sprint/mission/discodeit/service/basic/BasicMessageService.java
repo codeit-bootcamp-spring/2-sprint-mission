@@ -36,13 +36,11 @@ public class BasicMessageService implements MessageService {
         UUID channelId = request.getChannelId();
         Message message = new Message(userId, channelId, request.getContent());
 
-        channelService.addMessage(channelId, message.getId());
-
-        for (String path : request.getFilePath()) {
-            BinaryContent binaryContent = new BinaryContent(path);
-            binaryContentRepository.addBinaryContent(binaryContent);
-            message.addAttachment(binaryContent.id());
-        }
+//        for (String path : request.getFilePath()) {
+//            BinaryContent binaryContent = new BinaryContent(path);
+//            binaryContentRepository.addBinaryContent(binaryContent);
+//            message.addAttachment(binaryContent.id());
+//        }
 
         messageRepository.addMessage(message);
         return message;
@@ -93,7 +91,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID userId, UUID messageId, UpdateMessageRequest request) {
-        Message message = messageRepository.findMessageById(request.getMessageId());
+        Message message = messageRepository.findMessageById(messageId);
         if (!message.getSenderId().equals(userId)) {
             throw new RuntimeException("본인의 메시지만 수정할 수 있습니다.");
         }
@@ -109,7 +107,6 @@ public class BasicMessageService implements MessageService {
             throw new RuntimeException("본인의 메시지만 수정할 수 있습니다.");
         }
 
-        channelService.removeMessage(message.getChannelId(), messageId);
         binaryContentRepository.deleteBinaryContentById(messageId);
 
         messageRepository.deleteMessageById(messageId);

@@ -41,7 +41,6 @@ public class MessageController {
         String token = authHeader.replace("Bearer ", "");
         UUID userId = UUID.fromString(jwtUtil.extractUserId(token));
 
-
         messageService.updateMessage(userId, messageId, request);
 
         return ResponseEntity.ok("메세지가 업데이트 되었습니다.");
