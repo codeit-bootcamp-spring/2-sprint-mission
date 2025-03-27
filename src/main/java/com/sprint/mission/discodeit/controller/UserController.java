@@ -9,10 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -32,25 +29,25 @@ public class UserController {
                 .body(response);
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<ApiResponse<UserUpdateResponse>> update(@Valid @RequestBody UserUpdateRequest request) {
-        userService.updateUser(request);
-        ApiResponse<UserUpdateResponse> response = new ApiResponse<>(true, "유저 업데이트 성공", new UserUpdateResponse(request.userId()));
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserUpdateResponse>> update(@PathVariable UUID id, @Valid @RequestBody UserUpdateRequest request) {
+        userService.updateUser(id, request);
+        ApiResponse<UserUpdateResponse> response = new ApiResponse<>(true, "유저 업데이트 성공", new UserUpdateResponse(id));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }
 
-    @PostMapping("/delete")
-    public ResponseEntity<ApiResponse<UserDeleteResponse>> delete(@Valid @RequestBody UserDeleteRequest request) {
-        userService.deleteUser(request.userId());
-        ApiResponse<UserDeleteResponse> response = new ApiResponse<>(true, "유저 삭제 성공", new UserDeleteResponse(request.userId(), Instant.now()));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserDeleteResponse>> delete(@PathVariable UUID id) {
+        userService.deleteUser(id);
+        ApiResponse<UserDeleteResponse> response = new ApiResponse<>(true, "유저 삭제 성공", new UserDeleteResponse(id, Instant.now()));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }
 
-    @PostMapping("/read")
-    public ResponseEntity<ApiResponse<UserReadResponse>> read(@Valid @RequestBody UserReadRequest request) {
-        UserReadResponse readResponse = userService.readUser(request.userId());
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserReadResponse>> read(@PathVariable UUID id) {
+        UserReadResponse readResponse = userService.readUser(id);
         ApiResponse<UserReadResponse> response = new ApiResponse<>(true, "유저 읽기 성공", readResponse);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
