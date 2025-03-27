@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
@@ -71,24 +70,26 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAll() {
-        try (Stream<Path> paths = Files.list(DIRECTORY)) {
-            return paths
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            return (Channel) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        List<Channel> channels = new java.util.ArrayList<>();
+        File[] files = DIRECTORY.toFile().listFiles((dir, name) -> name.endsWith(EXTENSION));
+
+        if (files != null) {
+            for (File file : files) {
+                try (
+                        FileInputStream fis = new FileInputStream(file);
+                        ObjectInputStream ois = new ObjectInputStream(fis)
+                ) {
+                    Channel channel = (Channel) ois.readObject();
+                    channels.add(channel);
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
+
+        return channels;
     }
+
 
     @Override
     public boolean existsById(UUID id) {

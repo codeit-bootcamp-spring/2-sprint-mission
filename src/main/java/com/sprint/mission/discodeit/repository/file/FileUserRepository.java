@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
@@ -71,30 +70,35 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return this.findAll().stream()
-                .filter(user -> user.getUsername().equals(username))
-                .findFirst();
+        List<User> users = this.findAll();
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
     public List<User> findAll() {
-        try (Stream<Path> paths = Files.list(DIRECTORY)) {
-            return paths
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            return (User) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        List<User> result = new java.util.ArrayList<>();
+        File[] files = DIRECTORY.toFile().listFiles((dir, name) -> name.endsWith(EXTENSION));
+
+        if (files != null) {
+            for (File file : files) {
+                try (
+                        FileInputStream fis = new FileInputStream(file);
+                        ObjectInputStream ois = new ObjectInputStream(fis)
+                ) {
+                    User user = (User) ois.readObject();
+                    result.add(user);
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
+
+        return result;
     }
 
     @Override
@@ -115,13 +119,23 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public boolean existsByEmail(String email) {
-        return this.findAll().stream()
-                .anyMatch(user -> user.getEmail().equals(email));
+        List<User> users = this.findAll();
+        for (User user : users) {
+            if (user.getEmail().equals(email)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public boolean existsByUsername(String username) {
-        return this.findAll().stream()
-                .anyMatch(user -> user.getUsername().equals(username));
+        List<User> users = this.findAll();
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

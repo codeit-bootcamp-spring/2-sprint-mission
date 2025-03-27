@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
@@ -71,54 +70,63 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        try (Stream<Path> paths = Files.list(DIRECTORY)) {
-            return paths
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            return (ReadStatus) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .filter(readStatus -> readStatus.getUserId().equals(userId))
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        List<ReadStatus> result = new java.util.ArrayList<>();
+        File[] files = DIRECTORY.toFile().listFiles((dir, name) -> name.endsWith(EXTENSION));
+
+        if (files != null) {
+            for (File file : files) {
+                try (
+                        FileInputStream fis = new FileInputStream(file);
+                        ObjectInputStream ois = new ObjectInputStream(fis)
+                ) {
+                    ReadStatus readStatus = (ReadStatus) ois.readObject();
+                    if (readStatus.getUserId().equals(userId)) {
+                        result.add(readStatus);
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
+
+        return result;
     }
 
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        try (Stream<Path> paths = Files.list(DIRECTORY)) {
-            return paths
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            return (ReadStatus) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        List<ReadStatus> result = new java.util.ArrayList<>();
+        File[] files = DIRECTORY.toFile().listFiles((dir, name) -> name.endsWith(EXTENSION));
+
+        if (files != null) {
+            for (File file : files) {
+                try (
+                        FileInputStream fis = new FileInputStream(file);
+                        ObjectInputStream ois = new ObjectInputStream(fis)
+                ) {
+                    ReadStatus readStatus = (ReadStatus) ois.readObject();
+                    if (readStatus.getChannelId().equals(channelId)) {
+                        result.add(readStatus);
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
+
+        return result;
     }
 
     @Override
     public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
-        return findAllByUserId(userId).stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .findFirst();
+        List<ReadStatus> all = findAllByUserId(userId);
+        for (ReadStatus readStatus : all) {
+            if (readStatus.getChannelId().equals(channelId)) {
+                return Optional.of(readStatus);
+            }
+        }
+        return Optional.empty();
     }
+
 
     @Override
     public boolean existsById(UUID id) {

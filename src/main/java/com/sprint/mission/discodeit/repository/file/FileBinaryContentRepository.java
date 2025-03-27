@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
@@ -71,25 +70,28 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        try (Stream<Path> paths = Files.list(DIRECTORY)) {
-            return paths
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            return (BinaryContent) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .filter(content -> ids.contains(content.getId()))
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        List<BinaryContent> result = new java.util.ArrayList<>();
+        File[] files = DIRECTORY.toFile().listFiles((dir, name) -> name.endsWith(EXTENSION));
+
+        if (files != null) {
+            for (File file : files) {
+                try (
+                        FileInputStream fis = new FileInputStream(file);
+                        ObjectInputStream ois = new ObjectInputStream(fis)
+                ) {
+                    BinaryContent content = (BinaryContent) ois.readObject();
+                    if (ids.contains(content.getId())) {
+                        result.add(content);
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
+
+        return result;
     }
+
 
     @Override
     public boolean existsById(UUID id) {

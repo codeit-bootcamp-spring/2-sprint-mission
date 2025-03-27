@@ -71,31 +71,37 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
-        return findAll().stream()
-                .filter(userStatus -> userStatus.getUserId().equals(userId))
-                .findFirst();
+        List<UserStatus> all = findAll();
+        for (UserStatus userStatus : all) {
+            if (userStatus.getUserId().equals(userId)) {
+                return Optional.of(userStatus);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
     public List<UserStatus> findAll() {
-        try (Stream<Path> paths = Files.list(DIRECTORY)) {
-            return paths
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            return (UserStatus) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        List<UserStatus> result = new java.util.ArrayList<>();
+        File[] files = DIRECTORY.toFile().listFiles((dir, name) -> name.endsWith(EXTENSION));
+
+        if (files != null) {
+            for (File file : files) {
+                try (
+                        FileInputStream fis = new FileInputStream(file);
+                        ObjectInputStream ois = new ObjectInputStream(fis)
+                ) {
+                    UserStatus userStatus = (UserStatus) ois.readObject();
+                    result.add(userStatus);
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
+
+        return result;
     }
+
 
     @Override
     public boolean existsById(UUID id) {
