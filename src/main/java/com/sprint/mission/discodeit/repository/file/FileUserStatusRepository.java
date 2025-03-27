@@ -41,14 +41,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void update(UUID userStatusUUID) {
-        UserStatus userStatus = findById(userStatusUUID)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 상태를 찾을 수 없음"));
-        userStatus.updateLastLoginTime();
-        fileManager.writeToFile(SubDirectory.USER_STATUS, userStatus, userStatus.getId());
-    }
-
-    @Override
     public void delete(UUID userStatusUUID) {
         fileManager.deleteFileById(SubDirectory.USER_STATUS, userStatusUUID);
     }

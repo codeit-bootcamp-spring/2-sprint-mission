@@ -24,10 +24,5 @@ public class BasicAuthService implements AuthService {
         if (!userInfo.getPassword().equals(loginRequestDto.password())) {
             throw new IllegalArgumentException("회원정보가 일치하지 않음");
         }
-
-        UserStatus userStatus = userStatusRepository.findByUserId(userInfo.getId())
-                .orElseThrow(() -> new IllegalArgumentException("회원상태 업데이트 에러"));
-
-        userStatusRepository.update(userStatus.getId());
     }
 }

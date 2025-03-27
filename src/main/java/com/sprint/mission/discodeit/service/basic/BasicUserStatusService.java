@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -39,7 +40,10 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void update(UpdateUserStatusParamDto updateUserStatusParamDto) {
-        userStatusRepository.update(updateUserStatusParamDto.userStatusUUID());
+        UserStatus userStatus = userStatusRepository.findByUserId(updateUserStatusParamDto.userStatusUUID())
+                        .orElseThrow(() -> new NoSuchElementException("사용자 상태가 존재하지 않습니다."));
+        userStatus.updateLastLoginTime();
+        userStatusRepository.save(userStatus);
     }
 
     @Override
@@ -48,7 +52,8 @@ public class BasicUserStatusService implements UserStatusService {
                 .filter(userStatus -> userStatus.getUserUUID().equals(updateUserStatusByUserIdParamDto.id()))
                 .findAny()
                 .ifPresent(userStatus -> {
-                    userStatusRepository.update(userStatus.getId());
+                    userStatus.updateLastLoginTime();
+                    userStatusRepository.save(userStatus);
                 });
     }
 
