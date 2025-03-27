@@ -56,6 +56,13 @@ public class JCFReadStatusRepository extends AbstractRepository<ReadStatus> impl
     }
 
     @Override
+    public Optional<ReadStatus> findByUserIdChannelId(UUID userId, UUID channelId) {
+        return findByUserId(userId).stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .findFirst();
+    }
+
+    @Override
     public void updateReadTime(UUID readStatusId, Instant readTime) {
         super.findById(readStatusId).updateReadTime(readTime);
     }
