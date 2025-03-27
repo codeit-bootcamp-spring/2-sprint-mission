@@ -34,11 +34,8 @@ public class ChannelController {
     }
 
     @GetMapping("/update")
-    public ResponseEntity<?> update(
-            @RequestParam UUID channelUUID,
-            @RequestParam String channelName
-    ) {
-        channelService.updateChannel(new UpdateChannelParamDto(channelUUID, channelName));
+    public ResponseEntity<?> update(@ModelAttribute UpdateChannelParamDto updateChannelParamDto) {
+        channelService.updateChannel(updateChannelParamDto);
         return ResponseEntity.ok().build();
     }
 
