@@ -50,10 +50,6 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
-    public Map<UUID, User> getUserData() {
-        return userData;
-    }
-
     public User save(User user){
         this.userData.put(user.getId(), user);
         dataSave();
