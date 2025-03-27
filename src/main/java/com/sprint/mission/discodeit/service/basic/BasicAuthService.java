@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.util.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
+    private final UserStatusService userStatusService;
 
     @Override
     public UserDTO login(LoginParam loginParam) {
@@ -35,8 +36,7 @@ public class BasicAuthService implements AuthService {
     }
 
     private UserStatus findUserStatusByUserId(UUID id) {
-        return userStatusRepository.findByUserId(id)
-                .orElseThrow(() -> RestExceptions.USER_STATUS_NOT_FOUND);
+        return userStatusService.findByUserId(id);
     }
 
     private void checkPassword(User user, LoginParam loginParam) {
@@ -48,6 +48,6 @@ public class BasicAuthService implements AuthService {
     private UserStatus updateLoginAt (User user) {
         UserStatus userStatus = findUserStatusByUserId(user.getId());
         userStatus.updateUserStatus();
-        return userStatusRepository.save(userStatus);
+        return userStatusService.updateByUserId(user.getId());
     }
 }

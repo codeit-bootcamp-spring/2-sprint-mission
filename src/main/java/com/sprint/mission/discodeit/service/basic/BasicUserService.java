@@ -105,7 +105,7 @@ public class BasicUserService implements UserService {
         if (!user.getProfileId().equals(User.DEFAULT_PROFILE_ID)) {
            binaryContentService.delete(user.getProfileId());
         }
-        userStatusService.delete(userId);
+        userStatusService.deleteByUserId(userId);
     }
 
     private void validateUserField(CreateUserParam createUserParam) {

@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.service.userStatus.CreatedUserStatusParam;
-import com.sprint.mission.discodeit.dto.service.userStatus.UpdateUserStatusParam;
-import com.sprint.mission.discodeit.dto.service.userStatus.UserStatusDTO;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -29,8 +26,12 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus findById(UUID id) {
-        UserStatus userStatus = findUserStatusById(id);
-        return userStatus;
+        return findUserStatusById(id);
+    }
+
+    @Override
+    public UserStatus findByUserId(UUID userId) {
+        return findUserStatusByUserId(userId);
     }
 
     @Override
@@ -40,23 +41,20 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UUID update(UpdateUserStatusParam updateUserStatusParam) {
-        UserStatus userStatus = findUserStatusById(updateUserStatusParam.id());
+    public UserStatus updateByUserId(UUID userId) {
+        UserStatus userStatus = findUserStatusByUserId(userId);
         userStatus.updateUserStatus();
-        userStatusRepository.save(userStatus);
-        return userStatus.getId();
-    }
-
-    @Override
-    public UUID updateByUserId(UUID userId, UpdateUserStatusParam updateUserStatusParam) {
-        UserStatus userStatus = findUserStatusById(updateUserStatusParam.id());
-        userStatus.updateUserStatus();
-        return userStatus.getId();
+        return userStatusRepository.save(userStatus);
     }
 
     @Override
     public void delete(UUID id) {
         userStatusRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        userStatusRepository.deleteByUserId(userId);
     }
 
     private void checkUserExists(UserStatus userStatus) {
@@ -70,6 +68,11 @@ public class BasicUserStatusService implements UserStatusService {
         }
     }
 
+
+    private UserStatus findUserStatusByUserId(UUID userId) {
+        return userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> RestExceptions.USER_STATUS_NOT_FOUND);
+    }
 
     private UserStatus findUserStatusById(UUID id) {
         return userStatusRepository.findById(id)

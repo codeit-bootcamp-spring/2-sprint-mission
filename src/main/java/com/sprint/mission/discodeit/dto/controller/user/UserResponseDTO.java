@@ -8,6 +8,7 @@ public record UserResponseDTO(
         UUID profileId,
         String username,
         String email,
-        Instant createdAt
+        Instant createdAt,
+        boolean isLogin
 ) {
 }
