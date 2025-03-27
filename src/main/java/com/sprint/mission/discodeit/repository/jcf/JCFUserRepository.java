@@ -2,12 +2,13 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+import java.util.*;
+
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> users = new HashMap<>();
 
@@ -24,11 +25,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findByName(String name) {
+    public Optional<User> findByName(String name) {
         return users.values()
                 .stream()
                 .filter(user -> user.isSameName(name))
-                .toList();
+                .findFirst();
     }
 
     @Override

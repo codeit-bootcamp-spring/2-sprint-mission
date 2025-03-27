@@ -1,54 +1,64 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND;
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
-
-import com.sprint.mission.discodeit.application.UserDto;
-import com.sprint.mission.discodeit.application.UserRegisterDto;
+import com.sprint.mission.discodeit.application.dto.user.UserDto;
+import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
+
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
 
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Override
+    public UserDto register(UserRegisterDto userRegisterDto, UUID profileId) {
+        validateDuplicateEmail(userRegisterDto.email());
+        validateDuplicateUserName(userRegisterDto.name());
+
+        User savedUser = userRepository.save(new User(
+                userRegisterDto.name(),
+                userRegisterDto.email(),
+                userRegisterDto.password(),
+                profileId)
+        );
+        userStatusRepository.save(new UserStatus(savedUser.getId()));
+
+        return UserDto.fromEntity(savedUser);
     }
 
     @Override
-    public UserDto register(UserRegisterDto userRegisterDto) {
-        User requestUser = new User(userRegisterDto.name(), userRegisterDto.email(), userRegisterDto.password());
-        validateDuplicateEmail(requestUser);
-
-        User savedUser = userRepository.save(requestUser);
-
-        return toDto(savedUser);
-    }
-
-    @Override
-    public UserDto findById(UUID id) {
-        User user = userRepository.findById(id)
+    public UserDto findById(UUID userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
-        return toDto(user);
+        return UserDto.fromEntity(user);
     }
 
     @Override
-    public List<UserDto> findByName(String name) {
-        return userRepository.findByName(name)
-                .stream()
-                .map(this::toDto)
-                .toList();
+    public UserDto findByName(String name) {
+        User user = userRepository.findByName(name)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+
+        return UserDto.fromEntity(user);
     }
 
     @Override
     public List<UserDto> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(this::toDto)
+                .map(UserDto::fromEntity)
                 .toList();
     }
 
@@ -57,7 +67,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
 
-        return toDto(user);
+        return UserDto.fromEntity(user);
     }
 
     @Override
@@ -69,26 +79,46 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateName(UUID id, String name) {
-        userRepository.updateName(id, name);
+    public void updateName(UUID userId, String name) {
+        userRepository.updateName(userId, name);
     }
 
     @Override
-    public void delete(UUID id) {
-        userRepository.delete(id);
+    public UserDto updateProfileImage(UUID userId, UUID profileId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+
+        user.updateProfileImage(profileId);
+        User savedUser = userRepository.save(user);
+
+        return UserDto.fromEntity(savedUser);
     }
 
-    private UserDto toDto(User user) {
-        return new UserDto(user.getId(), user.getName(), user.getEmail());
+    @Override
+    public void delete(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent() + 11));
+
+        userRepository.delete(userId);
+        userStatusRepository.deleteByUserId(user.getId());
     }
 
-    private void validateDuplicateEmail(User requestUser) {
-        userRepository.findAll()
+    private void validateDuplicateUserName(String name) {
+        boolean isDuplicate = userRepository.findByName(name)
+                .isPresent();
+
+        if (isDuplicate) {
+            throw new IllegalArgumentException("이미 존재하는 이름 입니다");
+        }
+    }
+
+    private void validateDuplicateEmail(String requestEmail) {
+        boolean isDuplicate = userRepository.findAll()
                 .stream()
-                .filter(existingUser -> existingUser.isSameEmail(requestUser.getEmail()))
-                .findFirst()
-                .ifPresent(u -> {
-                    throw new IllegalArgumentException("이미 존재하는 유저입니다");
-                });
+                .anyMatch(existingUser -> existingUser.isSameEmail(requestEmail));
+
+        if (isDuplicate) {
+            throw new IllegalArgumentException("이미 존재하는 이메일 입니다");
+        }
     }
 }

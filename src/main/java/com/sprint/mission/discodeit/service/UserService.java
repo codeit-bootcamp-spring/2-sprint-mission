@@ -1,17 +1,17 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.UserDto;
-import com.sprint.mission.discodeit.application.UserRegisterDto;
-import java.util.Arrays;
+import com.sprint.mission.discodeit.application.dto.user.UserDto;
+import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
+
 import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserDto register(UserRegisterDto userRegisterDto);
+    UserDto register(UserRegisterDto userRegisterDto, UUID profileId);
 
-    UserDto findById(UUID id);
+    UserDto findById(UUID userId);
 
-    List<UserDto> findByName(String name);
+    UserDto findByName(String name);
 
     List<UserDto> findAll();
 
@@ -19,7 +19,9 @@ public interface UserService {
 
     List<UserDto> findAllByIds(List<UUID> userIds);
 
-    void updateName(UUID id, String name);
+    void updateName(UUID userId, String name);
 
-    void delete(UUID id);
+    UserDto updateProfileImage(UUID userId, UUID profileId);
+
+    void delete(UUID userId);
 }

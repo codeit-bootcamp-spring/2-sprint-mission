@@ -1,69 +1,74 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import static com.sprint.mission.discodeit.constants.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
-
-import com.sprint.mission.discodeit.application.MessageDto;
-import com.sprint.mission.discodeit.application.UserDto;
+import com.sprint.mission.discodeit.application.dto.message.MessageCreationDto;
+import com.sprint.mission.discodeit.application.dto.message.MessageDto;
+import com.sprint.mission.discodeit.application.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
+
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
-    private final UserService userService;
-
-    public BasicMessageService(MessageRepository messageRepository, UserService userService) {
-        this.messageRepository = messageRepository;
-        this.userService = userService;
-    }
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public MessageDto create(String context, UUID channelId, UUID userId) {
-        Message message = messageRepository.save(new Message(context, channelId, userId));
+    public MessageDto create(MessageCreationDto messageCreationDto, List<UUID> attachmentsIds) {
+        Message message = messageRepository.save(new Message(messageCreationDto.context(), messageCreationDto.chanelId(), messageCreationDto.userId(), attachmentsIds));
 
-        return toDto(message);
+        return MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message)));
     }
 
     @Override
     public MessageDto findById(UUID id) {
-        Message message = messageRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
-        return toDto(message);
+        return MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message)));
     }
 
     @Override
-    public List<MessageDto> findAll() {
-        return messageRepository.findAll()
-                .stream()
-                .map(this::toDto)
-                .toList();
-    }
-
-    @Override
-    public List<MessageDto> findByChannelId(UUID channelId) {
+    public List<MessageDto> findAllByChannelId(UUID channelId) {
         return messageRepository.findAll()
                 .stream()
                 .filter(message -> message.getChannelId().equals(channelId))
-                .map(this::toDto)
+                .sorted(Comparator.comparing(Message::getCreatedAt))
+                .map(message -> MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message))))
                 .toList();
     }
 
     @Override
-    public void updateContext(UUID id, String context) {
-        messageRepository.updateContext(id, context);
+    public MessageDto updateContext(UUID id, String context) {
+        Message message = messageRepository.updateContext(id, context);
+        return MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message)));
     }
 
     @Override
     public void delete(UUID id) {
+        MessageDto message = this.findById(id);
+        for (UUID attachmentId : message.attachmentIds()) {
+            binaryContentRepository.delete(attachmentId);
+        }
+
         messageRepository.delete(id);
     }
 
-    private MessageDto toDto(Message message) {
-        UserDto user = userService.findById(message.getUserId());
-        return new MessageDto(message.getId(), message.getContext(), message.getChannelId(), user);
+
+    private User findMessageUser(Message message) {
+        return userRepository.findById(message.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("메세지에 등록된 아이디의 유저가 없습니다: " + message.getUserId()));
     }
 }

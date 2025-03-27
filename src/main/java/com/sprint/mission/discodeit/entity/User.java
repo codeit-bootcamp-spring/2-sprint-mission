@@ -1,30 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private static final long SERIAL_VERSION_UID = 1L;
+    private final UUID id;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private String name;
     private String email;
     private String password;
+    private UUID profileId;
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().toEpochMilli();
+        this.createdAt = ZonedDateTime.now().toInstant();
         this.updatedAt = createdAt;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.profileId = profileId;
     }
 
     public void updateName(String name) {
         this.name = name;
-        updateTimestamp();
+        updateLastModified();
+    }
+
+    public void updateProfileImage(UUID profileId) {
+        this.profileId = profileId;
+        updateLastModified();
     }
 
     public boolean isSameName(String name) {
@@ -35,23 +46,11 @@ public class User implements Serializable {
         return this.email.equals(email);
     }
 
-    private void updateTimestamp() {
-        this.updatedAt = Instant.now().toEpochMilli();
+    public boolean isSamePassword(String password) {
+        return this.password.equals(password);
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getEmail() {
-        return email;
+    private void updateLastModified() {
+        this.updatedAt = ZonedDateTime.now().toInstant();
     }
 }
