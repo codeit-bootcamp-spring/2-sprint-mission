@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusFindResponse;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.readstatus.DuplicateReadStatusException;
+import com.sprint.mission.discodeit.exception.readstatus.NoSuchReadStatusException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -25,7 +26,6 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
-    private final ReadStatusService readStatusService;
 
     @Override
     public UUID createReadStatus(ReadStatusCreateRequest readStatusCreateRequest) {
@@ -64,7 +64,8 @@ public class BasicReadStatusService implements ReadStatusService {
     // 이 메서드는 언제 호출해야 하는가? 메세지를 작성할 때? 채널에 접속할 때? 채널에 접속해서 스크롤을 내려 메세지를 확인할 때?
     @Override
     public void updateReadStatus(ReadStatusUpdateRequest readStatusUpdateRequest) {
-        this.readStatusRepository.updateReadTime(readStatusUpdateRequest.id(), readStatusUpdateRequest.readTime());
+        ReadStatus readStatus = this.readStatusRepository.findByUserIdChannelId(readStatusUpdateRequest.userId(), readStatusUpdateRequest.channelId()).orElseThrow(()->new NoSuchReadStatusException("해당 readStatus가 존재하지 않습니다"));
+        this.readStatusRepository.updateReadTime(readStatus.getId(), readStatusUpdateRequest.readTime());
     }
 
     @Override
