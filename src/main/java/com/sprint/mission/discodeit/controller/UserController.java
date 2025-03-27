@@ -21,7 +21,8 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<UserResponse> createUser(@RequestBody CreateUserRequest request) {
-        return userService.getUserById(userService.createUser(request).getId())
+        UUID userId = userService.createUser(request).getId();
+        return userService.getUserById(userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.badRequest().build());
     }
