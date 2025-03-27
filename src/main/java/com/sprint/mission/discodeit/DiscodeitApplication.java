@@ -2,12 +2,12 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -47,13 +47,13 @@ public class DiscodeitApplication {
         }
 
         // 조회
-        List<UserResponseDto> foundUsers = userService.findAll();
+        List<UserDto> foundUsers = userService.findAll();
         System.out.println("유저 조회(다건): " + foundUsers.size());
 
         try {
             UserCreateDto userCreateDto = new UserCreateDto("findTest", "findTest@codeit.com", "test1234", null);
             User user = userService.create(userCreateDto);
-            UserResponseDto foundUser = userService.findById(user.getId());
+            UserDto foundUser = userService.findById(user.getId());
             System.out.println("유저 조회(단건): " + foundUser.id());
         } catch (RuntimeException e) {
             System.out.println("유저 조회(단건) 실패: " + e.getMessage());
@@ -61,7 +61,7 @@ public class DiscodeitApplication {
 
         // 존재하지 않는 ID 조회
         try {
-            UserResponseDto foundUser = userService.findById(UUID.randomUUID());
+            UserDto foundUser = userService.findById(UUID.randomUUID());
             System.out.println("유저 조회(단건): " + foundUser.id());
         } catch (RuntimeException e) {
             System.out.println("유저 조회(단건) 실패: " + e.getMessage());
@@ -96,10 +96,10 @@ public class DiscodeitApplication {
         UserCreateDto userCreateDto = new UserCreateDto("deletedTest", "deletedTest@codeit.com", "deletedTest1234",
                 null);
         User deletedUser = userService.create(userCreateDto);
-        List<UserResponseDto> foundUsersBeforeDelete = userService.findAll();
+        List<UserDto> foundUsersBeforeDelete = userService.findAll();
         System.out.println("유저 삭제 전: " + foundUsersBeforeDelete.size());
         userService.delete(deletedUser.getId());
-        List<UserResponseDto> foundUsersAfterDelete = userService.findAll();
+        List<UserDto> foundUsersAfterDelete = userService.findAll();
         System.out.println("유저 삭제 후: " + foundUsersAfterDelete.size());
     }
 
@@ -143,11 +143,11 @@ public class DiscodeitApplication {
         ChannelCreatePublicDto channelCreatePublicDto = new ChannelCreatePublicDto("testPublic", "testPublic");
         Channel publicChannel = channelService.createPublic(channelCreatePublicDto);
 
-        List<ChannelResponseDto> foundChannels = channelService.findAllByUserId(user.getId());
+        List<ChannelDto> foundChannels = channelService.findAllByUserId(user.getId());
         System.out.println("채널 조회(다건): " + foundChannels.size());
 
         try {
-            ChannelResponseDto foundChannel = channelService.findById(privateChannel.getId());
+            ChannelDto foundChannel = channelService.findById(privateChannel.getId());
             System.out.println("채널 조회(단건): " + foundChannel.id());
         } catch (RuntimeException e) {
             System.out.println("채널 조회(단건) 실패: " + e.getMessage());
@@ -155,7 +155,7 @@ public class DiscodeitApplication {
 
         // 존재하지 않는 ID 조회
         try {
-            ChannelResponseDto foundChannel = channelService.findById(UUID.randomUUID());
+            ChannelDto foundChannel = channelService.findById(UUID.randomUUID());
             System.out.println("채널 조회(단건): " + foundChannel.id());
         } catch (RuntimeException e) {
             System.out.println("채널 조회(단건) 실패: " + e.getMessage());
@@ -181,10 +181,10 @@ public class DiscodeitApplication {
         }
 
         // 삭제
-        List<ChannelResponseDto> foundChannelsBeforeDelete = channelService.findAllByUserId(user.getId());
+        List<ChannelDto> foundChannelsBeforeDelete = channelService.findAllByUserId(user.getId());
         System.out.println("채널 삭제 전: " + foundChannelsBeforeDelete.size());
         channelService.delete(publicChannel.getId());
-        List<ChannelResponseDto> foundChannelsAfterDelete = channelService.findAllByUserId(user.getId());
+        List<ChannelDto> foundChannelsAfterDelete = channelService.findAllByUserId(user.getId());
         System.out.println("채널 삭제: " + foundChannelsAfterDelete.size());
     }
 

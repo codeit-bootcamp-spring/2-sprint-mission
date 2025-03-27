@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import java.util.List;
@@ -13,9 +13,9 @@ public interface ChannelService {
 
     Channel createPublic(ChannelCreatePublicDto channelCreatePublicDto);
 
-    ChannelResponseDto findById(UUID channelId);
+    ChannelDto findById(UUID channelId);
 
-    List<ChannelResponseDto> findAllByUserId(UUID userId);
+    List<ChannelDto> findAllByUserId(UUID userId);
 
     Channel update(ChannelUpdateDto channelUpdateDto);
 
