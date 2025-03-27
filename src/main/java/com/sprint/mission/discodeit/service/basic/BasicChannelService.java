@@ -29,7 +29,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel create(PrivateChannelRequest privateRequest) {
-        Channel channel = new Channel(privateRequest.type(), null, null);
+        Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         Channel channelSave = channelRepository.save(channel);
         readStatusService.create(new ReadStatusCreateRequest(privateRequest.userIds(), channel.getId()));
         return channelSave;
@@ -37,10 +37,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel create(PublicChannelRequest publicRequest) {
-        Channel channel = new Channel(publicRequest.type(), publicRequest.name(), publicRequest.description());
+        Channel channel = new Channel(ChannelType.PUBLIC, publicRequest.name(), publicRequest.description());
         return channelRepository.save(channel);
     }
-
 
     @Override
     public ChannelByIdResponse find(UUID channelId) {
@@ -62,11 +61,7 @@ public class BasicChannelService implements ChannelService {
             userIds = null;
         }
 
-        return new ChannelByIdResponse(
-                channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                channel.getType(), name, description,
-                userIds, lastMessageTime
-        );
+        return ChannelByIdResponse.of(channel, name, description, userIds, lastMessageTime);
     }
 
     @Override
@@ -93,17 +88,14 @@ public class BasicChannelService implements ChannelService {
                         userIds = null;
                     }
 
-                    return new ChannelByIdResponse(
-                            channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                            channel.getType(), name, description, userIds, lastMessageTime
-                    );
+                    return ChannelByIdResponse.of(channel, name, description, userIds, lastMessageTime);
                 }).toList();
     }
 
     @Override
-    public Channel update(ChannelUpdateRequest updateRequest) {
-        Channel channel = channelRepository.findById(updateRequest.id())
-                .orElseThrow(() -> new NoSuchElementException(updateRequest.id() + " 에 해당하는 Channel이 없음"));
+    public Channel update(UUID id, ChannelUpdateRequest updateRequest) {
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 Channel이 없음"));
         if (channel.getType() == ChannelType.PRIVATE) {
             throw new IllegalArgumentException("비공개 채널은 수정 불가능");
         }

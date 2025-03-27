@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.dto.channel;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import java.time.Instant;
 import java.util.List;
@@ -15,4 +16,12 @@ public record ChannelByIdResponse(
         List<UUID> userIdList,
         Instant lastMessageTime
 ) {
+    public static ChannelByIdResponse of(Channel channel, String name, String description, List<UUID> userIds,
+                                         Instant lastMessageTime) {
+        return new ChannelByIdResponse(
+                channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
+                channel.getType(), name, description,
+                userIds, lastMessageTime
+        );
+    }
 }
