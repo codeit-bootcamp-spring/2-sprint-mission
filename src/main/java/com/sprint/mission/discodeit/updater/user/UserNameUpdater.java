@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class UserNameUpdater implements UserUpdater {
     @Override
@@ -13,7 +15,7 @@ public class UserNameUpdater implements UserUpdater {
     }
 
     @Override
-    public void update(UserUpdateRequest request, UserRepository userRepository) {
-        userRepository.updateUserName(request.userId(), request.userName());
+    public void update(UUID userId,  UserUpdateRequest request, UserRepository userRepository) {
+        userRepository.updateUserName(userId, request.userName());
     }
 }
