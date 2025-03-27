@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
 
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;
