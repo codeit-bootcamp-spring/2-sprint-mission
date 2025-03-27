@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,6 @@ public class UserController {
         CreateUserResponseDTO createUserResponseDTO = userMapper.toCreateUserResponseDTO(userDTO);
 
         return ResponseEntity.ok(createUserResponseDTO);
-
     }
 
     @GetMapping("/{userId}")
@@ -57,7 +57,7 @@ public class UserController {
 
     @PutMapping("/{userId}")
     public ResponseEntity<UpdateUserResponseDTO> updateUser(@PathVariable("userId") UUID id,
-                                                            @RequestPart("user") UpdateUserRequestDTO updateUserRequestDTO,
+                                                            @RequestPart("user") @Valid UpdateUserRequestDTO updateUserRequestDTO,
                                                             @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
         UpdateUserParam updateUserParam = userMapper.toUpdateUserParam(updateUserRequestDTO);
         UUID updatedId = userService.update(id, updateUserParam, multipartFile);
