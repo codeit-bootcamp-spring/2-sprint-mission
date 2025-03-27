@@ -59,10 +59,11 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     public UserStatus update(UserStatusUpdateRequestDto dto){
-        this.userStatusData.put(dto.getId(), userStatusData.get(dto.getId()));
+        UserStatus userStatus = userStatusData.get(dto.getId());
+        userStatus.update(dto.getNewActivatedAt());
 
         dataSave();
-        return userStatusData.get(dto.getId());
+        return userStatus;
     }
 
     public List<UserStatus> findAll(){
