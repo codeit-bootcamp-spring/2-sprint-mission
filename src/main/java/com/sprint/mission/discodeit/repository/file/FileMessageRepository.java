@@ -38,7 +38,9 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findMessageByChannel(UUID channelUUID) {
-        return fileManager.readFromMessageOfChannel(channelUUID);
+        return findAllMessage().stream()
+                .filter(message -> message.getChannelUUID().equals(channelUUID))
+                .toList();
     }
 
     @Override

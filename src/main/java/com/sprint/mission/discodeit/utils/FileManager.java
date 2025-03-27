@@ -64,31 +64,6 @@ public class FileManager {
         return list;
     }
 
-    public List<Message> readFromMessageOfChannel(UUID id) {
-        List<Message> list = new ArrayList<>();
-
-        File directory = new File(BASE_DIR + SubDirectory.MESSAGE + "\\");
-
-        if (!directory.exists() || !directory.isDirectory()) {
-            return list;
-        }
-
-        File[] files = directory.listFiles((dir, name) -> name.endsWith(DATA_EXTENSION));
-        if (files != null) {
-            for (File file : files) {
-                try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-                    Message message = (Message) ois.readObject();
-                    if(message.getChannelUUID().equals(id)) {
-                        list.add(message);
-                    }
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return list;
-    }
-
     public <T> Optional<T> readFromFileById(SubDirectory subDirectory, UUID id, Class<T> fileType) {
         String directoryPath = BASE_DIR + subDirectory.getDirectory() + "\\";
         File directory = new File(directoryPath);

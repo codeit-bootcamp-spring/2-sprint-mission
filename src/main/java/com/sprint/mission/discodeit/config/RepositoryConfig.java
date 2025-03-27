@@ -21,6 +21,7 @@ public class RepositoryConfig {
     private final JCFUserStatusRepository jcfUserStatusRepository;
     private final JCFReadStatusRepository jcfReadStatusRepository;
     private final JCFBinaryContentRepository jcfBinaryContentRepository;
+    private final JCFBinaryDataRepository jcfBinaryDataRepository;
 
     private final FileUserRepository fileUserRepository;
     private final FileChannelRepository fileChannelRepository;
@@ -28,6 +29,7 @@ public class RepositoryConfig {
     private final FileUserStatusRepository fileUserStatusRepository;
     private final FileReadStatusRepository fileReadStatusRepository;
     private final FileBinaryContentRepository fileBinaryContentRepository;
+    private final FileBinaryDataRepository fileBinaryDataRepository;
 
     @Bean
     public UserRepository userRepository() {
@@ -75,6 +77,14 @@ public class RepositoryConfig {
             return fileBinaryContentRepository;
         }
         return jcfBinaryContentRepository;
+    }
+
+    @Bean
+    public BinaryDataRepository binaryDataRepository() {
+        if(FILE_TYPE.equalsIgnoreCase(repositoryProperties.getType())) {
+            return fileBinaryDataRepository;
+        }
+        return jcfBinaryDataRepository;
     }
 
 }
