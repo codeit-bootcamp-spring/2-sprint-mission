@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.dto;
 
-public record SaveFileDto(
+public record BinaryDataResponseDto(
         String filePath,
         String fileName
 ) {
+
 }
