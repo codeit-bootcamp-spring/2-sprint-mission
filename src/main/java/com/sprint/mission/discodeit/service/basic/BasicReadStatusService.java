@@ -64,6 +64,18 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    public ReadStatus updateByChannelIdAndUserId(UUID userId, UUID channelId, UpdateReadStatusDTO dto) {
+        Instant newReadAt = dto.readAt();
+        ReadStatus readStatus = readStatusRepository.findAllByUserId(userId).stream()
+                .filter(status -> status.getChannelId().equals(channelId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("ReadStatus not found for the given userId and channelId"));
+
+        readStatus.updateReadAt(newReadAt);
+        return readStatusRepository.save(readStatus);
+    }
+
+    @Override
     public void delete(UUID readStatusId) {
         if (!readStatusRepository.existsById(readStatusId)) {
             throw new NoSuchElementException("ReadStatus with id " + readStatusId + " not found");
@@ -73,6 +85,6 @@ public class BasicReadStatusService implements ReadStatusService {
 
     private ReadStatus getReadStatus(UUID readStatusId) {
         return readStatusRepository.findById(readStatusId)
-                .orElseThrow(()->new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
     }
 }
