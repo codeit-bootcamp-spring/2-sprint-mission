@@ -34,11 +34,4 @@ public class ReadStatusController {
         ApiResponse<ReadStatus> response = new ApiResponse<>("체널의 메시지 읽음 상태 수정 성공", updatedStatus);
         return ResponseEntity.ok(response);
     }
-
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<ReadStatus>>> findAllByUser(@RequestParam UUID userId) {
-        List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
-        ApiResponse<List<ReadStatus>> response = new ApiResponse<>("사용자 메시지 읽음 상태 리스트 조회 성공", statuses);
-        return ResponseEntity.ok(response);
-    }
 }

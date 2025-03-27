@@ -22,8 +22,8 @@ import java.util.UUID;
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
 public class ChannelController {
-    ChannelService channelService;
-    MessageService messageService;
+    private final ChannelService channelService;
+    private final MessageService messageService;
 
     @PostMapping("/public")
     public ResponseEntity<ApiResponse<Channel>> createPublicChannel(@Valid @RequestBody PublicChannelCreateRequest request) {

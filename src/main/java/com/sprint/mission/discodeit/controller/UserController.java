@@ -4,8 +4,10 @@ import com.sprint.mission.discodeit.dto.channel.ChannelFindResponse;
 import com.sprint.mission.discodeit.dto.common.ApiResponse;
 import com.sprint.mission.discodeit.dto.user.*;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateResponse;
+import com.sprint.mission.discodeit.entity.common.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.UserStatus;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -24,6 +26,7 @@ public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
     private final ChannelService channelService;
+    private final ReadStatusService readStatusService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<UserCreateResponse>> create(@Valid @RequestBody UserCreateRequest request) {
@@ -81,5 +84,12 @@ public class UserController {
         List<ChannelFindResponse> response = channelService.findAllByUserId(userId);
         ApiResponse<List<ChannelFindResponse>> apiResponse = new ApiResponse<>("유저 채널 목록 조회 성공", response);
         return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/{userId}/readStatuses")
+    public ResponseEntity<ApiResponse<List<ReadStatus>>> findAllByUser(@PathVariable UUID userId) {
+        List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
+        ApiResponse<List<ReadStatus>> response = new ApiResponse<>("사용자 메시지 읽음 상태 리스트 조회 성공", statuses);
+        return ResponseEntity.ok(response);
     }
 }
