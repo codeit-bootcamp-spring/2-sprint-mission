@@ -34,5 +34,11 @@ public class ReadStatusController {
                 .body(response);
     }
 
-
+    @PostMapping("/read")
+    public ResponseEntity<ApiResponse<ReadStatusReadResponse>> read(@Valid @RequestBody ReadStatusReadRequest request) {
+        ReadStatusReadResponse readResponse = readStatusService.findReadStatusByUserIdChannelID(request.userId(), request.channelId());
+        ApiResponse<ReadStatusReadResponse> response = new ApiResponse<>(true, "readStatus 조회 성공", readResponse);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
 }
