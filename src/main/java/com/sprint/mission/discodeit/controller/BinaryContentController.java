@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.DTO.BinaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,13 @@ public class BinaryContentController {
     public ResponseEntity<List<BinaryContentDto>> getBinaryContent(@RequestParam List<UUID> ids){
         List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(ids);
         return ResponseEntity.ok(binaryContents);
+    }
+
+    //바이너리 파일 조회
+    @RequestMapping(method = RequestMethod.GET, value = "/find")
+    public ResponseEntity<BinaryContent> findBinaryFile(@RequestParam("binaryContentId") UUID binaryContentId){
+        BinaryContent binaryFile = binaryContentService.findRaw(binaryContentId);
+        return ResponseEntity.ok(binaryFile);
     }
 
 }

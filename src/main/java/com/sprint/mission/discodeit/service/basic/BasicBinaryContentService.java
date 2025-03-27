@@ -52,6 +52,11 @@ public class BasicBinaryContentService implements BinaryContentService {
         binaryContentRepository.deleteById(id);
     }
 
+    public BinaryContent findRaw(UUID id){
+        return binaryContentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Binary content not found with ID: " + id));
+    }
+
     private BinaryContentDto mapToDto(BinaryContent binaryContent) {
         return new BinaryContentDto(
                 binaryContent.getId(),

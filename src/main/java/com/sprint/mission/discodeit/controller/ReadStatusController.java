@@ -31,7 +31,7 @@ public class ReadStatusController {
 
     //특정 사용자의 메세지 수신 정보 조회
     @RequestMapping(method = RequestMethod.GET, value = "/user/{userId}")
-    public List<ReadStatusDto> findReadStatusByUserId(@PathVariable UUID userId) {
+    public List<ReadStatusDto> findReadStatusByUserId(@PathVariable("userId") UUID userId) {
         return readStatusService.findAllByUserId(userId);
     }
 }
