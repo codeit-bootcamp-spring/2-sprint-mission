@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.UserCreate;
-import com.sprint.mission.discodeit.dto.user.UserResponse;
-import com.sprint.mission.discodeit.dto.user.UserUpdate;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -26,7 +26,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(UserCreate dto) {
+    public User create(UserCreateRequestDto dto) {
         Map<UUID, User> userData = userRepository.getUserData();
 
         if (userData.values().stream()
@@ -48,29 +48,29 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponse find(UUID userId) {
+    public UserResponseDto find(UUID userId) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId);
         User user = userRepository.findById(userId);
 
-        return new UserResponse(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
+        return new UserResponseDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
                 user.getEmail(), user.getProfileId(), userStatus.isOnline());
     }
 
     @Override
-    public List<UserResponse> findAll() {
+    public List<UserResponseDto> findAll() {
         return userRepository.findAll()
                 .stream()
                 .map(
                         user -> {
                             UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
-                            return new UserResponse(user.getId(), user.getCreatedAt(), user.getUpdatedAt(),
+                            return new UserResponseDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(),
                                     user.getUsername(),
                                     user.getEmail(), user.getProfileId(), userStatus.isOnline());
                         }).toList();
     }
 
     @Override
-    public User update(UserUpdate dto) {
+    public User update(UserUpdateRequestDto dto) {
         Map<UUID, User> userData = userRepository.getUserData();
 
         User user = Optional.ofNullable(userData.get(dto.getUserID()))

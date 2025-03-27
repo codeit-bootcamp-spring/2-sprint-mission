@@ -5,6 +5,6 @@ import java.util.List;
 import lombok.Getter;
 
 @Getter
-public class ChannelCreatePrivate {
+public class PrivateChannelCreateRequestDto {
     private List<User> users;
 }

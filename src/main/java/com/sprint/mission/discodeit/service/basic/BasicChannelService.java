@@ -3,22 +3,18 @@ package com.sprint.mission.discodeit.service.basic;
 import static com.sprint.mission.discodeit.entity.ChannelType.PRIVATE;
 import static com.sprint.mission.discodeit.entity.ChannelType.PUBLIC;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivate;
-import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublic;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdate;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreate;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.ReadStatusService;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +34,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
 
-    public Channel createPublic(ChannelCreatePublic dto) {
+    public Channel createPublic(PublicChannelCreateRequestDto dto) {
         Map<UUID, Channel> channelData = channelRepository.getChannelData();
 
         if (channelData.values().stream()
@@ -50,18 +46,18 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.save(channel);
     }
 
-    public Channel createPrivate(ChannelCreatePrivate dto) {
+    public Channel createPrivate(PrivateChannelCreateRequestDto dto) {
         Channel channel = new Channel(PRIVATE, null, null);
         channelRepository.save(channel);
 
         dto.getUsers().forEach(user -> {
-            readStatusRepository.create(new ReadStatusCreate(user.getId(), channel.getId(), null));
+            readStatusRepository.create(new ReadStatusCreateRequestDto(user.getId(), channel.getId(), null));
         });
 
         return channel;
     }
 
-    public ChannelResponse find(UUID channelId) {
+    public ChannelResponseDto find(UUID channelId) {
         Channel channel = channelRepository.findById(channelId);
 
         Map<UUID, Message> messageData = messageRepository.getMessageData();
@@ -82,10 +78,10 @@ public class BasicChannelService implements ChannelService {
                             .toList();
         }
 
-        return new ChannelResponse(channel, latestMessage.get().getCreatedAt(), userIds);
+        return new ChannelResponseDto(channel, latestMessage.get().getCreatedAt(), userIds);
     }
 
-    public List<ChannelResponse> findAllByUserID(UUID userId) {
+    public List<ChannelResponseDto> findAllByUserID(UUID userId) {
         List<Channel> channels = channelRepository.findAll();
         Map<UUID, Message> messageData = messageRepository.getMessageData();
 
@@ -115,12 +111,12 @@ public class BasicChannelService implements ChannelService {
                                 .toList();
                     }
 
-                    return new ChannelResponse(channel, latestMessage.get().getCreatedAt(), userIds);
+                    return new ChannelResponseDto(channel, latestMessage.get().getCreatedAt(), userIds);
                 })
                 .toList();
     }
 
-    public Channel update(ChannelUpdate dto) {
+    public Channel update(ChannelUpdateRequestDto dto) {
         Map<UUID, Channel> channelData = channelRepository.getChannelData();
         Channel channelNullable = channelData.get(dto.getChannelId());
         Channel channel = Optional.ofNullable(channelNullable)

@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserStatusUpdate {
+public class UserStatusUpdateRequestDto {
     private UUID id;
     Instant newActivatedAt;
 }

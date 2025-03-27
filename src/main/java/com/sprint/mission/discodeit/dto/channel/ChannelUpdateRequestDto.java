@@ -4,7 +4,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class ChannelUpdate {
+public class ChannelUpdateRequestDto {
     private UUID channelId;
     private String newChannelName;
     private String newChannelDescription;

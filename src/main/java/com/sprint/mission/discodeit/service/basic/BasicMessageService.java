@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.message.MessageCreate;
-import com.sprint.mission.discodeit.dto.message.MessageUpdate;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -21,7 +20,7 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
 
-    public Message create(MessageCreate dto){
+    public Message create(MessageCreateRequestDto dto){
         Message message = new Message(dto.getContent(), dto.getChannelID(), dto.getAuthorId(), dto.getContents());
         return messageRepository.save(message);
     }
@@ -36,7 +35,7 @@ public class BasicMessageService implements MessageService {
                 .toList();
     }
 
-    public Message update(MessageUpdate dto){
+    public Message update(MessageUpdateRequestDto dto){
         Map<UUID, Message> messageData = messageRepository.getMessageData();
 
         Message messageNullable = messageData.get(dto.getMessageId());

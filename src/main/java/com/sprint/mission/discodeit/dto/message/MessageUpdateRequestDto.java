@@ -4,7 +4,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class MessageUpdate {
+public class MessageUpdateRequestDto {
     private UUID messageId;
     private String newContent;
 }

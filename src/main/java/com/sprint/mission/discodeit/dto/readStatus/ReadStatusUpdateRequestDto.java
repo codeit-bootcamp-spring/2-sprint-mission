@@ -4,7 +4,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class ReadStatusUpdate {
+public class ReadStatusUpdateRequestDto {
     private UUID readStatusId;
 
 }

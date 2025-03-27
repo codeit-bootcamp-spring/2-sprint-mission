@@ -4,7 +4,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class MessageCreate {
+public class MessageCreateRequestDto {
     private String content;
     private UUID channelID;
     private UUID authorId;

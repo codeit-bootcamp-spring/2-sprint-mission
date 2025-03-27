@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreate;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdate;
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -24,7 +23,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public UserStatus create(UserStatusCreate dto) {
+    public UserStatus create(UserStatusCreateRequestDto dto) {
         Map<UUID, UserStatus> userStatusData = userStatusRepository.getUserStatusData();
         Map<UUID, User> userData = userRepository.getUserData();
 
@@ -54,7 +53,7 @@ public class BasicUserStatusService implements UserStatusService {
         return userStatusRepository.findAll();
     }
 
-    public UserStatus update(UserStatusUpdate dto){
+    public UserStatus update(UserStatusUpdateRequestDto dto){
         Map<UUID, UserStatus> userStatusData = userStatusRepository.getUserStatusData();
 
         UserStatus userStatus = userStatusData.get(dto.getId());
@@ -73,7 +72,7 @@ public class BasicUserStatusService implements UserStatusService {
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("UserStatus with userid " + userId + " not found"));
 
-        return userStatusRepository.update(new UserStatusUpdate(userStatus.getId(), newActivatedAt));
+        return userStatusRepository.update(new UserStatusUpdateRequestDto(userStatus.getId(), newActivatedAt));
     }
 
     public void delete(UUID userStatusId){
