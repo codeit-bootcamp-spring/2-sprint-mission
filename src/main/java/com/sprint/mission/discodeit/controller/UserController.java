@@ -29,8 +29,8 @@ public class UserController {
                 .body(response);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserUpdateResponse>> update(@PathVariable UUID id, @Valid @RequestBody UserUpdateRequest request) {
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<ApiResponse<UserUpdateResponse>> updateProfile(@PathVariable UUID id, @Valid @RequestBody UserUpdateRequest request) {
         userService.updateUser(id, request);
         ApiResponse<UserUpdateResponse> response = new ApiResponse<>(true, "유저 업데이트 성공", new UserUpdateResponse(id));
         return ResponseEntity.status(HttpStatus.OK)
@@ -53,10 +53,10 @@ public class UserController {
                 .body(response);
     }
 
-    @PostMapping("/status")
-    public ResponseEntity<ApiResponse<Void>> updateStatus(@Valid @RequestBody UserStatusUpdateByUserIdRequest request) {
-        userStatusService.updateUserStatusByUserId(request);
-        ApiResponse<Void> response = new ApiResponse<>(true, "유저 접속시간 업데이트 성공", null);
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<Void>> updateStatus(@PathVariable UUID id, @Valid @RequestBody UserStatusUpdateByUserIdRequest request) {
+        userStatusService.updateUserStatusByUserId(id, request);
+        ApiResponse<Void> response = new ApiResponse<>(true, "유저 상태 업데이트 성공", null);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }
