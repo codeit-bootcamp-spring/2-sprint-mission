@@ -24,7 +24,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus create(UserStatusCreateRequest requestDto) {
         User user = userRepository.findById(requestDto.userId())
-                    .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
+                    .orElseThrow(() -> new ResourceNotFoundException("해당 유저 없음"));
 
         if (userStatusRepository.findByUserId(requestDto.userId()).isPresent()) {
             throw new IllegalArgumentException("해당 유저의 userStatus 이미 존재");

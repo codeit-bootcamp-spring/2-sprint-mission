@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelFindResponse;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.common.ApiResponse;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserCreateResponse;
-import com.sprint.mission.discodeit.dto.user.UserResponse;
+import com.sprint.mission.discodeit.dto.user.*;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateResponse;
+import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.user.UserStatus;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -23,6 +26,7 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
+    private final ChannelService channelService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<UserCreateResponse>> create(@Valid @RequestBody UserCreateRequest request) {
@@ -38,7 +42,7 @@ public class UserController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @GetMapping({"", "/"})
+    @GetMapping({"", "/","/findAll"})
     public ResponseEntity<ApiResponse<List<UserResponse>>> findAll() {
         List<UserResponse> response = userService.findAll();
         ApiResponse<List<UserResponse>> apiResponse = new ApiResponse<>("유저 목록 조회 성공", response);
@@ -49,6 +53,13 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID userId) {
         userService.delete(userId);
         ApiResponse<Void> apiResponse = new ApiResponse<>("유저 삭제 성공", null);
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PutMapping
+    public ResponseEntity<ApiResponse<UserUpdateResponse>> update(@Valid @RequestBody UserUpdateRequest request) {
+        UserUpdateResponse response = userService.update(request);
+        ApiResponse<UserUpdateResponse> apiResponse = new ApiResponse<>("유저 수정 성공", response);
         return ResponseEntity.ok(apiResponse);
     }
 
@@ -68,5 +79,10 @@ public class UserController {
         return ResponseEntity.ok(apiResponse);
     }
 
-
+    @GetMapping("/{userId}/channels")
+    public ResponseEntity<ApiResponse<List<ChannelFindResponse>>> findAllChannelByUser(@PathVariable UUID userId) {
+        List<ChannelFindResponse> response = channelService.findAllByUserId(userId);
+        ApiResponse<List<ChannelFindResponse>> apiResponse = new ApiResponse<>("유저 채널 목록 조회 성공", response);
+        return ResponseEntity.ok(apiResponse);
+    }
 }

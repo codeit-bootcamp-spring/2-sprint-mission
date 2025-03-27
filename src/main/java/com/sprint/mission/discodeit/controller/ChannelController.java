@@ -6,7 +6,9 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.common.ApiResponse;
 import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,10 +19,11 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/channel")
+@RequestMapping("/api/channels")
 @RequiredArgsConstructor
 public class ChannelController {
     ChannelService channelService;
+    MessageService messageService;
 
     @PostMapping("/public")
     public ResponseEntity<ApiResponse<Channel>> createPublicChannel(@Valid @RequestBody PublicChannelCreateRequest request) {
@@ -50,12 +53,10 @@ public class ChannelController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    //GET users/{userId}/channels
-    //GET channels?userId=...
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<ChannelFindResponse>>> findAllByUser(@RequestParam UUID userId) {
-        List<ChannelFindResponse> response = channelService.findAllByUserId(userId);
-        ApiResponse<List<ChannelFindResponse>> apiResponse = new ApiResponse<>("유저 채널 목록 조회 성공", response);
+    @GetMapping("{channelId}/messages")
+    public ResponseEntity<ApiResponse<List<Message>>> findAllByChannel(@PathVariable UUID channelId) {
+        List<Message> messages = messageService.findAllByChannelId(channelId);
+        ApiResponse<List<Message>> apiResponse = new ApiResponse<>("채널의 메시지 목록 조회 성공", messages);
         return ResponseEntity.ok(apiResponse);
     }
 }

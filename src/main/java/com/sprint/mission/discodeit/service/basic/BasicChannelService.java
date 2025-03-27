@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.common.ReadStatus;
+import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -84,7 +85,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel update(ChannelUpdateRequest request) {
         Channel channel = channelRepository.findById(request.id())
-                .orElseThrow(() -> new NoSuchElementException("해당 채널 없음"));
+                .orElseThrow(() -> new ResourceNotFoundException("해당 채널 없음"));
 
         if (channel.getType() == ChannelType.PRIVATE) {
             throw new IllegalArgumentException("PRIVATE 채널 수정 불가");
@@ -96,8 +97,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void delete(UUID channelId) {
-        if (!channelRepository.existsById(channelId)) {
-            throw new NoSuchElementException("Channel with id " + channelId + " not found");
+        if (channelRepository.existsById(channelId) == false) {
+            throw new ResourceNotFoundException("Channel with id " + channelId + " not found");
         }
 
         messageRepository.deleteByChannelId(channelId);
@@ -116,13 +117,13 @@ public class BasicChannelService implements ChannelService {
 
     private void validateUserExistence(UUID userId) {
         if (!userRepository.existsById(userId)) {
-            throw new NoSuchElementException("해당 유저 없음");
+            throw new ResourceNotFoundException("해당 유저 없음");
         }
     }
 
     private Channel getChannel(UUID channelId) {
         return channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("해당 채널 없음"));
+                .orElseThrow(() -> new ResourceNotFoundException("해당 채널 없음"));
     }
 
     private Instant getLatestMessageAt(Channel channel) {
@@ -146,7 +147,7 @@ public class BasicChannelService implements ChannelService {
 
     private void validateParticipantExistence(List<UUID> participantIds) {
         participantIds.forEach(userId -> userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("유저가 없습니다")));
+                .orElseThrow(() -> new ResourceNotFoundException("유저가 없습니다")));
     }
 
 }
