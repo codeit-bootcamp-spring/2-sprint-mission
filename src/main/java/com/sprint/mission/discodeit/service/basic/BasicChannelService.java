@@ -15,7 +15,10 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,13 +39,11 @@ public class BasicChannelService implements ChannelService {
     public Channel createPrivateChannel(CreatePrivateChannelRequest request) {
         Channel channel = new Channel(ChannelType.PRIVATE, "", "");
         UUID channelId = channel.getId();
-        ReadStatus readStatus = new ReadStatus(channelId);
-        readStatusRepository.addReadStatus(readStatus);
         request.getUsers().forEach(userId -> {
             if (!userRepository.existsById(userId)) {
                 throw new IllegalArgumentException("User " + userId + " 는 존재하지 않습니다.");
             }
-            readStatusRepository.addUser(channelId, userId);
+            readStatusRepository.addReadStatus(new ReadStatus(userId, channelId));
         });
         return channel;
     }
@@ -141,7 +142,10 @@ public class BasicChannelService implements ChannelService {
                 channel.getDescription(),
                 messageRepository.findLatestMessageByChannelId(channel.getId()).getCreatedAt(),
                 channel.getType() == ChannelType.PRIVATE
-                        ? new ArrayList<>(channel.getMembers())
+                        ? readStatusRepository.findAllReadStatus().stream()
+                        .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
+                        .map(ReadStatus::getUserId)
+                        .toList()
                         : Collections.emptyList()
         );
     }
