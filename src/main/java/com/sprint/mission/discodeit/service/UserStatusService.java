@@ -12,7 +12,7 @@ public interface UserStatusService {
     UUID createUserStatus(UserStatusCreateRequest userStatusCreateRequest);
     UserStatusFindResponse findUserStatus(UUID id);
     List<UserStatusFindResponse> findAllUserStatus();
-    void updateUserStatus(UserStatusUpdateRequest userStatusUpdateRequest);
-    void updateUserStatusByUserId(UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest);
+    void updateTimeById(UserStatusUpdateRequest userStatusUpdateRequest);
+    void updateTimeByUserId(UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest);
     void deleteUserStatus(UUID id);
 }
