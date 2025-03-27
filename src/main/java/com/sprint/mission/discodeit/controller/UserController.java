@@ -20,8 +20,8 @@ public class UserController {
     private final UserService userService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public User createUser(@RequestBody CreateUserDTO dto,@RequestBody Optional<BinaryContentDTO> profileCreateRequest) {
-        return userService.createUser(dto,profileCreateRequest);
+    public User createUser(@RequestBody CreateUserDTO dto, Optional<BinaryContentDTO> profileCreateRequest) {
+        return userService.createUser(dto, profileCreateRequest);
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
-    public User updateUser(@PathVariable UUID userId, @RequestBody UpdateUserDTO dto, @RequestBody Optional<BinaryContentDTO> profileCreateRequest) {
+    public User updateUser(@PathVariable UUID userId, @RequestBody UpdateUserDTO dto, Optional<BinaryContentDTO> profileCreateRequest) {
         return userService.updateUser(userId, dto, profileCreateRequest);
     }
 
