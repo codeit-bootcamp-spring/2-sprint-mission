@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
-@Repository
 public class FileUserRepository implements UserRepository {
     private Map<UUID, User> userData;
     private static final String USER_FILE_PATH = "users.ser";

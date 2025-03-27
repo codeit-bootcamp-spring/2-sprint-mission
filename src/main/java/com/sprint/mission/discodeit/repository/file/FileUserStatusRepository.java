@@ -15,9 +15,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public class FileUserStatusRepository implements UserStatusRepository {
     private Map<UUID, UserStatus> userStatusData;
     private static final String USER_STATUS_FILE_PATH = "userStatus.ser";

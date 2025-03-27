@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface UserRepository {
     User save(User user);
 

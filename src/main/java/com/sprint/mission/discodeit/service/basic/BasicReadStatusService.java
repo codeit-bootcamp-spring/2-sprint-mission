@@ -62,7 +62,7 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new NoSuchElementException("UserStatus with id " + dto.getReadStatusId() + " not found");
         }
 
-        return readStatusRepository.update(dto.getReadStatusId());
+        return readStatusRepository.update(dto);
     }
 
     @Override
