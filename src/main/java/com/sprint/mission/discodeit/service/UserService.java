@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public interface UserService {
     UserDTO create(CreateUserParam createUserParam, MultipartFile multipartFile) throws IOException;
-    UserDTO find(UUID userId);
+    UserDTO find(UUID id);
     List<UserDTO> findAll();
-    UpdateUserDTO update(UUID userId, UpdateUserParam updateUserParam, MultipartFile multipartFile);
-    void delete(UUID userId);;
+    UpdateUserDTO update(UUID id, UpdateUserParam updateUserParam, MultipartFile multipartFile);
+    void delete(UUID id);;
 }

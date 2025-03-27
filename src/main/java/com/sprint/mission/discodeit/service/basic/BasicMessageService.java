@@ -51,8 +51,8 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public UUID update(UpdateMessageParam updateMessageParam) {
-        Message message = findMessageById(updateMessageParam.id());
+    public UUID update(UUID id, UpdateMessageParam updateMessageParam) {
+        Message message = findMessageById(id);
         message.updateMessageInfo(updateMessageParam.content());
         messageRepository.save(message);
         return message.getId();
