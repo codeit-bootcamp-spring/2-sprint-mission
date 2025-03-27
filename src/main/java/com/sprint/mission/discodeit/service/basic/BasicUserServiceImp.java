@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.user.UserCreateResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -29,17 +30,18 @@ public class BasicUserServiceImp implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User register(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public UserCreateResponse register(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
 
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("User with email " + email + " already exists");
+            throw new IllegalArgumentException("[register] User with email " + email + " already exists");
         }
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("User with username " + username + " already exists");
+            throw new IllegalArgumentException("[register] User with username " + username + " already exists");
         }
 
+        //이 부분 좀더 파보기
         UUID nullableProfileId = optionalProfileCreateRequest
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
@@ -57,8 +59,10 @@ public class BasicUserServiceImp implements UserService {
         Instant now = Instant.now();
         UserStatus userStatus = new UserStatus(createdUser.getId(), now);
         userStatusRepository.save(userStatus);
+        UserCreateResponse createdUserDto = new UserCreateResponse(user.getUsername(), user.getEmail(), user.getProfileId(), user.getId(), user.getCreatedAt(), user.getUpdatedAt());
 
-        return createdUser;
+        System.out.println("회원 생성 완료");
+        return createdUserDto;
     }
 
     @Override
@@ -83,10 +87,14 @@ public class BasicUserServiceImp implements UserService {
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
-        if (userRepository.existsByEmail(newEmail)) {
+        String newPassword = userUpdateRequest.newPassword();
+
+        // 자기 자신 중복 제외
+        // 사용자 본인 이메일 아니고(제외), 레포지토리에 같은 이메일이 있으면 에러 던지기
+        if (!user.getEmail().equals(newEmail) && userRepository.existsByEmail(newEmail)) {
             throw new IllegalArgumentException("User with email " + newEmail + " already exists");
         }
-        if (userRepository.existsByUsername(newUsername)) {
+        if (!user.getUsername().equals(newUsername) && userRepository.existsByUsername(newUsername)) {
             throw new IllegalArgumentException("User with username " + newUsername + " already exists");
         }
 
@@ -103,7 +111,6 @@ public class BasicUserServiceImp implements UserService {
                 })
                 .orElse(null);
 
-        String newPassword = userUpdateRequest.newPassword();
         user.update(newUsername, newEmail, newPassword, nullableProfileId);
 
         return userRepository.save(user);

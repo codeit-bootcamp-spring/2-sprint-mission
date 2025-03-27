@@ -37,7 +37,12 @@ public class BasicChannelServiceImp implements ChannelService {
 
     @Override
     public Channel create(PrivateChannelCreateRequest request) {
-        Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+        List<UUID> participantIds = request.participantIds();
+        if (participantIds == null || participantIds.isEmpty()) {
+            throw new IllegalArgumentException("최소 참여자가 없습니다");
+        }
+
+        Channel channel = new Channel(ChannelType.PRIVATE, request.name(), request.name());
         Channel createdChannel = channelRepository.save(channel);
 
         request.participantIds().stream()
@@ -59,6 +64,15 @@ public class BasicChannelServiceImp implements ChannelService {
         List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
                 .map(ReadStatus::getChannelId)
                 .toList();
+
+        System.out.println("사용자 참여 톡방 리스트 :" + mySubscribedChannelIds);
+        System.out.println("리스트 결과 :" + channelRepository.findAll().stream()
+                .filter(channel ->
+                        channel.getType().equals(ChannelType.PUBLIC)
+                                || mySubscribedChannelIds.contains(channel.getId())
+                )
+                .map(this::toDto)
+                .toList());
 
         return channelRepository.findAll().stream()
                 .filter(channel ->
@@ -89,7 +103,6 @@ public class BasicChannelServiceImp implements ChannelService {
 
         messageRepository.deleteAllByChannelId(channel.getId());
         readStatusRepository.deleteAllByChannelId(channel.getId());
-
         channelRepository.deleteById(channelId);
     }
 

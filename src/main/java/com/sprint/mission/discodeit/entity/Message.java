@@ -53,6 +53,7 @@ public class Message implements Serializable {
                 ", content='" + content + '\'' +
                 ", channelId=" + channelId +
                 ", authorId=" + authorId +
+                ", attachmentIds=" + attachmentIds +
                 '}';
     }
 }

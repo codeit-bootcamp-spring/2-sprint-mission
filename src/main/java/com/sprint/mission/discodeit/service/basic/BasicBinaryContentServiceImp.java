@@ -38,6 +38,7 @@ public class BasicBinaryContentServiceImp implements BinaryContentService {
 
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+        // 특정 메세지에 포함된 파일 모두 조회 -> 다운로드
         return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
                 .toList();
     }

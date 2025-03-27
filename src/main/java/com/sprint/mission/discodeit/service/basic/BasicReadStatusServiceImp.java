@@ -22,6 +22,7 @@ public class BasicReadStatusServiceImp implements ReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
+    // 수신 정보 등록, 새로운 메세지 읽음 여부
     @Override
     public ReadStatus create(ReadStatusCreateRequest request) {
         UUID userId = request.userId();
@@ -33,6 +34,7 @@ public class BasicReadStatusServiceImp implements ReadStatusService {
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
         }
+        // 유저가 이미 읽은 상태 (톡방을 실시간으로 보고 있는 경우, 최신 메세지를 본 경우)에 대한 중복 읽음 상태 등록 방지
         if (readStatusRepository.findAllByUserId(userId).stream()
                 .anyMatch(readStatus -> readStatus.getChannelId().equals(channelId))) {
             throw new IllegalArgumentException("ReadStatus with userId " + userId + " and channelId " + channelId + " already exists");
