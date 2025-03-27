@@ -84,10 +84,10 @@ public class BasicUserService implements UserService {
 
     // binaryContent를 업데이트할지 다음 미션의 컨트롤러에서 결정할 것!
     @Override
-    public void updateUser(UserUpdateRequest userUpdateRequest) {
-        User findUser = this.userRepository.findById(userUpdateRequest.userId());
+    public void updateUser(UUID userId, UserUpdateRequest userUpdateRequest) {
+        User findUser = this.userRepository.findById(userId);
         List<UserUpdater> applicableUpdaters = userUpdaterProvider.getApplicableUpdaters(findUser, userUpdateRequest);
-        applicableUpdaters.forEach(updater -> updater.update(userUpdateRequest, this.userRepository));
+        applicableUpdaters.forEach(updater -> updater.update(userId, userUpdateRequest, this.userRepository));
     }
 
     @Override
