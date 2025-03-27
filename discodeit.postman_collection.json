@@ -1,0 +1,2028 @@
+{
+	"info": {
+		"_postman_id": "3c61f060-d512-4f5b-b54a-85d121d4d7ea",
+		"name": "discodeit",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24100926"
+	},
+	"item": [
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"라라라\",\n    \"email\": \"user4@gmail.com\",\n    \"password\": \"password4\",\n    \"profileId\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/users",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "가가가",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"가가가\",\n    \"email\": \"user1@gmail.com\",\n    \"password\": \"password1\",\n    \"profileId\": \"781c3df7-c1a2-4704-a09e-f07663225c6c\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/users",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:32:37 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"유저 생성 성공\",\n    \"data\": {\n        \"id\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n        \"createdAt\": \"2025-03-27T06:32:37.473579Z\",\n        \"updatedAt\": \"2025-03-27T06:32:37.473579Z\",\n        \"username\": \"가가가\",\n        \"email\": \"user1@gmail.com\",\n        \"profileId\": \"781c3df7-c1a2-4704-a09e-f07663225c6c\"\n    }\n}"
+						},
+						{
+							"name": "나나나",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"나나나\",\n    \"email\": \"user2@gmail.com\",\n    \"password\": \"password2\",\n    \"profileId\": \"4dc6dce5-8a8a-42d0-be9d-5d9cc815a592\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/users",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:33:19 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"유저 생성 성공\",\n    \"data\": {\n        \"id\": \"90874d47-fd73-428d-b2f3-b0726325ee41\",\n        \"createdAt\": \"2025-03-27T06:33:19.323689Z\",\n        \"updatedAt\": \"2025-03-27T06:33:19.323689Z\",\n        \"username\": \"나나나\",\n        \"email\": \"user2@gmail.com\",\n        \"profileId\": \"4dc6dce5-8a8a-42d0-be9d-5d9cc815a592\"\n    }\n}"
+						},
+						{
+							"name": "다다다",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"다다다\",\n    \"email\": \"user3@gmail.com\",\n    \"password\": \"password3\",\n    \"profileId\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/users",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:33:42 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"유저 생성 성공\",\n    \"data\": {\n        \"id\": \"82b28409-9a59-4ac0-a853-8c52de653fb5\",\n        \"createdAt\": \"2025-03-27T06:33:42.760970Z\",\n        \"updatedAt\": \"2025-03-27T06:33:42.760970Z\",\n        \"username\": \"다다다\",\n        \"email\": \"user3@gmail.com\",\n        \"profileId\": null\n    }\n}"
+						},
+						{
+							"name": "라라라",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"라라라\",\n    \"email\": \"user4@gmail.com\",\n    \"password\": \"password4\",\n    \"profileId\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/users",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:34:05 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"유저 생성 성공\",\n    \"data\": {\n        \"id\": \"22ae142f-26a8-467f-a3a7-f1b07a53bd32\",\n        \"createdAt\": \"2025-03-27T06:34:05.911962Z\",\n        \"updatedAt\": \"2025-03-27T06:34:05.911962Z\",\n        \"username\": \"라라라\",\n        \"email\": \"user4@gmail.com\",\n        \"profileId\": null\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/users/95ab66b7-29ac-4c42-9c92-c2149bceca06",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"users",
+								"95ab66b7-29ac-4c42-9c92-c2149bceca06"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "가가가",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/users/95ab66b7-29ac-4c42-9c92-c2149bceca06",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"users",
+										"95ab66b7-29ac-4c42-9c92-c2149bceca06"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:34:20 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"유저 조회 성공\",\n    \"data\": {\n        \"id\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n        \"createdAt\": \"2025-03-27T06:32:37.473579Z\",\n        \"updatedAt\": \"2025-03-27T06:32:37.473579Z\",\n        \"username\": \"가가가\",\n        \"email\": \"user1@gmail.com\",\n        \"profileId\": \"781c3df7-c1a2-4704-a09e-f07663225c6c\",\n        \"isOnline\": false\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "allUsers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/users",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "전체",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/users",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:34:40 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"유저 목록 조회 성공\",\n    \"data\": [\n        {\n            \"id\": \"22ae142f-26a8-467f-a3a7-f1b07a53bd32\",\n            \"createdAt\": \"2025-03-27T06:34:05.911962Z\",\n            \"updatedAt\": \"2025-03-27T06:34:05.911962Z\",\n            \"username\": \"라라라\",\n            \"email\": \"user4@gmail.com\",\n            \"profileId\": null,\n            \"isOnline\": false\n        },\n        {\n            \"id\": \"82b28409-9a59-4ac0-a853-8c52de653fb5\",\n            \"createdAt\": \"2025-03-27T06:33:42.760970Z\",\n            \"updatedAt\": \"2025-03-27T06:33:42.760970Z\",\n            \"username\": \"다다다\",\n            \"email\": \"user3@gmail.com\",\n            \"profileId\": null,\n            \"isOnline\": false\n        },\n        {\n            \"id\": \"90874d47-fd73-428d-b2f3-b0726325ee41\",\n            \"createdAt\": \"2025-03-27T06:33:19.323689Z\",\n            \"updatedAt\": \"2025-03-27T06:33:19.323689Z\",\n            \"username\": \"나나나\",\n            \"email\": \"user2@gmail.com\",\n            \"profileId\": \"4dc6dce5-8a8a-42d0-be9d-5d9cc815a592\",\n            \"isOnline\": false\n        },\n        {\n            \"id\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n            \"createdAt\": \"2025-03-27T06:32:37.473579Z\",\n            \"updatedAt\": \"2025-03-27T06:32:37.473579Z\",\n            \"username\": \"가가가\",\n            \"email\": \"user1@gmail.com\",\n            \"profileId\": \"781c3df7-c1a2-4704-a09e-f07663225c6c\",\n            \"isOnline\": false\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "user",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n    \"username\": \"가가가-이름바꿈\",\n    \"email\": null,\n    \"password\": null,\n    \"profileId\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/users",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "가가가",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n    \"username\": \"가가가-이름바꿈\",\n    \"email\": null,\n    \"password\": null,\n    \"profileId\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/users",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:35:44 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"유저 수정 성공\",\n    \"data\": {\n        \"id\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n        \"createdAt\": \"2025-03-27T06:32:37.473579Z\",\n        \"updatedAt\": \"2025-03-27T06:35:44.824639Z\",\n        \"username\": \"가가가-이름바꿈\",\n        \"email\": \"user1@gmail.com\",\n        \"profileId\": \"781c3df7-c1a2-4704-a09e-f07663225c6c\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "\buserStatus",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/users/95ab66b7-29ac-4c42-9c92-c2149bceca06/status",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"users",
+								"95ab66b7-29ac-4c42-9c92-c2149bceca06",
+								"status"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "가가가",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/users/95ab66b7-29ac-4c42-9c92-c2149bceca06/status",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"users",
+										"95ab66b7-29ac-4c42-9c92-c2149bceca06",
+										"status"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null,
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:36:08 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"사용자 온라인 상태 업데이트 성공\",\n    \"data\": {\n        \"userId\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n        \"username\": \"가가가-이름바꿈\",\n        \"isOnline\": true,\n        \"lastLoginAt\": \"2025-03-27T06:36:08.029919Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "user",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/users/22ae142f-26a8-467f-a3a7-f1b07a53bd32",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"users",
+								"22ae142f-26a8-467f-a3a7-f1b07a53bd32"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "라라라",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/users/22ae142f-26a8-467f-a3a7-f1b07a53bd32",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"users",
+										"22ae142f-26a8-467f-a3a7-f1b07a53bd32"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:36:40 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"유저 삭제 성공\",\n    \"data\": null\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "\bauth",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"나나나\",\n    \"password\": \"password2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "나나나",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"나나나\",\n    \"password\": \"password2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/auth/login",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:37:56 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"로그인 성공\",\n    \"data\": {\n        \"id\": \"90874d47-fd73-428d-b2f3-b0726325ee41\",\n        \"email\": \"user2@gmail.com\",\n        \"username\": \"나나나\"\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "\bchannels",
+			"item": [
+				{
+					"name": "publicChannel",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"공개 채널 2\",\n    \"description\": \"랄라\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/channels/public",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"channels",
+								"public"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "공개채널1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"공개 채널 1\",\n    \"description\": \"룰루\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/channels/public",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"channels",
+										"public"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:38:20 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"퍼블릭 채널 생성 성공\",\n    \"data\": {\n        \"id\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n        \"createdAt\": \"2025-03-27T06:38:20.685838Z\",\n        \"updatedAt\": \"2025-03-27T06:38:20.685838Z\",\n        \"type\": \"PUBLIC\",\n        \"name\": \"공개 채널 1\",\n        \"description\": \"룰루\"\n    }\n}"
+						},
+						{
+							"name": "공개채널2",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"공개 채널 2\",\n    \"description\": \"랄라\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/channels/public",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"channels",
+										"public"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:38:34 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"퍼블릭 채널 생성 성공\",\n    \"data\": {\n        \"id\": \"963981e4-0900-4565-8373-9502eb0373d5\",\n        \"createdAt\": \"2025-03-27T06:38:34.728809Z\",\n        \"updatedAt\": \"2025-03-27T06:38:34.728809Z\",\n        \"type\": \"PUBLIC\",\n        \"name\": \"공개 채널 2\",\n        \"description\": \"랄라\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "privateChannel",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"participantIds\": [\"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\"90874d47-fd73-428d-b2f3-b0726325ee41\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/channels/private",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"channels",
+								"private"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "프라이빗(가가가,나나나)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"participantIds\": [\"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\"90874d47-fd73-428d-b2f3-b0726325ee41\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/channels/private",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"channels",
+										"private"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:39:08 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"프라이빗 채널 생성 성공\",\n    \"data\": {\n        \"id\": \"ccff1c22-b934-4d44-ae22-ae9fe2aa564a\",\n        \"createdAt\": \"2025-03-27T06:39:08.387846Z\",\n        \"updatedAt\": \"2025-03-27T06:39:08.387846Z\",\n        \"type\": \"PRIVATE\",\n        \"name\": null,\n        \"description\": null\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "channel",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"963981e4-0900-4565-8373-9502eb0373d5\",\n    \"name\": \"얄라\",\n    \"description\": \"랄라\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/channels",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"channels"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "공개채널2",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"963981e4-0900-4565-8373-9502eb0373d5\",\n    \"name\": \"얄라\",\n    \"description\": \"랄라\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/channels",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"channels"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:39:41 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"채널 수정 성공\",\n    \"data\": {\n        \"id\": \"963981e4-0900-4565-8373-9502eb0373d5\",\n        \"createdAt\": \"2025-03-27T06:38:34.728809Z\",\n        \"updatedAt\": \"2025-03-27T06:39:41.261749Z\",\n        \"type\": \"PUBLIC\",\n        \"name\": \"얄라\",\n        \"description\": \"랄라\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "channel",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/channels/963981e4-0900-4565-8373-9502eb0373d5",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"channels",
+								"963981e4-0900-4565-8373-9502eb0373d5"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "공개채널2",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/channels/963981e4-0900-4565-8373-9502eb0373d5",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"channels",
+										"963981e4-0900-4565-8373-9502eb0373d5"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:40:10 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"채널 삭제 성공\",\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "channelsByUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/users/95ab66b7-29ac-4c42-9c92-c2149bceca06/channels",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"users",
+								"95ab66b7-29ac-4c42-9c92-c2149bceca06",
+								"channels"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "가가가의 채널",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/users/95ab66b7-29ac-4c42-9c92-c2149bceca06/channels",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"users",
+										"95ab66b7-29ac-4c42-9c92-c2149bceca06",
+										"channels"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:40:42 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"유저 채널 목록 조회 성공\",\n    \"data\": [\n        {\n            \"id\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n            \"createdAt\": \"2025-03-27T06:38:20.685838Z\",\n            \"updatedAt\": \"2025-03-27T06:38:20.685838Z\",\n            \"type\": \"PUBLIC\",\n            \"name\": \"공개 채널 1\",\n            \"description\": \"룰루\",\n            \"latestMessageAt\": null,\n            \"participantIds\": []\n        },\n        {\n            \"id\": \"ccff1c22-b934-4d44-ae22-ae9fe2aa564a\",\n            \"createdAt\": \"2025-03-27T06:39:08.387846Z\",\n            \"updatedAt\": \"2025-03-27T06:39:08.387846Z\",\n            \"type\": \"PRIVATE\",\n            \"name\": null,\n            \"description\": null,\n            \"latestMessageAt\": null,\n            \"participantIds\": [\n                \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n                \"90874d47-fd73-428d-b2f3-b0726325ee41\"\n            ]\n        }\n    ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "messages",
+			"item": [
+				{
+					"name": "message",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"반가워\",\n    \"authorId\": \"90874d47-fd73-428d-b2f3-b0726325ee41\",\n    \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n    \"attachmentIds\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/messages",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"messages"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "가가가-공채1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"핼로\",\n    \"authorId\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n    \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n    \"attachmentIds\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/messages",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"messages"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:43:29 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"메시지 전송 성공\",\n    \"data\": {\n        \"id\": \"d4c5fea3-70eb-42e0-8d1e-db93df27b877\",\n        \"createdAt\": \"2025-03-27T06:43:29.030855Z\",\n        \"updatedAt\": \"2025-03-27T06:43:29.030855Z\",\n        \"content\": \"핼로\",\n        \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n        \"authorId\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n        \"attachmentIds\": []\n    }\n}"
+						},
+						{
+							"name": "나나나-공채1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content\": \"반가워\",\n    \"authorId\": \"90874d47-fd73-428d-b2f3-b0726325ee41\",\n    \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n    \"attachmentIds\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/messages",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"messages"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:44:48 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"메시지 전송 성공\",\n    \"data\": {\n        \"id\": \"bd0e5431-7711-421e-a9f2-cfdb2cf87584\",\n        \"createdAt\": \"2025-03-27T06:44:48.217254Z\",\n        \"updatedAt\": \"2025-03-27T06:44:48.217254Z\",\n        \"content\": \"반가워\",\n        \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n        \"authorId\": \"90874d47-fd73-428d-b2f3-b0726325ee41\",\n        \"attachmentIds\": []\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "message",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"bd0e5431-7711-421e-a9f2-cfdb2cf87584\",\n    \"content\": \"수정했으\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/messages",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"messages"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "나나나-공채1",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"bd0e5431-7711-421e-a9f2-cfdb2cf87584\",\n    \"content\": \"수정했으\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/messages",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"messages"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:45:41 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"메시지 수정 성공\",\n    \"data\": {\n        \"id\": \"bd0e5431-7711-421e-a9f2-cfdb2cf87584\",\n        \"createdAt\": \"2025-03-27T06:44:48.217254Z\",\n        \"updatedAt\": \"2025-03-27T06:45:41.019934Z\",\n        \"content\": \"수정했으\",\n        \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n        \"authorId\": \"90874d47-fd73-428d-b2f3-b0726325ee41\",\n        \"attachmentIds\": []\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "message",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/messages/d4c5fea3-70eb-42e0-8d1e-db93df27b877",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"messages",
+								"d4c5fea3-70eb-42e0-8d1e-db93df27b877"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "가가가-공채1",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/messages/d4c5fea3-70eb-42e0-8d1e-db93df27b877",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"messages",
+										"d4c5fea3-70eb-42e0-8d1e-db93df27b877"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:46:05 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"메시지 삭제 성공\",\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "messagesByChannel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/channels/957b7997-7e27-4fa1-8262-87697666f933/messages",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"channels",
+								"957b7997-7e27-4fa1-8262-87697666f933",
+								"messages"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "공채1",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/channels/957b7997-7e27-4fa1-8262-87697666f933/messages",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"channels",
+										"957b7997-7e27-4fa1-8262-87697666f933",
+										"messages"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:46:35 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"채널의 메시지 목록 조회 성공\",\n    \"data\": [\n        {\n            \"id\": \"bd0e5431-7711-421e-a9f2-cfdb2cf87584\",\n            \"createdAt\": \"2025-03-27T06:44:48.217254Z\",\n            \"updatedAt\": \"2025-03-27T06:45:41.019934Z\",\n            \"content\": \"수정했으\",\n            \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n            \"authorId\": \"90874d47-fd73-428d-b2f3-b0726325ee41\",\n            \"attachmentIds\": []\n        },\n        {\n            \"id\": \"697a9652-fe01-4b05-bc96-3f28f242646d\",\n            \"createdAt\": \"2025-03-27T06:43:17.456155Z\",\n            \"updatedAt\": \"2025-03-27T06:43:17.456155Z\",\n            \"content\": \"안녕\",\n            \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n            \"authorId\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n            \"attachmentIds\": []\n        }\n    ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "readStatuses",
+			"item": [
+				{
+					"name": "readStatus",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n    \"userId\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/readStatuses",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"readStatuses"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "가가가-공채1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n    \"userId\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/readStatuses",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"readStatuses"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:47:06 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"체널의 메시지 읽음 상태 생성 성공\",\n    \"data\": {\n        \"userId\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n        \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n        \"id\": \"f37811ad-43ff-41e1-b5dd-d173dfb6463e\",\n        \"createdAt\": \"2025-03-27T06:47:06.598463Z\",\n        \"lastReadAt\": null\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "readStatus",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"f37811ad-43ff-41e1-b5dd-d173dfb6463e\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/readStatuses",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"readStatuses"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "가가가-공채1",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"f37811ad-43ff-41e1-b5dd-d173dfb6463e\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/readStatuses",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"readStatuses"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:47:41 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"체널의 메시지 읽음 상태 수정 성공\",\n    \"data\": {\n        \"userId\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n        \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n        \"id\": \"f37811ad-43ff-41e1-b5dd-d173dfb6463e\",\n        \"createdAt\": \"2025-03-27T06:47:06.598463Z\",\n        \"lastReadAt\": \"2025-03-27T06:47:41.573946Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "readStatusesByUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/users/95ab66b7-29ac-4c42-9c92-c2149bceca06/readStatuses",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"users",
+								"95ab66b7-29ac-4c42-9c92-c2149bceca06",
+								"readStatuses"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "가가가의 읽기목록",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/users/95ab66b7-29ac-4c42-9c92-c2149bceca06/readStatuses",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"users",
+										"95ab66b7-29ac-4c42-9c92-c2149bceca06",
+										"readStatuses"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:48:04 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"사용자 메시지 읽음 상태 리스트 조회 성공\",\n    \"data\": [\n        {\n            \"userId\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n            \"channelId\": \"ccff1c22-b934-4d44-ae22-ae9fe2aa564a\",\n            \"id\": \"e69d1a3b-b30d-4480-a509-ae31517842ab\",\n            \"createdAt\": \"2025-03-27T06:39:08.390093Z\",\n            \"lastReadAt\": null\n        },\n        {\n            \"userId\": \"95ab66b7-29ac-4c42-9c92-c2149bceca06\",\n            \"channelId\": \"957b7997-7e27-4fa1-8262-87697666f933\",\n            \"id\": \"f37811ad-43ff-41e1-b5dd-d173dfb6463e\",\n            \"createdAt\": \"2025-03-27T06:47:06.598463Z\",\n            \"lastReadAt\": \"2025-03-27T06:47:41.573946Z\"\n        }\n    ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "binaryContents",
+			"item": [
+				{
+					"name": "upload",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/han/Desktop/사진/2.webp"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/binaryContents/upload",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"binaryContents",
+								"upload"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "사진1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/Users/han/Desktop/사진/1.jpeg"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/binaryContents/upload",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"binaryContents",
+										"upload"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:30:23 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"바이너리 파일 생성 성공\",\n    \"data\": {\n        \"fileName\": \"1.jpeg\",\n        \"size\": 5380,\n        \"contentType\": \"image/jpeg\",\n        \"bytes\": \"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\",\n        \"id\": \"781c3df7-c1a2-4704-a09e-f07663225c6c\",\n        \"createdAt\": \"2025-03-27T06:30:23.853075Z\"\n    }\n}"
+						},
+						{
+							"name": "사진2",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/Users/han/Desktop/사진/2.webp"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/binaryContents/upload",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"binaryContents",
+										"upload"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:30:39 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"바이너리 파일 생성 성공\",\n    \"data\": {\n        \"fileName\": \"2.webp\",\n        \"size\": 7712,\n        \"contentType\": \"image/webp\",\n        \"bytes\": \"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\",\n        \"id\": \"4dc6dce5-8a8a-42d0-be9d-5d9cc815a592\",\n        \"createdAt\": \"2025-03-27T06:30:39.984566Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "\bbinaryContent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/binaryContents/4dc6dce5-8a8a-42d0-be9d-5d9cc815a592",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"binaryContents",
+								"4dc6dce5-8a8a-42d0-be9d-5d9cc815a592"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "사진2",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:{{port}}/api/binaryContents/4dc6dce5-8a8a-42d0-be9d-5d9cc815a592",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"binaryContents",
+										"4dc6dce5-8a8a-42d0-be9d-5d9cc815a592"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 27 Mar 2025 06:49:00 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"바이너리 파일 조회 성공\",\n    \"data\": {\n        \"fileName\": \"2.webp\",\n        \"size\": 7712,\n        \"contentType\": \"image/webp\",\n        \"bytes\": \"UklGRhgeAABXRUJQVlA4IAweAADwpACdASo4ATgBPpFEnEolo6KtqBMqSbASCWduvTBpEvLdHWuRimqtjFF59WZc/Q6Jnar1g+Efzc1EcUP+F3e258ZJO/+zaNLM6PFeDT9l34Bb118pOp687PzI5s4xLcAoPgESAc1uiEXhRiK88NkVCI2JFmhcmeaLEVPNErDRstChTVDw5IdtojmJK+KGpBJj5rJG4hx4hOcbSLdeOHaIGobwvKBEldmJ6WqYP7LmdDFSrUwEEjUa9YhGcq5yB3PaWovYA9CZhllrBJO/9/Xo6C9LhheyMuNWNVtyywmjo3f5ttWhAHfVJIfpAxFTExyBfATMj1aE8IRQ67bX86nOSvdzXrZH27nnsEFhV4150UkxWpQoxMbqJfx7VBcAepd+mkO0jzlLHD3ddy3BqWVQKE8ZtBnNWo7/2RQZ4OepQUNySYykXBGu2mKt6ulbU86HowsOv4gcXUNkpRMX2njplPHNQsx/HYOJ+mmYj0gJAhro8EURixI7p9l1bHNM1jhsj51qMN7eM9HZ1RoNgVGmhc+tbgOn31Re1gz4GC4PNFHcXtVqShInnYPP1Mytar16DjlbZqu64xzmrJIHXho6/+4UIvd2JfR1jYLIyFJU8wn47KGM+nSVNbPGGkmeLWi5WyoQW4SQtHL8Ndg2mXjpKHo4bcs32cVe4vjk80vl9NmSA/mub0dJG5SfBcZ8b0AyXrTQlr3vQ8ztNcT0kYlw9I5pSOJZ4kkJ1HkBblPlRgE7gcpbetn12enQPn05Wz8k7W9YwPK5g9tNcrRrBmhIy9w/hXO2paa/MfnOB4onkNyeswqRx6HnXazLjBITDPSa//8taHQAxeSd/KHfBmB1ozV2PZccDeq4ixAeDOQTBJ6JekE5hWhlL+3E1bUzeSqSUmgtDtRFRYChc0uFVGfXjUfIiwimip2+5Nak7zEMgT9krDlkTydG+p7mNvRcySYnRYcbg1prOjJAx8ahKvK0ukZ59AIocsnm6aM3f9Qf8d1fdehjuvnRuDCQQqtMG6gdr04DuHLV7+JQ/Ci4eqVX6bAeTbsJCRxyFkUolw2jbtqL1y5lMoHItaZGeQYSs0QQv2HJbmmLPz+yxjsK0jOEcTHIl5VQkYHQ42EbK6bNZEkZonVrbYQZMV0sLfV9BvdndkhOubJAnpIAElORXJgKvw3LyTD4JRQjI6FT04m+kGaWGLbPhpW3+mPmsUlWCQhvIbFl4EmcDdDpoaUxtJ0CeINsLTH2lo0HZFqDap+q4YZWrbLdFcbUVovE+gMQ1jhRaQtYI8IGXDE3wRHV3aEUXhXAunPFfXuEr2BqkJK/BuXeMLDHZNfVHCYIyFG29wDI2kfrpnQAYNmY5AeetDJqCIH2r+3xlyIRtLewgeerx53WnwXtcx885Kcp01q0FWrijQDRFmFr91ahcPeJi0w0aoclNfYJh3vQtNbs+MSW5P2+gI7yWMbDl+3Tq0U5B1bl7wFRdVqrovM589egYnN0+Eo9CZkVLpfw4remkxW0bC3caOkHoFhcACxlAEtl9Je6W9VJHjQ8gGCeF2BV9iemu99I+CLG4iklREm0BzZV47TcdUUtNdesSGzrvzmiYmlAR2ccVmRf2BECaDkU0Fuhr3naeCjhbwDaujHFIi2++/5CFQiIXv63XbUEJvqsw0fIFGo2k/NfG/oMR3eFu4xLwwkqLOVbxj8C1d+wDXy4D5LENvqnrZsXHGI5iOauAhiEWI6z7pT7ettASkMTfDJLuXqC0R5jLN4IOs9xbiisAAD+9ThTFSn826+4bo/gTCEwlmhEXM642qZdenDUlTlaTVhaRn6NBD7WBCb1dFsPPEO6x2xvbE0ZMRzdngOIn6uQ8AVLJt7bSlA8nXsnKE9UPN2C/SsChWhbnhK5yx3wQOK/ksU+jn++EvXqKetpxcmSca5WSST6KBjDKsEKtwMMGICtCdwTg6tmZFlVd3V7o7jXX7VSZeOojESixA9ZPk/KBQbwpBqkRV3RVYhTBo2HP2YNetzRG7Rg5OydX9bVhcaqgwRO+7DH49qJAaQduEuGwBl0FhWY3kogfrFQgcsSyAHgD8UkXXCEkdZUuoVwVsCdpOy6IB9pFDPM37JvYJ/YIdiHeu0D7VWyRSslp+j2mRkMy3pOGhtOGXdZMQ01JZRg1PM6NE5dQ5NDH87e3JSN6nDxDbSn4WqGOBCjfgS+upeZaj/0F3HCT9ZvN42vh79YiefkXuOahS3oTvLdgsYffQjJaw61mrqDKsYStn6TLWntnmA0WqXHx9AKhcp7FusWI/oNNcY/d9haX6j7cszx3OYVtFV95EpvgUb5pmAVvJPYY0aruhkdXWpeCN9melbiSF0jsJTQ242ICRJoMv3j3tCHTTIgdut6cjqVwZ2Nli+MiI1Jbvvit/Piw5WU//TbEJyHPUpu5t2Cv5I/3FCg+ST74aThRbWUUm/ib7j7oYHTzpDVsoIMavfj2f6WZyJSFMFsXZVMyhnbz7F1N18saKIby6NEjYyTTHd6y69O4/6j57w9jqpxoqcQeLEB/1hGChwjZc18BLi1CcSKx5zF8TJIqco1dATj1fYQX4oh4hhHmy2P4GiHGrcrzerD4FAsrxFbtMbJ/NmW/c349+LIHYfEMtr6csC3xwOOqBP3P0owXiKYj2MjU9xHZ4j4pn5I21LzGLXY++2Qg+hyHwnlT/DbijxgL6PDbvESPEooZJJjbIbjUWzfDyU7XO1229w8b4pGSaVgzgPr0RjzJAP8TjtQDjvfpdg4MzJK/zb6H9C/dOfcqGIY5w0OGE1x04yZ/5S4Brx+UXyLqEP3kqVNbW4Q0wWzUn1yFTvR5JkPX+p5gfPDg3PgAYbxKN1PBI6aDChG4tpsnMZByX+8pFcFC4OaSrsS2R9hmq2ws5jAIoPxAHlSde1kaRPt+nuoqRTR5bIc9JSjmZTeZUReMHDrRu9fSHpqJWTs7hF0+lGHOy+gJ+j3OrIFPpRIMLtvasoJ4IUKgT7FdNqn/5P3o2JAkPEwyZO4CRZRn+9PREXK0ra4pIAKYWOEcNt6ihRLMFkV8+GbGakAvEIhstyYuXc5N4x3ehjHHg4ARJrgvk2QoD3SoSNiOdyYOhD7Q+n5uFl658xcXVbwHMrtQecY+g9HomM1ABMWi4+d3OpdAVvMmEekMEM8j+veBZvwD5ZMxmLks3UB4Wyzy9J7DKy8LlhWE/MxBjuXPh3+UZC1zOHH4KhPsHDZHl31048rM62edNmUevHsYnGN0q2hLbhi0kkqDUU2cGf671Nsq75qmFhFMoZ/G5f7XvRg2JjuouK5J8uLsUw56h7xef7JtMuPYv9qQVw1IcXecsF6XqxR/F+BNx27dH3lS/KdBCVFvvEmwmVil5X6ZViRRz/2TzmsklD8BPqkkaBTs9QSPhcBsVQ9gS2zPa/rpGM5ODrgI5+fHP3N0gE4wpBxahzy5lBfc0TXnr4oe+8XpjQkcHO2U6S1hu5n4I7B5e9UldTjOzxyOig4VXzxdaHRQcRBolbPND0ZjaswwxMsQg5a9dPx+C39A7rMELtq6R8ffxjY5no5t24GKCRmz0WsIe51BycSsp/2Iqee7bdMgUNfFAilf0+cRrrL/UT81l+jD9GNcF2rgBvxAWEin3yHfPxlqN0PjxnjvGBgSln61NbXuHYaOfkf7NqNGo5B7msq5O9uhu7hz+hCIZWVEsITanO/qEdNv2fcvSs+FlGR1lsWOS0jQgji7TpVWD4Mkios1Xsn5ekxL66a4J6mdMnRCsNduZ5jsFUW01EcZhwd2LZqlUEwUaTqpOBqimZjdi1iaakOwh8zlmEkAvG2LmYTvZAFLTf8vT6xGC3OJrhevM7jIkBFdjOpbKsUI4V7Srn4sAsoSC2FBwZvLcLNoRASotyE2KtLPx8zfoTBdRQbZzFSjbFYDs43/qqzNC6NAKll5kKMqJGwZMRLonxh5lQ5Vin0l7YVsSTH8XGt5KrpIR+t0TNOsaqYmIxk7k+dF7pufefaWPpBBuEe8GK8XIUgbfXqum18wqQGNTwOhvPthHxKW1I/qRUOtGFAKZncHJT8ZF0mCVoPs1Q5oddFH+7MJoSObRj2BiBIweZ0ryQfBma9TEyXaQYHQYGQRULKFV58lsrAceEWtAoc1OOm5JdCqSr7UP4Wy8V8toBV+r7dZb074DXmAvU00P6GdtTmbIyvnkQt1qztTfVSewX2YoZl5pxoEXz83s4nXU3I2Ny5LBvee1bo4lvvC+0KSV41KrwxvoAlgrJ6kn3veNYg+ARA4OJ+i/Otvt2pImLTSVkyETD0XTLs2wRlYW2ofAOMVA1p927GHaj+T1UhtOcbAeoeEOtfyg5C1bMWY3QzKXpS2jksSOqNcKllRJx+ztrResbVYCJJ76Nu4ljRkNER5TWa8o/w+fnt7MeVquOKxstaJ1BZsQ/oUeycvGIxI/lUWn2DMeb981wW7XqqehTPCb+h9kH5cGSK8hQCzNK7fHH6hzw8b/KIGbMr+jVwkHwklC2IhGSsve/5yA3FU2So8u4vYkxuz1BVPDJjUoZzfng9fs7v7Aa9woma2qgP7Nsl7cRisuFJuNAA3Rls0arcLhSNeY/F2OSTNVQCJdccSi4zADLtMhYZ3wALxcagUcoxfjsLq8EFCTfOYnCXg+SK8dAHVx2i7JstR08D+wn94q7Zchd4oI2Rv2ukV+2H/XerVrAWfet2JM9NtujDeC6t6Mm14ZJ/ycaVP/qSrlYUxUTTRogsSz9M3GREGDirw4VuN+Uc7HH1AZPaUbMTsE2cKHBgJ18Uf/QBM9ehPsdIhOtut4jDQEAYpKoi2w23ScYhB4fG6S+2nNDTdpF+EDM6lXFdL8FE/89agLculq1y1hwY2ASqYVH/Oph9qA7JCHrsBwrEdul4UQjy7Roq3KM5iVm7AVPehpfCiky694N/+VQxDvymgXHGgSk2QYNObxURcuFLj7m4eYxEWNZCvxnySutG7/o7Xr1YXVBxSnUruyEz9jxFg9T7YYLi8KJtIZwkPBUa3kEkLzkABRgYWxMnOJ6qfCahy6klO5SsZdDB9JBVUdjYDGMn0Md2FYTd9VYFdSgwm/ewJIZVQWIaNCfgiGa7JBM4kfqUv+3NqvxYx0JFOhAPMEVPaNmTfG4d+jdnlIbxqDCjho3O7RtNbMdCY3QEoMk8pFvVTkjH6KrhJkqozUd1l4HSiFFTy7aVD26t0GA8CJhUKatkYroxAZ31maaOG/XzPTYc8NO69IPKHTq4qIsebHMVLTZWk6FoQFSgbzAIHyzsTMZ4+rzC1fYiNavot8Nwe5b8gKiRcCOYjn0ZqLLl6wO9q0DI6lByol+7Bsk9Pkuxig/xm3OtFdZn9BJok4+7/kAaZpgyZBMST11qMJynR4HGm6qStd0EgO3BkiBHqFHmDdRVQJx+iuHAi1DeTxkuS9aceaDbuukEuF9YglSKasSo/sFRmKrNXDbHJuxHmAbavDLkK9h9oNTXije/Sy7vBsWO2wC1vzDnRNjrV1suWa/1xICQDB9j+Wlw3JeoysRmwVLT3arYR+hWpqBR7l5GAoEOkKRIVhPXZw7JGRPih5xc7f9Jo/+ciaRfpfgj+/H900uXirF5qk3EteVJVD9C0DO3kgTfNSCZ+MqXRHBp1QAQz21kUPZb0a8ZvMJtYwuSKXBY+S3xgGCzu3RDlkBCH2mwf771xheB5QD1wIKNcAqru5HD18EG6+zM1Tu9IdTcWZx3nzCpsY+EPJnxpyDbVL8aIrjH24IsbFQW4q1bEppLUxZLONq8MTqvNrhghgdreTmM8oYNgq4ZxECimT8aLuLqtCZvaSObbbuDYvCPmoLKOC1rbF2RPfQ4FNwaQu52V2Q8zJRVH+WdxxyWPTnVSaXv/5VM6fOrmUu8GqOU/rPPRiinbcN/LCL4GCRyIiXDFIaoORphpRUXJSWQCvhQjzFMFvNKBjNRVcVaCEl8N0mAax5/L1qHh62UyubezEaxlO0qnKpShYOLIanCIR7swAWrWIQDcfNktZZ0rg8pC/gaBAtWQN0pE5jvvvX+iiieNS8CU3RH7/yKSm/F1Tc+Wy3eXSB4G1I0j/GkFEFfUbNBd0Y75wci85HBq7oEHqsbszfW4S+AsoaTileRFaLTARahydOiD2J3mEsO3OgvblYGODbGoFcj185/DZ0A6QBVk8Ah6GV+KTB31yRGS1lwto4TKtJB6A6Q3i0W2Mh4G6FPMa8bF70sOPg5qCsg4NHDvNOA5qhhTkhEb0FNDFd9xs56mrhJM4Xi+ek2gRQg0MoHTeUN+a2/FKG0NgS4LXhGYHgr1zbbJ7Bf027XaXyeJGzhEmfwD0IlwIk5syWr/wJWt3kwJG+0VJPMsV5/qy6ryla/QvXQi2cc1zIv3skmX6o4Klp6Hhmuq1v8RqYEPZzpZ8jERSO05otuJ2R/82zug3IOn9oY3xr29/bJB90YhirRu+0IWgjV/S8PbWJKeyOgH1+wN0LfUBcEGODmlUpvN7R/TNmoQtNkHrdOxVN+2CdP6qcirL91LtQl/csrdQXcvSrPmZ0CclyiMl/AreriBOT/doH0uCkH3SEfh9xwmb01l6EH44SOa3BRXFVaxXB1cIlUt9q9kB868p0ETkgYsduxfykQgLnpA59HUHEsQQKm0CCNEM3u/Mn2jt0HjsyXJf1VkCHC5yR6RAIude4AsfAeuYrWwzBqUqFOrYwgNOIl3NpoO4bQP5pDuaLwPY2RI9WdmoXmXQZ73QC32fgxpDV5ccnb9H8Xd7AKtqoTQS87kS56aISlAWCjL5mH+8dmIMIQIqcXxjEN6uSgEBq5ap2MNPxXA+ombnlTR4IwqArVoR3GrsArxTuSsilphcmRfpad9mL2eJMJt7eKDlJ6byA9Z9j1/SM22qO1j1M0m5AvrYzqrphbxO8D8MIIsKIL6o0i/ilIDuYfNW4ldoPiKljNK1wAk9tYVM//RVaxeWYC7Gd5JRqMgpYMtQBQvlgNW8DMUKVgolN7E9LwkjDn5LLtWudZX4bdf0R+BqzEudDQfuGAwKWcK6wffT4Y/nKbf2cjJBKdjM4ZtDL0wbKXsAHhqcBCquXexFjRTr5J5PevN2QQsJ0fvaYNdyUlxD7OY0CB2rolH9+XSfoD3ZxOss/mWZvk4oeSDJxfui9rooFZWqu5yM/FKG/JTuUgniLTcywwj/70kEX/pBanUUBIzqESbLo3TzCQy0c1o3hibwXLbToWV0o+BC3V5K/fN8LjCFoBIwkZbmUGPQEkccv8RP4yhW8I48GfDd3Wdh9x3TKc3Z52y1rXUzFI2fhafGCuEwwwg9weDKZlfKIWELbQ9YEPdQunHuo/Ab3qH/WisakOAtFdoOukwq7a3iVmxv6XHULJPhnqg9qOeYJMOes3djJ84mYedVYaU9qEHU8dv+HKBuTCEyBYgOfElSmIbmCLE/rr38r8si3/wh14cSY/+5CDWj/MW8/XYMz2iB6Zt01QGzHvgeW72oBd+uVzY+Vi++gvFnwRnFG/8vJJwIIZqeG+MUJ0QtScAoSk5Nte3OYfPn517aJefSwqAv3DT0KQj9OpFQrTY/wC3rt86tCbdtbl20FBNzJzdkj/ulaB6uk+sD67bukV1mJz9/HgP/Fsk+A+zwxkmUFzD7S1C7qr2Grexvyd4jpJQw+79eYBieiZIyRDizMeIVVmYpqA1HZ6IwtGdtsRNY6VunHgiqYk373iWIGe2q7f8ZCOIofRG559E3uHCKn2/mGN0thzh12lThuaXrqY2svYD2afKhWpZR1AoSP/Y3m49NYqCPpzynvrxCM48q872rU+1iK/zAXi37JGjBrC1Am3F/CGM+4qWnGDauqPLo6ZQOZCPHHgAOX6V8EAz4XTi1dpFmgTb3kJveL1T31K+qqmPin5O6orRfbvADvACo3RKJrHioWwZVmyrhCBWSJfhbzbgyPPiX8Dzoyc1qZm7VX+nIOgi1Yb59vMssD3/9PtUdjlntQPP27V/aXvz6x/JecoY2F9rxrSeVPxODtdwtkCwEPuscR+zZR2T41ek0kbmxc4UYpW1kpoYJfxOw3XWrfGZNG5lHmiP1VJ67/tb9OyQcXhcV5gbctX62xRpH/vF+Trx+pdwP7tysauATJ6sAtsIzj73buMht7GXAHALjcqGjNBkxp1nuawXtIPUIrKfq8buuxNDp2dsPUF3qRH2eozhLuRsppSK1vaH1FkDXRBhlYTaZMEMmxswQ5V6JE+xgE76l4xFSKsqjOmZDi98xQfTrcyRruHPSfI2+gNCyG/wLCV3uzQMJOPGkzh2XIJMhIFHJg1AcRFk5nGl2dfIAdPxyeqkuDR/jCpGmn3iegyRy8aDTYCWJnDPMvHbkR8XzrDa3XcWLh6IM4ovz48Vgb4upM4Y0TDEOUAHEEFvJd2iC/kqXZfxyUtXOF/EbzoqdFjK6W89hmjEiP1Svwjngbz48PPy+73TJKj6jiv7APiIzXPnKrmWLVy9FacbRYXuD3smXsyTrIeHgJwy+aEEO0jRXX2m0UDO9B0UlLQbkOeOs/3lyxKV5+mmcRSQvswvRvEJCkFq1ayp8clzmdxe/MNSHvt4o2JMRgfj1LLqev5iC9Xn/UXBPC3GPWG26sr5Jq/G0E9OP2szI9tmd5q26D3EHPrR8ogO9bs+1FMAhdI88lo9ucx/OjCj/wNyWC279RMkxSaW1bqY2jcWKNIhAwkzjwGMV58CeOwNQgwYX+piFcfPl2PNKDo55cGWn7a9o7ik+KYiQxOZsnF4ngAf/fVjhnKJ/Z7vAKlhv9Vi5WcmMwC5evQbC8lET7Z5i/T17PQFA0niwUahcABJujMPvu70CK1BVnpeOguQMDIQ5imCxUGCEGjb/Cl5tiS6B4GeCSL0rQ0KQM9b2BWBDXpTezgUEX+ue2lyz3Gvqdm/dQkFe58eMhXwDCkYpJs4fhfg811UPpYHclBZcn0QYJwHPU1GynmB0RskCoAiK4Y9CCyo/cP/JOHIWdHTe/UW+wdNI9tr62hcYAuDERJYVMMbiYLypNLlJNOAcdgKYdvAYjQWwVpzT+rGC7G5IPpuLDc5VWUy0gOjgvtuGvTXiETp8lsiLHj4DinLCNDGkvIKKLH8NujhADpDTedieOFzc9Ry1ATTjcYzXvqdrkTab3TTn/zZcdhKt5/2FlvphdLOnbg4MrpNEIzYOBvkXLkCG+oo2exNLqulXNsak01HcMSS5KQ0qAsQiBdjiiuiSCv+BC5DEbPCoVMWcnp+LmQShQbeDWKUAnd/9bAoa9V7aLQalWTIU68yaejhx9978YHIWelRDeWe4u0xGAB7z3K40Hy1qs84e1Oc/WOqzP+S3UxDIkPx9EQiQPcP7crqPgjkKFNfLoM8v1qUMCTKdDJScUqmU88U07o0WGw1h4GEnnXK7bdKvMf8Qa68jeoeq/Rj2/Jl8OUIqdgighNti1LtygaREq8mpIB//GZs4DyGhl1RpyDHfHpvLVTuBmLarTke8L7Sw12DJ6weXRravGLULQ8z28IK9qE4g3ETuOS3FhQ8PcRxr/S35YluvlZ/6SRljC3YzCVWZPlOnZmUe3WmzJZH6zHwtQGGUDaisQONodxGUjLLMOa5vabuuT/UDeLRC/tY8ZU3gXQmuqzK7PBtL28mRC9r/0Mlzdwu15C+gK8ztWgQa2hWEUqg5YlxI9Nv6ftOU3gQ9sTy3A9MSAqUhn2HucL4rduNH4Aye3apGrGfB3OMwOG/NgTg4DLGUfc6WICsKSagcC0EDN0NpTXW+bQarm9oUFwZPy5bzCqADzrqOQMiXtaBlLIaEICx+oRE0iWKi9jdfo9EPJ8MGjxasXh8bq4dxNBg/SQlZCCOKC6sOyBX724ZDAn2LSrHZeCcjA445YYyc13d4VucHohkuloDr+uHdi1hylkgGZD6HqvWHeRvWKaGpJKaZtnithU8jixpNM4Wje6GrwSezGkLPuDSePR+pII5QPLypZgnLJBbHSYr+it0/5Seld3zSWpftNhdSkObH5x0RSBTJ19K9ViRkQm0EQP8B1sDiJ1pNTTd6nC8L2C8gWkDCCxCaGUuEVXnXhSIDbMJl8rj0HVc5LuJ9iU0v7C/Wws5TLpSv0ikNNuxvRE7kXj+FxEv6LH/Y4x0x4LH3t69tDYqX3oHBHkp8EOdixcalv/KWhSsFUgomKMYQkMa30aZM7CndDYkJSfjGNlPQk0Op2HKfw6wmhW8RR1ewCD7EDxSf5uJnG97sSCGxnrgAA=\",\n        \"id\": \"4dc6dce5-8a8a-42d0-be9d-5d9cc815a592\",\n        \"createdAt\": \"2025-03-27T06:30:39.984566Z\"\n    }\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}

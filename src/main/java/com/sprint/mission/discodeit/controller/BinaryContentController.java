@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.common.ApiResponse;
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,7 +45,7 @@ public class BinaryContentController {
         BinaryContentCreateRequest request = BinaryContentCreateRequest.fromMultipartFile(file);
         BinaryContent content = binaryContentService.create(request);
         ApiResponse<BinaryContent> response = new ApiResponse<>("바이너리 파일 생성 성공", content);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 }
