@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.service.binaryContent.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.service.binaryContent.CreateBinaryContentParam;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserDTO;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import com.sprint.mission.discodeit.dto.service.userStatus.UserStatusDTO;
@@ -41,7 +42,6 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserDTO create(CreateUserParam createUserParam, MultipartFile multipartFile) {
-        validateUserField(createUserParam);
         checkDuplicateUsername(createUserParam);
         checkDuplicateEmail(createUserParam);
         BinaryContent binaryContent = createBinaryContentEntity(multipartFile);
@@ -58,7 +58,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserDTO find(UUID userId) {
         User findUser = findUserById(userId);
-        UserStatus findUserStatus = userStatusService.findById(userId);
+        UserStatus findUserStatus = userStatusService.findByUserId(userId);
         return UserMapper.userEntityToDTO(findUser, findUserStatus);
     }
 
@@ -76,7 +76,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UUID update(UUID userId, UpdateUserParam updateUserParam, MultipartFile multipartFile) {
+    public UpdateUserDTO update(UUID userId, UpdateUserParam updateUserParam, MultipartFile multipartFile) {
         User findUser = findUserById(userId);
         findUser.updateUserInfo(updateUserParam.username(), updateUserParam.email(), updateUserParam.password());
         if (multipartFile != null && !multipartFile.isEmpty()) { // 프로필을 유지하거나 프로필 변경 요청이 있을 때 업데이트
@@ -94,7 +94,7 @@ public class BasicUserService implements UserService {
             findUser.updateProfileDefault();
         }
         User user = userRepository.save(findUser);
-        return user.getId();
+        return entityToUpdateDTO(user);
     }
 
     @Override
@@ -108,12 +108,14 @@ public class BasicUserService implements UserService {
         userStatusService.deleteByUserId(userId);
     }
 
-    private void validateUserField(CreateUserParam createUserParam) {
-        if (Stream.of(createUserParam.username(), createUserParam.email(), createUserParam.password())
-                .anyMatch(field -> field == null || field.isBlank())) {
-            throw RestExceptions.BAD_REQUEST;
-        }
+    private UpdateUserDTO entityToUpdateDTO(User user) {
+        return new UpdateUserDTO(user.getId(),
+                user.getProfileId(),
+                user.getUpdatedAt(),
+                user.getUsername(),
+                user.getEmail());
     }
+
 
     private void checkDuplicateUsername(CreateUserParam createUserParam) {
         if (userRepository.existsByUsername(createUserParam.username())) {

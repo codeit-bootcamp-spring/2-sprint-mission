@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.controller.user.*;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserDTO;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -60,9 +61,9 @@ public class UserController {
                                                             @RequestPart("user") @Valid UpdateUserRequestDTO updateUserRequestDTO,
                                                             @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
         UpdateUserParam updateUserParam = userMapper.toUpdateUserParam(updateUserRequestDTO);
-        UUID updatedId = userService.update(id, updateUserParam, multipartFile);
+        UpdateUserDTO updateUserDTO = userService.update(id, updateUserParam, multipartFile);
 
-        return ResponseEntity.ok(new UpdateUserResponseDTO(updatedId, updatedId + "번 회원 수정 완료"));
+        return ResponseEntity.ok(userMapper.toUpdateUserResponseDTO(updateUserDTO));
     }
 
     @DeleteMapping("/{userId}")

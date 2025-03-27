@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserDTO;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,6 @@ public interface UserService {
     UserDTO create(CreateUserParam createUserParam, MultipartFile multipartFile) throws IOException;
     UserDTO find(UUID userId);
     List<UserDTO> findAll();
-    UUID update(UUID userId, UpdateUserParam updateUserParam, MultipartFile multipartFile);
+    UpdateUserDTO update(UUID userId, UpdateUserParam updateUserParam, MultipartFile multipartFile);
     void delete(UUID userId);;
 }
