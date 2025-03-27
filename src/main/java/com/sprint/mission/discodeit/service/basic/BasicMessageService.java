@@ -72,7 +72,7 @@ public class BasicMessageService implements MessageService {
         Message message = findById(messageId);
         List<UUID> attachmentIds = message.getAttachmentIds();
 
-        if (attachmentIds != null) {
+        if (!attachmentIds.isEmpty()) {
             attachmentIds.forEach(binaryContentRepository::delete);
         }
 
