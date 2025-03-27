@@ -6,14 +6,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 @ConditionalOnProperty(
         name = "discordit.repository.type",
         havingValue = "jcf")
 public class JCFBinaryContentRepository implements BinaryContentRepository {
-    private static final Map<UUID, List<BinaryContent>> binaryContentMap = new HashMap<>();
+    private static final Map<UUID, BinaryContent> binaryContentMap = new HashMap<>();
 
     @Override
     public void save() {
@@ -21,47 +20,26 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void addBinaryContent(BinaryContent content) {
-        binaryContentMap.computeIfAbsent(content.referenceId(), k -> new ArrayList<>()).add(content);
+        binaryContentMap.put(content.getId(), content);
     }
 
     @Override
-    public BinaryContent findBinaryContentById(UUID id) {
-        return binaryContentMap.values().stream()
-                .flatMap(List::stream)
-                .filter(content -> content.id().equals(id))
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public BinaryContent findBinaryContentByUserId(UUID referenceId) {
-        return binaryContentMap.getOrDefault(referenceId, Collections.emptyList())
-                .stream()
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public List<BinaryContent> findBinaryContentByMessageId(UUID referenceId) {
-        return binaryContentMap.getOrDefault(referenceId, Collections.emptyList());
+    public BinaryContent findBinaryContentById(UUID binaryContentId) {
+        return binaryContentMap.get(binaryContentId);
     }
 
     @Override
     public List<BinaryContent> findAllBinaryContents() {
-        return binaryContentMap.values().stream()
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+        return new ArrayList<>(binaryContentMap.values());
     }
 
     @Override
-    public void deleteBinaryContent(UUID binaryContentId) {
-        binaryContentMap.values().forEach(list -> list.removeIf(content -> content.id().equals(binaryContentId)));
+    public void deleteBinaryContentById(UUID binaryContentId) {
+        binaryContentMap.remove(binaryContentId);
     }
 
     @Override
     public boolean existsBinaryContent(UUID binaryContentId) {
-        return binaryContentMap.values().stream()
-                .flatMap(List::stream)
-                .anyMatch(content -> content.id().equals(binaryContentId));
+        return binaryContentMap.containsKey(binaryContentId);
     }
 }

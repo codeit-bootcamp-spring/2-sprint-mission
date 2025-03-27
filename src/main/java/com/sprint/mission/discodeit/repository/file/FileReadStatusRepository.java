@@ -39,31 +39,17 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void addUser(UUID channelId, UUID userId) {
-        readStatusMap.values().stream()
+    public ReadStatus findReadStatusById(UUID userId, UUID channelId) {
+        return readStatusMap.values().stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
                 .findFirst()
-                .ifPresent(readStatus -> readStatus.addUser(userId));
-        save();
-    }
-
-    @Override
-    public ReadStatus findReadStatusById(UUID id) {
-        return readStatusMap.get(id);
+                .orElse(null);
     }
 
     @Override
     public List<ReadStatus> findAllReadStatus() {
         return new ArrayList<>(readStatusMap.values());
-    }
-
-    @Override
-    public void updateTime(UUID channelId, UUID userId) {
-        readStatusMap.values().stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .findFirst()
-                .ifPresent(readStatus -> readStatus.updateLastAccessTime(userId));
-        save();
     }
 
     @Override

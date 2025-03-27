@@ -34,7 +34,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void addBinaryContent(BinaryContent content) {
-        binaryContentMap.put(content.id(), content);
+        binaryContentMap.put(content.getId(), content);
         save();
     }
 
@@ -43,20 +43,6 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         return binaryContentMap.get(id);
     }
 
-    @Override
-    public BinaryContent findBinaryContentByUserId(UUID referenceId) {
-        return binaryContentMap.values().stream()
-                .filter(content -> content.id().equals(referenceId))
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public List<BinaryContent> findBinaryContentByMessageId(UUID referenceId) {
-        return binaryContentMap.values().stream()
-                .filter(content -> content.id().equals(referenceId))
-                .toList();
-    }
 
     @Override
     public List<BinaryContent> findAllBinaryContents() {
@@ -64,14 +50,13 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public void deleteBinaryContent(UUID referenceId) {
-        binaryContentMap.values()
-                .removeIf(content -> content.id().equals(referenceId));
+    public void deleteBinaryContentById(UUID contentId) {
+        binaryContentMap.remove(contentId);
         save();
     }
 
     @Override
-    public boolean existsBinaryContent(UUID referenceId) {
-        return binaryContentMap.containsKey(referenceId);
+    public boolean existsBinaryContent(UUID contentId) {
+        return binaryContentMap.containsKey(contentId);
     }
 }
