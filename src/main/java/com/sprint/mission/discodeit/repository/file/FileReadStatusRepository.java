@@ -42,14 +42,6 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void update(UUID readStatusUUID) {
-        ReadStatus readStatus = find(readStatusUUID)
-                .orElseThrow(() -> new RuntimeException("채널 접속 상태를 찾을 수 없습니다."));
-        readStatus.updateLastReadAt();
-        fileManager.writeToFile(SubDirectory.READ_STATUS, readStatus, readStatus.getId());
-    }
-
-    @Override
     public void delete(UUID readStatusUUID) {
         fileManager.deleteFileById(SubDirectory.READ_STATUS, readStatusUUID);
     }

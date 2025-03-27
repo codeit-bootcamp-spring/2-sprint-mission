@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -52,7 +53,10 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void update(UpdateReadStatusParamDto updateReadStatusParamDto) {
-        readStatusRepository.update(updateReadStatusParamDto.readStatusUUID());
+        ReadStatus readStatus = readStatusRepository.find(updateReadStatusParamDto.readStatusUUID())
+                        .orElseThrow(() -> new NoSuchElementException("읽은 상태를 찾을 수 없습니다."));
+
+        readStatusRepository.save(readStatus);
     }
 
     @Override

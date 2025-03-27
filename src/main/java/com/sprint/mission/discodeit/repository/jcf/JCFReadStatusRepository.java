@@ -41,14 +41,6 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void update(UUID readStatusUUID) {
-        readStatusList.stream()
-                .filter(readStatus -> readStatus.getId().equals(readStatusUUID))
-                .findAny()
-                .ifPresent(ReadStatus::updateLastReadAt);
-    }
-
-    @Override
     public void delete(UUID readStatusUUID) {
         readStatusList.removeIf(readStatus -> readStatus.getId().equals(readStatusUUID));
     }

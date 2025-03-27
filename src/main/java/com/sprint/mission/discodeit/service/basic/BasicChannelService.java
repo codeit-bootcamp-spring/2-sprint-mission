@@ -90,21 +90,6 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public UUID joinChannel(UUID channelUUID, UUID userUUID) {
-        Channel channel = channelRepository.findChannelById(channelUUID)
-                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다."));
-
-        if(channel.getChannelType().equals(ChannelType.PRIVATE)){
-            ReadStatus readStatus = readStatusRepository.findByChannelId(channelUUID).stream()
-                    .filter(data -> data.getUserId().equals(userUUID))
-                    .findAny()
-                    .orElseThrow(() -> new IllegalArgumentException("private채널은 초대된 사용자만 입장 가능"));
-            readStatusRepository.update(readStatus.getId());
-        }
-        return channel.getId();
-    }
-
-    @Override
     public List<CheckReadStatusDto> checkReadStatusByUserId(UUID userUUID) {
         return readStatusRepository.findByUserId(userUUID).stream()
                 .map(readStatus -> {
