@@ -13,7 +13,7 @@ public interface MessageService {
     UUID createMessage(MessageCreateRequest messageCreateRequest);
     Message readMessage(UUID messageId);
     List<Message> findAllByChannelId(UUID channelId);
-    void updateMessage(MessageUpdateRequest messageUpdateRequest);
+    void updateMessage(UUID id, MessageUpdateRequest messageUpdateRequest);
     void deleteBinaryContentInMessage(UUID messageId, UUID binaryContentId);
     void deleteMessage(UUID messageId);
     static void validateMessageId(UUID messageId, MessageRepository jcfMessageRepository) {

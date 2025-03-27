@@ -69,15 +69,15 @@ public class BasicMessageService implements MessageService {
 
     // binaryContent를 업데이트할지 다음 미션의 컨트롤러에서 결정할 것!
     @Override
-    public void updateMessage(MessageUpdateRequest messageUpdateRequest) {
-        Message findMessage = this.messageRepository.findById(messageUpdateRequest.messageId());
+    public void updateMessage(UUID id, MessageUpdateRequest messageUpdateRequest) {
+        Message findMessage = this.messageRepository.findById(id);
         for(UUID attachmentId : messageUpdateRequest.attachmentIds()) {
             if (!binaryContentService.existsById(attachmentId)) {
                 throw new NoSuchElementException("해당 Id가 binaryContentRepository에 존재하지 않습니다 : " + attachmentId);
             }
         }
         List<MessageUpdater> applicableUpdaters = messageUpdaterProvider.getApplicableUpdaters(findMessage, messageUpdateRequest);
-        applicableUpdaters.forEach(updater -> updater.update(findMessage, messageUpdateRequest, this.messageRepository));
+        applicableUpdaters.forEach(updater -> updater.update(id, messageUpdateRequest, this.messageRepository));
     }
 
     @Override
