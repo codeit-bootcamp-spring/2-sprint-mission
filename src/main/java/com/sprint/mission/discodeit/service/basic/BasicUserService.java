@@ -24,7 +24,6 @@ import java.util.UUID;
 @Service
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    //
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
 
