@@ -25,15 +25,7 @@ public interface ChannelService {
 
     void updateChannel(UUID channelId, UpdateChannelRequest request);
 
-    void addUser(UUID channelId, UUID userId); //유저 추가
-
-    void addMessage(UUID channelId, UUID messageId);   //메세지 추가
-
     void deleteChannel(UUID channelId); //채널 삭제
-
-    void removeUser(UUID channelId, UUID userId); //유저 삭제
-
-    void removeMessage(UUID channelId, UUID messageId); //메세지 삭제
 
     void validateChannelExists(UUID channelId); // 채널 존재 확인
 }
