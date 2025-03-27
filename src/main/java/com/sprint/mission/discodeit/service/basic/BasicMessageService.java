@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageReadResponse;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -19,6 +20,7 @@ import com.sprint.mission.discodeit.updater.message.MessageUpdater;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -62,9 +64,13 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
+    public List<MessageReadResponse> findAllByChannelId(UUID channelId) {
         ChannelService.validateChannelId(channelId, this.channelRepository);
-        return this.messageRepository.findMessageListByChannelId(channelId);
+        List<MessageReadResponse> messageReadResponses = new ArrayList<>();
+        for(Message message : messageRepository.findMessageListByChannelId(channelId)) {
+            messageReadResponses.add(new MessageReadResponse(message.getId(), message.getContent(), message.getAttachmentIds()));
+        }
+        return messageReadResponses;
     }
 
     // binaryContent를 업데이트할지 다음 미션의 컨트롤러에서 결정할 것!
