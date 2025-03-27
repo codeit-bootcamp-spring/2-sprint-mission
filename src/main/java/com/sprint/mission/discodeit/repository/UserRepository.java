@@ -7,9 +7,6 @@ import java.util.UUID;
 import java.util.Optional;
 
 public interface UserRepository {
-
-    Map<UUID, User> getUserData();
-
     User save(User user);
 
     User update(User user, String newUsername, String newEmail, String newPassword, UUID newProfileId);
