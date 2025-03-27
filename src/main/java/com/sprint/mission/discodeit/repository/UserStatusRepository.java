@@ -4,9 +4,7 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface UserStatusRepository {
     UserStatus save(UserStatus userStatus);
 

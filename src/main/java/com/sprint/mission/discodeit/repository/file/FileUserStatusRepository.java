@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import java.io.File;
@@ -9,42 +10,60 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserStatusRepository implements UserStatusRepository {
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
+    //
     private Map<UUID, UserStatus> userStatusData;
-    private static final String USER_STATUS_FILE_PATH = "userStatus.ser";
+    private final Path userStatusFilePath;
 
-    public FileUserStatusRepository() {
+    public FileUserStatusRepository(@Value("${discodeit.repository.file-directory:data}") String fileDirectory) {
+
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, UserStatus.class.getSimpleName());
+        this.userStatusFilePath = DIRECTORY.resolve("userStatus" + EXTENSION);
+
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException("디렉토리 생성 실패: " + e.getMessage(), e);
+            }
+        }
         dataLoad();
     }
 
     public void dataLoad() {
-        File file = new File(USER_STATUS_FILE_PATH);
-        if (!file.exists()) {
+        if (!Files.exists(userStatusFilePath)) {
             userStatusData = new HashMap<>();
             dataSave();
             return;
         }
-        try (FileInputStream fis = new FileInputStream(USER_STATUS_FILE_PATH);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(userStatusFilePath.toFile()))) {
             userStatusData = (Map<UUID, UserStatus>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            throw new RuntimeException("파일을 불러올 수 없습니다.");
+            throw new RuntimeException("파일을 불러올 수 없습니다.", e);
         }
     }
 
     public void dataSave() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_STATUS_FILE_PATH))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(userStatusFilePath.toFile()))) {
             oos.writeObject(userStatusData);
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException("파일을 저장할 수 없습니다."+ e.getMessage(), e);
         }
     }

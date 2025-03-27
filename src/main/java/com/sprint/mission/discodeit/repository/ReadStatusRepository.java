@@ -3,9 +3,7 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface ReadStatusRepository {
     ReadStatus save(ReadStatus readStatus);
     ReadStatus findById(UUID id);
