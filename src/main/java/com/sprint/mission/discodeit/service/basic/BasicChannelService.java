@@ -32,7 +32,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
 
-        Channel newChannel = new Channel(ChannelType.PRIVATE, null, null);
+        Channel newChannel = Channel.createPrivate();
         channelRepository.save(newChannel);
 
         channelCreatePrivateDto.users().forEach(user -> {
@@ -57,8 +57,7 @@ public class BasicChannelService implements ChannelService {
             throw new RuntimeException(channelCreatePublicDto.name() + " 채널은 이미 존재합니다.");
         }
 
-        Channel newChannel = new Channel(ChannelType.PUBLIC, channelCreatePublicDto.name(),
-                channelCreatePublicDto.description());
+        Channel newChannel = Channel.createPublic(channelCreatePublicDto.name(), channelCreatePublicDto.description());
         channelRepository.save(newChannel);
 
         return newChannel;
