@@ -27,11 +27,12 @@ public class User implements Serializable {
     @Builder
     public User(String username, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
-        this.profileId = profileId == null ? DEFAULT_PROFILE_ID : profileId;
+        this.profileId = profileId;
+        this.updatedAt = Instant.now();
         this.createdAt = Instant.now();
         this.username = username;
         this.email = email;
-        this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+        this.password = password;
     }
 
 
@@ -56,12 +57,12 @@ public class User implements Serializable {
     }
 
     public void updateProfile(UUID profileId) {
-        UUID newProfileId = profileId == null ? DEFAULT_PROFILE_ID : profileId;
+        this.profileId = profileId;
+        this.updatedAt = Instant.now();
+    }
 
-        if(!this.profileId.equals(profileId)) {
-            this.profileId = newProfileId;
-            this.updatedAt = Instant.now();
-        }
+    public void updateProfileDefault() {
+        this.profileId = DEFAULT_PROFILE_ID;
     }
 
 }

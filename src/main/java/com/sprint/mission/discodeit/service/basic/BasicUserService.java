@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.util.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,7 +79,7 @@ public class BasicUserService implements UserService {
     public UUID update(UUID userId, UpdateUserParam updateUserParam, MultipartFile multipartFile) {
         User findUser = findUserById(userId);
         findUser.updateUserInfo(updateUserParam.username(), updateUserParam.email(), updateUserParam.password());
-        if (multipartFile != null) { // 프로필 변경 요청이 있을 때만 업데이트
+        if (multipartFile != null && !multipartFile.isEmpty()) { // 프로필을 유지하거나 프로필 변경 요청이 있을 때 업데이트
             // 기본 프로필 ID가 아닐 때만 기존 이미지 삭제
             if (!findUser.getProfileId().equals(User.DEFAULT_PROFILE_ID)) {
                 binaryContentService.delete(findUser.getProfileId());
@@ -86,16 +87,21 @@ public class BasicUserService implements UserService {
             BinaryContent binaryContent = createBinaryContentEntity(multipartFile);
             BinaryContent createdBinaryContent = binaryContentService.create(binaryContent);
             findUser.updateProfile(createdBinaryContent.getId());
+        } else { // 기본 프로필로 변경할 때
+            if (!findUser.getProfileId().equals(User.DEFAULT_PROFILE_ID)) {
+                binaryContentService.delete(findUser.getProfileId());
+            }
+            findUser.updateProfileDefault();
         }
-        userRepository.save(findUser);
-        return userId;
+        User user = userRepository.save(findUser);
+        return user.getId();
     }
 
     @Override
     public void delete(UUID userId) {
         User user = findUserById(userId);
         userRepository.deleteById(userId);
-        // 기본 프로필 ID가 아닐 때만 삭제
+        // 기본 프로필 ID가 아닐 때만 프로필 파일 삭제
         if (!user.getProfileId().equals(User.DEFAULT_PROFILE_ID)) {
            binaryContentService.delete(user.getProfileId());
         }
@@ -121,10 +127,10 @@ public class BasicUserService implements UserService {
         }
     }
 
-    public static User createUserEntity(CreateUserParam createUserParam, BinaryContent binaryContent) {
+    private User createUserEntity(CreateUserParam createUserParam, BinaryContent binaryContent) {
         return User.builder()
                 .username(createUserParam.username())
-                .password(createUserParam.password())
+                .password(BCrypt.hashpw(createUserParam.password(), BCrypt.gensalt()))
                 .email(createUserParam.email())
                 .profileId(binaryContent != null ? binaryContent.getId() : User.DEFAULT_PROFILE_ID)
                 .build();
