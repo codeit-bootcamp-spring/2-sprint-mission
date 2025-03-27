@@ -1,28 +1,25 @@
 package com.sprint.mission.discodeit.utils;
 
-import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.constant.SubDirectory;
 import com.sprint.mission.discodeit.dto.BinaryDataResponseDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryData;
-import com.sprint.mission.discodeit.entity.Message;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component
-@Configuration
 public class FileManager {
 
-    //private final String BASE_DIR = System.getProperty("user.dir") + "\\src\\main\\resources\\dir\\";
-
-    private String BASE_DIR;
+    private final String BASE_DIR;
     private final String DATA_EXTENSION = ".ser";
 
-    public FileManager(RepositoryProperties repositoryProperties) {
-        this.BASE_DIR = System.getProperty("user.dir") + repositoryProperties.getFileDirectory();
+    public FileManager(@Value("${discodeit.repository.file-directory}") String fileDirectory) {
+        this.BASE_DIR = System.getProperty("user.dir") + fileDirectory;
     }
 
     public <T extends Serializable> void writeToFile(SubDirectory subDirectory, T object, UUID id) {
