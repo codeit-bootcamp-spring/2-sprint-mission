@@ -10,8 +10,7 @@ public enum SubDirectory {
     USER_STATUS("userstatus"),
     READ_STATUS("readstatus"),
     BINARY_CONTENT("binarycontent"),
-    PROFILE("profile"),
-    FILE("file");
+    BINARY_DATA("binarydata");
 
     private final String directory;
 

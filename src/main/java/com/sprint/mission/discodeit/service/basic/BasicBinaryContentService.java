@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.constant.SubDirectory;
 import com.sprint.mission.discodeit.dto.SaveBinaryContentParamDto;
 import com.sprint.mission.discodeit.dto.SaveFileDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -9,8 +10,8 @@ import com.sprint.mission.discodeit.utils.FileManager;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Paths;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -22,9 +23,9 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent save(SaveBinaryContentParamDto saveBinaryContentParamDto) {
-        String originalFileName = Paths.get(saveBinaryContentParamDto.filePath()).getFileName().toString();
-        byte[] profile = saveBinaryContentParamDto.profile();
-        SaveFileDto saveImageDto = fileManager.writeToFile(saveBinaryContentParamDto.subDirectory(), profile, originalFileName);
+        String originalFileName = saveBinaryContentParamDto.fileName();
+        byte[] profile = saveBinaryContentParamDto.fileData();
+        SaveFileDto saveImageDto = fileManager.writeToFile(SubDirectory.BINARY_DATA, profile, originalFileName);
         BinaryContent binaryContent = new BinaryContent(saveImageDto.filePath(), saveImageDto.fileName(), originalFileName);
         binaryContentRepository.save(binaryContent);
         return binaryContent;
@@ -33,7 +34,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContent findById(UUID binaryContentUUID) {
         return binaryContentRepository.findById(binaryContentUUID)
-                .orElseThrow(NullPointerException::new);
+                .orElseThrow(() -> new NoSuchElementException("파일을 찾는데 실패하였습니다."));
     }
 
     @Override

@@ -125,9 +125,9 @@ public class FileManager {
 
     public SaveFileDto writeToFile(SubDirectory subDirectory, byte[] fileData, String originalFileName) {
         String extension = getFileExtension(originalFileName);
-        if (subDirectory.equals(SubDirectory.PROFILE)&&!isValidImageExtension(extension)) {
-            throw new IllegalArgumentException("[실패] 허용되지 않은 파일 형식");
-        }
+        //if (subDirectory.equals(SubDirectory.PROFILE)&&!isValidImageExtension(extension)) {
+        //    throw new IllegalArgumentException("[실패] 허용되지 않은 파일 형식");
+        //}
 
         String fileName = UUID.randomUUID().toString() + "." + extension;
         String filePath = BASE_DIR + subDirectory.getDirectory() + "\\" + fileName;
