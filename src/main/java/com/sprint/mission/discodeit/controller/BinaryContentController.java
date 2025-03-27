@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -35,6 +36,13 @@ public class BinaryContentController {
         BinaryContent binaryContent = binaryContentService.find(binaryContentId);
 
         return new ResponseEntity<>(binaryContent, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
+    public ResponseEntity<List<BinaryContent>> findMultipleBinaryContent(
+            @RequestParam List<UUID> binaryContentIds) {
+        List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+        return new ResponseEntity<>(binaryContents, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/delete/{binaryContentId}", method = RequestMethod.DELETE)

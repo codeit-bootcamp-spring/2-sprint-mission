@@ -12,13 +12,13 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/api/userstatus")
 public class UserStatusController {
     private final UserStatusService userStatusService;
 
-    @RequestMapping(value = "/{userId}/status", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.PUT)
     public ResponseEntity<Void> updateUserStatus(
-            @PathVariable UUID userId,
+            @RequestParam UUID userId,
             @RequestParam boolean isOnline) {
 
         UserStatusUpdateRequest updateRequest = new UserStatusUpdateRequest(isOnline ? Instant.now() : null);

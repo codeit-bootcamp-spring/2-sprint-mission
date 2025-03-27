@@ -40,9 +40,9 @@ public class ChannelController {
         return new ResponseEntity<>(channelDto, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/update/{channelId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.PUT)
     private ResponseEntity<ChannelDto> updatePublicChannel(
-            @PathVariable UUID channelId,
+            @RequestParam UUID channelId,
             @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
 
         Channel updatePublicChannel = channelService.update(channelId, publicChannelUpdateRequest);
@@ -51,18 +51,18 @@ public class ChannelController {
         return new ResponseEntity<>(channelDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/delete/{channelId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     private ResponseEntity<Void> deleteChannel(
-            @PathVariable UUID channelId){
+            @RequestParam UUID channelId){
 
         channelService.delete(channelId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
     private ResponseEntity<List<ChannelDto>> getChannelByUser(
-            @PathVariable UUID userId) {
+            @RequestParam UUID userId) {
 
         List<ChannelDto> channelDtos = channelService.findAllByUserId(userId);
 

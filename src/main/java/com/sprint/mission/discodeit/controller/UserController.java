@@ -50,9 +50,9 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/update/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update/", method = RequestMethod.PUT)
     private ResponseEntity<UserDto> updateUser(
-            @PathVariable UUID userId,
+            @RequestParam UUID userId,
             @RequestParam("userUpdate") String userJson,
             @RequestParam("profile") Optional<MultipartFile> profileFile) throws IOException {
 
@@ -77,9 +77,9 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/delete/{userId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     private ResponseEntity<Void> deleteUser(
-            @PathVariable UUID userId) {
+            @RequestParam UUID userId) {
 
         userService.delete(userId);
 
