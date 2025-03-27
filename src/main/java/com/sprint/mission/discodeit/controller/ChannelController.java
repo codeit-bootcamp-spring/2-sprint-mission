@@ -54,7 +54,7 @@ public class ChannelController {
     }
 
     @GetMapping("{channelId}/messages")
-    public ResponseEntity<ApiResponse<List<Message>>> findAllByChannel(@PathVariable UUID channelId) {
+    public ResponseEntity<ApiResponse<List<Message>>> findAllMessagesByChannel(@PathVariable UUID channelId) {
         List<Message> messages = messageService.findAllByChannelId(channelId);
         ApiResponse<List<Message>> apiResponse = new ApiResponse<>("채널의 메시지 목록 조회 성공", messages);
         return ResponseEntity.ok(apiResponse);

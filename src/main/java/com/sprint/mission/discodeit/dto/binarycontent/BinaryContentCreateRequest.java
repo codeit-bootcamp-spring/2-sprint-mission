@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.binarycontent;
 
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
