@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/users/")
+@RequestMapping("/api/user/")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -71,14 +71,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/find/{id}", method = RequestMethod.GET)
     public ResponseEntity<UserDto> findById(@PathVariable UUID id) {
         UserDto userDto  = userService.find(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(userDto);
     }
 
-    @RequestMapping(value = "/getAll")
+    @RequestMapping(value = "/findAll")
     public ResponseEntity<List<UserDto>> findAll() {
         List<UserDto> userDtos = userService.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(userDtos);

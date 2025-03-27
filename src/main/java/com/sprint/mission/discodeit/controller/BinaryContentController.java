@@ -11,26 +11,20 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/binary/")
+@RequestMapping("/api/binaryContent/")
 @RequiredArgsConstructor
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
-    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public ResponseEntity<ByteArrayResource> get(@PathVariable UUID id) {
-        BinaryContent content = binaryContentService.find(id);
-        ByteArrayResource resource = new ByteArrayResource(content.getBytes());
-
-        return ResponseEntity.ok()
-                .contentLength(content.getSize())
-                .contentType(MediaType.parseMediaType(content.getContentType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + content.getFileName() + "\"")
-                .body(resource);
+    @RequestMapping(value = "/find", method = RequestMethod.GET)
+    public ResponseEntity<BinaryContent> get(@RequestParam UUID binaryContentId) {
+        BinaryContent content = binaryContentService.find(binaryContentId);
+        return ResponseEntity.ok(content);
     }
 
-    @RequestMapping(value = "/getMultiple", method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContent>> getMultiple(@RequestParam List<UUID> ids) {
-        List<BinaryContent> contents = binaryContentService.findAllByIdIn(ids);
+    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
+    public ResponseEntity<List<BinaryContent>> getMultiple(@RequestParam List<UUID> binaryContentId) {
+        List<BinaryContent> contents = binaryContentService.findAllByIdIn(binaryContentId);
         return ResponseEntity.status(HttpStatus.OK).body(contents);
     }
 }
