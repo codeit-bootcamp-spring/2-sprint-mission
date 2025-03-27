@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class MessageContentUpdater implements MessageUpdater {
     @Override
@@ -13,7 +15,7 @@ public class MessageContentUpdater implements MessageUpdater {
     }
 
     @Override
-    public void update(Message message, MessageUpdateRequest request, MessageRepository messageRepository) {
-        messageRepository.updateMessageContent(message.getId(), request.content());
+    public void update(UUID messageId, MessageUpdateRequest request, MessageRepository messageRepository) {
+        messageRepository.updateMessageContent(messageId, request.content());
     }
 }
