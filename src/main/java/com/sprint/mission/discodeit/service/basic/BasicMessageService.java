@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
@@ -55,13 +56,32 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Optional<Message> getMessageById(UUID messageId) {
-        return messageRepository.getMessageById(messageId);
+    public Optional<MessageResponse> getMessageById(UUID messageId) {
+        return messageRepository.getMessageById(messageId)
+                .map(message -> new MessageResponse(
+                        message.getId(),
+                        message.getUserId(),
+                        message.getChannelId(),
+                        message.getText(),
+                        message.getAttachmentIds(),
+                        message.getCreatedAt(),
+                        message.getUpdatedAt()
+                ));
     }
 
     @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.getAllMessagesByChannel(channelId);
+    public List<MessageResponse> findAllByChannelId(UUID channelId) {
+        return messageRepository.getAllMessagesByChannel(channelId).stream()
+                .map(message -> new MessageResponse(
+                        message.getId(),
+                        message.getUserId(),
+                        message.getChannelId(),
+                        message.getText(),
+                        message.getAttachmentIds(),
+                        message.getCreatedAt(),
+                        message.getUpdatedAt()
+                ))
+                .toList();
     }
 
     @Override
