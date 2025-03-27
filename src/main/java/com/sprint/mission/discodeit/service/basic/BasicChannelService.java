@@ -80,10 +80,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(ChannelUpdateRequest channelUpdateRequest) {
-        Channel findChannel = this.channelRepository.findById(channelUpdateRequest.channelId());
+    public void updateChannel(UUID channelId, ChannelUpdateRequest channelUpdateRequest) {
+        Channel findChannel = this.channelRepository.findById(channelId);
         List<ChannelUpdater> applicableUpdaters = updaterProvider.getApplicableUpdaters(findChannel, channelUpdateRequest);
-        applicableUpdaters.forEach(updater -> updater.update(findChannel, channelUpdateRequest, this.channelRepository));
+        applicableUpdaters.forEach(updater -> updater.update(channelId, channelUpdateRequest, this.channelRepository));
     }
 
     // 삭제해야 될지도? 추후 필요할지도 모르니 일단 남겨두겠음 (스프린트미션3 기준 public은 참여자 정보가 필요없고, private은 참여자 정보가 필요함. 하지만 private은 생성 후 수정 불가능)
