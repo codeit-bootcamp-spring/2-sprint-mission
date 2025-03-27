@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.common.NoSuchIdException;
+import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.provider.MessageUpdaterProvider;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -36,14 +38,17 @@ public class BasicMessageService implements MessageService {
         UserService.validateUserId(messageCreateRequest.senderId(), this.userRepository);
         ChannelService.validateChannelId(messageCreateRequest.channelId(), this.channelRepository);
         Channel channel = channelRepository.findById(messageCreateRequest.channelId());
-        // 해당 채널에 sender가 participant로 있는지 확인하는 코드 필요?
-        if (!channel.getParticipantIds().contains(messageCreateRequest.senderId())) {
+        // Private 채널인 경우 sender가 participants로 있는지 확인
+        if (channel.getChannelType() == ChannelType.PRIVATE && !channel.getParticipantIds().contains(messageCreateRequest.senderId())) {
             throw new NoSuchElementException("해당 senderId를 가진 사용자가 해당 channelId의 Channel에 참여하지 않았습니다.");
         }
         Message newMessage = new Message(messageCreateRequest.senderId(), messageCreateRequest.content(), messageCreateRequest.channelId());     // content에 대한 유효성 검증은 Message 생성자에게 맡긴다.
-        if (messageCreateRequest.requests() != null) {      // 프론트에서 json을 전달할 때, reqeust 부분을 비워놓지 않고 반드시 빈 리스트로 만들어서 전달하면 필요 없을듯?
-            for (BinaryContentCreateRequest request : messageCreateRequest.requests()) {
-                newMessage.addAttachment(this.binaryContentService.create(request));    // binaryContentService를 통해 binaryContent를 생성하고 id를 message에 넣기
+        if (messageCreateRequest.attachmentIds() != null) {      // 프론트에서 json을 전달할 때, attachmentIds 부분을 비워놓지 않고 반드시 빈 리스트로 만들어서 전달하면 필요 없을듯?
+            for (UUID attachmentId : messageCreateRequest.attachmentIds()) {
+                if (!binaryContentService.existsById(attachmentId)) {
+                    throw new NoSuchIdException("해당 attachmentId가 존재하지 않습니다 : " + attachmentId);
+                }
+                newMessage.addAttachment(attachmentId);    // binaryContentService를 통해 binaryContent를 생성하고 id를 message에 넣기
             }
         }
         this.messageRepository.add(newMessage);
