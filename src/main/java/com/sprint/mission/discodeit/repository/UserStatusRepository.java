@@ -10,9 +10,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserStatusRepository {
-
-    Map<UUID, UserStatus> getUserStatusData();
-
     UserStatus save(UserStatus userStatus);
 
     UserStatus update(UserStatusUpdateRequestDto dto);
@@ -22,8 +19,6 @@ public interface UserStatusRepository {
     UserStatus findById(UUID userStatusId);
 
     UserStatus findByUserId(UUID userId);
-
-    Instant getLastOnlineTime(UUID userId);
 
     void delete(UUID userStatusId);
 }

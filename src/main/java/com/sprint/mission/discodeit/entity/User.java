@@ -8,7 +8,7 @@ import java.io.Serializable;
 import lombok.Getter;
 
 @Getter
-public class User implements Serializable {
+public class User extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
     private Instant createdAt;
@@ -21,8 +21,7 @@ public class User implements Serializable {
     private UUID profileId;
 
     public User(String username, String email, String password, UUID profileId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+        super();
         //
         this.username = username;
         this.email = email;

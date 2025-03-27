@@ -7,7 +7,7 @@ import java.io.Serializable;
 import lombok.Getter;
 
 @Getter
-public class Message implements Serializable {
+public class Message extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
     private Instant createdAt;
@@ -20,8 +20,7 @@ public class Message implements Serializable {
     private List<UUID> attachmentIds;
 
     public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+        super();
         //
         this.content = content;
         this.channelId = channelId;

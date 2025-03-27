@@ -6,7 +6,7 @@ import java.io.Serializable;
 import lombok.Getter;
 
 @Getter
-public class Channel implements Serializable {
+public class Channel extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
     private Instant createdAt;
@@ -17,8 +17,7 @@ public class Channel implements Serializable {
     private String description;
 
     public Channel(ChannelType type, String name, String description) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+        super();
         //
         this.type = type;
         this.name = name;

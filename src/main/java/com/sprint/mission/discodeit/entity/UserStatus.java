@@ -7,7 +7,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class UserStatus implements Serializable {
+public class UserStatus extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     //
     private UUID id;
@@ -19,9 +19,7 @@ public class UserStatus implements Serializable {
     private UUID userId;
 
     public UserStatus(UUID userId, Instant activatedAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
+        super();
         this.type = UserStatusType.OFFLINE;
         this.userId = userId;
         this.activatedAt = activatedAt;
