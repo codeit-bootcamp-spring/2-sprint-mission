@@ -19,11 +19,11 @@ public class UserStatus extends BaseEntity {
         this.lastConnectionTime = LastConnectionTime;
     }
 
-    public CurrentStatus currentUserStatus() {
+    public boolean currentUserStatus() {
         if (Duration.between(lastConnectionTime, Instant.now()).getSeconds() < 300) {
-            return CurrentStatus.ACTIVE;
+            return true;
         } else {
-            return CurrentStatus.INACTIVE;
+            return false;
         }
     }
 

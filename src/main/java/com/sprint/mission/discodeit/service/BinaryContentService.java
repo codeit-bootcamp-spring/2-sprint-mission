@@ -5,12 +5,13 @@ import com.sprint.mission.discodeit.service.dto.binarycontentdto.*;
 
 
 import java.util.List;
+import java.util.UUID;
 
 public interface BinaryContentService {
 
     BinaryContent create(BinaryContentCreateDto binaryContentCreateDto);
-    BinaryContent getUser(BinaryContentFindDto binaryContentFindDto);
-    List<BinaryContent> getAllUser();
+    BinaryContent find(UUID id);
+    List<BinaryContent> findAll();
     BinaryContent updateByUserId(BinaryContentUpdateDto binaryContentUpdateDto);
     void delete(BinaryContentDeleteDto binaryContentDeleteDto);
 

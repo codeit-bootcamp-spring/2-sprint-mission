@@ -12,11 +12,13 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.dto.channeldto.*;
-import com.sprint.mission.discodeit.service.dto.readstatusdto.ReadStatusCreateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,32 +27,32 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
-    private final ReadStatusService readStatusService;
 
 
     @Override
     public Channel createPrivate(ChannelCreateDto channelCreatePrivateDto) {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         Channel createdPirvateChannel = channelRepository.save(channel);
-        System.out.println(createdPirvateChannel);
 
         // Read Status 생성
-        ReadStatusCreateDto readStatusCreateDto = new ReadStatusCreateDto(channelCreatePrivateDto.userId(), createdPirvateChannel.getId());
-        ReadStatus createdReadStatus = readStatusService.create(readStatusCreateDto);
-        System.out.println(createdReadStatus);
+        channelCreatePrivateDto.userId().stream()
+                .map(userId -> new ReadStatus(userId, createdPirvateChannel.getId(), Instant.MIN))
+                .forEach(readStatusRepository::save);
+
         return createdPirvateChannel;
     }
 
 
     @Override
     public Channel createPublic(ChannelCreateDto channelCreatePublicDto) {
-        Channel channel = new Channel(ChannelType.PUBLIC, channelCreatePublicDto.channelName(), channelCreatePublicDto.description());
-        Optional<Channel> ChannelList = channelRepository.load().stream()
+        List<Channel> channelList = channelRepository.load();
+        Optional<Channel> matchingChannel = channelList.stream()
                 .filter(c -> c.getChannelName().equals(channelCreatePublicDto.channelName()))
                 .findAny();
-        if (ChannelList.isPresent()) {
+        if (matchingChannel.isPresent()) {
             throw new InvalidInputException("A channel already exists.");
         }
+        Channel channel = new Channel(ChannelType.PUBLIC, channelCreatePublicDto.channelName(), channelCreatePublicDto.description());
         Channel createdPublicChannel = channelRepository.save(channel);
         System.out.println(createdPublicChannel);
         return createdPublicChannel;

@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.service.dto.readstatusdto.ReadStatusUpdateDt
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -49,7 +50,8 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new InvalidInputException("Read status already exists");
         }
 
-        ReadStatus readStatus = new ReadStatus(matchingUser.getId(), matchingChannel.getId());
+        Instant lastReadAt = readStatusCreateDto.lastReadTime();
+        ReadStatus readStatus = new ReadStatus(matchingUser.getId(), matchingChannel.getId(), lastReadAt);
         readStatusRepository.save(readStatus);
         return readStatus;
 
@@ -79,7 +81,8 @@ public class BasicReadStatusService implements ReadStatusService {
                 .filter(m->m.getUserId().equals(readStatusUpdateDto.userId()) && m.getChannelId().equals(readStatusUpdateDto.channelId()))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("readStatus not found"));
-        matchingReadStatus.readStatusUpdate();
+        Instant newLastReadTime = readStatusUpdateDto.newLastReadTime();
+        matchingReadStatus.readStatusUpdate(newLastReadTime);
         return readStatusRepository.save(matchingReadStatus);
     }
 

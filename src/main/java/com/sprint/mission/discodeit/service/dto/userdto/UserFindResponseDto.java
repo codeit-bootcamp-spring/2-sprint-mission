@@ -9,19 +9,21 @@ import java.util.UUID;
 
 public record UserFindResponseDto(
         UUID userId,
+        Instant createdAt,
+        Instant updatedAt,
         String name,
         String email,
         UUID profileId,
-        Instant createdAt,
-        CurrentStatus userStatus
+        Boolean online
 ) {
     public static UserFindResponseDto UserFindResponse(User user, UserStatus userStatus) {
         return new UserFindResponseDto(
                 user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
                 user.getName(),
                 user.getEmail(),
                 user.getProfileId(),
-                user.getCreatedAt(),
                 userStatus.currentUserStatus()
 
         );

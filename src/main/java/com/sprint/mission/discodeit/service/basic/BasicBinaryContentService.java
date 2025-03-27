@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 
 @Service
@@ -38,16 +39,16 @@ public class BasicBinaryContentService implements BinaryContentService {
 
 
     @Override
-    public BinaryContent getUser(BinaryContentFindDto binaryContentFindDto) {
+    public BinaryContent find(UUID id) {
         return binaryContentRepository.load().stream()
-                .filter(m -> m.getId().equals(binaryContentFindDto.Id()))
+                .filter(m -> m.getId().equals(id))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("Profile not found."));
     }
 
 
     @Override
-    public List<BinaryContent> getAllUser() {
+    public List<BinaryContent> findAll() {
         List<BinaryContent> binaryContentList = binaryContentRepository.load();
         if (binaryContentList.isEmpty()) {
             throw new NotFoundException("Profile not found.");

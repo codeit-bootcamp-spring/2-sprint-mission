@@ -35,7 +35,7 @@ public class Application {
 //		String userUuid1 = "31802009-fe37-481c-8d0e-a7fcac00dcd3";
 //		UUID userUuid2 = UUID.fromString(userUuid1);
 //		BinaryContentFindDto find = new BinaryContentFindDto(userUuid2);
-//		BinaryContent print1 = binaryContentService.getUser(find);
+//		BinaryContent print1 = binaryContentService.find(find);
 //		System.out.println(print1);
 //
 //		BinaryContentDeleteDto delete = new BinaryContentDeleteDto(userUuid2);
