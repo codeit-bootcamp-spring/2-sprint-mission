@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -50,5 +51,11 @@ public class ChannelController {
                 .body(response);
     }
 
-
+    @GetMapping("/{userId}/channelList")
+    public ResponseEntity<ApiResponse<List<ChannelReadResponse>>> findAllByUserId(@PathVariable UUID userId) {
+        List<ChannelReadResponse> readResponses = channelService.findAllByUserId(userId);
+        ApiResponse<List<ChannelReadResponse>> response = new ApiResponse<>(true, "채널 불러오기 성공", readResponses);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
 }
