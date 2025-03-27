@@ -9,6 +9,7 @@ import lombok.Getter;
 @Getter
 public class UserStatus extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final Duration MAX_ACTIVE_MINUTES = Duration.ofMinutes(5);
     private final UUID userId;
 
     private Instant lastActiveAt;
@@ -33,9 +34,8 @@ public class UserStatus extends BaseEntity implements Serializable {
 
     public boolean isActive() {
         Instant now = Instant.now();
-        Instant lastActive = this.lastActiveAt;
-        Duration duration = Duration.between(now, lastActive);
+        Duration duration = Duration.between(now, this.lastActiveAt);
 
-        return duration.getSeconds() < 300; // 5분 이내면 true;
+        return duration.compareTo(MAX_ACTIVE_MINUTES) < 0; // 5분 이내면 true;
     }
 }
