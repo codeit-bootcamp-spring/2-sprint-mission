@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.exception.user.UserNotFound;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,5 +55,12 @@ public class UserController {
             throw new UserNotFound("User not found: " + id);
         }
         return userStatusService.update(statusDto);
+    }
+
+    //사용자 목록 조회
+    @RequestMapping(method = RequestMethod.GET, value = "/findAll")
+    public ResponseEntity<List<UserDto>> findAll() {
+        List<UserDto> users = userService.findAll();
+        return ResponseEntity.ok(users);
     }
 }
