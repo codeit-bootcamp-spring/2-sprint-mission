@@ -9,16 +9,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.FilePath.IMAGE_STORAGE_DIRECTORY;
 import static com.sprint.mission.discodeit.constant.FilePath.JPG_EXTENSION;
-import static com.sprint.mission.util.FileUtils.*;
+import static com.sprint.mission.discodeit.util.FileUtils.deleteImageFileFromPath;
+import static com.sprint.mission.discodeit.util.FileUtils.saveImageFileToPath;
 
 @Service
 @RequiredArgsConstructor

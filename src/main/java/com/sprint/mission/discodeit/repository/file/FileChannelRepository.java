@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.util.FileUtils.*;
+import static com.sprint.mission.discodeit.util.FileUtils.*;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")

@@ -1,4 +1,4 @@
-package com.sprint.mission.util;
+package com.sprint.mission.discodeit.util;
 
 import org.springframework.web.multipart.MultipartFile;
 

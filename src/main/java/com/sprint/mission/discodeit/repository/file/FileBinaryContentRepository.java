@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.util.FileUtils.loadAndSaveConsumer;
-import static com.sprint.mission.util.FileUtils.loadObjectsFromFile;
+import static com.sprint.mission.discodeit.util.FileUtils.loadAndSaveConsumer;
+import static com.sprint.mission.discodeit.util.FileUtils.loadObjectsFromFile;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
