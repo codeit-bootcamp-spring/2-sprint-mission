@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.model.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -55,6 +56,14 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
         findUserStatus.updateUpdatedAt(updateTime);
         super.saveToFile(directory.resolve(findUserStatus.getId().toString() + ".ser"), findUserStatus);    // file에 반영
     }
+
+    @Override
+    public void updateUserStatusByUserId(UUID id, UserStatusType type) {
+        UserStatus findUserStatus = findUserStatusByUserId(id);
+        findUserStatus.setUserStatusType(type);
+        super.saveToFile(directory.resolve(findUserStatus.getId().toString() + ".ser"), findUserStatus);
+    }
+
 
     @Override
     public void deleteById(UUID userStatusId) {
