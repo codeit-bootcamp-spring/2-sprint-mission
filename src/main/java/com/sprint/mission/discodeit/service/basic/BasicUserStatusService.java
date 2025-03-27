@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusFindResponse;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateByUserIdRequest;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.*;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.DuplicateUserIdException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -47,13 +44,18 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void updateTimeById(UserStatusUpdateRequest userStatusUpdateRequest) {
+    public void updateTimeById(UserStatusTimeUpdateRequest userStatusUpdateRequest) {
         this.userStatusRepository.updateTimeById(userStatusUpdateRequest.userStatusId(), userStatusUpdateRequest.updateTime());
     }
 
     @Override
-    public void updateTimeByUserId(UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
-        this.userStatusRepository.updateTimeByUserId(userStatusUpdateByUserIdRequest.userId(), userStatusUpdateByUserIdRequest.updateTime());
+    public void updateTimeByUserId(UserStatusTimeUpdateByUserIdRequest userStatusTimeUpdateByUserIdRequest) {
+        this.userStatusRepository.updateTimeByUserId(userStatusTimeUpdateByUserIdRequest.userId(), userStatusTimeUpdateByUserIdRequest.updateTime());
+    }
+
+    @Override
+    public void updateUserStatusByUserId(UUID id, UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
+        this.userStatusRepository.updateUserStatusByUserId(id, userStatusUpdateByUserIdRequest.type());
     }
 
     @Override
