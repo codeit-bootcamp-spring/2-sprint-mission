@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.dto.userdto;
 
-import com.sprint.mission.discodeit.entity.CurrentStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 

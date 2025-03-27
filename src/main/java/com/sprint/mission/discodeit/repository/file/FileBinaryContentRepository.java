@@ -8,7 +8,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,17 +15,13 @@ import java.util.stream.Stream;
 public class FileBinaryContentRepository implements BinaryContentRepository {
     private static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data", "content");
 
-    private final List<BinaryContent> binaryContentsData;
-
     public FileBinaryContentRepository() {
-        binaryContentsData = new ArrayList<>();
         init();
     }
 
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-//        binaryContentsData.add(binaryContent);
         Path path = DIRECTORY.resolve(binaryContent.getId() + ".ser");
         saveToFile(path, binaryContent);
         return binaryContent;

@@ -18,29 +18,17 @@ public record ChannelFindResponseDto(
         Instant lastReadTime
 ) {
     public static ChannelFindResponseDto fromChannel(Channel channel, ReadStatus readStatus) {
-        if (channel.getType() == ChannelType.PRIVATE) {
-            return new ChannelFindResponseDto(
-                    channel.getId(),
-                    channel.getType(),
-                    channel.getChannelName(),
-                    channel.getDescription(),
-                    channel.getCreatedAt(),
-                    channel.getUpdatedAt(),
-                    readStatus != null ? readStatus.getUserId() : null,
-                    readStatus != null ? readStatus.getLastReadTime() : null
+        UUID userId = (channel.getType() == ChannelType.PRIVATE && readStatus !=null) ? readStatus.getUserId() : null;
+        return new ChannelFindResponseDto(
+                channel.getId(),
+                channel.getType(),
+                channel.getChannelName(),
+                channel.getDescription(),
+                channel.getCreatedAt(),
+                channel.getUpdatedAt(),
+                userId,
+                readStatus != null ? readStatus.getLastReadTime() : null
 
-            );
-        } else {
-            return new ChannelFindResponseDto(
-                    channel.getId(),
-                    channel.getType(),
-                    channel.getChannelName(),
-                    channel.getDescription(),
-                    channel.getCreatedAt(),
-                    channel.getUpdatedAt(),
-                    null,  // PUBLIC 일 때 userId는 null
-                    readStatus != null ? readStatus.getLastReadTime() : null
-            );
-        }
+        );
     }
 }

@@ -4,15 +4,13 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.*;
+import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
+import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 
@@ -39,9 +37,9 @@ public class BasicBinaryContentService implements BinaryContentService {
 
 
     @Override
-    public BinaryContent find(UUID id) {
+    public BinaryContent find(UUID binaryContentId) {
         return binaryContentRepository.load().stream()
-                .filter(m -> m.getId().equals(id))
+                .filter(m -> m.getId().equals(binaryContentId))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("Profile not found."));
     }

@@ -12,7 +12,7 @@ public record UserFindAllResponseDto(
         UUID userId,
         Instant createdAt,
         Instant updatedAt,
-        String name,
+        String username,
         String email,
         UUID profileId,
         Boolean online

@@ -8,7 +8,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,17 +15,13 @@ import java.util.stream.Stream;
 public class FileChannelRepository implements ChannelRepository {
     private static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data", "channel");
 
-    private final List<Channel> channelData;
-
     public FileChannelRepository() {
-        channelData = new ArrayList<>();
         init();
     }
 
 
     @Override
     public Channel save(Channel channel) {
-        channelData.add(channel);
         Path path = DIRECTORY.resolve(channel.getId() + ".ser");
         saveToFile(path, channel);
         return channel;

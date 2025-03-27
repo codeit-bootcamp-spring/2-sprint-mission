@@ -8,7 +8,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,16 +15,12 @@ import java.util.stream.Stream;
 public class FileUserStatusRepository implements UserStatusRepository {
     private static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data", "userstatus");
 
-    private final List<UserStatus> userStatusData;
-
     public FileUserStatusRepository() {
-        userStatusData = new ArrayList<>();
         init();
     }
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        userStatusData.add(userStatus);
         Path path = DIRECTORY.resolve(userStatus.getId() + ".ser");
         saveToFile(path, userStatus);
         return userStatus;

@@ -19,6 +19,8 @@ public class UserStatus extends BaseEntity {
         this.lastConnectionTime = LastConnectionTime;
     }
 
+    // 마지막 접속시간과 현재시간을 계산했을 때 300보다 작으면 : 5분 이내 -> true
+    // 마지막 접속시간과 현재시간을 계산했을 때 300보다 크면 : 5분 초과 -> false
     public boolean currentUserStatus() {
         if (Duration.between(lastConnectionTime, Instant.now()).getSeconds() < 300) {
             return true;
@@ -32,8 +34,6 @@ public class UserStatus extends BaseEntity {
     }
 
 
-    // 마지막 접속시간과 현재시간을 계산했을 때 300보다 작으면 : 5분 이내 -> true
-    // 마지막 접속시간과 현재시간을 계산했을 때 300보다 크면 : 5분 초과 -> false
     public String getLastConnectionTimeAtFormatted() {
         return TimeUtil.convertToFormattedDate(lastConnectionTime);
     }
