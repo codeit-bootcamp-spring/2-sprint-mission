@@ -20,6 +20,10 @@ public class BinaryContentController {
         return ResponseEntity.ok(binaryContentService.find(binaryContentId));
     }
 
-
+    @GetMapping("/findall")
+    public ResponseEntity<List<BinaryContent>> findAll(@RequestParam("id") List<UUID> binaryContentId) {
+        List<BinaryContent> allbinary = binaryContentService.findAllByIdIn(binaryContentId);
+        return ResponseEntity.ok(allbinary);
+    }
 
 }
