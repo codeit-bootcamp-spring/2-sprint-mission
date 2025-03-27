@@ -20,4 +20,6 @@ public interface UserService {
     User updateUser(UUID userId, UpdateUserDTO dto,Optional<BinaryContentDTO> profileCreateRequest);
 
     void deleteUser(UUID userId);
+
+    UserResponseDTO updateOnlineState(UUID userId);
 }

@@ -64,7 +64,7 @@ public class BasicUserStatusService implements UserStatusService {
         Instant newLastActiveAt = dto.lastActiveAt();
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("UserStatus with userId \" + userId + \" not found"));
+                .orElseThrow(() -> new NoSuchElementException("UserStatus with userId " + userId + " not found"));
 
         userStatus.updateLastActiveAt(newLastActiveAt);
 

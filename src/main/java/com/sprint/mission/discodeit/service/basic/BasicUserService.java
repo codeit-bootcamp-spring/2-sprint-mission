@@ -116,10 +116,16 @@ public class BasicUserService implements UserService {
         userRepository.deleteById(userId);
     }
 
+    @Override
+    public UserResponseDTO updateOnlineState(UUID userId) {
+        User user = getUser(userId);
+        return toDto(user);
+    }
+
     private UserResponseDTO toDto(User user) {
         Boolean online = userStatusRepository.findByUserId(user.getId())
                 .map(UserStatus::isOnline)
-                .orElse(null);
+                .orElse(false);
 
         return new UserResponseDTO(
                 user.getId(),
