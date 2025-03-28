@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
@@ -48,7 +47,7 @@ public class UserController {
         return ResponseEntity.ok(userResponseDTO);
     }
 
-    @GetMapping("/findAll")
+    @GetMapping
     public ResponseEntity<UserListResponseDTO> getUserAll() {
         List<UserDTO> userDTOList = userService.findAll();
         UserListResponseDTO userListResponseDTO = new UserListResponseDTO(userDTOList);
