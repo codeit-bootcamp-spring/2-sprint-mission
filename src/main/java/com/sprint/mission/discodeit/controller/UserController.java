@@ -29,7 +29,7 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<UserResponseDto> create(@RequestBody UserCreateRequest request) {
-        User user = userService.create(request, null);
+        User user = userService.create(request, Optional.empty());
         UserStatus status = userStatusService.findByUserId(user.getId()).orElse(null);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new UserResponseDto(user, status));

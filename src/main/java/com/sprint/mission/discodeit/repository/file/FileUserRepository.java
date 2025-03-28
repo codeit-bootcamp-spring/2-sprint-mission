@@ -72,7 +72,7 @@ public class FileUserRepository implements UserRepository {
     public Optional<User> findByUsername(String username) {
         List<User> users = this.findAll();
         for (User user : users) {
-            if (user.getUsername().equals(username)) {
+            if (user.getUsername() != null && user.getUsername().equals(username)) {
                 return Optional.of(user);
             }
         }
@@ -121,7 +121,7 @@ public class FileUserRepository implements UserRepository {
     public boolean existsByEmail(String email) {
         List<User> users = this.findAll();
         for (User user : users) {
-            if (user.getEmail().equals(email)) {
+            if (user.getEmail() != null && user.getEmail().equals(email)) {
                 return true;
             }
         }
@@ -132,7 +132,7 @@ public class FileUserRepository implements UserRepository {
     public boolean existsByUsername(String username) {
         List<User> users = this.findAll();
         for (User user : users) {
-            if (user.getUsername().equals(username)) {
+            if (user.getUsername() != null && user.getUsername().equals(username)) {
                 return true;
             }
         }

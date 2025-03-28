@@ -4,7 +4,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -29,12 +29,19 @@ public class ChannelController {
     }
 
     @RequestMapping(value = "/private", method = RequestMethod.POST)
-    public ResponseEntity<Channel> createPrivate(@RequestBody PrivateChannelCreateRequest request){
-        Channel created = channelService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<Channel> createPrivate(@RequestBody PrivateChannelCreateRequest request) {
+        List<UUID> participants = request.participantIds() == null
+                ? List.of()
+                : request.participantIds();
+        
+        PrivateChannelCreateRequest safeRequest = new PrivateChannelCreateRequest(participants);
+
+        Channel channel = channelService.create(safeRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
-    @RequestMapping(value = "/{channelId}", method = RequestMethod.PUT)
+
+    @RequestMapping(value = "/public/{channelId}", method = RequestMethod.PUT)
     public ResponseEntity<Channel> updatePublic(
             @PathVariable UUID channelId,
             @RequestBody PublicChannelUpdateRequest request) {
