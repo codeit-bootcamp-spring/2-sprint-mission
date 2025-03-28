@@ -25,7 +25,7 @@ public class ReadStatusController {
     private final ReadStatusMapper readStatusMapper;
 
     @PostMapping
-    public ResponseEntity<CreateReadStatusResponseDTO> createReadStatus(@RequestBody  CreateReadStatusRequestDTO createReadStatusRequestDTO) {
+    public ResponseEntity<CreateReadStatusResponseDTO> createReadStatus(@RequestBody @Valid CreateReadStatusRequestDTO createReadStatusRequestDTO) {
         ReadStatusDTO readStatusDTO = readStatusService.create(readStatusMapper.toReadStatusParam(createReadStatusRequestDTO));
         return ResponseEntity.ok(readStatusMapper.toReadStatusResponseDTO(readStatusDTO));
     }
