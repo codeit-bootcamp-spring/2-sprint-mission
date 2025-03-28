@@ -98,7 +98,7 @@ public class BasicUserService implements UserService {
     public void updateUser(UpdateUserRequest request) {
         userRepository.getUserById(request.userId()).ifPresent(user -> {
             Instant updatedTime = Instant.now();
-            user.update(request.newName(), user.getPassword(), request.newEmail(), updatedTime);
+            user.update(request.username(), request.password(), request.email(), updatedTime);
             userRepository.save(user);
 
             if (request.profileImageFileName() != null && request.profileImageFilePath() != null) {

@@ -31,8 +31,9 @@ public class UserController {
     public ResponseEntity<Void> updateUser(@PathVariable UUID userId, @RequestBody UpdateUserRequest request) {
         userService.updateUser(new UpdateUserRequest(
                 userId,
-                request.newName(),
-                request.newEmail(),
+                request.username(),
+                request.password(),
+                request.email(),
                 request.profileImageFileName(),
                 request.profileImageFilePath()
         ));

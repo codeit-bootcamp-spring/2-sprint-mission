@@ -15,7 +15,7 @@ public class BasicAuthService implements AuthService {
     @Override
     public User login(LoginRequest request) {
         return userRepository.getAllUsers().stream()
-                .filter(user -> user.getUsername().equals(request.username()))
+                .filter(user -> user.getEmail().equals(request.email()))
                 .filter(user -> user.getPassword().equals(request.password()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다."));
