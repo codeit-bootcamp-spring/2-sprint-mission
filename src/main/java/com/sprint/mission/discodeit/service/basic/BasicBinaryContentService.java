@@ -26,11 +26,11 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContentCreateRequest request = fileStorageService.uploadFile(file, fileId);
         // 메타데이터 저장
         create(request);
-        return new BinaryContentUploadResponse(request.fileId(), request.filePath(), request.fileName(), request.fileType(), request.fileSize());
+        return new BinaryContentUploadResponse(request.fileId(), request.filePath(), request.fileName(), request.contentType(), request.fileSize());
     }
 
     private void create(BinaryContentCreateRequest binaryContentCreateRequest) {
-        BinaryContent newBinaryContent = new BinaryContent(binaryContentCreateRequest.fileId(), binaryContentCreateRequest.filePath(), binaryContentCreateRequest.fileName(), binaryContentCreateRequest.fileType(), binaryContentCreateRequest.fileSize());
+        BinaryContent newBinaryContent = new BinaryContent(binaryContentCreateRequest.fileId(), binaryContentCreateRequest.filePath(), binaryContentCreateRequest.fileName(), binaryContentCreateRequest.contentType(), binaryContentCreateRequest.fileSize());
         this.binaryContentRepository.add(newBinaryContent);
     }
 
