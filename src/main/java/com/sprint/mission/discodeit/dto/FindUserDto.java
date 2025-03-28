@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.dto;
 
-import com.sprint.mission.discodeit.constant.UserStatusType;
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,6 +10,6 @@ public record FindUserDto(
         Instant createdAt,
         Instant updatedAt,
         Instant lastLoginTime,
-        UserStatusType userStatus
+        boolean online
 ) {
 }
