@@ -3,11 +3,11 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.auth.AuthLoginDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.handler.custom.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class BasicAuthService implements AuthService {
                 .orElse(null);
 
         if (foundUser == null) {
-            throw new NoSuchElementException("로그인 실패: 유저를 찾을 수 없습니다.");
+            throw new UserNotFoundException("로그인 실패: 유저를 찾을 수 없습니다.");
         }
 
         UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto = new UserStatusUpdateByUserIdDto(foundUser.getId(),
