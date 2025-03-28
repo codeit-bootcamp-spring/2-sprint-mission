@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.controller.binarycontent.BinaryContentListDTO;
-import com.sprint.mission.discodeit.dto.controller.binarycontent.FindAllBinaryContenInResponseDTO;
+import com.sprint.mission.discodeit.dto.controller.binarycontent.FindAllBinaryContentInResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.binarycontent.FindBinaryContentResponseDTO;
 import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDTO;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +29,8 @@ public class BinaryContentController {
 
     @GetMapping
     // GetMapping엔 @RequestBody를 사용하지 못했었지만, 요새는 사용하는 추세
-    public ResponseEntity<BinaryContentListDTO> getBinaryContentAllIn(@RequestBody FindAllBinaryContenInResponseDTO findAllBinaryContenInResponseDTO) {
-        List<BinaryContentDTO> binaryContentDTOList = binaryContentService.findAllByIdIn(findAllBinaryContenInResponseDTO.attachmentIds());
+    public ResponseEntity<BinaryContentListDTO> getBinaryContentAllIn(@RequestBody @Valid FindAllBinaryContentInResponseDTO findAllBinaryContentInResponseDTO) {
+        List<BinaryContentDTO> binaryContentDTOList = binaryContentService.findAllByIdIn(findAllBinaryContentInResponseDTO.attachmentIds());
         return ResponseEntity.ok(new BinaryContentListDTO(binaryContentDTOList));
     }
 }
