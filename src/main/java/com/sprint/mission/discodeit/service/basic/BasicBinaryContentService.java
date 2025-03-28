@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.entity.BinaryData;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.BinaryDataRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.utils.FileManager;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,14 +20,23 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryDataRepository binaryDataRepository;
-    private final FileManager fileManager;
 
     @Override
     public BinaryContent save(SaveBinaryContentParamDto saveBinaryContentParamDto) {
         String originalFileName = saveBinaryContentParamDto.fileName();
+        String contentType = saveBinaryContentParamDto.contentType();
         byte[] binaryData = saveBinaryContentParamDto.fileData();
-        BinaryDataResponseDto binaryDataResponseDto = binaryDataRepository.save(new BinaryData(originalFileName, binaryData));
-        BinaryContent binaryContent = new BinaryContent(binaryDataResponseDto.filePath(), binaryDataResponseDto.fileName(), originalFileName);
+
+        String extension =originalFileName.substring(originalFileName.lastIndexOf("."));
+        String fileName = UUID.randomUUID().toString() + "." + extension;
+
+        BinaryDataResponseDto binaryDataResponseDto = binaryDataRepository.save(new BinaryData(fileName, binaryData));
+        BinaryContent binaryContent = new BinaryContent(
+                binaryDataResponseDto.filePath(),
+                binaryDataResponseDto.fileName(),
+                originalFileName,
+                contentType
+        );
         binaryContentRepository.save(binaryContent);
         return binaryContent;
     }

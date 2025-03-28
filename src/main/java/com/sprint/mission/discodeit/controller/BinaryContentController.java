@@ -20,8 +20,7 @@ public class BinaryContentController {
 
     @PostMapping("/save")
     public ResponseEntity<?> save(@RequestParam("file") MultipartFile file) throws IOException {
-        SaveBinaryContentParamDto saveBinaryContentParamDto = new SaveBinaryContentParamDto(file.getOriginalFilename(), file.getContentType(), file.getBytes());
-        binaryContentService.save(saveBinaryContentParamDto);
+        binaryContentService.save(SaveBinaryContentParamDto.from(file));
         return ResponseEntity.ok().build();
     }
 

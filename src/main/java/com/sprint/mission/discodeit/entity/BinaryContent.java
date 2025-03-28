@@ -13,4 +13,5 @@ public class BinaryContent extends BaseEntity implements Serializable {
     private String filePath;
     private String fileName;
     private String originalFileName;
+    private String contentType;
 }
