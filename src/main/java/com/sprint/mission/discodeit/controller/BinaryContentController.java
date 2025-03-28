@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/binary-content")
+@RequestMapping("/api/binaryContent")
 @RequiredArgsConstructor
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
     @RequestMapping(method = RequestMethod.GET, path = "/find")
-    public ResponseEntity<BinaryContent> findById(@RequestParam UUID id) {
-        return binaryContentService.find(id)
+    public ResponseEntity<BinaryContent> findById(@RequestParam("binaryContentId") UUID binaryContentId) {
+        return binaryContentService.find(binaryContentId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
