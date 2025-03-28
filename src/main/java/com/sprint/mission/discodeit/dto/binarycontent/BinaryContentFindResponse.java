@@ -7,6 +7,7 @@ public record BinaryContentFindResponse(
         String filePath,
         String fileName,
         String contentType,
-        long fileSize
+        long fileSize,
+        String bytes        // base64로 인코딩된 이미지 바이트
 ) {
 }
