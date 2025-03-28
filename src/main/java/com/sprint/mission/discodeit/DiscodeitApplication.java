@@ -15,9 +15,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -209,7 +206,7 @@ public class DiscodeitApplication {
         // 존재하지 않는 유저로 생성
         try {
             Message message = messageService.create(
-                    new MessageCreateDto(UUID.randomUUID(), privateChannel.getId(), "안녕하세요.", null));
+                    new MessageCreateDto(UUID.randomUUID(), privateChannel.getId(), "안녕하세요.", List.of()));
             System.out.println("메시지 생성: " + message.getId());
         } catch (RuntimeException e) {
             System.out.println("메시지 생성 실패: " + e.getMessage());
@@ -218,7 +215,7 @@ public class DiscodeitApplication {
         // 존재하지 않는 채널로 생성
         try {
             Message message = messageService.create(
-                    new MessageCreateDto(user.getId(), UUID.randomUUID(), "안녕하세요.", null));
+                    new MessageCreateDto(user.getId(), UUID.randomUUID(), "안녕하세요.", List.of()));
             System.out.println("메시지 생성: " + message.getId());
         } catch (RuntimeException e) {
             System.out.println("메시지 생성 실패: " + e.getMessage());
@@ -236,7 +233,7 @@ public class DiscodeitApplication {
 
         try {
             Message message = messageService.create(
-                    new MessageCreateDto(user.getId(), privateChannel.getId(), "메시지 조회 테스트", null));
+                    new MessageCreateDto(user.getId(), privateChannel.getId(), "메시지 조회 테스트", List.of()));
             Message foundMessage = messageService.findById(message.getId());
             System.out.println("메시지 조회(단건): " + foundMessage.getId());
         } catch (RuntimeException e) {
@@ -254,7 +251,7 @@ public class DiscodeitApplication {
         // 수정
         try {
             Message message = messageService.create(
-                    new MessageCreateDto(user.getId(), privateChannel.getId(), "메시지 수정 테스트", null));
+                    new MessageCreateDto(user.getId(), privateChannel.getId(), "메시지 수정 테스트", List.of()));
             Message updatedMessage = messageService.update(new MessageUpdateDto(message.getId(), "메시지 수정 성공 테스트입니다."));
             System.out.println("메시지 수정: " + updatedMessage.getContent());
         } catch (RuntimeException e) {
@@ -272,7 +269,7 @@ public class DiscodeitApplication {
 
         // 삭제
         Message deletedMessage = messageService.create(
-                new MessageCreateDto(user.getId(), privateChannel.getId(), "메시지 삭제 테스트", null));
+                new MessageCreateDto(user.getId(), privateChannel.getId(), "메시지 삭제 테스트", List.of()));
         List<Message> foundMessagesBeforeDelete = messageService.findAllByChannelId(privateChannel.getId());
         System.out.println("메시지 삭제 전: " + foundMessagesBeforeDelete.size());
         messageService.delete(deletedMessage.getId());
@@ -283,15 +280,15 @@ public class DiscodeitApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-        // 서비스 초기화
-        UserService userService = context.getBean(BasicUserService.class);
-        ChannelService channelService = context.getBean(BasicChannelService.class);
-        MessageService messageService = context.getBean(BasicMessageService.class);
-
-        // 테스트
-        userCRUDTest(userService);
-        channelCRUDTest(channelService, userService);
-        messageCRUDTest(messageService, userService, channelService);
+//        // 서비스 초기화
+//        UserService userService = context.getBean(BasicUserService.class);
+//        ChannelService channelService = context.getBean(BasicChannelService.class);
+//        MessageService messageService = context.getBean(BasicMessageService.class);
+//
+//        // 테스트
+//        userCRUDTest(userService);
+//        channelCRUDTest(channelService, userService);
+//        messageCRUDTest(messageService, userService, channelService);
     }
 
 }

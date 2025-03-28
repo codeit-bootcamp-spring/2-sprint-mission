@@ -7,13 +7,15 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.handler.custom.user.UserEmailAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.handler.custom.user.UserNameAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.handler.custom.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,12 +34,12 @@ public class BasicUserService implements UserService {
 
         boolean isEmailExist = users.stream().anyMatch(user -> user.getEmail().equals(userCreateDto.email()));
         if (isEmailExist) {
-            throw new RuntimeException(userCreateDto.email() + " 이메일은 이미 가입되었습니다.");
+            throw new UserEmailAlreadyExistsException(userCreateDto.email() + " 이메일은 이미 가입되었습니다.");
         }
 
         boolean isNameExist = users.stream().anyMatch(user -> user.getUsername().equals(userCreateDto.username()));
         if (isNameExist) {
-            throw new RuntimeException(userCreateDto.username() + " 이름은 이미 가입되었습니다.");
+            throw new UserNameAlreadyExistsException(userCreateDto.username() + " 이름은 이미 가입되었습니다.");
         }
 
         User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password());
@@ -52,7 +54,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId);
 
         if (user == null) {
-            throw new NoSuchElementException(userId + " 유저를 찾을 수 없습니다.");
+            throw new UserNotFoundException(userId + " 유저를 찾을 수 없습니다.");
         }
 
         UserStatus userStatus = userStatusService.findById(user.getId());
@@ -75,14 +77,14 @@ public class BasicUserService implements UserService {
                 user -> user.getEmail().equals(userUpdateDto.newEmail()));
 
         if (isEmailExist) {
-            throw new RuntimeException(userUpdateDto.newEmail() + " 이메일은 이미 존재하여 수정할 수 없습니다.");
+            throw new UserEmailAlreadyExistsException(userUpdateDto.newEmail() + " 이메일은 이미 존재하여 수정할 수 없습니다.");
         }
 
         boolean isNameExist = users.stream().anyMatch(
                 user -> user.getUsername().equals(userUpdateDto.newUsername()));
 
         if (isNameExist) {
-            throw new RuntimeException(userUpdateDto.newEmail() + " 유저는 이미 존재하여 수정할 수 없습니다.");
+            throw new UserNameAlreadyExistsException(userUpdateDto.newUsername() + " 유저는 이미 존재하여 수정할 수 없습니다.");
         }
 
         User user = userRepository.findById(userUpdateDto.id());
