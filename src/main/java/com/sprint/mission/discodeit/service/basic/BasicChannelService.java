@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.handler.custom.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.handler.custom.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -16,7 +18,6 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +56,7 @@ public class BasicChannelService implements ChannelService {
                 );
 
         if (isExistChannel) {
-            throw new RuntimeException(channelCreatePublicDto.name() + " 채널은 이미 존재합니다.");
+            throw new PrivateChannelUpdateException(channelCreatePublicDto.name() + " 채널은 이미 존재합니다.");
         }
 
         Channel newChannel = Channel.createPublic(channelCreatePublicDto.name(), channelCreatePublicDto.description());
@@ -69,7 +70,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId);
 
         if (channel == null) {
-            throw new NoSuchElementException(channelId + " 채널을 찾을 수 없습니다.");
+            throw new ChannelNotFoundException(channelId + " 채널을 찾을 수 없습니다.");
         }
 
         Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId())
@@ -133,11 +134,11 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelUpdateDto.id());
 
         if (channel == null) {
-            throw new RuntimeException(channelUpdateDto.id() + " 채널은 존재하지 않아 수정할 수 없습니다.");
+            throw new ChannelNotFoundException(channelUpdateDto.id() + " 채널은 존재하지 않아 수정할 수 없습니다.");
         }
 
         if (channel.getType().equals(ChannelType.PRIVATE)) {
-            throw new IllegalArgumentException("Private 채널은 수정할 수 없습니다.");
+            throw new PrivateChannelUpdateException("Private 채널은 수정할 수 없습니다.");
         }
 
         channel.update(channelUpdateDto.newName(), channelUpdateDto.newDescription());
