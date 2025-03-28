@@ -6,7 +6,7 @@ public record BinaryContentFindResponse(
         UUID binaryId,
         String filePath,
         String fileName,
-        String fileType,
+        String contentType,
         long fileSize
 ) {
 }

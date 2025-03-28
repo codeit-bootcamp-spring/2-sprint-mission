@@ -6,7 +6,7 @@ public record BinaryContentCreateRequest(
         UUID fileId,
         String filePath,
         String fileName,
-        String fileType,
+        String contentType,
         long fileSize
 ) {
 }
