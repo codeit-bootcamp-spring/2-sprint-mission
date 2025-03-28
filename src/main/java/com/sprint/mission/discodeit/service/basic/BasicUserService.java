@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
+import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusCreateRequest;
 import java.util.List;
@@ -44,21 +44,21 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserInfoResponse find(UUID userId) {
+    public UserDto find(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음"));
         UserStatus userStatus = userStatusService.findByUserId(user.getId());
 
-        return UserInfoResponse.of(user, userStatus);
+        return UserDto.of(user, userStatus);
     }
 
     @Override
-    public List<UserInfoResponse> findAll() {
+    public List<UserDto> findAll() {
         List<User> userList = userRepository.findAll();
         return userList.stream()
                 .map(user -> {
                     UserStatus userStatus = userStatusService.findByUserId(user.getId());
-                    return UserInfoResponse.of(user, userStatus);
+                    return UserDto.of(user, userStatus);
                 }).toList();
     }
 
@@ -67,13 +67,17 @@ public class BasicUserService implements UserService {
                        BinaryContentCreateRequest binaryData) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException(
-                        userId + " 에 해당하는 userStatus를 찾을 수 없음"));
-        validDuplicateUsername(updateRequest.newUsername());
-        validDuplicateEmail(updateRequest.newEmail());
+                        userId + " 에 해당하는 User를 찾을 수 없음"));
+        String newUsername = updateRequest.newUsername();
+        String newEmail = updateRequest.newEmail();
+        String newPassword = updateRequest.newPassword();
 
-        String username = (updateRequest.newUsername() == null) ? user.getUsername() : updateRequest.newUsername();
-        String email = (updateRequest.newEmail() == null) ? user.getEmail() : updateRequest.newEmail();
-        String password = (updateRequest.newPassword() == null) ? user.getPassword() : updateRequest.newPassword();
+        if (!user.getUsername().equals(newUsername)) {
+            validDuplicateUsername(newUsername);
+        }
+        if (!user.getEmail().equals(newEmail)) {
+            validDuplicateEmail(newEmail);
+        }
 
         UUID binaryContentId = null;
         if (binaryData != null) {
@@ -82,14 +86,14 @@ public class BasicUserService implements UserService {
             }
             binaryContentId = basicBinaryContentService.create(binaryData).getId();
         }
-        user.update(username, email, password, binaryContentId);
+        user.update(newUsername, newEmail, newPassword, binaryContentId);
         return userRepository.save(user);
     }
 
     @Override
     public void delete(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException(userId + " 에 해당하는 userStatus를 찾을 수 없음"));
+                .orElseThrow(() -> new NoSuchElementException(userId + " 에 해당하는 user를 찾을 수 없음"));
         if (user.getProfileId() != null) {
             basicBinaryContentService.delete(user.getProfileId());
         }

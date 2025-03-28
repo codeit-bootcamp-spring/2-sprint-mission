@@ -47,9 +47,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public void delete(UUID id) {
         BinaryContent binaryContent = findById(id);
-
         binaryContentRepository.deleteById(binaryContent);
-        // d
     }
 
 }

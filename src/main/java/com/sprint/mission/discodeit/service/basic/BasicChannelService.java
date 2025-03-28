@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.dto.channel.ChannelByIdResponse;
+import com.sprint.mission.discodeit.service.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PublicChannelRequest;
@@ -24,8 +24,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
-    private final ReadStatusService readStatusService;
     private final MessageRepository messageRepository;
+    private final ReadStatusService readStatusService;
+    private final BasicBinaryContentService basicBinaryContentService;
 
     @Override
     public Channel create(PrivateChannelRequest privateRequest) {
@@ -44,7 +45,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelByIdResponse find(UUID channelId) {
+    public ChannelDto find(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException(channelId + " 에 해당하는 Channel이 없음"));
         Instant lastMessageTime = findLastMessageTime(channel.getId());
@@ -63,11 +64,11 @@ public class BasicChannelService implements ChannelService {
             userIds = null;
         }
 
-        return ChannelByIdResponse.of(channel, name, description, userIds, lastMessageTime);
+        return ChannelDto.of(channel, name, description, userIds, lastMessageTime);
     }
 
     @Override
-    public List<ChannelByIdResponse> findAllByUserId(UUID userId) {
+    public List<ChannelDto> findAllByUserId(UUID userId) {
         List<UUID> joinedChannelIds = readStatusService.findAllByUserId(userId).stream()
                 .map(ReadStatus::getChannelId).toList();
         return channelRepository.findAll().stream()
@@ -90,7 +91,7 @@ public class BasicChannelService implements ChannelService {
                         userIds = null;
                     }
 
-                    return ChannelByIdResponse.of(channel, name, description, userIds, lastMessageTime);
+                    return ChannelDto.of(channel, name, description, userIds, lastMessageTime);
                 }).toList();
     }
 
@@ -101,12 +102,10 @@ public class BasicChannelService implements ChannelService {
         if (channel.getType() == ChannelType.PRIVATE) {
             throw new IllegalArgumentException("비공개 채널은 수정 불가능");
         }
+        String newName = updateRequest.newName();
+        String newDescription = updateRequest.newDescription();
 
-        String name = (updateRequest.newName() == null) ? channel.getName() : updateRequest.newName();
-        String description =
-                (updateRequest.newDescription() == null) ? channel.getDescription() : updateRequest.newDescription();
-
-        channel.update(name, description);
+        channel.update(newName, newDescription);
         return channelRepository.save(channel);
     }
 
@@ -116,7 +115,11 @@ public class BasicChannelService implements ChannelService {
             throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
         messageRepository.findAllByChannelId(channelId)
-                .forEach(message -> messageRepository.deleteById(message.getId()));
+                .forEach(message -> {
+                    message.getAttachmentIds().forEach(basicBinaryContentService::delete);
+                    messageRepository.deleteById(message.getId());
+                });
+
         readStatusService.findAllByChannelId(channelId).forEach(readStatusService::delete);
         channelRepository.deleteById(channelId);
     }
