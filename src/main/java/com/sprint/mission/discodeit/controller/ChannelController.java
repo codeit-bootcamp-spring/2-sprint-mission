@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.dto.IdResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.dto.channel.ChannelByIdResponse;
+import com.sprint.mission.discodeit.service.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PublicChannelRequest;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/channels")
+@RequestMapping("/api/channel")
 public class ChannelController {
     private final ChannelService channelService;
 
@@ -54,8 +54,8 @@ public class ChannelController {
 
     // 특정 사용자가 볼 수 있는 모든 채널 목록을 조회
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-    public ResponseEntity<List<ChannelByIdResponse>> findAllByUserId(@PathVariable UUID userId) {
-        List<ChannelByIdResponse> response = channelService.findAllByUserId(userId);
+    public ResponseEntity<List<ChannelDto>> findAllByUserId(@PathVariable UUID userId) {
+        List<ChannelDto> response = channelService.findAllByUserId(userId);
         return ResponseEntity.ok(response);
     }
 

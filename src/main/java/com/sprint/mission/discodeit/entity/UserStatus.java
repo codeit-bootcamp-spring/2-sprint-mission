@@ -32,17 +32,17 @@ public class UserStatus implements Serializable {
         this.status = status;
     }
 
-    public UserStatusType isOnline() {
+    public Boolean isOnline() {
         Instant now = Instant.now();
         if (status != UserStatusType.ONLINE && status != UserStatusType.OFFLINE) {
-            return status;
+            return false;
         }
         if (Duration.between(updatedAt, now).toMinutes() <= 5) {
             status = UserStatusType.ONLINE;
-            return UserStatusType.ONLINE;
+            return true;
         } else {
             status = UserStatusType.OFFLINE;
-            return UserStatusType.OFFLINE;
+            return false;
         }
     }
 }

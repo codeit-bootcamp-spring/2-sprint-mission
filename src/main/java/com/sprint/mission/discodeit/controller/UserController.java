@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserInfoResponse;
+import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
 import java.util.List;
@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
@@ -45,7 +45,7 @@ public class UserController {
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = "multipart/form-data")
     public ResponseEntity<IdResponse> update(
             @PathVariable("id") UUID userId,
-            @RequestPart("userUpdateDt0") UserUpdateRequest request,
+            @RequestPart("userUpdateDto") UserUpdateRequest request,
             @RequestPart(value = "fileDto", required = false) MultipartFile file
     ) {
         BinaryContentCreateRequest fileData = (file != null) ? new BinaryContentCreateRequest(file) : null;
@@ -61,9 +61,9 @@ public class UserController {
     }
 
     // 모든 사용자 조회
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<UserInfoResponse>> findAll() {
-        List<UserInfoResponse> response = userService.findAll();
+    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
+    public ResponseEntity<List<UserDto>> findAll() {
+        List<UserDto> response = userService.findAll();
         return ResponseEntity.ok(response);
     }
 

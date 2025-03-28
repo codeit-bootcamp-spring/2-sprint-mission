@@ -2,22 +2,21 @@ package com.sprint.mission.discodeit.service.dto.user;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.UserStatusType;
 import java.time.Instant;
 import java.util.UUID;
 
 
-public record UserInfoResponse(
-        UUID userId,
+public record UserDto(
+        UUID id,
         Instant createAt,
         Instant updateAt,
         String username,
         String email,
         UUID profileId,
-        UserStatusType status
+        Boolean online
 ) {
-    public static UserInfoResponse of(User user, UserStatus userStatus) {
-        return new UserInfoResponse(
+    public static UserDto of(User user, UserStatus userStatus) {
+        return new UserDto(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
