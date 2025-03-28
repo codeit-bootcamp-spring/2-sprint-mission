@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,25 +44,33 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContentFindResponse findById(UUID id) {
         BinaryContent findBinaryContent = this.binaryContentRepository.findById(id);
+        byte[] fileBytes = fileStorageService.readFile(Paths.get(findBinaryContent.getFilePath()));
+        String base64Bytes = Base64.getEncoder().encodeToString(fileBytes);
         return new BinaryContentFindResponse(
                 findBinaryContent.getId(),
                 findBinaryContent.getFilePath(),
                 findBinaryContent.getFileName(),
                 findBinaryContent.getFileType(),
-                findBinaryContent.getFileSize()
+                findBinaryContent.getFileSize(),
+                base64Bytes
         );
     }
 
     @Override
     public List<BinaryContentFindResponse> findAllByIdIn(List<UUID> ids) {
         return this.binaryContentRepository.findAllByIdIn(ids).stream()
-                .map(binaryContent -> new BinaryContentFindResponse(
+                .map(binaryContent -> {
+                    byte[] fileBytes = fileStorageService.readFile(Paths.get(binaryContent.getFilePath()));
+                    String base64Bytes = Base64.getEncoder().encodeToString(fileBytes);
+                    return new BinaryContentFindResponse(
                         binaryContent.getId(),
                         binaryContent.getFilePath(),
                         binaryContent.getFileName(),
                         binaryContent.getFileType(),
-                        binaryContent.getFileSize()
-                )).toList();
+                        binaryContent.getFileSize(),
+                            base64Bytes
+                    );
+                }).toList();
     }
 
     @Override
