@@ -44,6 +44,16 @@ public class BasicFileStorageService implements FileStorageService {
     }
 
     @Override
+    public byte[] readFile(Path path) {
+        try {
+            return Files.readAllBytes(path);
+        } catch (IOException e) {
+            logger.error("파일 읽는 중 오류 발생 {}", path.toAbsolutePath(), e);
+            throw new RuntimeException("파일을 읽을 수 없습니다.");
+        }
+    }
+
+    @Override
     public String getExtension(String originalFileName) {
         return originalFileName != null && originalFileName.contains(".")
                 ? originalFileName.substring(originalFileName.lastIndexOf("."))
