@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.FileRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
@@ -25,6 +26,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Path directory;
     private final Map<UUID, BinaryContent> binaryContentMap;
     private final FileRepository<BinaryContent> fileRepository;
+
 
     public FileBinaryContentRepository(@Value("${discodeit.repository.file-directory}") String fileDir, FileRepository<BinaryContent> fileRepository) {
         this.directory = Paths.get(System.getProperty("user.dir"), fileDir, "binarycontents");
@@ -53,14 +55,18 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void deleteById(UUID id) {
+        if (id == null) {
+            return;
+        }
         fileRepository.deleteFileById(id, directory);
         binaryContentMap.remove(id);
     }
 
     private void loadCacheFromFile() {
         List<BinaryContent> binaryContents = fileRepository.loadAllFromFile(directory);
-        for(BinaryContent binaryContent : binaryContents) {
+        for (BinaryContent binaryContent : binaryContents) {
             binaryContentMap.put(binaryContent.getId(), binaryContent);
         }
     }
+
 }

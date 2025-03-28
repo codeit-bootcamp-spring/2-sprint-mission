@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.controller.auth.LoginRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.auth.LoginResponseDTO;
+import com.sprint.mission.discodeit.dto.service.auth.LoginDTO;
 import com.sprint.mission.discodeit.dto.service.auth.LoginParam;
-import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-28T02:43:44+0900",
+    date = "2025-03-28T22:22:38+0900",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
 )
 @Component
@@ -33,14 +33,14 @@ public class AuthMapperImpl implements AuthMapper {
     }
 
     @Override
-    public LoginResponseDTO toLoginResponseDTO(UserDTO userDTO) {
-        if ( userDTO == null ) {
+    public LoginResponseDTO toLoginResponseDTO(LoginDTO loginDTO) {
+        if ( loginDTO == null ) {
             return null;
         }
 
         String username = null;
 
-        username = userDTO.username();
+        username = loginDTO.username();
 
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO( username );
 

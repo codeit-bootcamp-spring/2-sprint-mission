@@ -10,6 +10,7 @@ import java.util.UUID;
 
 @Getter
 public class UserStatus implements Serializable, Identifiable {
+    private static final long serialVersionUID = 1L;
     private final UUID id;
     private final UUID userId;
     private final Instant createdAt;

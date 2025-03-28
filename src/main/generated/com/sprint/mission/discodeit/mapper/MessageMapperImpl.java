@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.controller.message.CreateMessageRequestD
 import com.sprint.mission.discodeit.dto.controller.message.CreateMessageResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.message.UpdateMessageRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.message.UpdateMessageResponseDTO;
+import com.sprint.mission.discodeit.dto.controller.user.UserResponseDTO;
 import com.sprint.mission.discodeit.dto.service.message.CreateMessageParam;
 import com.sprint.mission.discodeit.dto.service.message.MessageDTO;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageDTO;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-28T02:43:44+0900",
+    date = "2025-03-28T22:22:38+0900",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
 )
 @Component
@@ -53,7 +54,6 @@ public class MessageMapperImpl implements MessageMapper {
         List<UUID> attachmentIds = null;
         String content = null;
         UUID channelId = null;
-        UUID authorId = null;
 
         id = messageDTO.id();
         createdAt = messageDTO.createdAt();
@@ -63,9 +63,10 @@ public class MessageMapperImpl implements MessageMapper {
         }
         content = messageDTO.content();
         channelId = messageDTO.channelId();
-        authorId = messageDTO.authorId();
 
-        CreateMessageResponseDTO createMessageResponseDTO = new CreateMessageResponseDTO( id, createdAt, attachmentIds, content, channelId, authorId );
+        UserResponseDTO userResponseDTO = null;
+
+        CreateMessageResponseDTO createMessageResponseDTO = new CreateMessageResponseDTO( id, createdAt, attachmentIds, content, channelId, userResponseDTO );
 
         return createMessageResponseDTO;
     }
@@ -96,7 +97,6 @@ public class MessageMapperImpl implements MessageMapper {
         List<UUID> attachmentIds = null;
         String content = null;
         UUID channelId = null;
-        UUID authorId = null;
 
         id = updateMessageDTO.id();
         updatedAt = updateMessageDTO.updatedAt();
@@ -106,9 +106,10 @@ public class MessageMapperImpl implements MessageMapper {
         }
         content = updateMessageDTO.content();
         channelId = updateMessageDTO.channelId();
-        authorId = updateMessageDTO.authorId();
 
-        UpdateMessageResponseDTO updateMessageResponseDTO = new UpdateMessageResponseDTO( id, updatedAt, attachmentIds, content, channelId, authorId );
+        UserResponseDTO userResponseDTO = null;
+
+        UpdateMessageResponseDTO updateMessageResponseDTO = new UpdateMessageResponseDTO( id, updatedAt, attachmentIds, content, channelId, userResponseDTO );
 
         return updateMessageResponseDTO;
     }

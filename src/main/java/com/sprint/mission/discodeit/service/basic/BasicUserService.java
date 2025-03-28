@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserDTO;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
@@ -8,11 +9,11 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.util.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusService userStatusService;
     private final BinaryContentService binaryContentService;
+    private final UserMapper userMapper;
 
 
     @Override
@@ -45,14 +47,19 @@ public class BasicUserService implements UserService {
         userRepository.save(user);
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusService.create(userStatus);
-        return UserMapper.userEntityToDTO(user, userStatus);
+        BinaryContentDTO binaryContentDTO = null;
+        if(binaryContent != null) {
+            binaryContentDTO = binaryContentService.find(user.getProfileId());
+        }
+        return userMapper.toUserDTO(user, userStatus, binaryContentDTO);
     }
 
     @Override
     public UserDTO find(UUID userId) {
         User findUser = findUserById(userId);
         UserStatus findUserStatus = userStatusService.findByUserId(userId);
-        return UserMapper.userEntityToDTO(findUser, findUserStatus);
+        BinaryContentDTO binaryContentDTO = findUser.getProfileId() != null ? binaryContentService.find(findUser.getProfileId()) : null;
+        return userMapper.toUserDTO(findUser, findUserStatus, binaryContentDTO);
     }
 
     @Override
@@ -64,7 +71,7 @@ public class BasicUserService implements UserService {
         Map<UUID, UserStatus> userStatusMap = userStatusService.findAll().stream()
                 .collect(Collectors.toMap(userStatus -> userStatus.getUserId(), userStatus -> userStatus));
         return users.stream()
-                .map(user -> UserMapper.userEntityToDTO(user, userStatusMap.get(user.getId())))
+                .map(user -> userMapper.toUserDTO(user, userStatusMap.get(user.getId()), user.getProfileId() != null ? binaryContentService.find(user.getProfileId()) : null))
                 .toList();
     }
 
@@ -74,20 +81,17 @@ public class BasicUserService implements UserService {
         findUser.updateUserInfo(updateUserParam.username(), updateUserParam.email(), updateUserParam.password());
         if (multipartFile != null && !multipartFile.isEmpty()) { // 프로필을 유지하거나 프로필 변경 요청이 있을 때 업데이트
             // 기본 프로필 ID가 아닐 때만 기존 이미지 삭제
-            if (!findUser.getProfileId().equals(User.DEFAULT_PROFILE_ID)) {
-                binaryContentService.delete(findUser.getProfileId());
-            }
+            binaryContentService.delete(findUser.getProfileId());
             BinaryContent binaryContent = createBinaryContentEntity(multipartFile);
             BinaryContent createdBinaryContent = binaryContentService.create(binaryContent);
             findUser.updateProfile(createdBinaryContent.getId());
         } else { // 기본 프로필로 변경할 때
-            if (!findUser.getProfileId().equals(User.DEFAULT_PROFILE_ID)) {
-                binaryContentService.delete(findUser.getProfileId());
-            }
+            binaryContentService.delete(findUser.getProfileId());
             findUser.updateProfileDefault();
         }
         User user = userRepository.save(findUser);
-        return entityToUpdateDTO(user);
+        BinaryContentDTO binaryContentDTO = user.getProfileId() != null ? binaryContentService.find(user.getProfileId()) : null;
+        return entityToUpdateDTO(user, binaryContentDTO);
     }
 
     @Override
@@ -95,15 +99,13 @@ public class BasicUserService implements UserService {
         User user = findUserById(userId);
         userRepository.deleteById(userId);
         // 기본 프로필 ID가 아닐 때만 프로필 파일 삭제
-        if (!user.getProfileId().equals(User.DEFAULT_PROFILE_ID)) {
-           binaryContentService.delete(user.getProfileId());
-        }
+        binaryContentService.delete(user.getProfileId());
         userStatusService.deleteByUserId(userId);
     }
 
-    private UpdateUserDTO entityToUpdateDTO(User user) {
+    private UpdateUserDTO entityToUpdateDTO(User user, BinaryContentDTO binaryContentDTO) {
         return new UpdateUserDTO(user.getId(),
-                user.getProfileId(),
+                binaryContentDTO,
                 user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail());
@@ -127,7 +129,7 @@ public class BasicUserService implements UserService {
                 .username(createUserParam.username())
                 .password(BCrypt.hashpw(createUserParam.password(), BCrypt.gensalt()))
                 .email(createUserParam.email())
-                .profileId(binaryContent != null ? binaryContent.getId() : User.DEFAULT_PROFILE_ID)
+                .profileId(binaryContent != null ? binaryContent.getId() : null)
                 .build();
     }
 
@@ -151,5 +153,6 @@ public class BasicUserService implements UserService {
             throw new RuntimeException("파일 저장 중 오류 발생: " + e.getMessage(), e);
         }
     }
+
 
 }
