@@ -26,9 +26,9 @@ public class ReadStatus implements Serializable {
         this.channelId = channelId;
         this.userId = userId;
         this.lastReadMessageId = lastReadMessageId;
-        this.lastReadAt = ZonedDateTime.now(); // 초기값 설정
+        this.lastReadAt = ZonedDateTime.now();
         this.createdAt = ZonedDateTime.now();
-        this.updatedAt = ZonedDateTime.now(); // null 대신 초기값 설정
+        this.updatedAt = ZonedDateTime.now(); //
     }
 
     public void updateLastReadMessage(UUID messageId) {

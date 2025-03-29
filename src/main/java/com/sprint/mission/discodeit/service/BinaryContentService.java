@@ -1,19 +1,27 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import org.springframework.context.event.EventListener;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.UUID;
 
 
 public interface BinaryContentService {
-    BinaryContentDto.Summary findBinaryContent(UUID id);
-    BinaryContentDto.Summary createBinaryContent(BinaryContentDto.Create binaryContentDto);
-    List<BinaryContentDto.Summary> findBinaryContent(List<UUID> ids);
-    void deleteBinaryContent(List<UUID> binaryContentIds);
-    BinaryContentDto.DeleteResponse deleteBinaryContent(UUID id);
-    List<BinaryContentDto.DeleteResponse> deleteBinaryContents(List<UUID> ids);
-    void deleteAllByOwnerId(UUID ownerId);
-    void deleteAllByUserId(UUID userId);
+
+
+    BinaryContentDto.Summary createBinaryContent(BinaryContentDto.Upload binaryContentDto) throws IOException;
+
+    BinaryContentDto.Summary findBinaryContentSummary(UUID id);
+
+    List<BinaryContentDto.Summary> findBinaryContentSummariesByIds(List<UUID> ids);
+
+    BinaryContent getBinaryContentEntity(UUID id);
+
+    Optional<InputStream> getContentStream(UUID id) throws IOException;
+
+    void deleteBinaryContentByOwner(UUID ownerId);
+    List<BinaryContentDto.DeleteResponse> deleteBinaryContentsByIds(List<UUID> ids);
 }

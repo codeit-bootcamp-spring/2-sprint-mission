@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-@Repository("basicUserRepository")
+
 public class BasicUserRepositoryImplement implements UserRepository {
     private final Map<UUID, User> userRepository = new HashMap<>();
 

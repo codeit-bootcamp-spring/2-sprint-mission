@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository("basicMessageRepository")
+
 public class BasicMessageRepositoryImplement implements MessageRepository {
     private final Map<UUID, Message> messageRepository = new HashMap<>();
 

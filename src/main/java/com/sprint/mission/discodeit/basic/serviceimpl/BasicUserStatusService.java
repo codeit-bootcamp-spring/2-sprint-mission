@@ -1,82 +1,52 @@
 package com.sprint.mission.discodeit.basic.serviceimpl;
 
 import com.sprint.mission.discodeit.dto.StatusDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.mapping.UserMapping;
+import com.sprint.mission.discodeit.exception.DataConflictException;
+import com.sprint.mission.discodeit.exception.InvalidRequestException;
+import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.mapping.UserStatusMapping;
-import com.sprint.mission.discodeit.service.UserRepository;
 import com.sprint.mission.discodeit.service.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import jakarta.validation.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.sprint.mission.discodeit.util.StatusOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.*;
-
+@RequiredArgsConstructor
 @Service
-
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
-    private final UserRepository userRepository;
-    @Autowired
-    public BasicUserStatusService(
-            @Qualifier("basicUserStatusRepository") UserStatusRepository userStatusRepository,
-            @Qualifier("basicUserRepository") UserRepository userRepository) {
-        this.userStatusRepository = userStatusRepository;
-        this.userRepository = userRepository;
-    }
+
 
     @Override
-    public StatusDto.Summary createUserStatus(StatusDto.Create statusDto) {
-        // 사용자 존재 확인
-        userRepository.findByUser(statusDto.getUserid())
-            .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다: " + statusDto.getUserid()));
-        
-        // 이미 존재하는지 확인
-        userStatusRepository.findById(statusDto.getUserid())
-            .ifPresent(existing -> {
-                throw new IllegalStateException("이미 같은 사용자에 대한 상태가 존재합니다");
-            });
-        
-        UserStatus userStatus = new UserStatus(statusDto.getUserid());
+    public boolean createUserStatus(UUID userId) {
+        userStatusRepository.findByUserId(userId)
+                .ifPresent(existing -> {
+                    throw new DataConflictException("UserStatus", "userId", userId);
+                });
+
+        UserStatus userStatus = new UserStatus(userId);
         userStatusRepository.register(userStatus);
-
-        return UserStatusMapping.INSTANCE.userStatusToSummary(userStatus);
+        return true;
     }
 
     @Override
-    public UserDto.Summary updateByUserId(@NotBlank UUID userId) {
-        User user = userRepository.findByUser(userId)
-            .orElseThrow(() -> new NoSuchElementException("User not found"));
-        
-        UserStatus userStatus = userStatusRepository.findById(user.getId())
-            .orElseThrow(() -> new NoSuchElementException("사용자 상태를 찾을 수 없습니다"));
-        
-        // 사용자의 마지막 접속 시간 업데이트
-        userStatus.updateLastTime();
-        userStatusRepository.update(userStatus);
-        
-        // 사용자 업데이트 시간 갱신
-        user.setUpdateAt();
-        userRepository.updateUser(user);
-        
-        return UserMapping.INSTANCE.userToSummary(user, userStatus);
+    public StatusDto.StatusResponse updateUserStatus(UUID userId, StatusDto.StatusRequest statusDto) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("UserStatus", "userId", userId));
+        try {
+            StatusOperation requestedStatus = StatusOperation.valueOf(statusDto.getStatus().toUpperCase());
+            userStatus.setStatus(requestedStatus);
+            return new StatusDto.StatusResponse(
+                    userId,
+                    requestedStatus
+            );
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRequestException("잘못된 상태 변경");
+        }
     }
     
-    @Override
-    public StatusDto.Summary update(StatusDto.Summary statusDto) {
-        UserStatus userStatus = userStatusRepository.findById(statusDto.getUserid())
-            .orElseThrow(() -> new NoSuchElementException("사용자 상태를 찾을 수 없습니다"));
-        
-        userStatus.setLastSeenAt(statusDto.getLastSeenAt());
-        userStatusRepository.update(userStatus);
-
-        return UserStatusMapping.INSTANCE.userStatusToSummary(userStatus);
-    }
-
     @Override
     public List<StatusDto.Summary> findAllUsers() {
         List<StatusDto.Summary> statusDtoList = new ArrayList<>();
@@ -90,38 +60,30 @@ public class BasicUserStatusService implements UserStatusService {
     
     @Override
     public StatusDto.Summary findById(UUID userId) {
-        UserStatus userStatus = userStatusRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("사용자 상태를 찾을 수 없습니다"));
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("UserStatus", "userId", userId));
             
         return UserStatusMapping.INSTANCE.userStatusToSummary(userStatus);
     }
     
     @Override
-    public StatusDto.ResponseDelete deleteUserStatus(UUID userId) {
-        UserStatus userStatus = userStatusRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("사용자 상태를 찾을 수 없습니다"));
+    public boolean deleteUserStatus(UUID userId) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("UserStatus", "userId", userId));
             
         boolean success = userStatusRepository.delete(userId);
-        String message = success ? "삭제 성공" : "삭제 실패";
-        
-        return UserStatusMapping.INSTANCE.userStatusToResponse(userStatus, message);
+        return success;
     }
-    
-
-    public boolean isUserOnline(UUID userId) {
-        UserStatus userStatus = userStatusRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("사용자 상태를 찾을 수 없습니다"));
-            
-        if (userStatus.getLastSeenAt() == null) return false;
-        
-        return userStatus.isOnline();
-    }
-
     @Override
-    public void deleteByUserId(UUID userId) {
-        Optional<UserStatus> userStatus = userStatusRepository.findByUserId(userId);
-        if (userStatus.isPresent()) {
-            userStatusRepository.delete(userStatus.get().getId());
+    public void setUserOnline(UUID userId) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserStatus", "userId", userId));
+        userStatus.setLastSeenAt(ZonedDateTime.now());
+        userStatus.setStatus(StatusOperation.ONLINE.ONLINE);
+
+        if (!userStatusRepository.update(userStatus)) {
+            throw new RuntimeException("업데이트 실패");
         }
     }
+
 }

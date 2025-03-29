@@ -8,17 +8,15 @@ import lombok.Setter;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-//읽음 상태 dTo
+
 public class ReadStatusDto {
     @Getter
     @Setter
     public static class Create {
         @NotNull
         private UUID channelId;
-
         @NotNull
         private UUID userId;
-
         @NotNull
         private UUID lastReadMessageId;
     }
@@ -36,9 +34,13 @@ public class ReadStatusDto {
     @Setter
     @NotBlank
     public static class ResponseReadStatus {
+        @NotNull
         private UUID id;
+        @NotNull
         private UUID channelId;
+        @NotNull
         private UUID userId;
+        @NotNull
         private UUID lastReadMessageId;
         private ZonedDateTime createdAt;
         private ZonedDateTime updatedAt;

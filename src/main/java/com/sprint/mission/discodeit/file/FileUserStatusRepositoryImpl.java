@@ -2,44 +2,42 @@ package com.sprint.mission.discodeit.file;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserStatusRepository;
+import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository("fileUserStatusRepository")
+@Repository("fileUserStatusRepositoryImpl")
 public class FileUserStatusRepositoryImpl implements UserStatusRepository {
-    private String DATA_DIR = "data";
-    private String USER_STATUS_DATA_FILE = "user_status.dat";
+    private String dataDir;
+    private String userStatusDataFile;
     
     private final Map<UUID, UserStatus> userStatuses;
-    
-    public FileUserStatusRepositoryImpl() {
-        userStatuses = loadData();
-    }
-    
+
     public FileUserStatusRepositoryImpl(String dataDir) {
-        DATA_DIR = dataDir;
-        USER_STATUS_DATA_FILE = "user_status.dat";
+        this.dataDir = dataDir;
+        this.userStatusDataFile = "user_status.dat";
         userStatuses = loadData();
     }
     
     @SuppressWarnings("unchecked")
     private Map<UUID, UserStatus> loadData() {
-        File dir = new File(DATA_DIR);
+        File dir = new File(dataDir);
         if (!dir.exists()) {
             dir.mkdirs();
         }
         
-        File file = new File(dir, USER_STATUS_DATA_FILE);
+        File file = new File(dir, userStatusDataFile);
+        System.out.println("사용자 상태 데이터 로드 경로: " + file.getAbsolutePath());
         
         if (file.exists()) {
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
                 return (Map<UUID, UserStatus>) in.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-
+                System.err.println("사용자 상태 데이터 로드 오류: " + e.getMessage());
+                return new HashMap<>();
             }
         }
         
@@ -47,18 +45,19 @@ public class FileUserStatusRepositoryImpl implements UserStatusRepository {
     }
     
     private synchronized void saveData() {
-        File dir = new File(DATA_DIR);
+        File dir = new File(dataDir);
         if (!dir.exists()) {
             dir.mkdirs();
         }
         
-        File file = new File(dir, USER_STATUS_DATA_FILE);
+        File file = new File(dir, userStatusDataFile);
+        System.out.println("사용자 상태 데이터 저장 경로: " + file.getAbsolutePath());
         
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(userStatuses);
         } catch (IOException e) {
-            throw new RuntimeException(e);
-
+            System.err.println("사용자 상태 데이터 저장 오류: " + e.getMessage());
+            throw new RuntimeException("사용자 상태 데이터 저장 실패", e);
         }
     }
     
@@ -103,5 +102,12 @@ public class FileUserStatusRepositoryImpl implements UserStatusRepository {
             saveData();
         }
         return result;
+    }
+
+    // 애플리케이션 종료 시 데이터 저장 보장
+    @PreDestroy
+    public void saveDataOnShutdown() {
+        System.out.println("애플리케이션 종료 - 사용자 상태 데이터 저장 중");
+        saveData();
     }
 } 

@@ -35,11 +35,11 @@ public class Jwt {
 
     // JWT 검증 메서드: 유효하면 사용자 ID(subject)를 반환
     public static String validateToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getSubject();
+        Claims claims = Jwts.parser()  // Jwts.parser() 사용
+                .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)))  // 서명 키 설정
+                .parseClaimsJws(token)  // JWT 파싱
+                .getBody();  // Claims 객체 추출
+
+        return claims.getSubject();  // 사용자 ID(subject) 반환
     }
 }

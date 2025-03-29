@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: discodeit
+  jpa:
+    open-in-view: false
+
+# 파일 저장소 설정
+discodeit:
+  storage:
+    data-dir: data    # 데이터가 저장될 기본 디렉토리
+
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    com.sprint.mission.discodeit: DEBUG
+    org.springframework.web: INFO
+
+jwt:
+  secret: your-very-strong-and-long-secret-key-please-change-this #

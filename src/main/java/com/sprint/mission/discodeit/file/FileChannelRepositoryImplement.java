@@ -2,65 +2,71 @@ package com.sprint.mission.discodeit.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelRepository;
+import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Repository("fileChannelRepository")
+@Repository("fileChannelRepositoryImplement")
 public class FileChannelRepositoryImplement implements ChannelRepository {
-    private String DATA_DIR = "data";
-    private String CHANNEL_DATA_FILE = "channels.dat";
-    
+    private String dataDir;
+    private String channelDataFile;
+
     private final Map<UUID, Channel> channelRepository;
-    
+
     public FileChannelRepositoryImplement() {
+        this.dataDir = "./data";
+        this.channelDataFile = "channels.dat";
         channelRepository = loadData();
     }
-    
+
     public FileChannelRepositoryImplement(String dataDir) {
-        DATA_DIR = dataDir;
-        CHANNEL_DATA_FILE = "channels.dat";
+        this.dataDir = dataDir;
+        this.channelDataFile = "channels.dat";
         channelRepository = loadData();
     }
-    
+
     @SuppressWarnings("unchecked")
     private Map<UUID, Channel> loadData() {
-        File dir = new File(DATA_DIR);
+        File dir = new File(dataDir);
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        
-        File file = new File(dir, CHANNEL_DATA_FILE);
-        
+
+        File file = new File(dir, channelDataFile);
+        System.out.println("채널 데이터 로드 경로: " + file.getAbsolutePath());
+
         if (file.exists()) {
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
                 return (Map<UUID, Channel>) in.readObject();
             } catch (IOException | ClassNotFoundException e) {
-               throw new RuntimeException(e);
+                System.err.println("채널 데이터 로드 오류: " + e.getMessage());
+                return new ConcurrentHashMap<>();
             }
         }
-        
+
         return new ConcurrentHashMap<>();
     }
-    
+
     private synchronized void saveData() {
-        File dir = new File(DATA_DIR);
+        File dir = new File(dataDir);
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        
-        File file = new File(dir, CHANNEL_DATA_FILE);
-        
+
+        File file = new File(dir, channelDataFile);
+        System.out.println("채널 데이터 저장 경로: " + file.getAbsolutePath());
+
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(channelRepository);
         } catch (IOException e) {
-            throw new RuntimeException(e);
-
+            System.err.println("채널 데이터 저장 오류: " + e.getMessage());
+            throw new RuntimeException("채널 데이터 저장 실패", e);
         }
     }
-    
+
     @Override
     public boolean register(Channel channel) {
         channelRepository.put(channel.getChannelId(), channel);
@@ -86,8 +92,8 @@ public class FileChannelRepositoryImplement implements ChannelRepository {
     @Override
     public Optional<Channel> findByName(String channelName) {
         return channelRepository.values().stream()
-            .filter(channel -> channel.getChannelName() != null && channel.getChannelName().equals(channelName))
-            .findFirst();
+                .filter(channel -> channel.getChannelName() != null && channel.getChannelName().equals(channelName))
+                .findFirst();
     }
 
     @Override
@@ -108,4 +114,11 @@ public class FileChannelRepositoryImplement implements ChannelRepository {
         saveData();
         return true;
     }
-} 
+
+    // 애플리케이션 종료 시 데이터 저장 보장
+    @PreDestroy
+    public void saveDataOnShutdown() {
+        System.out.println("애플리케이션 종료 - 채널 데이터 저장 중");
+        saveData();
+    }
+}

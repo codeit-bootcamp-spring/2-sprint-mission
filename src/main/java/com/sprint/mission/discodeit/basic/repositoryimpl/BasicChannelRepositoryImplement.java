@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-@Repository("basicChannelRepository")
+
 public class BasicChannelRepositoryImplement implements ChannelRepository {
     // 채널 id/채널
     private final Map<UUID, Channel> channelRepository = new HashMap<>();

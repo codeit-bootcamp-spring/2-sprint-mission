@@ -18,7 +18,6 @@ public class User implements Serializable {
     private ZonedDateTime updateAt;
     //가입 채널 리스트
     private final Set<UUID> belongChannels = new HashSet<>();
-    private static Long sequence;
     private String email;
     private String password;
     private UUID profileId;
@@ -56,7 +55,6 @@ public class User implements Serializable {
     }
     //로그인
     public boolean checkPassword(String inputPassword) {return this.password != null && this.password.equals(inputPassword);}
-    public boolean checkEmail(String inputEmail) {return this.email != null && this.email.equals(inputEmail);}
 
     // 프로필 이미지 id만 가지면 됨
     public void setProfileId(UUID profileId) {

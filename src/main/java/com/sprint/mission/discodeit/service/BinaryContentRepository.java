@@ -15,4 +15,5 @@ public interface BinaryContentRepository {
     List<BinaryContent> findAllByOwnerId(UUID ownerId);
     boolean delete(UUID userId);
 
+    Optional<BinaryContent> findByOwnerId(UUID ownerId);
 }

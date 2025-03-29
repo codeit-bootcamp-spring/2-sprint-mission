@@ -1,111 +1,96 @@
-package com.sprint.mission.discodeit.basic.serviceimpl;
+package com.sprint.mission.discodeit.basic.serviceimpl; // 서비스 구현체 패키지
 
+import com.sprint.mission.discodeit.UpdateOperation;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ForbiddenException;
+import com.sprint.mission.discodeit.exception.InvalidRequestException;
+import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.mapping.MessageMapping;
-import com.sprint.mission.discodeit.service.BinaryContentRepository;
-import com.sprint.mission.discodeit.service.ChannelRepository;
-import com.sprint.mission.discodeit.service.MessageRepository;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import com.sprint.mission.discodeit.service.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
-    private final BinaryContentRepository binaryContentRepository;
-
-    @Autowired
-    public BasicMessageService(
-            @Qualifier("basicMessageRepository") MessageRepository messageRepository,
-            @Qualifier("basicChannelRepository") ChannelRepository channelRepository,
-            @Qualifier("basicUserRepository") UserRepository userRepository,
-            @Qualifier("basicBinaryContentRepository") BinaryContentRepository binaryContentRepository) {
-        this.messageRepository = messageRepository;
-        this.channelRepository = channelRepository;
-        this.userRepository = userRepository;
-        this.binaryContentRepository = binaryContentRepository;
-    }
-
-
+    private final BinaryContentService binaryContentService;
 
     @Override
     public MessageDto.Response create(MessageDto.Create messageCreateDTO) {
-        // 사용자가 채널에 속해 있는지 검증
         validateUserInChannel(messageCreateDTO.getChannelId(), messageCreateDTO.getAuthorId());
 
-        // 메시지 생성
         Message message = new Message(
                 messageCreateDTO.getChannelId(),
                 messageCreateDTO.getAuthorId(),
                 messageCreateDTO.getContent()
         );
-        
-        // 첨부파일 처리
+
         if (messageCreateDTO.getBinaryContents() != null && !messageCreateDTO.getBinaryContents().isEmpty()) {
-            for (BinaryContentDto.Create file : messageCreateDTO.getBinaryContents()) {
-                try {
-                    // 첨부파일 생성
-                    BinaryContent attachment = new BinaryContent(
-                            file.getFile().getBytes(),
-                            file.getContentType(),
-                            file.getFileName(),
-                            message.getId(),
-                            "MESSAGE"
-                    );
-                    
-                    binaryContentRepository.register(attachment);
-                    
-                    // 메시지에 첨부파일 ID 추가
-                    message.addAttachment(attachment.getId());
-                } catch (IOException e) {
-                    throw new RuntimeException("첨부파일 처리 실패", e);
-                }
+            validateAttachmentIdsExist(messageCreateDTO.getBinaryContents());
+            for (UUID fileId : messageCreateDTO.getBinaryContents()) {
+                message.addAttachment(fileId);
             }
         }
-        
-        // 메시지 저장
-        messageRepository.register(message);
-        
-        return MessageMapping.INSTANCE.messageToResponse(message);
+
+        try {
+            if (!messageRepository.register(message)) {
+                throw new RuntimeException("메시지 저장에 실패했습니다."); 
+            }
+            return MessageMapping.INSTANCE.messageToResponse(message);
+        } catch (Exception e) {
+            throw new RuntimeException("메시지 저장 중 서버 오류가 발생했습니다.", e);
+        }
     }
 
-    // 유저 채널 속했는지 검증
     private void validateUserInChannel(UUID channelId, UUID userId) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다: " + channelId));
+                .orElseThrow(() -> new ResourceNotFoundException("Channel", "id", channelId)); // 404
         User user = userRepository.findByUser(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId)); // 404
 
-        boolean channelInUser = channel.getUserList().contains(userId);
-        boolean userBelongsToChannel = user.getBelongChannels().contains(channelId);
-        if (!(channelInUser && userBelongsToChannel)) {
-            throw new IllegalArgumentException("해당 유저는 이 채널에 존재하지 않습니다.");
+        boolean userInChannelList = channel.getUserList().contains(userId);
+        boolean channelInUserBelongs = user.getBelongChannels().contains(channelId);
+
+        if (!(userInChannelList && channelInUserBelongs)) {
+            throw new ForbiddenException("해당 채널에 대한 접근 권한이 없습니다.");
+        }
+    }
+
+    private void validateAttachmentIdsExist(List<UUID> attachmentIds) {
+        if (attachmentIds == null || attachmentIds.isEmpty()) {
+            return;
+        }
+        List<BinaryContentDto.Summary> existingSummaries = binaryContentService.findBinaryContentSummariesByIds(attachmentIds);
+
+        if (existingSummaries.size() != attachmentIds.size()) {
+            List<UUID> existingIds = existingSummaries.stream()
+                    .map(summary -> UUID.fromString(String.valueOf(summary.getId())))
+                    .toList();
+            List<UUID> nonExistentIds = new ArrayList<>(attachmentIds);
+            nonExistentIds.removeAll(existingIds);
+            throw new InvalidRequestException("attachments", "존재하지 않는 첨부파일 ID가 포함되어 있습니다: " + nonExistentIds);
         }
     }
 
     @Override
     public MessageDto.Response findByMessage(UUID messageId) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다"));
+                .orElseThrow(() -> new ResourceNotFoundException("Message", "id", messageId)); // 404
 
         return MessageMapping.INSTANCE.messageToResponse(message);
     }
@@ -120,10 +105,10 @@ public class BasicMessageService implements MessageService {
     @Override
     public List<MessageDto.Response> findAllByChannelId(UUID channelId) {
         channelRepository.findById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다"));
-                
-        return messageRepository.findAll().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
+                .orElseThrow(() -> new ResourceNotFoundException("Channel", "id", channelId)); // 404
+
+        List<Message> messages = messageRepository.findAllByChannelId(channelId);
+        return messages.stream()
                 .map(MessageMapping.INSTANCE::messageToResponse)
                 .collect(Collectors.toList());
     }
@@ -131,62 +116,94 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageDto.Response updateMessage(MessageDto.Update messageUpdateDTO) {
         Message message = messageRepository.findById(messageUpdateDTO.getMessageId())
-                .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다"));
+                .orElseThrow(() -> new ResourceNotFoundException("Message", "id", messageUpdateDTO.getMessageId()));
 
-        // 내용 업데이트
-        MessageMapping.INSTANCE.updateMessageFromDto(messageUpdateDTO, message);
+        boolean updated = false;
 
-        // 첨부파일 추가
-        if (messageUpdateDTO.getBinaryContents()!= null) {
-            for (BinaryContentDto.Create attachmentId : messageUpdateDTO.getBinaryContents()) {
-                message.addAttachment(attachmentId.getOwnerId());
-            }
+        if (messageUpdateDTO.getContent() != null && !messageUpdateDTO.getContent().equals(message.getMessage())) {
+            message.updateMessage(messageUpdateDTO.getContent());
+            updated = true;
         }
 
-        if (messageUpdateDTO.getBinaryContents() != null) {
-            List<UUID> removedAttachments = new ArrayList<>();
+        if (messageUpdateDTO.getBinaryContents() != null && !messageUpdateDTO.getBinaryContents().isEmpty()) {
+            UpdateOperation operation = messageUpdateDTO.getOperation();
+            List<UUID> binaryContentIds = messageUpdateDTO.getBinaryContents();
 
-            for (BinaryContentDto.Create attachmentId : messageUpdateDTO.getBinaryContents()) {
-                if (attachmentId != null && message.getAttachmentIds().contains(attachmentId)) {
-                    message.removeAttachment(attachmentId.getOwnerId());
-                    removedAttachments.add(attachmentId.getOwnerId());
+            if (operation == UpdateOperation.add) {
+                validateAttachmentIdsExist(binaryContentIds); // 추가할 ID 유효성 검증 (400)
+
+                for (UUID binaryContentId : binaryContentIds) {
+                    if (message.getAttachmentIds().add(binaryContentId)) {
+                        updated = true;
+                    }
                 }
-            }
+                if (updated) message.setUpdateAt();
 
-            // 바이너리 콘텐츠 직접 삭제
-            for (UUID attachmentId : removedAttachments) {
-                binaryContentRepository.delete(attachmentId);
+            } else if (operation == UpdateOperation.remove) {
+                List<UUID> removedAttachments = new ArrayList<>();
+                boolean attachmentsChanged = false;
+                for (UUID binaryContentId : binaryContentIds) {
+                    if (binaryContentId != null && message.getAttachmentIds().contains(binaryContentId)) {
+                        message.removeAttachment(binaryContentId);
+                        removedAttachments.add(binaryContentId);
+                        attachmentsChanged = true;
+                    }
+                }
+
+                if (attachmentsChanged) {
+                    updated = true;
+                    message.setUpdateAt();
+                }
+
+                if (!removedAttachments.isEmpty()) {
+                    try {
+
+                        binaryContentService.deleteBinaryContentsByIds(removedAttachments);
+                    } catch (Exception e) {
+                        throw new RuntimeException("첨부파일 삭제 중 서버 오류가 발생했습니다.", e);
+                    }
+                }
+            } else if (operation != null) {
+                throw new InvalidRequestException("operation", "지원되지 않는 첨부파일 작업입니다: " + operation);
             }
         }
 
-        // 저장 및 응답 반환
-        if(! messageRepository.register(message)){
-            throw new RuntimeException("저장오류");
+        if (updated) {
+            try {
+                if (!messageRepository.updateMessage(message)) {
+                    throw new RuntimeException("메시지 업데이트에 실패했습니다."); // 500 유발
+                }
+            } catch (Exception e) { // Repository RuntimeException 등
+                throw new RuntimeException("메시지 업데이트 중 서버 오류가 발생했습니다.", e); // 500 유발
+            }
         }
+
         return MessageMapping.INSTANCE.messageToResponse(message);
     }
-    
-    @Override
-    public MessageDto.Response updateMessage(UUID messageId, String newContent) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다: " + messageId));
-        message.updateMessage(newContent);
-        messageRepository.updateMessage(message);
-        return MessageMapping.INSTANCE.messageToResponse(message);
-    }
 
     @Override
-    public boolean deleteMessage(UUID messageId) {
+    public void deleteMessage(UUID messageId) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("메시지를 찾을 수 없습니다: " + messageId));
-        
-        // 첨부파일 직접 삭제
-        if (!message.getAttachmentIds().isEmpty()) {
-            for (UUID attachmentId : message.getAttachmentIds()) {
-                binaryContentRepository.delete(attachmentId);
+                .orElseThrow(() -> new ResourceNotFoundException("Message", "id", messageId)); // 404
+
+        Set<UUID> attachmentIds = message.getAttachmentIds();
+        if (attachmentIds != null && !attachmentIds.isEmpty()) {
+            List<UUID> idsToDelete = new ArrayList<>(attachmentIds);
+            try {
+
+                binaryContentService.deleteBinaryContentsByIds(idsToDelete);
+            } catch (Exception e) {
+                throw new RuntimeException("연결된 첨부파일 삭제 중 서버 오류가 발생했습니다.", e);
             }
         }
-        
-        return messageRepository.deleteMessage(messageId);
+
+        try {
+            if (!messageRepository.deleteMessage(messageId)) {
+                // 삭제 대상이 없음 (findById 이후 동시성 문제 등) -> 404 Not Found
+                throw new ResourceNotFoundException("Message", "id", messageId + " (삭제 시점 확인)");
+            }
+        } catch (Exception e) { // Repository RuntimeException 등
+            throw new RuntimeException("메시지 삭제 중 서버 오류가 발생했습니다.", e); // 500 유발
+        }
     }
 }

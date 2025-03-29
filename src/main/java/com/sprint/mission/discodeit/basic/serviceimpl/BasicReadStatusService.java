@@ -3,19 +3,21 @@ package com.sprint.mission.discodeit.basic.serviceimpl;
 import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.DataConflictException;
+import com.sprint.mission.discodeit.exception.InvalidRequestException;
+import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.mapping.ReadStatusMapping;
 import com.sprint.mission.discodeit.service.ChannelRepository;
 import com.sprint.mission.discodeit.service.MessageRepository;
 import com.sprint.mission.discodeit.service.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+@RequiredArgsConstructor
 @Service("basicReadStatusService")
 public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
@@ -23,42 +25,26 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
 
-    @Autowired
-    public BasicReadStatusService(
-            @Qualifier("basicReadStatusRepository") ReadStatusRepository readStatusRepository,
-            @Qualifier("basicUserRepository") UserRepository userRepository,
-            @Qualifier("basicChannelRepository") ChannelRepository channelRepository,
-            @Qualifier("basicMessageRepository") MessageRepository messageRepository) {
-        this.readStatusRepository = readStatusRepository;
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
-        this.messageRepository = messageRepository;
-    }
-
     @Override
     public ReadStatusDto.ResponseReadStatus create(ReadStatusDto.Create readStatusDto) {
-
         validateUserAndChannel(readStatusDto.getUserId(), readStatusDto.getChannelId());
-        
-        // 메시지 존재 확인
-        if (readStatusDto.getLastReadMessageId() != null) {
+
+        if (readStatusDto.getLastReadMessageId()!= null) {
             messageRepository.findById(readStatusDto.getLastReadMessageId())
-                    .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Message", "id", readStatusDto.getLastReadMessageId()));
         }
-        
-        // 중복 확인
+
         readStatusRepository.findByUserIdAndChannelId(readStatusDto.getUserId(), readStatusDto.getChannelId())
                 .ifPresent(existing -> {
-                    throw new IllegalStateException("이미 동일한 사용자와 채널에 대한 읽음 상태가 존재합니다");
+                    throw new DataConflictException("ReceptionStatus", "userId/channelId",
+                            readStatusDto.getUserId() + "/" + readStatusDto.getChannelId());
                 });
 
-        // ReadStatus 생성
-        ReadStatus readStatus = ReadStatusMapping.INSTANCE.createDtoToEntity(readStatusDto);
-        
-        // 저장
+       ReadStatus readStatus =ReadStatusMapping.INSTANCE.createDtoToEntity(readStatusDto);
+
         boolean success = readStatusRepository.register(readStatus);
         if (!success) {
-            throw new RuntimeException("저장실패");
+            throw new InvalidRequestException("reception_status", "수신 상태 저장에 실패했습니다");
         }
 
         return ReadStatusMapping.INSTANCE.toResponseDto(readStatus);
@@ -67,7 +53,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusDto.ResponseReadStatus find(UUID id) {
         ReadStatus readStatus = readStatusRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("읽음 상태를 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("ReadStatus", "id", id));
         
         return ReadStatusMapping.INSTANCE.toResponseDto(readStatus);
     }
@@ -76,7 +62,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public List<ReadStatusDto.ResponseReadStatus> findAllByUserId(UUID userId) {
         // 사용자 존재 확인
         userRepository.findByUser(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         
         return readStatusRepository.findAllByUserId(userId).stream()
                 .map(ReadStatusMapping.INSTANCE::toResponseDto)
@@ -88,45 +74,37 @@ public class BasicReadStatusService implements ReadStatusService {
         validateUserAndChannel(userId, channelId);
         
         ReadStatus readStatus = readStatusRepository.findByUserIdAndChannelId(userId, channelId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자와 채널에 대한 읽음 상태를 찾을 수 없습니다"));
+                .orElseThrow(() -> new ResourceNotFoundException("ReadStatus", "userId/channelId", 
+                        userId + "/" + channelId));
         
         return ReadStatusMapping.INSTANCE.toResponseDto(readStatus);
     }
 
     @Override
-    public ReadStatusDto.ResponseReadStatus update(ReadStatusDto.Update updateDto) {
-        // 읽음 상태 존재 확인
-        ReadStatus readStatus = readStatusRepository.findById(updateDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("읽음 상태를 찾을 수 없습니다"));
+    public ReadStatusDto.ResponseReadStatus update(UUID readStatusId, ReadStatusDto.Update updateDto) {
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId)
+                .orElseThrow(() -> new ResourceNotFoundException("ReceptionStatus", "id", readStatusId));
 
         messageRepository.findById(updateDto.getLastReadMessageId())
-                .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다"));
-        
-        // 읽음 상태 업데이트
-        ReadStatusMapping.INSTANCE.updateEntityFromDto(updateDto, readStatus);
-        
+                .orElseThrow(() -> new ResourceNotFoundException("Message", "id", updateDto.getLastReadMessageId()));
+
+        readStatus.updateLastReadMessage(updateDto.getLastReadMessageId());
+
         boolean success = readStatusRepository.updateReadStatus(readStatus);
         if (!success) {
-            throw new RuntimeException("읽음 상태 업데이트에 실패했습니다");
+            throw new InvalidRequestException("reception_status", "수신 상태 업데이트에 실패했습니다");
         }
-        
         return ReadStatusMapping.INSTANCE.toResponseDto(readStatus);
     }
 
     @Override
     public boolean delete(UUID id) {
-        readStatusRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("읽음 상태를 찾을 수 없습니다"));
-        
+
         return readStatusRepository.deleteReadStatus(id);
     }
     
     @Override
     public boolean deleteAllByUserId(UUID userId) {
-        // 사용자 존재 확인
-        userRepository.findByUser(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
-        
         return readStatusRepository.deleteAllByUserId(userId);
     }
     
@@ -134,7 +112,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public boolean deleteAllByChannelId(UUID channelId) {
         // 채널 존재 확인
         channelRepository.findById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다: " + channelId));
+                .orElseThrow(() -> new ResourceNotFoundException("Channel", "id", channelId));
         
         return readStatusRepository.deleteAllByChannelId(channelId);
     }
@@ -167,9 +145,9 @@ public class BasicReadStatusService implements ReadStatusService {
     // 검증 로직
     private void validateUserAndChannel(UUID userId, UUID channelId) {
         userRepository.findByUser(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         channelRepository.findById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다: " + channelId));
+                .orElseThrow(() -> new ResourceNotFoundException("Channel", "id", channelId));
     }
 }

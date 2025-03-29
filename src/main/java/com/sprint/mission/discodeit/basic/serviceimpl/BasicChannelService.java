@@ -5,18 +5,20 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.DataConflictException;
+import com.sprint.mission.discodeit.exception.ForbiddenException;
+import com.sprint.mission.discodeit.exception.InvalidRequestException;
+import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.mapping.ChannelMapping;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.util.*;
 
 @Service
-
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
@@ -24,18 +26,8 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
 
-    @Autowired
-    public BasicChannelService(
-            @Qualifier("basicChannelRepository") ChannelRepository channelRepository,
-            @Qualifier("basicMessageRepository") MessageRepository messageRepository,
-            @Qualifier("basicReadStatusRepository") ReadStatusRepository readStatusRepository,
-            @Qualifier("basicUserRepository") UserRepository userRepository) {
-        this.channelRepository = channelRepository;
-        this.messageRepository = messageRepository;
-        this.readStatusRepository = readStatusRepository;
-        this.userRepository = userRepository;
-    }
 
+    //private 명확하므로 읽음상태 생성
     @Override
     public ChannelDto.Response createPrivateChannel(ChannelDto.CreatePrivate dto) {
         // 채널 생성
@@ -61,7 +53,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto.Response createPublicChannel(ChannelDto.CreatePublic dto) {
         // 채널명 중복 체크
         checkChannelNameDuplication(dto.getChannelName());
-        
+
         // 채널 생성
         Channel channel;
         if (dto.getDescription() != null && !dto.getDescription().isEmpty()) {
@@ -78,28 +70,23 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelDto.Response findById(UUID channelId) {
-        // findChannelById -> findById로 변경 (테스트와 일치)
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("Channel not found with ID: " + channelId));
-        
-        // Response 객체 생성
+                .orElseThrow(() -> new ResourceNotFoundException("Channel", "id", channelId));
+
         ChannelDto.Response response = ChannelMapping.INSTANCE.channelToResponse(channel);
-        
-        // 최근 메시지 시간 정보 추가
-        findLatestMessageTimestamp(channelId).ifPresent(response::setLastMessageTime
-        );
+
+        findLatestMessageTimestamp(channelId).ifPresent(response::setLastMessageTime);
         
         return response;
     }
 
     @Override
     public List<ChannelDto.Response> findAllByUserId(UUID userId) {
-        // 모든 채널 ID 목록
+
         Set<UUID> allChannelIds = channelRepository.allChannelIdList();
         List<ChannelDto.Response> result = new ArrayList<>();
         
         for (UUID channelId : allChannelIds) {
-
             Optional<Channel> channelOpt = channelRepository.findById(channelId);
             if (channelOpt.isEmpty()) continue;
             
@@ -110,9 +97,7 @@ public class BasicChannelService implements ChannelService {
                 ChannelDto.Response response = ChannelMapping.INSTANCE.channelToResponse(channel);
                 
                 // 최근 메시지 시간 정보 추가
-                findLatestMessageTimestamp(channelId).ifPresent(timestamp -> 
-                    response.setLastMessageTime(timestamp)
-                );
+                findLatestMessageTimestamp(channelId).ifPresent(response::setLastMessageTime);
                 
                 result.add(response);
             }
@@ -127,9 +112,8 @@ public class BasicChannelService implements ChannelService {
         List<ChannelDto.Response> result = new ArrayList<>();
         
         for (UUID channelId : allChannelIds) {
-            // findChannelById -> findById로 변경 (테스트와 일치)
             Optional<Channel> channelOpt = channelRepository.findById(channelId);
-            if (!channelOpt.isPresent()) continue;
+            if (channelOpt.isEmpty()) continue;
             
             Channel channel = channelOpt.get();
             
@@ -137,9 +121,7 @@ public class BasicChannelService implements ChannelService {
                 ChannelDto.Response response = ChannelMapping.INSTANCE.channelToResponse(channel);
                 
                 // 최근 메시지 시간 정보 추가
-                findLatestMessageTimestamp(channelId).ifPresent(timestamp -> 
-                    response.setLastMessageTime(timestamp)
-                );
+                findLatestMessageTimestamp(channelId).ifPresent(response::setLastMessageTime);
                 
                 result.add(response);
             }
@@ -149,14 +131,13 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto.Response updateChannel(ChannelDto.Update dto) {
-        // findChannelById -> findById로 변경 (테스트와 일치)
+    public ChannelDto.Response updateChannel(ChannelDto.Update dto, UUID ownerId) {
         Channel channel = channelRepository.findById(dto.getChannelId())
-                .orElseThrow(() -> new NoSuchElementException("Channel not found with ID: " + dto.getChannelId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Channel", "id", dto.getChannelId()));
         
         // PRIVATE 채널은 수정 불가
         if (channel.isPrivate()) {
-            throw new RuntimeException("PRIVATE 채널은 수정 불가");
+            throw new InvalidRequestException("channel", "PRIVATE 채널은 수정할 수 없습니다");
         }
         
         // 채널 정보 업데이트
@@ -174,13 +155,15 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public boolean deleteChannel(UUID channelId) {
-        Optional<Channel> channelOpt = channelRepository.findById(channelId);
-        if (channelOpt.isEmpty()) {
-            return false;
+    public boolean deleteChannel(UUID channelId, UUID ownerId) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Channel", "id", channelId));
+                
+        if (!channel.getOwnerID().equals(ownerId)) {
+            throw new ForbiddenException("channel", "delete");
         }
         
-        Channel channel = channelOpt.get();
+        channelRepository.deleteChannel(channelId);
         
         // 채널의 메시지 직접 삭제
         List<Message> messages = messageRepository.findAllByChannelId(channelId);
@@ -203,20 +186,31 @@ public class BasicChannelService implements ChannelService {
         }
         
         // 채널 삭제
-        return channelRepository.deleteChannel(channelId);
+        return true;
+    }
+    //유저가 속한 프라이빗+공개채널 모두 반환
+    @Override
+    public List<ChannelDto.Response> getAccessibleChannels(UUID userId) {
+        List<ChannelDto.Response> channels = new ArrayList<>();
+
+        Set<UUID> channelIdList = channelRepository.allChannelIdList();
+        for (UUID channelId : channelIdList) {
+            Optional<Channel> allChannels = channelRepository.findById(channelId);
+            if (allChannels.isPresent() && allChannels.get().getUserList().contains(userId))
+                channels.add(ChannelMapping.INSTANCE.channelToResponse(allChannels.get()));
+        }
+        
+        return channels;
     }
 
     // 채널명 중복 체크 로직
     private void checkChannelNameDuplication(String channelName) {
-
         channelRepository.findByName(channelName).ifPresent(channel -> {
-            throw new IllegalArgumentException("이미 존재하는 채널명입니다: " + channelName);
+            throw new DataConflictException("Channel", "name", channelName);
         });
     }
     
-
     private Optional<ZonedDateTime> findLatestMessageTimestamp(UUID channelId) {
-        // MessageRepository에 findLatestByChannelId 메서드가 있으면 사용, 없으면 직접 구현
         List<Message> channelMessages = messageRepository.findAllByChannelId(channelId);
         if (channelMessages.isEmpty()) {
             return Optional.empty();
@@ -226,13 +220,6 @@ public class BasicChannelService implements ChannelService {
                 .map(Message::getCreatedAt)
                 .max(ZonedDateTime::compareTo);
     }
-    
-
-    private void deleteAllMessagesByChannelId(UUID channelId) {
-        List<Message> messages = messageRepository.findAllByChannelId(channelId);
-        for (Message message : messages) {
-            messageRepository.deleteMessage(message.getId());
-        }
-    }
 }
+
 

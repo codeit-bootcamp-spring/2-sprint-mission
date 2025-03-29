@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository("basicBinaryContentRepository")
+
 public class BasicBinaryContentRepositoryImplement implements BinaryContentRepository {
     private final Map<UUID, BinaryContent> binaryContentMap = new HashMap<>();
     
@@ -46,6 +46,11 @@ public class BasicBinaryContentRepositoryImplement implements BinaryContentRepos
     @Override
     public boolean delete(UUID id) {
         return binaryContentMap.remove(id) != null;
+    }
+
+    @Override
+    public Optional<BinaryContent> findByOwnerId(UUID ownerId) {
+        return binaryContentMap.values().stream().filter(content -> content.getOwnerId().equals(ownerId)).findFirst();
     }
 
     @Override

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository("basicReadStatusRepository")
+
 public class BasicReadStatusRepositoryImplement implements ReadStatusRepository {
     private final Map<UUID, ReadStatus> readStatusRepository = new HashMap<>();
 

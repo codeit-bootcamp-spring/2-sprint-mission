@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto;
 
+import com.sprint.mission.discodeit.UpdateOperation;
 import com.sprint.mission.discodeit.entity.Message;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -7,10 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,12 +19,14 @@ public class MessageDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @NotBlank
     public static class Create {
+        @NotNull
         private UUID channelId;
+        @NotNull
         private UUID authorId;
+        @NotBlank
         private String content;
-        private List<BinaryContentDto.Create> binaryContents;
+        private List<UUID> binaryContents;
     }
     @Data
     @Builder
@@ -35,17 +36,22 @@ public class MessageDto {
         @NotNull
         private UUID messageId;
         private String content;
-        private List<BinaryContentDto.Create> binaryContents;
+        private List<UUID> binaryContents;
+        @NotNull
+        private UpdateOperation operation;
     }
 
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @NotBlank
+
     public static class Response {
+        @NotNull
         private UUID messageId;
+        @NotNull
         private UUID channelId;
+        @NotNull
         private UUID authorId;
         private String content;
         private ZonedDateTime createdAt;
@@ -57,24 +63,16 @@ public class MessageDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateAttachments {
-        private UUID messageId;
-        private List<BinaryContentDto.Create> binaryContentsToAdd;
-        private List<UUID> binaryContentIdsToRemove;
-    }
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @NotBlank
     public static class Summary {
+        @NotNull
         private UUID id;
         private UUID senderId;           // 발신자
+        @NotNull
         private String message;          // 메시지 내용
         private ZonedDateTime createdAt; // 생성 시간
+        @NotNull
         private boolean hasAttachments;  // 첨부파일 유무
-
         public static Summary from(Message message, boolean hasAttachments) {
             return Summary.builder()
                     .id(message.getId())

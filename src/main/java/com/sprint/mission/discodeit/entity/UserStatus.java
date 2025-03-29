@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.util.StatusOperation;
 import lombok.Getter;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
@@ -20,7 +21,7 @@ public class UserStatus implements Serializable {
     private ZonedDateTime lastSeenAt; // 마지막 접속 시간
     private final ZonedDateTime createdAt; // 클래스 생성 시간
     private ZonedDateTime updatedAt; // 업데이트 시간
-
+    private StatusOperation status;
     public UserStatus(UUID userId) {
         this.id = UUID.randomUUID();
         this.userId = userId;
@@ -33,10 +34,15 @@ public class UserStatus implements Serializable {
         this.updatedAt = ZonedDateTime.now();
     }
 
-    //마지막 접속 시간
     public void setLastSeenAt(ZonedDateTime lastSeenAt) {
         this.lastSeenAt = lastSeenAt;
         this.updatedAt = ZonedDateTime.now();
+
+    }
+    //사용자 임의 설정
+    public void setStatus(StatusOperation statusOperation) {
+        this.status = statusOperation;
+        updateLastTime();
     }
 
     public boolean isOnline() {
@@ -44,6 +50,7 @@ public class UserStatus implements Serializable {
         Duration duration = Duration.between(lastSeenAt, now);
         return duration.toMinutes() < ONLINE_MINUTES;
     }
+
 
 
 }

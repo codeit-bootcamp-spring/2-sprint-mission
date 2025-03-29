@@ -15,6 +15,5 @@ public interface MessageService {
     List<MessageDto.Response> findAllMessage();
     List<MessageDto.Response> findAllByChannelId(UUID channelId);
     MessageDto.Response updateMessage(MessageDto.Update messageUpdateDTO) throws IOException;
-    MessageDto.Response updateMessage(UUID messageId, String newContent);
-    boolean deleteMessage(UUID messageId);
+    void deleteMessage(UUID messageId);
 }

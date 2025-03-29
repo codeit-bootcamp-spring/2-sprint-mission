@@ -3,54 +3,66 @@ package com.sprint.mission.discodeit.file;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusRepository;
 import org.springframework.stereotype.Repository;
+import jakarta.annotation.PreDestroy;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository("fileReadStatusRepository")
+@Repository("fileReadStatusRepositoryImplement")
 public class FileReadStatusRepositoryImplement implements ReadStatusRepository {
     private final Map<UUID, ReadStatus> readStatusRepository;
-    private String FILEPATH = "./data/read_status_data.ser";
-    
+    private String dataDir;
+    private String readStatusDataFile;
+
     public FileReadStatusRepositoryImplement() {
+        this.dataDir = "./data";
+        this.readStatusDataFile = "read_status.dat";
         readStatusRepository = loadData();
     }
-    
+
     public FileReadStatusRepositoryImplement(String dataDir) {
-        FILEPATH = dataDir + "/read_status_data.ser";
+        this.dataDir = dataDir;
+        this.readStatusDataFile = "read_status.dat";
         readStatusRepository = loadData();
     }
-    
+
     @SuppressWarnings("unchecked")
     private Map<UUID, ReadStatus> loadData() {
-        try {
-            File file = new File(FILEPATH);
-            if (!file.exists()) {
-                file.getParentFile().mkdirs();
-                return new HashMap<>();
-            }
-            
+        File dir = new File(dataDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        
+        File file = new File(dir, readStatusDataFile);
+        System.out.println("읽기 상태 데이터 로드 경로: " + file.getAbsolutePath());
+        
+        if (file.exists()) {
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
                 return (Map<UUID, ReadStatus>) in.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                System.err.println("읽기 상태 데이터 로드 오류: " + e.getMessage());
+                return new HashMap<>();
             }
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-
         }
+        
+        return new HashMap<>();
     }
-    
-    private void saveData() {
-        try {
-            File file = new File(FILEPATH);
-            file.getParentFile().mkdirs();
-            
-            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
-                out.writeObject(readStatusRepository);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
 
+    private synchronized void saveData() {
+        File dir = new File(dataDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        
+        File file = new File(dir, readStatusDataFile);
+        System.out.println("읽기 상태 데이터 저장 경로: " + file.getAbsolutePath());
+        
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
+            out.writeObject(readStatusRepository);
+        } catch (IOException e) {
+            System.err.println("읽기 상태 데이터 저장 오류: " + e.getMessage());
+            throw new RuntimeException("읽기 상태 데이터 저장 실패", e);
         }
     }
     
@@ -146,5 +158,11 @@ public class FileReadStatusRepositoryImplement implements ReadStatusRepository {
         }
         
         return success;
+    }
+
+    @PreDestroy
+    public void saveDataOnShutdown() {
+        System.out.println("애플리케이션 종료 - 읽기 상태 데이터 저장 중");
+        saveData();
     }
 } 
