@@ -1,1 +1,7 @@
-spring.application.name=discodeit
+spring:
+  web:
+    resources:
+      static-locations: classpath:/static/
+  mvc:
+    view:
+      suffix: .html
