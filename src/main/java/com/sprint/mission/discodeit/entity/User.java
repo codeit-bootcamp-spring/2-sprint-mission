@@ -12,60 +12,49 @@ import java.util.UUID;
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    protected final UUID id;
-    protected Instant createAt;
-    protected Instant updateAt;
-
-    private String userName;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private String username;
     private String email;
-    private UserStatus status;
-    private BinaryContent profileImage;
+    private String password;
+    private UUID profileId;     // BinaryContent
+    private boolean online;
 
-    public User() {
+    public User(String username, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
-        this.createAt = Instant.now();
-        this.updateAt = createAt;
-        this.userName = "Unknown";
-    }
-
-    public User(String userName, String email, UserStatus status) {
-        this();
-        this.userName = userName;
+        this.createdAt = Instant.now();
+        this.updatedAt = this.createdAt;
+        //
+        this.username = username;
         this.email = email;
-        this.status = status;
+        this.password = password;
+        this.profileId = profileId;
+        this.online = false;
     }
 
-    public User(UUID id, String userName, String email, Instant createAt, Instant updateAt, UserStatus status) {
-        this.id = id;
-        this.userName = userName;
-        this.email = email;
-        this.createAt = createAt;
-        this.updateAt = updateAt;
-        this.status = status;
-    }
+    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
+            anyValueUpdated = true;
+        }
 
-    public User(String userName) {
-        this();
-        this.userName = userName;
-    }
-
-    public void updateUsername(String newUserName) {
-        this.userName = newUserName;
-    }
-
-    public long getCreateAtMillis() {
-        return createAt.toEpochMilli();
-    }
-
-    public void setCreateAtMillis(long createAtMillis) {
-        this.createAt = Instant.ofEpochMilli(createAtMillis);
-    }
-
-    public long getUpdateAtMillis() {
-        return updateAt.toEpochMilli();
-    }
-
-    public void setUpdateAtMillis(long updateAtMillis) {
-        this.updateAt = Instant.ofEpochMilli(updateAtMillis);
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
