@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-28T22:33:57+0900",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
+    date = "2025-03-29T13:31:28+0900",
+    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
 public class UserMapperImpl implements UserMapper {
@@ -162,5 +162,31 @@ public class UserMapperImpl implements UserMapper {
         UserDTO userDTO = new UserDTO( id, binaryContentDTO1, createdAt, updatedAt, username, email, isLogin );
 
         return userDTO;
+    }
+
+    @Override
+    public UpdateUserDTO toUpdateUserDTO(User user, BinaryContentDTO binaryContentDTO) {
+        if ( user == null && binaryContentDTO == null ) {
+            return null;
+        }
+
+        UUID id = null;
+        Instant updatedAt = null;
+        String username = null;
+        String email = null;
+        if ( user != null ) {
+            id = user.getId();
+            updatedAt = user.getUpdatedAt();
+            username = user.getUsername();
+            email = user.getEmail();
+        }
+        BinaryContentDTO binaryContentDTO1 = null;
+        if ( binaryContentDTO != null ) {
+            binaryContentDTO1 = binaryContentDTO;
+        }
+
+        UpdateUserDTO updateUserDTO = new UpdateUserDTO( id, binaryContentDTO1, updatedAt, username, email );
+
+        return updateUserDTO;
     }
 }

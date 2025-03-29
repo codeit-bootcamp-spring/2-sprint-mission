@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.service.auth.LoginParam;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.mapper.AuthMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -18,13 +19,14 @@ import java.util.UUID;
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
     private final UserStatusService userStatusService;
+    private final AuthMapper authMapper;
 
     @Override
     public LoginDTO login(LoginParam loginParam) {
         User user = findUserByUsername(loginParam);
         checkPassword(user, loginParam);
         updateLoginAt(user);
-        return entityToDTO(user);
+        return authMapper.toLoginDTO(user);
     }
 
     private User findUserByUsername(LoginParam loginParam) {
@@ -46,9 +48,5 @@ public class BasicAuthService implements AuthService {
         UserStatus userStatus = findUserStatusByUserId(user.getId());
         userStatus.updateUserStatus();
         return userStatusService.updateByUserId(user.getId());
-    }
-
-    private LoginDTO entityToDTO(User user) {
-        return new LoginDTO(user.getId(), user.getUsername());
     }
 }

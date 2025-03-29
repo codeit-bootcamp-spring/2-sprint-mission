@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.controller.binarycontent.BinaryContentListDTO;
-import com.sprint.mission.discodeit.dto.controller.binarycontent.FindAllBinaryContentInResponseDTO;
+import com.sprint.mission.discodeit.dto.controller.binarycontent.FindAllBinaryContentInRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.binarycontent.FindBinaryContentResponseDTO;
 import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDTO;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
@@ -29,8 +29,8 @@ public class BinaryContentController {
 
     @GetMapping
     // GetMapping엔 @RequestBody를 사용하지 못했었지만, 요새는 사용하는 추세
-    public ResponseEntity<BinaryContentListDTO> getBinaryContentAllIn(@RequestBody @Valid FindAllBinaryContentInResponseDTO findAllBinaryContentInResponseDTO) {
-        List<BinaryContentDTO> binaryContentDTOList = binaryContentService.findAllByIdIn(findAllBinaryContentInResponseDTO.attachmentIds());
+    public ResponseEntity<BinaryContentListDTO> getBinaryContentAllIn(@RequestBody @Valid FindAllBinaryContentInRequestDTO findAllBinaryContentInRequestDTO) {
+        List<BinaryContentDTO> binaryContentDTOList = binaryContentService.findAllByIdIn(findAllBinaryContentInRequestDTO.attachmentIds());
         return ResponseEntity.ok(new BinaryContentListDTO(binaryContentDTOList));
     }
 }

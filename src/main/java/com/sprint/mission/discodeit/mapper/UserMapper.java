@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserDTO;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import org.mapstruct.Mapper;
@@ -31,4 +32,6 @@ public interface UserMapper {
     @Mapping(source = "binaryContentDTO", target = "binaryContentDTO")
     UserDTO toUserDTO(User user, UserStatus userStatus, BinaryContentDTO binaryContentDTO);
 
+    @Mapping(source = "user.id", target = "id")
+    UpdateUserDTO toUpdateUserDTO(User user, BinaryContentDTO binaryContentDTO);
 }

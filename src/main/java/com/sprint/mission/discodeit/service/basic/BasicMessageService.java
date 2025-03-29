@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.service.message.UpdateMessageParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -37,6 +38,7 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final BinaryContentService binaryContentService;
     private final UserMapper userMapper;
+    private final MessageMapper messageMapper;
 
 
     @Override
@@ -50,25 +52,25 @@ public class BasicMessageService implements MessageService {
             binaryContentList.forEach(binaryContentService::create);
         }
 
-        Message message = createMessageEntity(createMessageParam, binaryContentList);
+        Message message = messageMapper.toEntity(createMessageParam, binaryContentList);
         messageRepository.save(message);
 
         UserDTO userDTO = createUserDTO(message.getAuthorId());
-        return entityToDTO(message, userDTO);
+        return messageMapper.toMessageDTO(message, userDTO);
     }
 
     @Override
     public MessageDTO find(UUID messageId) {
         Message message = findMessageById(messageId);
         UserDTO userDTO = createUserDTO(message.getAuthorId());
-        return entityToDTO(message, userDTO);
+        return messageMapper.toMessageDTO(message, userDTO);
     }
 
     @Override
     public List<MessageDTO> findAllByChannelId(UUID channelId) {
         List<Message> messages = messageRepository.findAllByChannelId(channelId);
         return messages.stream()
-                .map(message -> entityToDTO(message, createUserDTO(message.getAuthorId())))
+                .map(message -> messageMapper.toMessageDTO(message, createUserDTO(message.getAuthorId())))
                 .toList();
     }
 
@@ -80,7 +82,7 @@ public class BasicMessageService implements MessageService {
         replaceMessageAttachments(message, multipartFiles);
         Message updatedMessage = messageRepository.save(message);
         UserDTO userDTO = createUserDTO(updatedMessage.getAuthorId());
-        return entityToMessageDTO(updatedMessage, userDTO);
+        return messageMapper.toUpdateMessageDTO(updatedMessage, userDTO);
     }
 
     @Override
@@ -133,15 +135,6 @@ public class BasicMessageService implements MessageService {
     }
 
 
-        private Message createMessageEntity (CreateMessageParam createMessageParam, List<BinaryContent> binaryContentList){
-            return Message.builder()
-                    .attachmentIds(binaryContentList.get(0).getSize() != 0 ? binaryContentList.stream().map(BinaryContent::getId).toList() : null)
-                    .authorId(createMessageParam.authorId())
-                    .channelId(createMessageParam.channelId())
-                    .content(createMessageParam.content())
-                    .build();
-        }
-
         private UserDTO createUserDTO(UUID userId) {
             User user = findUserById(userId);
             UserStatus userStatus = userStatusService.findByUserId(user.getId());
@@ -150,17 +143,9 @@ public class BasicMessageService implements MessageService {
         }
 
 
-        private MessageDTO entityToDTO (Message message, UserDTO userDTO){
-            return new MessageDTO(message.getId(), message.getCreatedAt(), message.getUpdatedAt(), message.getAttachmentIds(), message.getContent(), message.getChannelId(), userDTO);
-        }
-
         private Message findMessageById (UUID id){
             return messageRepository.findById(id)
                     .orElseThrow(() -> RestExceptions.MESSAGE_NOT_FOUND);
-        }
-
-        private UpdateMessageDTO entityToMessageDTO(Message message, UserDTO userDTO) {
-        return new UpdateMessageDTO(message.getId(), message.getUpdatedAt(), message.getAttachmentIds(), message.getContent(), message.getChannelId(), userDTO);
         }
 
         private User findUserById(UUID userId) {

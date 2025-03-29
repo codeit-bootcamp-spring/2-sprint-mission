@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.dto.service.channel.CreatePrivateChannelPara
 import com.sprint.mission.discodeit.dto.service.channel.PrivateChannelDTO;
 import com.sprint.mission.discodeit.dto.service.channel.UpdateChannelDTO;
 import com.sprint.mission.discodeit.dto.service.channel.UpdateChannelParam;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-28T22:22:38+0900",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
+    date = "2025-03-29T13:04:09+0900",
+    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
 public class ChannelMapperImpl implements ChannelMapper {
@@ -160,5 +161,53 @@ public class ChannelMapperImpl implements ChannelMapper {
         UpdateChannelResponseDTO updateChannelResponseDTO = new UpdateChannelResponseDTO( id, updatedAt, type, name, description );
 
         return updateChannelResponseDTO;
+    }
+
+    @Override
+    public ChannelDTO toChannelDTO(Channel channel) {
+        if ( channel == null ) {
+            return null;
+        }
+
+        UUID id = null;
+        Instant createdAt = null;
+        Instant updatedAt = null;
+        ChannelType type = null;
+        String name = null;
+        String description = null;
+
+        id = channel.getId();
+        createdAt = channel.getCreatedAt();
+        updatedAt = channel.getUpdatedAt();
+        type = channel.getType();
+        name = channel.getName();
+        description = channel.getDescription();
+
+        ChannelDTO channelDTO = new ChannelDTO( id, createdAt, updatedAt, type, name, description );
+
+        return channelDTO;
+    }
+
+    @Override
+    public UpdateChannelDTO toUpdateChannelDTO(Channel channel) {
+        if ( channel == null ) {
+            return null;
+        }
+
+        UUID id = null;
+        Instant updatedAt = null;
+        ChannelType type = null;
+        String name = null;
+        String description = null;
+
+        id = channel.getId();
+        updatedAt = channel.getUpdatedAt();
+        type = channel.getType();
+        name = channel.getName();
+        description = channel.getDescription();
+
+        UpdateChannelDTO updateChannelDTO = new UpdateChannelDTO( id, updatedAt, type, name, description );
+
+        return updateChannelDTO;
     }
 }

@@ -69,7 +69,9 @@ public class BasicUserService implements UserService {
         // UserStatusMap을 만들고, User와 해당하는 UserStatus 객체를 userEntityToDTO 메서드에 넘겨줌
         // userEntityDTO에서 userStatus.isLoginUser() 메서드를 실행시켜 isLogin에 대한 정보를 생성
         Map<UUID, UserStatus> userStatusMap = userStatusService.findAll().stream()
-                .collect(Collectors.toMap(userStatus -> userStatus.getUserId(), userStatus -> userStatus));
+                .collect(Collectors.toMap(userStatus -> userStatus.getUserId(),
+                        userStatus -> userStatus,
+                        (existing, duplicate) -> duplicate)); // 갱신을 할 경우 중복 key가 발생 -> 중복일 경우 새 데이터로 바꿔줌
         return users.stream()
                 .map(user -> userMapper.toUserDTO(user, userStatusMap.get(user.getId()), user.getProfileId() != null ? binaryContentService.find(user.getProfileId()) : null))
                 .toList();
@@ -91,7 +93,7 @@ public class BasicUserService implements UserService {
         }
         User user = userRepository.save(findUser);
         BinaryContentDTO binaryContentDTO = user.getProfileId() != null ? binaryContentService.find(user.getProfileId()) : null;
-        return entityToUpdateDTO(user, binaryContentDTO);
+        return userMapper.toUpdateUserDTO(user, binaryContentDTO);
     }
 
     @Override
@@ -101,14 +103,6 @@ public class BasicUserService implements UserService {
         // 기본 프로필 ID가 아닐 때만 프로필 파일 삭제
         binaryContentService.delete(user.getProfileId());
         userStatusService.deleteByUserId(userId);
-    }
-
-    private UpdateUserDTO entityToUpdateDTO(User user, BinaryContentDTO binaryContentDTO) {
-        return new UpdateUserDTO(user.getId(),
-                binaryContentDTO,
-                user.getUpdatedAt(),
-                user.getUsername(),
-                user.getEmail());
     }
 
 
@@ -124,14 +118,16 @@ public class BasicUserService implements UserService {
         }
     }
 
+    // 비밀번호를 해싱해서 넣어주는 비즈니스 로직이 있으므로 Mapper가 아닌 Service에 위치
     private User createUserEntity(CreateUserParam createUserParam, BinaryContent binaryContent) {
         return User.builder()
-                .username(createUserParam.username())
-                .password(BCrypt.hashpw(createUserParam.password(), BCrypt.gensalt()))
                 .email(createUserParam.email())
                 .profileId(binaryContent != null ? binaryContent.getId() : null)
+                .password(BCrypt.hashpw(createUserParam.password(), BCrypt.gensalt()))
+                .username(createUserParam.username())
                 .build();
     }
+
 
     private User findUserById(UUID userId) {
         return userRepository.findById(userId)

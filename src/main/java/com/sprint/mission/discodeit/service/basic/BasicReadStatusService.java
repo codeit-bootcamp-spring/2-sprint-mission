@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusParam
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.RestException;
 import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -25,6 +26,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final ReadStatusMapper readStatusMapper;
 
     @Override
     public ReadStatusDTO create(CreateReadStatusParam createReadStatusParam) {
@@ -32,22 +34,22 @@ public class BasicReadStatusService implements ReadStatusService {
         checkChannelExists(createReadStatusParam);
         checkDuplicateReadStatus(createReadStatusParam);
 
-        ReadStatus readStatus = createReadStatusEntity(createReadStatusParam);
+        ReadStatus readStatus = readStatusMapper.toEntity(createReadStatusParam);
         readStatusRepository.save(readStatus);
-        return readStatusEntityToDTO(readStatus);
+        return readStatusMapper.toReadStatusDTO(readStatus);
     }
 
     @Override
     public ReadStatusDTO find(UUID id) {
         ReadStatus readStatus = findReadStatusById(id);
-        return readStatusEntityToDTO(readStatus);
+        return readStatusMapper.toReadStatusDTO(readStatus);
     }
 
     @Override
     public List<ReadStatusDTO> findAllByUserId(UUID userId) {
         List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
         return readStatuses.stream()
-                .map(rs -> readStatusEntityToDTO(rs))
+                .map(rs -> readStatusMapper.toReadStatusDTO(rs))
                 .collect(Collectors.toList());
     }
 
@@ -55,7 +57,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public List<ReadStatusDTO> findAllByChannelId(UUID channelId) {
         List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
         return readStatuses.stream()
-                .map(rs -> readStatusEntityToDTO(rs))
+                .map(rs -> readStatusMapper.toReadStatusDTO(rs))
                 .collect(Collectors.toList());
     }
 
@@ -99,17 +101,4 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusRepository.findById(id)
                 .orElseThrow(() -> RestExceptions.READ_STATUS_NOT_FOUND);
     }
-
-    private ReadStatus createReadStatusEntity(CreateReadStatusParam createReadStatusParam) {
-        return ReadStatus.builder()
-                .userId(createReadStatusParam.userId())
-                .channelId(createReadStatusParam.channelId())
-                .build();
-    }
-
-    private ReadStatusDTO readStatusEntityToDTO(ReadStatus readStatus) {
-        return new ReadStatusDTO(readStatus.getId(), readStatus.getUserId(), readStatus.getChannelId(), readStatus.getUpdatedAt());
-    }
-
-
 }

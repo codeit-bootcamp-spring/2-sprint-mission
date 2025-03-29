@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.controller.auth.LoginResponseDTO;
 import com.sprint.mission.discodeit.dto.service.auth.LoginDTO;
 import com.sprint.mission.discodeit.dto.service.auth.LoginParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
+import com.sprint.mission.discodeit.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -15,5 +16,7 @@ public interface AuthMapper {
 
     LoginParam toLoginParam(LoginRequestDTO loginRequestDTO);
     LoginResponseDTO toLoginResponseDTO(LoginDTO loginDTO);
+
+    LoginDTO toLoginDTO(User user);
 
 }

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.controller.message.CreateMessageRequestDTO;
-import com.sprint.mission.discodeit.dto.controller.message.CreateMessageResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.message.UpdateMessageRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.message.UpdateMessageResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.user.UserResponseDTO;
@@ -9,6 +8,8 @@ import com.sprint.mission.discodeit.dto.service.message.CreateMessageParam;
 import com.sprint.mission.discodeit.dto.service.message.MessageDTO;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageDTO;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageParam;
+import com.sprint.mission.discodeit.dto.service.user.UserDTO;
+import com.sprint.mission.discodeit.entity.Message;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-28T22:22:38+0900",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
+    date = "2025-03-29T13:41:15+0900",
+    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
 public class MessageMapperImpl implements MessageMapper {
@@ -41,34 +42,6 @@ public class MessageMapperImpl implements MessageMapper {
         CreateMessageParam createMessageParam = new CreateMessageParam( content, channelId, authorId );
 
         return createMessageParam;
-    }
-
-    @Override
-    public CreateMessageResponseDTO toMessageResponseDTO(MessageDTO messageDTO) {
-        if ( messageDTO == null ) {
-            return null;
-        }
-
-        UUID id = null;
-        Instant createdAt = null;
-        List<UUID> attachmentIds = null;
-        String content = null;
-        UUID channelId = null;
-
-        id = messageDTO.id();
-        createdAt = messageDTO.createdAt();
-        List<UUID> list = messageDTO.attachmentIds();
-        if ( list != null ) {
-            attachmentIds = new ArrayList<UUID>( list );
-        }
-        content = messageDTO.content();
-        channelId = messageDTO.channelId();
-
-        UserResponseDTO userResponseDTO = null;
-
-        CreateMessageResponseDTO createMessageResponseDTO = new CreateMessageResponseDTO( id, createdAt, attachmentIds, content, channelId, userResponseDTO );
-
-        return createMessageResponseDTO;
     }
 
     @Override
@@ -112,5 +85,69 @@ public class MessageMapperImpl implements MessageMapper {
         UpdateMessageResponseDTO updateMessageResponseDTO = new UpdateMessageResponseDTO( id, updatedAt, attachmentIds, content, channelId, userResponseDTO );
 
         return updateMessageResponseDTO;
+    }
+
+    @Override
+    public MessageDTO toMessageDTO(Message message, UserDTO userDTO) {
+        if ( message == null && userDTO == null ) {
+            return null;
+        }
+
+        UUID id = null;
+        Instant createdAt = null;
+        Instant updatedAt = null;
+        List<UUID> attachmentIds = null;
+        String content = null;
+        UUID channelId = null;
+        if ( message != null ) {
+            id = message.getId();
+            createdAt = message.getCreatedAt();
+            updatedAt = message.getUpdatedAt();
+            List<UUID> list = message.getAttachmentIds();
+            if ( list != null ) {
+                attachmentIds = new ArrayList<UUID>( list );
+            }
+            content = message.getContent();
+            channelId = message.getChannelId();
+        }
+        UserDTO userDTO1 = null;
+        if ( userDTO != null ) {
+            userDTO1 = userDTO;
+        }
+
+        MessageDTO messageDTO = new MessageDTO( id, createdAt, updatedAt, attachmentIds, content, channelId, userDTO1 );
+
+        return messageDTO;
+    }
+
+    @Override
+    public UpdateMessageDTO toUpdateMessageDTO(Message message, UserDTO userDTO) {
+        if ( message == null && userDTO == null ) {
+            return null;
+        }
+
+        UUID id = null;
+        Instant updatedAt = null;
+        List<UUID> attachmentIds = null;
+        String content = null;
+        UUID channelId = null;
+        if ( message != null ) {
+            id = message.getId();
+            updatedAt = message.getUpdatedAt();
+            List<UUID> list = message.getAttachmentIds();
+            if ( list != null ) {
+                attachmentIds = new ArrayList<UUID>( list );
+            }
+            content = message.getContent();
+            channelId = message.getChannelId();
+        }
+        UserDTO userDTO1 = null;
+        if ( userDTO != null ) {
+            userDTO1 = userDTO;
+        }
+
+        UpdateMessageDTO updateMessageDTO = new UpdateMessageDTO( id, updatedAt, attachmentIds, content, channelId, userDTO1 );
+
+        return updateMessageDTO;
     }
 }

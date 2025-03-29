@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusParam
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -21,12 +22,13 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusService readStatusService;
     private final MessageRepository messageRepository;
+    private final ChannelMapper channelMapper;
 
     @Override
     public ChannelDTO createPublicChannel(CreateChannelParam createChannelParam) {
         Channel channel = createPublicChannelEntity(createChannelParam);
         channelRepository.save(channel);
-        return entityToDTO(channel);
+        return channelMapper.toChannelDTO(channel);
     }
 
     @Override
@@ -34,7 +36,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = createPrivateChannelEntity(createPrivateChannelParam);
         channelRepository.save(channel);
         createReadStatusesForUsers(createPrivateChannelParam.userIds(), channel.getId());
-        return entityToPrivateDTO(createPrivateChannelParam.userIds(), channel);
+        return channelMapper.toPrivateChannelDTO(createPrivateChannelParam.userIds(), channel);
     }
 
     @Override
@@ -42,7 +44,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = findChannelById(channelId);
         Instant latestMessageTime = findMessageLatestTimeInChannel(channelId);
         List<UUID> userIds = getUserIdsFromChannel(channel);
-        return entityToFindDTO(channel, latestMessageTime, userIds);
+        return channelMapper.toFindChannelDTO(channel, latestMessageTime, userIds);
     }
 
     // PRIVATE의 경우, 참여한 User의 id정보를 포함해야함
@@ -54,7 +56,7 @@ public class BasicChannelService implements ChannelService {
         List<Channel> channels = channelRepository.findAll();
         return channels.stream()
                 .filter(ch -> ch.getType() == ChannelType.PUBLIC || getUserIdsFromChannel(ch).contains(userId))
-                .map(ch -> entityToFindDTO(ch,
+                .map(ch -> channelMapper.toFindChannelDTO(ch,
                         findMessageLatestTimeInChannel(ch.getId()),
                         getUserIdsFromChannel(ch)))
                 .toList();
@@ -69,7 +71,7 @@ public class BasicChannelService implements ChannelService {
         }
         channel.update(updateChannelParam.name(), updateChannelParam.description());
         Channel updatedChannel = channelRepository.save(channel);
-        return entityToUpdateDTO(updatedChannel);
+        return channelMapper.toUpdateChannelDTO(updatedChannel);
     }
 
     @Override
@@ -91,13 +93,6 @@ public class BasicChannelService implements ChannelService {
         return Channel.ofPrivate(createPrivateChannelParam.type());
     }
 
-    private ChannelDTO entityToDTO(Channel channel) {
-        return new ChannelDTO(channel.getId(),channel.getCreatedAt(),channel.getUpdatedAt(),channel.getType(), channel.getName(), channel.getDescription());
-    }
-
-    private PrivateChannelDTO entityToPrivateDTO(List<UUID> userIds, Channel channel) {
-        return new PrivateChannelDTO(channel.getId(),channel.getCreatedAt(),channel.getUpdatedAt(),channel.getType(), channel.getName(), channel.getDescription(), userIds);
-    }
 
     private void createReadStatusesForUsers(List<UUID> userIds, UUID channelId) {
         List<CreateReadStatusParam> createReadStatusParams = userIds.stream()
@@ -105,14 +100,6 @@ public class BasicChannelService implements ChannelService {
                         .toList();
         // DTO를 이용해 readStatus 생성
         createReadStatusParams.forEach(cr -> readStatusService.create(cr));
-    }
-
-    private UpdateChannelDTO entityToUpdateDTO(Channel channel) {
-        return new UpdateChannelDTO(channel.getId(), channel.getUpdatedAt(), channel.getType(), channel.getName(), channel.getDescription());
-    }
-
-    private FindChannelDTO entityToFindDTO(Channel channel, Instant latestMessageTime, List<UUID> userIds) {
-        return new FindChannelDTO(channel.getId(), channel.getType(), channel.getName(), channel.getDescription(), latestMessageTime, userIds);
     }
 
     // PRIVATE 채널일때만 userId 가져오고 아닐떈 빈리스트 반환

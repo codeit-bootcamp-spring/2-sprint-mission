@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.controller.readstatus.UpdateReadStatusRe
 import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusParam;
 import com.sprint.mission.discodeit.dto.service.readStatus.ReadStatusDTO;
 import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusDTO;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -17,4 +18,7 @@ public interface ReadStatusMapper {
     CreateReadStatusResponseDTO toReadStatusResponseDTO(ReadStatusDTO readStatusDTO);
 
     UpdateReadStatusResponseDTO toUpdateReadStatusResponseDTO(UpdateReadStatusDTO updateReadStatusDTO);
+
+    ReadStatus toEntity(CreateReadStatusParam createReadStatusParam);
+    ReadStatusDTO toReadStatusDTO(ReadStatus readStatus);
 }
