@@ -15,6 +15,11 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
+    public Message findById(UUID id) {
+        return null;
+    }
+
+    @Override
     public List<Message> findByUser(UUID userId) {
         List<Message> messages = messageData.values().stream().filter(m -> m.getUserId().equals(userId)).toList();
         if(messages.isEmpty()){

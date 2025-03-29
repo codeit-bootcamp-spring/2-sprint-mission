@@ -48,7 +48,7 @@ public class JavaApplication {
         MessageRepository messageRepository = new FileMessageRepository(messageFile, saveLoadHandler);
 
         ChannelService channelService = new BasicChannelService(channelRepository, readStatusRepository, messageRepository);
-        MessageService messageService = new BasicMessageService(messageRepository);
+        MessageService messageService = new BasicMessageService(messageRepository, userRepository, channelRepository, binaryContentRepository);
         BasicAuthService basicAuthService = new BasicAuthService(userRepository);
 
         Scanner scanner = new Scanner(System.in);

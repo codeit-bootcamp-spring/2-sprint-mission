@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface MessageRepository {
     Message save(Message message);
+    Message findById(UUID id);
     List<Message> findByUser(UUID userId);
     List<Message> findByChannel(UUID channelId);
     List<Message> findByUserAndByChannel(UUID userId, UUID channelId);

@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.MessageService.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageService.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -21,7 +23,7 @@ public class JCFMessageService implements MessageService {
 
 
     @Override
-    public Message create(MessageCreateRequest messageCreateRequest) {
+    public Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentDTO> binaryContentDtos) {
         try{
             channelService.find(messageCreateRequest.channelId());
             userService.find(messageCreateRequest.userId());
@@ -29,9 +31,10 @@ public class JCFMessageService implements MessageService {
             throw new IllegalArgumentException("채널 혹은 유저가 존재하지 않습니다.");
         }
 
-        Message message = messageCreateRequest.toEntity();
-        messageData.put(message.getId(), message);
-        return message;
+//        Message message = messageCreateRequest.toEntity();
+//        messageData.put(message.getId(), message);
+//        return message;
+        return null;
     }
 
     @Override
@@ -67,10 +70,10 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UUID messageId, String newMessage) {
-        Message messageNullable = messageData.get(messageId);
-        Message message = Optional.ofNullable(messageNullable).orElseThrow(() -> new NoSuchElementException("메세지 " + messageId + "가 존재하지 않습니다."));
-        message.updateMessage(newMessage);
+    public Message update(MessageUpdateRequest messageUpdateRequest) {
+        Message messageNullable = messageData.get(messageUpdateRequest.messageId());
+        Message message = Optional.ofNullable(messageNullable).orElseThrow(() -> new NoSuchElementException("메세지 " + messageUpdateRequest.messageId() + "가 존재하지 않습니다."));
+        message.updateMessage(messageUpdateRequest.newMessage());
         return message; 
     }
 

@@ -9,11 +9,4 @@ public record MessageCreateRequest(
         UUID userId,
         UUID channelId
 ) {
-    public static MessageCreateRequest toDTO(Message message) {
-        return new MessageCreateRequest(message.getMessage(), message.getUserId(), message.getChannelId());
-    }
-
-    public Message toEntity() {
-        return new Message(this.message, this.userId, this.channelId);
-    }
 }

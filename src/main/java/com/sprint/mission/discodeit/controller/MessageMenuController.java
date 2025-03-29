@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.MessageService.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageService.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.UserService.AuthRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
@@ -146,7 +147,8 @@ public class MessageMenuController {
     private void createMessage(){
         String message = getMessageInput("작성할 메세지: ");
         MessageCreateRequest messageCreateRequest = new MessageCreateRequest(message,loggedUser.getId(), currentChannel.getId());
-        messageService.create(messageCreateRequest);
+
+        messageService.create(messageCreateRequest,);
     }
 
     private void findMessage(){
@@ -184,7 +186,8 @@ public class MessageMenuController {
     private void updateMessage(){
         UUID messageId = getIdFromInput("수정할 메세지의 ID를 입력해주세요: ");
         String newMessage = getMessageInput("새로운 메세지: ");
-        messageService.update(messageId,newMessage);
+        MessageUpdateRequest request = new MessageUpdateRequest(messageId, newMessage);
+        messageService.update(request);
 
     }
 
