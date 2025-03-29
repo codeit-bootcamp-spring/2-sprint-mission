@@ -13,6 +13,8 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +29,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final ReadStatusMapper readStatusMapper;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public ReadStatusDTO create(CreateReadStatusParam createReadStatusParam) {
@@ -83,22 +86,32 @@ public class BasicReadStatusService implements ReadStatusService {
 
     private void checkUserExists(CreateReadStatusParam createReadStatusParam) {
         userRepository.findById(createReadStatusParam.userId())
-                .orElseThrow(() -> RestExceptions.USER_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("읽음상태 생성 중 유저 찾기 실패: {}", createReadStatusParam.userId());
+                    return RestExceptions.USER_NOT_FOUND;
+                });
     }
 
     private void checkChannelExists(CreateReadStatusParam createReadStatusParam) {
         channelRepository.findById(createReadStatusParam.channelId())
-                .orElseThrow(() -> RestExceptions.CHANNEL_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("읽음상태 생성 중 채널 찾기 실패: {}", createReadStatusParam.channelId());
+                    return RestExceptions.CHANNEL_NOT_FOUND;
+                });
     }
 
     private void checkDuplicateReadStatus(CreateReadStatusParam createReadStatusParam) {
         if (readStatusRepository.existsByUserIdAndChannelId(createReadStatusParam.userId(), createReadStatusParam.channelId())) {
+            logger.error("읽음상태 중복 발생 - userId: {}, channelId: {}", createReadStatusParam.userId(), createReadStatusParam.channelId());
             throw RestExceptions.DUPLICATE_READ_STATUS;
         }
     }
 
     private ReadStatus findReadStatusById(UUID id) {
         return readStatusRepository.findById(id)
-                .orElseThrow(() -> RestExceptions.READ_STATUS_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("읽음상태 찾기 실패: {}", id);
+                    return RestExceptions.READ_STATUS_NOT_FOUND;
+                });
     }
 }

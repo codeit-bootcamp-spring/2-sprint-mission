@@ -11,6 +11,8 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -23,6 +25,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusService readStatusService;
     private final MessageRepository messageRepository;
     private final ChannelMapper channelMapper;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public ChannelDTO createPublicChannel(CreateChannelParam createChannelParam) {
@@ -67,6 +70,7 @@ public class BasicChannelService implements ChannelService {
     public UpdateChannelDTO update(UUID id, UpdateChannelParam updateChannelParam) {
         Channel channel = findChannelById(id);
         if(channel.getType() == ChannelType.PRIVATE) {
+            logger.error("채널 수정 실패 - ID: {}, Type: {} (PRIVATE 채널은 수정 불가)", id, channel.getType());
             throw RestExceptions.UNAUTHORIZED_PRIVATE_CHANNEL;
         }
         channel.update(updateChannelParam.name(), updateChannelParam.description());
@@ -115,7 +119,10 @@ public class BasicChannelService implements ChannelService {
 
     private Channel findChannelById(UUID id) {
         return channelRepository.findById(id)
-                .orElseThrow(() -> RestExceptions.CHANNEL_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("채널 찾기 실패: {}", id);
+                    return RestExceptions.CHANNEL_NOT_FOUND;
+                });
     }
 
     private Instant findMessageLatestTimeInChannel(UUID channelId) {
@@ -124,7 +131,10 @@ public class BasicChannelService implements ChannelService {
             return null;
         }
         return messageRepository.findLatestMessageTimeByChannelId(channelId)
-                .orElseThrow(() -> RestExceptions.MESSAGE_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("채널 내 메시지 찾기 실패 - channelId: {}", channelId);
+                    return RestExceptions.MESSAGE_NOT_FOUND;
+                });
     }
 
 

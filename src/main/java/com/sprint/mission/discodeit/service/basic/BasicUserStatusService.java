@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public UserStatus create(UserStatus userStatus) {
@@ -59,11 +62,15 @@ public class BasicUserStatusService implements UserStatusService {
 
     private void checkUserExists(UserStatus userStatus) {
         userRepository.findById(userStatus.getUserId())
-                .orElseThrow(() -> RestExceptions.USER_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("유저상태 생성 중 유저 찾기 실패: {}", userStatus.getUserId());
+                    return RestExceptions.USER_NOT_FOUND;
+                });
     }
 
     private void checkDuplicateUser(UserStatus userStatus) {
         if (userStatusRepository.existsByUserId(userStatus.getUserId())) {
+            logger.error("유저상태 생성 중 유저상태 중복 발생: {}", userStatus.getId());
             throw RestExceptions.DUPLICATE_USER_STATUS;
         }
     }
@@ -71,11 +78,17 @@ public class BasicUserStatusService implements UserStatusService {
 
     private UserStatus findUserStatusByUserId(UUID userId) {
         return userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> RestExceptions.USER_STATUS_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("유저상태 조회 실패 - userId: {}", userId);
+                    return RestExceptions.USER_STATUS_NOT_FOUND;
+                });
     }
 
     private UserStatus findUserStatusById(UUID id) {
         return userStatusRepository.findById(id)
-                .orElseThrow(() -> RestExceptions.USER_STATUS_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("유저상태 조회 실패: {}", id);
+                    return RestExceptions.USER_STATUS_NOT_FOUND;
+                });
     }
 }

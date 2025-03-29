@@ -16,6 +16,8 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,6 +35,7 @@ public class BasicUserService implements UserService {
     private final UserStatusService userStatusService;
     private final BinaryContentService binaryContentService;
     private final UserMapper userMapper;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     @Override
@@ -131,7 +134,10 @@ public class BasicUserService implements UserService {
 
     private User findUserById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> RestExceptions.USER_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("유저 찾기 실패: {}", userId);
+                    return RestExceptions.USER_NOT_FOUND;
+                });
     }
 
     private BinaryContent createBinaryContentEntity(MultipartFile multipartFile) {
@@ -146,7 +152,8 @@ public class BasicUserService implements UserService {
                     .filename(multipartFile.getOriginalFilename())
                     .build();
         } catch (IOException e) {
-            throw new RuntimeException("파일 저장 중 오류 발생: " + e.getMessage(), e);
+            logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
+            throw RestExceptions.FILE_READ_ERROR;
         }
     }
 
