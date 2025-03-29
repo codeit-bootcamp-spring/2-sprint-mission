@@ -31,11 +31,10 @@ public class BasicUserService implements UserService {
         validDuplicateEmail(createRequest.email());
 
         UUID binaryContentId = (binaryData != null)
-                ? basicBinaryContentService.create(binaryData).getId()
-                : null;
+                ? basicBinaryContentService.create(binaryData).getId() : null;
 
-        User user = new User(createRequest.username(), createRequest.email()
-                , createRequest.password(), binaryContentId);
+        User user = new User(createRequest.username(), createRequest.email(), createRequest.password(),
+                binaryContentId);
         userRepository.save(user);
         UserStatusCreateRequest statusParam = new UserStatusCreateRequest(user.getId());
         userStatusService.create(statusParam);
