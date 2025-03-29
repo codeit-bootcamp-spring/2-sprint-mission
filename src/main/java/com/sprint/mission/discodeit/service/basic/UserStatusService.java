@@ -1,8 +1,9 @@
-package com.sprint.mission.discodeit.service.domain;
+package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.domain.UserStatus;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,20 +20,19 @@ public class UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
 
-    public UserStatusCreateDto create(UserStatusCreateDto request) {
+    public UserStatus create(UserStatusCreateRequest request) {
 //        관련된 User가 존재하지 않으면 예외를 발생시킵니다.
-        if(!userRepository.existsById(request.userId())){
-            throw new IllegalArgumentException("User does not exist");
-        }
+        User user = userRepository.findById(request.userId())
+                .orElseThrow(()-> new NoSuchElementException("User not found"));
 //        같은 User와 관련된 객체가 이미 존재하면 예외를 발생시킵니다.
         if(userStatusRepository.findByUserId(request.userId()).isPresent()){
             throw new IllegalArgumentException("User with id " + request.userId() + " already exists");
         }
 
-        UserStatus userStatus = new UserStatus(request.userId(), request.lastOnlineAt());
+        UserStatus userStatus = new UserStatus(user.getId(), request.lastOnlineAt());
         userStatusRepository.save(userStatus);
 
-        return new UserStatusCreateDto(userStatus.getUserId(), userStatus.getLastOnlineAt());
+        return userStatus;
     }
 
     public UserStatus find(UUID id){
@@ -44,8 +44,8 @@ public class UserStatusService {
         return userStatusRepository.findAll();
     }
 
-    public UserStatus update(UserStatusUpdateDto request) {
-        UserStatus userStatus = userStatusRepository.findById(request.id())
+    public UserStatus update(UUID userId, UserStatusUpdateRequest request) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("UserStatus does not exist"));
 
         userStatus.updateLastOnline(request.lastOnLineAt());
@@ -53,7 +53,7 @@ public class UserStatusService {
         return userStatusRepository.save(userStatus);
     }
 
-    public UserStatus updateByUserId(UUID userId){
+    public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
         // userId 로 특정 User의 객체를 업데이트합니다.
         // 뭘 업데이트 하라는 걸까?
         UserStatus userStatus = userStatusRepository.findByUserId(userId)

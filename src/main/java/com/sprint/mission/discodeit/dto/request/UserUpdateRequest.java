@@ -1,12 +1,11 @@
-package com.sprint.mission.discodeit.dto.user.request;
+package com.sprint.mission.discodeit.dto.request;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public record UserUpdateRequest(
-        UUID Id,
+        UUID id,
         Optional<String> username,
         Optional<String> email,
-        Optional<String> password,
-        Optional<UUID> BinaryContentId
+        Optional<String> password
 ) {}
