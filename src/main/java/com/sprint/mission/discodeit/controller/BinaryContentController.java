@@ -29,14 +29,4 @@ public class BinaryContentController {
     public ResponseEntity<List<BinaryContent>> findAll(@RequestParam List<UUID> ids) {
         return ResponseEntity.ok(binaryContentService.findAllByIdIn(ids));
     }
-
-
-
-
-
-
-
-
-
-
 }
