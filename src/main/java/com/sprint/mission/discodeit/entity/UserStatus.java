@@ -2,32 +2,44 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class UserStatus {
-    private final UUID id;
-    private final Instant createAt;
-    private final Instant updateAt;
-    private final Instant lastActiveAt;
+public class UserStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private UUID userId;
+    private Instant lastActiveAt;
 
-    public UserStatus(UUID id, Instant createAt, Instant updateAt, Instant lastActiveAt) {
-        this.id = id;
-        this.createAt = createAt;
-        this.updateAt = updateAt;
+    public UserStatus(UUID userId, Instant lastActiveAt) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.userId = userId;
         this.lastActiveAt = lastActiveAt;
     }
 
-    public UserStatus(Instant lastActiveAt) {
-        this(UUID.randomUUID(), Instant.now(), Instant.now(), lastActiveAt);
+    public void update(Instant lastActiveAt) {
+        boolean anyValueUpdated = false;
+        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+            this.lastActiveAt = lastActiveAt;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
-    private static final long ONLINE_THRESHOLD_SECONDS = 300;
+    public Boolean isOnline() {
+        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
-    public boolean isOnline() {
-        return lastActiveAt != null &&
-                Duration.between(lastActiveAt, Instant.now()).toSeconds() < ONLINE_THRESHOLD_SECONDS;
+        return lastActiveAt.isAfter(instantFiveMinutesAgo);
     }
 }
