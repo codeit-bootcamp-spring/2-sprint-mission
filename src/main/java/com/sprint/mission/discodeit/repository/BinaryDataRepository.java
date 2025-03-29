@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.dto.BinaryDataResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryData;
 
+import java.util.Optional;
+import java.util.UUID;
+
 public interface BinaryDataRepository {
-    BinaryDataResponseDto save(BinaryData binaryData);
+    BinaryData save(BinaryData binaryData);
+    Optional<BinaryData> findById(UUID binaryContentUUID);
 }

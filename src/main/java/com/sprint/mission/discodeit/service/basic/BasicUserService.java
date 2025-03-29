@@ -55,7 +55,7 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자 상태 확인 불가"));
 
         FindUserDto findUserDto = new FindUserDto(
-                user.getId(), user.getNickname(),
+                user.getId(), user.getUsername(), user.getEmail(),
                 user.getProfile(), user.getCreatedAt(),
                 user.getUpdatedAt(), userStatus.getUpdatedAt(),
                 userStatus.isLastStatus());

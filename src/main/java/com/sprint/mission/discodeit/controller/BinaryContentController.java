@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.FindBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.SaveBinaryContentParamDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ public class BinaryContentController {
     }
 
     @GetMapping("/find")
-    public ResponseEntity<BinaryContent> find(@RequestParam UUID binaryContentId) {
+    public ResponseEntity<FindBinaryContentRequestDto> find(@RequestParam UUID binaryContentId) {
         binaryContentService.findById(binaryContentId);
         return ResponseEntity.ok().body(binaryContentService.findById(binaryContentId));
     }

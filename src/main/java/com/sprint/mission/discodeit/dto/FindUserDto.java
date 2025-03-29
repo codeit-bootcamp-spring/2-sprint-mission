@@ -5,7 +5,8 @@ import java.util.UUID;
 
 public record FindUserDto(
         UUID userUUID,
-        String nickname,
+        String username,
+        String email,
         UUID profileId,
         Instant createdAt,
         Instant updatedAt,

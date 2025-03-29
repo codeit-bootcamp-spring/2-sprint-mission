@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.utils;
 
 import com.sprint.mission.discodeit.constant.SubDirectory;
-import com.sprint.mission.discodeit.dto.BinaryDataResponseDto;
-import com.sprint.mission.discodeit.entity.BinaryData;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -22,7 +20,7 @@ public class FileManager {
         this.BASE_DIR = System.getProperty("user.dir") + fileDirectory;
     }
 
-    public <T extends Serializable> void writeToFile(SubDirectory subDirectory, T object, UUID id) {
+    public <T extends Serializable> T writeToFile(SubDirectory subDirectory, T object, UUID id) {
         String fileName = id.toString() + DATA_EXTENSION;
         String filePath = BASE_DIR + subDirectory.getDirectory() + "\\" + fileName;
 
@@ -36,6 +34,7 @@ public class FileManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return object;
     }
 
     public <T> List<T> readFromFileAll(SubDirectory subDirectory, Class<T> type) {
@@ -92,23 +91,5 @@ public class FileManager {
             return true;
         }
         return false;
-    }
-
-    public BinaryDataResponseDto writeToFile(BinaryData binaryData) {
-        String fileName = binaryData.getBinaryFileName();
-        String filePath = BASE_DIR + SubDirectory.BINARY_DATA.getDirectory() + "\\" + fileName;
-
-        File directory = new File(BASE_DIR + SubDirectory.BINARY_DATA.getDirectory());
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
-        try (FileOutputStream fos = new FileOutputStream(filePath)) {
-            fos.write(binaryData.getData());
-            fos.flush();
-        } catch (IOException e) {
-            throw new RuntimeException("[실패] 파일 저장 실패", e);
-        }
-        return new BinaryDataResponseDto(filePath, fileName);
     }
 }

@@ -1,22 +1,29 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.BinaryDataResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryData;
 import com.sprint.mission.discodeit.repository.BinaryDataRepository;
-import com.sprint.mission.discodeit.utils.FileManager;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 @Repository
-@RequiredArgsConstructor
 public class JCFBinaryDataRepository implements BinaryDataRepository {
 
-    private final FileManager fileManager;
+    Map<UUID, BinaryData> binaryDataList = new HashMap<>();
 
     @Override
-    public BinaryDataResponseDto save(BinaryData binaryData) {
-        return fileManager.writeToFile(binaryData);
+    public BinaryData save(BinaryData binaryData) {
+        binaryDataList.put(binaryData.getId(), binaryData);
+        return binaryDataList.get(binaryData.getId());
+    }
+
+    @Override
+    public Optional<BinaryData> findById(UUID binaryContentUUID) {
+        return Optional.of(binaryDataList.get(binaryContentUUID));
     }
 }
