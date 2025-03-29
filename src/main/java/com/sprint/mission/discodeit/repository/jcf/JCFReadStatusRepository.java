@@ -4,42 +4,52 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class JCFReadStatusRepository implements ReadStatusRepository {
-    private final Map<String, ReadStatus> readStatusMap = new HashMap<>();
+    private final Map<UUID, ReadStatus> data;
 
-    private String generateKey(UUID userId, UUID channelId) {
-        return userId.toString() + "-" + channelId.toString();
+    public JCFReadStatusRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public void save(ReadStatus readStatus) {
-        String key = generateKey(readStatus.getUser().getId(), readStatus.getChannel().getId());
-        readStatusMap.put(key, readStatus);
+    public ReadStatus save(ReadStatus readStatus) {
+        this.data.put(readStatus.getId(), readStatus);
+        return readStatus;
     }
 
     @Override
-    public Optional<ReadStatus> findById(UUID userId, UUID channelId) {
-        String key = generateKey(userId, channelId);
-        return Optional.ofNullable(readStatusMap.get(key));
-    }
-
-    @Override
-    public List<ReadStatus> findAll() {
-        return new ArrayList<>(readStatusMap.values());
+    public Optional<ReadStatus> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusMap.values().stream()
-                .filter(rs -> rs.getUser().getId().equals(userId))
-                .collect(Collectors.toList());
+        return this.data.values().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .toList();
     }
 
     @Override
-    public void delete(UUID userId, UUID channelId) {
-        String key = generateKey(userId, channelId);
-        readStatusMap.remove(key);
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return this.data.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(readStatus -> this.deleteById(readStatus.getId()));
     }
 }
