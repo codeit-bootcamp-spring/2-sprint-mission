@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.service.domain;
+package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.domain.BinaryContent;
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +15,8 @@ import java.util.UUID;
 public class BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
-    public BinaryContent create(BinaryContentDto request) {
-        BinaryContent binaryContent = new BinaryContent(request.content(), request.contentType());
+    public BinaryContent create(BinaryContentCreateRequest request) {
+        BinaryContent binaryContent = new BinaryContent(request.fileName(), (long) request.bytes().length, request.contentType(), request.bytes());
 
         return binaryContentRepository.save(binaryContent);
     }
@@ -33,6 +33,9 @@ public class BinaryContentService {
     }
 
     public void delete(UUID id){
+        if (!binaryContentRepository.existsById(id)) {
+            throw new NoSuchElementException("BinaryContent with id " + id + " not found");
+        }
         binaryContentRepository.delete(id);
     }
 }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain;
+package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
@@ -12,13 +12,17 @@ public class BinaryContent implements Serializable {
 
     private final UUID id;
     private final Instant createdAt;
-    private final byte[] content;
-    private final String contentType;
+    private String fileName;
+    private Long size;
+    private String contentType;
+    private byte[] bytes;
 
-    public BinaryContent(byte[] content, String contentType) {
+    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        this.content = content;
+        this.fileName = fileName;
+        this.size = size;
         this.contentType = contentType;
+        this.bytes = bytes;
     }
 }
