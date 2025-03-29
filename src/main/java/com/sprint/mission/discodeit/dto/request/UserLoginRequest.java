@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.user.request;
+package com.sprint.mission.discodeit.dto.request;
 
 public record UserLoginRequest(
         String username,
