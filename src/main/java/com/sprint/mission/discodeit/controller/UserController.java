@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/user")
@@ -15,23 +17,31 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final UserStatusService userStatusService;
 
-    @PostMapping("/save")
-    public ResponseEntity<ApiResponse<Void>> save(@RequestBody SaveUserParamDto saveUserParamDto) {
-        userService.save(saveUserParamDto);
+    @PostMapping("")
+    public ResponseEntity<ApiResponse<Void>> save(
+            @ModelAttribute SaveUserRequestDto saveUserRequestDto,
+            @RequestParam(value =  "file", required = false) MultipartFile file
+    ) throws IOException {
+        userService.save(saveUserRequestDto, SaveBinaryContentRequestDto.nullableFrom(file));
         return ResponseEntity.ok(ApiResponse.success());
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ApiResponse<Void>> update(@RequestBody UpdateUserParamDto updateUserParamDto) {
-        userService.update(updateUserParamDto);
+    @PutMapping("/{userId}")
+    public ResponseEntity<ApiResponse<Void>> update(
+            @PathVariable UUID userId,
+            @ModelAttribute UpdateUserParamDto updateUserParamDto,
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+        userService.update(userId, updateUserParamDto, SaveBinaryContentRequestDto.nullableFrom(file));
         return ResponseEntity.ok(ApiResponse.success());
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<ApiResponse<Void>> delete(@RequestBody DeleteUserRequestDto deleteUserRequestDto) {
-        userService.delete(deleteUserRequestDto);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @PathVariable UUID userId
+    ) {
+        userService.delete(userId);
         return ResponseEntity.ok(ApiResponse.success());
     }
 
@@ -40,11 +50,4 @@ public class UserController {
         List<FindUserDto> findUserDtoList = userService.findAllUser();
         return ResponseEntity.ok(ApiResponse.success(findUserDtoList));
     }
-
-    @PutMapping("/update-user-status")
-    public ResponseEntity<ApiResponse<Void>> updateUserStatus(@RequestBody UpdateUserStatusByUserIdParamDto updateUserStatusByUserIdParamDto) {
-        userStatusService.updateByUserId(updateUserStatusByUserIdParamDto);
-        return ResponseEntity.ok(ApiResponse.success());
-    }
-
 }

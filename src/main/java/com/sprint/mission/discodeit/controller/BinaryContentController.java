@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ApiResponse;
 import com.sprint.mission.discodeit.dto.FindBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.SaveBinaryContentParamDto;
+import com.sprint.mission.discodeit.dto.SaveBinaryContentRequestDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class BinaryContentController {
 
     @PostMapping("/save")
     public ResponseEntity<ApiResponse<Void>> save(@RequestParam("file") MultipartFile file) throws IOException {
-        binaryContentService.save(SaveBinaryContentParamDto.from(file));
+        binaryContentService.save(SaveBinaryContentRequestDto.from(file));
         return ResponseEntity.ok(ApiResponse.success());
     }
 

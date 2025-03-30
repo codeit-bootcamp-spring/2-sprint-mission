@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.FindBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.SaveBinaryContentParamDto;
+import com.sprint.mission.discodeit.dto.SaveBinaryContentRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryData;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -22,10 +22,10 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryDataRepository binaryDataRepository;
 
     @Override
-    public BinaryContent save(SaveBinaryContentParamDto saveBinaryContentParamDto) {
-        String fileName = saveBinaryContentParamDto.fileName();
-        String contentType = saveBinaryContentParamDto.contentType();
-        byte[] data = saveBinaryContentParamDto.fileData();
+    public BinaryContent save(SaveBinaryContentRequestDto saveBinaryContentRequestDto) {
+        String fileName = saveBinaryContentRequestDto.fileName();
+        String contentType = saveBinaryContentRequestDto.contentType();
+        byte[] data = saveBinaryContentRequestDto.fileData();
 
         BinaryData binaryData = binaryDataRepository.save(new BinaryData(data));
         BinaryContent binaryContent = new BinaryContent(
