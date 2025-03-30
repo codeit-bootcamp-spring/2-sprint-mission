@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -49,6 +50,13 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserReadResponse>> read(@PathVariable UUID id) {
         UserReadResponse readResponse = userService.readUser(id);
         ApiResponse<UserReadResponse> response = new ApiResponse<>(true, "유저 읽기 성공", readResponse);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @GetMapping("/finaAll")
+    public ResponseEntity<List<UserReadResponse>> readAll() {       // 미션 요구사항때문에 이 api의 반환값만 ApiResponse를 사용안함.
+        List<UserReadResponse> response = userService.readAllUsers();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }
