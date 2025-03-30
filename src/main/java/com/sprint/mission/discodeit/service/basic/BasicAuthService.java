@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.*;
+import com.sprint.mission.discodeit.dto.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.LoginRequest;
+import com.sprint.mission.discodeit.dto.LoginResponse;
+import com.sprint.mission.discodeit.dto.RegisterResponse;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.jwt.JwtUtil;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final UserStatusRepository userStatusRepository;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -43,6 +47,10 @@ public class BasicAuthService implements AuthService {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
+        userStatusRepository.findUserStatusById(user.getId())
+                .ifPresent(status -> status.updateLastActiveAt());
+        userStatusRepository.save();
+
         String token = jwtUtil.generateToken(user.getId().toString());
 
         return LoginResponse.builder()
@@ -50,14 +58,5 @@ public class BasicAuthService implements AuthService {
                 .message("성공적으로 로그인 되었습니다.")
                 .token(token)
                 .build();
-    }
-
-    private UserInfoDto mapToUserFindDto(User user) {
-        UserInfoDto dto = new UserInfoDto();
-        dto.setUserid(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setEmail(user.getEmail());
-        dto.setStatus(UserStatusType.Online);
-        return dto;
     }
 }

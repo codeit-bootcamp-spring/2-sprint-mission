@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,19 +16,19 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/channels")
+@RequestMapping("/api/channel")
 public class ChannelController {
 
     private final ChannelService channelService;
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/create/private", method = RequestMethod.POST)
     public ResponseEntity<?> createPrivateChannel(@RequestBody CreatePrivateChannelRequest channelDto) {
         Channel channel = channelService.createPrivateChannel(channelDto);
 
-        return ResponseEntity.ok(channel.getMembers());
+        return ResponseEntity.ok(channel.getId());
     }
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/create/public", method = RequestMethod.POST)
     public ResponseEntity<?> createPublicChannel(@RequestBody CreatePublicChannelRequest channelDto) {
         Channel channel = channelService.createPublicChannel(channelDto);
 
@@ -48,6 +49,7 @@ public class ChannelController {
         return ResponseEntity.ok("채널이 삭제되었습니다.");
     }
 
+    @RequiresAuth
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<?> getAllChannels(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");

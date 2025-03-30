@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.jwt.JwtUtil;
+import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class MessageController {
     private final MessageService messageService;
     private final JwtUtil jwtUtil;
 
+    @RequiresAuth
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public ResponseEntity<?> createMessage(
             @RequestBody CreateMessageRequest request,
@@ -33,6 +35,7 @@ public class MessageController {
         return ResponseEntity.ok("메세지가 성공적으로 생성되었습니다.");
     }
 
+    @RequiresAuth
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateMessage(
             @PathVariable UUID messageId,
@@ -46,6 +49,7 @@ public class MessageController {
         return ResponseEntity.ok("메세지가 업데이트 되었습니다.");
     }
 
+    @RequiresAuth
     @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteMessage(
             @PathVariable UUID messageId,

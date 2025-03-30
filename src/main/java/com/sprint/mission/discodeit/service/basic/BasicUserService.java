@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.UserInfoDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -86,6 +87,7 @@ public class BasicUserService implements UserService {
     @Override
     public void updateProfile(UUID userId, UUID profileId) {
         userRepository.findUserById(userId).updateProfile(profileId);
+        userRepository.save();
     }
 
     @Override
@@ -113,13 +115,17 @@ public class BasicUserService implements UserService {
     }
 
     private UserInfoDto mapToUserFindDto(User user) {
+        Boolean isOnline = userStatusRepository.findUserStatusById(user.getId())
+                .map(status -> status.isUserOnline() == UserStatusType.Online)
+                .orElse(null);
+
         UserInfoDto dto = new UserInfoDto();
         dto.setUserid(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
-        dto.setStatus(userStatusRepository.findUserStatusById(user.getId()).getStatus()); // ✅ 온라인 상태 추가
+        dto.setOnline(isOnline);
+        dto.setProfileId(user.getProfileId());
         return dto;
     }
-
 
 }

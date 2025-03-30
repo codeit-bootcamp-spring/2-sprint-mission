@@ -13,10 +13,13 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
-    BinaryContentRepository binaryContentRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
-    public void createBinaryContent(CreateBinaryContentRequest request) {
-        binaryContentRepository.addBinaryContent(new BinaryContent(request.getReferenceId(), request.getFilePath()));
+    public UUID createBinaryContent(CreateBinaryContentRequest request) {
+        BinaryContent binaryContent = new BinaryContent(request.getFileName(), request.getSize(), request.getContentType(), request.getBytes());
+        binaryContentRepository.addBinaryContent(binaryContent);
+
+        return binaryContent.getId();
     }
 
     public BinaryContent findBinaryContent(UUID binaryContentId) {

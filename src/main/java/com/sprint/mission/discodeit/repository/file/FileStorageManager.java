@@ -23,6 +23,8 @@ public class FileStorageManager {
                 dir.mkdirs();
             }
 
+            System.out.println("🔎 저장 시도 경로: " + filePath + fileName);
+
             // 파일이 없으면 새로 만들고 빈 Map 리턴
             if (!file.exists()) {
                 System.out.println("📄 파일이 존재하지 않아 새로 생성합니다: " + file.getPath());

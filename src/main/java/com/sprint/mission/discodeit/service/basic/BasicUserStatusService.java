@@ -24,8 +24,8 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusInfoDto findById(UUID id) {
-        UserStatus status = userStatusRepository.findUserStatusById(id);
-        if (status == null) throw new IllegalArgumentException("UserStatus를 찾을 수 없습니다.");
+        UserStatus status = userStatusRepository.findUserStatusById(id)
+                .orElseThrow(() -> new IllegalArgumentException("UserStatus를 찾을 수 없습니다."));
         return convert(status);
     }
 
@@ -53,8 +53,8 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void update(UUID userId) {
-        UserStatus status = userStatusRepository.findUserStatusById(userId);
-        if (status == null) throw new IllegalArgumentException("UserStatus를 찾을 수 없습니다.");
+        UserStatus status = userStatusRepository.findUserStatusById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("UserStatus를 찾을 수 없습니다."));
         status.updateLastActiveAt();
         userStatusRepository.addUserStatus(status);
     }

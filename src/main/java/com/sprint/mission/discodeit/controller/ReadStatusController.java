@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.jwt.JwtUtil;
+import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ public class ReadStatusController {
     private final ReadStatusService readStatusService;
     private final JwtUtil jwtUtil;
 
+    @RequiresAuth
     @RequestMapping(value = "/channel/{channelId}", method = RequestMethod.POST)
     public ResponseEntity<?> createReadStatus(
             @PathVariable UUID channelId,
@@ -31,7 +33,8 @@ public class ReadStatusController {
         return ResponseEntity.ok("채널 가입이 완료되었습니다.");
     }
 
-    @RequestMapping(value = "/channel/{channelId}", method = RequestMethod.POST)
+    @RequiresAuth
+    @RequestMapping(value = "/channel/{channelId}", method = RequestMethod.PUT)
     public ResponseEntity<?> updateReadStatus(
             @PathVariable UUID channelId,
             @RequestHeader("Authorization") String authHeader
@@ -44,6 +47,7 @@ public class ReadStatusController {
         return ResponseEntity.ok("유저 메세지 수신정보 업데이트 완료되었습니다.");
     }
 
+    @RequiresAuth
     @RequestMapping(value = "/channel/{channelId}", method = RequestMethod.GET)
     public ResponseEntity<?> getReadStatus(
             @PathVariable UUID channelId,

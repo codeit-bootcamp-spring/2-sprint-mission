@@ -24,9 +24,10 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findUserStatusById(UUID userId) {
-        return userStatusMap.get(userId);
+    public Optional<UserStatus> findUserStatusById(UUID userId) {
+        return Optional.ofNullable(userStatusMap.get(userId));
     }
+
 
     @Override
     public List<UserStatus> findAllUserStatus() {
