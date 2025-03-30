@@ -16,40 +16,44 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
-    @GetMapping("/create-public")
-    public ResponseEntity<ApiResponse<SaveChannelDto>> createPublic(
-            @RequestParam String channelName
+    @PostMapping("/public")
+    public ResponseEntity<ApiResponse<SaveChannelResponseDto>> createPublic(
+            @RequestBody SaveChannelRequestDto saveChannelRequestDto
     ) {
-        SaveChannelDto saveChannelDto = channelService.createPublicChannel(SaveChannelParamDto.createPublic(channelName));
-        return ResponseEntity.ok(ApiResponse.success(saveChannelDto));
+        SaveChannelResponseDto saveChannelResponseDto = channelService.createPublicChannel(saveChannelRequestDto);
+        return ResponseEntity.ok(ApiResponse.success(saveChannelResponseDto));
     }
 
-    @GetMapping("/create-private")
-    public ResponseEntity<ApiResponse<SaveChannelDto>> createPrivate(
-            @RequestParam String channelName,
-            @RequestParam List<UUID> userList
+    @PostMapping("/private")
+    public ResponseEntity<ApiResponse<SaveChannelResponseDto>> createPrivate(
+            @RequestBody SaveChannelRequestDto saveChannelRequestDto
     ) {
-        SaveChannelDto saveChannelDto = channelService.createPrivateChannel(SaveChannelParamDto.createPrivate(channelName, userList));
-        return ResponseEntity.ok(ApiResponse.success(saveChannelDto));
+        SaveChannelResponseDto saveChannelResponseDto = channelService.createPrivateChannel(saveChannelRequestDto);
+        return ResponseEntity.ok(ApiResponse.success(saveChannelResponseDto));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ApiResponse<Void>> update(@ModelAttribute UpdateChannelParamDto updateChannelParamDto) {
-        channelService.updateChannel(updateChannelParamDto);
+    @PutMapping("/{channelId}")
+    public ResponseEntity<ApiResponse<Void>> update(
+            @PathVariable UUID channelId,
+            @RequestBody UpdateChannelRequestDto updateChannelRequestDto
+    ) {
+        channelService.updateChannel(channelId, updateChannelRequestDto);
         return ResponseEntity.ok(ApiResponse.success());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/{channelId}")
     public ResponseEntity<ApiResponse<Void>> delete(
-            @RequestParam UUID channelUUID
+            @PathVariable UUID channelId
     ) {
-        channelService.deleteChannel(channelUUID);
+        channelService.deleteChannel(channelId);
         return ResponseEntity.ok(ApiResponse.success());
     }
 
-    @PostMapping("/find-my-channel")
-    public ResponseEntity<ApiResponse<List<FindChannelDto>>> findMyChannel(@RequestBody FindAllByUserIdRequestDto findAllByUserIDRequestDto) {
-        List<FindChannelDto> findMyChannelList = channelService.findAllByUserId(findAllByUserIDRequestDto);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse<List<FindChannelDto>>> findMyChannel(
+            @PathVariable UUID userId
+    ) {
+        List<FindChannelDto> findMyChannelList = channelService.findAllByUserId(userId);
         return ResponseEntity.ok(ApiResponse.success(findMyChannelList));
     }
 }

@@ -87,7 +87,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void update(UUID userId, UpdateUserParamDto updateUserDto, Optional<SaveBinaryContentRequestDto> saveBinaryContentRequestDto) {
+    public void update(UUID userId, UpdateUserRequestDto updateUserDto, Optional<SaveBinaryContentRequestDto> saveBinaryContentRequestDto) {
         User user = userRepository.findUserById(userId).
                 orElseThrow(() -> new NullPointerException("사용자가 존재하지 않습니다."));
 

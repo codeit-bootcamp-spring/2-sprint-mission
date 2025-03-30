@@ -7,9 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    void save(SaveUserRequestDto saveUserParamDto, Optional<SaveBinaryContentRequestDto> binaryContentParamDto);
+    void save(SaveUserRequestDto saveUserParamDto, Optional<SaveBinaryContentRequestDto> saveBinaryContentRequestDto);
     FindUserDto findByUser(UUID userId);
     List<FindUserDto> findAllUser();
-    void update(UUID userId, UpdateUserParamDto updateUserDto, Optional<SaveBinaryContentRequestDto> saveBinaryContentParamDto);
+    void update(UUID userId, UpdateUserRequestDto updateUserDto, Optional<SaveBinaryContentRequestDto> saveBinaryContentRequestDto);
     void delete(UUID userId);
 }

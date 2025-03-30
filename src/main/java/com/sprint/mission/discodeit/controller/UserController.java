@@ -30,10 +30,10 @@ public class UserController {
     @PutMapping("/{userId}")
     public ResponseEntity<ApiResponse<Void>> update(
             @PathVariable UUID userId,
-            @ModelAttribute UpdateUserParamDto updateUserParamDto,
+            @ModelAttribute UpdateUserRequestDto updateUserRequestDto,
             @RequestParam("file") MultipartFile file
     ) throws IOException {
-        userService.update(userId, updateUserParamDto, SaveBinaryContentRequestDto.nullableFrom(file));
+        userService.update(userId, updateUserRequestDto, SaveBinaryContentRequestDto.nullableFrom(file));
         return ResponseEntity.ok(ApiResponse.success());
     }
 
