@@ -6,10 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.channel.CreatePrivateChannelException;
-import com.sprint.mission.discodeit.exception.channel.CreatePublicChannelException;
-import com.sprint.mission.discodeit.exception.channel.DeleteChannelException;
-import com.sprint.mission.discodeit.exception.channel.UpdateChannelException;
+import com.sprint.mission.discodeit.exception.channel.*;
 import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.provider.ChannelReadStrategyProvider;
 import com.sprint.mission.discodeit.provider.ChannelUpdaterProvider;
@@ -83,10 +80,18 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelReadResponse> findAllByUserId(UUID userId) {
-        UserService.validateUserId(userId, this.userRepository);
-        return channelRepository.findAllByUserId(userId).stream()
-                .map(channel -> strategyProvider.getChannelReadStrategy(channel.getChannelType()).toDto(channel))
-                .collect(Collectors.toList());
+        try {
+            UserService.validateUserId(userId, this.userRepository);
+
+            return channelRepository.findAllByUserId(userId).stream()
+                    .map(channel -> strategyProvider.getChannelReadStrategy(channel.getChannelType()).toDto(channel))
+                    .collect(Collectors.toList());
+        } catch (NoSuchElementException e) {
+            throw new FindChannelListException("해당 userId의 채널을 찾을 수 없습니다.", HttpStatus.NOT_FOUND, e);
+        }
+        catch (Exception e) {
+            throw new FindChannelListException("채널리스트 탐색 중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @Override
