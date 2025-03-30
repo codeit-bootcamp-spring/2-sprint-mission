@@ -34,7 +34,7 @@ public class UserStatus extends BaseEntity implements Serializable {
 
     public boolean isActive() {
         Instant now = Instant.now();
-        Duration duration = Duration.between(now, this.lastActiveAt);
+        Duration duration = Duration.between(this.lastActiveAt, now);
 
         return duration.compareTo(MAX_ACTIVE_MINUTES) < 0; // 5분 이내면 true;
     }

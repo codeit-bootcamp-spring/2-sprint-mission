@@ -71,7 +71,7 @@ public class UserController {
         return ResponseEntity.ok(BaseResponseDto.success(userId + " 유저 삭제가 완료되었습니다."));
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     public ResponseEntity<List<UserDto>> getUsers() {
         return ResponseEntity.ok(userService.findAll());
     }
