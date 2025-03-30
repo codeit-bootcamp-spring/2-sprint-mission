@@ -84,19 +84,25 @@ public class BasicUserService implements UserService {
 
     @Override
     public List<UserReadResponse> readAllUsers() {
-        return this.userRepository.getAll().values().stream()
-                .map(user ->
-                        new UserReadResponse(
-                                user.getId(),
-                                user.getUserName(),
-                                user.getUserEmail(),
-                                user.getProfileId(),
-                                this.userStatusRepository.findUserStatusByUserId(user.getId()).isOnline(),
-                                user.getCreatedAt(),
-                                user.getUpdatedAt()
-                        )
-                )
-                .collect(Collectors.toList());
+        try {
+            return this.userRepository.getAll().values().stream()
+                    .map(user ->
+                            new UserReadResponse(
+                                    user.getId(),
+                                    user.getUserName(),
+                                    user.getUserEmail(),
+                                    user.getProfileId(),
+                                    this.userStatusRepository.findUserStatusByUserId(user.getId()).isOnline(),
+                                    user.getCreatedAt(),
+                                    user.getUpdatedAt()
+                            )
+                    )
+                    .collect(Collectors.toList());
+        } catch (NoSuchIdException e) {
+            throw new ReadAllUserException(e.getMessage(), e.getStatus(), e);
+        } catch (Exception e) {
+            throw new ReadAllUserException("모든 user를 읽어들이는 중 예상치 못한 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     // binaryContent를 업데이트할지 다음 미션의 컨트롤러에서 결정할 것!
