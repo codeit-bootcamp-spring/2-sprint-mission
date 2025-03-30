@@ -8,48 +8,76 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
 
-@Controller
+@RestController
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final BinaryContentService binaryContentService;
     private final UserStatusService userStatusService;
 
-    public UserResult register(UserRequest userRequest, MultipartFile multipartFile) {
+    @PostMapping("/register")
+    public ResponseEntity<UserResult> register(@RequestPart UserRequest userRequest,
+                                               @RequestPart(required = false) MultipartFile multipartFile) {
         UUID profileId = binaryContentService.createProfileImage(multipartFile);
 
-        return userService.register(userRequest, profileId);
+        return ResponseEntity.ok(userService.register(userRequest, profileId));
     }
 
-    public UserResponse findById(UUID userId) {
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponse> findById(@PathVariable UUID userId) {
         UserResult userResult = userService.findById(userId);
         UserStatusResult userStatusDto = userStatusService.findByUserId(userResult.id());
 
-        return UserResponse.of(userResult, userStatusDto.isLogin());
+        return ResponseEntity.ok(UserResponse.of(userResult, userStatusDto.isLogin()));
     }
 
+    @GetMapping
     public List<UserResult> findAll() {
         return userService.findAll();
     }
 
-    public UserResult updateProfile(UUID userId, MultipartFile multipartFile) {
-        UserResult beforeUpdatedUser = userService.findById(userId);
-        UUID profileId = binaryContentService.createProfileImage(multipartFile);
-        UserResult user = userService.updateProfileImage(userId, profileId);
-        binaryContentService.delete(beforeUpdatedUser.profileId());
-
-        return user;
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserResult> updateUser(@PathVariable UUID userId,
+                                                 @RequestBody UserRequest userRequest) {
+        UserResult updatedUser = userService.updateName(userId, userRequest.name());
+        return ResponseEntity.ok(updatedUser);
     }
 
-    public void delete(UUID userId) {
+
+    @PutMapping("/{userId}/profile-image")
+    public ResponseEntity<UserResult> updateProfileImage(@PathVariable UUID userId,
+                                                         @RequestPart MultipartFile profileImage) {
+        UserResult beforeUpdatedUser = userService.findById(userId);
+        UUID profileId = binaryContentService.createProfileImage(profileImage);
+        UserResult user = userService.updateProfileImage(userId, profileId);
+        binaryContentService.delete(beforeUpdatedUser.profileId());
+        if (beforeUpdatedUser.profileId() != null) {
+            binaryContentService.delete(beforeUpdatedUser.profileId());
+        }
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/{userId}/status")
+    public ResponseEntity<UserStatusResult> updateOnlineStatus(@PathVariable UUID userId) {
+        UserStatusResult status = userStatusService.updateByUserId(userId);
+
+        return ResponseEntity.ok(status);
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID userId) {
         UserResult beforeUpdatedUser = userService.findById(userId);
         userService.delete(userId);
         binaryContentService.delete(beforeUpdatedUser.profileId());
+
+        return ResponseEntity.ok().build();
     }
 }

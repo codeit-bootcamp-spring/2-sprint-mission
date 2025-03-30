@@ -54,7 +54,7 @@ class UserControllerTest {
     void registerException() {
         UserRequest userRequest = new UserRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(),
                 LOGIN_USER.getPassword());
-        UserResult user = userController.register(userRequest, null);
+        UserResult user = userController.register(userRequest, null).getBody();
         assertThat(user.profileId()).isNull();
     }
 
@@ -70,7 +70,7 @@ class UserControllerTest {
         UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword());
 
-        UserResult user = userController.register(userRequest, file);
+        UserResult user = userController.register(userRequest, file).getBody();
         BinaryContentResult binaryContentResult = binaryContentService.findById(user.profileId());
 
         assertThat(binaryProfileImage).isEqualTo(binaryContentResult.bytes());
@@ -80,8 +80,8 @@ class UserControllerTest {
     @Test
     void registerValidateUserStatus() {
         UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
-        UserResult user = userController.register(userRequest, null); // UserResponseDto를 통해 로그인 상태를 확인
-        UserResponse userResponse = userController.findById(user.id());
+        UserResult user = userController.register(userRequest, null).getBody();
+        UserResponse userResponse = userController.findById(user.id()).getBody();
 
         assertThat(userResponse.isLogin()).isFalse();
     }
@@ -97,7 +97,7 @@ class UserControllerTest {
         UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword());
 
-        UserResult user = userController.register(userRequest, file);
+        UserResult user = userController.register(userRequest, file).getBody();
 
 
         byte[] updatedProfileImage = loadImageFileFromResource("Kirby.jpg");
@@ -105,7 +105,7 @@ class UserControllerTest {
                 MediaType.IMAGE_JPEG_VALUE,
                 updatedProfileImage
         );
-        UserResult profileImageUpdatedUser = userController.updateProfile(user.id(), otherFile);
+        UserResult profileImageUpdatedUser = userController.updateProfileImage(user.id(), otherFile).getBody();
 
         BinaryContentResult binaryContentResult = binaryContentService.findById(profileImageUpdatedUser.profileId());
 
@@ -123,7 +123,7 @@ class UserControllerTest {
                 OTHER_USER.getPassword());
 
 
-        UserResult user = userController.register(userRequest, file);
+        UserResult user = userController.register(userRequest, file).getBody();
         userController.delete(user.id());
 
         assertAll(

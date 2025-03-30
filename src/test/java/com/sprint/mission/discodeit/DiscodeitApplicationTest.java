@@ -52,7 +52,7 @@ class DiscodeitApplicationTest {
 
     private UserResult setupUser() {
         UserRequest userRequest = new UserRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword());
-        return userController.register(userRequest, null);
+        return userController.register(userRequest, null).getBody();
     }
 
     private ChannelRequest setupChannel() {
