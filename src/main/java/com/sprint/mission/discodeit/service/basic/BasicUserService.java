@@ -64,16 +64,22 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserReadResponse readUser(UUID userId) {
-        User findUser = this.userRepository.findById(userId);
-        UserStatus findUserStatus = this.userStatusRepository.findUserStatusByUserId(userId);
-        return new UserReadResponse(
-                findUser.getId(),
-                findUser.getUserName(),
-                findUser.getUserEmail(),
-                findUser.getProfileId(),
-                findUserStatus.isOnline(),
-                findUser.getCreatedAt(),
-                findUser.getUpdatedAt());
+        try {
+            User findUser = this.userRepository.findById(userId);
+            UserStatus findUserStatus = this.userStatusRepository.findUserStatusByUserId(userId);
+            return new UserReadResponse(
+                    findUser.getId(),
+                    findUser.getUserName(),
+                    findUser.getUserEmail(),
+                    findUser.getProfileId(),
+                    findUserStatus.isOnline(),
+                    findUser.getCreatedAt(),
+                    findUser.getUpdatedAt());
+        } catch (NoSuchIdException e) {
+            throw new ReadUserException(e.getMessage(), HttpStatus.NOT_FOUND, e);
+        } catch (Exception e) {
+            throw new ReadUserException("유저를 읽는 중에 예상치 못한 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @Override
