@@ -16,7 +16,7 @@ async function fetchAndRenderUsers() {
         const response = await fetch(ENDPOINTS.USERS);
         if (!response.ok) throw new Error('Failed to fetch users');
         const users = await response.json();
-        renderUserList(users);
+        renderUserList(users.data);
     } catch (error) {
         console.error('Error fetching users:', error);
     }

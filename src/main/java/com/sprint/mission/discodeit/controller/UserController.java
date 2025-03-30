@@ -18,33 +18,33 @@ public class UserController {
     private final UserStatusService userStatusService;
 
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestBody SaveUserParamDto saveUserParamDto) {
+    public ResponseEntity<ApiResponse<Void>> save(@RequestBody SaveUserParamDto saveUserParamDto) {
         userService.save(saveUserParamDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> update(@RequestBody UpdateUserParamDto updateUserParamDto) {
+    public ResponseEntity<ApiResponse<Void>> update(@RequestBody UpdateUserParamDto updateUserParamDto) {
         userService.update(updateUserParamDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<?> delete(@RequestBody DeleteUserRequestDto deleteUserRequestDto) {
+    public ResponseEntity<ApiResponse<Void>> delete(@RequestBody DeleteUserRequestDto deleteUserRequestDto) {
         userService.delete(deleteUserRequestDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<FindUserDto>> findAll() {
+    public ResponseEntity<ApiResponse<List<FindUserDto>>> findAll() {
         List<FindUserDto> findUserDtoList = userService.findAllUser();
-        return ResponseEntity.ok().body(findUserDtoList);
+        return ResponseEntity.ok(ApiResponse.success(findUserDtoList));
     }
 
     @PostMapping("/update-user-status")
-    public ResponseEntity<?> updateUserStatus(@RequestBody UpdateUserStatusByUserIdParamDto updateUserStatusByUserIdParamDto) {
+    public ResponseEntity<ApiResponse<Void>> updateUserStatus(@RequestBody UpdateUserStatusByUserIdParamDto updateUserStatusByUserIdParamDto) {
         userStatusService.updateByUserId(updateUserStatusByUserIdParamDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
 }
