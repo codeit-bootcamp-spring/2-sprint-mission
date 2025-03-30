@@ -49,8 +49,7 @@ public class UserController {
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
     public ResponseEntity<Void> updateUserStatus(@PathVariable UUID userId) {
 
-        UserStatus userStatus = userStatusService.find(userId);
-        userStatus.updateLastLogin();
+        userStatusService.updateByUserId(userId);
 
         return ResponseEntity.noContent().build();
     }
