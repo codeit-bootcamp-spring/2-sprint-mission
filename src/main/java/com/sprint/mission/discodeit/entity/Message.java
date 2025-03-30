@@ -20,4 +20,9 @@ public class Message extends BaseEntity implements Serializable {
         super.updateTime();
         this.content = content;
     }
+
+    public void updateAttachmentList(List<UUID> attachmentList) {
+        super.updateTime();
+        this.attachmentList = attachmentList;
+    }
 }

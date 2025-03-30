@@ -19,12 +19,6 @@ public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
-    @PostMapping("/save")
-    public ResponseEntity<ApiResponse<Void>> save(@RequestParam("file") MultipartFile file) throws IOException {
-        binaryContentService.save(SaveBinaryContentRequestDto.from(file));
-        return ResponseEntity.ok(ApiResponse.success());
-    }
-
     @GetMapping("/find")
     public ResponseEntity<ApiResponse<FindBinaryContentRequestDto>> find(@RequestParam UUID binaryContentId) {
         binaryContentService.findById(binaryContentId);
