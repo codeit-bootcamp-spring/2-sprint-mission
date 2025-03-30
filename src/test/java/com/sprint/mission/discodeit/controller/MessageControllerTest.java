@@ -38,12 +38,11 @@ class MessageControllerTest {
     void setUp() {
         binaryContentRepository = new JCFBinaryContentRepository();
         userRepository = new JCFUserRepository();
-        messageService = new BasicMessageService(new JCFMessageRepository(), userRepository, binaryContentRepository);
+        messageService = new BasicMessageService(new JCFMessageRepository(), binaryContentRepository);
         basicBinaryContentService = new BasicBinaryContentService(binaryContentRepository);
         messageController = new MessageController(messageService, basicBinaryContentService);
 
-        setUpUser = userRepository.save(
-                new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
+        setUpUser = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
     }
 
     @DisplayName("채널에 메시지를 생성하면 올바른 내용을 반환한다.")
@@ -57,15 +56,11 @@ class MessageControllerTest {
     @DisplayName("메시지를 삭제하면 첨부 파일도 삭제된다.")
     @Test
     void deleteMessageDeletesAttachments() {
-        MockMultipartFile file = new MockMultipartFile(
-                MediaType.IMAGE_JPEG_VALUE,
-                MESSAGE_CONTENT.getBytes()
-        );
+        MockMultipartFile file = new MockMultipartFile(MediaType.IMAGE_JPEG_VALUE, MESSAGE_CONTENT.getBytes());
 
         MessageResult message = messageController.createMessage(new MessageCreationRequest(MESSAGE_CONTENT, UUID.randomUUID(), setUpUser.getId()), List.of(file));
         messageController.delete(message.messageId());
 
-        assertThatThrownBy(() -> basicBinaryContentService.findById(message.attachmentIds().get(0)))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> basicBinaryContentService.findById(message.attachmentIds().get(0))).isInstanceOf(IllegalArgumentException.class);
     }
 }

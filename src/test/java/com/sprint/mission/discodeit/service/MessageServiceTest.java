@@ -37,7 +37,7 @@ class MessageServiceTest {
         userRepository = new JCFUserRepository();
         messageRepository = new JCFMessageRepository();
         binaryContentRepository = new JCFBinaryContentRepository();
-        messageService = new BasicMessageService(messageRepository, userRepository, binaryContentRepository);
+        messageService = new BasicMessageService(messageRepository, binaryContentRepository);
 
         setUpUser = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
         channelId = UUID.randomUUID();

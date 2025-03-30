@@ -56,7 +56,6 @@ public class BasicChannelService implements ChannelService {
 
         Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId());
 
-
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             List<UUID> userId = readStatusRepository.findByChannelId(channel.getId()).stream().toList()
                     .stream()
