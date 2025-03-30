@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.console;
 
 import com.sprint.mission.discodeit.dto.MessageService.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.MessageService.MessageUpdateRequest;
@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class MessageMenuController {
+public class ConsoleMessageMenuController {
     private final MessageService messageService;
     private final ChannelService channelService;
     private final UserService userService;
@@ -25,7 +25,7 @@ public class MessageMenuController {
     private static Channel currentChannel;
 
 
-    public MessageMenuController(UserService userService, ChannelService channelService, MessageService messageService, BasicAuthService basicAuthService, Scanner scanner) {
+    public ConsoleMessageMenuController(UserService userService, ChannelService channelService, MessageService messageService, BasicAuthService basicAuthService, Scanner scanner) {
         this.messageService = messageService;
         this.channelService = channelService;
         this.userService = userService;
@@ -148,7 +148,7 @@ public class MessageMenuController {
         String message = getMessageInput("작성할 메세지: ");
         MessageCreateRequest messageCreateRequest = new MessageCreateRequest(message,loggedUser.getId(), currentChannel.getId());
 
-        messageService.create(messageCreateRequest,);
+//        messageService.create(messageCreateRequest,);
     }
 
     private void findMessage(){
@@ -184,10 +184,10 @@ public class MessageMenuController {
     }
 
     private void updateMessage(){
-        UUID messageId = getIdFromInput("수정할 메세지의 ID를 입력해주세요: ");
-        String newMessage = getMessageInput("새로운 메세지: ");
-        MessageUpdateRequest request = new MessageUpdateRequest(messageId, newMessage);
-        messageService.update(request);
+//        UUID messageId = getIdFromInput("수정할 메세지의 ID를 입력해주세요: ");
+//        String newMessage = getMessageInput("새로운 메세지: ");
+//        MessageUpdateRequest request = new MessageUpdateRequest(messageId, newMessage);
+//        messageService.update(, request);
 
     }
 

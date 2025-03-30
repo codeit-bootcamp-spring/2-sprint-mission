@@ -9,9 +9,6 @@ public record UserCreateRequest(
         String password
 
 ) {
-  public static UserCreateRequest toDTO(User user) {
-      return new UserCreateRequest(user.getUserName(), user.getEmail(), user.getPassword());
-  }
 
   public User toEntity() {
       return new User(this.userName, this.email, this.password);

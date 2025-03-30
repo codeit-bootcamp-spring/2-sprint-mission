@@ -56,6 +56,11 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
+    public Message findById(UUID messageId) {
+        return messageRepository.findById(messageId);
+    }
+
+    @Override
     public List<Message> findByUser(UUID userId) {
         return messageRepository.findByUser(userId);
     }
@@ -76,8 +81,8 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(MessageUpdateRequest request) {
-        return messageRepository.update(request.messageId(),request.newMessage());
+    public Message update(UUID id,MessageUpdateRequest request) {
+        return messageRepository.update(id, request.newMessage());
     }
 
     @Override

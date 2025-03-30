@@ -70,10 +70,15 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message update(MessageUpdateRequest messageUpdateRequest) {
-        Message messageNullable = messageData.get(messageUpdateRequest.messageId());
-        Message message = Optional.ofNullable(messageNullable).orElseThrow(() -> new NoSuchElementException("메세지 " + messageUpdateRequest.messageId() + "가 존재하지 않습니다."));
-        message.updateMessage(messageUpdateRequest.newMessage());
+    public Message findById(UUID messageId) {
+        return null;
+    }
+
+    @Override
+    public Message update(UUID id, MessageUpdateRequest request) {
+        Message messageNullable = messageData.get(id);
+        Message message = Optional.ofNullable(messageNullable).orElseThrow(() -> new NoSuchElementException("메세지 " + id + "가 존재하지 않습니다."));
+        message.updateMessage(request.newMessage());
         return message; 
     }
 

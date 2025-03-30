@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.console;
 
 import com.sprint.mission.discodeit.menus.MainMenu;
 import com.sprint.mission.discodeit.service.basic.BasicAuthService;
@@ -8,17 +8,17 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.Scanner;
 
-public class MainMenuController {
+public class ConsoleMainMenuController {
     private final Scanner scanner;
-    private final UserMenuController userMenuController;
-    private final ChannelMenuController channelMenuController;
-    private final MessageMenuController messageMenuController;
+    private final ConsoleUserMenuController consoleUserMenuController;
+    private final ConsoleChannelMenuController consoleChannelMenuController;
+    private final ConsoleMessageMenuController consoleMessageMenuController;
 
-    public MainMenuController(Scanner scanner, UserService userService, ChannelService channelService, MessageService messageService, BasicAuthService basicAuthService) {
+    public ConsoleMainMenuController(Scanner scanner, UserService userService, ChannelService channelService, MessageService messageService, BasicAuthService basicAuthService) {
         this.scanner = scanner;
-        this.userMenuController = new UserMenuController(userService,scanner);
-        this.channelMenuController = new ChannelMenuController(channelService, userService, scanner);
-        this.messageMenuController = new MessageMenuController(userService, channelService, messageService, basicAuthService,scanner);
+        this.consoleUserMenuController = new ConsoleUserMenuController(userService,scanner);
+        this.consoleChannelMenuController = new ConsoleChannelMenuController(channelService, userService, scanner);
+        this.consoleMessageMenuController = new ConsoleMessageMenuController(userService, channelService, messageService, basicAuthService,scanner);
     }
 
     public void run(){
@@ -42,13 +42,13 @@ public class MainMenuController {
     private boolean execute(MainMenu selectedMenu) {
         switch (selectedMenu) {
             case USER:
-                userMenuController.handleUserMenu();
+                consoleUserMenuController.handleUserMenu();
                 return true;
             case CHANNEL:
-                channelMenuController.handleChannelMenu();
+                consoleChannelMenuController.handleChannelMenu();
                 return true;
             case MESSAGE:
-                messageMenuController.handleMessageMenu();
+                consoleMessageMenuController.handleMessageMenu();
                 return true;
             case EXIT:
                 return false;

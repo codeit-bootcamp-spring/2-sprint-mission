@@ -63,6 +63,11 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
+    public Message findById(UUID messageId) {
+        return null;
+    }
+
+    @Override
     public List<Message> findByUser(UUID userId) {
         List<Message> messages = messageData.values().stream().filter(m -> m.getUserId().equals(userId)).toList();
         if(messages.isEmpty() || messages == null){
@@ -95,10 +100,10 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message update(MessageUpdateRequest messageUpdateRequest) {
-        Message messageNullable = messageData.get(messageUpdateRequest.messageId());
-        Message message = Optional.ofNullable(messageNullable).orElseThrow(() -> new NoSuchElementException("메세지 " + messageId + "가 존재하지 않습니다."));
-        message.updateMessage(messageUpdateRequest.newMessage());
+    public Message update(UUID id, MessageUpdateRequest request) {
+        Message messageNullable = messageData.get(id);
+        Message message = Optional.ofNullable(messageNullable).orElseThrow(() -> new NoSuchElementException("메세지 " + id + "가 존재하지 않습니다."));
+        message.updateMessage(request.newMessage());
         saveData();
         return message;
     }

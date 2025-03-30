@@ -77,12 +77,12 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateRequest userUpdateRequest) {
+    public User update( UUID id, UserUpdateRequest userUpdateRequest) {
         if(userUpdateRequest.photo() != null){
-            binaryContentRepository.delete(userRepository.findById(userUpdateRequest.id()).getProfileId());
+            binaryContentRepository.delete(userRepository.findById(id).getProfileId());
             BinaryContent binaryContent = new BinaryContent(BinaryContentType.IMAGE, userUpdateRequest.photo());
             binaryContentRepository.save(binaryContent);
-            userRepository.findById(userUpdateRequest.id()).useProfileId(binaryContent.getId());
+            userRepository.findById(id).useProfileId(binaryContent.getId());
         }
         for (User user1 : userRepository.findAll()) {
             if (user1.getEmail().equals(userUpdateRequest.email()) ||
@@ -91,7 +91,7 @@ public class BasicUserService implements UserService {
                 return null;
             }
         }
-        return userRepository.update(userUpdateRequest.id(), userUpdateRequest.userName(), userUpdateRequest.email(), userUpdateRequest.password());
+        return userRepository.update(id, userUpdateRequest.userName(), userUpdateRequest.email(), userUpdateRequest.password());
     }
 
     @Override
@@ -103,6 +103,7 @@ public class BasicUserService implements UserService {
         userRepository.delete(userId);
 
     }
+
 
 
 }

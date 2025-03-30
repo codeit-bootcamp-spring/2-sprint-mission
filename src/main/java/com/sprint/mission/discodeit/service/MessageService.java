@@ -10,10 +10,11 @@ import java.util.UUID;
 
 public interface MessageService {
     Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentDTO> binaryContentDtos);
+    Message findById(UUID messageId);
     List<Message> findByUser(UUID userId);
     List<Message> findByChannel(UUID channelId);
     List<Message> findByUserAndByChannel(UUID userId, UUID channelId);
     List<Message> findAll();
-    Message update(MessageUpdateRequest messageUpdateRequest);
+    Message update(UUID id, MessageUpdateRequest request);
     void delete(UUID messageId);
 }

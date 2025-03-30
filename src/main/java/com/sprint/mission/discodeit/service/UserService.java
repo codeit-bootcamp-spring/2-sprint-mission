@@ -15,6 +15,6 @@ public interface UserService {
     UserFindDto findWithStatus(UUID id);
     List<User> findAll();
     List<UserFindDto>  findAllWithStatus();
-    User update(UserUpdateRequest userUpdateRequest);
+    User update(UUID id, UserUpdateRequest userUpdateRequest);
     void delete(UUID userId);
 }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.controller.MainMenuController;
+import com.sprint.mission.discodeit.controller.console.ConsoleMainMenuController;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
 import com.sprint.mission.discodeit.service.basic.BasicAuthService;
@@ -52,7 +52,7 @@ public class JavaApplication {
         BasicAuthService basicAuthService = new BasicAuthService(userRepository);
 
         Scanner scanner = new Scanner(System.in);
-        MainMenuController menuController = new MainMenuController(scanner, userService, channelService, messageService, basicAuthService);
+        ConsoleMainMenuController menuController = new ConsoleMainMenuController(scanner, userService, channelService, messageService, basicAuthService);
         menuController.run();
 
 

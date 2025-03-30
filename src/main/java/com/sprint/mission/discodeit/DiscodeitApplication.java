@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.controller.MainMenuController;
+import com.sprint.mission.discodeit.controller.console.ConsoleMainMenuController;
 import com.sprint.mission.discodeit.service.basic.BasicAuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -15,16 +15,16 @@ import java.util.Scanner;
 public class DiscodeitApplication {
 
     public static void main(String[] args) {
-        ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
-        UserService userService = context.getBean(UserService.class);
-        ChannelService channelService = context.getBean(ChannelService.class);
-        MessageService messageService = context.getBean(MessageService.class);
-        BasicAuthService basicAuthService = context.getBean(BasicAuthService.class);
+//        ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+//        UserService userService = context.getBean(UserService.class);
+//        ChannelService channelService = context.getBean(ChannelService.class);
+//        MessageService messageService = context.getBean(MessageService.class);
+//        BasicAuthService basicAuthService = context.getBean(BasicAuthService.class);
+//
+//        Scanner scanner = new Scanner(System.in);
 
-        Scanner scanner = new Scanner(System.in);
-
-        MainMenuController menuController = new MainMenuController(scanner,  userService, channelService, messageService, basicAuthService);
-        menuController.run();
+//        ConsoleMainMenuController menuController = new ConsoleMainMenuController(scanner,  userService, channelService, messageService, basicAuthService);
+        SpringApplication.run(DiscodeitApplication.class, args);
 
 
     }

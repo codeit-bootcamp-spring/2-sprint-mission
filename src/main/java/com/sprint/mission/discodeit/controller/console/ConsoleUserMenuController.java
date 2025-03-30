@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.console;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.UserService.UserCreateRequest;
@@ -12,11 +12,11 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.entity.BinaryContentType.IMAGE;
 
-public class UserMenuController {
+public class ConsoleUserMenuController {
     private final UserService userService;
     private final Scanner scanner;
 
-    public UserMenuController(UserService userService, Scanner scanner) {
+    public ConsoleUserMenuController(UserService userService, Scanner scanner) {
         this.userService = userService;
         this.scanner = scanner;
     }
@@ -136,32 +136,32 @@ public class UserMenuController {
     }
 
     private void updateUser() {
-        UUID id = getUserIdFromInput("업데이트할 유저 ID를 입력해주세요: ");
-        System.out.println("변경할 유저명, 이메일, 비밀번호를 입력하세요.");
-        String userName = getUserInput("유저명: ");
-        String email = getUserInput("이메일: ");
-        String password = getUserInput("비밀번호: ");
-        UserUpdateRequest userUpdateRequest;
-        System.out.println("프로필 사진을 업데이트 하시겠습니까?\n" +
-                            "1. 예\n" +
-                            "2. 아니오");
-        String choice = scanner.nextLine();
-        switch (choice) {
-            case "1", "예":
-                byte[] binaryContent = getBinaryContentInput("이미지를 넣어주세요: ");
-                userUpdateRequest = new UserUpdateRequest(id, userName, email, password, binaryContent);
-                System.out.println("업데이트 시도: \n" + userService.update(userUpdateRequest));
-                return;
-            case "2", "아니오":
-                userUpdateRequest = new UserUpdateRequest(id, userName, email, password, null);
-                System.out.println("업데이트 시도: \n" + userService.update(userUpdateRequest));
-                return;
-            default:
-                System.out.println("잘못 입력되어 건너뛰었습니다.");
-        }
-
-        userUpdateRequest = new UserUpdateRequest(id, userName, email, password, null);
-        System.out.println("업데이트 시도: \n" + userService.update(userUpdateRequest));
+//        UUID id = getUserIdFromInput("업데이트할 유저 ID를 입력해주세요: ");
+//        System.out.println("변경할 유저명, 이메일, 비밀번호를 입력하세요.");
+//        String userName = getUserInput("유저명: ");
+//        String email = getUserInput("이메일: ");
+//        String password = getUserInput("비밀번호: ");
+//        UserUpdateRequest userUpdateRequest;
+//        System.out.println("프로필 사진을 업데이트 하시겠습니까?\n" +
+//                            "1. 예\n" +
+//                            "2. 아니오");
+//        String choice = scanner.nextLine();
+//        switch (choice) {
+//            case "1", "예":
+//                byte[] binaryContent = getBinaryContentInput("이미지를 넣어주세요: ");
+//                userUpdateRequest = new UserUpdateRequest(id, userName, email, password, binaryContent);
+//                System.out.println("업데이트 시도: \n" + userService.update(, userUpdateRequest));
+//                return;
+//            case "2", "아니오":
+//                userUpdateRequest = new UserUpdateRequest(id, userName, email, password, null);
+//                System.out.println("업데이트 시도: \n" + userService.update(, userUpdateRequest));
+//                return;
+//            default:
+//                System.out.println("잘못 입력되어 건너뛰었습니다.");
+//        }
+//
+//        userUpdateRequest = new UserUpdateRequest(id, userName, email, password, null);
+//        System.out.println("업데이트 시도: \n" + userService.update(, userUpdateRequest));
     }
 
     private void deleteUser() {

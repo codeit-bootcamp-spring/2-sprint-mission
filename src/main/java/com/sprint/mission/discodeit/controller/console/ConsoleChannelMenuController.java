@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.console;
 
 import com.sprint.mission.discodeit.dto.channelService.ChannelCreateByPrivateRequest;
 import com.sprint.mission.discodeit.dto.channelService.ChannelCreateRequest;
@@ -8,17 +8,18 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.menus.ChannelMenu;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class ChannelMenuController {
+public class ConsoleChannelMenuController {
     private final ChannelService channelService;
     private final UserService userService;
     private final Scanner scanner;
 
-    public ChannelMenuController(ChannelService channelService,UserService userService, Scanner scanner) {
+    public ConsoleChannelMenuController(ChannelService channelService, UserService userService, Scanner scanner) {
         this.channelService = channelService;
         this.userService = userService;
         this.scanner = scanner;

@@ -72,9 +72,9 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateRequest userUpdateRequest) {
-        User userNullable = userData.get(userUpdateRequest.id());
-        User user = Optional.ofNullable(userNullable).orElseThrow(() -> new NoSuchElementException(userUpdateRequest.id() + "가 존재하지 않습니다."));
+    public User update(UUID id, UserUpdateRequest userUpdateRequest) {
+        User userNullable = userData.get(id);
+        User user = Optional.ofNullable(userNullable).orElseThrow(() -> new NoSuchElementException(id + "가 존재하지 않습니다."));
         user.updateUser(userUpdateRequest.userName(), userUpdateRequest.email(), userUpdateRequest.password());
         saveData();
 
