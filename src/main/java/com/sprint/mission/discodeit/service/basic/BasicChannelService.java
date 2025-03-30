@@ -50,7 +50,7 @@ public class BasicChannelService implements ChannelService {
         channelRepository.save(channel);
 
         dto.getUsers().forEach(user -> {
-            readStatusRepository.create(new ReadStatusCreateRequestDto(user.getId(), channel.getId(), null));
+            readStatusRepository.save(new ReadStatusCreateRequestDto(user.getId(), channel.getId(), null));
         });
 
         return channel;

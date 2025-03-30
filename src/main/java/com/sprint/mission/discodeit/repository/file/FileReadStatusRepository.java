@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -67,7 +68,8 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         }
     }
 
-    public ReadStatus save(ReadStatus readStatus){
+    public ReadStatus save(ReadStatusCreateRequestDto dto){
+        ReadStatus readStatus = new ReadStatus(dto.getUserID(), dto.getChannelID(), dto.getLastRead());
         this.readStatusData.put(readStatus.getId(), readStatus);
         dataSave();
 

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -21,8 +22,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
         this.data = new HashMap<>();
     }
 
-    public ReadStatus save(ReadStatus readStatus){
-        data.put(readStatus.getId(), readStatus);
+    public ReadStatus save(ReadStatusCreateRequestDto dto){
+        ReadStatus readStatus = new ReadStatus(dto.getUserID(), dto.getChannelID(), dto.getLastRead());
+        this.data.put(readStatus.getId(), readStatus);
         return readStatus;
     }
 

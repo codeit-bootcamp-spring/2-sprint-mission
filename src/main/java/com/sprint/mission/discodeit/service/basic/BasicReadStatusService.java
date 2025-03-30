@@ -37,9 +37,7 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new IllegalArgumentException("관련된 객체가 이미 존재합니다.");
         }
 
-        ReadStatus readStatus = new ReadStatus(dto.getUserID(), dto.getChannelID(), dto.getLastRead());
-
-        return readStatusRepository.save(readStatus);
+        return readStatusRepository.save(dto);
     }
 
     @Override
