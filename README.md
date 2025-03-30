@@ -118,7 +118,7 @@
 - [x] DTO 네이밍 규칙 반영
   - 컨트롤러 : Request/Response
   - Service 응답 : Info/Result
-- [ ] UserStatues Dto, 안에 메서드 넣어 놓은 부분 수정
+- [x] UserStatues Dto, 안에 메서드 넣어 놓은 부분 수정
 - [x] serialVersionUID 수정
 - [x] loadAndSave 수정 : 문제 - 같은 동작을 하는 메서드2개 정의
 - [ ] Repository는

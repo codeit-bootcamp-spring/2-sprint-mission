@@ -51,9 +51,10 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public List<UserStatusResult> findAll() {
-        List<UserStatus> userStatuses = userStatusRepository.findAll();
-
-        return UserStatusResult.fromEntity(userStatuses);
+        return userStatusRepository.findAll()
+                .stream()
+                .map(userStatus -> UserStatusResult.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant())))
+                .toList();
     }
 
     @Override
