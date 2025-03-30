@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.common.NoSuchIdException;
 import com.sprint.mission.discodeit.exception.message.CreateMessageException;
+import com.sprint.mission.discodeit.exception.message.DeleteMessageException;
 import com.sprint.mission.discodeit.exception.message.UpdateMessageException;
 import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.provider.MessageUpdaterProvider;
@@ -114,10 +115,16 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void deleteMessage(UUID messageId) {
-        List<UUID> attachmentIds = this.messageRepository.findById(messageId).getAttachmentIds();
-        for(UUID id : attachmentIds) {
-            this.binaryContentService.deleteByID(id);
+        try {
+            List<UUID> attachmentIds = this.messageRepository.findById(messageId).getAttachmentIds();
+            for (UUID id : attachmentIds) {
+                this.binaryContentService.deleteByID(id);
+            }
+            this.messageRepository.deleteById(messageId);
+        } catch (NoSuchIdException e) {
+            throw new DeleteMessageException(e.getMessage(), HttpStatus.NOT_FOUND, e);
+        } catch (Exception e) {
+            throw new DeleteMessageException("message 삭제 중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
         }
-        this.messageRepository.deleteById(messageId);
     }
 }
