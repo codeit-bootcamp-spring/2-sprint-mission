@@ -39,13 +39,13 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public List<ReadStatusResult> findByChannelId(UUID channelId) {
+    public List<ReadStatusResult> getByChannelId(UUID channelId) {
         List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(channelId);
         return ReadStatusResult.fromEntity(readStatuses);
     }
 
     @Override
-    public ReadStatusResult findByReadStatusId(UUID readStatusId) {
+    public ReadStatusResult getByReadStatusId(UUID readStatusId) {
         ReadStatus readStatus = readStatusRepository.find(readStatusId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Id의 객체가 없습니다."));
 
@@ -53,7 +53,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public List<ReadStatusResult> findAllByUserId(UUID useId) {
+    public List<ReadStatusResult> getAllByUserId(UUID useId) {
         List<ReadStatus> readStatuses = readStatusRepository.findByUserId(useId);
         return ReadStatusResult.fromEntity(readStatuses);
     }

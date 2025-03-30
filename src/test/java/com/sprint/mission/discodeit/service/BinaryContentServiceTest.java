@@ -37,7 +37,7 @@ class BinaryContentServiceTest {
     void createProfileImage() {
         MockMultipartFile file = createMockImageFile(MESSAGE_CONTENT);
         UUID profileId = binaryContentService.createProfileImage(file);
-        BinaryContentResult binaryContent = binaryContentService.findById(profileId);
+        BinaryContentResult binaryContent = binaryContentService.getById(profileId);
 
         assertThat(profileId).isEqualTo(binaryContent.id());
     }
@@ -50,7 +50,7 @@ class BinaryContentServiceTest {
 
         UUID profileId1 = binaryContentService.createProfileImage(file1);
         UUID profileId2 = binaryContentService.createProfileImage(file2);
-        List<BinaryContentResult> binaryContentsResults = binaryContentService.findByIdIn(List.of(profileId1, profileId2));
+        List<BinaryContentResult> binaryContentsResults = binaryContentService.getByIdIn(List.of(profileId1, profileId2));
 
         BinaryContentResult binaryContentResult1 = binaryContentsResults.get(0);
         BinaryContentResult binaryContentResult2 = binaryContentsResults.get(1);
@@ -66,11 +66,11 @@ class BinaryContentServiceTest {
     void deleteProfileImage() {
         MockMultipartFile file = createMockImageFile(MESSAGE_CONTENT);
         UUID profileId = binaryContentService.createProfileImage(file);
-        BinaryContentResult binaryContent = binaryContentService.findById(profileId);
+        BinaryContentResult binaryContent = binaryContentService.getById(profileId);
 
         binaryContentService.delete(profileId);
 
-        assertThatThrownBy(() -> binaryContentService.findById(profileId))
+        assertThatThrownBy(() -> binaryContentService.getById(profileId))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

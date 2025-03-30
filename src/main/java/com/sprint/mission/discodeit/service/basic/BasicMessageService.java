@@ -29,7 +29,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageResult findById(UUID id) {
+    public MessageResult getById(UUID id) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
@@ -37,7 +37,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageResult> findAllByChannelId(UUID channelId) {
+    public List<MessageResult> getAllByChannelId(UUID channelId) {
         return messageRepository.findAll()
                 .stream()
                 .filter(message -> message.getChannelId().equals(channelId))

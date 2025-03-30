@@ -39,7 +39,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResult findById(UUID userId) {
+    public UserResult getById(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
@@ -47,7 +47,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResult findByName(String name) {
+    public UserResult getByName(String name) {
         User user = userRepository.findByName(name)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
@@ -55,7 +55,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserResult> findAll() {
+    public List<UserResult> getAll() {
         return userRepository.findAll()
                 .stream()
                 .map(UserResult::fromEntity)
@@ -63,7 +63,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResult findByEmail(String email) {
+    public UserResult getByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
 
@@ -71,10 +71,10 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserResult> findAllByIds(List<UUID> userIds) {
+    public List<UserResult> getAllByIds(List<UUID> userIds) {
         return userIds
                 .stream()
-                .map(this::findById)
+                .map(this::getById)
                 .toList();
     }
 

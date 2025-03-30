@@ -50,21 +50,21 @@ class UserServiceTest {
     @DisplayName("존재하지 않는 UUID로 유저 조회 시 예외 발생")
     @Test
     void findByIdThrowsExceptionWhenUserNotFound() {
-        assertThatThrownBy(() -> userService.findById(UUID.randomUUID()))
+        assertThatThrownBy(() -> userService.getById(UUID.randomUUID()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("UUID로 유저 단건 조회")
     @Test
     void findByIdReturnsUser() {
-        UserResult userResult = userService.findById(setUpUser.id());
+        UserResult userResult = userService.getById(setUpUser.id());
         assertThat(userResult.id()).isEqualTo(setUpUser.id());
     }
 
     @DisplayName("이름으로 유저 단건 조회")
     @Test
     void findByNameReturnsUser() {
-        UserResult user = userService.findByName(LOGIN_USER.getName());
+        UserResult user = userService.getByName(LOGIN_USER.getName());
         assertThat(user.name()).isEqualTo(LOGIN_USER.getName());
     }
 
@@ -90,7 +90,7 @@ class UserServiceTest {
     @Test
     void deleteUserAndVerifyNotFound() {
         userService.delete(setUpUser.id());
-        assertThatThrownBy(() -> userService.findById(setUpUser.id()))
+        assertThatThrownBy(() -> userService.getById(setUpUser.id()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

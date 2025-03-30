@@ -31,7 +31,7 @@ public class MessageController {
 
     @GetMapping("/channel/{channelId}")
     public ResponseEntity<List<MessageResult>> findByChannelId(@PathVariable UUID channelId) {
-        return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
+        return ResponseEntity.ok(messageService.getAllByChannelId(channelId));
     }
 
     @PatchMapping("/{messageId}")

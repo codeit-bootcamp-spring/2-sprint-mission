@@ -8,11 +8,11 @@ import java.util.UUID;
 public interface ReadStatusService {
     ReadStatusResult create(UUID userId, UUID channelId);
 
-    List<ReadStatusResult> findByChannelId(UUID channelId);
+    List<ReadStatusResult> getByChannelId(UUID channelId);
 
-    ReadStatusResult findByReadStatusId(UUID readStatusId);
+    ReadStatusResult getByReadStatusId(UUID readStatusId);
 
-    List<ReadStatusResult> findAllByUserId(UUID useId);
+    List<ReadStatusResult> getAllByUserId(UUID useId);
 
     ReadStatusResult updateLastReadTime(UUID readStatusId);
 

@@ -13,9 +13,9 @@ public interface ChannelService {
 
     ChannelRequest addPrivateChannelMember(UUID channelId, UUID friendId);
 
-    ChannelRequest findById(UUID id);
+    ChannelRequest getById(UUID id);
 
-    List<ChannelRequest> findAllByUserId(UUID userId);
+    List<ChannelRequest> getAllByUserId(UUID userId);
 
     ChannelRequest updatePublicChannelName(UUID id, String name);
 

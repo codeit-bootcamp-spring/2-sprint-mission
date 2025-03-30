@@ -9,9 +9,9 @@ import java.util.UUID;
 public interface MessageService {
     MessageResult create(MessageCreationRequest messageCreationRequest, List<UUID> attachmentsIds);
 
-    MessageResult findById(UUID id);
+    MessageResult getById(UUID id);
 
-    List<MessageResult> findAllByChannelId(UUID channelId);
+    List<MessageResult> getAllByChannelId(UUID channelId);
 
     MessageResult updateContext(UUID id, String context);
 

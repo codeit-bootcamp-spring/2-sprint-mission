@@ -61,7 +61,7 @@ class UserStatusServiceTest {
     @Test
     void findByUserId() {
         UserStatusResult userStatusDto = userStatusService.create(user.getId());
-        UserStatusResult userStatusDto1 = userStatusService.findByUserId(user.getId());
+        UserStatusResult userStatusDto1 = userStatusService.getByUserId(user.getId());
 
         assertThat(userStatusDto.id()).isEqualTo(userStatusDto1.id());
     }

@@ -71,7 +71,7 @@ class UserControllerTest {
                 OTHER_USER.getPassword());
 
         UserResult user = userController.register(userRequest, file).getBody();
-        BinaryContentResult binaryContentResult = binaryContentService.findById(user.profileId());
+        BinaryContentResult binaryContentResult = binaryContentService.getById(user.profileId());
 
         assertThat(binaryProfileImage).isEqualTo(binaryContentResult.bytes());
     }
@@ -107,7 +107,7 @@ class UserControllerTest {
         );
         UserResult profileImageUpdatedUser = userController.updateProfileImage(user.id(), otherFile).getBody();
 
-        BinaryContentResult binaryContentResult = binaryContentService.findById(profileImageUpdatedUser.profileId());
+        BinaryContentResult binaryContentResult = binaryContentService.getById(profileImageUpdatedUser.profileId());
 
         assertThat(updatedProfileImage).isEqualTo(binaryContentResult.bytes());
     }

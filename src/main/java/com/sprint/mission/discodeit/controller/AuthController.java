@@ -23,7 +23,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@RequestBody LoginRequest loginRequest) {
         UserResult userResult = authService.login(loginRequest);
-        UserStatusResult userStatus = userStatusService.findByUserId(userResult.id());
+        UserStatusResult userStatus = userStatusService.getByUserId(userResult.id());
         UserResponse response = UserResponse.of(userResult, userStatus.isLogin());
         return ResponseEntity.ok(response);
     }

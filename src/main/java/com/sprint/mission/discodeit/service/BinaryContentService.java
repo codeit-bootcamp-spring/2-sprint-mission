@@ -9,9 +9,9 @@ import java.util.UUID;
 public interface BinaryContentService {
     UUID createProfileImage(MultipartFile multipartFile);
 
-    BinaryContentResult findById(UUID id);
+    BinaryContentResult getById(UUID id);
 
-    List<BinaryContentResult> findByIdIn(List<UUID> ids);
+    List<BinaryContentResult> getByIdIn(List<UUID> ids);
 
     void delete(UUID id);
 }

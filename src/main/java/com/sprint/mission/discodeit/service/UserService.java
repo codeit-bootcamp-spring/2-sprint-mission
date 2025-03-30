@@ -9,15 +9,15 @@ import java.util.UUID;
 public interface UserService {
     UserResult register(UserRequest userRequest, UUID profileId);
 
-    UserResult findById(UUID userId);
+    UserResult getById(UUID userId);
 
-    UserResult findByName(String name);
+    UserResult getByName(String name);
 
-    List<UserResult> findAll();
+    List<UserResult> getAll();
 
-    UserResult findByEmail(String email);
+    UserResult getByEmail(String email);
 
-    List<UserResult> findAllByIds(List<UUID> userIds);
+    List<UserResult> getAllByIds(List<UUID> userIds);
 
     UserResult updateName(UUID userId, String name);
 

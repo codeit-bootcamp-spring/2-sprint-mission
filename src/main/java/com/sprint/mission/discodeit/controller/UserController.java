@@ -33,15 +33,15 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponse> findById(@PathVariable UUID userId) {
-        UserResult userResult = userService.findById(userId);
-        UserStatusResult userStatusDto = userStatusService.findByUserId(userResult.id());
+        UserResult userResult = userService.getById(userId);
+        UserStatusResult userStatusDto = userStatusService.getByUserId(userResult.id());
 
         return ResponseEntity.ok(UserResponse.of(userResult, userStatusDto.isLogin()));
     }
 
     @GetMapping
     public ResponseEntity<List<UserResult>> findAll() {
-        return ResponseEntity.ok(userService.findAll());
+        return ResponseEntity.ok(userService.getAll());
     }
 
     @PutMapping("/{userId}")
@@ -55,7 +55,7 @@ public class UserController {
     @PutMapping("/{userId}/profile-image")
     public ResponseEntity<UserResult> updateProfileImage(@PathVariable UUID userId,
                                                          @RequestPart MultipartFile profileImage) {
-        UserResult beforeUpdatedUser = userService.findById(userId);
+        UserResult beforeUpdatedUser = userService.getById(userId);
         UUID profileId = binaryContentService.createProfileImage(profileImage);
         UserResult user = userService.updateProfileImage(userId, profileId);
         binaryContentService.delete(beforeUpdatedUser.profileId());
@@ -74,7 +74,7 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> delete(@PathVariable UUID userId) {
-        UserResult beforeUpdatedUser = userService.findById(userId);
+        UserResult beforeUpdatedUser = userService.getById(userId);
         userService.delete(userId);
         binaryContentService.delete(beforeUpdatedUser.profileId());
 

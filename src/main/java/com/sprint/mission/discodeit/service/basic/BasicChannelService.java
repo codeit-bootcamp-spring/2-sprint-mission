@@ -50,7 +50,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelRequest findById(UUID id) {
+    public ChannelRequest getById(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
@@ -69,7 +69,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelRequest> findAllByUserId(UUID userId) {
+    public List<ChannelRequest> getAllByUserId(UUID userId) {
         List<ChannelRequest> totalChannels = new ArrayList<>(findPublicChannelsByUserId());
         List<ChannelRequest> privateChannels = findPrivateChannelsByUserId(userId);
 
@@ -137,7 +137,7 @@ public class BasicChannelService implements ChannelService {
     private List<ChannelRequest> findPrivateChannelsByUserId(UUID userId) {
         return readStatusRepository.findByUserId(userId)
                 .stream()
-                .map(readStatus -> this.findById(readStatus.getChannelId()))
+                .map(readStatus -> this.getById(readStatus.getChannelId()))
                 .toList();
     }
 

@@ -31,7 +31,7 @@ public class ChannelController {
 
     @GetMapping("/user/{userId}")
     public List<ChannelRequest> findAllByUserId(@PathVariable UUID userId) {
-        return channelService.findAllByUserId(userId);
+        return channelService.getAllByUserId(userId);
     }
 
     @PatchMapping("/{channelId}/public")
@@ -41,14 +41,14 @@ public class ChannelController {
 
     @PostMapping("/{channelId}/members")
     public ChannelRequest addPrivateChannelMember(@PathVariable UUID channelId, @RequestParam String friendEmail) {
-        UserResult friend = userService.findByEmail(friendEmail);
+        UserResult friend = userService.getByEmail(friendEmail);
 
         return channelService.addPrivateChannelMember(channelId, friend.id());
     }
 
     @GetMapping("/{channelId}")
     public ChannelRequest findById(@PathVariable UUID channelId) {
-        return channelService.findById(channelId);
+        return channelService.getById(channelId);
     }
 
     @DeleteMapping("/{channelId}")

@@ -34,7 +34,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResult findByStatusId(UUID userStatusId) {
+    public UserStatusResult getByStatusId(UUID userStatusId) {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저상태가 존재하지 않습니다."));
 
@@ -42,7 +42,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResult findByUserId(UUID userId) {
+    public UserStatusResult getByUserId(UUID userId) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저 Id를 가진 UserStatus가 없습니다."));
 
@@ -50,7 +50,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public List<UserStatusResult> findAll() {
+    public List<UserStatusResult> getAll() {
         return userStatusRepository.findAll()
                 .stream()
                 .map(userStatus -> UserStatusResult.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant())))

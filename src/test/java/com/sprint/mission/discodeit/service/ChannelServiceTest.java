@@ -78,7 +78,7 @@ class ChannelServiceTest {
     @DisplayName("채널 ID로 조회하면 올바른 채널을 반환한다.")
     @Test
     void findChannelById() {
-        ChannelRequest channel = channelService.findById(setUpChannel.id());
+        ChannelRequest channel = channelService.getById(setUpChannel.id());
         assertThat(setUpChannel.id() + setUpChannel.name()).isEqualTo(channel.id() + channel.name());
     }
 
@@ -86,7 +86,7 @@ class ChannelServiceTest {
     @Test
     void updatePublicChannelName() {
         channelService.updatePublicChannelName(setUpChannel.id(), UPDATED_CHANNEL_NAME);
-        assertThat(channelService.findById(setUpChannel.id()).name()).isEqualTo(UPDATED_CHANNEL_NAME);
+        assertThat(channelService.getById(setUpChannel.id()).name()).isEqualTo(UPDATED_CHANNEL_NAME);
     }
 
     @DisplayName("Private 채널의 이름을 변경하려고 하면 예외가 발생한다.")
@@ -108,7 +108,7 @@ class ChannelServiceTest {
 
         ChannelRequest userPrivateChannel = channelService.createPrivate(new ChannelRegisterRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId()), new ArrayList<>());
 
-        List<UUID> setUpUserChannelIds = channelService.findAllByUserId(setUpUser.getId())
+        List<UUID> setUpUserChannelIds = channelService.getAllByUserId(setUpUser.getId())
                 .stream()
                 .map(ChannelRequest::id)
                 .toList();
@@ -122,7 +122,7 @@ class ChannelServiceTest {
         UUID channelId = setUpChannel.id();
         channelService.delete(channelId);
 
-        assertThatThrownBy(() -> channelService.findById(channelId)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> channelService.getById(channelId)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("채널 삭제 시 채널에 속한 메시지도 함께 삭제된다.")
@@ -159,7 +159,7 @@ class ChannelServiceTest {
         messageRepository.save(new Message(MESSAGE_CONTENT, setUpChannel.id(), setUpUser.getId(), new ArrayList<>()));
         Message message = messageRepository.save(new Message(MESSAGE_CONTENT + "123", setUpChannel.id(), setUpUser.getId(), new ArrayList<>()));
 
-        ChannelRequest channel = channelService.findById(setUpChannel.id());
+        ChannelRequest channel = channelService.getById(setUpChannel.id());
         assertThat(channel.lastMessageCreatedAt()).isEqualTo(message.getCreatedAt());
     }
 }

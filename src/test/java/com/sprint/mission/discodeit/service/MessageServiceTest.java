@@ -53,7 +53,7 @@ class MessageServiceTest {
     @DisplayName("메시지 ID로 단건 조회 시 올바른 메시지를 반환한다.")
     @Test
     void findMessageById() {
-        MessageResult message = messageService.findById(setUpMessage.messageId());
+        MessageResult message = messageService.getById(setUpMessage.messageId());
         assertThat(message.context()).isEqualTo(MESSAGE_CONTENT);
     }
 
@@ -61,7 +61,7 @@ class MessageServiceTest {
     @Test
     void findAllMessagesByChannelId() {
         MessageResult messageResult = messageService.create(new MessageCreationRequest(MESSAGE_CONTENT, channelId, setUpUser.getId()), new ArrayList<>());
-        List<MessageResult> messages = messageService.findAllByChannelId(channelId);
+        List<MessageResult> messages = messageService.getAllByChannelId(channelId);
         assertThat(messages).containsExactly(setUpMessage, messageResult);
     }
 
@@ -76,7 +76,7 @@ class MessageServiceTest {
     @Test
     void deleteMessage() {
         messageService.delete(setUpMessage.messageId());
-        assertThatThrownBy(() -> messageService.findById(setUpMessage.messageId()))
+        assertThatThrownBy(() -> messageService.getById(setUpMessage.messageId()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

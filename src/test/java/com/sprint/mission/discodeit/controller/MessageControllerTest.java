@@ -61,6 +61,6 @@ class MessageControllerTest {
         MessageResult message = messageController.createMessage(new MessageCreationRequest(MESSAGE_CONTENT, UUID.randomUUID(), setUpUser.getId()), List.of(file)).getBody();
         messageController.delete(message.messageId());
 
-        assertThatThrownBy(() -> basicBinaryContentService.findById(message.attachmentIds().get(0))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> basicBinaryContentService.getById(message.attachmentIds().get(0))).isInstanceOf(IllegalArgumentException.class);
     }
 }

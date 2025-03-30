@@ -27,7 +27,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public BinaryContentResult findById(UUID id) {
+    public BinaryContentResult getById(UUID id) {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
 
@@ -35,9 +35,9 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public List<BinaryContentResult> findByIdIn(List<UUID> ids) {
+    public List<BinaryContentResult> getByIdIn(List<UUID> ids) {
         return ids.stream()
-                .map(this::findById)
+                .map(this::getById)
                 .toList();
     }
 
