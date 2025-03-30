@@ -44,6 +44,9 @@ public class BasicUserService implements UserService {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
+                    if (bytes == null) {
+                        bytes = new byte[0]; // 예: 빈 배열로 처리
+                    }
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
                     return binaryContentRepository.save(binaryContent).getId();
                 })

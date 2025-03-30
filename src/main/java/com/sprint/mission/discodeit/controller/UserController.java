@@ -44,7 +44,7 @@ public class UserController {
         userService.deleteUser(userId);
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
     public UserResponseDTO updateOnlineState(@PathVariable UUID userId) {
         return userService.updateOnlineState(userId);
     }

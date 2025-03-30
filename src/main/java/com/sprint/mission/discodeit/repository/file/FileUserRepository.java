@@ -81,7 +81,7 @@ public class FileUserRepository implements UserRepository {
             return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> deserialize(path))
-                    .filter(user -> user.getUserName().equals(userName))
+                    .filter(user -> user.getUserName() != null && user.getUserName().equals(userName))
                     .findFirst();
         } catch (IOException e) {
             throw new RuntimeException("사용자 검색 중 오류 발생 (username: " + userName + ")", e);
@@ -139,6 +139,6 @@ public class FileUserRepository implements UserRepository {
     @Override
     public boolean existsByUsername(String username) {
         return this.findAll().stream()
-                .anyMatch(user -> user.getUserName().equals(username));
+                .anyMatch(user -> user.getUserName() != null && user.getUserName().equals(username));
     }
 }

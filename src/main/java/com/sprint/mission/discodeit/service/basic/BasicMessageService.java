@@ -37,6 +37,7 @@ public class BasicMessageService implements MessageService {
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("존재하지 않는 채널 입니다. 메세지를 생성할 수 없습니다.");
         }
+
         List<UUID> attachmentIds = binaryContentDto.stream()
                 .map(attachmentRequest -> {
                     String fileName = attachmentRequest.fileName();

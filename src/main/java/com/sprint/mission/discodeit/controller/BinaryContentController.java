@@ -18,11 +18,12 @@ public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
-    @RequestMapping(value="/{binaryContentId}",method = RequestMethod.GET)
+    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
     public BinaryContent getBinaryContent(@PathVariable UUID binaryContentId) {
         return binaryContentService.find(binaryContentId);
     }
-    @RequestMapping(method=RequestMethod.GET)
+
+    @RequestMapping(method = RequestMethod.GET)
     public List<BinaryContent> getBinaryContents(List<UUID> binaryContentIds) {
         return binaryContentService.findAllByIdIn(binaryContentIds);
     }

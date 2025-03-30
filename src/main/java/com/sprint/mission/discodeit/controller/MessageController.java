@@ -18,8 +18,9 @@ public class MessageController {
     private final MessageService messageService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public Message createMessage(@RequestBody CreateMessageDTO dto, List<BinaryContentDTO> attachments) {
-        return messageService.createMessage(dto, attachments != null ? attachments : List.of());
+    public Message createMessage(@RequestBody CreateMessageDTO dto) {
+        List<BinaryContentDTO> attachments = dto.attachments().orElse(List.of());
+        return messageService.createMessage(dto, attachments);
     }
 
     @RequestMapping(value = "/{messageId}", method = RequestMethod.PUT)
