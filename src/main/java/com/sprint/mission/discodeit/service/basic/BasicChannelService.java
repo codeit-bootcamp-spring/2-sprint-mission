@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.channel.CreatePrivateChannelException;
 import com.sprint.mission.discodeit.exception.channel.CreatePublicChannelException;
+import com.sprint.mission.discodeit.exception.channel.UpdateChannelException;
 import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.provider.ChannelReadStrategyProvider;
 import com.sprint.mission.discodeit.provider.ChannelUpdaterProvider;
@@ -95,9 +96,15 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void updateChannel(UUID channelId, ChannelUpdateRequest channelUpdateRequest) {
-        Channel findChannel = this.channelRepository.findById(channelId);
-        List<ChannelUpdater> applicableUpdaters = updaterProvider.getApplicableUpdaters(findChannel, channelUpdateRequest);
-        applicableUpdaters.forEach(updater -> updater.update(channelId, channelUpdateRequest, this.channelRepository));
+        try {
+            Channel findChannel = this.channelRepository.findById(channelId);
+            List<ChannelUpdater> applicableUpdaters = updaterProvider.getApplicableUpdaters(findChannel, channelUpdateRequest);
+            applicableUpdaters.forEach(updater -> updater.update(channelId, channelUpdateRequest, this.channelRepository));
+        } catch (NoSuchElementException e) {
+            throw new UpdateChannelException("해당 channelId가 존재하지 않습니다.", HttpStatus.NOT_FOUND, e);
+        } catch (Exception e) {
+            throw new UpdateChannelException("채널 업데이트 중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     // 삭제해야 될지도? 추후 필요할지도 모르니 일단 남겨두겠음 (스프린트미션3 기준 public은 참여자 정보가 필요없고, private은 참여자 정보가 필요함. 하지만 private은 생성 후 수정 불가능)
