@@ -31,8 +31,8 @@ public class UserController {
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateUser(@RequestBody UserUpdateRequest userRequest, BinaryContentCreateRequest binaryContentRequest) {
-        User updatedUser = userService.update(userRequest, binaryContentRequest);
+    public ResponseEntity<?> updateUser(@RequestBody UserUpdateRequest userRequest) {
+        User updatedUser = userService.update(userRequest);
         log.info("사용자 수정 완료 {}", updatedUser);
 
         return ResponseEntity.ok(updatedUser);

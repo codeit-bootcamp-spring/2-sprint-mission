@@ -76,7 +76,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateRequest request, BinaryContentCreateRequest binaryContentRequest) {
+    public User update(UserUpdateRequest request) {
         User user = userRepository.findByKey(request.userKey());
         UUID updateProfileKey = null;
         if (user == null) {
@@ -101,12 +101,12 @@ public class BasicUserService implements UserService {
             user.updateEmail(request.newEmail());
         }
 
-        if (isValidBinaryContent(binaryContentRequest)) {
+        if (isValidBinaryContent(request.binaryContentRequest())) {
             UUID currentProfileId = user.getProfileId();
             if (currentProfileId != null) {
                 binaryContentRepository.delete(currentProfileId);
             }
-            updateProfileKey = binaryContentService.create(binaryContentRequest).getUuid();
+            updateProfileKey = binaryContentService.create(request.binaryContentRequest()).getUuid();
             user.updateProfileId(updateProfileKey);
         }
 
