@@ -39,7 +39,7 @@ public class BasicFileStorageService implements FileStorageService {
             return new BinaryContentCreateRequest(fileId, filePath.toAbsolutePath().toString(), fileName, file.getContentType(), file.getSize());
         } catch (IOException e) {
             logger.error("파일 저장 중 오류 발생: {}", fileStorageLocation.toAbsolutePath(), e);
-            throw new RuntimeException();
+            throw new RuntimeException("파일 저장 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
     }
 
@@ -49,7 +49,7 @@ public class BasicFileStorageService implements FileStorageService {
             return Files.readAllBytes(path);
         } catch (IOException e) {
             logger.error("파일 읽는 중 오류 발생 {}", path.toAbsolutePath(), e);
-            throw new RuntimeException("파일을 읽을 수 없습니다.");
+            throw new RuntimeException("파일을 읽을 수 없습니다: " + e.getMessage(), e);
         }
     }
 
@@ -69,10 +69,12 @@ public class BasicFileStorageService implements FileStorageService {
                             Files.delete(path);
                         } catch (IOException e) {
                             logger.error("해당 파일을 삭제할 수 없습니다 :{}", fileId, e);
+                            throw new RuntimeException("파일 삭제 중 오류가 발생했습니다: " + e.getMessage(), e);
                         }
                     });
         } catch (IOException e) {
             logger.error("해당 디렉토리에 접근할 수 없습니다 : {}", fileStorageLocation.toAbsolutePath(), e);
+            throw new RuntimeException("디렉토리 접근 오류: " + e.getMessage(), e);
         }
     }
 }
