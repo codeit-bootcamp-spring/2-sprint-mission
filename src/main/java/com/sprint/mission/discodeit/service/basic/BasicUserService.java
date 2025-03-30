@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateUserNameException;
-import com.sprint.mission.discodeit.exception.binarycontent.FileIdNotFoundException;
+import com.sprint.mission.discodeit.exception.binarycontent.FileFindException;
 import com.sprint.mission.discodeit.provider.UserUpdaterProvider;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.updater.user.UserUpdater;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,13 +36,13 @@ public class BasicUserService implements UserService {
     @Override
     public UUID createUser(UserCreateRequest userCreateRequest) {
         if (userRepository.existsByUserName(userCreateRequest.userName())) {
-            throw new DuplicateUserNameException(userCreateRequest.userName());
+            throw new DuplicateUserNameException("해당 userName이 이미 존재합니다." + userCreateRequest.userName(), HttpStatus.CONFLICT);
         }
         if (userRepository.existsByEmail(userCreateRequest.userEmail())) {
-            throw new DuplicateEmailException(userCreateRequest.userEmail());
+            throw new DuplicateEmailException("해당 userEmail이 이미 존재합니다." + userCreateRequest.userEmail(), HttpStatus.CONFLICT);
         }
         if (!binaryContentService.existsById(userCreateRequest.profileId())) {
-            throw new FileIdNotFoundException(userCreateRequest.profileId());
+            throw new FileFindException("해당 id를 가진 binaryContent가 존재하지 않습니다." + userCreateRequest.profileId().toString(), HttpStatus.NOT_FOUND);
         }
         User newUser = new User(userCreateRequest.userName(), userCreateRequest.userEmail(), userCreateRequest.password(), userCreateRequest.profileId()); //각 요소에 대한 유효성 검증은 User 생성자에게 맡긴다
         this.userRepository.add(newUser);
