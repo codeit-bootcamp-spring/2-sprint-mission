@@ -54,7 +54,7 @@ public class UserController {
                 .body(response);
     }
 
-    @GetMapping("/finaAll")
+    @GetMapping("/findAll")
     public ResponseEntity<List<UserReadResponse>> readAll() {       // 미션 요구사항때문에 이 api의 반환값만 ApiResponse를 사용안함.
         List<UserReadResponse> response = userService.readAllUsers();
         return ResponseEntity.status(HttpStatus.OK)
