@@ -9,14 +9,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/read-status")
+@RequestMapping("/api/readStatus")
 @RequiredArgsConstructor
 public class ReadStatusController {
 
     private final ReadStatusService readStatusService;
 
-    @PostMapping("/save")
-    public ResponseEntity<ApiResponse<Void>> save(@RequestBody SaveReadStatusParamDto saveReadStatusParamDto) {
+    @PostMapping("")
+    public ResponseEntity<ApiResponse<Void>> save(
+            @RequestBody SaveReadStatusParamDto saveReadStatusParamDto
+    ) {
         readStatusService.save(saveReadStatusParamDto);
         return ResponseEntity.ok(ApiResponse.success());
     }
@@ -27,8 +29,10 @@ public class ReadStatusController {
         return ResponseEntity.ok(ApiResponse.success());
     }
 
-    @PostMapping("/find")
-    public ResponseEntity<ApiResponse<List<CheckReadStatusResponseDto>>> findByUserId(@RequestBody FindReadStatusByUserIdRequestDto findReadStatusByUserIdRequestDto) {
+    @GetMapping("/find")
+    public ResponseEntity<ApiResponse<List<CheckReadStatusResponseDto>>> findByUserId(
+            @RequestBody FindReadStatusByUserIdRequestDto findReadStatusByUserIdRequestDto
+    ) {
         List<CheckReadStatusResponseDto> checkReadStatusResponseDtoList = readStatusService.findAllByUserId(findReadStatusByUserIdRequestDto);
         return ResponseEntity.ok(ApiResponse.success(checkReadStatusResponseDtoList));
     }

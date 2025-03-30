@@ -31,10 +31,10 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void save(SaveReadStatusParamDto saveReadStatusParamDto) {
-        User user = userRepository.findUserById(saveReadStatusParamDto.userUUID())
+        User user = userRepository.findUserById(saveReadStatusParamDto.userId())
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
 
-        Channel channel = channelRepository.findChannelById(saveReadStatusParamDto.channelUUID())
+        Channel channel = channelRepository.findChannelById(saveReadStatusParamDto.channelId())
                 .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다."));
 
         ReadStatus readStatus = ReadStatus.builder()

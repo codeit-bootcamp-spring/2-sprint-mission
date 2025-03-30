@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -19,9 +20,19 @@ public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
-    @GetMapping("/find")
-    public ResponseEntity<ApiResponse<FindBinaryContentRequestDto>> find(@RequestParam UUID binaryContentId) {
+    @GetMapping("/{binaryContentId}")
+    public ResponseEntity<ApiResponse<FindBinaryContentRequestDto>> find(
+            @PathVariable UUID binaryContentId
+    ) {
         binaryContentService.findById(binaryContentId);
         return ResponseEntity.ok(ApiResponse.success(binaryContentService.findById(binaryContentId)));
+    }
+
+    @GetMapping("/find")
+    public ResponseEntity<ApiResponse<List<FindBinaryContentRequestDto>>> findByIdIn(
+            @RequestParam List<UUID> binaryContentIdList
+    ) {
+        List<FindBinaryContentRequestDto> result = binaryContentService.findByIdIn(binaryContentIdList);
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 }
