@@ -3,10 +3,10 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.channel.ChannelReadResponse;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserReadResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.channel.CreateChannelException;
 import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.provider.ChannelReadStrategyProvider;
 import com.sprint.mission.discodeit.provider.ChannelUpdaterProvider;
@@ -18,9 +18,11 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.updater.channel.ChannelUpdater;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,18 +38,24 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public UUID createPrivateChannel(PrivateChannelCreateRequest privateChannelCreateRequest) {
-        Channel newChannel = new Channel(ChannelType.PRIVATE);      // private channel 생성자 호출
-        this.channelRepository.add(newChannel);
-        this.readStatusRepository.addChannelIdMap(newChannel.getId());
-        // for 문이 transaction 처리가 간편하다 하여 stream 사용X
-        for(UUID userId : privateChannelCreateRequest.users()) {
-            UserService.validateUserId(userId, userRepository);             // privateChannelCreateRequest의 userId들에 대한 검증 (따로 앞쪽에 빼는게 좋나?)
-            this.readStatusRepository.add(new ReadStatus(userId, newChannel.getId()));
-            newChannel.addParticipant(userId);
-        }
+        try {
+            Channel newChannel = new Channel(ChannelType.PRIVATE);      // private channel 생성자 호출
+            this.channelRepository.add(newChannel);
+            this.readStatusRepository.addChannelIdMap(newChannel.getId());
+            // for 문이 transaction 처리가 간편하다 하여 stream 사용X
+            for (UUID userId : privateChannelCreateRequest.users()) {
+                UserService.validateUserId(userId, userRepository);             // privateChannelCreateRequest의 userId들에 대한 검증 (따로 앞쪽에 빼는게 좋나?)
+                this.readStatusRepository.add(new ReadStatus(userId, newChannel.getId()));
+                newChannel.addParticipant(userId);
+            }
 
-        this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
-        return newChannel.getId();
+            this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
+            return newChannel.getId();
+        } catch (NoSuchElementException e) {
+            throw new CreateChannelException("존재하지 않는 userId 입니다.", HttpStatus.NOT_FOUND, e);
+        } catch (Exception e) {
+            throw new CreateChannelException("private 채널 생성 중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @Override
