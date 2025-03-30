@@ -6,7 +6,8 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.channel.CreateChannelException;
+import com.sprint.mission.discodeit.exception.channel.CreatePrivateChannelException;
+import com.sprint.mission.discodeit.exception.channel.CreatePublicChannelException;
 import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.provider.ChannelReadStrategyProvider;
 import com.sprint.mission.discodeit.provider.ChannelUpdaterProvider;
@@ -52,19 +53,24 @@ public class BasicChannelService implements ChannelService {
             this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
             return newChannel.getId();
         } catch (NoSuchElementException e) {
-            throw new CreateChannelException("존재하지 않는 userId 입니다.", HttpStatus.NOT_FOUND, e);
+            throw new CreatePrivateChannelException("존재하지 않는 userId 입니다.", HttpStatus.NOT_FOUND, e);
         } catch (Exception e) {
-            throw new CreateChannelException("private 채널 생성 중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+            throw new CreatePrivateChannelException("private 채널 생성 중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
         }
     }
 
     @Override
     public UUID createPublicChannel(String channelName) {
-        Channel newChannel = new Channel(ChannelType.PUBLIC, channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
-        this.channelRepository.add(newChannel);
-        this.readStatusRepository.addChannelIdMap(newChannel.getId());
-        this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
-        return newChannel.getId();
+        try {
+            Channel newChannel = new Channel(ChannelType.PUBLIC, channelName);      //channelName에 대한 유효성 검증은 Channel 생성자에게 맡긴다.
+            this.channelRepository.add(newChannel);
+            this.readStatusRepository.addChannelIdMap(newChannel.getId());
+            this.messageRepository.addChannelIdToChannelIdMessage(newChannel.getId());      // messageRepository의 ChannelIdMessage 와의 동기화
+            return newChannel.getId();
+        } catch (Exception e) {
+            throw new CreatePublicChannelException("public 채널 생성 중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+
+        }
     }
 
     @Override
