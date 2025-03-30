@@ -39,7 +39,8 @@ public class ChannelDto {
     public static class Update {
         @NotNull
         private UUID channelId;
-        @NotBlank
+        @NotNull
+        private UUID ownerId;
         private String channelName;
         private String description;
     }
@@ -57,7 +58,7 @@ public class ChannelDto {
         private UUID ownerId;
         private String description;
         @NotNull
-        private boolean isPrivate;
+        private String channelType;
         private ZonedDateTime lastMessageTime;
         @NotNull
         private Set<UUID> userList;
@@ -72,7 +73,7 @@ public class ChannelDto {
         @NotBlank
         private final String channelName;
         @NotNull// 채널 이름
-        private final boolean isPrivate;
+        private final String channelType;
         @NotNull// PRIVATE 채널 여부
         private final int participantCount;     // 참여자 수
         private final ZonedDateTime lastMessageAt; // 최근 메시지 시간
@@ -83,8 +84,9 @@ public class ChannelDto {
             SummaryBuilder builder = Summary.builder()
                     .channelId(channel.getChannelId())
                     .channelName(channel.getChannelName())
-                    .isPrivate(channel.isPrivate())
-                    .participantCount(channel.getUserList().size());
+                    .channelType(channel.getChannelType())
+                    .participantCount(channel.getUserList().size())
+                    ;
 
             // PRIVATE:참여자 목록 포함
             if (channel.isPrivate()) {

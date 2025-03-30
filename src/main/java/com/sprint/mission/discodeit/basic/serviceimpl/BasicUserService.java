@@ -95,9 +95,16 @@ public class BasicUserService implements UserService {
     public UserDto.Update updateUser(UUID userId, UserDto.Update updateUserDto) {
         User user = userRepository.findByUser(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-        
-        if (updateUserDto.getPassword() != null) {
-            user.setPassword(updateUserDto.getPassword());
+
+        String newPassword = updateUserDto.getPassword();
+
+        if (newPassword != null) {
+            String existingPassword = user.getPassword();
+            if (newPassword.equals(existingPassword)) {
+                throw new InvalidRequestException("기존 비밀번호와 동일한 비밀번호로는 변경할 수 없습니다");
+            }
+            user.setPassword(newPassword);
+
         }
         
         if (updateUserDto.getProfileImage() != null) {

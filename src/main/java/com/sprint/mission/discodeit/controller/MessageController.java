@@ -20,9 +20,9 @@ public class MessageController {
     @RequiresAuth
     @PostMapping("/create")
     public ResponseEntity<MessageDto.Response> sendMessage(
-            @RequestBody MessageDto.Create createMessage) throws IOException {
-
-        return ResponseEntity.ok(messageService.create(createMessage));
+            @RequestBody MessageDto.Create createMessage,HttpServletRequest httpRequest) throws IOException {
+        String authorId = (String) httpRequest.getAttribute("userId");
+        return ResponseEntity.ok(messageService.create(createMessage,UUID.fromString(authorId)));
     }
     
     @RequiresAuth
@@ -32,21 +32,17 @@ public class MessageController {
             @RequestBody MessageDto.Update updateMessage,
             HttpServletRequest httpRequest) throws IOException {
 
-        String userId = (String) httpRequest.getAttribute("userId");
-        UUID userUuid;
-
-        updateMessage.setMessageId(messageId);
-        
-        MessageDto.Response updatedMessage = messageService.updateMessage(updateMessage);
+        String authorId = (String) httpRequest.getAttribute("userId");
+        MessageDto.Response updatedMessage = messageService.updateMessage(messageId,updateMessage,UUID.fromString(authorId));
         return ResponseEntity.ok(updatedMessage);
     }
     
     @RequiresAuth
     @DeleteMapping("/delete/{messageId}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
+    public ResponseEntity<String> deleteMessage(@PathVariable UUID messageId) {
 
-        messageService.deleteMessage(messageId);
-        return ResponseEntity.noContent().build();
+       boolean message= messageService.deleteMessage(messageId);
+        return ResponseEntity.ok(String.valueOf(message));
     }
 
     @GetMapping("/channel/{channelId}")

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource; // InputStreamResource 사용
 import org.springframework.core.io.Resource;
@@ -21,14 +22,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional; // Optional 임포트
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 @RestController
-@RequestMapping("/api/binary-contents") // 기본 경로 설정 (예시)
+@RequestMapping("/binary-contents")
 @RequiredArgsConstructor
-public class BinaryContentController { // 클래스 이름 가정
+public class BinaryContentController {
 
-    private final BinaryContentService binaryContentService; // 변경된 서비스 주입
+    private final BinaryContentService binaryContentService;
 
     @RequiresAuth
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -36,7 +39,7 @@ public class BinaryContentController { // 클래스 이름 가정
 
             @RequestParam("ownerId") UUID ownerId,
             @RequestParam("ownerType") String ownerType,
-            @RequestPart("file") MultipartFile file) throws IOException { // IOException 처리 필요
+            @RequestPart("file") MultipartFile file) throws IOException {
 
         BinaryContentDto.Upload uploadDto = BinaryContentDto.Upload.builder()
                 .ownerId(ownerId)
@@ -46,7 +49,7 @@ public class BinaryContentController { // 클래스 이름 가정
 
         BinaryContentDto.Summary summary = binaryContentService.createBinaryContent(uploadDto);
 
-        return ResponseEntity.ok(summary); // 200 OK
+        return ResponseEntity.ok(summary);
     }
 
     @RequiresAuth
@@ -55,7 +58,6 @@ public class BinaryContentController { // 클래스 이름 가정
 
         BinaryContent metadata = binaryContentService.getBinaryContentEntity(contentId);
 
-        // 2. 실제 컨텐츠 스트림 얻기
         Optional<InputStream> streamOpt = binaryContentService.getContentStream(contentId);
 
         if (streamOpt.isEmpty()) {
@@ -73,10 +75,50 @@ public class BinaryContentController { // 클래스 이름 가정
                 .contentLength(metadata.getSize())
                 .body(resource);
     }
+    @RequiresAuth
+    @GetMapping("/download-archive")
+    public void downloadFilesAsZip(
+            @RequestParam List<UUID> ids,
+            HttpServletResponse response) throws IOException {
 
+        String zipFileName = "download_" + System.currentTimeMillis() + ".zip"; // 동적 파일명 생성
+        String encodedZipFileName = UriUtils.encode(zipFileName, StandardCharsets.UTF_8);
+        String contentDisposition = "attachment; filename*=UTF-8''" + encodedZipFileName;
+
+        response.setContentType("application/zip");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
+
+        try (ZipOutputStream zos = new ZipOutputStream(response.getOutputStream())) {
+
+            for (UUID contentId : ids) {
+
+                BinaryContent metadata = binaryContentService.getBinaryContentEntity(contentId);
+                Optional<InputStream> streamOpt = binaryContentService.getContentStream(contentId);
+
+                if (streamOpt.isPresent() && metadata != null) {
+                    try (InputStream fileStream = streamOpt.get()) {
+
+                        String entryName = metadata.getId() + "_" + metadata.getFileName();
+                        ZipEntry zipEntry = new ZipEntry(entryName);
+                        zos.putNextEntry(zipEntry);
+                        byte[] buffer = new byte[1024];
+                        int len;
+                        while ((len = fileStream.read(buffer)) > 0) {
+                            zos.write(buffer, 0, len);
+                        }
+                        zos.closeEntry();
+                    } catch (IOException e) {
+
+                        System.err.println("Error processing file for zipping: " + contentId + ", Error: " + e.getMessage());
+                    }
+                }
+                }
+            zos.finish();
+        }
+    }
 
     @GetMapping("/summaries")
-    public ResponseEntity<List<BinaryContentDto.Summary>> getBinaryContentSummaries(
+    public ResponseEntity<List<BinaryContentDto.Summary>> downloadBinaryContents(
             @RequestParam List<UUID> ids) {
 
         List<BinaryContentDto.Summary> summaries;
@@ -87,7 +129,7 @@ public class BinaryContentController { // 클래스 이름 가정
 
 
     @RequiresAuth
-    @DeleteMapping
+    @DeleteMapping("/delete/{ids}")
     public ResponseEntity<List<BinaryContentDto.DeleteResponse>> deleteBinaryContentsByIds(
             @RequestParam List<UUID> ids) {
 
@@ -96,7 +138,7 @@ public class BinaryContentController { // 클래스 이름 가정
     }
 
     @RequiresAuth
-    @DeleteMapping("/owner/{ownerId}")
+    @DeleteMapping("/delete/{ownerId}")
     public ResponseEntity<Void> deleteBinaryContentsByOwner(@PathVariable UUID ownerId) {
         binaryContentService.deleteBinaryContentByOwner(ownerId);
         return ResponseEntity.noContent().build();

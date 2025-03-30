@@ -4,11 +4,12 @@ spring:
   jpa:
     open-in-view: false
 
-# 파일 저장소 설정
 discodeit:
   storage:
-    data-dir: data    # 데이터가 저장될 기본 디렉토리
 
+    data-dir: data
+    # 이미지 파일
+    image-dir: C:/Users/ych61/IdeaProjects/codeit_sprint/2-sprint-mission/images
 # 로깅 설정
 logging:
   level:

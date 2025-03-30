@@ -39,7 +39,6 @@ public class UserStatus implements Serializable {
         this.updatedAt = ZonedDateTime.now();
 
     }
-    //사용자 임의 설정
     public void setStatus(StatusOperation statusOperation) {
         this.status = statusOperation;
         updateLastTime();

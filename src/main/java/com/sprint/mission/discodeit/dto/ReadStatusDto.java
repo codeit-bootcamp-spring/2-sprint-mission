@@ -17,8 +17,6 @@ public class ReadStatusDto {
         private UUID channelId;
         @NotNull
         private UUID userId;
-        @NotNull
-        private UUID lastReadMessageId;
     }
     @Getter
     @Setter

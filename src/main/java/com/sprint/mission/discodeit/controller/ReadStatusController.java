@@ -26,8 +26,7 @@ public class ReadStatusController {
     @RequiresAuth
     @PostMapping("/create")
     public ResponseEntity<ReadStatusDto.ResponseReadStatus> createReceptionStatus(
-            @RequestBody ReadStatusDto.Create request,
-            HttpServletRequest httpRequest) {
+            @RequestBody ReadStatusDto.Create request) {
 
         return ResponseEntity.ok(readStatusService.create(request));
     }

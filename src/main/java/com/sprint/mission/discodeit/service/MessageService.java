@@ -10,10 +10,10 @@ import java.util.UUID;
 @Qualifier("BasicMessageService")
 public interface MessageService {
 
-    MessageDto.Response create(MessageDto.Create messageCreateDTO) throws IOException;
+    MessageDto.Response create(MessageDto.Create messageCreateDTO, UUID uuid) throws IOException;
     MessageDto.Response findByMessage(UUID messageId);
     List<MessageDto.Response> findAllMessage();
     List<MessageDto.Response> findAllByChannelId(UUID channelId);
-    MessageDto.Response updateMessage(MessageDto.Update messageUpdateDTO) throws IOException;
-    void deleteMessage(UUID messageId);
+    MessageDto.Response updateMessage(UUID messageId, MessageDto.Update messageUpdateDTO, UUID uuid) throws IOException;
+    boolean deleteMessage(UUID messageId);
 }

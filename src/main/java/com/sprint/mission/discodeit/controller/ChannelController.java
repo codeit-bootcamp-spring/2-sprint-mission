@@ -21,46 +21,45 @@ public class ChannelController {
 
     @RequiresAuth
     @PostMapping("/public")
-    public ResponseEntity<ChannelDto.Response> createPublicChannel(@RequestBody ChannelDto.CreatePublic channelDto) {
+    public ResponseEntity<ChannelDto.Response> createPublicChannel(@Valid @RequestBody ChannelDto.CreatePublic channelDto) {
         return ResponseEntity.ok(channelService.createPublicChannel(channelDto));
     }
     
     @RequiresAuth
     @PostMapping("/private")
-    public ResponseEntity<ChannelDto.Response> createPrivateChannel( @RequestBody ChannelDto.CreatePrivate channelDto) {
+    public ResponseEntity<ChannelDto.Response> createPrivateChannel(@Valid @RequestBody ChannelDto.CreatePrivate channelDto) {
         return ResponseEntity.ok(channelService.createPrivateChannel(channelDto));
     }
     
     @RequiresAuth
     @PutMapping("/update/{channelId}")
     public ResponseEntity<ChannelDto.Response> updateChannel(
-            @PathVariable String channelId,
-            @Valid @RequestBody ChannelDto.Update channelDto, 
-            HttpServletRequest httpRequest) {
+            @PathVariable UUID channelId,
+            @Valid @RequestBody ChannelDto.Update channelDto) {
 
-        String ownerId= (String)httpRequest.getAttribute("userId");
-        ChannelDto.Response updatedChannel = channelService.updateChannel(channelDto, UUID.fromString(ownerId));
+        ChannelDto.Response updatedChannel = channelService.updateChannel(channelDto, channelId);
         return ResponseEntity.ok(updatedChannel);
     }
     
     @RequiresAuth
     @DeleteMapping("/delete/{channelId}")
     public ResponseEntity<ChannelDto.DeleteResponse> deleteChannel(
-            @PathVariable UUID channelId,HttpServletRequest httpRequest) {
+          @Valid  @PathVariable UUID channelId,HttpServletRequest httpRequest) {
         String ownerId = (String) httpRequest.getAttribute("userId");
         boolean success = channelService.deleteChannel(channelId, UUID.fromString(ownerId));
+
         return ResponseEntity.ok(new ChannelDto.DeleteResponse(channelId, String.valueOf(success)));
 
     }
     @GetMapping("/find/{userId}")
-    public ResponseEntity<List<ChannelDto.Response>> getChannelsForUser(@PathVariable UUID userId) {
+    public ResponseEntity<List<ChannelDto.Response>> getChannelsForUser(@Valid @PathVariable UUID userId) {
 
         List<ChannelDto.Response> channels = channelService.getAccessibleChannels(userId);
         return ResponseEntity.ok(channels);
     }
     
     @GetMapping("/{channelId}")
-    public ResponseEntity<ChannelDto.Response> getChannel(@PathVariable UUID channelId) {
+    public ResponseEntity<ChannelDto.Response> getChannel(@Valid @PathVariable UUID channelId) {
         
         ChannelDto.Response channel = channelService.findById(channelId);
         return ResponseEntity.ok(channel);

@@ -29,11 +29,6 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusDto.ResponseReadStatus create(ReadStatusDto.Create readStatusDto) {
         validateUserAndChannel(readStatusDto.getUserId(), readStatusDto.getChannelId());
 
-        if (readStatusDto.getLastReadMessageId()!= null) {
-            messageRepository.findById(readStatusDto.getLastReadMessageId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Message", "id", readStatusDto.getLastReadMessageId()));
-        }
-
         readStatusRepository.findByUserIdAndChannelId(readStatusDto.getUserId(), readStatusDto.getChannelId())
                 .ifPresent(existing -> {
                     throw new DataConflictException("ReceptionStatus", "userId/channelId",

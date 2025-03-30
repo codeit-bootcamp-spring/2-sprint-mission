@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto;
 
-import com.sprint.mission.discodeit.UpdateOperation;
+import com.sprint.mission.discodeit.util.UpdateOperation;
 import com.sprint.mission.discodeit.entity.Message;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,10 +22,8 @@ public class MessageDto {
     public static class Create {
         @NotNull
         private UUID channelId;
-        @NotNull
-        private UUID authorId;
         @NotBlank
-        private String content;
+        private String message;
         private List<UUID> binaryContents;
     }
     @Data
@@ -34,10 +32,9 @@ public class MessageDto {
     @AllArgsConstructor
     public static class Update {
         @NotNull
-        private UUID messageId;
-        private String content;
+        private UUID id;
+        private String message;
         private List<UUID> binaryContents;
-        @NotNull
         private UpdateOperation operation;
     }
 
@@ -48,14 +45,14 @@ public class MessageDto {
 
     public static class Response {
         @NotNull
-        private UUID messageId;
+        private UUID id;
         @NotNull
         private UUID channelId;
         @NotNull
         private UUID authorId;
-        private String content;
+        private String message;
         private ZonedDateTime createdAt;
-        private ZonedDateTime updatedAt;
+        private ZonedDateTime updateAt;
         private List<UUID> binaryContentIds;
     }
 

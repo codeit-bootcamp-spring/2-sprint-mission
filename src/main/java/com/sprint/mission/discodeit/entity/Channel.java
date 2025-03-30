@@ -18,45 +18,45 @@ public class Channel implements Serializable {
     private final UUID channelId; // 채널 ID
     private final ZonedDateTime createdAt; // 생성시간
     private ZonedDateTime updateAt; // 업데이트 된 시간
-    private final UUID ownerID; // 채널 생성자의 아이디
-    private final Set<UUID> userList = new HashSet<>(); // 가입한 유저 ID 리스트
+    private final UUID ownerId; // 채널 생성자의 아이디
+    private final Set<UUID> userList = new HashSet<>(); // 가입한 유저 리스트
     private String channelName; //채널이름
     private final String channelType; // 채널 타입 (PUBLIC/PRIVATE)
     private String description; // 채널 설명 (PUBLIC)
 
     // PUBLIC
-    public Channel(String channelName, UUID ownerID) {
+    public Channel(String channelName, UUID ownerId) {
         this.createdAt = ZonedDateTime.now();
         this.channelId = UUID.randomUUID();
         this.channelName = channelName;
-        this.ownerID = ownerID;
+        this.ownerId = ownerId;
         this.channelType = ChannelType.PUBLIC;
-        userList.add(ownerID); // 생성자를 채널에 자동 추가
+        userList.add(ownerId); // 생성자를 채널에 자동 추가
     }
 
     // PUBLIC
-    public Channel(String channelName, UUID ownerID, String description) {
-        this(channelName, ownerID);
+    public Channel(String channelName, UUID ownerId, String description) {
+        this(channelName, ownerId);
         this.description = description;
     }
 
     // PRIVATE 채널 생성자
-    public Channel(UUID ownerID, Set<UUID> participants) {
+    public Channel(UUID ownerId, Set<UUID> participants) {
         this.createdAt = ZonedDateTime.now();
         this.channelId = UUID.randomUUID();
-        this.ownerID = ownerID;
+        this.ownerId = ownerId;
         this.channelType = ChannelType.PRIVATE;
 
         // 참여자 추가
-        userList.add(ownerID);
+        userList.add(ownerId);
         if (participants != null) {
             userList.addAll(participants);
         }
     }
 
     // PRIVATE 채널 생성자 (이름 포함)
-    public Channel(String channelName, UUID ownerID, Set<UUID> participants) {
-        this(ownerID, participants);
+    public Channel(String channelName, UUID ownerId, Set<UUID> participants) {
+        this(ownerId, participants);
         this.channelName = channelName;
     }
 
@@ -89,7 +89,7 @@ public class Channel implements Serializable {
         updateAt = ZonedDateTime.now();
     }
 
-    // 채널 타입 확인 메서드
+//    // 채널 타입 확인 메서드
     public boolean isPrivate() {
         return ChannelType.PRIVATE.equals(this.channelType);
     }

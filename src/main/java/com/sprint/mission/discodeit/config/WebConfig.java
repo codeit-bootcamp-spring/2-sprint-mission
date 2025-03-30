@@ -20,8 +20,14 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(@NonNull InterceptorRegistry registry) {
         registry.addInterceptor(jwtAuthInterceptor)
-                .addPathPatterns("/user/**") // <--- '/user/**' 경로 추가 또는 변경
-                .addPathPatterns("/api/**")   // 기존 '/api/**'도 필요하다면 유지
+                .addPathPatterns(
+                        "/user/**",
+                        "/channel/**",   // <--- 수정: /** 추가
+                        "/message/**",   // <--- 수정: /** 추가
+                        "/binary-contents/**", // <--- 수정: /** 추가
+                        "/api/**",
+                        "read-status/**"// 기존 '/api/**'도 필요하다면 유지
+                )  // 기존 '/api/**'도 필요하다면 유지
                 .excludePathPatterns("/auth/login", "/auth/register"); // 로그인, 회원가입은 제외
         // 다른 필요한 경로 패턴 추가/제외 가능
     }

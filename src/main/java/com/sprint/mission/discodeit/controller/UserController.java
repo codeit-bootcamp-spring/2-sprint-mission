@@ -58,7 +58,7 @@ public class UserController {
     @PutMapping("/status/{userId}")
     public ResponseEntity<StatusDto.StatusResponse> updateUserStatus(
             @PathVariable UUID userId,@RequestBody StatusDto.StatusRequest statusRequest) {
-
+        System.out.println("Asdadsasdasd");
         return ResponseEntity.ok(userStatusService.updateUserStatus(userId,statusRequest));
     }
 }

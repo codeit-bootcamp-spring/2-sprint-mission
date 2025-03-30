@@ -25,17 +25,22 @@ public class BinaryContentDto {
         @Getter
         @Builder(toBuilder = true)
         public static class Summary{
+            @NotNull
             private UUID id;
-            private String email;
+            @NotBlank
             private String fileName;
+            @NotBlank
             private String contentType;
         }
 
         @Getter
         @Builder(toBuilder = true)
         public static class DeleteResponse {
+            @NotNull
             private UUID id;
+            @NotBlank
             private String fileName;
+            @NotBlank
             private boolean success;
             private String message;
         }

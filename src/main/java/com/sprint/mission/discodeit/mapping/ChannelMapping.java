@@ -13,6 +13,7 @@ import java.util.UUID;
 @Mapper(config = CentralMapperConfig.class)
 public interface ChannelMapping {
     ChannelMapping INSTANCE = Mappers.getMapper(ChannelMapping.class);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     ChannelDto.Response channelToResponse(Channel channel);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     ChannelDto.Update channelToUpdateDto(Channel channel);

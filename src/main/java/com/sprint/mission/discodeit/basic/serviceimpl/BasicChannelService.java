@@ -30,18 +30,18 @@ public class BasicChannelService implements ChannelService {
     //private 명확하므로 읽음상태 생성
     @Override
     public ChannelDto.Response createPrivateChannel(ChannelDto.CreatePrivate dto) {
-        // 채널 생성
         Channel channel;
         if (dto.getChannelName() != null && !dto.getChannelName().isEmpty()) {
             channel = new Channel(dto.getChannelName(), dto.getOwnerId(), dto.getParticipantIds());
         } else {
             channel = new Channel(dto.getOwnerId(), dto.getParticipantIds());
         }
-        
+
         channelRepository.register(channel);
-        
+
         // 모든 참여자에 대한 ReadStatus 생성
         for (UUID userId : dto.getParticipantIds()) {
+            userRepository.findByUser(userId).get().addBelongChannel(channel.getId());
             ReadStatus readStatus = new ReadStatus(userId, channel.getChannelId(), null);
             readStatusRepository.register(readStatus);
         }
@@ -51,17 +51,15 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelDto.Response createPublicChannel(ChannelDto.CreatePublic dto) {
-        // 채널명 중복 체크
-        checkChannelNameDuplication(dto.getChannelName());
 
-        // 채널 생성
+        checkChannelNameDuplication(dto.getChannelName());
         Channel channel;
         if (dto.getDescription() != null && !dto.getDescription().isEmpty()) {
             channel = new Channel(dto.getChannelName(), dto.getOwnerId(), dto.getDescription());
         } else {
-            channel = new Channel(dto.getChannelName(), dto.getOwnerId());
+            channel = new Channel(dto.getChannelName(),dto.getOwnerId());
         }
-        
+        userRepository.findByUser(dto.getOwnerId()).get().addBelongChannel(channel.getId());
         // 채널 저장
         channelRepository.register(channel);
 
@@ -131,10 +129,12 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto.Response updateChannel(ChannelDto.Update dto, UUID ownerId) {
-        Channel channel = channelRepository.findById(dto.getChannelId())
+    public ChannelDto.Response updateChannel(ChannelDto.Update dto, UUID channelId) {
+        Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Channel", "id", dto.getChannelId()));
-        
+        if(!channel.getOwnerId().equals(dto.getOwnerId())){
+            throw new InvalidRequestException("권한이 없습니다");
+        }
         // PRIVATE 채널은 수정 불가
         if (channel.isPrivate()) {
             throw new InvalidRequestException("channel", "PRIVATE 채널은 수정할 수 없습니다");
@@ -159,7 +159,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Channel", "id", channelId));
                 
-        if (!channel.getOwnerID().equals(ownerId)) {
+        if (!channel.getOwnerId().equals(ownerId)) {
             throw new ForbiddenException("channel", "delete");
         }
         
