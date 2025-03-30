@@ -6,11 +6,8 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.common.NoSuchIdException;
-import com.sprint.mission.discodeit.exception.user.CreateUserException;
-import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
-import com.sprint.mission.discodeit.exception.user.DuplicateUserNameException;
+import com.sprint.mission.discodeit.exception.user.*;
 import com.sprint.mission.discodeit.exception.binarycontent.FileFindException;
-import com.sprint.mission.discodeit.exception.user.UpdateUserException;
 import com.sprint.mission.discodeit.provider.UserUpdaterProvider;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -112,10 +109,16 @@ public class BasicUserService implements UserService {
 
     @Override
     public void deleteUser(UUID userId) {
-        User deleteUser = this.userRepository.findById(userId);
-        this.userStatusRepository.deleteById(userStatusRepository.findUserStatusByUserId(deleteUser.getId()).getId());
-        this.readStatusRepository.deleteByUserId(userId);
-        this.binaryContentService.deleteByID(deleteUser.getProfileId());
-        this.userRepository.deleteById(userId);
+        try {
+            User deleteUser = this.userRepository.findById(userId);
+            this.userStatusRepository.deleteById(userStatusRepository.findUserStatusByUserId(deleteUser.getId()).getId());
+            this.readStatusRepository.deleteByUserId(userId);
+            this.binaryContentService.deleteByID(deleteUser.getProfileId());
+            this.userRepository.deleteById(userId);
+        } catch (NoSuchIdException e) {
+            throw new DeleteUserException(e.getMessage(), e.getStatus(), e);
+        } catch (Exception e) {
+            throw new CreateUserException("유저 delete 중 예상치 못한 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
     }
 }
