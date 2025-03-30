@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.ApiResponse;
 import com.sprint.mission.discodeit.dto.FindBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.SaveBinaryContentParamDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -19,14 +20,14 @@ public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
     @PostMapping("/save")
-    public ResponseEntity<?> save(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<ApiResponse<Void>> save(@RequestParam("file") MultipartFile file) throws IOException {
         binaryContentService.save(SaveBinaryContentParamDto.from(file));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @GetMapping("/find")
-    public ResponseEntity<FindBinaryContentRequestDto> find(@RequestParam UUID binaryContentId) {
+    public ResponseEntity<ApiResponse<FindBinaryContentRequestDto>> find(@RequestParam UUID binaryContentId) {
         binaryContentService.findById(binaryContentId);
-        return ResponseEntity.ok().body(binaryContentService.findById(binaryContentId));
+        return ResponseEntity.ok(ApiResponse.success(binaryContentService.findById(binaryContentId)));
     }
 }

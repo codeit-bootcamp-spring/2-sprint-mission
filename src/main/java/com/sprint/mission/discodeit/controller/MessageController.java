@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.ApiResponse;
 import com.sprint.mission.discodeit.dto.FindMessageByChannelIdResponseDto;
 import com.sprint.mission.discodeit.dto.SaveMessageParamDto;
 import com.sprint.mission.discodeit.dto.UpdateMessageParamDto;
@@ -19,30 +20,30 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping("/send")
-    public ResponseEntity<?> send(@RequestBody SaveMessageParamDto saveMessageParamDto) {
+    public ResponseEntity<ApiResponse<Void>> send(@RequestBody SaveMessageParamDto saveMessageParamDto) {
         messageService.sendMessage(saveMessageParamDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @GetMapping("/update")
-    public ResponseEntity<?> update(@ModelAttribute UpdateMessageParamDto updateMessageParamDto) {
+    public ResponseEntity<ApiResponse<Void>> update(@ModelAttribute UpdateMessageParamDto updateMessageParamDto) {
         messageService.updateMessage(updateMessageParamDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @GetMapping("/delete")
-    public ResponseEntity<?> delete(
+    public ResponseEntity<ApiResponse<Void>> delete(
             @RequestParam UUID messageUUID
     ) {
         messageService.deleteMessageById(messageUUID);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @GetMapping("/find-channel-message")
-    public ResponseEntity<List<FindMessageByChannelIdResponseDto>> FindChannelMessage(
+    public ResponseEntity<ApiResponse<List<FindMessageByChannelIdResponseDto>>> FindChannelMessage(
             @RequestParam UUID channelUUID
     ) {
         List<FindMessageByChannelIdResponseDto> findMessageByChannelIdDtoList = messageService.findMessageByChannelId(channelUUID);
-        return ResponseEntity.ok().body(findMessageByChannelIdDtoList);
+        return ResponseEntity.ok(ApiResponse.success(findMessageByChannelIdDtoList));
     }
 }

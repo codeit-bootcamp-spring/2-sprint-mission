@@ -30,7 +30,7 @@ async function fetchUserProfile(profileId) {
         const profile = await response.json();
 
         // Convert base64 encoded bytes to data URL
-        return `data:${profile.contentType};base64,${profile.bytes}`;
+        return `data:${profile.data.contentType};base64,${profile.data.bytes}`;
     } catch (error) {
         console.error('Error fetching profile:', error);
         return '/default-avatar.png'; // Fallback to default avatar

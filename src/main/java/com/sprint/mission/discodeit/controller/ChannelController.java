@@ -17,39 +17,39 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @GetMapping("/create-public")
-    public ResponseEntity<SaveChannelDto> createPublic(
+    public ResponseEntity<ApiResponse<SaveChannelDto>> createPublic(
             @RequestParam String channelName
     ) {
         SaveChannelDto saveChannelDto = channelService.createPublicChannel(SaveChannelParamDto.createPublic(channelName));
-        return ResponseEntity.ok().body(saveChannelDto);
+        return ResponseEntity.ok(ApiResponse.success(saveChannelDto));
     }
 
     @GetMapping("/create-private")
-    public ResponseEntity<SaveChannelDto> createPrivate(
+    public ResponseEntity<ApiResponse<SaveChannelDto>> createPrivate(
             @RequestParam String channelName,
             @RequestParam List<UUID> userList
     ) {
         SaveChannelDto saveChannelDto = channelService.createPrivateChannel(SaveChannelParamDto.createPrivate(channelName, userList));
-        return ResponseEntity.ok().body(saveChannelDto);
+        return ResponseEntity.ok(ApiResponse.success(saveChannelDto));
     }
 
     @GetMapping("/update")
-    public ResponseEntity<?> update(@ModelAttribute UpdateChannelParamDto updateChannelParamDto) {
+    public ResponseEntity<ApiResponse<Void>> update(@ModelAttribute UpdateChannelParamDto updateChannelParamDto) {
         channelService.updateChannel(updateChannelParamDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @GetMapping("/delete")
-    public ResponseEntity<?> delete(
+    public ResponseEntity<ApiResponse<Void>> delete(
             @RequestParam UUID channelUUID
     ) {
         channelService.deleteChannel(channelUUID);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
 
     @PostMapping("/find-my-channel")
-    public ResponseEntity<?> findMyChannel(@RequestBody FindAllByUserIdRequestDto findAllByUserIDRequestDto) {
+    public ResponseEntity<ApiResponse<List<FindChannelDto>>> findMyChannel(@RequestBody FindAllByUserIdRequestDto findAllByUserIDRequestDto) {
         List<FindChannelDto> findMyChannelList = channelService.findAllByUserId(findAllByUserIDRequestDto);
-        return ResponseEntity.ok().body(findMyChannelList);
+        return ResponseEntity.ok(ApiResponse.success(findMyChannelList));
     }
 }
