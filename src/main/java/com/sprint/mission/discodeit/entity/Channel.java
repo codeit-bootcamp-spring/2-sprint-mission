@@ -5,13 +5,11 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
 public class Channel implements Serializable {
-    private static final long SERIAL_VERSION_UID = 1L;
+    private static final long serialVersionUID = 1L;
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;

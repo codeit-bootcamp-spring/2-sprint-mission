@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.util.FileUtils.*;
+import static com.sprint.mission.discodeit.util.FileUtils.loadAndSave;
+import static com.sprint.mission.discodeit.util.FileUtils.loadObjectsFromFile;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
@@ -69,16 +70,18 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void delete(UUID id) {
-        loadAndSaveConsumer(userStatusPath, (Map<UUID, UserStatus> userStatuses) ->
+        loadAndSave(userStatusPath, (Map<UUID, UserStatus> userStatuses) ->
                 userStatuses.remove(id)
         );
     }
 
     @Override
     public void deleteByUserId(UUID userId) {
-        loadAndSaveConsumer(userStatusPath, (Map<UUID, UserStatus> userStatuses) ->
-                userStatuses.values()
-                        .removeIf(userStatus -> userStatus.getUserId().equals(userId))
+        loadAndSave(userStatusPath, (Map<UUID, UserStatus> userStatuses) -> {
+                    userStatuses.values()
+                            .removeIf(userStatus -> userStatus.getUserId().equals(userId));
+                    return null;
+                }
         );
     }
 }

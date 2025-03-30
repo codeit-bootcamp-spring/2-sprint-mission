@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.util.FileUtils.loadAndSaveConsumer;
+import static com.sprint.mission.discodeit.util.FileUtils.loadAndSave;
 import static com.sprint.mission.discodeit.util.FileUtils.loadObjectsFromFile;
 
 @Repository
@@ -26,7 +26,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User save(User requestUser) {
-        loadAndSaveConsumer(userPath, (Map<UUID, User> users) ->
+        loadAndSave(userPath, (Map<UUID, User> users) ->
                 users.put(requestUser.getId(), requestUser)
         );
 
@@ -71,16 +71,17 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void updateName(UUID id, String name) {
-        loadAndSaveConsumer(userPath, (Map<UUID, User> users) -> {
+        loadAndSave(userPath, (Map<UUID, User> users) -> {
                     User user = users.get(id);
                     user.updateName(name);
+                    return null;
                 }
         );
     }
 
     @Override
     public void delete(UUID id) {
-        loadAndSaveConsumer(userPath, (Map<UUID, User> users) ->
+        loadAndSave(userPath, (Map<UUID, User> users) ->
                 users.remove(id)
         );
     }

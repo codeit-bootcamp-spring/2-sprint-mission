@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.util.FileUtils.*;
+import static com.sprint.mission.discodeit.util.FileUtils.loadAndSave;
+import static com.sprint.mission.discodeit.util.FileUtils.loadObjectsFromFile;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
@@ -25,7 +26,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel save(Channel channel) {
-        loadAndSaveConsumer(channelPath, (Map<UUID, Channel> channels) ->
+        loadAndSave(channelPath, (Map<UUID, Channel> channels) ->
                 channels.put(channel.getId(), channel)
         );
 
@@ -60,7 +61,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void delete(UUID id) {
-        loadAndSaveConsumer(channelPath, (Map<UUID, Channel> channels) ->
+        loadAndSave(channelPath, (Map<UUID, Channel> channels) ->
                 channels.remove(id)
         );
     }

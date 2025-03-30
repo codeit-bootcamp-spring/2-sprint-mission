@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class FileUtils {
@@ -19,12 +18,6 @@ public final class FileUtils {
         T result = operation.apply(objects);
         saveObjectsToFile(objectPath, objects);
         return result;
-    }
-
-    public static <U, T> void loadAndSaveConsumer(Path objectPath, Consumer<Map<U, T>> operation) {
-        Map<U, T> objects = loadObjectsFromFile(objectPath);
-        operation.accept(objects);
-        saveObjectsToFile(objectPath, objects);
     }
 
     public static <U, T> Map<U, T> loadObjectsFromFile(Path filePath) {

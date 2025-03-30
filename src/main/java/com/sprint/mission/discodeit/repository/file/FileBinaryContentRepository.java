@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.util.FileUtils.loadAndSaveConsumer;
+import static com.sprint.mission.discodeit.util.FileUtils.loadAndSave;
 import static com.sprint.mission.discodeit.util.FileUtils.loadObjectsFromFile;
 
 @Repository
@@ -25,7 +25,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        loadAndSaveConsumer(binaryContentPath, (Map<UUID, BinaryContent> binaryContents) ->
+        loadAndSave(binaryContentPath, (Map<UUID, BinaryContent> binaryContents) ->
                 binaryContents.put(binaryContent.getId(), binaryContent)
         );
 
@@ -40,7 +40,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void delete(UUID id) {
-        loadAndSaveConsumer(binaryContentPath, (Map<UUID, BinaryContent> binaryContents) ->
+        loadAndSave(binaryContentPath, (Map<UUID, BinaryContent> binaryContents) ->
                 binaryContents.remove(id)
         );
     }

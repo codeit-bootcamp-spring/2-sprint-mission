@@ -10,8 +10,8 @@ import java.util.UUID;
 
 @Getter
 public class UserStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static final int DEFAULT_DURATION = 5 * 60 * 1000;
-    private static final long SERIAL_VERSION_UID = 1L;
     private final UUID id;
     private final UUID userId;
     private final Instant createdAt;
