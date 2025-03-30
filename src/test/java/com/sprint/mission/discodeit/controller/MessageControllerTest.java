@@ -48,7 +48,7 @@ class MessageControllerTest {
     @DisplayName("채널에 메시지를 생성하면 올바른 내용을 반환한다.")
     @Test
     void createMessageTest() {
-        MessageResult message = messageController.createMessage(new MessageCreationRequest(MESSAGE_CONTENT, UUID.randomUUID(), setUpUser.getId()), new ArrayList<>());
+        MessageResult message = messageController.createMessage(new MessageCreationRequest(MESSAGE_CONTENT, UUID.randomUUID(), setUpUser.getId()), new ArrayList<>()).getBody();
 
         assertThat(message.context()).isEqualTo(MESSAGE_CONTENT);
     }
@@ -58,7 +58,7 @@ class MessageControllerTest {
     void deleteMessageDeletesAttachments() {
         MockMultipartFile file = new MockMultipartFile(MediaType.IMAGE_JPEG_VALUE, MESSAGE_CONTENT.getBytes());
 
-        MessageResult message = messageController.createMessage(new MessageCreationRequest(MESSAGE_CONTENT, UUID.randomUUID(), setUpUser.getId()), List.of(file));
+        MessageResult message = messageController.createMessage(new MessageCreationRequest(MESSAGE_CONTENT, UUID.randomUUID(), setUpUser.getId()), List.of(file)).getBody();
         messageController.delete(message.messageId());
 
         assertThatThrownBy(() -> basicBinaryContentService.findById(message.attachmentIds().get(0))).isInstanceOf(IllegalArgumentException.class);

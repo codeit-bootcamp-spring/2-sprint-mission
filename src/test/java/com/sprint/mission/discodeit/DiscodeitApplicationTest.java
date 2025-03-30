@@ -45,7 +45,7 @@ class DiscodeitApplicationTest {
     @Test
     void createMessage() {
         MessageCreationRequest messageCreationRequest = new MessageCreationRequest(MESSAGE_CONTENT, setUpChannel.id(), setUpUser.id());
-        MessageResult message = messageController.createMessage(messageCreationRequest, new ArrayList<>());
+        MessageResult message = messageController.createMessage(messageCreationRequest, new ArrayList<>()).getBody();
 
         assertThat(message.context()).isEqualTo(MESSAGE_CONTENT);
     }
