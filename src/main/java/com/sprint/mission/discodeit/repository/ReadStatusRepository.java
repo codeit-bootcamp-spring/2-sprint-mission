@@ -5,14 +5,15 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ReadStatusRepository {
-    UUID createReadStatus(ReadStatus readStatus);
-    ReadStatus findById(UUID id);
-    ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId);
+    ReadStatus save(ReadStatus readStatus);
+    Optional<ReadStatus> findById(UUID id);
+    Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
     List<ReadStatus> findAllByUserId(UUID userId);
-    void updateReadStatus(UUID id, Instant lastReadAt);
-    void deleteReadStatus(UUID id);
-    void deleteReadStatusByChannelId(UUID channelId);
+    List<ReadStatus> findAllByChannelId(UUID channelId);
+    void deleteById(UUID id);
+    void deleteAllByChannelId(UUID channelId);
 }

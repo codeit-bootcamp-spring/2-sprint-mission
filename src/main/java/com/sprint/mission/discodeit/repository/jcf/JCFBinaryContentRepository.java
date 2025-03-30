@@ -14,18 +14,19 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     private final Map<UUID, BinaryContent> data = new HashMap<>();
 
     @Override
-    public UUID createBinaryContent(BinaryContent binaryContent) {
+    public BinaryContent save(BinaryContent binaryContent) {
         data.put(binaryContent.getId(), binaryContent);
-        return findById(binaryContent.getId()).getId();
+        return binaryContent;
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
-        BinaryContent binaryContent = data.get(id);
-        if (binaryContent == null) {
-            throw new NoSuchElementException("해당 ID의 BinaryContent를 찾을 수 없습니다: " + id);
-        }
-        return binaryContent;
+    public Optional<BinaryContent> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
+    }
+
+    @Override
+    public Optional<byte[]> findBinaryById(UUID id) {
+        return Optional.of(data.get(id).getFileData());
     }
 
     @Override
@@ -36,9 +37,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public void deleteBinaryContent(UUID id) {
-        checkBinaryContentExists(id);
-
+    public void deleteById(UUID id) {
         data.remove(id);
     }
 
@@ -51,13 +50,5 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
         return new ArrayList<>(fileData);
     }
 
-    /*******************************
-     * Validation check
-     *******************************/
-    private void checkBinaryContentExists(UUID id) {
-        if(findById(id) == null){
-            throw new NoSuchElementException("해당 ID의 BinaryContent를 찾을 수 없습니다: " + id);
-        }
-    }
 
 }

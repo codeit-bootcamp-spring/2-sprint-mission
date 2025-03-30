@@ -9,10 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -20,6 +17,7 @@ import java.util.stream.Collectors;
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
     private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
     public FileBinaryContentRepository(RepositoryProperties properties) {
         this.DIRECTORY = Paths.get(properties.getBinaryContent());
@@ -27,25 +25,30 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public UUID createBinaryContent(BinaryContent binaryContent) {
-        // 중복 여부 확인
-//        if (binaryContentRepository.existsByFileHashAndFileSize(createDto.fileHash(), createDto.fileSize())) {
-//            throw new IllegalArgumentException("이미 존재하는 파일입니다.");
-//        }
-        String fileName = binaryContent.getFileName();
+    public BinaryContent save(BinaryContent binaryContent) {
+        String extension = getFileExtension(binaryContent.getFileName());
+        String fileName = binaryContent.getId().toString() + extension;
         FileUtil.saveBytesToFile(binaryContent.getFileData(), DIRECTORY, fileName);
-        return binaryContent.getId();
+        return binaryContent;
+    }
+
+    private String getFileExtension(String fileName) {
+        int lastIndex = fileName.lastIndexOf(".");
+        return (lastIndex == -1) ? "" : fileName.substring(lastIndex);
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
-        return (BinaryContent) FileUtil.loadFromFile(DIRECTORY, id)
-                .orElseThrow(() -> new NoSuchElementException("해당 ID의 BinaryContent를 찾을 수 없습니다: " + id));
+    public Optional<BinaryContent> findById(UUID id) {
+        return FileUtil.loadFromFile(DIRECTORY, id);
+    }
+
+    public Optional<byte[]> findBinaryById(UUID id) {
+        return FileUtil.loadBinaryFile2(DIRECTORY, id);
     }
 
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> idList) {
-        return FileUtil.loadAllFiles(DIRECTORY).stream()
+        return FileUtil.loadAllFiles(DIRECTORY, EXTENSION).stream()
                 .filter(BinaryContent.class::isInstance)
                 .map(BinaryContent.class::cast)
                 .filter(object -> idList.contains(object.getId()))
@@ -54,26 +57,14 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public void deleteBinaryContent(UUID id) {
-        checkBinaryContentExists(id);
-
+    public void deleteById(UUID id) {
         FileUtil.deleteFile(DIRECTORY, id);
     }
 
     @Override
     public List<byte[]> findAll() {
-        return FileUtil.loadAllByteFiles(DIRECTORY).stream()
-                .peek(fileData -> System.out.println("검증: " + Arrays.toString(fileData)))
-                .collect(Collectors.toList());
+        return new ArrayList<>(FileUtil.loadAllByteFiles(DIRECTORY));
     }
 
-    /*******************************
-     * Validation check
-     *******************************/
-    private void checkBinaryContentExists(UUID id) {
-        if(findById(id) == null){
-            throw new NoSuchElementException("해당 ID의 BinaryContent를 찾을 수 없습니다: " + id);
-        }
-    }
 
 }

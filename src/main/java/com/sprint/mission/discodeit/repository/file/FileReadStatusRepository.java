@@ -9,9 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -20,6 +19,7 @@ import java.util.stream.Collectors;
 public class FileReadStatusRepository implements ReadStatusRepository {
 
     private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
     public FileReadStatusRepository(RepositoryProperties properties) {
         this.DIRECTORY = Paths.get(properties.getReadStatus());
@@ -27,40 +27,27 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public UUID createReadStatus(ReadStatus readStatus) {
-        validateReadStatusDoesNotExist(readStatus.getUserId(), readStatus.getChannelId());
-
+    public ReadStatus save(ReadStatus readStatus) {
         return FileUtil.saveToFile(DIRECTORY, readStatus, readStatus.getId());
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
-        return (ReadStatus) FileUtil.loadFromFile(DIRECTORY, id)
-                .orElseThrow(() -> new NoSuchElementException("해당 ID의 ReadStatus를 찾을 수 없습니다: " + id));
+    public Optional<ReadStatus> findById(UUID id) {
+        return FileUtil.loadFromFile(DIRECTORY, id);
     }
 
     @Override
-    public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
-        return FileUtil.loadAllFiles(DIRECTORY).stream()
+    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
+        return FileUtil.loadAllFiles(DIRECTORY, EXTENSION).stream()
                 .filter(object -> object instanceof ReadStatus)
                 .map(object -> (ReadStatus) object)
                 .filter(ReadStatus -> ReadStatus.getUserId().equals(userId) && ReadStatus.getChannelId().equals(channelId))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자 및 채널을 가진 ReadStatus를 찾을 수 없습니다: " + userId + "/" + channelId));
-    }
-
-    public ReadStatus findByUserIdAndChannelIdOrNull(UUID userId, UUID channelId) {
-        return FileUtil.loadAllFiles(DIRECTORY).stream()
-                .filter(object -> object instanceof ReadStatus)
-                .map(object -> (ReadStatus) object)
-                .filter(ReadStatus -> ReadStatus.getUserId().equals(userId) && ReadStatus.getChannelId().equals(channelId))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return FileUtil.loadAllFiles(DIRECTORY).stream()
+        return FileUtil.loadAllFiles(DIRECTORY, EXTENSION).stream()
                 .filter(object -> object instanceof ReadStatus)
                 .map(object -> (ReadStatus) object)
                 .filter(ReadStatus -> ReadStatus.getUserId().equals(userId))
@@ -68,45 +55,24 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void updateReadStatus(UUID id, Instant lastReadAt) {
-        checkReadStatusExists(id);
-        ReadStatus readStatus = findById(id);
-
-        readStatus.update(lastReadAt);
-        FileUtil.saveToFile(DIRECTORY, readStatus, id);
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return FileUtil.loadAllFiles(DIRECTORY, EXTENSION).stream()
+                .filter(object -> object instanceof ReadStatus)
+                .map(object -> (ReadStatus) object)
+                .filter(ReadStatus -> ReadStatus.getChannelId().equals(channelId))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void deleteReadStatus(UUID id) {
-        checkReadStatusExists(id);
+    public void deleteById(UUID id) {
         FileUtil.deleteFile(DIRECTORY, id);
     }
 
     @Override
-    public void deleteReadStatusByChannelId(UUID channelId) {
-        ReadStatus readStatus = FileUtil.loadAllFiles(DIRECTORY).stream()
-                .filter(object -> object instanceof ReadStatus)
-                .map(object -> (ReadStatus) object)
-                .filter(readStatusObj -> readStatusObj.getChannelId().equals(channelId))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("해당 채널을 가진 ReadStatus를 찾을 수 없습니다: " + channelId));
-
-        FileUtil.deleteFile(DIRECTORY, readStatus.getId());
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(readStatus -> this.deleteById(readStatus.getId()));
     }
 
-    /*******************************
-     * Validation check
-     *******************************/
-    private void checkReadStatusExists(UUID id) {
-        if(findById(id) == null){
-            throw new NoSuchElementException("해당 ID의 ReadStatus를 찾을 수 없습니다: " + id);
-        }
-    }
-
-    private void validateReadStatusDoesNotExist(UUID userId, UUID channelId) {
-        if (findByUserIdAndChannelIdOrNull(userId, channelId) != null) {
-            throw new IllegalArgumentException("이미 존재하는 객체입니다.");
-        }
-    }
 
 }

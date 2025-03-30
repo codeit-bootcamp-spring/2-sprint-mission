@@ -17,6 +17,7 @@ import java.util.*;
 public class FileMessageRepository implements MessageRepository {
 
     private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
     public FileMessageRepository(RepositoryProperties properties) {
         this.DIRECTORY = Paths.get(properties.getMessage());
@@ -24,19 +25,18 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public UUID createMessage(Message message) {
+    public Message save(Message message) {
         return FileUtil.saveToFile(DIRECTORY, message, message.getId());
     }
 
     @Override
-    public Message findById(UUID id) {
-        return (Message) FileUtil.loadFromFile(DIRECTORY, id)
-                .orElseThrow(() -> new NoSuchElementException("해당 ID의 메시지를 찾을 수 없습니다: " + id));
+    public Optional<Message> findById(UUID id) {
+        return FileUtil.loadFromFile(DIRECTORY, id);
     }
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        return FileUtil.loadAllFiles(DIRECTORY).stream()
+        return FileUtil.loadAllFiles(DIRECTORY, EXTENSION).stream()
                 .filter(object -> object instanceof Message)
                 .map(object -> (Message) object)
                 .filter(message -> message.getChannelId().equals(channelId))
@@ -44,49 +44,23 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void updateMessage(UUID id, String content, UUID userId, UUID channelId, List<UUID> attachmentIds) {
-        checkMessageExists(id);
-        Message message = findById(id);
-
-        message.update(content, attachmentIds);
-        FileUtil.saveToFile(DIRECTORY, message, id);
-    }
-
-    @Override
-    public void deleteMessage(UUID id, UUID userId, UUID channelId) {
-        checkMessageExists(id);
-
+    public void deleteById(UUID id) {
         FileUtil.deleteFile(DIRECTORY, id);
     }
 
     @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        findAllByChannelId(channelId)
+                .forEach(message ->this.deleteById(message.getId()));
+    }
+
+    @Override
     public Optional<Instant> findLatestCreatedAtByChannelId(UUID channelId) {
-        return FileUtil.loadAllFiles(DIRECTORY).stream()
+        return FileUtil.loadAllFiles(DIRECTORY, EXTENSION).stream()
                 .map(obj -> (Message) obj)
                 .filter(message -> message.getChannelId().equals(channelId)) // 해당 채널의 메시지만 필터링
                 .max(Comparator.comparing(Message::getCreatedAt)) // 가장 최신 메시지 찾기
                 .map(Message::getCreatedAt); // createdAt 값만 반환
-    }
-
-    @Override
-    public void deleteMessageByChannelId(UUID channelId) {
-        Message message = FileUtil.loadAllFiles(DIRECTORY).stream()
-                .filter(object -> object instanceof Message)
-                .map(object -> (Message) object)
-                .filter(messageObj -> messageObj.getChannelId().equals(channelId))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("해당 채널의 메시지를 찾을 수 없습니다: " + channelId));
-
-        FileUtil.deleteFile(DIRECTORY, message.getId());
-    }
-
-    /*******************************
-     * Validation check
-     *******************************/
-    private void checkMessageExists(UUID id) {
-        if(findById(id) == null){
-            throw new NoSuchElementException("해당 ID의 메시지를 찾을 수 없습니다: " + id);
-        }
     }
 
 }
