@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.channel.CreatePrivateChannelException;
 import com.sprint.mission.discodeit.exception.channel.CreatePublicChannelException;
+import com.sprint.mission.discodeit.exception.channel.DeleteChannelException;
 import com.sprint.mission.discodeit.exception.channel.UpdateChannelException;
 import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.provider.ChannelReadStrategyProvider;
@@ -116,8 +117,14 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID channelId) {
-        this.channelRepository.deleteById(channelId);
-        this.messageRepository.findMessageListByChannelId(channelId).forEach(message -> this.messageRepository.deleteById(message.getId()));
-        this.readStatusRepository.deleteByChannelId(channelId);
+        try {
+            this.channelRepository.deleteById(channelId);
+            this.messageRepository.findMessageListByChannelId(channelId).forEach(message -> this.messageRepository.deleteById(message.getId()));
+            this.readStatusRepository.deleteByChannelId(channelId);
+        } catch (NoSuchElementException e) {
+            throw new DeleteChannelException("해당 channelId를 찾을 수 없습니다.", HttpStatus.NOT_FOUND, e);
+        } catch (Exception e) {
+            throw new DeleteChannelException("채널 삭제 중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
     }
 }
