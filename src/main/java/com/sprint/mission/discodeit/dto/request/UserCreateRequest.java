@@ -1,11 +1,9 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import java.util.UUID;
-
 public record UserCreateRequest(
-        String username,
+        String name,
         String email,
         String password,
-        UUID profileImageKey
+        BinaryContentCreateRequest binaryContentRequest
 ) {
 }

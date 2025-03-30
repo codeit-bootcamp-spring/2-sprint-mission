@@ -7,7 +7,7 @@ public record UserDto(
         UUID userKey,
         Instant createdAt,
         Instant updatedAt,
-        String username,
+        String name,
         String email,
         UUID profileKey,
         Boolean online

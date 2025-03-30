@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,18 +25,28 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentService binaryContentService;
 
     @Override
-    public Message create(MessageCreateRequest request) {
-        if (!channelRepository.existsByKey(request.channelKey())) {
-            throw new NoSuchElementException("[Error] 채널이 존재하지 않습니다. " + request.channelKey());
+    public Message create(MessageCreateRequest messageRequest) {
+        List<UUID> attachmentKeys = null;
+        if (!channelRepository.existsByKey(messageRequest.channelKey())) {
+            throw new NoSuchElementException("[Error] 채널이 존재하지 않습니다. " + messageRequest.channelKey());
         }
-        if (!userRepository.existsByKey(request.authorKey())) {
-            throw new NoSuchElementException("[Error] 유저가 존재하지 않습니다. " + request.authorKey());
+        if (!userRepository.existsByKey(messageRequest.authorKey())) {
+            throw new NoSuchElementException("[Error] 유저가 존재하지 않습니다. " + messageRequest.authorKey());
         }
-        Message message = new Message(request.content(), request.authorKey(), request.channelKey(), request.attachmentKeys());
-        messageRepository.save(message);
-        return message;
+        if (messageRequest.binaryContentRequests() != null) {
+            attachmentKeys = messageRequest.binaryContentRequests().stream()
+                    .filter(this::isValidBinaryContent)
+                    .map(binaryContentService::create)
+                    .map(BinaryContent::getUuid)
+                    .toList();
+        }
+
+        Message message = new Message(messageRequest.content(), messageRequest.authorKey(), messageRequest.channelKey(), attachmentKeys);
+
+        return messageRepository.save(message);
     }
 
     @Override
@@ -48,7 +61,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public List<Message> readAllByChannelKey(UUID channelKey) {
         List<Message> messages = messageRepository.findAllByChannelKey(channelKey);
-        if (messages.isEmpty()) {
+        if (messages == null || messages.isEmpty()) {
             throw new IllegalStateException("[Error] 읽을 메시지가 없습니다.");
         }
         return messages;
@@ -60,7 +73,7 @@ public class BasicMessageService implements MessageService {
         if (message == null) {
             throw new IllegalArgumentException("[Error] 해당 메시지가 존재하지 않습니다");
         }
-        if (!request.newContent().isEmpty()) {
+        if (request.newContent() != null && !request.newContent().isEmpty()) {
             message.updateContent(request.newContent());
         }
         return message;
@@ -76,5 +89,13 @@ public class BasicMessageService implements MessageService {
         message.getAttachmentKeys().forEach(binaryContentRepository::delete);
 
         messageRepository.delete(messageKey);
+    }
+
+    private boolean isValidBinaryContent(BinaryContentCreateRequest request) {
+        return  request != null &&
+                request.bytes() != null &&
+                request.bytes().length > 0 &&
+                request.fileName() != null &&
+                !request.fileName().isBlank();
     }
 }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
+import com.sprint.mission.discodeit.dto.request.ChannelDeleteRequest;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
@@ -11,6 +12,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,19 +27,21 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public Channel createPublic(PublicChannelCreateRequest request) {
-        Channel channel = new Channel(ChannelType.PUBLIC, request.name(), request.description());
+    public Channel create(PublicChannelCreateRequest request) {
+        Channel channel = new Channel(ChannelType.PUBLIC, request.name(), request.introduction());
         return channelRepository.save(channel);
     }
 
     @Override
-    public Channel createPrivate(PrivateChannelCreateRequest request) {
+    public Channel create(PrivateChannelCreateRequest request) {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         Channel createdChannel = channelRepository.save(channel);
 
         request.memberKeys().stream()
+                .filter(userRepository::existsByKey)
                 .map(userKey -> new ReadStatus(userKey, createdChannel.getUuid(), Instant.EPOCH))
                 .forEach(readStatusRepository::save);
 
@@ -85,18 +89,18 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void delete(UUID channelKey) {
-        Channel channel = channelRepository.findByKey(channelKey);
+    public void delete(ChannelDeleteRequest request) {
+        Channel channel = channelRepository.findByKey(request.channelKey());
         if (channel == null) {
             throw new IllegalArgumentException("[Error] 존재하지 않는 채널입니다.");
         }
 
-        List<Message> messages = messageRepository.findAllByChannelKey(channelKey);
+        List<Message> messages = messageRepository.findAllByChannelKey(request.channelKey());
         for (Message message : messages) {
             messageRepository.delete(message.getUuid());
         }
 
-        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelKey(channelKey);
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelKey(request.channelKey());
         for (ReadStatus readStatus : readStatuses) {
             readStatusRepository.delete(readStatus.getUuid());
         }

@@ -84,7 +84,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public UserStatus findByUserKey(UUID userKey) {
         return findAll().stream()
-                .filter(userStatus -> userStatus.getUserKey().equals(userKey))
+                .filter(userStatus -> userKey.equals(userStatus.getUserKey()))
                 .findFirst()
                 .orElse(null);
     }

@@ -1,55 +1,64 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.*;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
 public class UserController {
-
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-    // [x] 사용자를 등록할 수 있다.
-    @PostMapping("/create")
-    public UserDto createUser(@RequestBody UserCreateRequest request) {
-        return userService.create(request);
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    public ResponseEntity<?> createUser(@RequestBody UserCreateRequest userRequest) {
+        UserDto userDto = userService.create(userRequest);
+        log.info("사용자 생성 완료 {}", userDto);
+
+        return ResponseEntity.ok(userDto);
     }
 
-    // [x] 사용자 정보를 수정할 수 있다.
-    @PostMapping("/update")
-    public User updateUser(@RequestBody UserUpdateRequest request) {
-        return userService.update(request);
+    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    public ResponseEntity<?> updateUser(@RequestBody UserUpdateRequest userRequest, BinaryContentCreateRequest binaryContentRequest) {
+        User updatedUser = userService.update(userRequest, binaryContentRequest);
+        log.info("사용자 수정 완료 {}", updatedUser);
+
+        return ResponseEntity.ok(updatedUser);
     }
 
-    // [x] 사용자를 삭제할 수 있다.
-    @PostMapping("/delete")
-    public String deleteUser(@RequestBody UUID userKey) {
-        userService.delete(userKey);
-        return "삭제 완료";
+    @RequestMapping(value = "/readAll", method = RequestMethod.GET)
+    public ResponseEntity<?> readAllUsers() {
+        List<UserDto> userDtos = userService.readAll();
+        log.info("조회된 사용자 목록: {}", userDtos);
+
+        return ResponseEntity.ok(userDtos);
     }
 
-    // [x] 모든 사용자를 조회할 수 있다.
-    @GetMapping("/all")
-    public List<UserDto> getAllUsers() {
-        return userService.readAll();
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteUser(@RequestBody UserDeleteRequest request) {
+        userService.delete(request);
+        log.info("삭제된 사용자 정보 {}", request.userKey());
+
+        return ResponseEntity.noContent().build();
     }
 
-    // [x] 사용자의 온라인 상태를 업데이트할 수 있다.
-    @PostMapping("/status")
-    public UserStatus updateUserStatus(@RequestBody UserStatusUpdateRequest request) {
-        return userStatusService.update(request);
+    @RequestMapping(value = "/updateStatus", method = RequestMethod.PUT)
+    public ResponseEntity<?> updateUserStatus(@RequestBody UserStatusUpdateRequest request) {
+        UserStatus updatedUserStatus = userStatusService.update(request);
+        log.info("업데이트 된 사용자 상태 {}", updatedUserStatus);
+
+        return ResponseEntity.ok(updatedUserStatus);
     }
 }

@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -52,12 +51,9 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus update(UserStatusUpdateRequest request) {
-        UserStatus userStatus = userStatusRepository.findByKey(request.userKey());
+        UserStatus userStatus = userStatusRepository.findByUserKey(request.userKey());
         if (userStatus == null) {
             throw new IllegalArgumentException("[Error] userStatus is null");
-        }
-        if (request.newLastActiveAt() == null) {
-            throw new IllegalArgumentException("[Error] lastActiveAt is null");
         }
         userStatus.updateLastActiveAt(Instant.now());
         return userStatusRepository.save(userStatus);

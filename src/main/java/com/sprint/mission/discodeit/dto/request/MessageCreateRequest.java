@@ -7,6 +7,6 @@ public record MessageCreateRequest(
         String content,
         UUID channelKey,
         UUID authorKey,
-        List<UUID> attachmentKeys
+        List<BinaryContentCreateRequest> binaryContentRequests
 ) {
 }
