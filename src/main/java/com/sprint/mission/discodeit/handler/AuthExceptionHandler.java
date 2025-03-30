@@ -12,7 +12,7 @@ public class AuthExceptionHandler {
     @ExceptionHandler(LoginFailedException.class)
     public ResponseEntity<ApiResponse<Void>> handleInvalidCredentials(LoginFailedException e) {
         String causeMessage = (e.getCause() != null) ? "\n원인: " + e.getCause() : "";
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity.status(e.getStatus())
                 .body(new ApiResponse<>(
                         false,
                         "예외 발생: " + e.getMessage() + causeMessage,
