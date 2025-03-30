@@ -3,12 +3,15 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.handler.custom.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.handler.custom.readStatus.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.handler.custom.readStatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.handler.custom.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,18 +28,18 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatus create(ReadStatusCreateDto readStatusCreateDto) {
         boolean isExistUser = userRepository.findById(readStatusCreateDto.userId()) != null;
         if (!isExistUser) {
-            throw new NoSuchElementException(readStatusCreateDto.userId() + " 유저를 찾을 수 없습니다.");
+            throw new UserNotFoundException(readStatusCreateDto.userId() + " 유저를 찾을 수 없습니다.");
         }
 
         boolean isExistChannel = channelRepository.findById(readStatusCreateDto.channelId()) != null;
         if (!isExistChannel) {
-            throw new NoSuchElementException(readStatusCreateDto.channelId() + " 채널을 찾을 수 없습니다.");
+            throw new ChannelNotFoundException(readStatusCreateDto.channelId() + " 채널을 찾을 수 없습니다.");
         }
 
         boolean isExistReadStatus = readStatusRepository.findAllByChannelId(readStatusCreateDto.channelId()).stream()
                 .anyMatch(readStatus -> readStatus.getUserId().equals(readStatusCreateDto.userId()));
         if (isExistReadStatus) {
-            throw new RuntimeException(
+            throw new ReadStatusAlreadyExistsException(
                     readStatusCreateDto.userId() + " 유저는 이미 " + readStatusCreateDto.channelId() + " 채널을 읽었습니다.");
         }
 
@@ -51,7 +54,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = readStatusRepository.findById(id);
 
         if (readStatus == null) {
-            throw new NoSuchElementException(id + " 읽은 상태를 찾을 수 없습니다.");
+            throw new ReadStatusNotFoundException(id + " 읽은 상태를 찾을 수 없습니다.");
         }
 
         return readStatus;
@@ -77,7 +80,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = findById(readStatusUpdateDto.id());
         readStatus.update(readStatusUpdateDto.newLastReadAt());
 
-        return readStatus;
+        return readStatusRepository.save(readStatus);
     }
 
     @Override
