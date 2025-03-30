@@ -65,14 +65,4 @@ public class FileUserStatusRepository implements UserStatusRepository {
                 userStatuses.remove(id)
         );
     }
-
-    @Override
-    public void deleteByUserId(UUID userId) {
-        loadAndSave(userStatusPath, (Map<UUID, UserStatus> userStatuses) -> {
-                    userStatuses.values()
-                            .removeIf(userStatus -> userStatus.getUserId().equals(userId));
-                    return null;
-                }
-        );
-    }
 }

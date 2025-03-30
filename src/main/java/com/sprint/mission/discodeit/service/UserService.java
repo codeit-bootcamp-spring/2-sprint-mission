@@ -19,7 +19,7 @@ public interface UserService {
 
     List<UserResult> findAllByIds(List<UUID> userIds);
 
-    void updateName(UUID userId, String name);
+    UserResult updateName(UUID userId, String name);
 
     UserResult updateProfileImage(UUID userId, UUID profileId);
 

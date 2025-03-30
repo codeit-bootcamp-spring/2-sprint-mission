@@ -14,9 +14,9 @@ public interface MessageRepository {
 
     List<Message> findAll();
 
-    void delete(UUID id);
+    List<Message> findByChannelId(UUID channelId);
 
-    void deleteByChannelId(UUID channelId);
+    void delete(UUID id);
 
     Instant findLastMessageCreatedAtByChannelId(UUID channelId);
 }

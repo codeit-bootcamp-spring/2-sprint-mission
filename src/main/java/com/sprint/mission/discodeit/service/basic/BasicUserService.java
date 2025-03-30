@@ -79,12 +79,13 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void updateName(UUID userId, String name) {
+    public UserResult updateName(UUID userId, String name) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
         user.updateName(name);
+        User savedUser = userRepository.save(user);
 
-        userRepository.save(user);
+        return UserResult.fromEntity(savedUser);
     }
 
     @Override
@@ -100,11 +101,12 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent() + 11));
-
         userRepository.delete(userId);
-        userStatusRepository.deleteByUserId(user.getId());
+
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+
+        userStatusRepository.delete(userStatus.getId());
     }
 
     private void validateDuplicateUserName(String name) {

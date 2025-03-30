@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.application.dto.user.UserRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResponse;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
-import com.sprint.mission.discodeit.application.dto.userStatus.UserStatusResult;
+import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusResult;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;

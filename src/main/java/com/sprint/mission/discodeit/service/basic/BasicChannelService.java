@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterReque
 import com.sprint.mission.discodeit.application.dto.channel.ChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -96,10 +97,25 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void delete(UUID channelId) {
-        // TODO: 3/30/25 서비스 로직에서 수정바람
         channelRepository.delete(channelId);
-        readStatusRepository.deleteByChannelId(channelId);
-        messageRepository.deleteByChannelId(channelId);
+
+        List<UUID> readStatusIds = readStatusRepository.findByChannelId(channelId)
+                .stream()
+                .map(ReadStatus::getId)
+                .toList();
+
+        for (UUID readStatusId : readStatusIds) {
+            readStatusRepository.delete(readStatusId);
+        }
+
+        List<UUID> messageIds = messageRepository.findByChannelId(channelId)
+                .stream()
+                .map(Message::getId)
+                .toList();
+
+        for (UUID messageId : messageIds) {
+            messageRepository.delete(messageId);
+        }
     }
 
 

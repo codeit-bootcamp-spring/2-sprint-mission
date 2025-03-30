@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.userStatus.UserStatusResult;
+import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusResult;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -34,7 +34,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResult findByStautsId(UUID userStatusId) {
+    public UserStatusResult findByStatusId(UUID userStatusId) {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저상태가 존재하지 않습니다."));
 

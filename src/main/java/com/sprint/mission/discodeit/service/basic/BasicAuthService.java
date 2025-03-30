@@ -20,7 +20,9 @@ public class BasicAuthService implements AuthService {
         User user = findUserByNameAndValidatePassword(loginRequestUser);
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저의 상태가 존재하지 않습니다."));
+
         userStatus.updateLastLoginAt();
+        userStatusRepository.save(userStatus);
 
         return UserResult.fromEntity(user);
     }

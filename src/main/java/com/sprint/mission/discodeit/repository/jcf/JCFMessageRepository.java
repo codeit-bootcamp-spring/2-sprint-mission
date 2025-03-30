@@ -33,6 +33,14 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
+    public List<Message> findByChannelId(UUID channelId) {
+        return messages.values()
+                .stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
     public Instant findLastMessageCreatedAtByChannelId(UUID channelId) {
         return messages.values()
                 .stream()
@@ -45,18 +53,5 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void delete(UUID id) {
         messages.remove(id);
-    }
-
-    @Override
-    public void deleteByChannelId(UUID channelId) {
-        List<UUID> sameChannelMessageIds = messages.values()
-                .stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .map(Message::getId)
-                .toList();
-
-        for (UUID messageId : sameChannelMessageIds) {
-            messages.remove(messageId);
-        }
     }
 }

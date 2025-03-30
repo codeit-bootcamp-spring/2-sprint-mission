@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -71,9 +72,18 @@ class UserServiceTest {
     @Test
     void updateUserName() {
         String newUserName = "김철수";
-        userService.updateName(setUpUser.id(), newUserName);
-        UserResult updatedUserInfo = userService.findById(setUpUser.id());
-        assertThat(updatedUserInfo.name()).isEqualTo(newUserName);
+        UserResult user = userService.updateName(setUpUser.id(), newUserName);
+        assertThat(user.name()).isEqualTo(newUserName);
+    }
+
+    @DisplayName("유저 삭제시 userStatus 같이 삭제")
+    @Test
+    void deleteWithUserStatus() {
+        userService.delete(setUpUser.id());
+        Assertions.assertAll(
+                () -> assertThat(userRepository.findById(setUpUser.id())).isEmpty(),
+                () -> assertThat(userStatusRepository.findByUserId(setUpUser.id())).isEmpty()
+        );
     }
 
     @DisplayName("유저 삭제 후 조회 시 예외 발생")

@@ -26,7 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         if (multipartFile == null) {
             return null;
         }
-
+        // TODO: 3/30/25  수정바람
         Path imageFile = IMAGE_STORAGE_DIRECTORY.resolve(UUID.randomUUID() + JPG_EXTENSION);
         saveImageFileToPath(multipartFile, imageFile);
 
@@ -55,6 +55,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
 
+        // TODO: 3/30/25 수정 바람
         deleteImageFileFromPath(Path.of(binaryContent.getPath()));
         binaryContentRepository.delete(id);
     }
