@@ -3,10 +3,12 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.jboss.logging.Messages;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Repository
 public class JCFMessageRepository implements MessageRepository {
     private final HashMap<UUID, Message> messages = new HashMap<>();
 

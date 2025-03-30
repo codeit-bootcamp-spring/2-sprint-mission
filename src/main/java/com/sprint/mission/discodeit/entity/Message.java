@@ -14,8 +14,8 @@ public class Message extends BaseEntity {
     private UUID authorId;
     private List<UUID> attachmentIds = new ArrayList<>();
 
-    public Message(UUID id, Instant createdAt, String content, UUID channelId, UUID authorId, UUID attachmentId) {
-        super(id, createdAt);
+    public Message(Instant createdAt, String content, UUID channelId, UUID authorId, UUID attachmentId) {
+        super(UUID.randomUUID(), createdAt);
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;

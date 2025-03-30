@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.channel.response;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.groups.ChannelType;
@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record ChannelDto(
+public record ChannelFindAllUserIdDto(
         @NotNull
         UUID channelId,
         @NotNull
@@ -25,8 +25,8 @@ public record ChannelDto(
         @NotNull
         ChannelType channelType
 ){
-        public static ChannelDto from(Channel channel) {
-                return new ChannelDto(
+        public static ChannelFindAllUserIdDto from(Channel channel) {
+                return new ChannelFindAllUserIdDto(
                         channel.getId(),
                         channel.getName(),
                         channel.getDescription(),

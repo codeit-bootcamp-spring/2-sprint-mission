@@ -1,17 +1,18 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.channel.request;
 
 import com.sprint.mission.discodeit.groups.ChannelType;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public record ChannelPrivateCreateDto(
+public record ChannelPublicCreateDto(
     @NotNull
-    UUID channelId,
+    String name,
+    @NotNull
+    String description,
     @NotNull
     UUID userId,
     @NotNull
     ChannelType channelType
-
 ) {
 }

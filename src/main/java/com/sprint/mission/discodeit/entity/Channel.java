@@ -15,14 +15,14 @@ public class Channel extends BaseEntity {
     private List<UUID> userIds = new ArrayList<>();
     private ChannelType channelType;
 
-    public Channel(UUID id, Instant createdAt, UUID userId, ChannelType channelType) {
-        super(id, createdAt);
+    public Channel(Instant createdAt, UUID userId, ChannelType channelType) {
+        super(UUID.randomUUID(), createdAt);
         userIds.add(userId);
         this.channelType = channelType;
     }
 
-    public Channel(UUID id, Instant createdAt, String name, String description, UUID userId, ChannelType channelType) {
-        super(id, createdAt);
+    public Channel(Instant createdAt, String name, String description, UUID userId, ChannelType channelType) {
+        super(UUID.randomUUID(), createdAt);
         this.name = name;
         this.description = description;
         userIds.add(userId);

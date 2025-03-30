@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.*;
+import com.sprint.mission.discodeit.dto.channel.request.ChannelPrivateCreateDto;
+import com.sprint.mission.discodeit.dto.channel.request.ChannelPublicCreateDto;
+import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelFindAllUserIdDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -10,11 +13,13 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
@@ -23,12 +28,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void create(ChannelPublicCreateDto channelPublicCreateDto) {
-        if (channelRepository.findById(channelPublicCreateDto.channelId()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 채널입니다: " + channelPublicCreateDto.channelId());
-        }
-
         if(channelPublicCreateDto.channelType() == ChannelType.PRIVATE) {
-            this.createPrivateChannel(new ChannelPrivateCreateDto(channelPublicCreateDto.channelId(), channelPublicCreateDto.userId(), channelPublicCreateDto.channelType()));
+            this.createPrivateChannel(new ChannelPrivateCreateDto(channelPublicCreateDto.userId(), channelPublicCreateDto.channelType()));
         }else{
             this.createPublicChannel(channelPublicCreateDto);
         }
@@ -36,7 +37,6 @@ public class BasicChannelService implements ChannelService {
 
     private void createPublicChannel(ChannelPublicCreateDto ChannelPublicCreateDto) {
         channelRepository.save(new Channel(
-                ChannelPublicCreateDto.channelId(),
                 Instant.now(),
                 ChannelPublicCreateDto.name(),
                 ChannelPublicCreateDto.description(),
@@ -46,25 +46,26 @@ public class BasicChannelService implements ChannelService {
     }
 
     private void createPrivateChannel(ChannelPrivateCreateDto ChannelPrivateCreateDto) {
-        channelRepository.save(new Channel(
-                ChannelPrivateCreateDto.channelId(),
+        Channel channel = new Channel(
                 Instant.now(),
                 ChannelPrivateCreateDto.userId(),
                 ChannelPrivateCreateDto.channelType()
-        ));
+        );
 
-        readStatusRepository.save(new ReadStatus(UUID.randomUUID(), ChannelPrivateCreateDto.userId(), ChannelPrivateCreateDto.channelId(), false));
+        channelRepository.save(channel);
+
+        readStatusRepository.save(new ReadStatus(UUID.randomUUID(), ChannelPrivateCreateDto.userId(), channel.getId(), false));
     }
 
     @Override
-    public ChannelDto findById(UUID id) {
+    public ChannelFindAllUserIdDto findById(UUID id) {
         return channelRepository.findById(id)
-                .map(ChannelDto :: from)
+                .map(ChannelFindAllUserIdDto:: from)
                 .orElseThrow(() -> new RuntimeException("채널을 찾을 수 없습니다."));
     }
 
     @Override
-    public List<ChannelDto> findAllByUserId(UUID userId) {
+    public List<ChannelFindAllUserIdDto> findAllByUserId(UUID userId) {
         return channelRepository
                 .findAll()
                 .orElse(Collections.emptyList())
@@ -74,7 +75,7 @@ public class BasicChannelService implements ChannelService {
                         return null;
                     }
 
-                    return new ChannelDto(
+                    return new ChannelFindAllUserIdDto(
                             channel.getId(),
                             channel.getName(),
                             channel.getDescription(),
@@ -105,7 +106,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void delete(UUID id) {
-        ChannelDto channelDto = this.findById(id);
+        ChannelFindAllUserIdDto channelDto = this.findById(id);
         channelRepository.delete(id);
 
         Message message = messageRepository

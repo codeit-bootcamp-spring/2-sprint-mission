@@ -1,15 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.UserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.request.UserStatusDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
@@ -39,7 +41,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void update(UserStatusDto userStatusDto){
+    public void update(UserStatusDto userStatusDto) {
         UserStatusDto userStatus = this.find(userStatusDto.userId());
         userStatusRepository.update(new UserStatus(userStatus.id(), userStatus.userId(), !userStatus.onLineStatus()));
     }

@@ -1,22 +1,19 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.readStatus.response;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.groups.ChannelType;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.List;
 import java.util.UUID;
 
-public record ReadStatusDto(
+public record ReadStatusFindAllByUserIdResponse(
         @NotNull UUID id,
         @NotNull UUID userId,
         @NotNull UUID channelId,
         @NotNull Boolean readStatus
 ) {
 
-    public static ReadStatusDto from(ReadStatus readStatus) {
-        return new ReadStatusDto(
+    public static ReadStatusFindAllByUserIdResponse from(ReadStatus readStatus) {
+        return new ReadStatusFindAllByUserIdResponse(
                 readStatus.getId(),
                 readStatus.getUserId(),
                 readStatus.getChannelId(),
