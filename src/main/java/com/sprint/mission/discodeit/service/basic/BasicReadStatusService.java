@@ -4,9 +4,11 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusReadResponse;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.common.NoSuchIdException;
 import com.sprint.mission.discodeit.exception.readstatus.CreateReadStatusException;
 import com.sprint.mission.discodeit.exception.readstatus.DuplicateReadStatusException;
 import com.sprint.mission.discodeit.exception.readstatus.NoSuchReadStatusException;
+import com.sprint.mission.discodeit.exception.readstatus.UpdateReadStatusException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -78,8 +81,18 @@ public class BasicReadStatusService implements ReadStatusService {
     // 이 메서드는 언제 호출해야 하는가? 메세지를 작성할 때? 채널에 접속할 때? 채널에 접속해서 스크롤을 내려 메세지를 확인할 때?
     @Override
     public void updateReadStatus(ReadStatusUpdateRequest readStatusUpdateRequest) {
-        ReadStatus readStatus = this.readStatusRepository.findByUserIdChannelId(readStatusUpdateRequest.userId(), readStatusUpdateRequest.channelId()).orElseThrow(()->new NoSuchReadStatusException("해당 readStatus가 존재하지 않습니다", HttpStatus.NOT_FOUND));
-        this.readStatusRepository.updateReadTime(readStatus.getId(), readStatusUpdateRequest.readTime());
+        try {
+            ReadStatus readStatus = this.readStatusRepository.findByUserIdChannelId(readStatusUpdateRequest.userId(), readStatusUpdateRequest.channelId()).orElseThrow(() -> new NoSuchReadStatusException("해당 readStatus가 존재하지 않습니다", HttpStatus.NOT_FOUND));
+            this.readStatusRepository.updateReadTime(readStatus.getId(), readStatusUpdateRequest.readTime());
+        } catch (NoSuchReadStatusException e) {
+            throw new UpdateReadStatusException(e.getMessage(), e.getStatus(), e);
+        } catch (NoSuchIdException e) {
+            throw new UpdateReadStatusException(e.getMessage(), e.getStatus(), e);
+        } catch (NoSuchElementException e) {
+            throw new UpdateReadStatusException(e.getMessage(), HttpStatus.NOT_FOUND, e);
+        } catch (Exception e) {
+            throw new UpdateReadStatusException("ReadStatus 업데이트 중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @Override
