@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.dto.userStatus.UserStatusDto;
+import com.sprint.mission.discodeit.application.dto.userStatus.UserStatusResult;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -36,7 +36,7 @@ class UserStatusServiceTest {
     @DisplayName("처음 생성시 유저의 로그인 상태는 false를 반환합니다.")
     @Test
     void create() {
-        UserStatusDto userStatusDto = userStatusService.create(user.getId());
+        UserStatusResult userStatusDto = userStatusService.create(user.getId());
         assertThat(userStatusDto.isLogin()).isFalse();
     }
 
@@ -60,8 +60,8 @@ class UserStatusServiceTest {
     @DisplayName("유저 ID로 상태를 조회하면 올바른 상태를 반환한다.")
     @Test
     void findByUserId() {
-        UserStatusDto userStatusDto = userStatusService.create(user.getId());
-        UserStatusDto userStatusDto1 = userStatusService.findByUserId(user.getId());
+        UserStatusResult userStatusDto = userStatusService.create(user.getId());
+        UserStatusResult userStatusDto1 = userStatusService.findByUserId(user.getId());
 
         assertThat(userStatusDto.id()).isEqualTo(userStatusDto1.id());
     }
@@ -69,8 +69,8 @@ class UserStatusServiceTest {
     @DisplayName("유저 ID로 상태를 업데이트하면 로그인 시간이 갱신된다.")
     @Test
     void updateByUserId() {
-        UserStatusDto userStatusDto = userStatusService.create(user.getId());
-        UserStatusDto updatedUserStatusDto = userStatusService.updateByUserId(user.getId());
+        UserStatusResult userStatusDto = userStatusService.create(user.getId());
+        UserStatusResult updatedUserStatusDto = userStatusService.updateByUserId(user.getId());
 
         assertThat(updatedUserStatusDto.lastLoginAt()).isAfter(userStatusDto.lastLoginAt());
     }

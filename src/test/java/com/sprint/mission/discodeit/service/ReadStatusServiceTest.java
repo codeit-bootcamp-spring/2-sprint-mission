@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusDto;
+import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusResult;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
@@ -43,7 +43,7 @@ class ReadStatusServiceTest {
     @DisplayName("읽기 상태를 생성하면 ID가 반환된다.")
     @Test
     void createReadStatus() {
-        ReadStatusDto readStatus = basicReadStatusService.create(user.getId(), channel.getId());
+        ReadStatusResult readStatus = basicReadStatusService.create(user.getId(), channel.getId());
         assertThat(readStatus.id()).isNotNull();
     }
 

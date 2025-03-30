@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.user.UserDto;
-import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
-import com.sprint.mission.discodeit.application.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.application.dto.user.UserRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserResponse;
+import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -54,9 +54,9 @@ class UserControllerTest {
     @DisplayName("프로필 사진 저장을 선택하지 않았을 때 프로필 아이디가 null을 반환한다.")
     @Test
     void registerException() {
-        UserRegisterDto userRegisterDto = new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(),
+        UserRequest userRequest = new UserRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(),
                 LOGIN_USER.getPassword());
-        UserDto user = userController.register(userRegisterDto, null);
+        UserResult user = userController.register(userRequest, null);
         assertThat(user.profileId()).isNull();
     }
 
@@ -69,10 +69,10 @@ class UserControllerTest {
                 binaryProfileImage
         );
 
-        UserRegisterDto userRegisterDto = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(),
+        UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword());
 
-        UserDto user = userController.register(userRegisterDto, file);
+        UserResult user = userController.register(userRequest, file);
         BinaryContent binaryContent = binaryContentRepository.findById(user.profileId()).get();
 
         byte[] storedFileBytes = Files.readAllBytes(Path.of(binaryContent.getPath()));
@@ -82,9 +82,9 @@ class UserControllerTest {
     @DisplayName("처음 등록한 유저의 로그인 상태는 false를 반환한다.")
     @Test
     void registerValidateUserStatus() {
-        UserRegisterDto userRegisterDto = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
-        UserDto user = userController.register(userRegisterDto, null); // UserResponseDto를 통해 로그인 상태를 확인
-        UserResponseDto userResponse = userController.findById(user.id());
+        UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
+        UserResult user = userController.register(userRequest, null); // UserResponseDto를 통해 로그인 상태를 확인
+        UserResponse userResponse = userController.findById(user.id());
 
         assertThat(userResponse.isLogin()).isFalse();
     }
@@ -97,10 +97,10 @@ class UserControllerTest {
                 MediaType.IMAGE_JPEG_VALUE,
                 existingProfileImage
         );
-        UserRegisterDto userRegisterDto = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(),
+        UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword());
 
-        UserDto user = userController.register(userRegisterDto, file);
+        UserResult user = userController.register(userRequest, file);
 
 
         byte[] updatedProfileImage = loadImageFileFromResource("Kirby.jpg");
@@ -108,7 +108,7 @@ class UserControllerTest {
                 MediaType.IMAGE_JPEG_VALUE,
                 updatedProfileImage
         );
-        UserDto profileImageUpdatedUser = userController.updateProfile(user.id(), otherFile);
+        UserResult profileImageUpdatedUser = userController.updateProfile(user.id(), otherFile);
 
         BinaryContent binaryContent = binaryContentRepository.findById(profileImageUpdatedUser.profileId()).get();
         byte[] storedFileBytes = Files.readAllBytes(Path.of(binaryContent.getPath()));
@@ -123,11 +123,11 @@ class UserControllerTest {
                 MediaType.IMAGE_JPEG_VALUE,
                 MESSAGE_CONTENT.getBytes()
         );
-        UserRegisterDto userRegisterDto = new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(),
+        UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword());
 
 
-        UserDto user = userController.register(userRegisterDto, file);
+        UserResult user = userController.register(userRequest, file);
         userController.delete(user.id());
 
         assertAll(

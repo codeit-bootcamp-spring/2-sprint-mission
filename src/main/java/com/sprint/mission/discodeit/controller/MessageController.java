@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.message.MessageCreationDto;
-import com.sprint.mission.discodeit.application.dto.message.MessageDto;
+import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
+import com.sprint.mission.discodeit.application.dto.message.MessageResult;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -17,19 +17,19 @@ public class MessageController {
     private final MessageService messageService;
     private final BinaryContentService binaryContentService;
 
-    public MessageDto createMessage(MessageCreationDto messageCreationDto, List<MultipartFile> files) {
+    public MessageResult createMessage(MessageCreationRequest messageCreationRequest, List<MultipartFile> files) {
         List<UUID> profileImageIds = files.stream()
                 .map(binaryContentService::createProfileImage)
                 .toList();
 
-        return messageService.create(messageCreationDto, profileImageIds);
+        return messageService.create(messageCreationRequest, profileImageIds);
     }
 
-    public List<MessageDto> findByChannelId(UUID channelId) {
+    public List<MessageResult> findByChannelId(UUID channelId) {
         return messageService.findAllByChannelId(channelId);
     }
 
-    public MessageDto updateContent(UUID messageId, String context) {
+    public MessageResult updateContent(UUID messageId, String context) {
         return messageService.updateContext(messageId, context);
     }
 

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.userStatus.UserStatusDto;
-import com.sprint.mission.discodeit.application.dto.userStatus.UserStatusesDto;
+import com.sprint.mission.discodeit.application.dto.userStatus.UserStatusResult;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -20,7 +19,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public UserStatusDto create(UUID userId) {
+    public UserStatusResult create(UUID userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
 
@@ -31,48 +30,48 @@ public class BasicUserStatusService implements UserStatusService {
 
         UserStatus userStatus = userStatusRepository.save(new UserStatus(userId));
 
-        return UserStatusDto.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
+        return UserStatusResult.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
     }
 
     @Override
-    public UserStatusDto find(UUID userStatusId) {
+    public UserStatusResult find(UUID userStatusId) {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
 
-        return UserStatusDto.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
+        return UserStatusResult.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
     }
 
     @Override
-    public UserStatusDto findByUserId(UUID userId) {
+    public UserStatusResult findByUserId(UUID userId) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저 Id를 가진 UserStatus가 없습니다."));
 
-        return UserStatusDto.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
+        return UserStatusResult.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
     }
 
     @Override
-    public UserStatusesDto findAll() {
+    public List<UserStatusResult> findAll() {
         List<UserStatus> userStatuses = userStatusRepository.findAll();
 
-        return UserStatusesDto.fromEntity(userStatuses);
+        return UserStatusResult.fromEntity(userStatuses);
     }
 
     @Override
-    public UserStatusDto update(UUID userStatusId) {
+    public UserStatusResult update(UUID userStatusId) {
         UserStatus userStatus = userStatusRepository.update(userStatusId);
 
-        return UserStatusDto.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
+        return UserStatusResult.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
     }
 
     @Override
-    public UserStatusDto updateByUserId(UUID userId) {
+    public UserStatusResult updateByUserId(UUID userId) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저 Id를 가진 UserStatus가 없습니다."));
 
         userStatus.updateLastLoginAt();
         UserStatus updatedUserStatus = userStatusRepository.save(userStatus);
 
-        return UserStatusDto.fromEntity(updatedUserStatus, updatedUserStatus.isLogin(ZonedDateTime.now().toInstant()));
+        return UserStatusResult.fromEntity(updatedUserStatus, updatedUserStatus.isLogin(ZonedDateTime.now().toInstant()));
     }
 
     @Override

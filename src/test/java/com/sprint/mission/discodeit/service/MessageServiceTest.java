@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.dto.message.MessageCreationDto;
-import com.sprint.mission.discodeit.application.dto.message.MessageDto;
+import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
+import com.sprint.mission.discodeit.application.dto.message.MessageResult;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -28,7 +28,7 @@ class MessageServiceTest {
     private UserRepository userRepository;
     private MessageRepository messageRepository;
     private BinaryContentRepository binaryContentRepository;
-    private MessageDto setUpMessage;
+    private MessageResult setUpMessage;
     private UUID channelId;
     private User setUpUser;
 
@@ -41,7 +41,7 @@ class MessageServiceTest {
 
         setUpUser = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
         channelId = UUID.randomUUID();
-        setUpMessage = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, channelId, setUpUser.getId()), new ArrayList<>());
+        setUpMessage = messageService.create(new MessageCreationRequest(MESSAGE_CONTENT, channelId, setUpUser.getId()), new ArrayList<>());
     }
 
     @DisplayName("메시지 생성 시 내용이 올바르게 설정된다.")
@@ -53,22 +53,22 @@ class MessageServiceTest {
     @DisplayName("메시지 ID로 단건 조회 시 올바른 메시지를 반환한다.")
     @Test
     void findMessageById() {
-        MessageDto message = messageService.findById(setUpMessage.messageId());
+        MessageResult message = messageService.findById(setUpMessage.messageId());
         assertThat(message.context()).isEqualTo(MESSAGE_CONTENT);
     }
 
     @DisplayName("채널 ID로 메시지들을 조회하면 생성 순서대로 반환한다.")
     @Test
     void findAllMessagesByChannelId() {
-        MessageDto messageDto = messageService.create(new MessageCreationDto(MESSAGE_CONTENT, channelId, setUpUser.getId()), new ArrayList<>());
-        List<MessageDto> messages = messageService.findAllByChannelId(channelId);
-        assertThat(messages).containsExactly(setUpMessage, messageDto);
+        MessageResult messageResult = messageService.create(new MessageCreationRequest(MESSAGE_CONTENT, channelId, setUpUser.getId()), new ArrayList<>());
+        List<MessageResult> messages = messageService.findAllByChannelId(channelId);
+        assertThat(messages).containsExactly(setUpMessage, messageResult);
     }
 
     @DisplayName("메시지 내용을 수정하면 변경된 내용이 반영된다.")
     @Test
     void updateMessageContent() {
-        MessageDto message = messageService.updateContext(setUpMessage.messageId(), MESSAGE_CONTENT + "123");
+        MessageResult message = messageService.updateContext(setUpMessage.messageId(), MESSAGE_CONTENT + "123");
         assertThat(message.context()).isEqualTo(MESSAGE_CONTENT + "123");
     }
 

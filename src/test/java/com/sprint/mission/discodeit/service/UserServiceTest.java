@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.dto.user.UserDto;
-import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
+import com.sprint.mission.discodeit.application.dto.user.UserRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
@@ -22,27 +22,27 @@ class UserServiceTest {
     private UserService userService;
     private UserRepository userRepository;
     private UserStatusRepository userStatusRepository;
-    private UserDto setUpUser;
+    private UserResult setUpUser;
 
     @BeforeEach
     void setUp() {
         userRepository = new JCFUserRepository();
         userStatusRepository = new JCFUserStatusRepository();
         userService = new BasicUserService(userRepository, userStatusRepository);
-        setUpUser = userService.register(new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
+        setUpUser = userService.register(new UserRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
     }
 
     @DisplayName("유저 등록시 중복된 이메일이 있을 경우 예외 처리합니다")
     @Test
     void registerDuplicateEmail() {
-        assertThatThrownBy(() -> userService.register(new UserRegisterDto(OTHER_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null))
+        assertThatThrownBy(() -> userService.register(new UserRequest(OTHER_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("유저 등록시 중복된 유저 이름이 있을 경우 예외 처리합니다")
     @Test
     void registerDuplicateUserName() {
-        assertThatThrownBy(() -> userService.register(new UserRegisterDto(LOGIN_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword()), null))
+        assertThatThrownBy(() -> userService.register(new UserRequest(LOGIN_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword()), null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -56,14 +56,14 @@ class UserServiceTest {
     @DisplayName("UUID로 유저 단건 조회")
     @Test
     void findByIdReturnsUser() {
-        UserDto userDto = userService.findById(setUpUser.id());
-        assertThat(userDto.id()).isEqualTo(setUpUser.id());
+        UserResult userResult = userService.findById(setUpUser.id());
+        assertThat(userResult.id()).isEqualTo(setUpUser.id());
     }
 
     @DisplayName("이름으로 유저 단건 조회")
     @Test
     void findByNameReturnsUser() {
-        UserDto user = userService.findByName(LOGIN_USER.getName());
+        UserResult user = userService.findByName(LOGIN_USER.getName());
         assertThat(user.name()).isEqualTo(LOGIN_USER.getName());
     }
 
@@ -72,7 +72,7 @@ class UserServiceTest {
     void updateUserName() {
         String newUserName = "김철수";
         userService.updateName(setUpUser.id(), newUserName);
-        UserDto updatedUserInfo = userService.findById(setUpUser.id());
+        UserResult updatedUserInfo = userService.findById(setUpUser.id());
         assertThat(updatedUserInfo.name()).isEqualTo(newUserName);
     }
 

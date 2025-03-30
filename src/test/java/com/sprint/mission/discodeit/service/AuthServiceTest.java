@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.dto.user.UserDto;
-import com.sprint.mission.discodeit.application.dto.user.UserLoginDto;
-import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
+import com.sprint.mission.discodeit.application.dto.auth.LoginRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -32,15 +32,15 @@ class AuthServiceTest {
         userRepository = new JCFUserRepository();
         userStatusRepository = new JCFUserStatusRepository();
         userService = new BasicUserService(userRepository, userStatusRepository);
-        userService.register(new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
+        userService.register(new UserRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
         authService = new BasicAuthService(userRepository, userStatusRepository);
     }
 
     @DisplayName("로그인 시 유저 정보를 반환하고 UserStatus가 변경된다.")
     @Test
     void loginUpdatesUserStatus() {
-        UserLoginDto loginRequestUser = new UserLoginDto(LOGIN_USER.getName(), LOGIN_USER.getPassword());
-        UserDto user = authService.login(loginRequestUser);
+        LoginRequest loginRequestUser = new LoginRequest(LOGIN_USER.getName(), LOGIN_USER.getPassword());
+        UserResult user = authService.login(loginRequestUser);
         UserStatus userStatus = userStatusRepository.findByUserId(user.id()).get();
 
         assertThat(userStatus.isLogin(ZonedDateTime.now().toInstant())).isTrue();
@@ -49,7 +49,7 @@ class AuthServiceTest {
     @DisplayName("등록되지 않은 유저로 로그인 시 예외가 발생한다.")
     @Test
     void loginThrowsExceptionForUnregisteredUser() {
-        UserLoginDto loginRequestUser = new UserLoginDto(OTHER_USER.getName(), OTHER_USER.getPassword());
+        LoginRequest loginRequestUser = new LoginRequest(OTHER_USER.getName(), OTHER_USER.getPassword());
         assertThatThrownBy(() -> authService.login(loginRequestUser))
                 .isInstanceOf(IllegalArgumentException.class);
     }

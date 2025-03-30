@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentDto;
-import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentsDto;
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -37,20 +36,18 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public BinaryContentDto findById(UUID id) {
+    public BinaryContentResult findById(UUID id) {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
 
-        return BinaryContentDto.fromEntity(binaryContent);
+        return BinaryContentResult.fromEntity(binaryContent);
     }
 
     @Override
-    public BinaryContentsDto findByIdIn(List<UUID> ids) {
-        List<BinaryContentDto> binaryContentDtos = ids.stream()
+    public List<BinaryContentResult> findByIdIn(List<UUID> ids) {
+        return ids.stream()
                 .map(this::findById)
                 .toList();
-
-        return new BinaryContentsDto(binaryContentDtos);
     }
 
     @Override

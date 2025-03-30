@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.message.MessageCreationDto;
-import com.sprint.mission.discodeit.application.dto.message.MessageDto;
-import com.sprint.mission.discodeit.application.dto.user.UserDto;
+import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
+import com.sprint.mission.discodeit.application.dto.message.MessageResult;
+import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -26,39 +26,39 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public MessageDto create(MessageCreationDto messageCreationDto, List<UUID> attachmentsIds) {
-        Message message = messageRepository.save(new Message(messageCreationDto.context(), messageCreationDto.chanelId(), messageCreationDto.userId(), attachmentsIds));
+    public MessageResult create(MessageCreationRequest messageCreationRequest, List<UUID> attachmentsIds) {
+        Message message = messageRepository.save(new Message(messageCreationRequest.context(), messageCreationRequest.chanelId(), messageCreationRequest.userId(), attachmentsIds));
 
-        return MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message)));
+        return MessageResult.fromEntity(message, UserResult.fromEntity(findMessageUser(message)));
     }
 
     @Override
-    public MessageDto findById(UUID id) {
+    public MessageResult findById(UUID id) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
-        return MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message)));
+        return MessageResult.fromEntity(message, UserResult.fromEntity(findMessageUser(message)));
     }
 
     @Override
-    public List<MessageDto> findAllByChannelId(UUID channelId) {
+    public List<MessageResult> findAllByChannelId(UUID channelId) {
         return messageRepository.findAll()
                 .stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .sorted(Comparator.comparing(Message::getCreatedAt))
-                .map(message -> MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message))))
+                .map(message -> MessageResult.fromEntity(message, UserResult.fromEntity(findMessageUser(message))))
                 .toList();
     }
 
     @Override
-    public MessageDto updateContext(UUID id, String context) {
+    public MessageResult updateContext(UUID id, String context) {
         Message message = messageRepository.updateContext(id, context);
-        return MessageDto.fromEntity(message, UserDto.fromEntity(findMessageUser(message)));
+        return MessageResult.fromEntity(message, UserResult.fromEntity(findMessageUser(message)));
     }
 
     @Override
     public void delete(UUID id) {
-        MessageDto message = this.findById(id);
+        MessageResult message = this.findById(id);
         for (UUID attachmentId : message.attachmentIds()) {
             binaryContentRepository.delete(attachmentId);
         }

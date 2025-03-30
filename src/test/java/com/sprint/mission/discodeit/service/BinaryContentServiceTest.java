@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentDto;
-import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentsDto;
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
@@ -41,7 +40,7 @@ class BinaryContentServiceTest {
     void createProfileImage() throws IOException {
         MockMultipartFile file = createMockImageFile(MESSAGE_CONTENT);
         UUID profileId = binaryContentService.createProfileImage(file);
-        BinaryContentDto binaryContent = binaryContentService.findById(profileId);
+        BinaryContentResult binaryContent = binaryContentService.findById(profileId);
 
         byte[] storedFileBytes = Files.readAllBytes(Path.of(binaryContent.path()));
         assertThat(file.getBytes()).isEqualTo(storedFileBytes);
@@ -55,14 +54,14 @@ class BinaryContentServiceTest {
 
         UUID profileId1 = binaryContentService.createProfileImage(file1);
         UUID profileId2 = binaryContentService.createProfileImage(file2);
-        BinaryContentsDto binaryContentsDto = binaryContentService.findByIdIn(List.of(profileId1, profileId2));
+        List<BinaryContentResult> binaryContentsResults = binaryContentService.findByIdIn(List.of(profileId1, profileId2));
 
-        BinaryContentDto binaryContentDto1 = binaryContentsDto.binaryContents().get(0);
-        BinaryContentDto binaryContentDto2 = binaryContentsDto.binaryContents().get(1);
+        BinaryContentResult binaryContentResult1 = binaryContentsResults.get(0);
+        BinaryContentResult binaryContentResult2 = binaryContentsResults.get(1);
 
         assertAll(
-                () -> assertThat(binaryContentDto1.id()).isEqualTo(profileId1),
-                () -> assertThat(binaryContentDto2.id()).isEqualTo(profileId2)
+                () -> assertThat(binaryContentResult1.id()).isEqualTo(profileId1),
+                () -> assertThat(binaryContentResult2.id()).isEqualTo(profileId2)
         );
     }
 
@@ -71,7 +70,7 @@ class BinaryContentServiceTest {
     void deleteProfileImage() {
         MockMultipartFile file = createMockImageFile(MESSAGE_CONTENT);
         UUID profileId = binaryContentService.createProfileImage(file);
-        BinaryContentDto binaryContent = binaryContentService.findById(profileId);
+        BinaryContentResult binaryContent = binaryContentService.findById(profileId);
 
         binaryContentService.delete(profileId);
 

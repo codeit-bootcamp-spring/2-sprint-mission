@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.user.UserDto;
-import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
-import com.sprint.mission.discodeit.application.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.application.dto.userStatus.UserStatusDto;
+import com.sprint.mission.discodeit.application.dto.user.UserRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserResponse;
+import com.sprint.mission.discodeit.application.dto.user.UserResult;
+import com.sprint.mission.discodeit.application.dto.userStatus.UserStatusResult;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -21,34 +21,34 @@ public class UserController {
     private final BinaryContentService binaryContentService;
     private final UserStatusService userStatusService;
 
-    public UserDto register(UserRegisterDto userRegisterDto, MultipartFile multipartFile) {
+    public UserResult register(UserRequest userRequest, MultipartFile multipartFile) {
         UUID profileId = binaryContentService.createProfileImage(multipartFile);
 
-        return userService.register(userRegisterDto, profileId);
+        return userService.register(userRequest, profileId);
     }
 
-    public UserResponseDto findById(UUID userId) {
-        UserDto userDto = userService.findById(userId);
-        UserStatusDto userStatusDto = userStatusService.findByUserId(userDto.id());
+    public UserResponse findById(UUID userId) {
+        UserResult userResult = userService.findById(userId);
+        UserStatusResult userStatusDto = userStatusService.findByUserId(userResult.id());
 
-        return UserResponseDto.of(userDto, userStatusDto.isLogin());
+        return UserResponse.of(userResult, userStatusDto.isLogin());
     }
 
-    public List<UserDto> findAll() {
+    public List<UserResult> findAll() {
         return userService.findAll();
     }
 
-    public UserDto updateProfile(UUID userId, MultipartFile multipartFile) {
-        UserDto beforeUpdatedUser = userService.findById(userId);
+    public UserResult updateProfile(UUID userId, MultipartFile multipartFile) {
+        UserResult beforeUpdatedUser = userService.findById(userId);
         UUID profileId = binaryContentService.createProfileImage(multipartFile);
-        UserDto user = userService.updateProfileImage(userId, profileId);
+        UserResult user = userService.updateProfileImage(userId, profileId);
         binaryContentService.delete(beforeUpdatedUser.profileId());
 
         return user;
     }
 
     public void delete(UUID userId) {
-        UserDto beforeUpdatedUser = userService.findById(userId);
+        UserResult beforeUpdatedUser = userService.findById(userId);
         userService.delete(userId);
         binaryContentService.delete(beforeUpdatedUser.profileId());
     }

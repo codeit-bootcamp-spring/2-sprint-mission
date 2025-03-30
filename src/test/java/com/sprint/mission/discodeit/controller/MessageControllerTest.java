@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.message.MessageCreationDto;
-import com.sprint.mission.discodeit.application.dto.message.MessageDto;
+import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
+import com.sprint.mission.discodeit.application.dto.message.MessageResult;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -49,7 +49,7 @@ class MessageControllerTest {
     @DisplayName("채널에 메시지를 생성하면 올바른 내용을 반환한다.")
     @Test
     void createMessageTest() {
-        MessageDto message = messageController.createMessage(new MessageCreationDto(MESSAGE_CONTENT, UUID.randomUUID(), setUpUser.getId()), new ArrayList<>());
+        MessageResult message = messageController.createMessage(new MessageCreationRequest(MESSAGE_CONTENT, UUID.randomUUID(), setUpUser.getId()), new ArrayList<>());
 
         assertThat(message.context()).isEqualTo(MESSAGE_CONTENT);
     }
@@ -62,7 +62,7 @@ class MessageControllerTest {
                 MESSAGE_CONTENT.getBytes()
         );
 
-        MessageDto message = messageController.createMessage(new MessageCreationDto(MESSAGE_CONTENT, UUID.randomUUID(), setUpUser.getId()), List.of(file));
+        MessageResult message = messageController.createMessage(new MessageCreationRequest(MESSAGE_CONTENT, UUID.randomUUID(), setUpUser.getId()), List.of(file));
         messageController.delete(message.messageId());
 
         assertThatThrownBy(() -> basicBinaryContentService.findById(message.attachmentIds().get(0)))

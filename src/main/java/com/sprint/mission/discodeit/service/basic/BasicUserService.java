@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.user.UserDto;
-import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
+import com.sprint.mission.discodeit.application.dto.user.UserRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -23,55 +23,55 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserDto register(UserRegisterDto userRegisterDto, UUID profileId) {
-        validateDuplicateEmail(userRegisterDto.email());
-        validateDuplicateUserName(userRegisterDto.name());
+    public UserResult register(UserRequest userRequest, UUID profileId) {
+        validateDuplicateEmail(userRequest.email());
+        validateDuplicateUserName(userRequest.name());
 
         User savedUser = userRepository.save(new User(
-                userRegisterDto.name(),
-                userRegisterDto.email(),
-                userRegisterDto.password(),
+                userRequest.name(),
+                userRequest.email(),
+                userRequest.password(),
                 profileId)
         );
         userStatusRepository.save(new UserStatus(savedUser.getId()));
 
-        return UserDto.fromEntity(savedUser);
+        return UserResult.fromEntity(savedUser);
     }
 
     @Override
-    public UserDto findById(UUID userId) {
+    public UserResult findById(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
-        return UserDto.fromEntity(user);
+        return UserResult.fromEntity(user);
     }
 
     @Override
-    public UserDto findByName(String name) {
+    public UserResult findByName(String name) {
         User user = userRepository.findByName(name)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
-        return UserDto.fromEntity(user);
+        return UserResult.fromEntity(user);
     }
 
     @Override
-    public List<UserDto> findAll() {
+    public List<UserResult> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(UserDto::fromEntity)
+                .map(UserResult::fromEntity)
                 .toList();
     }
 
     @Override
-    public UserDto findByEmail(String email) {
+    public UserResult findByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
 
-        return UserDto.fromEntity(user);
+        return UserResult.fromEntity(user);
     }
 
     @Override
-    public List<UserDto> findAllByIds(List<UUID> userIds) {
+    public List<UserResult> findAllByIds(List<UUID> userIds) {
         return userIds
                 .stream()
                 .map(this::findById)
@@ -84,14 +84,14 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserDto updateProfileImage(UUID userId, UUID profileId) {
+    public UserResult updateProfileImage(UUID userId, UUID profileId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         user.updateProfileImage(profileId);
         User savedUser = userRepository.save(user);
 
-        return UserDto.fromEntity(savedUser);
+        return UserResult.fromEntity(savedUser);
     }
 
     @Override

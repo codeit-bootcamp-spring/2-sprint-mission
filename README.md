@@ -114,8 +114,8 @@
 ### 멘토님 피드백
 
 - [ ] DTO 다형성 삭제 : 명확해야 관리하기가 쉽다
-- [ ] DTOs 관리하기할때 내부에서 선언하여 관리하는 법 학습
-- [ ] DTO 네이밍 규칙 반영
+- [x] DTOs 관리하기할때 내부에서 선언하여 관리하는 법 학습
+- [x] DTO 네이밍 규칙 반영
   - 컨트롤러 : Request/Response
   - Service 응답 : Info/Result
 - [ ] UserStatues Dto, 안에 메서드 넣어 놓은 부분 수정

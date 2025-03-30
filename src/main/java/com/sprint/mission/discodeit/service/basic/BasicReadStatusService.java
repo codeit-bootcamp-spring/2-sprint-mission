@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusDto;
-import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusesDto;
+import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusResult;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -21,7 +20,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public ReadStatusDto create(UUID userId, UUID channelId) {
+    public ReadStatusResult create(UUID userId, UUID channelId) {
         channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("readStaus에 해당하는 채널이 없습니다."));
         userRepository.findById(userId)
@@ -36,33 +35,33 @@ public class BasicReadStatusService implements ReadStatusService {
 
         ReadStatus readStatus = readStatusRepository.save(new ReadStatus(userId, channelId));
 
-        return ReadStatusDto.fromEntity(readStatus);
+        return ReadStatusResult.fromEntity(readStatus);
     }
 
     @Override
-    public ReadStatusesDto findByChannelId(UUID channelId) {
+    public List<ReadStatusResult> findByChannelId(UUID channelId) {
         List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(channelId);
-        return ReadStatusesDto.fromEntity(readStatuses);
+        return ReadStatusResult.fromEntity(readStatuses);
     }
 
     @Override
-    public ReadStatusDto find(UUID readStatusId) {
+    public ReadStatusResult find(UUID readStatusId) {
         ReadStatus readStatus = readStatusRepository.find(readStatusId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Id의 객체가 없습니다."));
 
-        return ReadStatusDto.fromEntity(readStatus);
+        return ReadStatusResult.fromEntity(readStatus);
     }
 
     @Override
-    public ReadStatusesDto findAllByUserId(UUID useId) {
+    public List<ReadStatusResult> findAllByUserId(UUID useId) {
         List<ReadStatus> readStatuses = readStatusRepository.findByUserId(useId);
-        return ReadStatusesDto.fromEntity(readStatuses);
+        return ReadStatusResult.fromEntity(readStatuses);
     }
 
     @Override
-    public ReadStatusDto updateLastReadTime(UUID readStatusId) {
+    public ReadStatusResult updateLastReadTime(UUID readStatusId) {
         ReadStatus readStatus = readStatusRepository.updateLastReadTime(readStatusId);
-        return ReadStatusDto.fromEntity(readStatus);
+        return ReadStatusResult.fromEntity(readStatus);
     }
 
     @Override

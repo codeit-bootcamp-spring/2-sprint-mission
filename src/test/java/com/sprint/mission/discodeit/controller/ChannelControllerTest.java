@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelDto;
-import com.sprint.mission.discodeit.application.dto.user.UserDto;
-import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterRequest;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.jcf.*;
@@ -34,7 +33,7 @@ class ChannelControllerTest {
     private MessageRepository messageRepository;
     private ChannelRepository channelRepository;
     private ReadStatusRepository readStatusRepository;
-    private UserDto setUpUser;
+    private UserResult setUpUser;
 
     @BeforeEach
     void setUp() {
@@ -48,13 +47,13 @@ class ChannelControllerTest {
         channelService = new BasicChannelService(channelRepository, readStatusRepository, messageRepository);
         channelController = new ChannelController(channelService, userService);
 
-        setUpUser = userService.register(new UserRegisterDto(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
+        setUpUser = userService.register(new UserRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
     }
 
     @DisplayName("Public 채널 생성")
     @Test
     void createPublicChannel() {
-        ChannelDto channel = channelController.createPublicChannel(new ChannelRegisterDto(ChannelType.PUBLIC, "Public", setUpUser.id()));
+        ChannelRequest channel = channelController.createPublicChannel(new ChannelRegisterRequest(ChannelType.PUBLIC, "Public", setUpUser.id()));
 
         assertThat(channel.type()).isEqualTo(ChannelType.PUBLIC);
     }
@@ -62,8 +61,8 @@ class ChannelControllerTest {
     @DisplayName("Private 채널 생성시 채널 멤버의 ID를 반환한다.")
     @Test
     void createPrivateChannel() {
-        UserDto otherUser = userService.register(new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
-        PrivateChannelDto privateChannel = (PrivateChannelDto) createPrivateChannel(setUpUser, List.of(otherUser.id()));
+        UserResult otherUser = userService.register(new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
+        ChannelRequest privateChannel = createPrivateChannel(setUpUser, List.of(otherUser.id()));
 
         assertThat(privateChannel.privateMemberIds()).containsExactlyInAnyOrder(otherUser.id());
     }
@@ -71,29 +70,29 @@ class ChannelControllerTest {
     @DisplayName("Private 채널 조회 시 유저에게만 속한 Private 채널을 반환한다.")
     @Test
     void findAll() {
-        PrivateChannelDto userPrivateChannel = (PrivateChannelDto) createPrivateChannel(setUpUser, new ArrayList<>());
-        ChannelDto userPublicChannel = channelController.createPublicChannel(new ChannelRegisterDto(ChannelType.PUBLIC, "Public", setUpUser.id()));
-        UserDto otherUser = userService.register(new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
+        ChannelRequest privateChannel = createPrivateChannel(setUpUser, new ArrayList<>());
+        ChannelRequest userPublicChannel = channelController.createPublicChannel(new ChannelRegisterRequest(ChannelType.PUBLIC, "Public", setUpUser.id()));
+        UserResult otherUser = userService.register(new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
         createPrivateChannel(otherUser, new ArrayList<>());
 
 
-        List<UUID> channelIds = channelController.findAllByUserId(setUpUser.id()).stream().map(ChannelDto::id).toList();
+        List<UUID> channelIds = channelController.findAllByUserId(setUpUser.id()).stream().map(ChannelRequest::id).toList();
 
-        assertThat(channelIds).containsExactlyInAnyOrder(userPrivateChannel.id(), userPublicChannel.id());
+        assertThat(channelIds).containsExactlyInAnyOrder(privateChannel.id(), userPublicChannel.id());
     }
 
     @DisplayName("Private채널에 맴버를 추가한다")
     @Test
     void findByIdPrivateChannel_MemberTogether() {
-        UserDto otherUser = userService.register(new UserRegisterDto(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
-        ChannelDto channel = createPrivateChannel(setUpUser, new ArrayList<>());
+        UserResult otherUser = userService.register(new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
+        ChannelRequest channel = createPrivateChannel(setUpUser, new ArrayList<>());
 
-        PrivateChannelDto privateChannel = (PrivateChannelDto) channelController.addPrivateChannelMember(channel.id(), OTHER_USER.getEmail());
+        ChannelRequest privateChannel = channelController.addPrivateChannelMember(channel.id(), OTHER_USER.getEmail());
 
         assertThat(privateChannel.privateMemberIds()).containsExactlyInAnyOrder(setUpUser.id(), otherUser.id());
     }
 
-    private ChannelDto createPrivateChannel(UserDto loginUser, List<UUID> memberIds) {
-        return channelController.createPrivateChannel(new ChannelRegisterDto(ChannelType.PRIVATE, CHANNEL_NAME, loginUser.id()), memberIds);
+    private ChannelRequest createPrivateChannel(UserResult loginUser, List<UUID> memberIds) {
+        return channelController.createPrivateChannel(new ChannelRegisterRequest(ChannelType.PRIVATE, CHANNEL_NAME, loginUser.id()), memberIds);
     }
 }

@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelDto;
-import com.sprint.mission.discodeit.application.dto.channel.PublicChannelDto;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterRequest;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -30,28 +28,28 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public ChannelDto createPublic(ChannelRegisterDto channelRegisterDto) {
-        Channel channel = new Channel(channelRegisterDto.channelType(), channelRegisterDto.name());
+    public ChannelRequest createPublic(ChannelRegisterRequest channelRegisterRequest) {
+        Channel channel = new Channel(channelRegisterRequest.channelType(), channelRegisterRequest.name());
         Channel savedChannel = channelRepository.save(channel);
 
-        return PublicChannelDto.fromPublicChannel(savedChannel, Instant.ofEpochSecond(0));
+        return ChannelRequest.fromPublic(savedChannel, Instant.ofEpochSecond(0));
     }
 
     @Override
-    public ChannelDto createPrivate(ChannelRegisterDto channelRegisterDto, List<UUID> channelMemberIds) {
-        Channel channel = new Channel(channelRegisterDto.channelType(), channelRegisterDto.name());
+    public ChannelRequest createPrivate(ChannelRegisterRequest channelRegisterRequest, List<UUID> channelMemberIds) {
+        Channel channel = new Channel(channelRegisterRequest.channelType(), channelRegisterRequest.name());
         Channel savedChannel = channelRepository.save(channel);
 
-        readStatusRepository.save(new ReadStatus(channelRegisterDto.logInUserId(), savedChannel.getId()));
+        readStatusRepository.save(new ReadStatus(channelRegisterRequest.logInUserId(), savedChannel.getId()));
         for (UUID memberId : channelMemberIds) {
             readStatusRepository.save(new ReadStatus(memberId, savedChannel.getId()));
         }
 
-        return PrivateChannelDto.fromPrivateChannel(savedChannel, Instant.ofEpochSecond(0), channelMemberIds);
+        return ChannelRequest.fromPrivate(savedChannel, Instant.ofEpochSecond(0), channelMemberIds);
     }
 
     @Override
-    public ChannelDto findById(UUID id) {
+    public ChannelRequest findById(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
@@ -64,16 +62,16 @@ public class BasicChannelService implements ChannelService {
                     .map(ReadStatus::getUserId)
                     .toList();
 
-            return PrivateChannelDto.fromPrivateChannel(channel, lastMessageCreatedAt, userId);
+            return ChannelRequest.fromPrivate(channel, lastMessageCreatedAt, userId);
         }
 
-        return PublicChannelDto.fromPublicChannel(channel, lastMessageCreatedAt);
+        return ChannelRequest.fromPublic(channel, lastMessageCreatedAt);
     }
 
     @Override
-    public List<ChannelDto> findAllByUserId(UUID userId) {
-        List<ChannelDto> totalChannels = new ArrayList<>(findPublicChannelsByUserId());
-        List<ChannelDto> privateChannels = findPrivateChannelsByUserId(userId);
+    public List<ChannelRequest> findAllByUserId(UUID userId) {
+        List<ChannelRequest> totalChannels = new ArrayList<>(findPublicChannelsByUserId());
+        List<ChannelRequest> privateChannels = findPrivateChannelsByUserId(userId);
 
         totalChannels.addAll(privateChannels);
 
@@ -81,7 +79,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto updatePublicChannelName(UUID id, String name) {
+    public ChannelRequest updatePublicChannelName(UUID id, String name) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
@@ -92,7 +90,7 @@ public class BasicChannelService implements ChannelService {
         Channel updatedChannel = channelRepository.updateName(id, name);
         Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId());
 
-        return PublicChannelDto.fromPublicChannel(updatedChannel, lastMessageCreatedAt);
+        return ChannelRequest.fromPublic(updatedChannel, lastMessageCreatedAt);
     }
 
     @Override
@@ -104,7 +102,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public ChannelDto addPrivateChannelMember(UUID channelId, UUID friendId) {
+    public ChannelRequest addPrivateChannelMember(UUID channelId, UUID friendId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
@@ -116,21 +114,21 @@ public class BasicChannelService implements ChannelService {
                 .map(ReadStatus::getUserId)
                 .toList();
 
-        return PrivateChannelDto.fromPrivateChannel(channel, lastMessageCreatedAt, userId);
+        return ChannelRequest.fromPrivate(channel, lastMessageCreatedAt, userId);
     }
 
-    private List<ChannelDto> findPrivateChannelsByUserId(UUID userId) {
+    private List<ChannelRequest> findPrivateChannelsByUserId(UUID userId) {
         return readStatusRepository.findByUserId(userId)
                 .stream()
                 .map(readStatus -> this.findById(readStatus.getChannelId()))
                 .toList();
     }
 
-    private List<ChannelDto> findPublicChannelsByUserId() {
+    private List<ChannelRequest> findPublicChannelsByUserId() {
         return channelRepository.findAll()
                 .stream()
                 .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
-                .map(channel -> PublicChannelDto.fromPublicChannel(channel, messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())))
+                .map(channel -> ChannelRequest.fromPublic(channel, messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())))
                 .toList();
     }
 }
