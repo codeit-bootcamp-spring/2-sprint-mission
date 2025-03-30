@@ -6,7 +6,7 @@ import java.util.UUID;
 public record UserReadResponse (
         UUID userId,
         String userName,
-        String userEmail,
+        String email,
         UUID profileId,
         boolean online,
         Instant createdAt,
