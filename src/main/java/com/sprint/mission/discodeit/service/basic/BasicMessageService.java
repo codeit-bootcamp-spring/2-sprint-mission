@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.common.NoSuchIdException;
 import com.sprint.mission.discodeit.exception.message.CreateMessageException;
 import com.sprint.mission.discodeit.exception.message.DeleteMessageException;
+import com.sprint.mission.discodeit.exception.message.FindMessageListException;
 import com.sprint.mission.discodeit.exception.message.UpdateMessageException;
 import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.provider.MessageUpdaterProvider;
@@ -77,12 +78,20 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<MessageReadResponse> findAllByChannelId(UUID channelId) {
-        ChannelService.validateChannelId(channelId, this.channelRepository);
-        List<MessageReadResponse> messageReadResponses = new ArrayList<>();
-        for(Message message : messageRepository.findMessageListByChannelId(channelId)) {
-            messageReadResponses.add(new MessageReadResponse(message.getId(), message.getContent(), message.getAttachmentIds()));
+        try {
+            ChannelService.validateChannelId(channelId, this.channelRepository);
+            List<MessageReadResponse> messageReadResponses = new ArrayList<>();
+            for (Message message : messageRepository.findMessageListByChannelId(channelId)) {
+                messageReadResponses.add(new MessageReadResponse(message.getId(), message.getContent(), message.getAttachmentIds()));
+            }
+            return messageReadResponses;
+        } catch (NoSuchIdException e) {
+            throw new FindMessageListException(e.getMessage(), HttpStatus.NOT_FOUND, e);
+        } catch (NoSuchElementException e) {
+            throw new FindMessageListException(e.getMessage(), HttpStatus.NOT_FOUND, e);
+        } catch (Exception e) {
+            throw new FindMessageListException("channelId로 메세지 리스트 조회 중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
         }
-        return messageReadResponses;
     }
 
     // binaryContent를 업데이트할지 다음 미션의 컨트롤러에서 결정할 것!
