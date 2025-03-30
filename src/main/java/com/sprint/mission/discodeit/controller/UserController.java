@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.user.UserResponseDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -24,9 +25,10 @@ public class UserController {
         return userService.createUser(dto, profileCreateRequest);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public List<UserResponseDTO> getAllUsers() {
-        return userService.searchAllUsers();
+    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        List<UserResponseDTO> users = userService.searchAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
