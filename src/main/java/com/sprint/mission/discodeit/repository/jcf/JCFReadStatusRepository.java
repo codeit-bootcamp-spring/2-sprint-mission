@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository.file;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -9,23 +9,15 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileReadStatusRepository implements ReadStatusRepository {
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+public class JCFReadStatusRepository implements ReadStatusRepository {
 
-    private final String READ_STATUS_FILE;
-    private final Map<UUID, ReadStatus> readStatusData;
-    private final SaveLoadHandler<ReadStatus> saveLoadHandler;
+    private final Map<UUID, ReadStatus> readStatusData = new HashMap<>();
 
-    public FileReadStatusRepository(@Value("${discodeit.repository.file.readStatus}") String fileName,SaveLoadHandler<ReadStatus> saveLoadHandler) {
-        READ_STATUS_FILE = fileName;
-        this.saveLoadHandler = saveLoadHandler;
-        readStatusData = saveLoadHandler.loadData(READ_STATUS_FILE);
-    }
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
         readStatusData.put(readStatus.getId(), readStatus);
-        saveLoadHandler.saveData(READ_STATUS_FILE, readStatusData);
         return readStatus;
     }
 
@@ -58,14 +50,12 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         ReadStatus readStatusNullable = readStatusData.get(id);
         ReadStatus readStatus = Optional.ofNullable(readStatusNullable).orElseThrow(() -> new NoSuchElementException(("상태를 찾을 수 없습니다.")));
         readStatus.updateLastCheckedAt();
-        saveLoadHandler.saveData(READ_STATUS_FILE, readStatusData);
         return readStatus;
     }
 
     @Override
     public void delete(UUID id) {
         readStatusData.remove(id);
-        saveLoadHandler.saveData(READ_STATUS_FILE, readStatusData);
     }
 
     @Override

@@ -10,3 +10,4 @@ discodeit:
       binaryContent: binaryContents.ser
       readStatus: readStatuses.ser
       userStatus: userStatuses.ser
+

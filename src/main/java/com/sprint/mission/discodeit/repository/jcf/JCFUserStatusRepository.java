@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository.file;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -9,22 +9,14 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileUserStatusRepository implements UserStatusRepository {
-    private final String USER_STATUS_FILE;
-    private final Map<UUID,UserStatus> userStatusData;
-    private final SaveLoadHandler<UserStatus> saveLoadHandler;
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+public class JCFUserStatusRepository implements UserStatusRepository {
+    private final Map<UUID,UserStatus> userStatusData = new HashMap<>();
 
-    public FileUserStatusRepository(@Value("${discodeit.repository.file.userStatus}") String fileName, SaveLoadHandler<UserStatus> saveLoadHandler) {
-        this.USER_STATUS_FILE = fileName;
-        this.saveLoadHandler = saveLoadHandler;
-        userStatusData = saveLoadHandler.loadData(USER_STATUS_FILE);
-    }
 
     @Override
     public UserStatus save(UserStatus userStatus) {
         userStatusData.put(userStatus.getId(), userStatus);
-        saveLoadHandler.saveData(USER_STATUS_FILE, userStatusData);
         return userStatus;
     }
 
@@ -53,7 +45,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
         UserStatus userStatusNullable = userStatusData.get(id);
         UserStatus userStatus = Optional.ofNullable(userStatusNullable).orElseThrow(() -> new NoSuchElementException(id + "가 존재하지 않습니다."));
         userStatus.updateLastLogin();
-        saveLoadHandler.saveData(USER_STATUS_FILE, userStatusData);
 
         return userStatus;
     }
@@ -64,6 +55,5 @@ public class FileUserStatusRepository implements UserStatusRepository {
             throw new NoSuchElementException("유저 " + id + "가 존재하지 않습니다.");
         }
         userStatusData.remove(id);
-        saveLoadHandler.saveData(USER_STATUS_FILE, userStatusData);
     }
 }

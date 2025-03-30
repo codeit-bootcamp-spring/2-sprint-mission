@@ -1,13 +1,21 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.channelService.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.file.SaveLoadHandler;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channelData = new HashMap<>();
+    private final Map<UUID,Channel> channelData = new HashMap<>();
+
+
+
 
     @Override
     public Channel save(Channel channel) {
@@ -32,6 +40,5 @@ public class JCFChannelRepository implements ChannelRepository {
             throw new NoSuchElementException("채널 " + id + "가 존재하지 않습니다.");
         }
         channelData.remove(id);
-
     }
 }

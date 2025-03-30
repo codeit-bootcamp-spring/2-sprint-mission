@@ -55,7 +55,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserFindDto findWithStatus(UUID id) {
         User user = userRepository.findById(id);
-        UserStatus userStatus = userStatusRepository.findById(id);
+        UserStatus userStatus = userStatusRepository.findByUserId(id);
         return new UserFindDto(user, userStatus);
     }
 
@@ -99,7 +99,7 @@ public class BasicUserService implements UserService {
         if(userRepository.findById(userId).getProfileId() !=null) {
             binaryContentRepository.delete(userRepository.findById(userId).getProfileId());
         }
-        userStatusRepository.findById(userId);
+        userStatusRepository.findByUserId(userId);
         userRepository.delete(userId);
 
     }

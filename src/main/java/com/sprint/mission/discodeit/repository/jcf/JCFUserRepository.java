@@ -2,12 +2,17 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.SaveLoadHandler;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> userData = new HashMap<>();
-
+    private final Map<UUID, User> userData = new  HashMap<>();
 
     @Override
     public User save(User user) {
@@ -36,6 +41,9 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void delete(UUID id) {
+        if(!userData.containsKey(id)){
+            throw new NoSuchElementException("유저 " + id + "가 존재하지 않습니다.");
+        }
         userData.remove(id);
     }
 }
