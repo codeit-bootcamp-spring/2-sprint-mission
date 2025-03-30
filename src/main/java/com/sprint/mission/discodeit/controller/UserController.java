@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.DTO.User.UserCreateRequest;
 import com.sprint.mission.discodeit.DTO.User.UserDto;
 import com.sprint.mission.discodeit.DTO.User.UserUpdateRequest;
 import com.sprint.mission.discodeit.DTO.UserStatus.UpdateUserStatusDto;
-import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserNotFound;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -50,11 +50,11 @@ public class UserController {
 
     //사용자 온라인 상태 업데이트
     @RequestMapping(method = RequestMethod.PATCH, value = "/{id}/status")
-    public UserStatusDto updateOnlineStatus(@PathVariable UUID id, @RequestBody UpdateUserStatusDto statusDto){
+    public UserStatus updateOnlineStatus(@PathVariable UUID id, @RequestBody UpdateUserStatusDto statusDto){
         if (!userService.exists(id)) {
             throw new UserNotFound("User not found: " + id);
         }
-        return userStatusService.update(statusDto);
+        return userStatusService.update(id, statusDto);
     }
 
     //사용자 목록 조회

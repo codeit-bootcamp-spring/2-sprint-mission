@@ -24,11 +24,11 @@ public class UserStatus implements Serializable {
     @Setter
     private Status status;
 
-    public UserStatus(UUID userId, Status online) {
+    public UserStatus(UUID userId, Instant lastActivatedAt) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.userId = userId;
-        this.lastActivatedAt = null;
+        this.lastActivatedAt = lastActivatedAt;
     }
 
     public void updateLastActivatedAt(Instant newLastActivatedAt) {
@@ -58,6 +58,5 @@ public class UserStatus implements Serializable {
         return isCurrentlyOnline() ? Status.ONLINE : Status.OFFLINE;
     }
 
-    public boolean getCurrentOnline() { return isCurrentlyOnline(); }
 
 }

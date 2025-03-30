@@ -33,11 +33,6 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User update(User user) {
-        return save(user);
-    }
-
-    @Override
     public void delete(UUID userId) {
         Map<UUID, User> users = loadUsers();
         users.remove(userId);
@@ -110,5 +105,14 @@ public class FileUserRepository implements UserRepository {
         }
         return false;
     }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        Map<UUID, User> users = loadUsers();
+        return users.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
 }
 
