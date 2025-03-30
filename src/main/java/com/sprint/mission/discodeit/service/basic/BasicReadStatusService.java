@@ -5,10 +5,7 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusReadResponse;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.common.NoSuchIdException;
-import com.sprint.mission.discodeit.exception.readstatus.CreateReadStatusException;
-import com.sprint.mission.discodeit.exception.readstatus.DuplicateReadStatusException;
-import com.sprint.mission.discodeit.exception.readstatus.NoSuchReadStatusException;
-import com.sprint.mission.discodeit.exception.readstatus.UpdateReadStatusException;
+import com.sprint.mission.discodeit.exception.readstatus.*;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -62,9 +59,15 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatusReadResponse findReadStatusByUserIdChannelID(UUID userId, UUID channelId) {
-        ReadStatus readStatus = this.readStatusRepository.findByUserIdChannelId(userId, channelId)
-                                                        .orElseThrow(()->new NoSuchReadStatusException("해당 readStatus가 존재하지 않습니다", HttpStatus.NOT_FOUND));
-        return new ReadStatusReadResponse(readStatus.getUserId(), readStatus.getChannelId(), readStatus.getReadTime());
+        try {
+            ReadStatus readStatus = this.readStatusRepository.findByUserIdChannelId(userId, channelId)
+                    .orElseThrow(() -> new NoSuchReadStatusException("해당 readStatus가 존재하지 않습니다", HttpStatus.NOT_FOUND));
+            return new ReadStatusReadResponse(readStatus.getUserId(), readStatus.getChannelId(), readStatus.getReadTime());
+        } catch (NoSuchReadStatusException e) {
+            throw new FindReadStatusException(e.getMessage(), e.getStatus(), e);
+        } catch (Exception e) {
+            throw new FindReadStatusException("해당 ReadStatus를 찾는 중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @Override
