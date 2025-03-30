@@ -40,8 +40,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserResult> findAll() {
-        return userService.findAll();
+    public ResponseEntity<List<UserResult>> findAll() {
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @PutMapping("/{userId}")
