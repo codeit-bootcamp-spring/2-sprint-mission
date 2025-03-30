@@ -23,13 +23,13 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success());
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<ApiResponse<Void>> update(@RequestBody UpdateUserParamDto updateUserParamDto) {
         userService.update(updateUserParamDto);
         return ResponseEntity.ok(ApiResponse.success());
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<ApiResponse<Void>> delete(@RequestBody DeleteUserRequestDto deleteUserRequestDto) {
         userService.delete(deleteUserRequestDto);
         return ResponseEntity.ok(ApiResponse.success());
@@ -41,7 +41,7 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(findUserDtoList));
     }
 
-    @PostMapping("/update-user-status")
+    @PutMapping("/update-user-status")
     public ResponseEntity<ApiResponse<Void>> updateUserStatus(@RequestBody UpdateUserStatusByUserIdParamDto updateUserStatusByUserIdParamDto) {
         userStatusService.updateByUserId(updateUserStatusByUserIdParamDto);
         return ResponseEntity.ok(ApiResponse.success());

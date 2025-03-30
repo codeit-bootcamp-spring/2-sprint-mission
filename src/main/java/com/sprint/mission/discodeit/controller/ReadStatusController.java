@@ -4,10 +4,7 @@ import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,8 +21,8 @@ public class ReadStatusController {
         return ResponseEntity.ok(ApiResponse.success());
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<?> update(@RequestBody UpdateReadStatusParamDto updateReadStatusParamDto) {
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse<Void>> update(@RequestBody UpdateReadStatusParamDto updateReadStatusParamDto) {
         readStatusService.update(updateReadStatusParamDto);
         return ResponseEntity.ok(ApiResponse.success());
     }

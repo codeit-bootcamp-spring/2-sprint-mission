@@ -33,13 +33,13 @@ public class ChannelController {
         return ResponseEntity.ok(ApiResponse.success(saveChannelDto));
     }
 
-    @GetMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<ApiResponse<Void>> update(@ModelAttribute UpdateChannelParamDto updateChannelParamDto) {
         channelService.updateChannel(updateChannelParamDto);
         return ResponseEntity.ok(ApiResponse.success());
     }
 
-    @GetMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<ApiResponse<Void>> delete(
             @RequestParam UUID channelUUID
     ) {

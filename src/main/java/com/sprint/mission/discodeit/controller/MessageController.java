@@ -25,13 +25,13 @@ public class MessageController {
         return ResponseEntity.ok(ApiResponse.success());
     }
 
-    @GetMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<ApiResponse<Void>> update(@ModelAttribute UpdateMessageParamDto updateMessageParamDto) {
         messageService.updateMessage(updateMessageParamDto);
         return ResponseEntity.ok(ApiResponse.success());
     }
 
-    @GetMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<ApiResponse<Void>> delete(
             @RequestParam UUID messageUUID
     ) {
