@@ -119,7 +119,7 @@
   - 컨트롤러 : Request/Response
   - Service 응답 : Info/Result
 - [ ] UserStatues Dto, 안에 메서드 넣어 놓은 부분 수정
-- [ ] serialVersionUID 수정
+- [x] serialVersionUID 수정
 - [ ] loadAndSave 수정 : 문제 - 같은 동작을 하는 메서드2개 정의
 - [ ] Repository는
   - 조회 (Read)
