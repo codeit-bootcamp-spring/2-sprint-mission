@@ -70,16 +70,6 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void updateName(UUID id, String name) {
-        loadAndSave(userPath, (Map<UUID, User> users) -> {
-                    User user = users.get(id);
-                    user.updateName(name);
-                    return null;
-                }
-        );
-    }
-
-    @Override
     public void delete(UUID id) {
         loadAndSave(userPath, (Map<UUID, User> users) ->
                 users.remove(id)

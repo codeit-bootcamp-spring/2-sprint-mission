@@ -60,15 +60,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus update(UUID userStatusId) {
-        return loadAndSave(userStatusPath, (Map<UUID, UserStatus> userStatuses) -> {
-            UserStatus userStatus = userStatuses.get(userStatusId);
-            userStatus.updateLastLoginAt();
-            return userStatus;
-        });
-    }
-
-    @Override
     public void delete(UUID id) {
         loadAndSave(userStatusPath, (Map<UUID, UserStatus> userStatuses) ->
                 userStatuses.remove(id)

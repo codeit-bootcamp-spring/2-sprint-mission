@@ -40,14 +40,6 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus update(UUID userStatusId) {
-        UserStatus userStatus = userStatuses.get(userStatusId);
-        userStatus.updateLastLoginAt();
-
-        return userStatus;
-    }
-
-    @Override
     public void delete(UUID id) {
         userStatuses.remove(id);
     }

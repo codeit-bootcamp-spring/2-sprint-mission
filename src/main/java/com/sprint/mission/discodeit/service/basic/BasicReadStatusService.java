@@ -45,7 +45,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusResult find(UUID readStatusId) {
+    public ReadStatusResult findByReadStatusId(UUID readStatusId) {
         ReadStatus readStatus = readStatusRepository.find(readStatusId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Id의 객체가 없습니다."));
 
@@ -60,8 +60,13 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatusResult updateLastReadTime(UUID readStatusId) {
-        ReadStatus readStatus = readStatusRepository.updateLastReadTime(readStatusId);
-        return ReadStatusResult.fromEntity(readStatus);
+        ReadStatus readStatus = readStatusRepository.find(readStatusId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 Id의 객체가 없습니다."));
+
+        readStatus.updateLastReadTime();
+        ReadStatus savedReadStatus = readStatusRepository.save(readStatus);
+
+        return ReadStatusResult.fromEntity(savedReadStatus);
     }
 
     @Override

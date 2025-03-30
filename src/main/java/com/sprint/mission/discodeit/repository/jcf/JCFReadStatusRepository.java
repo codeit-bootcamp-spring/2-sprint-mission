@@ -41,14 +41,6 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus updateLastReadTime(UUID readStatusId) {
-        ReadStatus readStatus = readStatuses.get(readStatusId);
-        readStatus.updateLastReadTime();
-
-        return readStatus;
-    }
-
-    @Override
     public void delete(UUID readStatusId) {
         readStatuses.remove(readStatusId);
     }

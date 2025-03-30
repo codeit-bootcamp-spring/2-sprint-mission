@@ -43,13 +43,6 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message updateContext(UUID id, String context) {
-        messages.get(id).updateContext(context);
-
-        return messages.get(id);
-    }
-
-    @Override
     public void delete(UUID id) {
         messages.remove(id);
     }

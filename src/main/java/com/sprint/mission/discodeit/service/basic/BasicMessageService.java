@@ -52,8 +52,12 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageResult updateContext(UUID id, String context) {
-        Message message = messageRepository.updateContext(id, context);
-        return MessageResult.fromEntity(message, UserResult.fromEntity(findMessageUser(message)));
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
+        message.updateContext(context);
+        Message savedMessage = messageRepository.save(message);
+
+        return MessageResult.fromEntity(savedMessage, UserResult.fromEntity(findMessageUser(savedMessage)));
     }
 
     @Override

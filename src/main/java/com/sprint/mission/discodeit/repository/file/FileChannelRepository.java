@@ -50,16 +50,6 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel updateName(UUID id, String name) {
-        return loadAndSave(channelPath, (Map<UUID, Channel> channels) -> {
-                    Channel channel = channels.get(id);
-                    channel.updateName(name);
-                    return channel;
-                }
-        );
-    }
-
-    @Override
     public void delete(UUID id) {
         loadAndSave(channelPath, (Map<UUID, Channel> channels) ->
                 channels.remove(id)

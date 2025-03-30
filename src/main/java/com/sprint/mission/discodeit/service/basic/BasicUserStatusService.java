@@ -34,9 +34,9 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResult find(UUID userStatusId) {
+    public UserStatusResult findByStautsId(UUID userStatusId) {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저상태가 존재하지 않습니다."));
 
         return UserStatusResult.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
     }
@@ -58,10 +58,14 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResult update(UUID userStatusId) {
-        UserStatus userStatus = userStatusRepository.update(userStatusId);
+    public UserStatusResult updateByStatusId(UUID userStatusId) {
+        UserStatus userStatus = userStatusRepository.findById(userStatusId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저상태가 존재하지 않습니다."));
 
-        return UserStatusResult.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
+        userStatus.updateLastLoginAt();
+        UserStatus savedUserStatus = userStatusRepository.save(userStatus);
+
+        return UserStatusResult.fromEntity(savedUserStatus, savedUserStatus.isLogin(ZonedDateTime.now().toInstant()));
     }
 
     @Override

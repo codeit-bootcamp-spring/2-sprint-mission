@@ -17,7 +17,5 @@ public interface UserRepository {
 
     List<User> findAll();
 
-    void updateName(UUID id, String name);
-
     void delete(UUID id);
 }

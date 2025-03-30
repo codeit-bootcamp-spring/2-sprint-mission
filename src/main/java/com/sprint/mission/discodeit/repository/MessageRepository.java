@@ -14,8 +14,6 @@ public interface MessageRepository {
 
     List<Message> findAll();
 
-    Message updateContext(UUID id, String context);
-
     void delete(UUID id);
 
     void deleteByChannelId(UUID channelId);

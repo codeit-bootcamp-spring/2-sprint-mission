@@ -10,7 +10,7 @@ public interface ReadStatusService {
 
     List<ReadStatusResult> findByChannelId(UUID channelId);
 
-    ReadStatusResult find(UUID readStatusId);
+    ReadStatusResult findByReadStatusId(UUID readStatusId);
 
     List<ReadStatusResult> findAllByUserId(UUID useId);
 

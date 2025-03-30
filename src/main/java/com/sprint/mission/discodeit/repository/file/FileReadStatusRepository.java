@@ -59,16 +59,6 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus updateLastReadTime(UUID readStatusId) {
-        return loadAndSave(readStatusPath, (Map<UUID, ReadStatus> readStatuses) -> {
-                    ReadStatus readStatus = readStatuses.get(readStatusId);
-                    readStatus.updateLastReadTime();
-                    return readStatus;
-                }
-        );
-    }
-
-    @Override
     public void delete(UUID readStatusId) {
         loadAndSave(readStatusPath, (Map<UUID, ReadStatus> readStatuses) ->
                 readStatuses.remove(readStatusId)

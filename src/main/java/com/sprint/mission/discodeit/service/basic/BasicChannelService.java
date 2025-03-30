@@ -86,8 +86,9 @@ public class BasicChannelService implements ChannelService {
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             throw new IllegalArgumentException("Private 파일은 수정할 수 없습니다.");
         }
+        channel.updateName(name);
 
-        Channel updatedChannel = channelRepository.updateName(id, name);
+        Channel updatedChannel = channelRepository.save(channel);
         Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId());
 
         return ChannelRequest.fromPublic(updatedChannel, lastMessageCreatedAt);
@@ -95,6 +96,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void delete(UUID channelId) {
+        // TODO: 3/30/25 서비스 로직에서 수정바람
         channelRepository.delete(channelId);
         readStatusRepository.deleteByChannelId(channelId);
         messageRepository.deleteByChannelId(channelId);

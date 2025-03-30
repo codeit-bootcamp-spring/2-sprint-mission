@@ -48,16 +48,6 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message updateContext(UUID id, String context) {
-        return loadAndSave(messagePath, (Map<UUID, Message> messages) -> {
-                    Message message = messages.get(id);
-                    message.updateContext(context);
-                    return message;
-                }
-        );
-    }
-
-    @Override
     public void delete(UUID id) {
         loadAndSave(messagePath, (Map<UUID, Message> messages) ->
                 messages.remove(id)

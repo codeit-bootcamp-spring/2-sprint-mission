@@ -80,7 +80,11 @@ public class BasicUserService implements UserService {
 
     @Override
     public void updateName(UUID userId, String name) {
-        userRepository.updateName(userId, name);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+        user.updateName(name);
+
+        userRepository.save(user);
     }
 
     @Override

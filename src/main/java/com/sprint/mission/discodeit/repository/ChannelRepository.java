@@ -13,7 +13,5 @@ public interface ChannelRepository {
 
     List<Channel> findAll();
 
-    Channel updateName(UUID id, String name);
-
     void delete(UUID id);
 }
