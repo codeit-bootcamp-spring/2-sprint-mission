@@ -3,13 +3,15 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.handler.custom.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.handler.custom.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.handler.custom.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,8 +30,10 @@ public class BasicMessageService implements MessageService {
         try {
             userService.findById(messageCreateDto.authorId());
             channelService.findById(messageCreateDto.channelId());
-        } catch (NoSuchElementException e) {
-            throw new RuntimeException("Message 생성 실패: " + e.getMessage());
+        } catch (UserNotFoundException e) {
+            throw new UserNotFoundException("Message 생성 실패: " + e.getMessage());
+        } catch (ChannelNotFoundException e) {
+            throw new ChannelNotFoundException("Message 생성 실패: " + e.getMessage());
         }
 
         Message newMessage = new Message(messageCreateDto.authorId(), messageCreateDto.channelId(),
@@ -43,7 +47,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId);
 
         if (message == null) {
-            throw new NoSuchElementException(messageId + " 메시지를 찾을 수 없습니다.");
+            throw new MessageNotFoundException(messageId + " 메시지를 찾을 수 없습니다.");
         }
 
         return message;
