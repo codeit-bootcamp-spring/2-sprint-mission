@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.common.NoSuchIdException;
 import com.sprint.mission.discodeit.exception.message.CreateMessageException;
+import com.sprint.mission.discodeit.exception.message.UpdateMessageException;
 import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.provider.MessageUpdaterProvider;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -86,14 +87,23 @@ public class BasicMessageService implements MessageService {
     // binaryContent를 업데이트할지 다음 미션의 컨트롤러에서 결정할 것!
     @Override
     public void updateMessage(UUID id, MessageUpdateRequest messageUpdateRequest) {
-        Message findMessage = this.messageRepository.findById(id);
-        for(UUID attachmentId : messageUpdateRequest.attachmentIds()) {
-            if (!binaryContentService.existsById(attachmentId)) {
-                throw new NoSuchElementException("해당 Id가 binaryContentRepository에 존재하지 않습니다 : " + attachmentId);
+        try {
+            Message findMessage = this.messageRepository.findById(id);
+            for (UUID attachmentId : messageUpdateRequest.attachmentIds()) {
+                if (!binaryContentService.existsById(attachmentId)) {
+                    throw new NoSuchElementException("해당 Id가 binaryContentRepository에 존재하지 않습니다 : " + attachmentId);
+                }
             }
+            List<MessageUpdater> applicableUpdaters = messageUpdaterProvider.getApplicableUpdaters(findMessage, messageUpdateRequest);
+            applicableUpdaters.forEach(updater -> updater.update(id, messageUpdateRequest, this.messageRepository));
+        } catch (NoSuchIdException e) {
+            throw new UpdateMessageException(e.getMessage(), HttpStatus.NOT_FOUND, e);
+        } catch (NoSuchElementException e) {
+            throw new UpdateMessageException(e.getMessage(), HttpStatus.NOT_FOUND, e);
         }
-        List<MessageUpdater> applicableUpdaters = messageUpdaterProvider.getApplicableUpdaters(findMessage, messageUpdateRequest);
-        applicableUpdaters.forEach(updater -> updater.update(id, messageUpdateRequest, this.messageRepository));
+        catch (Exception e) {
+            throw new UpdateMessageException("메세지 업데이트 도중 알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @Override
