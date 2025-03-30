@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.SaveUserStatusParamDto;
-import com.sprint.mission.discodeit.dto.UpdateUserStatusByUserIdParamDto;
 import com.sprint.mission.discodeit.dto.UpdateUserStatusParamDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -50,8 +49,8 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void updateByUserId(UpdateUserStatusByUserIdParamDto updateUserStatusByUserIdParamDto) {
-        User user = userRepository.findUserById(updateUserStatusByUserIdParamDto.id())
+    public void updateByUserId(UUID userId) {
+        User user = userRepository.findUserById(userId)
                         .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new NoSuchElementException("사용자 상태 수정 오류"));
