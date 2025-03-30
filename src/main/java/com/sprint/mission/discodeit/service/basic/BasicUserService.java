@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.UserReadResponse;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.CreateUserException;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateUserNameException;
 import com.sprint.mission.discodeit.exception.binarycontent.FileFindException;
@@ -35,21 +36,31 @@ public class BasicUserService implements UserService {
     // 이 부분도 createMessage처럼 컨트롤러에서 createBinaryContent 와 userCreate을 분리하는게 좋을듯
     @Override
     public UUID createUser(UserCreateRequest userCreateRequest) {
-        if (userRepository.existsByUserName(userCreateRequest.userName())) {
-            throw new DuplicateUserNameException("해당 userName이 이미 존재합니다." + userCreateRequest.userName(), HttpStatus.CONFLICT);
+        try {
+            if (userRepository.existsByUserName(userCreateRequest.userName())) {
+                throw new DuplicateUserNameException("해당 userName이 이미 존재합니다." + userCreateRequest.userName(), HttpStatus.CONFLICT);
+            }
+            if (userRepository.existsByEmail(userCreateRequest.userEmail())) {
+                throw new DuplicateEmailException("해당 userEmail이 이미 존재합니다." + userCreateRequest.userEmail(), HttpStatus.CONFLICT);
+            }
+            if (!binaryContentService.existsById(userCreateRequest.profileId())) {
+                throw new FileFindException("해당 id를 가진 binaryContent가 존재하지 않습니다." + userCreateRequest.profileId().toString(), HttpStatus.NOT_FOUND);
+            }
+            User newUser = new User(userCreateRequest.userName(), userCreateRequest.userEmail(), userCreateRequest.password(), userCreateRequest.profileId()); //각 요소에 대한 유효성 검증은 User 생성자에게 맡긴다
+            this.userRepository.add(newUser);
+            this.readStatusRepository.addUserIdMap(newUser.getId());
+            UserStatus newUserStatus = new UserStatus(newUser.getId());
+            this.userStatusRepository.add(newUserStatus);
+            return newUser.getId();
+        } catch (DuplicateUserNameException e) {
+            throw new CreateUserException(e.getMessage(), e.getStatus(), e);
+        } catch (DuplicateEmailException e) {
+            throw new CreateUserException(e.getMessage(), e.getStatus(), e);
+        } catch (FileFindException e) {
+            throw new CreateUserException(e.getMessage(), e.getStatus(), e);
+        } catch (Exception e) {
+            throw new CreateUserException("유저 생성 중 예상치 못한 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
         }
-        if (userRepository.existsByEmail(userCreateRequest.userEmail())) {
-            throw new DuplicateEmailException("해당 userEmail이 이미 존재합니다." + userCreateRequest.userEmail(), HttpStatus.CONFLICT);
-        }
-        if (!binaryContentService.existsById(userCreateRequest.profileId())) {
-            throw new FileFindException("해당 id를 가진 binaryContent가 존재하지 않습니다." + userCreateRequest.profileId().toString(), HttpStatus.NOT_FOUND);
-        }
-        User newUser = new User(userCreateRequest.userName(), userCreateRequest.userEmail(), userCreateRequest.password(), userCreateRequest.profileId()); //각 요소에 대한 유효성 검증은 User 생성자에게 맡긴다
-        this.userRepository.add(newUser);
-        this.readStatusRepository.addUserIdMap(newUser.getId());
-        UserStatus newUserStatus = new UserStatus(newUser.getId());
-        this.userStatusRepository.add(newUserStatus);
-        return newUser.getId();
     }
 
     @Override
