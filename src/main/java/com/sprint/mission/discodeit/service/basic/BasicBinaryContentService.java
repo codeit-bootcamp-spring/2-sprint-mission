@@ -8,14 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
-
-import static com.sprint.mission.discodeit.constant.FilePath.IMAGE_STORAGE_DIRECTORY;
-import static com.sprint.mission.discodeit.constant.FilePath.JPG_EXTENSION;
-import static com.sprint.mission.discodeit.util.FileUtils.deleteImageFileFromPath;
-import static com.sprint.mission.discodeit.util.FileUtils.saveImageFileToPath;
 
 @Service
 @RequiredArgsConstructor
@@ -26,13 +20,10 @@ public class BasicBinaryContentService implements BinaryContentService {
         if (multipartFile == null) {
             return null;
         }
-        // TODO: 3/30/25  수정바람
-        Path imageFile = IMAGE_STORAGE_DIRECTORY.resolve(UUID.randomUUID() + JPG_EXTENSION);
-        saveImageFileToPath(multipartFile, imageFile);
 
-        BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(imageFile));
+        BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(multipartFile));
 
-        return binaryContent.getId();
+        return savedBinaryContent.getId();
     }
 
     @Override
@@ -52,11 +43,6 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public void delete(UUID id) {
-        BinaryContent binaryContent = binaryContentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
-
-        // TODO: 3/30/25 수정 바람
-        deleteImageFileFromPath(Path.of(binaryContent.getPath()));
         binaryContentRepository.delete(id);
     }
 }

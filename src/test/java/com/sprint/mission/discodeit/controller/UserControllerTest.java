@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.application.dto.user.UserRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResponse;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -24,8 +24,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static com.sprint.mission.discodeit.constant.MessageInfo.MESSAGE_CONTENT;
 import static com.sprint.mission.discodeit.constant.SetUpUserInfo.LOGIN_USER;
@@ -62,7 +60,7 @@ class UserControllerTest {
 
     @DisplayName("프로필 사진을 저장하면 파일 저장 경로를 반환한다.")
     @Test
-    void register() throws IOException {
+    void register() {
         byte[] binaryProfileImage = loadImageFileFromResource("dog.jpg");
         MockMultipartFile file = new MockMultipartFile(
                 MediaType.IMAGE_JPEG_VALUE,
@@ -73,10 +71,9 @@ class UserControllerTest {
                 OTHER_USER.getPassword());
 
         UserResult user = userController.register(userRequest, file);
-        BinaryContent binaryContent = binaryContentRepository.findById(user.profileId()).get();
+        BinaryContentResult binaryContentResult = binaryContentService.findById(user.profileId());
 
-        byte[] storedFileBytes = Files.readAllBytes(Path.of(binaryContent.getPath()));
-        assertThat(binaryProfileImage).isEqualTo(storedFileBytes);
+        assertThat(binaryProfileImage).isEqualTo(binaryContentResult.bytes());
     }
 
     @DisplayName("처음 등록한 유저의 로그인 상태는 false를 반환한다.")
@@ -91,7 +88,7 @@ class UserControllerTest {
 
     @DisplayName("사용자 프로필 이미지를 업데이트하면 변경된 이미지 정보가 반영된다.")
     @Test
-    void updateProfileImage() throws IOException {
+    void updateProfileImage() {
         byte[] existingProfileImage = loadImageFileFromResource("dog.jpg");
         MockMultipartFile file = new MockMultipartFile(
                 MediaType.IMAGE_JPEG_VALUE,
@@ -110,10 +107,9 @@ class UserControllerTest {
         );
         UserResult profileImageUpdatedUser = userController.updateProfile(user.id(), otherFile);
 
-        BinaryContent binaryContent = binaryContentRepository.findById(profileImageUpdatedUser.profileId()).get();
-        byte[] storedFileBytes = Files.readAllBytes(Path.of(binaryContent.getPath()));
+        BinaryContentResult binaryContentResult = binaryContentService.findById(profileImageUpdatedUser.profileId());
 
-        assertThat(updatedProfileImage).isEqualTo(storedFileBytes);
+        assertThat(updatedProfileImage).isEqualTo(binaryContentResult.bytes());
     }
 
     @DisplayName("유저 삭제 시 프로필 이미지와 UserStatus도 삭제된다.")

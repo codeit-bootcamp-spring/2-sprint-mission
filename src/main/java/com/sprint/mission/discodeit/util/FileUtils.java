@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.util;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,15 +43,6 @@ public final class FileUtils {
         }
     }
 
-    public static void saveImageFileToPath(MultipartFile multipartFile, Path imageFilePath) {
-        try {
-            init(imageFilePath);
-            Files.write(imageFilePath, multipartFile.getBytes());
-        } catch (IOException e) {
-            throw new UncheckedIOException("프로필이미지 파일을 저장할 수 없습니다.", e);
-        }
-    }
-
     private static <U, T> Map<U, T> deserializeFromFile(Path filePath) {
         try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
             Object object = objectInputStream.readObject();
@@ -84,7 +73,6 @@ public final class FileUtils {
             throw new UncheckedIOException("파일에 저장하는 작업을 실패했습니다.", e);
         }
     }
-
 
     private static void creatDirectory(Path directory) {
         try {

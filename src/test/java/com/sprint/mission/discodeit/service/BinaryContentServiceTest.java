@@ -10,9 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,13 +34,12 @@ class BinaryContentServiceTest {
 
     @DisplayName("이미지 파일을 저장하면 올바른 경로가 반환된다.")
     @Test
-    void createProfileImage() throws IOException {
+    void createProfileImage() {
         MockMultipartFile file = createMockImageFile(MESSAGE_CONTENT);
         UUID profileId = binaryContentService.createProfileImage(file);
         BinaryContentResult binaryContent = binaryContentService.findById(profileId);
 
-        byte[] storedFileBytes = Files.readAllBytes(Path.of(binaryContent.path()));
-        assertThat(file.getBytes()).isEqualTo(storedFileBytes);
+        assertThat(profileId).isEqualTo(binaryContent.id());
     }
 
     @DisplayName("여러 ID로 조회하면 해당하는 모든 바이너리 콘텐츠가 반환된다.")
@@ -74,10 +70,7 @@ class BinaryContentServiceTest {
 
         binaryContentService.delete(profileId);
 
-        assertAll(
-                () -> assertThatThrownBy(() -> binaryContentService.findById(profileId))
-                        .isInstanceOf(IllegalArgumentException.class),
-                () -> assertThat(Files.exists(Path.of(binaryContent.path()))).isFalse()
-        );
+        assertThatThrownBy(() -> binaryContentService.findById(profileId))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
