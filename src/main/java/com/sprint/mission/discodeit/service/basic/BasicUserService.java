@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
@@ -16,6 +17,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +31,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(UserCreateDto userCreateDto) {
+    public User create(UserCreateDto userCreateDto, Optional<BinaryContentCreateDto> binaryContentCreateDto) {
         List<User> users = userRepository.findAll();
 
         boolean isEmailExist = users.stream().anyMatch(user -> user.getEmail().equals(userCreateDto.email()));
@@ -42,7 +44,18 @@ public class BasicUserService implements UserService {
             throw new UserNameAlreadyExistsException(userCreateDto.username() + " 이름은 이미 가입되었습니다.");
         }
 
-        User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password());
+        UUID nullableProfileId = binaryContentCreateDto
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytesImage();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
+
+        User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(),
+                nullableProfileId);
         userRepository.save(newUser);
         userStatusService.create(new UserStatusCreateDto(newUser.getId(), Instant.MIN));
 

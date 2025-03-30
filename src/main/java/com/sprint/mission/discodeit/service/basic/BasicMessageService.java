@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.handler.custom.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.handler.custom.message.MessageNotFoundException;
@@ -26,7 +28,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message create(MessageCreateDto messageCreateDto) {
+    public Message create(MessageCreateDto messageCreateDto, List<BinaryContentCreateDto> binaryContentCreateDtos) {
         try {
             userService.findById(messageCreateDto.authorId());
             channelService.findById(messageCreateDto.channelId());
@@ -36,8 +38,20 @@ public class BasicMessageService implements MessageService {
             throw new ChannelNotFoundException("Message 생성 실패: " + e.getMessage());
         }
 
+        List<UUID> attachmentIds = binaryContentCreateDtos.stream()
+                .map(attachmentRequest -> {
+                    String fileName = attachmentRequest.fileName();
+                    String contentType = attachmentRequest.contentType();
+                    byte[] bytes = attachmentRequest.bytesImage();
+
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+                    return createdBinaryContent.getId();
+                })
+                .toList();
+
         Message newMessage = new Message(messageCreateDto.authorId(), messageCreateDto.channelId(),
-                messageCreateDto.content(), messageCreateDto.attachmentIds());
+                messageCreateDto.content(), attachmentIds);
 
         return messageRepository.save(newMessage);
     }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.BaseResponseDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
@@ -8,16 +9,21 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,9 +33,29 @@ public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<BaseResponseDto> createUser(@RequestBody UserCreateDto userCreateDto) {
-        User user = userService.create(userCreateDto);
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BaseResponseDto> createUser(@RequestPart("user") UserCreateDto userCreateDto,
+                                                      @RequestPart(value = "file", required = false) MultipartFile file) {
+
+        Optional<BinaryContentCreateDto> optionalBinaryContent = Optional.empty();
+
+        if (file != null && !file.isEmpty()) {
+            try {
+                BinaryContentCreateDto dto = new BinaryContentCreateDto(
+                        file.getOriginalFilename(),
+                        file.getSize(),
+                        file.getContentType(),
+                        file.getBytes()
+                );
+                optionalBinaryContent = Optional.of(dto);
+            } catch (IOException e) {
+                return ResponseEntity.internalServerError()
+                        .body(BaseResponseDto.failure("파일 처리 중 오류가 발생했습니다: " + e.getMessage()));
+            }
+        }
+
+        User user = userService.create(userCreateDto, optionalBinaryContent);
+
         return ResponseEntity.ok(BaseResponseDto.success(user.getId() + " 유저 등록이 완료되었습니다."));
     }
 
