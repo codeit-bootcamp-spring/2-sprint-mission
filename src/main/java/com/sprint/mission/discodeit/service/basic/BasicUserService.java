@@ -30,6 +30,12 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDTO create(CreateUserDTO createUserDTO) {
+        // 동일한 username을 가진 사용자가 존재하는지 확인
+        Optional<User> existingUser = userRepository.findByUsername(createUserDTO.getUsername());
+        if (existingUser.isPresent()) {
+            throw new IllegalStateException("User already exists with username: " + createUserDTO.getUsername());
+        }
+
         User user = new User(createUserDTO.getUsername(), createUserDTO.getEmail(), createUserDTO.getPassword());
         user = userRepository.save(user);
 
