@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: discodeit
+
+discodeit:
+  repository:
+    type: jcf   # jcf | file
+    file-directory: .discodeit
+
+logging:
+  level:
+    org.springframework: INFO
+    com.sprint.mission.discodeit: INFO
+
+
+Spring:
+  web:
+    mvc:
+      cors:
+        mappings:
+          /api/**:
+            allowed-origins: "http://localhost:63342"
+            allowed-methods: GET, POST, PUT, DELETE
+            allowed-headers:
+            allow-credentials: true
+
+server:
+  port: 8080

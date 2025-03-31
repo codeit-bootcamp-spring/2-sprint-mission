@@ -2,45 +2,49 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+@Repository
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> messageMap;
+    private final Map<UUID, Message> data;
 
     public JCFMessageRepository() {
-        messageMap = new HashMap<>();
+        this.data = new HashMap<>();
     }
 
     @Override
     public Message save(Message message) {
-        this.messageMap.put(message.getId(), message);
+        this.data.put(message.getId(), message);
         return message;
     }
 
     @Override
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
+    }
+
+    @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        List<Message> messages = new ArrayList<>();
-        for (Message message : messageMap.values()) {
-            if (message.getChannelId().equals(channelId)) {
-                messages.add(message);
-            }
-        }
-        return messages;
+        return this.data.values().stream().filter(message -> message.getChannelId().equals(channelId)).toList();
     }
 
     @Override
-    public Optional<Message> findById(UUID messageId) {
-        return Optional.ofNullable(messageMap.get(messageId));
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public boolean existsById(UUID messageId) {
-        return this.messageMap.containsKey(messageId);
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 
     @Override
-    public void deleteById(UUID messageId) {
-        this.messageMap.remove(messageId);
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(message -> this.deleteById(message.getId()));
     }
 }

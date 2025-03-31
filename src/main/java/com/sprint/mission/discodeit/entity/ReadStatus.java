@@ -7,15 +7,20 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class ReadStatus extends BaseEntity implements Serializable {
+public class ReadStatus implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    private final UUID userId;
-    private final UUID channelId;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private UUID userId;
+    private UUID channelId;
     private Instant lastReadAt;
 
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        super();
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.userId = userId;
         this.channelId = channelId;
         this.lastReadAt = lastReadAt;
@@ -27,8 +32,9 @@ public class ReadStatus extends BaseEntity implements Serializable {
             this.lastReadAt = newLastReadAt;
             anyValueUpdated = true;
         }
+
         if (anyValueUpdated) {
-            update();
+            this.updatedAt = Instant.now();
         }
     }
 }
