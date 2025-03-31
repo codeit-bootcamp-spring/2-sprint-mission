@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.user.UserRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserCreationRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -23,7 +23,7 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserResult register(UserRequest userRequest, UUID profileId) {
+    public UserResult register(UserCreationRequest userRequest, UUID profileId) {
         validateDuplicateEmail(userRequest.email());
         validateDuplicateUserName(userRequest.name());
 

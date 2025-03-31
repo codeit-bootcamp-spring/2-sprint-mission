@@ -23,7 +23,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageResult create(MessageCreationRequest messageCreationRequest, List<UUID> attachmentsIds) {
-        Message message = messageRepository.save(new Message(messageCreationRequest.context(), messageCreationRequest.chanelId(), messageCreationRequest.userId(), attachmentsIds));
+        Message message = messageRepository.save(new Message(messageCreationRequest.context(), messageCreationRequest.channelId(), messageCreationRequest.userId(), attachmentsIds));
 
         return MessageResult.fromEntity(message);
     }

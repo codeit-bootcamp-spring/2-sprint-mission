@@ -25,6 +25,10 @@ public class Channel implements Serializable {
     }
 
     public void updateName(String name) {
+        if (this.type == ChannelType.PRIVATE) {
+            throw new IllegalArgumentException("Private 파일은 수정할 수 없습니다.");
+        }
+
         this.name = name;
         updateLastModified();
     }

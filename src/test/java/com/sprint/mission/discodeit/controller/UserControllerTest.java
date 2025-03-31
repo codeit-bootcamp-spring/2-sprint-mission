@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
-import com.sprint.mission.discodeit.application.dto.user.UserRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserCreationRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResponse;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -52,7 +52,7 @@ class UserControllerTest {
     @DisplayName("프로필 사진 저장을 선택하지 않았을 때 프로필 아이디가 null을 반환한다.")
     @Test
     void registerException() {
-        UserRequest userRequest = new UserRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(),
+        UserCreationRequest userRequest = new UserCreationRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(),
                 LOGIN_USER.getPassword());
         UserResult user = userController.register(userRequest, null).getBody();
         assertThat(user.profileId()).isNull();
@@ -67,7 +67,7 @@ class UserControllerTest {
                 binaryProfileImage
         );
 
-        UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(),
+        UserCreationRequest userRequest = new UserCreationRequest(OTHER_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword());
 
         UserResult user = userController.register(userRequest, file).getBody();
@@ -79,7 +79,7 @@ class UserControllerTest {
     @DisplayName("처음 등록한 유저의 로그인 상태는 false를 반환한다.")
     @Test
     void registerValidateUserStatus() {
-        UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
+        UserCreationRequest userRequest = new UserCreationRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
         UserResult user = userController.register(userRequest, null).getBody();
         UserResponse userResponse = userController.getById(user.id()).getBody();
 
@@ -94,7 +94,7 @@ class UserControllerTest {
                 MediaType.IMAGE_JPEG_VALUE,
                 existingProfileImage
         );
-        UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(),
+        UserCreationRequest userRequest = new UserCreationRequest(OTHER_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword());
 
         UserResult user = userController.register(userRequest, file).getBody();
@@ -119,7 +119,7 @@ class UserControllerTest {
                 MediaType.IMAGE_JPEG_VALUE,
                 MESSAGE_CONTENT.getBytes()
         );
-        UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(),
+        UserCreationRequest userRequest = new UserCreationRequest(OTHER_USER.getName(), OTHER_USER.getEmail(),
                 OTHER_USER.getPassword());
 
 

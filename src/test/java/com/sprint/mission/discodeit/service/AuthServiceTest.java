@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.application.dto.auth.LoginRequest;
-import com.sprint.mission.discodeit.application.dto.user.UserRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserCreationRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -32,7 +32,7 @@ class AuthServiceTest {
         userRepository = new JCFUserRepository();
         userStatusRepository = new JCFUserStatusRepository();
         userService = new BasicUserService(userRepository, userStatusRepository);
-        userService.register(new UserRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
+        userService.register(new UserCreationRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword()), null);
         authService = new BasicAuthService(userRepository, userStatusRepository);
     }
 

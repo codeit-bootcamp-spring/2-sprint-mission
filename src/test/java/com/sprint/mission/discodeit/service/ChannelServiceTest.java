@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
-import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelCreationRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -50,7 +50,7 @@ class ChannelServiceTest {
 
         setUpUser = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
-        ChannelCreateRequest channelRegisterRequest = new ChannelCreateRequest(ChannelType.PUBLIC, CHANNEL_NAME, setUpUser.getId());
+        ChannelCreateRequest channelRegisterRequest = new ChannelCreateRequest(CHANNEL_NAME, setUpUser.getId());
         setUpChannel = channelService.createPublic(channelRegisterRequest);
     }
 
@@ -64,8 +64,8 @@ class ChannelServiceTest {
     @Test
     void createPrivateChannel() {
         User otherUser = userRepository.save(new User(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword(), null));
-        ChannelCreateRequest channelRegisterRequest = new ChannelCreateRequest(ChannelType.PUBLIC, CHANNEL_NAME, setUpUser.getId());
-        ChannelResult privateChannel = channelService.createPrivate(channelRegisterRequest, List.of(otherUser.getId()));
+        PrivateChannelCreationRequest privateChannelCreationRequest = new PrivateChannelCreationRequest(CHANNEL_NAME, setUpUser.getId(), List.of(otherUser.getId()));
+        ChannelResult privateChannel = channelService.createPrivate(privateChannelCreationRequest);
 
         List<UUID> readStatusUserIds = readStatusRepository.findByChannelId(privateChannel.id())
                 .stream()
@@ -92,8 +92,8 @@ class ChannelServiceTest {
     @DisplayName("Private 채널의 이름을 변경하려고 하면 예외가 발생한다.")
     @Test
     void updatePrivateChannelNameThrowsException() {
-        ChannelCreateRequest privateChannelDto = new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId());
-        ChannelResult privateChannel = channelService.createPrivate(privateChannelDto, new ArrayList<>());
+        PrivateChannelCreationRequest privateChannelDto = new PrivateChannelCreationRequest(CHANNEL_NAME, setUpUser.getId(), List.of());
+        ChannelResult privateChannel = channelService.createPrivate(privateChannelDto);
 
         assertThatThrownBy(() -> channelService.updatePublicChannelName(privateChannel.id(), UPDATED_CHANNEL_NAME))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -104,9 +104,9 @@ class ChannelServiceTest {
     void findAllChannelsForUser() {
         User otherUser = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
-        channelService.createPrivate(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, otherUser.getId()), new ArrayList<>());
+        channelService.createPrivate(new PrivateChannelCreationRequest(CHANNEL_NAME, otherUser.getId(), List.of()));
 
-        ChannelResult userPrivateChannel = channelService.createPrivate(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId()), new ArrayList<>());
+        ChannelResult userPrivateChannel = channelService.createPrivate(new PrivateChannelCreationRequest(CHANNEL_NAME, setUpUser.getId(), List.of()));
 
         List<UUID> setUpUserChannelIds = channelService.getAllByUserId(setUpUser.getId())
                 .stream()
@@ -141,7 +141,7 @@ class ChannelServiceTest {
     @DisplayName("비공개 채널 삭제 시 읽음 상태도 함께 삭제된다.")
     @Test
     void deletePrivateChannelRemovesReadStatus() {
-        ChannelResult privateChannel = channelService.createPrivate(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId()), new ArrayList<>());
+        ChannelResult privateChannel = channelService.createPrivate(new PrivateChannelCreationRequest(CHANNEL_NAME, setUpUser.getId(), List.of()));
 
         UUID privateChannelId = privateChannel.id();
         channelService.delete(privateChannelId);

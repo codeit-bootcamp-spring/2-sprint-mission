@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
+import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelCreationRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -30,23 +31,23 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResult createPublic(ChannelCreateRequest channelRegisterRequest) {
-        Channel channel = new Channel(channelRegisterRequest.channelType(), channelRegisterRequest.name());
+        Channel channel = new Channel(ChannelType.PUBLIC, channelRegisterRequest.channelName());
         Channel savedChannel = channelRepository.save(channel);
 
         return ChannelResult.fromPublic(savedChannel, Instant.ofEpochSecond(0));
     }
 
     @Override
-    public ChannelResult createPrivate(ChannelCreateRequest channelRegisterRequest, List<UUID> channelMemberIds) {
-        Channel channel = new Channel(channelRegisterRequest.channelType(), channelRegisterRequest.name());
+    public ChannelResult createPrivate(PrivateChannelCreationRequest privateChannelCreationRequest) {
+        Channel channel = new Channel(ChannelType.PRIVATE, privateChannelCreationRequest.channelName());
         Channel savedChannel = channelRepository.save(channel);
 
-        readStatusRepository.save(new ReadStatus(channelRegisterRequest.logInUserId(), savedChannel.getId()));
-        for (UUID memberId : channelMemberIds) {
+        readStatusRepository.save(new ReadStatus(privateChannelCreationRequest.creatorId(), savedChannel.getId()));
+        for (UUID memberId : privateChannelCreationRequest.memberIds()) {
             readStatusRepository.save(new ReadStatus(memberId, savedChannel.getId()));
         }
 
-        return ChannelResult.fromPrivate(savedChannel, Instant.ofEpochSecond(0), channelMemberIds);
+        return ChannelResult.fromPrivate(savedChannel, Instant.ofEpochSecond(0), privateChannelCreationRequest.memberIds());
     }
 
     @Override
@@ -83,9 +84,6 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
-        if (channel.getType().equals(ChannelType.PRIVATE)) {
-            throw new IllegalArgumentException("Private 파일은 수정할 수 없습니다.");
-        }
         channel.updateName(name);
 
         Channel updatedChannel = channelRepository.save(channel);

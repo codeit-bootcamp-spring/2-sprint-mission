@@ -26,6 +26,7 @@ public class AuthController {
         UserResult userResult = authService.login(loginRequest);
         UserStatusResult userStatus = userStatusService.getByUserId(userResult.id());
         UserResponse response = UserResponse.of(userResult, userStatus.isLogin());
+
         return ResponseEntity.ok(response);
     }
 }

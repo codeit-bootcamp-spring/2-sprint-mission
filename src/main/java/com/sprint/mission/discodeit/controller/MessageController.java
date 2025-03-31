@@ -35,9 +35,9 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getAllByChannelId(channelId));
     }
 
-    @PatchMapping("/{messageId}")
-    public ResponseEntity<MessageResult> updateContent(@PathVariable UUID messageId, @RequestParam String context) {
-        return ResponseEntity.ok(messageService.updateContext(messageId, context));
+    @PutMapping("/{messageId}")
+    public ResponseEntity<MessageResult> updateContent(@PathVariable UUID messageId, @RequestBody MessageCreationRequest messageCreationRequest) {
+        return ResponseEntity.ok(messageService.updateContext(messageId, messageCreationRequest.context()));
     }
 
     @DeleteMapping("/{messageId}")

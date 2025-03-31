@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
+import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelCreationRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,7 +10,7 @@ import java.util.UUID;
 public interface ChannelService {
     ChannelResult createPublic(ChannelCreateRequest channelRegisterRequest);
 
-    ChannelResult createPrivate(ChannelCreateRequest channelRegisterRequest, List<UUID> channelMemberIds);
+    ChannelResult createPrivate(PrivateChannelCreationRequest privateChannelCreationRequest);
 
     ChannelResult addPrivateChannelMember(UUID channelId, UUID friendId);
 

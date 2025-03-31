@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
-import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
+import com.sprint.mission.discodeit.application.dto.channel.*;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -21,35 +20,35 @@ public class ChannelController {
     private final UserService userService;
 
     @PostMapping("/public")
-    public ChannelResult createPublicChannel(@Valid @RequestBody ChannelCreateRequest channelRegisterRequest) {
-        return channelService.createPublic(channelRegisterRequest);
+    public ResponseEntity<ChannelResult> createPublicChannel(@Valid @RequestBody ChannelCreateRequest channelRegisterRequest) {
+        return ResponseEntity.ok(channelService.createPublic(channelRegisterRequest));
     }
 
     @PostMapping("/private")
-    public ChannelResult createPrivateChannel(@Valid @RequestBody ChannelCreateRequest channelRegisterRequest, @RequestParam List<UUID> memberIds) {
-        return channelService.createPrivate(channelRegisterRequest, memberIds);
+    public ResponseEntity<ChannelResult> createPrivateChannel(@Valid @RequestBody PrivateChannelCreationRequest privateChannelCreationRequest) {
+        return ResponseEntity.ok(channelService.createPrivate(privateChannelCreationRequest));
     }
 
     @GetMapping("/user/{userId}")
-    public List<ChannelResult> getAllByUserId(@PathVariable UUID userId) {
-        return channelService.getAllByUserId(userId);
+    public ResponseEntity<List<ChannelResult>> getAllByUserId(@PathVariable UUID userId) {
+        return ResponseEntity.ok(channelService.getAllByUserId(userId));
     }
 
-    @PatchMapping("/{channelId}/public")
-    public ChannelResult updatePublicChannelName(@PathVariable UUID channelId, @RequestParam String channelName) {
-        return channelService.updatePublicChannelName(channelId, channelName);
+    @PutMapping("/public/update")
+    public ResponseEntity<ChannelResult> updatePublicChannelName(@RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
+        return ResponseEntity.ok(channelService.updatePublicChannelName(publicChannelUpdateRequest.channelId(), publicChannelUpdateRequest.channelName()));
     }
 
-    @PostMapping("/{channelId}/members")
-    public ChannelResult addPrivateChannelMember(@PathVariable UUID channelId, @RequestParam String friendEmail) {
-        UserResult friend = userService.getByEmail(friendEmail);
+    @PostMapping("/private/members")
+    public ResponseEntity<ChannelResult> addPrivateChannelMember(@RequestBody PrivateChannelAddMemeberRequest privateChannelAddMemeberRequest) {
+        UserResult friend = userService.getByEmail(privateChannelAddMemeberRequest.friendEmail());
 
-        return channelService.addPrivateChannelMember(channelId, friend.id());
+        return ResponseEntity.ok(channelService.addPrivateChannelMember(privateChannelAddMemeberRequest.channelId(), friend.id()));
     }
 
     @GetMapping("/{channelId}")
-    public ChannelResult getById(@PathVariable UUID channelId) {
-        return channelService.getById(channelId);
+    public ResponseEntity<ChannelResult> getById(@PathVariable UUID channelId) {
+        return ResponseEntity.ok(channelService.getById(channelId));
     }
 
     @DeleteMapping("/{channelId}")

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.user.UserRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserCreationRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResponse;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusResult;
@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class UserController {
     private final UserStatusService userStatusService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResult> register(@Valid @RequestPart UserRequest userRequest,
+    public ResponseEntity<UserResult> register(@Valid @RequestPart UserCreationRequest userRequest,
                                                @RequestPart(required = false) MultipartFile multipartFile) {
         UUID profileId = binaryContentService.createProfileImage(multipartFile);
 
@@ -45,9 +47,9 @@ public class UserController {
         return ResponseEntity.ok(userService.getAll());
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping(value = "/{userId}")
     public ResponseEntity<UserResult> updateUser(@PathVariable UUID userId,
-                                                 @RequestBody UserRequest userRequest) {
+                                                 @RequestBody UserCreationRequest userRequest) {
         UserResult updatedUser = userService.updateName(userId, userRequest.name());
         return ResponseEntity.ok(updatedUser);
     }
