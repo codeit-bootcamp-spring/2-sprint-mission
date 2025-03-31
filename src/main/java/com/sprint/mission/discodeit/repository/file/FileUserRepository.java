@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -12,13 +14,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileUserRepository implements UserRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileUserRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+    public FileUserRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, User.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
@@ -75,8 +80,8 @@ public class FileUserRepository implements UserRepository {
         try {
             return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path->deserialize(path))
-                    .filter(user -> user.getUserName().equals(userName))
+                    .map(path -> deserialize(path))
+                    .filter(user -> user.getUserName() != null && user.getUserName().equals(userName))
                     .findFirst();
         } catch (IOException e) {
             throw new RuntimeException("사용자 검색 중 오류 발생 (username: " + userName + ")", e);
@@ -88,7 +93,7 @@ public class FileUserRepository implements UserRepository {
         try {
             return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path->deserialize(path))
+                    .map(path -> deserialize(path))
                     .filter(user -> user.getEmail().equals(email)) // email 비교
                     .findFirst();
         } catch (IOException e) {
@@ -115,7 +120,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(UUID userId) {
+    public void deleteById(UUID userId) {
         Path path = getFilePath(userId);
         try {
             Files.deleteIfExists(path);
@@ -123,5 +128,17 @@ public class FileUserRepository implements UserRepository {
         } catch (IOException e) {
             throw new RuntimeException("사용자 삭제 실패: " + userId, e);
         }
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return this.findAll().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return this.findAll().stream()
+                .anyMatch(user -> user.getUserName() != null && user.getUserName().equals(username));
     }
 }

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -18,35 +17,41 @@ public class User implements Serializable {
     private String userName;
     private String email;
     private String password;
-
-    @Setter
     private UUID profileId;
 
-    public User(String userName, String email, String password) {
+    public User(String userName, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         this.userName = userName;
         this.email = email;
         this.password = password;
-        this.profileId = null;
+        this.profileId = profileId;
 
     }
 
-    public void updateUser(String userName, String email, String password, UUID profileId) {
-        if (userName != null) {
-            this.userName = userName;
+    public void updateUser(String newUserName, String newEmail, String newPassword, UUID newProfileId) {
+        boolean anyValueUpdated = false;
+        if (newUserName != null && !newUserName.equals(this.userName)) {
+            this.userName = newUserName;
+            anyValueUpdated = true;
         }
-        if (email != null) {
-            this.email = email;
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
         }
-        if (password != null) {
-            this.password = password;
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
         }
-        if (profileId != null) {
-            this.profileId = profileId;
+        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
+            anyValueUpdated = true;
         }
-        this.updatedAt = Instant.now();
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
     public String toString() {

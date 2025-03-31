@@ -29,14 +29,20 @@ public class Channel implements Serializable {
 
     }
 
-    public void updateChannel(String channelName, String description) {
-        if (channelName != null) {
-            this.channelName = channelName;
+    public void updateChannel(String newChannelName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newChannelName != null && !newChannelName.equals(this.channelName)) {
+            this.channelName = newChannelName;
+            anyValueUpdated = true;
         }
-        if (description != null) {
-            this.description = description;
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
         }
-        this.updatedAt = Instant.now();
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
     public String toString() {

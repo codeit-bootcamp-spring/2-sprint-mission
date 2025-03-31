@@ -2,9 +2,7 @@ spring:
   application:
     name: discodeit
 
-server:
-  port: 8080
-
-logging:
-  level:
-    root: info
+discodeit:
+  repository:
+    type: file   # jcf | file
+    file-directory: .discodeit

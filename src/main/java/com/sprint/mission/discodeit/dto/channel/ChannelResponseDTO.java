@@ -11,7 +11,7 @@ public record ChannelResponseDTO(
         ChannelType type,
         String channelName,
         String description,
-        Instant lastMessageAt,
-        List<UUID> userIds
+        List<UUID> participants,
+        Instant lastMessageAt
 ) {
 }

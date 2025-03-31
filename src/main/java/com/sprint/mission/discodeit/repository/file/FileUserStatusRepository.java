@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -16,14 +16,14 @@ import java.util.UUID;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
-public class FileChannelRepository implements ChannelRepository {
+public class FileUserStatusRepository implements UserStatusRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileChannelRepository(
+    public FileUserStatusRepository(
             @Value("${discodeit.repository.file-directory:data}") String fileDirectory
     ) {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, Channel.class.getSimpleName());
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, UserStatus.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
@@ -33,42 +33,42 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
-    private Path getFilePath(UUID channelId) {
-        return DIRECTORY.resolve("channel-" + channelId + EXTENSION);
+    private Path getFilePath(UUID userStatusId) {
+        return DIRECTORY.resolve(userStatusId + EXTENSION);
     }
 
-    public void serialize(Channel channel) {
-        Path path = getFilePath(channel.getId());
+    public void serialize(UserStatus userStatus) {
+        Path path = getFilePath(userStatus.getUserStatusId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
-            oos.writeObject(channel);
+            oos.writeObject(userStatus);
         } catch (IOException e) {
-            throw new RuntimeException("채널 데이터를 저장하는 중 오류 발생: " + path, e);
+            throw new RuntimeException(e);
         }
     }
 
-    public Channel deserialize(Path path) {
+    public UserStatus deserialize(Path path) {
         try (
                 FileInputStream fis = new FileInputStream(path.toFile());
                 ObjectInputStream ois = new ObjectInputStream(fis)
         ) {
-            return (Channel) ois.readObject();
+            return (UserStatus) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("채널 파일을 읽는 중 오류 발생: " + path, e);
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Channel save(Channel channel) {
-        serialize(channel);
-        return channel;
+    public UserStatus saveUserStatus(UserStatus userStatus) {
+        serialize(userStatus);
+        return userStatus;
     }
 
     @Override
-    public Optional<Channel> findById(UUID channelId) {
-        Path path = getFilePath(channelId);
+    public Optional<UserStatus> findById(UUID userStatusId) {
+        Path path = getFilePath(userStatusId);
         if (Files.notExists(path)) {
             return Optional.empty();
         }
@@ -76,31 +76,44 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findAll() {
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return findAll().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .findFirst();
+
+    }
+
+    @Override
+    public List<UserStatus> findAll() {
         try {
             return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> deserialize(path))
                     .toList();
         } catch (IOException e) {
-            throw new RuntimeException("채널 목록을 불러오는 중 오류 발생", e);
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public boolean existsById(UUID channelId) {
-        return Files.exists(getFilePath(channelId));
+    public boolean existsById(UUID userStatusId) {
+        return Files.exists(getFilePath(userStatusId));
     }
 
     @Override
-    public void deleteById(UUID channelId) {
-        Path path = getFilePath(channelId);
+    public void deleteById(UUID userStatusId) {
+        Path path = getFilePath(userStatusId);
         try {
-            Files.delete(path);
-            System.out.println(channelId + " 채널 삭제 완료되었습니다.");
+            Files.deleteIfExists(path);
         } catch (IOException e) {
-            throw new RuntimeException("채널 삭제 실패: " + channelId, e);
+            throw new RuntimeException(e);
         }
     }
 
+    @Override
+    public void deleteByUserId(UUID userId) {
+        this.findByUserId(userId)
+                .ifPresent(userStatus -> deleteById(userStatus.getUserId()));
+
+    }
 }

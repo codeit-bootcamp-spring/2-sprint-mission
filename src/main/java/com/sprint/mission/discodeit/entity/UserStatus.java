@@ -1,9 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-public class UserStatus {
+@Getter
+public class UserStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
     private UUID userStatusId;
     private Instant createdAt;
     private Instant updatedAt;
@@ -21,11 +26,18 @@ public class UserStatus {
         this.lastActiveAt = lastActiveAt;
     }
 
+    public void updateLastActiveAt(Instant lastActiveAt) {
+        boolean anyValueUpdated = false;
+        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+            this.lastActiveAt = lastActiveAt;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
+    }
+
     public boolean isOnline() {
         return Instant.now().minusSeconds(300).isBefore(lastActiveAt);
-    }
-    public void updateLastActiveAt(Instant lastActiveAt){
-        this.lastActiveAt = lastActiveAt;
-        this.updatedAt = Instant.now();
     }
 }
