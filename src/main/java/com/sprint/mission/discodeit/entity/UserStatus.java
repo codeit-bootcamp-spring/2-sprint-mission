@@ -18,7 +18,7 @@ public class UserStatus implements Serializable {
     private Instant lastActiveAt;
 
     public UserStatus(UUID userId) {
-        validateReadStatus(userId);
+        validateUserStatus(userId);
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
@@ -59,7 +59,7 @@ public class UserStatus implements Serializable {
     /*******************************
      * Validation check
      *******************************/
-    private void validateReadStatus(UUID userId){
+    private void validateUserStatus(UUID userId){
         // 1. null check
         if (userId == null) {
             throw new IllegalArgumentException("userId가 없습니다.");

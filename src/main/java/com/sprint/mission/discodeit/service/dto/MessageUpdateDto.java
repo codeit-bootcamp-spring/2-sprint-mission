@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -9,9 +11,6 @@ public record MessageUpdateDto(
         UUID channelId,
         String content,
         List<UUID> attachmentIds,
-        List<BinaryContentDto> attachments
+        List<MultipartFile> attachments
 ) {
-    public static MessageUpdateDto withoutFile(UUID id, UUID userId, UUID channelId, String content){
-        return new MessageUpdateDto(id, userId, channelId, content, null, null);
-    }
 }

@@ -1,5 +1,9 @@
 package com.sprint.mission.discodeit.util;
 
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,9 +13,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Component
+@RequiredArgsConstructor
 public class FileUtil {
 
-    public static <T> UUID saveToFile(Path directory, T object, UUID objectId) {
+    //////////////////////////////// 이미지 파일 처리용 임시
+    
+    public static Optional<byte[]> loadBinaryFile2(Path directory, UUID objectId) {
+        Path filePath = getFilePath2(directory, objectId);
+        if (Files.exists(filePath)) {
+            try {
+                byte[] fileContent = Files.readAllBytes(filePath); // 이미지 파일을 바이트 배열로 읽기
+                return Optional.of(fileContent);
+            } catch (IOException e) {
+                throw new RuntimeException("파일 로드 실패: " + filePath, e);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static Path getFilePath2(Path directory, UUID id) {
+        return directory.resolve(id.toString() + ".jpeg");
+    }
+
+    //////////////////////////////////
+
+    public static <T> T saveToFile(Path directory, T object, UUID objectId) {
         Path filePath = getFilePath(directory, objectId);
         try (FileOutputStream fos = new FileOutputStream(filePath.toFile());
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
@@ -19,7 +46,7 @@ public class FileUtil {
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패: " + filePath, e);
         }
-        return objectId;
+        return object;
     }
 
     public static <T> Optional<T> loadFromFile(Path directory, UUID objectId) {
@@ -28,7 +55,7 @@ public class FileUtil {
             try (FileInputStream fis = new FileInputStream(filePath.toFile());
                  ObjectInputStream ois = new ObjectInputStream(fis)) {
                 T object = (T) ois.readObject();
-                return Optional.of(object);
+                return Optional.ofNullable(object);
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException("파일 로드 실패: " + filePath, e);
             }
@@ -36,11 +63,11 @@ public class FileUtil {
         return Optional.empty();
     }
 
-    public static <T> List<T> loadAllFiles(Path directory) {
+    public static <T> List<T> loadAllFiles(Path directory, String extension) {
         List<T> objectList = new ArrayList<>();
         try {
             Files.list(directory)
-                    .filter(path -> path.toString().endsWith(".ser"))
+                    .filter(path -> path.toString().endsWith(extension))
                     .forEach(path -> {
                         UUID objectId = UUID.fromString(path.getFileName().toString().replace(".ser", ""));
                         Optional<T> objectOpt = loadFromFile(directory, objectId);
@@ -72,6 +99,15 @@ public class FileUtil {
             }
         } catch (IOException e) {
             throw new RuntimeException("디렉토리 생성 실패: " + directory, e);
+        }
+    }
+
+    public static byte[] loadBinaryFile(Path directory, UUID id) {
+        Path filePath = directory.resolve(id.toString() + ".txt");
+        try {
+            return Files.readAllBytes(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException("바이너리 파일 로드 실패: " + filePath, e);
         }
     }
 

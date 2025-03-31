@@ -3,30 +3,26 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.*;
 
-@Component
+@Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 public class JCFMessageRepository implements MessageRepository {
 
     private final Map<UUID, Message> data = new HashMap<>();
 
     @Override
-    public UUID createMessage(Message message) {
+    public Message save(Message message) {
         data.put(message.getId(), message);
-        return findById(message.getId()).getId();
+        return message;
     }
 
     @Override
-    public Message findById(UUID id) {
-        Message message = data.get(id);
-        if(message == null){
-            throw new NoSuchElementException("해당 ID의 메시지를 찾을 수 없습니다: " + id);
-        }
-        return message;
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
@@ -37,18 +33,14 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void updateMessage(UUID id, String content, UUID userId, UUID channelId, List<UUID> attachmentIds) {
-        checkMessageExists(id);
-        Message message = data.get(id);
-
-        message.update(content, attachmentIds);
+    public void deleteById(UUID id) {
+        data.remove(id);
     }
 
     @Override
-    public void deleteMessage(UUID id, UUID userId, UUID channelId) {
-        checkMessageExists(id);
-
-        data.remove(id);
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(message -> this.deleteById(message.getId()));
     }
 
     @Override
@@ -59,23 +51,5 @@ public class JCFMessageRepository implements MessageRepository {
                 .max(Comparator.naturalOrder());
     }
 
-    @Override
-    public void deleteMessageByChannelId(UUID channelId) {
-        Message message = data.values().stream()
-                .filter(result -> result.getChannelId().equals(channelId))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("해당 채널의 메시지를 찾을 수 없습니다: " + channelId));
-
-        data.remove(message.getId());
-    }
-
-    /*******************************
-     * Validation check
-     *******************************/
-    private void checkMessageExists(UUID id) {
-        if(findById(id) == null){
-            throw new NoSuchElementException("해당 ID의 메시지를 찾을 수 없습니다: " + id);
-        }
-    }
 
 }

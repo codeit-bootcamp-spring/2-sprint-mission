@@ -3,47 +3,33 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.*;
 
-@Component
+@Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 public class JCFReadStatusRepository implements ReadStatusRepository {
 
     private final Map<UUID, ReadStatus> data = new HashMap<>();
 
     @Override
-    public UUID createReadStatus(ReadStatus readStatus) {
-        validateReadStatusDoesNotExist(readStatus.getUserId(), readStatus.getChannelId());
-
+    public ReadStatus save(ReadStatus readStatus) {
         data.put(readStatus.getId(), readStatus);
-        return findById(readStatus.getId()).getId();
-    }
-
-    @Override
-    public ReadStatus findById(UUID id) {
-        ReadStatus readStatus = data.get(id);
-        if (readStatus == null) {
-            throw new NoSuchElementException("해당 ID의 ReadStatus를 찾을 수 없습니다: " + id);
-        }
         return readStatus;
     }
 
     @Override
-    public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
-        return data.values().stream()
-                .filter(readStatus -> readStatus.getUserId().equals(userId) && readStatus.getChannelId().equals(channelId))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자 및 채널의 ReadStatus를 찾을 수 없습니다: " + userId + "/" + channelId));
+    public Optional<ReadStatus> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
-    public ReadStatus findByUserIdAndChannelIdOrNull(UUID userId, UUID channelId) {
+    @Override
+    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
         return data.values().stream()
                 .filter(readStatus -> readStatus.getUserId().equals(userId) && readStatus.getChannelId().equals(channelId))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -54,43 +40,21 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void updateReadStatus(UUID id, Instant lastReadAt) {
-        checkReadStatusExists(id);
-        ReadStatus readStatus = data.get(id);
-
-        readStatus.update(lastReadAt);
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
-    public void deleteReadStatus(UUID id) {
-        checkReadStatusExists(id);
-
+    public void deleteById(UUID id) {
         data.remove(id);
     }
 
     @Override
-    public void deleteReadStatusByChannelId(UUID channelId) {
-        ReadStatus readStatus = data.values().stream()
-                .filter(result -> result.getChannelId().equals(channelId))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("해당 채널의 ReadStatus를 찾을 수 없습니다: " + channelId));
-
-        data.remove(readStatus.getId());
-    }
-
-    /*******************************
-     * Validation check
-     *******************************/
-    private void checkReadStatusExists(UUID id) {
-        if(findById(id) == null){
-            throw new NoSuchElementException("해당 ID의 ReadStatus를 찾을 수 없습니다: " + id);
-        }
-    }
-
-    private void validateReadStatusDoesNotExist(UUID userId, UUID channelId) {
-        if (findByUserIdAndChannelIdOrNull(userId, channelId) != null) {
-            throw new IllegalArgumentException("이미 존재하는 객체입니다.");
-        }
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(readStatus -> this.deleteById(readStatus.getId()));
     }
 
 }

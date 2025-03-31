@@ -7,6 +7,7 @@ public record BinaryContentCreateDto(
         String filePath,
         String fileName,
         String fileType,
+//        String fileExtension,
         long fileSize
 ) {
     public BinaryContent convertCreateDtoToBinaryContent() {

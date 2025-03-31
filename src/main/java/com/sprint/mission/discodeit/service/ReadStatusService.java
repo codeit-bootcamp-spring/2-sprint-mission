@@ -11,9 +11,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ReadStatusService {
-    UUID createReadStatus(ReadStatusCreateDto createDto);
+    ReadStatus createReadStatus(ReadStatusCreateDto createDto);
     ReadStatusResponseDto findById(UUID id);
     List<ReadStatusResponseDto> findAllByUserId(UUID userId);
-    void updateReadStatus(ReadStatusUpdateDto updateDto);
+    ReadStatus updateReadStatus(ReadStatusUpdateDto updateDto);
     void deleteReadStatus(UUID id);
 }
