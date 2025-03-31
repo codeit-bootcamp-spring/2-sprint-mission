@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +39,7 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저상태가 존재하지 않습니다."));
 
-        return UserStatusResult.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
+        return UserStatusResult.fromEntity(userStatus, userStatus.isLogin(Instant.now()));
     }
 
     @Override
@@ -46,14 +47,14 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저 Id를 가진 UserStatus가 없습니다."));
 
-        return UserStatusResult.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant()));
+        return UserStatusResult.fromEntity(userStatus, userStatus.isLogin(Instant.now()));
     }
 
     @Override
     public List<UserStatusResult> getAll() {
         return userStatusRepository.findAll()
                 .stream()
-                .map(userStatus -> UserStatusResult.fromEntity(userStatus, userStatus.isLogin(ZonedDateTime.now().toInstant())))
+                .map(userStatus -> UserStatusResult.fromEntity(userStatus, userStatus.isLogin(Instant.now())))
                 .toList();
     }
 
@@ -65,7 +66,7 @@ public class BasicUserStatusService implements UserStatusService {
         userStatus.updateLastLoginAt();
         UserStatus savedUserStatus = userStatusRepository.save(userStatus);
 
-        return UserStatusResult.fromEntity(savedUserStatus, savedUserStatus.isLogin(ZonedDateTime.now().toInstant()));
+        return UserStatusResult.fromEntity(savedUserStatus, savedUserStatus.isLogin(Instant.now()));
     }
 
     @Override
@@ -76,7 +77,7 @@ public class BasicUserStatusService implements UserStatusService {
         userStatus.updateLastLoginAt();
         UserStatus updatedUserStatus = userStatusRepository.save(userStatus);
 
-        return UserStatusResult.fromEntity(updatedUserStatus, updatedUserStatus.isLogin(ZonedDateTime.now().toInstant()));
+        return UserStatusResult.fromEntity(updatedUserStatus, updatedUserStatus.isLogin(Instant.now()));
     }
 
     @Override

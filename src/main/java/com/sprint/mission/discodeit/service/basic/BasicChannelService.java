@@ -56,14 +56,13 @@ public class BasicChannelService implements ChannelService {
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
         Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId());
-
         if (channel.getType().equals(ChannelType.PRIVATE)) {
-            List<UUID> userId = readStatusRepository.findByChannelId(channel.getId()).stream().toList()
+            List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId())
                     .stream()
                     .map(ReadStatus::getUserId)
                     .toList();
 
-            return ChannelResult.fromPrivate(channel, lastMessageCreatedAt, userId);
+            return ChannelResult.fromPrivate(channel, lastMessageCreatedAt, userIds);
         }
 
         return ChannelResult.fromPublic(channel, lastMessageCreatedAt);
@@ -71,10 +70,26 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelResult> getAllByUserId(UUID userId) {
-        List<ChannelResult> totalChannels = new ArrayList<>(findPublicChannelsByUserId());
-        List<ChannelResult> privateChannels = findPrivateChannelsByUserId(userId);
+        List<Channel> publicChannels = channelRepository.findAll()
+                .stream()
+                .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
+                .toList();
 
-        totalChannels.addAll(privateChannels);
+        List<Channel> privateChannels = readStatusRepository.findByUserId(userId)
+                .stream()
+                .map(readStatus -> channelRepository.findById(readStatus.getChannelId())
+                        .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent())))
+                .toList();
+
+
+        List<ChannelResult> publicChannelResults = publicChannels.stream()
+                .map(channel -> this.getById(channel.getId()))
+                .toList();
+        List<ChannelResult> privateChannelResults = privateChannels.stream()
+                .map(channel -> this.getById(channel.getId()))
+                .toList();
+        List<ChannelResult> totalChannels = new ArrayList<>(publicChannelResults);
+        totalChannels.addAll(privateChannelResults);
 
         return totalChannels;
     }
@@ -131,20 +146,4 @@ public class BasicChannelService implements ChannelService {
 
         return ChannelResult.fromPrivate(channel, lastMessageCreatedAt, userId);
     }
-
-    private List<ChannelResult> findPrivateChannelsByUserId(UUID userId) {
-        return readStatusRepository.findByUserId(userId)
-                .stream()
-                .map(readStatus -> this.getById(readStatus.getChannelId()))
-                .toList();
-    }
-
-    private List<ChannelResult> findPublicChannelsByUserId() {
-        return channelRepository.findAll()
-                .stream()
-                .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
-                .map(channel -> ChannelResult.fromPublic(channel, messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())))
-                .toList();
-    }
 }
-

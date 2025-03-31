@@ -19,7 +19,7 @@
 
 4. API 테스트
 
-- [ ] Postman을 활용해 컨트롤러를 테스트 하세요.
+- [x] Postman을 활용해 컨트롤러를 테스트 하세요.
     - Postman API 테스트 결과를 다음과 같이 export하여 PR에 첨부해주세요.
 
 ### 웹 API 요구사항
