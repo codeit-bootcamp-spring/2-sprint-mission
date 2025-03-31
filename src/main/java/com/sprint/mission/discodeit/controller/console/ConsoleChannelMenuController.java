@@ -1,20 +1,27 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.console;
 
-import com.sprint.mission.discodeit.DTO.channelService.ChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.channelService.ChannelCreateByPrivateRequest;
+import com.sprint.mission.discodeit.dto.channelService.ChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channelService.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.menus.ChannelMenu;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class ChannelMenuController {
+public class ConsoleChannelMenuController {
     private final ChannelService channelService;
+    private final UserService userService;
     private final Scanner scanner;
 
-    public ChannelMenuController(ChannelService channelService, Scanner scanner) {
+    public ConsoleChannelMenuController(ChannelService channelService, UserService userService, Scanner scanner) {
         this.channelService = channelService;
+        this.userService = userService;
         this.scanner = scanner;
     }
 
@@ -104,10 +111,17 @@ public class ChannelMenuController {
     private void createChannel() {
         System.out.println("생성할 채널타입, 채널명을 입력해주세요: ");
         ChannelType type = getChannelTypeFromInput("채널타입: ");
-        String channelName = getChannelNameFromInput("채널명: ");
-        ChannelCreateDTO channelCreateDto = new ChannelCreateDTO(type, channelName);
-        System.out.println("채널 생성 완료: \n" + channelService.create(channelCreateDto));
+        if(type.equals(ChannelType.PUBLIC)){
+            String channelName = getChannelNameFromInput("채널명: ");
+            ChannelCreateRequest channelCreateRequest = new ChannelCreateRequest(type, channelName);
+            System.out.println("채널 생성 완료: \n" + channelService.create(channelCreateRequest));
 
+        } else{
+            System.out.println("privte 서버에 초대할 유저들을 넣어주세요: " + userService.findAll());
+            //example
+            ChannelCreateByPrivateRequest request = new ChannelCreateByPrivateRequest(userService.findAll().stream().map(User::getId).toList());
+            channelService.createByPrivate(request);
+        }
     }
 
     private void findChannel() {
@@ -124,8 +138,8 @@ public class ChannelMenuController {
         System.out.print("변경할 채널 타입, 채널명을 입력해주세요: ");
         ChannelType type =  getChannelTypeFromInput("채널 타입: ");
         String channelName = getChannelNameFromInput("채널명: ");
-
-        System.out.println("업데이트 완료: \n" + channelService.update(id, channelName, type));
+        ChannelUpdateRequest channelUpdateRequest = new ChannelUpdateRequest(channelName,type);
+        System.out.println("업데이트 시도: \n" + channelService.update(id,channelUpdateRequest));
     }
 
     private void deleteChannel() {

@@ -1,28 +1,31 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
-    private final String CHANNEL_FILE = "channels.ser";
+    private final String CHANNEL_FILE;
     private final Map<UUID,Channel> channelData;
     private final SaveLoadHandler<Channel> saveLoadHandler;
 
-    public FileChannelRepository() {
-        saveLoadHandler = new SaveLoadHandler<>(CHANNEL_FILE);
-        channelData = saveLoadHandler.loadData();
+    public FileChannelRepository(@Value("${discodeit.repository.file.channel}") String fileName,SaveLoadHandler<Channel> saveLoadHandler) {
+        CHANNEL_FILE = fileName;
+        this.saveLoadHandler = saveLoadHandler;
+        channelData = saveLoadHandler.loadData(CHANNEL_FILE);
     }
 
 
     @Override
     public Channel save(Channel channel) {
         channelData.put(channel.getId(), channel);
-        saveLoadHandler.saveData(channelData);
+        saveLoadHandler.saveData(CHANNEL_FILE ,channelData);
         return channel;
     }
 
@@ -36,16 +39,6 @@ public class FileChannelRepository implements ChannelRepository {
         return channelData.values().stream().toList();
     }
 
-    @Override
-    public Channel update(UUID id, String newName, ChannelType channelType) {
-        Channel channelNullable = channelData.get(id);
-        Channel channel = Optional.ofNullable(channelNullable).orElseThrow(() -> new NoSuchElementException("채널 " + id + "가 존재하지 않습니다."));
-        channel.updateChannel(newName);
-        channel.updateChannelType(channelType);
-        saveLoadHandler.saveData(channelData);
-
-        return channel;
-    }
 
     @Override
     public void delete(UUID id) {
@@ -53,6 +46,6 @@ public class FileChannelRepository implements ChannelRepository {
             throw new NoSuchElementException("채널 " + id + "가 존재하지 않습니다.");
         }
         channelData.remove(id);
-        saveLoadHandler.saveData(channelData);
+        saveLoadHandler.saveData(CHANNEL_FILE,channelData);
     }
 }

@@ -1,15 +1,15 @@
-package com.sprint.mission.discodeit.DTO.channelService;
+package com.sprint.mission.discodeit.dto.channelService;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
 
-public record ChannelCreateDTO(
+public record ChannelCreateRequest(
         ChannelType type,
         String name
 ) {
-    public static ChannelCreateDTO toDTO(Channel channel) {
-        return new ChannelCreateDTO(channel.getType(), channel.getChannelName());
+    public static ChannelCreateRequest toDTO(Channel channel) {
+        return new ChannelCreateRequest(channel.getType(), channel.getChannelName());
     }
 
     public Channel toEntity() {

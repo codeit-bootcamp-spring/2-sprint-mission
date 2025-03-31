@@ -1,11 +1,12 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.console;
 
-import com.sprint.mission.discodeit.DTO.MessageService.MessageCreateDTO;
-import com.sprint.mission.discodeit.DTO.UserService.AuthDTO;
+import com.sprint.mission.discodeit.dto.MessageService.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageService.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.UserService.AuthRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.menus.MessageMenu;
-import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.basic.BasicAuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -14,21 +15,21 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class MessageMenuController {
+public class ConsoleMessageMenuController {
     private final MessageService messageService;
-    private final UserService userService;
     private final ChannelService channelService;
-    private final AuthService authService;
+    private final UserService userService;
+    private final BasicAuthService basicAuthService;
     private final Scanner scanner;
     private static User loggedUser;
     private static Channel currentChannel;
 
 
-    public MessageMenuController(UserService userService, ChannelService channelService, MessageService messageService,AuthService authService, Scanner scanner) {
+    public ConsoleMessageMenuController(UserService userService, ChannelService channelService, MessageService messageService, BasicAuthService basicAuthService, Scanner scanner) {
         this.messageService = messageService;
-        this.userService =  userService;
         this.channelService = channelService;
-        this.authService = authService;
+        this.userService = userService;
+        this.basicAuthService = basicAuthService;
         this.scanner = scanner;
 
     }
@@ -36,8 +37,8 @@ public class MessageMenuController {
     public void handleMessageMenu() {
         String loginUserName = getMessageInput("로그인: ");
         String loginPassword = getMessageInput("비밀번호: ");
-        AuthDTO authDTO = new AuthDTO(loginUserName, loginPassword);
-        if(!logInUser(authService.login(authDTO)))
+        AuthRequest authRequest = new AuthRequest(loginUserName, loginPassword);
+        if(!logInUser(basicAuthService.login(authRequest)))
         {
             return;
         }
@@ -145,8 +146,9 @@ public class MessageMenuController {
 
     private void createMessage(){
         String message = getMessageInput("작성할 메세지: ");
-        MessageCreateDTO messageCreateDTO = new MessageCreateDTO(message,loggedUser.getId(), currentChannel.getId());
-        messageService.create(messageCreateDTO);
+        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(message,loggedUser.getId(), currentChannel.getId());
+
+//        messageService.create(messageCreateRequest,);
     }
 
     private void findMessage(){
@@ -182,9 +184,10 @@ public class MessageMenuController {
     }
 
     private void updateMessage(){
-        UUID messageId = getIdFromInput("수정할 메세지의 ID를 입력해주세요: ");
-        String newMessage = getMessageInput("새로운 메세지: ");
-        messageService.update(messageId,newMessage);
+//        UUID messageId = getIdFromInput("수정할 메세지의 ID를 입력해주세요: ");
+//        String newMessage = getMessageInput("새로운 메세지: ");
+//        MessageUpdateRequest request = new MessageUpdateRequest(messageId, newMessage);
+//        messageService.update(, request);
 
     }
 

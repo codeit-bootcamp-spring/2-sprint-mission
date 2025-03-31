@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.menus;
 
+import lombok.Getter;
+
+@Getter
 public enum MainMenu {
     USER("1", "유저 관리"),
     CHANNEL("2", "채널 관리"),
@@ -12,14 +15,6 @@ public enum MainMenu {
     MainMenu(String code, String description) {
         this.code = code;
         this.description = description;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public static MainMenu getByCode(String code) {

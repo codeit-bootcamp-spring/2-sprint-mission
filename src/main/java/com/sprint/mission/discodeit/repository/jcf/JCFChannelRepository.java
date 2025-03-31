@@ -1,14 +1,21 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.file.SaveLoadHandler;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channelData = new HashMap<>();
+    private final Map<UUID,Channel> channelData = new HashMap<>();
+
+
+
 
     @Override
     public Channel save(Channel channel) {
@@ -26,15 +33,6 @@ public class JCFChannelRepository implements ChannelRepository {
         return channelData.values().stream().toList();
     }
 
-    @Override
-    public Channel update(UUID id, String newName, ChannelType channelType) {
-        Channel channelNullable = channelData.get(id);
-        Channel channel = Optional.ofNullable(channelNullable).orElseThrow(() -> new NoSuchElementException("채널 " + id + "가 존재하지 않습니다."));
-        channel.updateChannel(newName);
-        channel.updateChannelType(channelType);
-
-        return channel;
-    }
 
     @Override
     public void delete(UUID id) {
@@ -42,6 +40,5 @@ public class JCFChannelRepository implements ChannelRepository {
             throw new NoSuchElementException("채널 " + id + "가 존재하지 않습니다.");
         }
         channelData.remove(id);
-
     }
 }
