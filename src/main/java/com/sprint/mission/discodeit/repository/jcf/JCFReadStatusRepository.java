@@ -37,17 +37,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public List<UUID> findAllUserByChannelId(UUID channelId) {
+    public List<ReadStatus> findAllByChannelId(UUID channelId) { // channelId를 가지고 있는 ReadStatus들의 userId모음
         return data.values().stream()
-                .filter(value -> value.getChannelId().equals(channelId))
-                .map(ReadStatus::getUserId).toList();
-    }
-
-    @Override
-    public List<UUID> findAllByChannelId(UUID channelId) {
-        return data.values().stream()
-                .filter(value -> value.getChannelId().equals(channelId))
-                .map(ReadStatus::getId).toList();
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId)).toList();
     }
 
     @Override

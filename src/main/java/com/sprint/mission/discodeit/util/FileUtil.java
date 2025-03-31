@@ -37,7 +37,7 @@ public class FileUtil {
         ) {
             oos.writeObject(object);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 저장 중 오류 발생: " + e);
         }
         return object;
     }
@@ -57,7 +57,7 @@ public class FileUtil {
             }
             return Optional.empty();
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("id에 해당하는 파일 조회 중 오류 발생: " + e);
         }
     }
 
@@ -72,7 +72,7 @@ public class FileUtil {
                         objectNullable.ifPresent(objectList::add);
                     });
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("모든 파일 조회 중 오류 발생: " + e);
         }
         return objectList;
     }
@@ -87,8 +87,23 @@ public class FileUtil {
         try {
             Files.delete(filePath);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 삭제 중 오류 발생: ", e);
         }
+    }
+
+    public static boolean isAllowedExtension(String originalFilename) {
+        String[] allowedExtensions = {".png", ".jpg", ".jpeg", ".gif", ".pdf"};
+        if (originalFilename == null) {
+            return false;
+        }
+
+        String lowercaseName = originalFilename.toLowerCase();
+        for (String ext : allowedExtensions) {
+            if (lowercaseName.endsWith(ext)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

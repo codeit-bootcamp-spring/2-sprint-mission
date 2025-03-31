@@ -24,20 +24,18 @@ public class BasicMessageService implements MessageService {
     private final BasicBinaryContentService basicBinaryContentService;
 
     @Override
-    public Message create(MessageCreateRequest createRequest,
+    public Message create(UUID channelId, UUID authorId, MessageCreateRequest createRequest,
                           List<BinaryContentCreateRequest> binaryContentRequestList) {
-        if (!channelRepository.existsById(createRequest.channelId())) {
-            throw new NoSuchElementException(createRequest.channelId() + "에 해당하는 Channel을 찾을 수 없음");
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException(channelId + "에 해당하는 Channel을 찾을 수 없음");
         }
-        if (!userRepository.existsById(createRequest.authorId())) {
-            throw new NoSuchElementException(createRequest.authorId() + "에 해당하는 Author를 찾을 수 없음");
+        if (!userRepository.existsById(authorId)) {
+            throw new NoSuchElementException(authorId + "에 해당하는 Author를 찾을 수 없음");
         }
         List<UUID> idList = binaryContentRequestList.stream()
                 .map(request ->
                         basicBinaryContentService.create(request).getId()).toList();
-
-        Message message = new Message(createRequest.content(), createRequest.channelId(),
-                createRequest.authorId(), idList);
+        Message message = new Message(createRequest.content(), channelId, authorId, idList);
         return messageRepository.save(message);
     }
 
@@ -53,9 +51,9 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(MessageUpdateRequest updateRequest) {
-        Message message = messageRepository.findById(updateRequest.id())
-                .orElseThrow(() -> new NoSuchElementException(updateRequest.id() + " 에 해당하는 Message를 찾을 수 없음"));
+    public Message update(UUID id, MessageUpdateRequest updateRequest) {
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 Message를 찾을 수 없음"));
         message.update(updateRequest.newContent());
         return messageRepository.save(message);
     }

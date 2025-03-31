@@ -15,27 +15,34 @@ public class UserStatus implements Serializable {
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
+    private UserStatusType status;
 
     private final UUID userId;
 
-    public UserStatus(UUID userId, Instant createdAt) {
+    public UserStatus(UUID userId) {
         this.id = UUID.randomUUID();
-        this.createdAt = createdAt;
-        this.updatedAt = createdAt;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.userId = userId;
+        this.status = UserStatusType.ONLINE;
     }
 
-    public void update(Instant time) {
-        this.updatedAt = time;
+    public void update(UserStatusType status) {
+        this.updatedAt = Instant.now();
+        this.status = status;
     }
 
-    public UserStatusType isOnline() {
+    public Boolean isOnline() {
         Instant now = Instant.now();
+        if (status != UserStatusType.ONLINE && status != UserStatusType.OFFLINE) {
+            return false;
+        }
         if (Duration.between(updatedAt, now).toMinutes() <= 5) {
-            return UserStatusType.ONLINE;
+            status = UserStatusType.ONLINE;
+            return true;
         } else {
-            return UserStatusType.OFFLINE;
+            status = UserStatusType.OFFLINE;
+            return false;
         }
     }
-
 }

@@ -43,17 +43,9 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public List<UUID> findAllUserByChannelId(UUID channelId) { // channelId를 가지고 있는 ReadStatus들의 userId모음
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
         return FileUtil.findAll(DIRECTORY, ReadStatus.class).stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .map(ReadStatus::getUserId).toList();
-    }
-
-    @Override
-    public List<UUID> findAllByChannelId(UUID channelId) { // channelId를 가지고 있는 ReadStatus들의 id모음
-        return FileUtil.findAll(DIRECTORY, ReadStatus.class).stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .map(ReadStatus::getId).toList();
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId)).toList();
     }
 
     @Override

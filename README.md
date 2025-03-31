@@ -25,7 +25,7 @@ BasicUserService userService = context.getBean(BasicUserService.class);
 ```
 
 @SpirngBootApplication의 내부 어노테이션들이 실행되며 컴포넌트 스캔과 자동 설정이 활성화된다. 이 과정에서 @Service, @Repository
-등을 스캔하여 Bean으로 등록해야 한다는 것을 인지한 후 의존성 관계를 파악하여 @Repository를 초기화해준 다음 @Service를 초기화하면서
-@Repository를 자동으로 주입해준다.
+등을 스캔하여 Bean으로 등록하게 되며, 실제 의존성 주입은 Spring의 DI 컨테이너가 관리한다.
+즉, **어노테이션의 순서와 관계없이** Spring이 의존성 관계를 파악하고, @Repository를 초기화한 후 @Service에 자동으로 주입하는 방식이다.
 
 따라서 개발자는 직접 의존성 주입을 하지 않아도 되고, Spring의 자동 의존성 주입으로 코드가 간결해지며 클래스 간에 결합도가 낮아져 유지보수성이 좋아진다.
