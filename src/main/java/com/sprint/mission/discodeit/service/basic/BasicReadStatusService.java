@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusResult;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -20,20 +21,20 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public ReadStatusResult create(UUID userId, UUID channelId) {
-        channelRepository.findById(channelId)
+    public ReadStatusResult create(ReadStatusCreateRequest readStatusCreateRequest) {
+        channelRepository.findById(readStatusCreateRequest.channelId())
                 .orElseThrow(() -> new IllegalArgumentException("readStaus에 해당하는 채널이 없습니다."));
-        userRepository.findById(userId)
+        userRepository.findById(readStatusCreateRequest.userId())
                 .orElseThrow(() -> new IllegalArgumentException("readStatus에 해당하는 유저가 없습니다."));
 
-        List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(channelId);
+        List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(readStatusCreateRequest.channelId());
         boolean isExisting = readStatuses.stream()
-                .anyMatch(readStatus -> readStatus.getUserId().equals(userId));
+                .anyMatch(readStatus -> readStatus.getUserId().equals(readStatusCreateRequest.userId()));
         if (isExisting) {
             throw new IllegalArgumentException("채널과 유저 사이의 ReadStatus는 하나만 있을 수 있습니다.");
         }
 
-        ReadStatus readStatus = readStatusRepository.save(new ReadStatus(userId, channelId));
+        ReadStatus readStatus = readStatusRepository.save(new ReadStatus(readStatusCreateRequest.userId(), readStatusCreateRequest.channelId()));
 
         return ReadStatusResult.fromEntity(readStatus);
     }
@@ -53,8 +54,8 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public List<ReadStatusResult> getAllByUserId(UUID useId) {
-        List<ReadStatus> readStatuses = readStatusRepository.findByUserId(useId);
+    public List<ReadStatusResult> getAllByUserId(UUID userId) {
+        List<ReadStatus> readStatuses = readStatusRepository.findByUserId(userId);
         return ReadStatusResult.fromEntity(readStatuses);
     }
 

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterRequest;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.ChannelRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
@@ -53,7 +53,7 @@ class ChannelControllerTest {
     @DisplayName("Public 채널 생성")
     @Test
     void createPublicChannel() {
-        ChannelRequest channel = channelController.createPublicChannel(new ChannelRegisterRequest(ChannelType.PUBLIC, "Public", setUpUser.id()));
+        ChannelRequest channel = channelController.createPublicChannel(new ChannelCreateRequest(ChannelType.PUBLIC, "Public", setUpUser.id()));
 
         assertThat(channel.type()).isEqualTo(ChannelType.PUBLIC);
     }
@@ -71,7 +71,7 @@ class ChannelControllerTest {
     @Test
     void findAll() {
         ChannelRequest privateChannel = createPrivateChannel(setUpUser, new ArrayList<>());
-        ChannelRequest userPublicChannel = channelController.createPublicChannel(new ChannelRegisterRequest(ChannelType.PUBLIC, "Public", setUpUser.id()));
+        ChannelRequest userPublicChannel = channelController.createPublicChannel(new ChannelCreateRequest(ChannelType.PUBLIC, "Public", setUpUser.id()));
         UserResult otherUser = userService.register(new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
         createPrivateChannel(otherUser, new ArrayList<>());
 
@@ -93,6 +93,6 @@ class ChannelControllerTest {
     }
 
     private ChannelRequest createPrivateChannel(UserResult loginUser, List<UUID> memberIds) {
-        return channelController.createPrivateChannel(new ChannelRegisterRequest(ChannelType.PRIVATE, CHANNEL_NAME, loginUser.id()), memberIds);
+        return channelController.createPrivateChannel(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, loginUser.id()), memberIds);
     }
 }

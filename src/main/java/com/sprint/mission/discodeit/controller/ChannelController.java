@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterRequest;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.ChannelRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -20,12 +20,12 @@ public class ChannelController {
     private final UserService userService;
 
     @PostMapping("/public")
-    public ChannelRequest createPublicChannel(@RequestBody ChannelRegisterRequest channelRegisterRequest) {
+    public ChannelRequest createPublicChannel(@RequestBody ChannelCreateRequest channelRegisterRequest) {
         return channelService.createPublic(channelRegisterRequest);
     }
 
     @PostMapping("/private")
-    public ChannelRequest createPrivateChannel(@RequestBody ChannelRegisterRequest channelRegisterRequest, @RequestParam List<UUID> memberIds) {
+    public ChannelRequest createPrivateChannel(@RequestBody ChannelCreateRequest channelRegisterRequest, @RequestParam List<UUID> memberIds) {
         return channelService.createPrivate(channelRegisterRequest, memberIds);
     }
 

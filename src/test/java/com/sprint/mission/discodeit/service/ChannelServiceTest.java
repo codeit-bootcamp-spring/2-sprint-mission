@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterRequest;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.ChannelRequest;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -50,7 +50,7 @@ class ChannelServiceTest {
 
         setUpUser = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
-        ChannelRegisterRequest channelRegisterRequest = new ChannelRegisterRequest(ChannelType.PUBLIC, CHANNEL_NAME, setUpUser.getId());
+        ChannelCreateRequest channelRegisterRequest = new ChannelCreateRequest(ChannelType.PUBLIC, CHANNEL_NAME, setUpUser.getId());
         setUpChannel = channelService.createPublic(channelRegisterRequest);
     }
 
@@ -64,7 +64,7 @@ class ChannelServiceTest {
     @Test
     void createPrivateChannel() {
         User otherUser = userRepository.save(new User(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword(), null));
-        ChannelRegisterRequest channelRegisterRequest = new ChannelRegisterRequest(ChannelType.PUBLIC, CHANNEL_NAME, setUpUser.getId());
+        ChannelCreateRequest channelRegisterRequest = new ChannelCreateRequest(ChannelType.PUBLIC, CHANNEL_NAME, setUpUser.getId());
         ChannelRequest privateChannel = channelService.createPrivate(channelRegisterRequest, List.of(otherUser.getId()));
 
         List<UUID> readStatusUserIds = readStatusRepository.findByChannelId(privateChannel.id())
@@ -92,7 +92,7 @@ class ChannelServiceTest {
     @DisplayName("Private 채널의 이름을 변경하려고 하면 예외가 발생한다.")
     @Test
     void updatePrivateChannelNameThrowsException() {
-        ChannelRegisterRequest privateChannelDto = new ChannelRegisterRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId());
+        ChannelCreateRequest privateChannelDto = new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId());
         ChannelRequest privateChannel = channelService.createPrivate(privateChannelDto, new ArrayList<>());
 
         assertThatThrownBy(() -> channelService.updatePublicChannelName(privateChannel.id(), UPDATED_CHANNEL_NAME))
@@ -104,9 +104,9 @@ class ChannelServiceTest {
     void findAllChannelsForUser() {
         User otherUser = userRepository.save(new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
 
-        channelService.createPrivate(new ChannelRegisterRequest(ChannelType.PRIVATE, CHANNEL_NAME, otherUser.getId()), new ArrayList<>());
+        channelService.createPrivate(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, otherUser.getId()), new ArrayList<>());
 
-        ChannelRequest userPrivateChannel = channelService.createPrivate(new ChannelRegisterRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId()), new ArrayList<>());
+        ChannelRequest userPrivateChannel = channelService.createPrivate(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId()), new ArrayList<>());
 
         List<UUID> setUpUserChannelIds = channelService.getAllByUserId(setUpUser.getId())
                 .stream()
@@ -141,7 +141,7 @@ class ChannelServiceTest {
     @DisplayName("비공개 채널 삭제 시 읽음 상태도 함께 삭제된다.")
     @Test
     void deletePrivateChannelRemovesReadStatus() {
-        ChannelRequest privateChannel = channelService.createPrivate(new ChannelRegisterRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId()), new ArrayList<>());
+        ChannelRequest privateChannel = channelService.createPrivate(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId()), new ArrayList<>());
 
         UUID privateChannelId = privateChannel.id();
         channelService.delete(privateChannelId);

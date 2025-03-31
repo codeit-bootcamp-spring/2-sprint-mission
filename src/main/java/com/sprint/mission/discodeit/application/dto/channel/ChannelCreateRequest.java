@@ -4,5 +4,5 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.UUID;
 
-public record ChannelRegisterRequest(ChannelType channelType, String name, UUID logInUserId) {
+public record ChannelCreateRequest(ChannelType channelType, String name, UUID logInUserId) {
 }

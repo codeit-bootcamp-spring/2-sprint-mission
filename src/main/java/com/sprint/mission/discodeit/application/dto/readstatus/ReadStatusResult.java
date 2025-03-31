@@ -2,12 +2,13 @@ package com.sprint.mission.discodeit.application.dto.readstatus;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record ReadStatusResult(UUID id, UUID userId, UUID channelId) {
+public record ReadStatusResult(UUID readStatusId, UUID userId, UUID channelId, Instant lastReadTime) {
     public static ReadStatusResult fromEntity(ReadStatus readStatus) {
-        return new ReadStatusResult(readStatus.getId(), readStatus.getUserId(), readStatus.getChannelId());
+        return new ReadStatusResult(readStatus.getId(), readStatus.getUserId(), readStatus.getChannelId(), readStatus.getLastReadTime());
     }
 
 

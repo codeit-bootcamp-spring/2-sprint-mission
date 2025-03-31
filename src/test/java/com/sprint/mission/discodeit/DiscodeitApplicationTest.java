@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterRequest;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.ChannelRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
@@ -56,7 +56,7 @@ class DiscodeitApplicationTest {
     }
 
     private ChannelRequest setupChannel() {
-        ChannelRegisterRequest channelRegisterRequest = new ChannelRegisterRequest(ChannelType.PUBLIC, "7팀", setUpUser.id());
+        ChannelCreateRequest channelRegisterRequest = new ChannelCreateRequest(ChannelType.PUBLIC, "7팀", setUpUser.id());
         return channelController.createPublicChannel(channelRegisterRequest);
     }
 }
