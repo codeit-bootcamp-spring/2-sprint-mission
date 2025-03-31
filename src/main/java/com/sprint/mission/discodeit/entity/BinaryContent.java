@@ -1,26 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
+
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class BinaryContent {
-    private final UUID id;
-    private final Instant createdAtSeconds;
-    private byte[] data;
-    private final UUID userId; //profileId와 연결
-    private final UUID messageId; //attachments와 연결
+public class BinaryContent implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
+    //
+    private String fileName;
+    private Long size;
+    private String contentType;
+    private byte[] bytes;
 
-    public BinaryContent(byte[] data, UUID userId, UUID messageId) {
-        if ((userId != null && messageId != null) || (userId == null && messageId == null)) {
-            throw new IllegalArgumentException("BinaryContent는 userId 또는 messageId 중 하나만 설정해야 합니다.");
-        }
-
+    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
         this.id = UUID.randomUUID();
-        this.createdAtSeconds = Instant.now();
-        this.data = data;
-        this.userId = userId;
-        this.messageId = messageId;
+        this.createdAt = Instant.now();
+        //
+        this.fileName = fileName;
+        this.size = size;
+        this.contentType = contentType;
+        this.bytes = bytes;
     }
 }

@@ -1,37 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.time.Instant;
-import java.time.Duration;
-import java.util.UUID;
 import lombok.Getter;
 
+import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.UUID;
+
 @Getter
-public class UserStatus {
-    private final UUID id;
-    private final Instant createdAtSeconds;
-    private Instant updatedAtSeconds;
-    private final UUID userId;
+public class UserStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private UUID userId;
     private Instant lastActiveAt;
-    private boolean isOnline;
 
     public UserStatus(UUID userId, Instant lastActiveAt) {
         this.id = UUID.randomUUID();
-        this.createdAtSeconds = Instant.now();
-        this.updatedAtSeconds = createdAtSeconds;
+        this.createdAt = Instant.now();
+        //
         this.userId = userId;
         this.lastActiveAt = lastActiveAt;
     }
 
+    public void update(Instant lastActiveAt) {
+        boolean anyValueUpdated = false;
+        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+            this.lastActiveAt = lastActiveAt;
+            anyValueUpdated = true;
+        }
 
-    public void updatedLastActiveAt(Instant newLastActiveAt) {
-        if (newLastActiveAt != null && newLastActiveAt.isAfter(this.lastActiveAt)){
-            this.lastActiveAt = newLastActiveAt;
-            this.updatedAtSeconds = Instant.now();
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
         }
     }
 
-    public boolean isUserOnline() {
-        Instant now = Instant.now();
-        return Duration.between(lastActiveAt, now).getSeconds() <= 300;
+    public Boolean isOnline() {
+        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+
+        return lastActiveAt.isAfter(instantFiveMinutesAgo);
     }
 }
