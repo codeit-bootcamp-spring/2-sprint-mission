@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreate;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdate;
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -10,7 +9,6 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,14 +22,11 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public UserStatus create(UserStatusCreate dto) {
-        Map<UUID, UserStatus> userStatusData = userStatusRepository.getUserStatusData();
-        Map<UUID, User> userData = userRepository.getUserData();
-
-        User user = Optional.ofNullable(userData.get(dto.getUserId()))
+    public UserStatus create(UserStatusCreateRequestDto dto) {
+        User user = Optional.ofNullable(userRepository.findById(dto.getUserId()))
                 .orElseThrow(() -> new NoSuchElementException("User with id " + dto.getUserId() + " not found"));
 
-        if(userStatusData.values().stream()
+        if(userStatusRepository.findAll().stream()
                 .anyMatch(userStatus -> userStatus.getUserId().equals(user.getId()))){
             throw new IllegalArgumentException("관련된 객체가 이미 존재합니다.");
         }
@@ -44,9 +39,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus findById(UUID userStatusId){
-        Map<UUID, UserStatus> userStatusData = userStatusRepository.getUserStatusData();
-
-        return Optional.ofNullable(userStatusData.get(userStatusId))
+        return Optional.ofNullable(userStatusRepository.findById(userStatusId))
                 .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
     }
 
@@ -54,10 +47,8 @@ public class BasicUserStatusService implements UserStatusService {
         return userStatusRepository.findAll();
     }
 
-    public UserStatus update(UserStatusUpdate dto){
-        Map<UUID, UserStatus> userStatusData = userStatusRepository.getUserStatusData();
-
-        UserStatus userStatus = userStatusData.get(dto.getId());
+    public UserStatus update(UserStatusUpdateRequestDto dto){
+        UserStatus userStatus = userStatusRepository.findById(dto.getId());
         if (userStatus == null) {
             throw new NoSuchElementException("UserStatus with id " + dto.getId() + " not found");
         }
@@ -66,14 +57,12 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     public UserStatus updateByUserId(UUID userId, Instant newActivatedAt){
-        Map<UUID, UserStatus> userStatusData = userStatusRepository.getUserStatusData();
-
-        UserStatus userStatus = userStatusData.values().stream()
+        UserStatus userStatus = userStatusRepository.findAll().stream()
                 .filter(status -> status.getUserId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("UserStatus with userid " + userId + " not found"));
 
-        return userStatusRepository.update(new UserStatusUpdate(userStatus.getId(), newActivatedAt));
+        return userStatusRepository.update(new UserStatusUpdateRequestDto(userStatus.getId(), newActivatedAt));
     }
 
     public void delete(UUID userStatusId){

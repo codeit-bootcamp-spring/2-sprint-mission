@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class ReadStatusCreate {
+public class ReadStatusCreateRequestDto {
     private UUID userID;
     private UUID channelID;
     private Instant lastRead;

@@ -10,9 +10,8 @@ public class BaseEntity{
 
     public BaseEntity() {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.ofEpochSecond(System.currentTimeMillis());
+        this.createdAt = Instant.now();
         this.updatedAt = createdAt;
-
     }
 
     public UUID getId() {
@@ -26,7 +25,7 @@ public class BaseEntity{
     }
 
     public void update() {
-        this.updatedAt = Instant.ofEpochSecond(System.currentTimeMillis());
+        this.updatedAt = Instant.now();
     }
 
 }

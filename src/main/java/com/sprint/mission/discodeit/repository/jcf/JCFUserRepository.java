@@ -8,7 +8,11 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;
 
@@ -23,15 +27,10 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User update(User user, String newUsername, String newEmail, String newPassword){
-        user.update(newUsername, newEmail, newPassword);
+    public User update(User user, String newUsername, String newEmail, String newPassword, UUID newProfileId){
+        user.update(newUsername, newEmail, newPassword, newProfileId);
 
         return user;
-    }
-
-    @Override
-    public Map<UUID, User> getUserData(){
-        return data;
     }
 
     @Override

@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.UserCreate;
-import com.sprint.mission.discodeit.dto.user.UserResponse;
-import com.sprint.mission.discodeit.dto.user.UserUpdate;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -11,7 +12,6 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,14 +26,12 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(UserCreate dto) {
-        Map<UUID, User> userData = userRepository.getUserData();
-
-        if (userData.values().stream()
+    public User create(UserCreateRequestDto dto) {
+        if (userRepository.findAll().stream()
                 .anyMatch(user -> user.getUsername().equals(dto.getUsername()))) {
             throw new IllegalArgumentException("같은 이름을 가진 사람이 있습니다.");
         }
-        if (userData.values().stream()
+        if (userRepository.findAll().stream()
                 .anyMatch(user -> user.getEmail().equals(dto.getEmail()))) {
             throw new IllegalArgumentException("같은 메일을 가진 사람이 있습니다.");
         }
@@ -48,32 +46,30 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponse find(UUID userId) {
+    public UserResponseDto find(UUID userId) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId);
         User user = userRepository.findById(userId);
 
-        return new UserResponse(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
+        return new UserResponseDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
                 user.getEmail(), user.getProfileId(), userStatus.isOnline());
     }
 
     @Override
-    public List<UserResponse> findAll() {
+    public List<UserResponseDto> findAll() {
         return userRepository.findAll()
                 .stream()
                 .map(
                         user -> {
                             UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
-                            return new UserResponse(user.getId(), user.getCreatedAt(), user.getUpdatedAt(),
+                            return new UserResponseDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(),
                                     user.getUsername(),
                                     user.getEmail(), user.getProfileId(), userStatus.isOnline());
                         }).toList();
     }
 
     @Override
-    public User update(UserUpdate dto) {
-        Map<UUID, User> userData = userRepository.getUserData();
-
-        User user = Optional.ofNullable(userData.get(dto.getUserID()))
+    public User update(UserUpdateRequestDto dto) {
+        User user = Optional.ofNullable(userRepository.findById(dto.getUserID()))
                 .orElseThrow(() -> new NoSuchElementException("User with id " + dto.getUserID() + " not found"));
 
         return userRepository.update(user, dto.getNewUserName(), dto.getNewEmail(), dto.getNewPassword(), dto.getNewProfileID());
@@ -81,12 +77,14 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        Map<UUID, User> userData = userRepository.getUserData();
-        if (!userData.containsKey(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " not found");
-        }
+        User user = userRepository.findById(userId);
+
         userRepository.delete(userId);
         userStatusRepository.delete(userStatusRepository.findByUserId(userId).getId());
-        binaryContentRepository.delete(binaryContentRepository.getBinaryContentByUserId(userId).getId());
+
+        if (user.getProfileId() != null) {
+            BinaryContent binaryContent = binaryContentRepository.findById(user.getProfileId());
+            binaryContentRepository.delete(binaryContent.getId());
+        }
     }
 }

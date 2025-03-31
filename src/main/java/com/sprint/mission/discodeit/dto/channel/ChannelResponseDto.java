@@ -7,7 +7,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class ChannelResponse {
+public class ChannelResponseDto {
     Channel channel;
     Instant lastMessageAt;
     List<UUID> userIds;

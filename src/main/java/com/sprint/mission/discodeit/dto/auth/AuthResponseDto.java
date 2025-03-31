@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.user;
+package com.sprint.mission.discodeit.dto.auth;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserResponse {
+public class AuthResponseDto {
     private UUID id;
     private Instant createdAt;
     private Instant updatedAt;
@@ -16,5 +16,4 @@ public class UserResponse {
     private String email;
     //
     private UUID profileId;
-    private boolean isOnline;
 }

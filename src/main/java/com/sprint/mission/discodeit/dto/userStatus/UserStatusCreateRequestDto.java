@@ -5,7 +5,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class UserStatusCreate {
+public class UserStatusCreateRequestDto {
     private UUID userId;
     private Instant activatedAt;
 }

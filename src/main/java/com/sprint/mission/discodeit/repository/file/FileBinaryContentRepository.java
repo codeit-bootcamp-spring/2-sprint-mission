@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import java.io.File;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,17 +22,17 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileUserRepository implements UserRepository {
+public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
     //
-    private Map<UUID, User> userData;
-    private final Path userFilePath;
+    private Map<UUID, BinaryContent> data;
+    private final Path binaryContentFilePath;
 
-    public FileUserRepository(@Value("${discodeit.repository.file-directory:data}") String fileDirectory) {
+    public FileBinaryContentRepository(@Value("${discodeit.repository.file-directory:data}") String fileDirectory) {
 
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, User.class.getSimpleName());
-        this.userFilePath = DIRECTORY.resolve("user" + EXTENSION);
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, BinaryContent.class.getSimpleName());
+        this.binaryContentFilePath = DIRECTORY.resolve("binaryContent" + EXTENSION);
 
         if (Files.notExists(DIRECTORY)) {
             try {
@@ -47,51 +45,44 @@ public class FileUserRepository implements UserRepository {
     }
 
     public void dataLoad() {
-        if (!Files.exists(userFilePath)) {
-            userData = new HashMap<>();
+        if (!Files.exists(binaryContentFilePath)) {
+            data = new HashMap<>();
             dataSave();
             return;
         }
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(userFilePath.toFile()))) {
-            userData = (Map<UUID, User>) ois.readObject();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(binaryContentFilePath.toFile()))) {
+            data = (Map<UUID, BinaryContent>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("파일을 불러올 수 없습니다.", e);
         }
     }
 
     public void dataSave() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(userFilePath.toFile()))) {
-            oos.writeObject(userData);
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(binaryContentFilePath.toFile()))) {
+            oos.writeObject(data);
         } catch (IOException e) {
             throw new RuntimeException("파일을 저장할 수 없습니다."+ e.getMessage(), e);
         }
     }
 
-    public User save(User user){
-        this.userData.put(user.getId(), user);
+    public BinaryContent save(BinaryContent binaryContent){
+        this.data.put(binaryContent.getId(), binaryContent);
         dataSave();
 
-        return user;
+        return binaryContent;
     }
 
-    public User update(User user, String newUsername, String newEmail, String newPassword, UUID newProfileID){
-        user.update(newUsername, newEmail, newPassword, newProfileID);
-
-        dataSave();
-        return user;
+    public BinaryContent findById(UUID binaryContentId){
+        return Optional.ofNullable(data.get(binaryContentId))
+                .orElseThrow(() -> new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found"));
     }
 
-    public List<User> findAll(){
-        return this.userData.values().stream().toList();
+    public List<BinaryContent> findAll(){
+        return this.data.values().stream().toList();
     }
 
-    public User findById(UUID userId){
-        return Optional.ofNullable(userData.get(userId))
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-    }
-
-    public void delete(UUID userId){
-        userData.remove(userId);
+    public void delete(UUID binaryContentId){
+        data.remove(binaryContentId);
         dataSave();
     }
 }
