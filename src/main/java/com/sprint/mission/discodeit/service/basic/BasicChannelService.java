@@ -51,7 +51,12 @@ public class BasicChannelService implements ChannelService {
         List<UUID> userIds = createPrivateChannelDTO.getUserIds();
         if(userIds != null){
             for(UUID userId : userIds){
-                ReadStatus readStatus = new ReadStatus(UUID.randomUUID(), userId, channel.getId(), Instant.now());
+                ReadStatus readStatus = new ReadStatus(
+                        UUID.randomUUID(),
+                        userId,
+                        channel.getId(),
+                        Instant.now(),
+                        Instant.now());
                 readStatusRepository.save(readStatus);
             }
         }
@@ -134,7 +139,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDTO update(UpdateChannelDTO updateChannelDTO) {
+    public void update(UpdateChannelDTO updateChannelDTO) {
         Channel channel = channelRepository.findById(updateChannelDTO.getChannelId())
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + updateChannelDTO.getChannelId() + " not found"));
 
@@ -144,17 +149,6 @@ public class BasicChannelService implements ChannelService {
 
         channel.update(updateChannelDTO.getName(), updateChannelDTO.getDescription());
         channelRepository.save(channel);
-
-        Instant lastMessageTime = findLastMessageTime(channel.getId());
-
-        return new ChannelResponseDTO(
-                channel.getId(),
-                channel.getName(),
-                channel.getDescription(),
-                channel.getType(),
-                lastMessageTime,
-                null
-        );
     }
 
     @Override

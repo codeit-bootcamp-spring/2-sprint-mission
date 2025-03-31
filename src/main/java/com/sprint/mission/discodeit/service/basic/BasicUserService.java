@@ -30,6 +30,12 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDTO create(CreateUserDTO createUserDTO) {
+        // 동일한 username을 가진 사용자가 존재하는지 확인
+        Optional<User> existingUser = userRepository.findByUsername(createUserDTO.getUsername());
+        if (existingUser.isPresent()) {
+            throw new IllegalStateException("User already exists with username: " + createUserDTO.getUsername());
+        }
+
         User user = new User(createUserDTO.getUsername(), createUserDTO.getEmail(), createUserDTO.getPassword());
         user = userRepository.save(user);
 
@@ -64,8 +70,6 @@ public class BasicUserService implements UserService {
     public List<UserResponseDTO> findAll() {
         List<User> users = userRepository.findAll();
         return users.stream().map(user -> {
-            //UserStatus status = userStatusRepository.findByUserId(user.getId())
-                    //.orElseThrow(() -> new NoSuchElementException("User with id " + user.getId() + " not found"));
             Optional<UserStatus> optionalStatus = userStatusRepository.findByUserId(user.getId());
             boolean online = optionalStatus.map(UserStatus::isLogin).orElse(false);
             // status != null && status.isLogin();
@@ -74,7 +78,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDTO update(UpdateUserDTO updateUserDTO) {
+    public void update(UpdateUserDTO updateUserDTO) {
         User user = userRepository.findById(updateUserDTO.getUserId())
                 .orElseThrow(() -> new NoSuchElementException("User with id " + updateUserDTO.getUserId() + " not found"));
         user.update(user.getUsername(), user.getEmail(), user.getPassword());
@@ -96,7 +100,6 @@ public class BasicUserService implements UserService {
         UserStatus status = userStatusRepository.findByUserId(user.getId())
                 .orElseThrow(()->new NoSuchElementException("User with id " + finalUser.getId() + " not found"));
         boolean online = status != null && status.isLogin();
-        return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail(), online);
     }
 
     @Override

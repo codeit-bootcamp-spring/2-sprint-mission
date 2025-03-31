@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 @Getter
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
@@ -55,12 +57,11 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus update(UpdateUserStatusDTO userStatusDTO) {
+    public void update(UpdateUserStatusDTO userStatusDTO) {
         UserStatus userStatus = userStatusRepository.findByUserId(userStatusDTO.getId())
                 .orElseThrow(()-> new NoSuchElementException("User not found"));
         userStatus.setLastLogin(userStatusDTO.getLastModified());
         userStatusRepository.save(userStatus);
-        return userStatus;
     }
 
     @Override

@@ -2,8 +2,8 @@ server:
   port: 8080
 spring:
   application:
-    name: MyApp
+    name: discodeit
 discodeit:
   repository:
-    type: jcf # jcf | file (기본값은 jcf)
+    # type: jcf # jcf | file (기본값은 jcf)
     file-directory: .discodeit

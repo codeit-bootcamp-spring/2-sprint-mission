@@ -17,7 +17,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Repository
-@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file")
+@ConditionalOnProperty(
+        prefix = "discodeit.repository", name = "type",
+        havingValue = "file")
 public class FileUserRepository implements UserRepository {
     @Value("${discodeit.repository.file-directory}")
     private final Path DIRECTORY;

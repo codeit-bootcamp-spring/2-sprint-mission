@@ -31,7 +31,9 @@ public class BasicReadStatusService implements ReadStatusService {
                 .orElseThrow(() -> new NoSuchElementException("Channel not found"));
         User user = userRepository.findById(readStatusDTO.getUserId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
-        ReadStatus existing = readStatusRepository.findByUserAndChannel(readStatusDTO.getUserId(), channel.getId());
+        ReadStatus existing = readStatusRepository.findByUserAndChannel(user.getId(), channel.getId());
+
+        // 이미 존재한다면 exception
         if (existing != null) {
             throw new IllegalStateException("ReadStatus already exists");
         }
@@ -41,6 +43,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 UUID.randomUUID(),
                 readStatusDTO.getUserId(),
                 readStatusDTO.getChannelId(),
+                Instant.now(),
                 lastRead
         );
         readStatusRepository.save(readStatus);
@@ -62,12 +65,19 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(UpdateReadStatusDTO updateReadStatusDTO){
+    public Optional<ReadStatus> findByChannelIdAndUserId(UUID channelId, UUID userId) {
+        return findAllByUserId(userId).stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .max(Comparator.comparing(ReadStatus::getLastRead));
+    }
+
+    @Override
+    public void update(UpdateReadStatusDTO updateReadStatusDTO){
         ReadStatus readStatus = readStatusRepository.findById(updateReadStatusDTO.getId());
-        Optional.ofNullable(readStatus).orElseThrow(()-> new NoSuchElementException("ReadStatus not found"));
+        Optional.ofNullable(readStatus).
+                orElseThrow(()-> new NoSuchElementException("ReadStatus not found"));
         readStatus.setLastRead(updateReadStatusDTO.getLastReadAt());
         readStatusRepository.save(readStatus);
-        return readStatus;
     }
 
     @Override
