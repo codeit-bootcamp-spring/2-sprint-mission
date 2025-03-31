@@ -2,66 +2,108 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-@Primary
 @Repository
 public class FileMessageRepository implements MessageRepository {
-    private static final String FILE_PATH = "messages.ser";
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
+
+    public FileMessageRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
 
     @Override
-    public void save(Message message) {
-        if (message == null || message.getId() == null) {
-            throw new IllegalArgumentException("메세지나 ID가 공백입니다.");
+    public Message save(Message message) {
+        Path path = resolvePath(message.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        List<Message> messages = readFromFile();
-        messages.removeIf(m -> m.getId() != null && m.getId().equals(message.getId()));
-        messages.add(message);
-        writeToFile(messages);
+        return message;
     }
 
     @Override
     public Optional<Message> findById(UUID id) {
-        if (id == null) return Optional.empty();
-        return readFromFile().stream()
-                .filter(m -> id.equals(m.getId()))
-                .findFirst();
-    }
-
-    @Override
-    public List<Message> findAll() {
-        return readFromFile();
-    }
-
-    @Override
-    public void delete(UUID id) {
-        if (id == null) return;
-        List<Message> messages = readFromFile();
-        boolean removed = messages.removeIf(m -> id.equals(m.getId()));
-        if (removed) {
-            writeToFile(messages);
+        Message messageNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                messageNullable = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
+        return Optional.ofNullable(messageNullable);
     }
 
-    private void writeToFile(List<Message> messages) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(messages);
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Message) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .filter(message -> message.getChannelId().equals(channelId))
+                    .toList();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
-    private List<Message> readFromFile() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
-            List<Message> messages = (List<Message>) ois.readObject();
-            messages.removeIf(m -> m.getId() == null); // 데이터 정합성 체크
-            return messages;
-        } catch (IOException | ClassNotFoundException e) {
-            return new ArrayList<>();
+    @Override
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(message -> this.deleteById(message.getId()));
     }
 }
