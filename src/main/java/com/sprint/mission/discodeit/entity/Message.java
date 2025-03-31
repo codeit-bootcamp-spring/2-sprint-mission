@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -13,27 +12,24 @@ public class Message extends BaseEntity {
     private String message;
     private final UUID channelId;
     private final UUID senderId;
-    private final List<UUID> attachmentIds = new ArrayList<>();
+    private final List<UUID> attachmentIds;
 
 
-    public Message(String message, UUID channelId, UUID senderId) {
+    public Message(String message, UUID channelId, UUID senderId, List<UUID> attachmentIds) {
         this.message = message;
         this.channelId = channelId;
         this.senderId = senderId;
+        this.attachmentIds = attachmentIds;
     }
 
-    public void updateMessage(String newMessage, List<UUID> attachmentIds) {
+    public void updateMessage(String newMessage) {
         this.message = newMessage;
-        if (attachmentIds != null) {
-            this.attachmentIds.clear();
-            this.attachmentIds.addAll(attachmentIds);
-        }
         super.update();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(message, channelId, senderId);
+        return Objects.hash(getId());
     }
 
     @Override

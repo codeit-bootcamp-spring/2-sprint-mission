@@ -1,17 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.*;
+import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
+import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.UUID;
 
 
 @Service
@@ -22,37 +22,34 @@ public class BasicBinaryContentService implements BinaryContentService {
 
 
     @Override
-    public BinaryContent create(BinaryContentCreateDto binaryContentCreateDto) {
-        Path proFilePath = binaryContentCreateDto.path();
-        if (proFilePath != null && !proFilePath.toString().trim().isEmpty()) {
-            try {
-                byte[] bytes = Files.readAllBytes(proFilePath);
-                BinaryContent binaryContent = new BinaryContent(bytes);
-                BinaryContent createdContent = binaryContentRepository.save(binaryContent);
-                System.out.println(createdContent);
-                return createdContent;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return null;
+    public BinaryContent create(BinaryContentCreateDto request) {
+        String fileName = request.fileName();
+        String contentType = request.contentType();
+        byte[] bytes = request.bytes();
+        BinaryContent binaryContent = new BinaryContent(
+                fileName,
+                (long) bytes.length,
+                contentType,
+                bytes
+        );
+        return binaryContentRepository.save(binaryContent);
     }
 
 
     @Override
-    public BinaryContent getUser(BinaryContentFindDto binaryContentFindDto) {
+    public BinaryContent find(UUID binaryContentId) {
         return binaryContentRepository.load().stream()
-                .filter(m -> m.getId().equals(binaryContentFindDto.Id()))
+                .filter(m -> m.getId().equals(binaryContentId))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("Profile not found."));
+                .orElseThrow(() -> new NotFoundException("Profile not found."));
     }
 
 
     @Override
-    public List<BinaryContent> getAllUser() {
+    public List<BinaryContent> findAll() {
         List<BinaryContent> binaryContentList = binaryContentRepository.load();
         if (binaryContentList.isEmpty()) {
-            throw new NoSuchElementException("Profile not found.");
+            throw new NotFoundException("Profile not found.");
         }
         return binaryContentList;
     }
@@ -63,15 +60,19 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent matchingBinaryContent = binaryContentRepository.load().stream()
                 .filter(m -> m.getId().equals(binaryContentUpdateDto.Id()))
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("Profile not found."));
+                .orElseThrow(() -> new NotFoundException("Profile not found."));
 
-        Path proFilePath = binaryContentUpdateDto.newProfilePath();
-        try {
-            byte[] imageToBytes = Files.readAllBytes(proFilePath);
-            matchingBinaryContent.updateBinaryContent(imageToBytes);
-        } catch (IOException e) {
-            throw new NoSuchElementException(e);
-        }
+        String fileName = binaryContentUpdateDto.newFileName();
+        String contentType = binaryContentUpdateDto.newContentType();
+        byte[] bytes = binaryContentUpdateDto.newBytes();
+        BinaryContent binaryContent = new BinaryContent(
+                fileName,
+                (long) bytes.length,
+                contentType,
+                bytes
+        );
+
+        matchingBinaryContent.updateBinaryContent(fileName, (long) bytes.length, contentType, bytes);
         return binaryContentRepository.save(matchingBinaryContent);
     }
 

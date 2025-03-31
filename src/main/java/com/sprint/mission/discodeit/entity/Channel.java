@@ -29,7 +29,7 @@ public class Channel extends BaseEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(channelName, description);
+        return Objects.hash(getId());
     }
 
     @Override

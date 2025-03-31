@@ -10,11 +10,12 @@ import java.util.UUID;
 
 public record UserFindAllResponseDto(
         UUID userId,
-        String name,
+        Instant createdAt,
+        Instant updatedAt,
+        String username,
         String email,
         UUID profileId,
-        Instant createdAt,
-        String userStatus
+        Boolean online
 ) {
     public static List<UserFindAllResponseDto> UserFindAllResponse(List<User> users, List<UserStatus> userStatuses) {
         List<UserFindAllResponseDto> FindAllResponse = new ArrayList<>();
@@ -27,10 +28,11 @@ public record UserFindAllResponseDto(
             if (matchingUserStatus != null) {
                 UserFindAllResponseDto responseDto = new UserFindAllResponseDto(
                         user.getId(),
+                        user.getCreatedAt(),
+                        user.getUpdatedAt(),
                         user.getName(),
                         user.getEmail(),
                         user.getProfileId(),
-                        user.getCreatedAt(),
                         matchingUserStatus.currentUserStatus()
                 );
                 FindAllResponse.add(responseDto);

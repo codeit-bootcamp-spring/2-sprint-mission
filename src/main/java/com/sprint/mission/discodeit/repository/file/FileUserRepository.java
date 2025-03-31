@@ -8,8 +8,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -17,16 +15,12 @@ import java.util.stream.Stream;
 public class FileUserRepository implements UserRepository {
     private static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data", "user");
 
-    private final List<User> userData;
-
     public FileUserRepository() {
-        userData = new ArrayList<>();
         init();
     }
 
     @Override
     public User save(User user) {
-        userData.add(user);
         Path path = DIRECTORY.resolve(user.getId() + ".ser");
         saveToFile(path, user);
         return user;
@@ -77,11 +71,11 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void remove(User user) {
-        try{
+        try {
             if (user != null && Files.exists(DIRECTORY.resolve(user.getId() + ".ser"))) {
                 Files.delete(DIRECTORY.resolve(user.getId() + ".ser"));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

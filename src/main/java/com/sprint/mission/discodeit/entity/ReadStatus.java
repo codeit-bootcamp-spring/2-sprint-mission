@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.sprint.mission.discodeit.utils.TimeUtil;
 import lombok.Getter;
 
@@ -14,14 +15,21 @@ public class ReadStatus extends BaseEntity {
     private Instant lastReadTime;
 
 
-    public ReadStatus(UUID userId, UUID channelId) {
+    public ReadStatus(UUID userId, UUID channelId, Instant lastReadTime) {
         this.userId = userId;
         this.channelId = channelId;
-        this.lastReadTime = Instant.now();
+        this.lastReadTime = lastReadTime;
     }
 
-    public void readStatusUpdate(){
-        this.lastReadTime = Instant.now();
+    public void readStatusUpdate(Instant newLastReadTime) {
+        boolean anyValueUpdated = false;
+        if (newLastReadTime != null && !newLastReadTime.equals(this.lastReadTime)) {
+            this.lastReadTime = newLastReadTime;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
     public String getReadAttFormatted() {

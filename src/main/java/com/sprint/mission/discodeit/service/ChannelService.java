@@ -6,8 +6,8 @@ import com.sprint.mission.discodeit.service.dto.channeldto.*;
 import java.util.List;
 
 public interface ChannelService {
-    Channel createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto);
-    Channel createPublic(ChannelCreatePublicDto channelCreateDto);
+    Channel createPrivate(ChannelCreateDto channelCreatePrivateDto);
+    Channel createPublic(ChannelCreateDto channelCreateDto);
     ChannelFindResponseDto find(ChannelFindRequestDto channelFindRequestDto);
     List<ChannelFindAllByUserIdResponseDto> findAllByUserId(ChannelFindAllByUserIdRequestDto channelFindAllByUserIdRequestDto);
     Channel update(ChannelUpdateDto channelUpdateDto);

@@ -8,23 +8,19 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 @Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
-    private static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"),"data", "readstatus");
+    private static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data", "readstatus");
 
-    private final List<ReadStatus> readStatusesData;
     public FileReadStatusRepository() {
-        readStatusesData = new ArrayList<>();
         init();
     }
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        readStatusesData.add(readStatus);
         Path path = DIRECTORY.resolve(readStatus.getId() + ".ser");
         saveToFile(path, readStatus);
         return readStatus;
