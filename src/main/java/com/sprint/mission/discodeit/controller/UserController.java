@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusResult;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class UserController {
     private final UserStatusService userStatusService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResult> register(@RequestPart UserRequest userRequest,
+    public ResponseEntity<UserResult> register(@Valid @RequestPart UserRequest userRequest,
                                                @RequestPart(required = false) MultipartFile multipartFile) {
         UUID profileId = binaryContentService.createProfileImage(multipartFile);
 
@@ -32,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserResponse> findById(@PathVariable UUID userId) {
+    public ResponseEntity<UserResponse> getById(@PathVariable UUID userId) {
         UserResult userResult = userService.getById(userId);
         UserStatusResult userStatusDto = userStatusService.getByUserId(userResult.id());
 
@@ -40,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResult>> findAll() {
+    public ResponseEntity<List<UserResult>> getAll() {
         return ResponseEntity.ok(userService.getAll());
     }
 

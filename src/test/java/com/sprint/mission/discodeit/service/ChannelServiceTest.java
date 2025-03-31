@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
-import com.sprint.mission.discodeit.application.dto.channel.ChannelRequest;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -37,7 +37,7 @@ class ChannelServiceTest {
     private MessageRepository messageRepository;
     private ReadStatusRepository readStatusRepository;
     private ChannelRepository channelRepository;
-    private ChannelRequest setUpChannel;
+    private ChannelResult setUpChannel;
     private User setUpUser;
 
     @BeforeEach
@@ -65,7 +65,7 @@ class ChannelServiceTest {
     void createPrivateChannel() {
         User otherUser = userRepository.save(new User(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword(), null));
         ChannelCreateRequest channelRegisterRequest = new ChannelCreateRequest(ChannelType.PUBLIC, CHANNEL_NAME, setUpUser.getId());
-        ChannelRequest privateChannel = channelService.createPrivate(channelRegisterRequest, List.of(otherUser.getId()));
+        ChannelResult privateChannel = channelService.createPrivate(channelRegisterRequest, List.of(otherUser.getId()));
 
         List<UUID> readStatusUserIds = readStatusRepository.findByChannelId(privateChannel.id())
                 .stream()
@@ -78,7 +78,7 @@ class ChannelServiceTest {
     @DisplayName("채널 ID로 조회하면 올바른 채널을 반환한다.")
     @Test
     void findChannelById() {
-        ChannelRequest channel = channelService.getById(setUpChannel.id());
+        ChannelResult channel = channelService.getById(setUpChannel.id());
         assertThat(setUpChannel.id() + setUpChannel.name()).isEqualTo(channel.id() + channel.name());
     }
 
@@ -93,7 +93,7 @@ class ChannelServiceTest {
     @Test
     void updatePrivateChannelNameThrowsException() {
         ChannelCreateRequest privateChannelDto = new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId());
-        ChannelRequest privateChannel = channelService.createPrivate(privateChannelDto, new ArrayList<>());
+        ChannelResult privateChannel = channelService.createPrivate(privateChannelDto, new ArrayList<>());
 
         assertThatThrownBy(() -> channelService.updatePublicChannelName(privateChannel.id(), UPDATED_CHANNEL_NAME))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -106,11 +106,11 @@ class ChannelServiceTest {
 
         channelService.createPrivate(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, otherUser.getId()), new ArrayList<>());
 
-        ChannelRequest userPrivateChannel = channelService.createPrivate(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId()), new ArrayList<>());
+        ChannelResult userPrivateChannel = channelService.createPrivate(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId()), new ArrayList<>());
 
         List<UUID> setUpUserChannelIds = channelService.getAllByUserId(setUpUser.getId())
                 .stream()
-                .map(ChannelRequest::id)
+                .map(ChannelResult::id)
                 .toList();
 
         assertThat(setUpUserChannelIds).containsExactlyInAnyOrder(setUpChannel.id(), userPrivateChannel.id());
@@ -141,7 +141,7 @@ class ChannelServiceTest {
     @DisplayName("비공개 채널 삭제 시 읽음 상태도 함께 삭제된다.")
     @Test
     void deletePrivateChannelRemovesReadStatus() {
-        ChannelRequest privateChannel = channelService.createPrivate(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId()), new ArrayList<>());
+        ChannelResult privateChannel = channelService.createPrivate(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, setUpUser.getId()), new ArrayList<>());
 
         UUID privateChannelId = privateChannel.id();
         channelService.delete(privateChannelId);
@@ -159,7 +159,7 @@ class ChannelServiceTest {
         messageRepository.save(new Message(MESSAGE_CONTENT, setUpChannel.id(), setUpUser.getId(), new ArrayList<>()));
         Message message = messageRepository.save(new Message(MESSAGE_CONTENT + "123", setUpChannel.id(), setUpUser.getId(), new ArrayList<>()));
 
-        ChannelRequest channel = channelService.getById(setUpChannel.id());
+        ChannelResult channel = channelService.getById(setUpChannel.id());
         assertThat(channel.lastMessageCreatedAt()).isEqualTo(message.getCreatedAt());
     }
 }

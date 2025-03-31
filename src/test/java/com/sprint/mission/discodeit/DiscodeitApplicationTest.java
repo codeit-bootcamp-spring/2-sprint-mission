@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
-import com.sprint.mission.discodeit.application.dto.channel.ChannelRequest;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
 import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
 import com.sprint.mission.discodeit.application.dto.user.UserRequest;
@@ -33,7 +33,7 @@ class DiscodeitApplicationTest {
     @Autowired
     private MessageController messageController;
     private UserResult setUpUser;
-    private ChannelRequest setUpChannel;
+    private ChannelResult setUpChannel;
 
     @BeforeEach
     void setUp() {
@@ -55,7 +55,7 @@ class DiscodeitApplicationTest {
         return userController.register(userRequest, null).getBody();
     }
 
-    private ChannelRequest setupChannel() {
+    private ChannelResult setupChannel() {
         ChannelCreateRequest channelRegisterRequest = new ChannelCreateRequest(ChannelType.PUBLIC, "7팀", setUpUser.id());
         return channelController.createPublicChannel(channelRegisterRequest);
     }

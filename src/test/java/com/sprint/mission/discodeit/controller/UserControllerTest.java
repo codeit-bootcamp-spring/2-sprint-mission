@@ -81,7 +81,7 @@ class UserControllerTest {
     void registerValidateUserStatus() {
         UserRequest userRequest = new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), LOGIN_USER.getPassword());
         UserResult user = userController.register(userRequest, null).getBody();
-        UserResponse userResponse = userController.findById(user.id()).getBody();
+        UserResponse userResponse = userController.getById(user.id()).getBody();
 
         assertThat(userResponse.isLogin()).isFalse();
     }

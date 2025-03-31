@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
-import com.sprint.mission.discodeit.application.dto.channel.ChannelRequest;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
 import com.sprint.mission.discodeit.application.dto.user.UserRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -53,7 +53,7 @@ class ChannelControllerTest {
     @DisplayName("Public 채널 생성")
     @Test
     void createPublicChannel() {
-        ChannelRequest channel = channelController.createPublicChannel(new ChannelCreateRequest(ChannelType.PUBLIC, "Public", setUpUser.id()));
+        ChannelResult channel = channelController.createPublicChannel(new ChannelCreateRequest(ChannelType.PUBLIC, "Public", setUpUser.id()));
 
         assertThat(channel.type()).isEqualTo(ChannelType.PUBLIC);
     }
@@ -62,7 +62,7 @@ class ChannelControllerTest {
     @Test
     void createPrivateChannel() {
         UserResult otherUser = userService.register(new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
-        ChannelRequest privateChannel = createPrivateChannel(setUpUser, List.of(otherUser.id()));
+        ChannelResult privateChannel = createPrivateChannel(setUpUser, List.of(otherUser.id()));
 
         assertThat(privateChannel.privateMemberIds()).containsExactlyInAnyOrder(otherUser.id());
     }
@@ -70,13 +70,13 @@ class ChannelControllerTest {
     @DisplayName("Private 채널 조회 시 유저에게만 속한 Private 채널을 반환한다.")
     @Test
     void findAll() {
-        ChannelRequest privateChannel = createPrivateChannel(setUpUser, new ArrayList<>());
-        ChannelRequest userPublicChannel = channelController.createPublicChannel(new ChannelCreateRequest(ChannelType.PUBLIC, "Public", setUpUser.id()));
+        ChannelResult privateChannel = createPrivateChannel(setUpUser, new ArrayList<>());
+        ChannelResult userPublicChannel = channelController.createPublicChannel(new ChannelCreateRequest(ChannelType.PUBLIC, "Public", setUpUser.id()));
         UserResult otherUser = userService.register(new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
         createPrivateChannel(otherUser, new ArrayList<>());
 
 
-        List<UUID> channelIds = channelController.findAllByUserId(setUpUser.id()).stream().map(ChannelRequest::id).toList();
+        List<UUID> channelIds = channelController.getAllByUserId(setUpUser.id()).stream().map(ChannelResult::id).toList();
 
         assertThat(channelIds).containsExactlyInAnyOrder(privateChannel.id(), userPublicChannel.id());
     }
@@ -85,14 +85,14 @@ class ChannelControllerTest {
     @Test
     void findByIdPrivateChannel_MemberTogether() {
         UserResult otherUser = userService.register(new UserRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword()), null);
-        ChannelRequest channel = createPrivateChannel(setUpUser, new ArrayList<>());
+        ChannelResult channel = createPrivateChannel(setUpUser, new ArrayList<>());
 
-        ChannelRequest privateChannel = channelController.addPrivateChannelMember(channel.id(), OTHER_USER.getEmail());
+        ChannelResult privateChannel = channelController.addPrivateChannelMember(channel.id(), OTHER_USER.getEmail());
 
         assertThat(privateChannel.privateMemberIds()).containsExactlyInAnyOrder(setUpUser.id(), otherUser.id());
     }
 
-    private ChannelRequest createPrivateChannel(UserResult loginUser, List<UUID> memberIds) {
+    private ChannelResult createPrivateChannel(UserResult loginUser, List<UUID> memberIds) {
         return channelController.createPrivateChannel(new ChannelCreateRequest(ChannelType.PRIVATE, CHANNEL_NAME, loginUser.id()), memberIds);
     }
 }

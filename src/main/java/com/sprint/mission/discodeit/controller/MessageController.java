@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.application.dto.message.MessageCreationReque
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class MessageController {
     private final BinaryContentService binaryContentService;
 
     @PostMapping
-    public ResponseEntity<MessageResult> createMessage(@RequestPart("message") MessageCreationRequest messageCreationRequest,
+    public ResponseEntity<MessageResult> createMessage(@Valid @RequestPart("message") MessageCreationRequest messageCreationRequest,
                                                        @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         List<UUID> profileImageIds = files.stream()
                 .map(binaryContentService::createProfileImage)
@@ -30,7 +31,7 @@ public class MessageController {
     }
 
     @GetMapping("/channel/{channelId}")
-    public ResponseEntity<List<MessageResult>> findByChannelId(@PathVariable UUID channelId) {
+    public ResponseEntity<List<MessageResult>> getByChannelId(@PathVariable UUID channelId) {
         return ResponseEntity.ok(messageService.getAllByChannelId(channelId));
     }
 

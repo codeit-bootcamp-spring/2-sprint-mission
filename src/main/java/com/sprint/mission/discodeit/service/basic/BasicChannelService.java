@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
-import com.sprint.mission.discodeit.application.dto.channel.ChannelRequest;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -29,15 +29,15 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public ChannelRequest createPublic(ChannelCreateRequest channelRegisterRequest) {
+    public ChannelResult createPublic(ChannelCreateRequest channelRegisterRequest) {
         Channel channel = new Channel(channelRegisterRequest.channelType(), channelRegisterRequest.name());
         Channel savedChannel = channelRepository.save(channel);
 
-        return ChannelRequest.fromPublic(savedChannel, Instant.ofEpochSecond(0));
+        return ChannelResult.fromPublic(savedChannel, Instant.ofEpochSecond(0));
     }
 
     @Override
-    public ChannelRequest createPrivate(ChannelCreateRequest channelRegisterRequest, List<UUID> channelMemberIds) {
+    public ChannelResult createPrivate(ChannelCreateRequest channelRegisterRequest, List<UUID> channelMemberIds) {
         Channel channel = new Channel(channelRegisterRequest.channelType(), channelRegisterRequest.name());
         Channel savedChannel = channelRepository.save(channel);
 
@@ -46,11 +46,11 @@ public class BasicChannelService implements ChannelService {
             readStatusRepository.save(new ReadStatus(memberId, savedChannel.getId()));
         }
 
-        return ChannelRequest.fromPrivate(savedChannel, Instant.ofEpochSecond(0), channelMemberIds);
+        return ChannelResult.fromPrivate(savedChannel, Instant.ofEpochSecond(0), channelMemberIds);
     }
 
     @Override
-    public ChannelRequest getById(UUID id) {
+    public ChannelResult getById(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
@@ -62,16 +62,16 @@ public class BasicChannelService implements ChannelService {
                     .map(ReadStatus::getUserId)
                     .toList();
 
-            return ChannelRequest.fromPrivate(channel, lastMessageCreatedAt, userId);
+            return ChannelResult.fromPrivate(channel, lastMessageCreatedAt, userId);
         }
 
-        return ChannelRequest.fromPublic(channel, lastMessageCreatedAt);
+        return ChannelResult.fromPublic(channel, lastMessageCreatedAt);
     }
 
     @Override
-    public List<ChannelRequest> getAllByUserId(UUID userId) {
-        List<ChannelRequest> totalChannels = new ArrayList<>(findPublicChannelsByUserId());
-        List<ChannelRequest> privateChannels = findPrivateChannelsByUserId(userId);
+    public List<ChannelResult> getAllByUserId(UUID userId) {
+        List<ChannelResult> totalChannels = new ArrayList<>(findPublicChannelsByUserId());
+        List<ChannelResult> privateChannels = findPrivateChannelsByUserId(userId);
 
         totalChannels.addAll(privateChannels);
 
@@ -79,7 +79,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelRequest updatePublicChannelName(UUID id, String name) {
+    public ChannelResult updatePublicChannelName(UUID id, String name) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
@@ -91,7 +91,7 @@ public class BasicChannelService implements ChannelService {
         Channel updatedChannel = channelRepository.save(channel);
         Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId());
 
-        return ChannelRequest.fromPublic(updatedChannel, lastMessageCreatedAt);
+        return ChannelResult.fromPublic(updatedChannel, lastMessageCreatedAt);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public ChannelRequest addPrivateChannelMember(UUID channelId, UUID friendId) {
+    public ChannelResult addPrivateChannelMember(UUID channelId, UUID friendId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
@@ -131,21 +131,21 @@ public class BasicChannelService implements ChannelService {
                 .map(ReadStatus::getUserId)
                 .toList();
 
-        return ChannelRequest.fromPrivate(channel, lastMessageCreatedAt, userId);
+        return ChannelResult.fromPrivate(channel, lastMessageCreatedAt, userId);
     }
 
-    private List<ChannelRequest> findPrivateChannelsByUserId(UUID userId) {
+    private List<ChannelResult> findPrivateChannelsByUserId(UUID userId) {
         return readStatusRepository.findByUserId(userId)
                 .stream()
                 .map(readStatus -> this.getById(readStatus.getChannelId()))
                 .toList();
     }
 
-    private List<ChannelRequest> findPublicChannelsByUserId() {
+    private List<ChannelResult> findPublicChannelsByUserId() {
         return channelRepository.findAll()
                 .stream()
                 .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
-                .map(channel -> ChannelRequest.fromPublic(channel, messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())))
+                .map(channel -> ChannelResult.fromPublic(channel, messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())))
                 .toList();
     }
 }
