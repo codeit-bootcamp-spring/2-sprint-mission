@@ -2,103 +2,123 @@ package com.sprint.mission.discodeit.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelRepository;
+import jakarta.annotation.PreDestroy;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Channel 저장소의 파일 기반 구현 클래스
- */
+@Repository("fileChannelRepositoryImplement")
 public class FileChannelRepositoryImplement implements ChannelRepository {
-    private static final String DATA_DIR = "data";
-    private static final String CHANNEL_DATA_FILE = "channels.dat";
-    
-    // 채널 데이터를 저장할 Map (채널 ID를 키로 사용)
-    private Map<UUID, Channel> channelRepository;
-    
+    private String dataDir;
+    private String channelDataFile;
+
+    private final Map<UUID, Channel> channelRepository;
+
     public FileChannelRepositoryImplement() {
-        loadData();
+        this.dataDir = "./data";
+        this.channelDataFile = "channels.dat";
+        channelRepository = loadData();
     }
-    
-    /**
-     * 메모리에 데이터를 파일로부터 로드합니다.
-     */
+
+    public FileChannelRepositoryImplement(String dataDir) {
+        this.dataDir = dataDir;
+        this.channelDataFile = "channels.dat";
+        channelRepository = loadData();
+    }
+
     @SuppressWarnings("unchecked")
-    private void loadData() {
-        File dir = new File(DATA_DIR);
+    private Map<UUID, Channel> loadData() {
+        File dir = new File(dataDir);
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        
-        File file = new File(dir, CHANNEL_DATA_FILE);
-        
+
+        File file = new File(dir, channelDataFile);
+        System.out.println("채널 데이터 로드 경로: " + file.getAbsolutePath());
+
         if (file.exists()) {
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
-                channelRepository = (Map<UUID, Channel>) in.readObject();
-                System.out.println("채널 데이터 로드 완료: " + channelRepository.size() + "개의 채널");
+                return (Map<UUID, Channel>) in.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                System.err.println("채널 데이터 로드 중 오류 발생: " + e.getMessage());
-                channelRepository = new HashMap<>();
+                System.err.println("채널 데이터 로드 오류: " + e.getMessage());
+                return new ConcurrentHashMap<>();
             }
-        } else {
-            channelRepository = new HashMap<>();
-            System.out.println("새로운 채널 저장소 생성");
         }
+
+        return new ConcurrentHashMap<>();
     }
-    
-    /**
-     * 메모리의 데이터를 파일에 저장합니다.
-     */
-    private void saveData() {
-        File dir = new File(DATA_DIR);
+
+    private synchronized void saveData() {
+        File dir = new File(dataDir);
         if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                System.err.println("데이터 디렉토리 생성 실패: " + DATA_DIR);
-                return;
-            }
+            dir.mkdirs();
         }
-        
-        File file = new File(dir, CHANNEL_DATA_FILE);
-        
+
+        File file = new File(dir, channelDataFile);
+        System.out.println("채널 데이터 저장 경로: " + file.getAbsolutePath());
+
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(channelRepository);
-            System.out.println("채널 데이터 저장 완료: " + channelRepository.size() + "개의 채널");
         } catch (IOException e) {
-            System.err.println("채널 데이터 저장 중 오류 발생: " + e.getMessage());
+            System.err.println("채널 데이터 저장 오류: " + e.getMessage());
+            throw new RuntimeException("채널 데이터 저장 실패", e);
         }
     }
-    
+
     @Override
-    public Channel registerChannel(Channel channel) {
+    public boolean register(Channel channel) {
         channelRepository.put(channel.getChannelId(), channel);
-        saveData(); // 데이터 변경 시 저장
-        return channel;
+        saveData();
+        return true;
     }
-    
+
     @Override
-    public Set<UUID> AllChannelUserList() {
-        // 방어적 복사를 통해 원본 데이터 보호
+    public Set<UUID> allChannelIdList() {
         return new HashSet<>(channelRepository.keySet());
     }
 
     @Override
-    public Optional<Channel> findByChannelId(UUID channelId) {
+    public Optional<Channel> findById(UUID channelId) {
         return Optional.ofNullable(channelRepository.get(channelId));
     }
 
     @Override
-    public Optional<Channel> findByChannelName(String channelName) {
+    public Optional<String> findChannelNameById(UUID channelId) {
+        return findById(channelId).map(Channel::getChannelName);
+    }
+
+    @Override
+    public Optional<Channel> findByName(String channelName) {
         return channelRepository.values().stream()
-                .filter(channel -> channel.getChannelName().equals(channelName))
+                .filter(channel -> channel.getChannelName() != null && channel.getChannelName().equals(channelName))
                 .findFirst();
     }
-    
+
     @Override
-    public boolean removeChannel(UUID channelId) {
-        boolean result = channelRepository.remove(channelId) != null;
-        if (result) {
-            saveData(); // 데이터 변경 시 저장
+    public boolean deleteChannel(UUID channelId) {
+        boolean removed = channelRepository.remove(channelId) != null;
+        if (removed) {
+            saveData();
         }
-        return result;
+        return removed;
     }
-} 
+
+    @Override
+    public boolean updateChannel(Channel channel) {
+        if (channel == null || !channelRepository.containsKey(channel.getChannelId())) {
+            return false;
+        }
+        channelRepository.put(channel.getChannelId(), channel);
+        saveData();
+        return true;
+    }
+
+    // 애플리케이션 종료 시 데이터 저장 보장
+    @PreDestroy
+    public void saveDataOnShutdown() {
+        System.out.println("애플리케이션 종료 - 채널 데이터 저장 중");
+        saveData();
+    }
+}

@@ -1,17 +1,20 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.UserDto;
+import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
-//유저 CRUD
+@Component//유저 CRUD
 public interface UserService {
-    void createdUser(String email, String password); //등록
-    User findByUserId(UUID userId); //조회(단건)
-    Set<UUID> findByAllUsersId();//모든 유저조회
-    User deleteUser(UUID userId);//삭제
-    
-    User updateEmail(UUID userId, String newEmail); //이메일 업데이트
-    User updatePassword(UUID userId, String newPassword); //비밀번호 업데이트
+
+    UserDto.Summary findByUserId(UUID id);
+    List<UserDto.Summary> findByAllUsersId();
+    void deleteUser(UUID id);
+    UserDto.Response createdUser(UserDto.Create createUserDto);
+    //업데이트 권한에 대한 것은?
+    UserDto.Update updateUser(UUID userId, UserDto.Update updateUserDto);
+
+    boolean existsById(String userId);
 }

@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: discodeit
+  jpa:
+    open-in-view: false
+
+discodeit:
+  storage:
+
+    data-dir: data
+    # 이미지 파일
+    image-dir: C:/Users/ych61/IdeaProjects/codeit_sprint/2-sprint-mission/images
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    com.sprint.mission.discodeit: DEBUG
+    org.springframework.web: INFO
+
+jwt:
+  secret: your-very-strong-and-long-secret-key-please-change-this #

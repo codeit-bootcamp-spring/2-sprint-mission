@@ -2,75 +2,76 @@ package com.sprint.mission.discodeit.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageRepository;
+import jakarta.annotation.PreDestroy;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
-/**
- * Message 저장소의 파일 기반 구현 클래스
- */
+@Repository("fileMessageRepositoryImplement")
 public class FileMessageRepositoryImplement implements MessageRepository {
-    private static final String DATA_DIR = "data";
-    private static final String MESSAGE_DATA_FILE = "messages.dat";
+    private String dataDir;
+    private String messageDataFile;
     
-    private Map<UUID, Message> messageRepository;
-
+    private final Map<UUID, Message> messageRepository;
+    
     public FileMessageRepositoryImplement() {
-        loadData();
+        this.dataDir = "./data";
+        this.messageDataFile = "messages.dat";
+        messageRepository = loadData();
     }
     
-    /**
-     * 메모리에 데이터를 파일로부터 로드합니다.
-     */
+    public FileMessageRepositoryImplement(String dataDir) {
+        this.dataDir = dataDir;
+        this.messageDataFile = "messages.dat";
+        messageRepository = loadData();
+    }
+    
     @SuppressWarnings("unchecked")
-    private void loadData() {
-        File dir = new File(DATA_DIR);
+    private Map<UUID, Message> loadData() {
+        File dir = new File(dataDir);
         if (!dir.exists()) {
             dir.mkdirs();
         }
         
-        File file = new File(dir, MESSAGE_DATA_FILE);
+        File file = new File(dir, messageDataFile);
+        System.out.println("메시지 데이터 로드 경로: " + file.getAbsolutePath());
         
         if (file.exists()) {
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
-                messageRepository = (Map<UUID, Message>) in.readObject();
-                System.out.println("메시지 데이터 로드 완료: " + messageRepository.size() + "개의 메시지");
+                return (Map<UUID, Message>) in.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                System.err.println("메시지 데이터 로드 중 오류 발생: " + e.getMessage());
-                messageRepository = new HashMap<>();
-            }
-        } else {
-            messageRepository = new HashMap<>();
-            System.out.println("새로운 메시지 저장소 생성");
-        }
-    }
-    
-    /**
-     * 메모리의 데이터를 파일에 저장합니다.
-     */
-    private void saveData() {
-        File dir = new File(DATA_DIR);
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                System.err.println("데이터 디렉토리 생성 실패: " + DATA_DIR);
-                return;
+                System.err.println("메시지 데이터 로드 오류: " + e.getMessage());
+                return new HashMap<>();
             }
         }
         
-        File file = new File(dir, MESSAGE_DATA_FILE);
+        return new HashMap<>();
+    }
+    
+    private synchronized void saveData() {
+        File dir = new File(dataDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        
+        File file = new File(dir, messageDataFile);
+        System.out.println("메시지 데이터 저장 경로: " + file.getAbsolutePath());
         
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
             out.writeObject(messageRepository);
-            System.out.println("메시지 데이터 저장 완료: " + messageRepository.size() + "개의 메시지");
         } catch (IOException e) {
-            System.err.println("메시지 데이터 저장 중 오류 발생: " + e.getMessage());
+            System.err.println("메시지 데이터 저장 오류: " + e.getMessage());
+            throw new RuntimeException("메시지 데이터 저장 실패", e);
         }
     }
 
     @Override
-    public void register(Message message) {
+    public boolean register(Message message) {
         messageRepository.put(message.getId(), message);
-        saveData(); // 데이터 변경 시 저장
+        saveData();
+        return true;
     }
 
     @Override
@@ -80,16 +81,46 @@ public class FileMessageRepositoryImplement implements MessageRepository {
 
     @Override
     public List<Message> findAll() {
-        // 방어적 복사를 통해 원본 데이터 보호
         return new ArrayList<>(messageRepository.values());
     }
 
     @Override
     public boolean deleteMessage(UUID messageId) {
-        boolean result = messageRepository.remove(messageId) != null;
-        if (result) {
-            saveData(); // 데이터 변경 시 저장
+        boolean removed = messageRepository.remove(messageId) != null;
+        if (removed) {
+            saveData();
         }
-        return result;
+        return removed;
+    }
+
+
+    @Override
+    public boolean updateMessage(Message message) {
+        if (message == null || !messageRepository.containsKey(message.getId())) {
+            return false;
+        }
+        messageRepository.put(message.getId(), message);
+        saveData();
+        return true;
+    }
+
+    public List<Message> findAllByAuthorId(UUID authorId) {
+        return messageRepository.values().stream()
+            .filter(message -> authorId.equals(message.getAuthorId()))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.values().stream()
+            .filter(message -> message.getChannelId() != null && message.getChannelId().equals(channelId))
+            .collect(Collectors.toList());
+    }
+
+    // 애플리케이션 종료 시 데이터 저장 보장
+    @PreDestroy
+    public void saveDataOnShutdown() {
+        System.out.println("애플리케이션 종료 - 메시지 데이터 저장 중");
+        saveData();
     }
 } 
