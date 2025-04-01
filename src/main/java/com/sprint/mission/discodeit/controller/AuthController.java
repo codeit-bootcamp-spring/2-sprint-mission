@@ -10,17 +10,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
-@Controller
-@ResponseBody
+@RestController
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
 
-    @RequestMapping(path = "login")
+    @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
         User user = authService.login(loginRequest);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(user);
+        return ResponseEntity.ok(user);
     }
 }
