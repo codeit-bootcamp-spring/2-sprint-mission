@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.util.LogMapUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,33 +22,37 @@ public class MessageController {
     private final MessageService messageService;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<?> create(@RequestBody MessageCreateRequest messageRequest) {
+    public ResponseEntity<Message> create(@RequestBody MessageCreateRequest messageRequest) {
         Message message = messageService.create(messageRequest);
-        log.info("메시지 생성 완료 {}", message);
+        log.info("{}", LogMapUtil.of("action", "create")
+                .add("message", message));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 
     @RequestMapping(value = "/read", method = RequestMethod.GET)
-    public ResponseEntity<?> read(@RequestParam UUID messageKey) {
+    public ResponseEntity<Message> read(@RequestParam UUID messageKey) {
         Message message = messageService.read(messageKey);
-        log.info("메시지 조회 완료 {}", message);
+        log.info("{}", LogMapUtil.of("action", "read")
+                .add("message", message));
 
         return ResponseEntity.ok(message);
     }
 
     @RequestMapping(value = "/readAllByChannel", method = RequestMethod.GET)
-    public ResponseEntity<?> readAllByChannel(@RequestParam UUID channelKey) {
+    public ResponseEntity<List<Message>> readAllByChannel(@RequestParam UUID channelKey) {
         List<Message> messages = messageService.readAllByChannelKey(channelKey);
-        log.info("채널 {} 의 메시지 {}", channelKey, messages);
+        log.info("{}", LogMapUtil.of("action", "readAllByChannel")
+                .add("messages", messages));
 
         return ResponseEntity.ok(messages);
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public ResponseEntity<?> update(@RequestBody MessageUpdateRequest request) {
+    public ResponseEntity<Message> update(@RequestBody MessageUpdateRequest request) {
         Message updated = messageService.update(request);
-        log.info("메시지 수정 완료 {}", updated);
+        log.info("{}", LogMapUtil.of("action", "update")
+                .add("updated", updated));
 
         return ResponseEntity.ok(updated);
     }
@@ -55,7 +60,8 @@ public class MessageController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@RequestParam UUID messageKey) {
         messageService.delete(messageKey);
-        log.info("메시지 삭제 완료 {}", messageKey);
+        log.info("{}", LogMapUtil.of("action", "delete")
+                .add("messageKey", messageKey));
         return ResponseEntity.noContent().build();
     }
 }

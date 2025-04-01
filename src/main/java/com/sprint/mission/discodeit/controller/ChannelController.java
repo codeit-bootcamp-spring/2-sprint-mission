@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.util.LogMapUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,45 +25,46 @@ public class ChannelController {
     private static final Logger log = LoggerFactory.getLogger(ChannelController.class);
 
     @RequestMapping(value = "/createPublic", method = RequestMethod.POST)
-    public ResponseEntity<?> createPublicChannel(@RequestBody PublicChannelCreateRequest request) {
-        log.info("public 채널 요청 {}", request);
+    public ResponseEntity<Channel> createPublicChannel(@RequestBody PublicChannelCreateRequest request) {
         Channel publicChannel = channelService.create(request);
-        log.info("public 채널 정보 {}", publicChannel);
+        log.info("{}", LogMapUtil.of("action", "createPublic")
+                .add("publicChannel", publicChannel));
 
         return ResponseEntity.ok(publicChannel);
     }
 
     @RequestMapping(value = "/createPrivate", method = RequestMethod.POST)
-    public ResponseEntity<?> createPrivateChannel(@RequestBody PrivateChannelCreateRequest request) {
-        log.info("private 채널 요청 {}", request);
+    public ResponseEntity<Channel> createPrivateChannel(@RequestBody PrivateChannelCreateRequest request) {
         Channel privateChannel = channelService.create(request);
-        log.info("private 채널 정보 {}", privateChannel);
+        log.info("{}", LogMapUtil.of("action", "createPrivate")
+                .add("privateChannel", privateChannel));
 
         return ResponseEntity.ok(privateChannel);
     }
 
     @RequestMapping(value = "/updatePublic", method = RequestMethod.PUT)
-    public ResponseEntity<?> updatePublicChannel(@RequestBody PublicChannelUpdateRequest request) {
-        log.info("public 채널 업데이트 요청 {}", request);
+    public ResponseEntity<Channel> updatePublicChannel(@RequestBody PublicChannelUpdateRequest request) {
         Channel updated = channelService.update(request);
-        log.info("업데이트 된 채널 정보 {}", updated);
+        log.info("{}", LogMapUtil.of("action", "updatePublic")
+                .add("updated", updated));
 
         return ResponseEntity.ok(updated);
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteChannel(@RequestBody ChannelDeleteRequest request) {
-        log.info("삭제할 채널 {}", request);
+    public ResponseEntity<Channel> deleteChannel(@RequestBody ChannelDeleteRequest request) {
         channelService.delete(request);
-        log.info("삭제된 채널 {}", request);
+        log.info("{}", LogMapUtil.of("action", "delete")
+                .add("request", request));
 
         return ResponseEntity.noContent().build();
     }
 
     @RequestMapping(value = "/listAccessibleChannels", method = RequestMethod.GET)
-    public ResponseEntity<?> listAccessibleChannels(@RequestParam UUID userKey) {
+    public ResponseEntity<List<ChannelDto>> listAccessibleChannels(@RequestParam UUID userKey) {
         List<ChannelDto> listAccessibleChannels = channelService.readAllByUserKey(userKey);
-        log.info("{} 가 볼 수 있는 채널 정보 {}", userKey, listAccessibleChannels);
+        log.info("{}", LogMapUtil.of("action", "listAccessibleChannels")
+                .add("listAccessibleChannels", listAccessibleChannels));
 
         return ResponseEntity.ok(listAccessibleChannels);
     }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.util.LogMapUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +19,10 @@ public class AuthController {
     private final AuthService authService;
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-
+    public ResponseEntity<User> login(@RequestBody LoginRequest request) {
         User loginUser = authService.login(request);
-        log.info("로그인된 유저 정보 {}", loginUser);
+        log.info("{}", LogMapUtil.of("action", "login")
+                .add("loginUser", loginUser));
 
         return ResponseEntity.ok(loginUser);
     }

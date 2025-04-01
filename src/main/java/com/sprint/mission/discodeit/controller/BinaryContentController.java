@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.util.LogMapUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,16 +21,18 @@ public class BinaryContentController {
     private static final Logger log = LoggerFactory.getLogger(BinaryContentController.class);
 
     @RequestMapping(value = "/read", method = RequestMethod.GET)
-    public ResponseEntity<?> read(@RequestParam UUID binaryContentKey) {
+    public ResponseEntity<BinaryContent> read(@RequestParam UUID binaryContentKey) {
         BinaryContent content = binaryContentService.find(binaryContentKey);
-        log.info("단일 파일 조회 결과: {}", content);
+        log.info("{}", LogMapUtil.of("action", "read")
+                .add("content", content));
         return ResponseEntity.ok(content);
     }
 
     @RequestMapping(value = "/readAll", method = RequestMethod.GET)
-    public ResponseEntity<?> readAll(@RequestParam List<UUID> binaryContentKeys) {
+    public ResponseEntity<List<BinaryContent>> readAll(@RequestParam List<UUID> binaryContentKeys) {
         List<BinaryContent> contents = binaryContentService.findAllByKey(binaryContentKeys);
-        log.info("다중 파일 조회 결과: {}", contents);
+        log.info("{}", LogMapUtil.of("action", "readAll")
+                .add("contents", contents));
         return ResponseEntity.ok(contents);
     }
 }
