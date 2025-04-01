@@ -21,8 +21,8 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public ReadStatus create(UUID channelId, ReadStatusCreateRequest param) {
-        UUID userId = param.userId();
+    public ReadStatus create(UUID channelId, ReadStatusCreateRequest request) {
+        UUID userId = request.userId();
         if (!userRepository.existsById(userId)) {
             throw new IllegalArgumentException(userId + " 에 해당하는 User을 찾을 수 없음");
         }
@@ -32,7 +32,7 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new IllegalArgumentException("중복된 객체 존재");
         }
 
-        ReadStatus status = new ReadStatus(userId, channelId, param.lastReadAt());
+        ReadStatus status = new ReadStatus(userId, channelId, request.lastReadAt());
         readStatusRepository.save(status);
         return status;
     }
@@ -70,9 +70,9 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(UUID id, ReadStatusUpdateRequest param) {
+    public ReadStatus update(UUID id, ReadStatusUpdateRequest request) {
         ReadStatus readStatus = find(id);
-        readStatus.update(param.lastReadAt());
+        readStatus.update(request.lastReadAt());
         readStatusRepository.save(readStatus);
         return readStatus;
     }
