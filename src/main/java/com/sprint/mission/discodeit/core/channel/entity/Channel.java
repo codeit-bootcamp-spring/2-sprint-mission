@@ -1,0 +1,64 @@
+package com.sprint.mission.discodeit.core.channel.entity;
+
+import com.sprint.mission.discodeit.core.user.entity.User;
+import lombok.Getter;
+import lombok.ToString;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@ToString
+@Getter
+public class Channel implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private UUID channelId;
+    private final UUID serverId;
+    private final UUID userId;
+
+    private String name;
+    private List<User> userList = new ArrayList<>();
+
+    private ChannelType type;
+
+    public final Instant createdAt;
+    public Instant updatedAt;
+
+    public Channel(UUID serverId, UUID userId, String name ) {
+        this(UUID.randomUUID(), serverId, userId,Instant.now(), name, ChannelType.PUBLIC);
+    }
+
+    public Channel(UUID serverId, UUID userId, String name, ChannelType type) {
+        this(UUID.randomUUID(), serverId, userId,Instant.now(), name, type);
+    }
+
+    public Channel(UUID channelId, UUID serverId, UUID userId, Instant createdAt, String name, ChannelType type) {
+        this.channelId = channelId;
+        this.serverId = serverId;
+        this.userId = userId;
+        this.createdAt = createdAt;
+        this.updatedAt = createdAt;
+        this.name = name;
+        this.type = type;
+    }
+
+    public void setChannelId(UUID channelId) {
+        this.channelId = channelId;
+        updatedAt = Instant.now();
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        updatedAt = Instant.now();
+    }
+
+    public void setType(ChannelType type) {
+        this.type = type;
+        updatedAt = Instant.now();
+    }
+}

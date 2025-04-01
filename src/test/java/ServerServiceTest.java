@@ -1,16 +1,7 @@
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ServerRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.basic.BasicServerService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import org.junit.jupiter.api.BeforeEach;
+import com.sprint.mission.discodeit.core.user.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
@@ -45,8 +36,8 @@ public class ServerServiceTest {
 //    }
 
 
-    @Test
-    void delete_Successful() {
+  @Test
+  void delete_Successful() {
 //        // given
 //        UUID randomUserId = UUID.randomUUID();
 //        User mockUser = createMockUser(randomUserId);
@@ -66,10 +57,10 @@ public class ServerServiceTest {
 //        verify(serverRepository).remove(server.getOwnerId());
 //
 
-    }
+  }
 
-    static User createMockUser(UUID userId) {
-        return new User(userId, null, Instant.now(), null, null, null);
-    }
+  static User createMockUser(UUID userId) {
+    return new User(userId, null, Instant.now(), null, null, null);
+  }
 
 }

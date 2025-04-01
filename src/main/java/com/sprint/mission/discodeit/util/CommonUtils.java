@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.util;
 
-import com.sprint.mission.discodeit.exception.Valid.DuplicateUserException;
-import com.sprint.mission.discodeit.exception.Valid.InvalidTokenException;
+import com.sprint.mission.discodeit.core.user.exception.DuplicateUserException;
 
 import java.util.List;
 import java.util.Optional;
