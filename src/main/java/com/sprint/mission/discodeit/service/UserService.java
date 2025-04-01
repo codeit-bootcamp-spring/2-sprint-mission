@@ -25,5 +25,4 @@ public interface UserService {
   UserResult updateProfileImage(UUID userId, MultipartFile profileImage);
 
   void delete(UUID userId);
-
 }
