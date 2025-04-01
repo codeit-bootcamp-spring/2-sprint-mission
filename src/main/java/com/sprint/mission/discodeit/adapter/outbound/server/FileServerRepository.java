@@ -3,11 +3,11 @@ package com.sprint.mission.discodeit.adapter.outbound.server;
 import com.sprint.mission.discodeit.adapter.inbound.server.dto.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.core.server.entity.Server;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.server.exception.EmptyServerListException;
-import com.sprint.mission.discodeit.core.user.exception.EmptyUserListException;
+import com.sprint.mission.discodeit.exception.server.EmptyServerListException;
+import com.sprint.mission.discodeit.exception.user.UserListEmptyError;
 import com.sprint.mission.discodeit.adapter.outbound.SaveFileNotFoundException;
-import com.sprint.mission.discodeit.core.server.exception.ServerNotFoundException;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.server.ServerNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.server.port.ServerRepository;
 import com.sprint.mission.discodeit.util.CommonUtils;
@@ -77,7 +77,7 @@ public class FileServerRepository implements ServerRepository {
   public User quit(Server server, User user) {
     List<User> users = server.getUserList();
     if (users.isEmpty()) {
-      throw new EmptyUserListException("서버 내 유저 리스트가 비어있습니다.");
+      throw new UserListEmptyError("서버 내 유저 리스트가 비어있습니다.");
     }
     users.remove(user);
     fileRepository.save(serverList);
@@ -96,7 +96,7 @@ public class FileServerRepository implements ServerRepository {
     List<Server> servers = findAllByUserId(userId);
     return servers.stream().filter(s -> s.getUserId().equals(userId))
         .findFirst()
-        .orElseThrow(() -> new UserNotFoundException("서버장을 찾을 수 없습니다."));
+        .orElseThrow(() -> new UserNotFoundError("서버장을 찾을 수 없습니다."));
 
   }
 

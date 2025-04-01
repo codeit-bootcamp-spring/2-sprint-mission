@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.adapter.inbound.channel.dto.UpdateChannelDTO
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.server.entity.Server;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.exception.EmptyUserListException;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserListEmptyError;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.util.CommonUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -52,7 +52,7 @@ public class JCFChannelRepository implements ChannelRepository {
   public User quit(Channel channel, User user) {
     List<User> list = channel.getUserList();
     if (list.isEmpty()) {
-      throw new EmptyUserListException("채널 내 유저 리스트가 비어있습니다.");
+      throw new UserListEmptyError("채널 내 유저 리스트가 비어있습니다.");
     }
     list.remove(user);
     return user;

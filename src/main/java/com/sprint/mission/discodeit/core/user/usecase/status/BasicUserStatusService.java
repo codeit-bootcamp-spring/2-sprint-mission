@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.core.user.usecase.status;
 
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;
-import com.sprint.mission.discodeit.core.user.exception.DuplicateUserStatusException;
+import com.sprint.mission.discodeit.exception.user.DuplicateUserStatusException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.core.user.port.UserRepository;
 import com.sprint.mission.discodeit.core.user.port.UserStatusRepository;

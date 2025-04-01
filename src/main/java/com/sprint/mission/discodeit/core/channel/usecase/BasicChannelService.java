@@ -15,7 +15,7 @@ import com.sprint.mission.discodeit.adapter.inbound.channel.dto.ChannelFindDTO;
 import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PrivateChannelCreateRequestDTO;
 import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PublicChannelCreateRequestDTO;
 import com.sprint.mission.discodeit.adapter.inbound.channel.dto.UpdateChannelDTO;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelModificationNotAllowedException;
+import com.sprint.mission.discodeit.exception.channel.ChannelModificationNotAllowedException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.adapter.outbound.content;
 
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.exception.EmptyBinaryContentListException;
-import com.sprint.mission.discodeit.core.content.exception.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.exception.content.EmptyBinaryContentListException;
+import com.sprint.mission.discodeit.exception.content.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.adapter.outbound.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepository;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
@@ -19,49 +19,51 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
-    private final FileRepositoryImpl<List<BinaryContent>> fileRepository;
-    private final Path path = Paths.get(System.getProperty("user.dir"), "data", "BinaryContentList.ser");
-    private List<BinaryContent> binaryContentList = new LinkedList<>();
 
-    public FileBinaryContentRepository() {
-        this.fileRepository = new FileRepositoryImpl<>(path);
-        try {
-            this.binaryContentList = fileRepository.load();
-        } catch (SaveFileNotFoundException e) {
-            System.out.println("FileBinaryContentRepository init");
-        }
-    }
+  private final FileRepositoryImpl<List<BinaryContent>> fileRepository;
+  private final Path path = Paths.get(System.getProperty("user.dir"), "data",
+      "BinaryContentList.ser");
+  private List<BinaryContent> binaryContentList = new LinkedList<>();
 
-    @Override
-    public BinaryContent save(BinaryContent binaryContent) {
-        binaryContentList.add(binaryContent);
-        fileRepository.save(binaryContentList);
-        return binaryContent;
+  public FileBinaryContentRepository() {
+    this.fileRepository = new FileRepositoryImpl<>(path);
+    try {
+      this.binaryContentList = fileRepository.load();
+    } catch (SaveFileNotFoundException e) {
+      System.out.println("FileBinaryContentRepository init");
     }
+  }
 
-    @Override
-    public BinaryContent findById(UUID binaryId) {
-        BinaryContent content = CommonUtils.findById(binaryContentList, binaryId, BinaryContent::getId)
-                .orElseThrow(() -> new BinaryContentNotFoundException("바이너리 데이터를 찾을 수 없습니다."));
-        return content;
-    }
+  @Override
+  public BinaryContent save(BinaryContent binaryContent) {
+    binaryContentList.add(binaryContent);
+    fileRepository.save(binaryContentList);
+    return binaryContent;
+  }
 
-    @Override
-    public List<BinaryContent> findAllByIdIn() {
-        if (binaryContentList.isEmpty()) {
-            throw new EmptyBinaryContentListException("Repository 내 바이너리 정보 리스트가 비어있습니다.");
-        }
-        return binaryContentList;
-    }
+  @Override
+  public BinaryContent findById(UUID binaryId) {
+    BinaryContent content = CommonUtils.findById(binaryContentList, binaryId, BinaryContent::getId)
+        .orElseThrow(() -> new BinaryContentNotFoundException("바이너리 데이터를 찾을 수 없습니다."));
+    return content;
+  }
 
-    @Override
-    public void delete(UUID binaryId) {
-        try {
-            BinaryContent content = findById(binaryId);
-            binaryContentList.remove(content);
-            fileRepository.save(binaryContentList);
-        } catch (BinaryContentNotFoundException e) {
-            System.out.println("해당 바이너리 데이터는 존재하지 않습니다.");
-        }
+  @Override
+  public List<BinaryContent> findAllByIdIn() {
+    if (binaryContentList.isEmpty()) {
+      throw new EmptyBinaryContentListException("Repository 내 바이너리 정보 리스트가 비어있습니다.");
     }
+    return binaryContentList;
+  }
+
+  @Override
+  public void delete(UUID binaryId) {
+    try {
+      BinaryContent content = findById(binaryId);
+      binaryContentList.remove(content);
+      fileRepository.save(binaryContentList);
+    } catch (BinaryContentNotFoundException e) {
+      System.out.println("해당 바이너리 데이터는 존재하지 않습니다.");
+    }
+  }
 }

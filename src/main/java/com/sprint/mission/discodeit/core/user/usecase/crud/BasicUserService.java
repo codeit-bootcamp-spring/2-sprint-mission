@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.adapter.inbound.user.dto.UpdateUserRequestDT
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;
-import com.sprint.mission.discodeit.core.user.exception.DuplicateUserException;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsError;
 import com.sprint.mission.discodeit.core.user.usecase.status.UserStatusService;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepository;
@@ -119,7 +119,7 @@ public class BasicUserService implements UserService {
 
   private void checkDuplicate(String name, String email) {
     if (userRepository.existName(name) || userRepository.existEmail(email)) {
-      throw new DuplicateUserException("동일한 유저가 존재합니다.");
+      throw new UserAlreadyExistsError("동일한 유저가 존재합니다.");
     }
   }
 }

@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.adapter.outbound.user;
 
 import com.sprint.mission.discodeit.adapter.inbound.user.dto.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.exception.EmptyUserListException;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserListEmptyError;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
 import com.sprint.mission.discodeit.core.user.port.UserRepository;
 import com.sprint.mission.discodeit.util.CommonUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -33,13 +33,13 @@ public class JCFUserRepository implements UserRepository {
   @Override
   public User findById(UUID userId) {
     return CommonUtils.findById(userList, userId, User::getId)
-        .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
+        .orElseThrow(() -> new UserNotFoundError("유저를 찾을 수 없습니다."));
   }
 
   @Override
   public List<User> findAll() {
     if (userList.isEmpty()) {
-      throw new EmptyUserListException("유저 리스트가 비어있습니다.");
+      throw new UserListEmptyError("유저 리스트가 비어있습니다.");
     }
     return userList;
   }
@@ -62,7 +62,7 @@ public class JCFUserRepository implements UserRepository {
   @Override
   public UUID remove(User user) {
     if (userList.isEmpty()) {
-      throw new EmptyUserListException("유저 리스트가 비어있습니다.");
+      throw new UserListEmptyError("유저 리스트가 비어있습니다.");
     }
     userList.remove(user);
     return user.getId();
