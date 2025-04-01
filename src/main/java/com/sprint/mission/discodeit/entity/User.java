@@ -19,6 +19,7 @@ public class User implements Serializable {
   private String email;
   private String password;
   private UUID profileId;     // BinaryContent
+  private boolean online;
 
   public User(String username, String email, String password, UUID profileId) {
     this.id = UUID.randomUUID();
@@ -28,6 +29,7 @@ public class User implements Serializable {
     this.email = email;
     this.password = password;
     this.profileId = profileId;
+    this.online = false;
   }
 
   public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
