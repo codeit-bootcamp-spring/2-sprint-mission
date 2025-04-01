@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.util;
 
+import com.sprint.mission.discodeit.config.FileConfig;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -92,18 +93,12 @@ public class FileUtil {
     }
 
     public static boolean isAllowedExtension(String originalFilename) {
-        String[] allowedExtensions = {".png", ".jpg", ".jpeg", ".gif", ".pdf"};
-        if (originalFilename == null) {
-            return false;
+        int dotIndex = originalFilename.lastIndexOf('.');
+        if (dotIndex == -1) {
+            return false;  // 확장자가 없다면 false
         }
-
-        String lowercaseName = originalFilename.toLowerCase();
-        for (String ext : allowedExtensions) {
-            if (lowercaseName.endsWith(ext)) {
-                return true;
-            }
-        }
-        return false;
+        String ext = originalFilename.substring(dotIndex).toLowerCase();
+        return FileConfig.ALLOWED_EXTENSIONS.contains(ext);
     }
 
 

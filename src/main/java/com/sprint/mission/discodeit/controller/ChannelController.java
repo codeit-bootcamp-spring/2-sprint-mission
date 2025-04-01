@@ -27,14 +27,14 @@ public class ChannelController {
     @RequestMapping(value = "/public", method = RequestMethod.POST)
     public ResponseEntity<IdResponse> createPublic(@RequestBody PublicChannelRequest request) {
         Channel channel = channelService.create(request);
-        return ResponseEntity.ok(IdResponse.of(true, channel.getId()));
+        return ResponseEntity.ok(IdResponse.of(channel.getId()));
     }
 
     // 비공개 채널 생성
     @RequestMapping(value = "/private", method = RequestMethod.POST)
     public ResponseEntity<IdResponse> createPrivate(@RequestBody PrivateChannelRequest request) {
         Channel channel = channelService.create(request);
-        return ResponseEntity.ok(IdResponse.of(true, channel.getId()));
+        return ResponseEntity.ok(IdResponse.of(channel.getId()));
     }
 
     // 공개 채널 정보 수정
@@ -42,7 +42,7 @@ public class ChannelController {
     public ResponseEntity<IdResponse> updatePublic(@PathVariable UUID id,
                                                    @RequestBody ChannelUpdateRequest request) {
         Channel channel = channelService.update(id, request);
-        return ResponseEntity.ok(IdResponse.of(true, channel.getId()));
+        return ResponseEntity.ok(IdResponse.of(channel.getId()));
     }
 
     // 채널 삭제

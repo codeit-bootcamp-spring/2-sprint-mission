@@ -27,7 +27,7 @@ public class MessageReadController {
     public ResponseEntity<IdResponse> createByChannelId(@PathVariable UUID channelId,
                                                         @RequestBody ReadStatusCreateRequest request) {
         ReadStatus status = readStatusService.create(channelId, request);
-        return ResponseEntity.ok(IdResponse.of(true, status.getId()));
+        return ResponseEntity.ok(IdResponse.of(status.getId()));
     }
 
     // 특정 채널의 메시지 수신 정보를 수정
@@ -35,7 +35,7 @@ public class MessageReadController {
     public ResponseEntity<IdResponse> updateByChannelId(@PathVariable("id") UUID id,
                                                         @RequestBody ReadStatusUpdateRequest request) {
         ReadStatus status = readStatusService.update(id, request);
-        return ResponseEntity.ok(IdResponse.of(true, status.getId()));
+        return ResponseEntity.ok(IdResponse.of(status.getId()));
     }
 
     // 특정 사용자의 메시지 수신 정보를 조회

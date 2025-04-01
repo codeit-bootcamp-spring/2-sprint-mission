@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +28,7 @@ public class MessageController {
     private final MessageService messageService;
 
     // 메시지 생성
-    @RequestMapping(value = "/{channelId}/{authorId}", method = RequestMethod.POST, consumes = "multipart/form-data")
+    @RequestMapping(value = "/{channelId}/{authorId}", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<IdResponse> create(
             @PathVariable UUID channelId, @PathVariable UUID authorId,
             @RequestPart("content") MessageCreateRequest request,
@@ -39,14 +40,14 @@ public class MessageController {
             }
         }
         Message message = messageService.create(channelId, authorId, request, binaryContentList);
-        return ResponseEntity.ok(IdResponse.of(true, message.getId()));
+        return ResponseEntity.ok(IdResponse.of(message.getId()));
     }
 
     // 메시지 수정
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity<IdResponse> update(@PathVariable UUID id, @RequestBody MessageUpdateRequest request) {
         Message message = messageService.update(id, request);
-        return ResponseEntity.ok(IdResponse.of(true, message.getId()));
+        return ResponseEntity.ok(IdResponse.of(message.getId()));
     }
 
     // 메시지 삭제

@@ -6,7 +6,7 @@ public record IdResponse(
         boolean success,
         UUID id
 ) {
-    public static IdResponse of(boolean success, UUID id) {
-        return new IdResponse(success, id);
+    public static IdResponse of(UUID id) {
+        return new IdResponse(true, id);
     }
 }

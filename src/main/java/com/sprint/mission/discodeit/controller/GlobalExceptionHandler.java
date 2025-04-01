@@ -15,18 +15,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIllegalArgument(IllegalArgumentException e) {
-        return ErrorResponse.of(false, e.getMessage());
+        return ErrorResponse.of(e.getMessage());
     }
 
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNoSuchElement(NoSuchElementException e) {
-        return ErrorResponse.of(false, e.getMessage());
+        return ErrorResponse.of(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleRuntime(RuntimeException e) {
-        return ErrorResponse.of(false, e.getMessage());
+        return ErrorResponse.of(e.getMessage());
     }
 }

@@ -28,7 +28,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         } catch (IOException e) {
             throw new RuntimeException("파일 변환 중 오류 발생: " + e);
         }
-        if (!FileUtil.isAllowedExtension(originalFilename)) {
+        if (originalFilename != null && !FileUtil.isAllowedExtension(originalFilename)) {
             throw new IllegalArgumentException("허용하지 않는 파일");
         }
         BinaryContent binaryContent = new BinaryContent(originalFilename, contentType, size, bytes);

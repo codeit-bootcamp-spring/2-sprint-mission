@@ -25,14 +25,14 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message create(UUID channelId, UUID authorId, MessageCreateRequest createRequest,
-                          List<BinaryContentCreateRequest> binaryContentRequestList) {
+                          List<BinaryContentCreateRequest> binaryRequestList) {
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException(channelId + "에 해당하는 Channel을 찾을 수 없음");
         }
         if (!userRepository.existsById(authorId)) {
             throw new NoSuchElementException(authorId + "에 해당하는 Author를 찾을 수 없음");
         }
-        List<UUID> idList = binaryContentRequestList.stream()
+        List<UUID> idList = binaryRequestList.stream()
                 .map(request ->
                         basicBinaryContentService.create(request).getId()).toList();
         Message message = new Message(createRequest.content(), channelId, authorId, idList);

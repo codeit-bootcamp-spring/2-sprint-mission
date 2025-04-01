@@ -4,7 +4,7 @@ public record ErrorResponse(
         boolean success,
         String message
 ) {
-    public static ErrorResponse of(boolean success, String message) {
-        return new ErrorResponse(success, message);
+    public static ErrorResponse of(String message) {
+        return new ErrorResponse(false, message);
     }
 }

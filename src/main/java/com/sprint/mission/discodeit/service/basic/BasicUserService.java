@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusCreateRequest;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -26,18 +27,18 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(UserCreateRequest createRequest,
-                       BinaryContentCreateRequest binaryData) {
+                       BinaryContentCreateRequest binaryRequest) {
         validDuplicateUsername(createRequest.username());
         validDuplicateEmail(createRequest.email());
 
-        UUID binaryContentId = (binaryData != null)
-                ? basicBinaryContentService.create(binaryData).getId() : null;
+        UUID binaryContentId = (binaryRequest != null)
+                ? basicBinaryContentService.create(binaryRequest).getId() : null;
 
         User user = new User(createRequest.username(), createRequest.email(), createRequest.password(),
                 binaryContentId);
         userRepository.save(user);
-        UserStatusCreateRequest statusParam = new UserStatusCreateRequest(user.getId());
-        userStatusService.create(statusParam);
+        UserStatusCreateRequest statusRequest = new UserStatusCreateRequest(user.getId(), Instant.now());
+        userStatusService.create(statusRequest);
 
         return user;
     }
@@ -63,7 +64,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public User update(UUID userId, UserUpdateRequest updateRequest,
-                       BinaryContentCreateRequest binaryData) {
+                       BinaryContentCreateRequest binaryRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException(
                         userId + " 에 해당하는 User를 찾을 수 없음"));
@@ -79,11 +80,11 @@ public class BasicUserService implements UserService {
         }
 
         UUID binaryContentId = null;
-        if (binaryData != null) {
+        if (binaryRequest != null) {
             if (user.getProfileId() != null) {
                 basicBinaryContentService.delete(user.getProfileId());
             }
-            binaryContentId = basicBinaryContentService.create(binaryData).getId();
+            binaryContentId = basicBinaryContentService.create(binaryRequest).getId();
         }
         user.update(newUsername, newEmail, newPassword, binaryContentId);
         return userRepository.save(user);

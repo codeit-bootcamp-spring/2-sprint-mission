@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdate
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,26 +32,26 @@ public class UserController {
     private final UserStatusService userStatusService;
 
     // 사용자 등록
-    @RequestMapping(method = RequestMethod.POST, consumes = "multipart/form-data")
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<IdResponse> create(
             @RequestPart("userDto") UserCreateRequest userRequest,
-            @RequestPart(value = "fileDto", required = false) MultipartFile file
+            @RequestPart(value = "file", required = false) MultipartFile file
     ) {
-        BinaryContentCreateRequest fileData = (file != null) ? new BinaryContentCreateRequest(file) : null;
+        BinaryContentCreateRequest fileData = BinaryContentCreateRequest.of(file);
         User user = userService.create(userRequest, fileData);
-        return ResponseEntity.ok(IdResponse.of(true, user.getId()));
+        return ResponseEntity.ok(IdResponse.of(user.getId()));
     }
 
     // 사용자 정보 수정
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = "multipart/form-data")
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<IdResponse> update(
             @PathVariable("id") UUID userId,
             @RequestPart("userUpdateDto") UserUpdateRequest request,
-            @RequestPart(value = "fileDto", required = false) MultipartFile file
+            @RequestPart(value = "file", required = false) MultipartFile file
     ) {
-        BinaryContentCreateRequest fileData = (file != null) ? new BinaryContentCreateRequest(file) : null;
+        BinaryContentCreateRequest fileData = new BinaryContentCreateRequest(file);
         User user = userService.update(userId, request, fileData);
-        return ResponseEntity.ok(IdResponse.of(true, user.getId()));
+        return ResponseEntity.ok(IdResponse.of(user.getId()));
     }
 
     // 사용자 삭제
@@ -72,8 +73,8 @@ public class UserController {
     public ResponseEntity<UserStatusUpdateResponse> updateStatus(
             @PathVariable("id") UUID userId, @RequestBody UserStatusUpdateRequest request
     ) {
-        UserStatus userStatus = userStatusService.update(userId, request);
-        UserStatusUpdateResponse response = new UserStatusUpdateResponse(true, userStatus.getStatus());
+        UserStatus userStatus = userStatusService.updateByUserId(userId, request);
+        UserStatusUpdateResponse response = UserStatusUpdateResponse.of(userStatus);
         return ResponseEntity.ok(response);
     }
 }
