@@ -18,7 +18,6 @@ import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import java.io.IOException;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -66,17 +65,23 @@ class UserServiceTest {
         .isInstanceOf(IllegalArgumentException.class);
   }
 
-  @DisplayName("프로필 사진을 저장하면 파일 저장 경로를 반환합니다.")
+  @DisplayName("프로필 이미지를 null로 설정하면 null을 반환합니다.")
   @Test
-  void register() throws IOException {
+  void register_ProfileNull() {
+    assertThat(setUpUser.profileId()).isNull();
+  }
+
+  @DisplayName("프로필 사진을 저장하면 ID로 저장합니다.")
+  @Test
+  void register() {
     MultipartFile imageFile = createMockImageFile("dog.jpg");
     UserCreateRequest mockUserRequest = createMockUserRequest(OTHER_USER.getName(),
         OTHER_USER.getEmail());
 
-    UserResult user = userService.register(mockUserRequest, imageFile);
-    BinaryContent binaryContent = binaryContentRepository.findById(user.profileId()).get();
+    UserResult otherUser = userService.register(mockUserRequest, imageFile);
+    BinaryContent binaryContent = binaryContentRepository.findById(otherUser.profileId()).get();
 
-    assertThat(imageFile.getBytes()).isEqualTo(binaryContent.getBytes());
+    assertThat(otherUser.profileId()).isEqualTo(binaryContent.getId());
   }
 
   @DisplayName("프로필 사진 저장을 선택하지 않았을 때 프로필 아이디가 null을 반환합니다.")

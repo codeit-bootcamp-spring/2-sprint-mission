@@ -16,9 +16,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -34,6 +36,7 @@ public class BasicUserService implements UserService {
 
     UUID binaryContentId = null;
     if (profileImage != null) {
+      log.warn("getIn");
       BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(profileImage));
       binaryContentId = binaryContent.getId();
     }

@@ -71,7 +71,7 @@ class ReadStatusServiceTest {
         .isInstanceOf(IllegalArgumentException.class);
   }
 
-  @DisplayName("이미 존재하는 읽기 상태를 생성하려 하면 예외 발생")
+  @DisplayName("한 채널에 존재하는 읽기 상태를 생성하려 하면 예외를 반환합니다.")
   @Test
   void createReadStatusWhenAlreadyExists() {
     ReadStatusCreateRequest readStatusCreateRequest = new ReadStatusCreateRequest(setUpUser.getId(),

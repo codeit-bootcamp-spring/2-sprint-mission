@@ -13,7 +13,11 @@ import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.controller.ChannelController;
 import com.sprint.mission.discodeit.controller.MessageController;
 import com.sprint.mission.discodeit.controller.UserController;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,5 +64,20 @@ class DiscodeitApplicationTest {
   private ChannelResult setupChannel() {
     ChannelCreateRequest channelRegisterRequest = new ChannelCreateRequest("7팀", setUpUser.id());
     return channelController.createPublicChannel(channelRegisterRequest).getBody();
+  }
+
+  @AfterEach
+  void cleanupFiles() throws Exception {
+    List<String> filePaths = List.of(
+        "filestorage/test/binary-content.ser",
+        "filestorage/test/channel.ser",
+        "filestorage/test/user.ser",
+        "filestorage/test/userStatus.ser",
+        "filestorage/test/message.ser");
+
+    for (String filePath : filePaths) {
+      Path path = Path.of(filePath);
+      Files.deleteIfExists(path);
+    }
   }
 }

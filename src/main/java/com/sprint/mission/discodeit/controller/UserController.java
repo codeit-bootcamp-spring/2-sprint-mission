@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.application.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusResult;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -30,10 +29,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
   private final UserService userService;
-  private final BinaryContentService binaryContentService;
   private final UserStatusService userStatusService;
 
-  @PostMapping("/register")
+  @PostMapping
   public ResponseEntity<UserResult> register(@Valid @RequestPart UserCreateRequest userRequest,
       @RequestPart(required = false) MultipartFile profileImage) {
     UserResult user = userService.register(userRequest, profileImage);

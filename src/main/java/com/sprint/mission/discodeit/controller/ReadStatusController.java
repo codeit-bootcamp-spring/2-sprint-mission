@@ -27,18 +27,21 @@ public class ReadStatusController {
   public ResponseEntity<ReadStatusResult> createReadStatus(
       @Valid @RequestBody ReadStatusCreateRequest request) {
     ReadStatusResult readStatusResult = readStatusService.create(request);
+
     return ResponseEntity.ok(readStatusResult);
   }
 
   @PutMapping("/{readStatusId}")
   public ResponseEntity<ReadStatusResult> updateReadStatus(@PathVariable UUID readStatusId) {
     ReadStatusResult readStatusResult = readStatusService.updateLastReadTime(readStatusId);
+
     return ResponseEntity.ok(readStatusResult);
   }
 
   @GetMapping("/{userId}")
   public ResponseEntity<List<ReadStatusResult>> getUserReadStatus(@PathVariable UUID userId) {
     List<ReadStatusResult> readStatusResults = readStatusService.getAllByUserId(userId);
+
     return ResponseEntity.ok(readStatusResults);
   }
 }

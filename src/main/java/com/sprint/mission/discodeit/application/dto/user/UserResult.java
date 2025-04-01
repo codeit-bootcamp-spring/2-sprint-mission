@@ -9,10 +9,4 @@ public record UserResult(UUID id, String name, String email, UUID profileId, boo
     return new UserResult(user.getId(), user.getName(), user.getEmail(), user.getProfileId(),
         isLogin);
   }
-
-//    public static List<UserResult> fromEntity(List<User> users) {
-//        return users.stream()
-//                .map(UserResult::fromEntity)
-//                .toList();
-//    }
 }
