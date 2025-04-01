@@ -23,7 +23,7 @@ public class MessageController {
 
     @PostMapping("/create")
     public ResponseEntity<Message> createMessage(
-            @RequestPart("messageInfo") MessageCreateDto messageCreateReq,
+            @RequestPart("messageInfo") MessageCreateDto messageCreateRequest,
             @RequestPart(value = "files", required = false) List<MultipartFile> files
 
     ) {
@@ -38,48 +38,48 @@ public class MessageController {
                             file.getBytes()
                     );
                     contentCreate.add(content);
-                } catch (IOException e){
-                    return ResponseEntity.badRequest().build();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }
 
-        Message createMessage = messageService.create(messageCreateReq, contentCreate);
+        Message createMessage = messageService.create(messageCreateRequest, contentCreate);
         return ResponseEntity.ok(createMessage);
     }
 
 
     @PutMapping("/update")
-    public ResponseEntity<Message> updateMessage(@RequestPart("newMessageInfo")MessageUpdateDto messageUpdateReq){
+    public ResponseEntity<Message> updateMessage(@RequestBody MessageUpdateDto messageUpdateRequest) {
 
-        Message updateMessage = messageService.update(messageUpdateReq);
+        Message updateMessage = messageService.update(messageUpdateRequest);
         return ResponseEntity.ok(updateMessage);
     }
 
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Message> deleteMessage(@RequestPart("messageInfo") MessageDeleteDto messageDeleteReq){
+    public ResponseEntity<Message> deleteMessage(@RequestBody MessageDeleteDto messageDeleteRequest) {
 
-        messageService.delete(messageDeleteReq);
+        messageService.delete(messageDeleteRequest);
         return ResponseEntity.noContent().build();
     }
 
 
     @GetMapping("/find")
     public ResponseEntity<MessageFindResponseDto> findMessages(
-            @RequestPart("messageInfo")MessageFindRequestDto messageFindReq
+            @RequestBody MessageFindRequestDto messageFindRequest
     ) {
-        MessageFindResponseDto MessageFindResponse = messageService.find(messageFindReq);
+        MessageFindResponseDto MessageFindResponse = messageService.find(messageFindRequest);
         return ResponseEntity.ok(MessageFindResponse);
     }
 
 
     @GetMapping("/findAllByChannel")
     public ResponseEntity<List<MessageFindAllByChannelIdResponseDto>> findMessagesByChannelId(
-            @RequestPart("channelId") MessageFindAllByChannelIdRequestDto messageFindByChannelIdReq
+            @RequestBody MessageFindAllByChannelIdRequestDto messageFindByChannelIdRequest
     ) {
         List<MessageFindAllByChannelIdResponseDto> messageFindByChannelResponse =
-                messageService.findAllByChannelId(messageFindByChannelIdReq);
+                messageService.findAllByChannelId(messageFindByChannelIdRequest);
 
         return ResponseEntity.ok(messageFindByChannelResponse);
     }

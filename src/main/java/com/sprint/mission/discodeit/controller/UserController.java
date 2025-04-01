@@ -34,7 +34,7 @@ public class UserController {
                         file.getBytes()
                 ));
             } catch (IOException e) {
-                return ResponseEntity.badRequest().build();
+                throw new RuntimeException(e);
             }
         }
         User user = userService.create(userCreateRequest, contentCreate);
@@ -56,7 +56,7 @@ public class UserController {
                         file.getBytes()
                 ));
             } catch (IOException e) {
-                return ResponseEntity.badRequest().build();
+                throw new RuntimeException(e);
             }
         }
         User user = userService.update(userUpdateRequest, contentCreate);
@@ -66,7 +66,7 @@ public class UserController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteUser(
-            @RequestPart("userId") UserDeleteDto userDeleteRequest
+            @RequestBody UserDeleteDto userDeleteRequest
     ) {
         userService.delete(userDeleteRequest);
         return ResponseEntity.noContent().build();
@@ -75,7 +75,7 @@ public class UserController {
 
     @GetMapping("/find")
     public ResponseEntity<UserFindResponseDto> findUser(
-            @RequestPart("userId") UserFindRequestDto userFindRequest
+            @RequestBody UserFindRequestDto userFindRequest
     ) {
         UserFindResponseDto userFindResponse = userService.find(userFindRequest);
         return ResponseEntity.ok(userFindResponse);

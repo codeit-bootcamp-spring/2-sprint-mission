@@ -19,53 +19,56 @@ public class ChannelController {
     private final ChannelService channelService;
 
 
-    @PostMapping("/create")
-    public ResponseEntity<Channel> createChannel(
-            @RequestPart("channelInfo") ChannelCreateDto channelCreateReq
+    @PostMapping("/createPublic")
+    public ResponseEntity<Channel> createPublicChannel(
+            @RequestBody ChannelCreateDto channelCreateRequest
     ) {
-        if (channelCreateReq.channelType() == ChannelType.PRIVATE) {
-            Channel privateChannel = channelService.createPrivate(channelCreateReq);
-            return ResponseEntity.status(HttpStatus.CREATED).body(privateChannel);
-        } else {
-            Channel publicChannel = channelService.createPublic(channelCreateReq);
-            return ResponseEntity.status(HttpStatus.CREATED).body(publicChannel);
-        }
+        Channel publicChannel  = channelService.createPublic(channelCreateRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(publicChannel);
+    }
+
+    @PostMapping("/createPrivate")
+    public ResponseEntity<Channel> createPrivateChannel(
+            @RequestBody ChannelCreateDto channelCreateRequest
+    ) {
+        Channel privateChannel = channelService.createPrivate(channelCreateRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(privateChannel);
     }
 
 
     @PutMapping("/update")
     public ResponseEntity<Channel> updateChannel(
-            @RequestPart("newChannelInfo") ChannelUpdateDto channelUpdateReq
+            @RequestBody ChannelUpdateDto channelUpdateRequest
     ) {
 
-        Channel updateChannel = channelService.update(channelUpdateReq);
+        Channel updateChannel = channelService.update(channelUpdateRequest);
         return ResponseEntity.ok(updateChannel);
     }
 
 
     @DeleteMapping("/delete")
     public ResponseEntity<Channel> deleteChannel(
-            @RequestPart("channelInfo") ChannelDeleteDto ChannelDeleteReq
+            @RequestBody ChannelDeleteDto ChannelDeleteRequest
     ) {
-        channelService.delete(ChannelDeleteReq);
+        channelService.delete(ChannelDeleteRequest);
         return ResponseEntity.noContent().build();
     }
 
 
     @GetMapping("/find")
     public ResponseEntity<ChannelFindResponseDto> findChannel(
-            @RequestPart("channelInfo") ChannelFindRequestDto channelFindReq
+            @RequestBody ChannelFindRequestDto channelFindRequest
     ) {
-        ChannelFindResponseDto channelFindResponse = channelService.find(channelFindReq);
+        ChannelFindResponseDto channelFindResponse = channelService.find(channelFindRequest);
         return ResponseEntity.ok(channelFindResponse);
     }
 
 
     @GetMapping("/findAllByUserId")
     public ResponseEntity<List<ChannelFindAllByUserIdResponseDto>> findChannelByUserId(
-            @RequestPart("userId") ChannelFindAllByUserIdRequestDto channelFindAllByUserIdReq
+            @RequestBody ChannelFindAllByUserIdRequestDto channelFindAllByUserIdRequest
     ) {
-        List<ChannelFindAllByUserIdResponseDto> channelFindAllByUserIdResponse = channelService.findAllByUserId(channelFindAllByUserIdReq);
+        List<ChannelFindAllByUserIdResponseDto> channelFindAllByUserIdResponse = channelService.findAllByUserId(channelFindAllByUserIdRequest);
         return ResponseEntity.ok(channelFindAllByUserIdResponse);
     }
 }

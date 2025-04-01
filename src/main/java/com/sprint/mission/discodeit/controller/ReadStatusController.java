@@ -20,27 +20,27 @@ public class ReadStatusController {
 
     @PostMapping("/create")
     public ResponseEntity<ReadStatus> create(
-            @RequestPart("readStatusInfo") ReadStatusCreateDto readStatusCreateReq
+            @RequestBody ReadStatusCreateDto readStatusCreateRequest
     ) {
-        ReadStatus createReadStatus = readStatusService.create(readStatusCreateReq);
+        ReadStatus createReadStatus = readStatusService.create(readStatusCreateRequest);
         return ResponseEntity.ok(createReadStatus);
     }
 
 
     @PutMapping("/update")
     public ResponseEntity<ReadStatus> update(
-            @RequestPart("readStatusInfo")ReadStatusUpdateDto readStatusUpdateReq
+            @RequestBody ReadStatusUpdateDto readStatusUpdateRequest
     ) {
-        ReadStatus updateReadStatus = readStatusService.update(readStatusUpdateReq);
+        ReadStatus updateReadStatus = readStatusService.update(readStatusUpdateRequest);
         return ResponseEntity.ok(updateReadStatus);
     }
 
 
     @GetMapping("/findAllByUserId")
     public ResponseEntity<List<ReadStatus>> findAllByUserId(
-            @RequestPart("readStatusFindInfo")ReadStatusFindDto readStatusFindReq
+            @RequestBody ReadStatusFindDto readStatusFindRequest
     ) {
-        List<ReadStatus> findAllByUserId = readStatusService.findAllByUserId(readStatusFindReq);
+        List<ReadStatus> findAllByUserId = readStatusService.findAllByUserId(readStatusFindRequest);
         return ResponseEntity.ok(findAllByUserId);
     }
 }
