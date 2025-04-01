@@ -21,7 +21,9 @@ public class FileChannelRepository implements ChannelRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileChannelRepository(@Value("${discodeit.repository.file-directory:data}") String fileDirectory) {
+    public FileChannelRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
         this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, Channel.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
@@ -33,14 +35,16 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     private Path resolvePath(UUID id) {
-        return DIRECTORY.resolve(id.toString() + EXTENSION);
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
     public Channel save(Channel channel) {
-        Path filePath = resolvePath(channel.getId());
-        try (FileOutputStream fos = new FileOutputStream(filePath.toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+        Path path = resolvePath(channel.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
             oos.writeObject(channel);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -49,26 +53,32 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Optional<Channel> findById(UUID channelId) {
-        Path filePath = resolvePath(channelId);
-        if (Files.exists(filePath)) {
-            try (FileInputStream fis = new FileInputStream(filePath.toFile());
-                 ObjectInputStream ois = new ObjectInputStream(fis)) {
-                return Optional.of((Channel) ois.readObject());
+    public Optional<Channel> findById(UUID id) {
+        Channel channelNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                channelNullable = (Channel) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
-        return Optional.empty();
+        return Optional.ofNullable(channelNullable);
     }
 
     @Override
     public List<Channel> findAll() {
         try (Stream<Path> paths = Files.list(DIRECTORY)) {
-            return paths.filter(path -> path.toString().endsWith(EXTENSION))
+            return paths
+                    .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
-                        try (FileInputStream fis = new FileInputStream(path.toFile());
-                             ObjectInputStream ois = new ObjectInputStream(fis)) {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
                             return (Channel) ois.readObject();
                         } catch (IOException | ClassNotFoundException e) {
                             throw new RuntimeException(e);
@@ -81,16 +91,16 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean existsById(UUID channelId) {
-        Path filePath = resolvePath(channelId);
-        return Files.exists(filePath);
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
     @Override
-    public void deleteById(UUID channelId) {
-        Path filePath = resolvePath(channelId);
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
         try {
-            Files.deleteIfExists(filePath);
+            Files.delete(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

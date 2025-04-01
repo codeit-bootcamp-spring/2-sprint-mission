@@ -18,29 +18,29 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        data.put(binaryContent.getId(), binaryContent);
+        this.data.put(binaryContent.getId(), binaryContent);
         return binaryContent;
     }
 
     @Override
-    public Optional<BinaryContent> findById(UUID binaryContentId) {
-        return Optional.ofNullable(data.get(binaryContentId));
+    public Optional<BinaryContent> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-        return data.values().stream()
-                .filter(binaryContent -> binaryContentIds.contains(binaryContent.getId()))
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        return this.data.values().stream()
+                .filter(content -> ids.contains(content.getId()))
                 .toList();
     }
 
     @Override
-    public boolean existsById(UUID binaryContentId) {
-        return data.containsKey(binaryContentId);
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public void deleteById(UUID binaryContentId) {
-        data.remove(binaryContentId);
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }

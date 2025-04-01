@@ -7,38 +7,38 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class Channel extends BaseEntity implements Serializable {
+public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private String title;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private ChannelType type;
+    private String name;
     private String description;
-    private ChannelType channelType;
 
-    public Channel(ChannelType channelType, String title, String description) {
+    public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
-        this.title = title;
+        this.createdAt = Instant.now();
+        //
+        this.type = type;
+        this.name = name;
         this.description = description;
-        this.channelType = channelType;
     }
 
-    public void updateChannel(String newTitle, String newDescription, Instant updateAt) {
-        boolean isChanged = false;
-        if (!newTitle.equals(this.title)) {
-            this.title = newTitle;
-            isChanged = true;
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
         }
-        if (!newDescription.equals(this.description)) {
+        if (newDescription != null && !newDescription.equals(this.description)) {
             this.description = newDescription;
-            isChanged = true;
+            anyValueUpdated = true;
         }
-        if (isChanged) {
-            super.updateUpdatedAt(updateAt);
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
         }
     }
-
-    @Override
-    public String toString() {
-        return "Channel{id:" + id + ",title:" + title +  ",createdAt:" + getCreatedAt() + ",updatedAt:" + getUpdatedAt() + "}";
-    }
-
 }
