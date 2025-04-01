@@ -7,6 +7,7 @@ import com.sprint.discodeit.repository.util.FilePathUtil;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     public void save(User user) {
         Map<UUID, User> users = loadAll();
         if (users.containsKey(user.getId())) {
-            System.out.println("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + user.getId());
+            throw new IllegalArgumentException("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + user.getId());
         } else {
             users.put(user.getId(), user);
             writeToFile(users);
@@ -55,12 +56,12 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
 
     public Optional<User> findByUsername(String username) {
         Map<UUID, User> users = loadAll();
-        return users.values().stream().filter(user -> user.getUsername().equals(username)).findFirst();
+        return users.values().stream().filter(user -> Objects.toString(user.getUsername(), "").equals(username)).findFirst();
     }
 
     public Optional<User> findByEmail(String email) {
         Map<UUID, User> users = loadAll();
-        return users.values().stream().filter(user -> user.getEmail().equals(email)).findFirst();
+        return users.values().stream().filter(user -> Objects.toString(user.getEmail(), "").equals(email)).findFirst();
     }
 
     public Optional<User> findByPassword(String password) {

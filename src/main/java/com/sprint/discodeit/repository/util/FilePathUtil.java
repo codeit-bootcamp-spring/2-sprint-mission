@@ -4,7 +4,7 @@ public enum FilePathUtil {
 
     CHANNELS("channels.dat"),
     USERS("users.dat"),
-    Message("message.dat"),
+    MESSAGE("message.dat"),
     STATUS("status.dat"),
     BINARY("binary.dat"),
     READSTATUS("reads.dat");

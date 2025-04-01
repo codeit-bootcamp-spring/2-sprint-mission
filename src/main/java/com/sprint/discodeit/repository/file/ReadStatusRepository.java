@@ -22,21 +22,39 @@ public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> imp
     public void save(ReadStatus readStatus) {
         Map<UUID, ReadStatus> readStatusMap = loadAll();
         if (readStatusMap.containsKey(readStatus.getId())) {
-            System.out.println("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + readStatus.getId());
+            throw new IllegalArgumentException("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + readStatus.getId());
         } else {
             readStatusMap.put(readStatus.getId(), readStatus);
             writeToFile(readStatusMap);
         }
     }
 
-    @Override
-    public void delete(UUID uuId) {
+    public void saveAll(List<ReadStatus> readStatusList) {
         Map<UUID, ReadStatus> readStatusMap = loadAll();
-        Optional<ReadStatus> readStatusOptional = readStatusMap.values().stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(uuId))
-                .findFirst();
-        readStatusMap.remove(readStatusOptional.get().getId());
+
+        for (ReadStatus readStatus : readStatusList) {
+            UUID id = readStatus.getId();
+            if (readStatusMap.containsKey(id)) {
+                throw new IllegalArgumentException("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + id);
+            }
+            readStatusMap.put(id, readStatus);
+        }
+
         writeToFile(readStatusMap);
+    }
+
+
+    @Override
+    public void delete(UUID channelId) {
+        Map<UUID, ReadStatus> readStatusMap = loadAll();
+
+        readStatusMap.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .findFirst()
+                .ifPresent(readStatus -> {
+                    readStatusMap.remove(readStatus.getId());
+                    writeToFile(readStatusMap);
+                });
     }
 
 
@@ -58,6 +76,14 @@ public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> imp
         return readStatusMap.values().stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                 .map(ReadStatus::getUserId)
+                .collect(Collectors.toList());
+    }
+
+    public List<UUID> findChannelIdsByUserIdAll(UUID userId) {
+        Map<UUID, ReadStatus> readStatusMap = loadAll();
+        return readStatusMap.values().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .map(ReadStatus::getChannelId)
                 .collect(Collectors.toList());
     }
 }

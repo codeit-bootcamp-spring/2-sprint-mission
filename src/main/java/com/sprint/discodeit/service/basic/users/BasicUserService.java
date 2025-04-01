@@ -18,7 +18,6 @@ import com.sprint.discodeit.service.basic.util.BinaryGenerator;
 import com.sprint.discodeit.service.basic.util.UserStatusEvaluator;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -55,21 +54,21 @@ public class BasicUserService implements UserServiceV1 {
         BinaryContent profileImage = binaryGenerator.createProfileImage(userProfileImgResponseDto.imgUrl());
 
         //dto를 엔티티로 변환
-        User userMapper = UserMapper.toUserMapper(userRequestDto);
+        User user = UserMapper.toUser(userRequestDto);
 
-        UserStatus userStatus = new UserStatus(userMapper.getCreatedAt(), StatusType.Active.getExplanation());
+        UserStatus userStatus = new UserStatus(user.getCreatedAt(), StatusType.Active.getExplanation());
 
         //연관관계 메소드로 상태 정보 주입
-        userMapper.associateStatus(userStatus);
-        userMapper.associateProfileId(profileImage);
+        user.associateStatus(userStatus);
+        user.associateProfileId(profileImage);
 
         // 저장
         baseUserStatusRepository.save(userStatus);
-        fileUserRepository.save(userMapper);
+        fileUserRepository.save(user);
         baseBinaryContentRepository.save(profileImage);
 
         // User -> UserNameResponse 변환
-        return new UserNameStatusResponseDto(userMapper.getUsername(), userStatus.getStatusType(), userMapper.getId());
+        return new UserNameStatusResponseDto(user.getUsername(), userStatus.getStatusType(), user.getId());
     }
 
 
@@ -85,23 +84,13 @@ public class BasicUserService implements UserServiceV1 {
     @Override
     public List<User> findAll() {
         List<User> userAll = fileUserRepository.findByAll();
-        Map<UUID, UserStatus> byAllAndUser = baseUserStatusRepository.findByAllAndUser(userAll);
-        System.out.println(byAllAndUser);
         return userAll;
-//        userAll.stream().map(user -> {
-//            UserStatus userStatus = byAllAndUser.get(user.getUserStatusId().toString());
-//
-//            //  상태 판별 수행
-//            String status = userStatusEvaluator.determineUserStatus(userStatus.getLastLoginTime())
-//                    : StatusType.Inactive.getExplanation();
-//        })
-//        return fileUserRepository.findByAll();
     }
 
     @Override
-    public UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto) {
+    public UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, String userId) {
         //조회
-        User user = fileUserRepository.findById(userUpdateRequestDto.userId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
+        User user = fileUserRepository.findById(UUID.fromString(userId)).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정 입니다"));
 
         //가공
         BinaryContent profileImage = binaryGenerator.createProfileImage(userUpdateRequestDto.profileImg());
@@ -112,14 +101,14 @@ public class BasicUserService implements UserServiceV1 {
         user.update(userUpdateRequestDto.newUsername(), userUpdateRequestDto.newEmail(), userUpdateRequestDto.newPassword());
         fileUserRepository.save(user);
 
-        return new UserResponseDto(user.getProfileId(), userUpdateRequestDto.newUsername(), userUpdateRequestDto.newEmail(), StatusType.Active.toString());
+        return new UserResponseDto(user.getProfileId(),user.getUsername(), user.getEmail() , StatusType.Active.toString());
     }
 
     @Override
     public void delete(UUID userId) {
         Optional<User> user = fileUserRepository.findById(userId);
         if (user.isPresent()) {
-            user.get().isDeleted();
+            user.get().softDelete();
             UserStatus userStatus = new UserStatus(Instant.now(), StatusType.Inactive.getExplanation());
             baseUserStatusRepository.save(userStatus);
             fileUserRepository.save(user.get());

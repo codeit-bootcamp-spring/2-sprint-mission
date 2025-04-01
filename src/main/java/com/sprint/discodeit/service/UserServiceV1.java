@@ -14,6 +14,6 @@ public interface UserServiceV1 {
     UserNameStatusResponseDto create(UserRequestDto userRequestDto, UserProfileImgResponseDto userProfileImgResponseDto);
     UserResponseDto find(UUID userId);
     List<User> findAll();
-    UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto);
+    UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, String userId);
     void delete(UUID userId);
 }
