@@ -1,0 +1,960 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="daf1a141-2719-4892-b03e-28252696c9a4" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileChanges/last-build.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/8.11.1/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gradle/vcs-1/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/DiscodeitApplication.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/AuthController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/BinaryContentController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/ChannelController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/MessageController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/ReadStatusController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/UserController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/data/ChannelDto.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/data/UserDto.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/BinaryContentCreateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/LoginRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/MessageCreateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/MessageUpdateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/PrivateChannelCreateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/PublicChannelCreateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/PublicChannelUpdateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/ReadStatusCreateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/ReadStatusUpdateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/UserCreateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/UserStatusCreateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/UserStatusUpdateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/request/UserUpdateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/BinaryContent.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/Channel.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/ChannelType.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/Message.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/ReadStatus.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/User.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/UserStatus.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/exception/GlobalExceptionHandler.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/BinaryContentRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/ChannelRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/MessageRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/ReadStatusRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/UserRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/UserStatusRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileBinaryContentRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileChannelRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileMessageRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileReadStatusRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileUserRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/file/FileUserStatusRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFBinaryContentRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFChannelRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFMessageRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFReadStatusRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFUserRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/jcf/JCFUserStatusRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/AuthService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/BinaryContentService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/ChannelService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/MessageService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/ReadStatusService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/UserService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/UserStatusService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicAuthService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicBinaryContentService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicChannelService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicMessageService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicReadStatusService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicUserService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicUserStatusService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/resources/main/application.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/resources/main/static/script.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/resources/main/static/styles.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/resources/main/static/user-list.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/script.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/styles.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/user-list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.discodeit/Channel/b4d58ba1-7a31-433f-a5d0-0ec749e117e9.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.discodeit/Message/cc41e3e4-11f5-481a-a705-a2a83a99dd0c.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.discodeit/User/9fc4dfbd-0bc9-4a18-b57e-30a14945821f.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.discodeit/UserStatus/f48b482d-2fda-4e0f-90de-bbb30f4c38dd.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/PULL_REQUEST_TEMPLATE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/0c7925a5-7795-423c-817b-f81908a9bba1.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/0dc7356e-7ce1-4ea0-a1fa-a9ea7fe61199.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/15fe61ba-93ff-4ffb-bf6b-b1b5570baf18.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/177829c1-26d9-4716-9eff-2c4cd52f596a.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/18bc2211-d931-462c-ac74-6bf06f7fb9fe.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/1ac3837f-6dd8-4703-a709-afb0a448c1c9.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/20495a93-58ff-4e25-8252-60c0ec874284.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/21d0fd03-a4c5-411b-ab53-05ffd8c47165.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/237e8c1a-6f06-4f24-89d2-01531e64303c.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/28071f4e-4d99-416e-85c1-dcbf6d2f7013.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/2a86cc66-db56-4898-8742-a02bb1556362.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/313ead94-731a-45d5-9f22-9656eaa5caae.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/333c93fd-48d6-45aa-8cf7-2bbdaf380cd4.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/36bd0ff8-1339-45d8-934b-7a2a09bebc02.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/377111aa-5e5a-4b8a-a2c3-1ee5d28a61a8.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/45675da4-1c08-44a9-b41e-c0277dc5d2b2.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/47b2b22f-3163-4497-852a-11b2629b1649.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/49cd6b52-aa54-4830-84d0-18fcf47acd9f.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/4b2016d0-2616-4b89-9d6d-0e216de8372c.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/4e38a0f4-5f22-4dc5-9774-f3586ca47223.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/4ff4ccf2-9c42-4714-bdeb-1f2e5f8af9ee.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/517681c4-9db7-456b-bb43-db526dbf80fc.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/51a87fbe-d4d3-482e-b35f-67e33358298c.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/5da35b59-c97b-4368-8530-bcbd99f41f84.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/610ae174-3563-43c9-9a03-f3edb534d1ae.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/658b85d1-f6c1-42d4-a6f2-ef27f618b717.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/6bc7e8ec-d9cf-452b-89cc-3ac1a9d0f09c.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/7b5ac6a8-f36b-4b19-8884-2696330bfec5.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/7d1bbb15-a6a3-4f73-802f-150e16d423bd.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/8011284e-7294-4ff1-8f2c-ae8d0c2baeb6.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/82a4ecbf-2d68-4976-b011-49394a45b316.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/95b04a0b-764c-47c5-a8cf-16d5774fe0b0.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/96ef2f52-0c0b-4d35-a04c-8c5f0d1a5441.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/9d7eb8cb-7150-436c-8716-d8f512f3250d.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/a14964ff-827f-4064-a0b3-e436cdcdc505.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/b08aced8-6240-4c48-95b0-09737eefbc06.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/b61f352a-7a63-42c1-9b34-e86c140b8578.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/b6ecab65-57ae-4087-908d-9d28fbcf7995.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/bb1c6b23-b80a-4227-84d2-a7f4cb6d9089.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/bbb1c563-111c-4305-b9e1-267d638b1d9a.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/c39e1535-d9ab-4380-ad66-2a461f077e27.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/d43b77f7-bd8b-470a-9e37-0e679e4fb922.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/d7115c52-4b58-41ef-8fab-34c03026fb0a.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/f5364c25-ad59-40f0-87a5-9eb55373d159.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/f542dc13-1c73-41a0-b698-0409e0db90de.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/f87d7933-f7da-48de-86b1-b417182e5535.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/fb813107-b6db-4aa0-a905-727cd14c66e1.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Channel/ff87a5ea-cc3c-40cc-9b5a-3c387b6b1e09.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/002ccbd8-72bc-40b1-9e33-5bb60278a0cb.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/02f57d28-c47e-4794-808a-195e50214978.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/032e412d-ed20-421b-a519-03210ea02a39.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/148b25d4-e1f9-41e4-8edf-6f449fb35e6f.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/212a2978-306e-4a7a-b475-d18c86c9446b.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/2394488b-4a72-492a-953a-fb2daa1bdb4a.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/24e4b8bd-cdee-493f-ac94-6dad7e55eb73.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/2741a5f5-fe16-46f3-96f4-6b451361f72b.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/2c800bb5-20c5-4cd2-8d15-ea0a19d621b2.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/307dc95e-a025-47fe-87df-69a44f876382.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/3e022c63-d32b-4efb-83e4-41517936767b.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/46ef4e26-2f55-4edc-ac6b-c01ff77c189b.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/4d74f12c-314d-46cc-98e2-32ffc7f67d42.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/506b5277-d487-4b1f-b8cc-bebc1edf7ebe.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/5eebd0a0-e30d-47cd-b093-398f852afd5b.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/621ab6e7-4d82-45c5-949b-52812a6ffcd4.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/6d66a605-05ec-4150-8e6f-a9585cc6fffb.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/6d70148f-7fd5-42f1-a24f-5ac9ac52c341.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/6fec69f7-50b8-4c14-954e-956634a90dba.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/7e050037-632a-4fdc-b729-687313d2ecb7.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/8088f6e0-fd57-4707-8608-f339606d9fae.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/8cf80a45-a317-447a-a7d1-4e1091ad4cb6.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/90da2343-9ce1-4183-abec-ba3670f081ab.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/9789f3f3-d67a-4b9d-bc62-d96208a99ae6.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/a0c90e9c-239f-48b9-a1d8-4b567fda94a1.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/a1ad45d3-9e4f-43ca-b057-98c2535ee753.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/abc8e928-b36b-42cd-a6d8-36f5d1616cf8.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/ac1f8996-e2e3-42c0-893f-c724b0fe2ab4.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/b085f749-c18c-4b06-9193-fef1b524732f.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/b09a8c04-4d73-4852-8ccc-103f452c90ae.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/b2881b63-8dba-4d71-b78c-93c31a35d50b.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/c122f59f-f954-4545-86b5-b237d91e10e8.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/c1306036-a0f6-46e4-a67b-8169305f1f9d.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/c3fce541-d3c3-49c7-a27b-0f671592e058.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/c78512c8-f33f-4337-832d-e5ad494295d8.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/c8f488e7-bbcf-4703-b0ec-ddfa9a7f5345.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/d1db9641-a6ec-4464-9261-e6aabe1c2367.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/d3634249-103f-4f08-9ba8-31d65a4629c3.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/d6d922ca-031a-444a-8d38-13dd2c5ee60e.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/ddbc099f-398f-414a-99f5-5595a626fa1b.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/debd1e1b-55b6-4091-a252-a41c2d669908.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/dee90f0f-6a4d-495e-905f-b406c5604c8a.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/df6cae2e-f42b-4784-abf1-beacf8ee66ed.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/e4042309-a969-47d8-9b20-581b6f9318de.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/eaae0100-db7a-4003-ad2b-4d8255581b39.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/f6a538cd-9e70-42e7-8c66-64820d72de6e.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/f711540c-52b4-43f0-8ce1-1b4c03e75ca6.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/Message/fd62cc60-739b-4c69-97b1-ac0f08adbc4d.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/01153bbb-9a8c-4fd8-9466-c613aec7ef22.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/04acdf54-1d21-43a1-afeb-53c5b383239d.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/05860d6e-3346-42d6-80ef-96f3dd6e1cf5.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/05c006f2-c20f-4af5-ab77-4ad030a294cc.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/0ae2c342-4535-46ef-9297-3daceb8351fc.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/111680a8-fc98-4483-bca9-f4f237a99635.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/18a6f175-ec3c-47bc-a287-60ea5472608f.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/18cda63e-eba3-47cd-8a42-112f3224a592.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/1c8de42f-88b7-4e30-aba4-3c07432f92c2.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/258e629b-1272-4605-aaf6-92c669ff66cf.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/2dc9b5ac-7553-4a9d-831c-0e1e787d0ab5.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/37490d2d-2b02-4ce6-ada5-57c0d158cca9.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/41d88dc6-20e3-4e65-a65e-f50c8788e6d0.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/481e87c4-3941-4ddd-91cd-4f63590e539e.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/4e402f07-676c-47eb-80d9-7d87440e9ad1.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/57c4eb9b-2e69-4815-b115-f31825b76caf.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/60d9e47a-5557-42ec-b696-8a6ff8f20f47.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/6656f81d-f7f2-4512-b57c-6da98163d690.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/671208ac-a35d-443c-b618-fdabe38bedd1.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/69280a65-8e06-4634-84c9-48475705a64f.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/713ada62-163d-4113-819a-1b3f792403ee.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/77f8c92d-9953-4c00-b02b-8f8a364dd0ed.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/7bcf4416-7968-4307-9955-590d493c8185.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/7c72b345-8e84-4a44-8b7b-21b0a11621a2.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/7dd7dade-5459-4f29-83be-f8a515dd2249.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/7ef3515a-4e3b-42c0-a3ad-c05ec7120b6e.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/8eafc4a6-b066-44e8-9538-939fc728d042.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/9053cc2b-4837-4f31-86ee-de6465de7ef0.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/9e970dd3-037e-4de3-85c6-3e0aa82710a4.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/9f071b04-6bfb-4706-8feb-1441cb9101ee.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/a15b2d41-afa9-45b8-b561-7122740f9ddd.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/a3dc8710-4746-495d-8708-950e10fb8330.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/a59b600d-fc18-4c9e-abbd-4c9f3ecd68a1.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/afb50547-dd74-43a9-9406-6bf4c9d12710.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/b62f1595-c580-4986-a693-24fdfd3b7106.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/baba8cf9-3e09-46ae-bce3-faaa211fcf58.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/c247bafd-8ee1-40e7-a654-d48309747964.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/c5591b17-e265-4f68-9895-152dbc0763c1.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/c814c0b2-45db-456d-8703-2b631feb3443.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/cdee20ce-2cd1-4c0f-99c6-7467b06d15d3.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/d2b3d097-8ad7-459b-a5ca-4093477cc9d7.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/d68e22bd-cf1a-4b59-8a61-fe1812b2f332.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/e53cd3ea-62d4-442d-a3f3-bd093e1d7ed6.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/eaf67e9d-984c-43c1-92db-67c1e988d1d7.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/f7f50875-5e5c-4636-ac6f-e86c371bde90.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/fe101fde-fe31-4669-986e-24c42c848e8c.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/ff145f08-9360-41e5-8565-2237f95ad1f0.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file-data-map/User/ffb08ffe-2127-493a-81d2-f3fcf45ddc6b.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/DiscodeitApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/DiscodeitApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/BinaryContentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/BinaryContentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/ChannelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/ChannelController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/MessageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/ReadStatusController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/ReadStatusController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/data/BinaryContentDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/data/ChannelDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/data/ChannelDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/data/MessageDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/data/ReadStatusDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/data/UserDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/data/UserDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/BinaryContentCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/BinaryContentCreateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/LoginRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/LoginRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/MessageCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/MessageCreateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/MessageUpdateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/MessageUpdateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/PrivateChannelCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/PrivateChannelCreateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/PublicChannelCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/PublicChannelCreateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/PublicChannelUpdateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/PublicChannelUpdateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/ReadStatusCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/ReadStatusCreateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/ReadStatusUpdateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/ReadStatusUpdateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserCreateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserStatusCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserStatusCreateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserStatusUpdateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserStatusUpdateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserUpdateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserUpdateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/BinaryContent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/BinaryContent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Channel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Channel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/ChannelType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/ChannelType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/ReadStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/ReadStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/UserStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/UserStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/BinaryContentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/BinaryContentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/ChannelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/ChannelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/MessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/MessageRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/ReadStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/ReadStatusRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/UserStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/UserStatusRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileBinaryContentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileBinaryContentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileChannelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileChannelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileMessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileMessageRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileReadStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileReadStatusRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileUserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileUserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileUserStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileUserStatusRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFBinaryContentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFBinaryContentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFChannelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFChannelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFMessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFMessageRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFReadStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFReadStatusRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFUserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFUserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFUserStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFUserStatusRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/BinaryContentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/BinaryContentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/ChannelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/ChannelService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/MessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/MessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/ReadStatusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/ReadStatusService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/UserStatusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/UserStatusService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicAuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicAuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicBinaryContentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicBinaryContentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicChannelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicChannelService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicReadStatusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicReadStatusService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicUserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicUserStatusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicUserStatusService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yaml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="discodeit" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--tags" />
+        <option name="title" value="All" />
+      </GitPushTagMode>
+    </option>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="part1-허재석" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2tHomV7dc4pEnLsLoHO06nbJyoO" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.2-sprint-mission [:Main.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.2-sprint-mission [:com.sprint.mission.discodeit.JavaApplication.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.2-sprint-mission [:com.sprint.mission.discodeit.JavaApplication_Basic.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.2-sprint-mission [:com.sprint.mission.discodeit.JavaApplication_FileIO.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.2-sprint-mission [:com.sprint.mission.discodeit.JavaApplication_Message.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.2-sprint-mission [:com.sprint.mission.discodeit.JavaApplication_Switch.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.2-sprint-mission [:com.sprint.mission.discodeit.User_READTEST.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build 2-sprint-mission.executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Spring Boot.DiscodeitApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;part1-허재석-sprint5&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.tabs&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.sprint.mission.discodeit.repository" />
+      <recent name="com.sprint.mission.discodeit.service" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Spring Boot.DiscodeitApplication">
+    <configuration name="JavaApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.discodeit.JavaApplication" />
+      <module name="2-sprint-mission.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.discodeit.dto.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="JavaApplication_Message" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.discodeit.JavaApplication_Message" />
+      <module name="2-sprint-mission.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.discodeit.dto.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="2-sprint-mission" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="2-sprint-mission" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <configuration name="DiscodeitApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="discodeit.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.sprint.mission.discodeit.DiscodeitApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.JavaApplication" />
+        <item itemvalue="Application.JavaApplication_Message" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.24978.46" />
+        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-IU-243.24978.46" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="StructureViewState">
+    <option name="selectedTab" value="Logical" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="daf1a141-2719-4892-b03e-28252696c9a4" name="Changes" comment="" />
+      <created>1740018520055</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1740018520055</updated>
+      <workItem from="1740018520977" duration="48954000" />
+      <workItem from="1740354425134" duration="14324000" />
+      <workItem from="1740466069638" duration="4230000" />
+      <workItem from="1740553518345" duration="192000" />
+      <workItem from="1740614172332" duration="7658000" />
+      <workItem from="1740751839564" duration="1605000" />
+      <workItem from="1740909130692" duration="91000" />
+      <workItem from="1741062435132" duration="30376000" />
+      <workItem from="1741241901374" duration="3618000" />
+      <workItem from="1741245598430" duration="8353000" />
+      <workItem from="1741832155320" duration="11850000" />
+      <workItem from="1741849384033" duration="23604000" />
+      <workItem from="1742170660241" duration="63522000" />
+      <workItem from="1742517137707" duration="3433000" />
+      <workItem from="1742524461997" duration="778000" />
+      <workItem from="1742894884068" duration="1165000" />
+      <workItem from="1742948688463" duration="23241000" />
+      <workItem from="1742996931176" duration="4079000" />
+      <workItem from="1743323473310" duration="3054000" />
+      <workItem from="1743480744796" duration="1171000" />
+    </task>
+    <task id="LOCAL-00012" summary="MessageService 인터페이스 구현">
+      <option name="closed" value="true" />
+      <created>1740114177569</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1740114177569</updated>
+    </task>
+    <task id="LOCAL-00013" summary="JCFMessageService 클래스 구현 및 MessageService">
+      <option name="closed" value="true" />
+      <created>1740116629763</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1740116629763</updated>
+    </task>
+    <task id="LOCAL-00014" summary="JCFChannelService 클래스 구현">
+      <option name="closed" value="true" />
+      <created>1740118421136</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1740118421136</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Branch 생성(메시지 구현 Main 클래스) / Message 메인클래스 구현">
+      <option name="closed" value="true" />
+      <created>1740356155772</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1740356155772</updated>
+    </task>
+    <task id="LOCAL-00016" summary="JavaApplication_Message 클래스 오타 변경">
+      <option name="closed" value="true" />
+      <created>1740471187060</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1740471187060</updated>
+    </task>
+    <task id="LOCAL-00017" summary="User 클래스 직렬화 적용(Serializable 구현) / FileUserService에서 객체 저장 가능하도록 변경 완료 / User_READTEST.java로 기능 구현 확인(삭제 예정)">
+      <option name="closed" value="true" />
+      <created>1741072224664</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1741072224664</updated>
+    </task>
+    <task id="LOCAL-00018" summary="UserRepository 인터페이스 생성">
+      <option name="closed" value="true" />
+      <created>1741072659824</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1741072659824</updated>
+    </task>
+    <task id="LOCAL-00019" summary="JCFUserRepository 구현">
+      <option name="closed" value="true" />
+      <created>1741073081103</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1741073081103</updated>
+    </task>
+    <task id="LOCAL-00020" summary="FileUserRepository 구현">
+      <option name="closed" value="true" />
+      <created>1741073822624</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1741073822624</updated>
+    </task>
+    <task id="LOCAL-00021" summary="JCFUserService 에서 레포지토리 사용하도록 변경">
+      <option name="closed" value="true" />
+      <created>1741073998324</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1741073998324</updated>
+    </task>
+    <task id="LOCAL-00022" summary="FileUserService 레포지토리 사용하도록 변경">
+      <option name="closed" value="true" />
+      <created>1741074261744</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1741074261744</updated>
+    </task>
+    <task id="LOCAL-00023" summary="MessageRepository 인터페이스 구현">
+      <option name="closed" value="true" />
+      <created>1741075556058</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1741075556058</updated>
+    </task>
+    <task id="LOCAL-00024" summary="JCFMessageRepository">
+      <option name="closed" value="true" />
+      <created>1741076515986</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1741076515986</updated>
+    </task>
+    <task id="LOCAL-00025" summary="FileMessageRepository 구현 완료">
+      <option name="closed" value="true" />
+      <created>1741077114156</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1741077114156</updated>
+    </task>
+    <task id="LOCAL-00026" summary="ChannelRepository 인터페이스 정의">
+      <option name="closed" value="true" />
+      <created>1741077225301</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1741077225301</updated>
+    </task>
+    <task id="LOCAL-00027" summary="JCFChannelRepository 구현">
+      <option name="closed" value="true" />
+      <created>1741077605832</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1741077605832</updated>
+    </task>
+    <task id="LOCAL-00028" summary="FileChannelRepository 구현">
+      <option name="closed" value="true" />
+      <created>1741077676834</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1741077676834</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Channel, Message, User 채널에 Serializble 구현/ 자바어플리케이션으로 저장 및 로드 테스트 구현 완료">
+      <option name="closed" value="true" />
+      <created>1741080596546</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1741080596546</updated>
+    </task>
+    <task id="LOCAL-00030" summary="직렬화 확장자 .ser로 변경">
+      <option name="closed" value="true" />
+      <created>1741081711159</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1741081711159</updated>
+    </task>
+    <task id="LOCAL-00031" summary="refactor(mentor): 싱글톤 패턴 적용">
+      <option name="closed" value="true" />
+      <created>1741222079968</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1741222079968</updated>
+    </task>
+    <task id="LOCAL-00032" summary="refractor(mentor): ConcurrentHashMap 사용">
+      <option name="closed" value="true" />
+      <created>1741223427342</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1741223427342</updated>
+    </task>
+    <task id="LOCAL-00033" summary="refractor(mentor): throw new 구현">
+      <option name="closed" value="true" />
+      <created>1741224194234</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1741224194234</updated>
+    </task>
+    <task id="LOCAL-00034" summary="레포리지트리타입 추가 (FILE/JCF 결정)">
+      <option name="closed" value="true" />
+      <created>1741243124876</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1741243124876</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Basic 서비스 구현 및 코드 템플릿 테스트">
+      <option name="closed" value="true" />
+      <created>1741247360605</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1741247360605</updated>
+    </task>
+    <task id="LOCAL-00036" summary="보완 : UUID 구현 추가">
+      <option name="closed" value="true" />
+      <created>1741254563266</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1741254563266</updated>
+    </task>
+    <task id="LOCAL-00037" summary="스프링 프로젝트 초기화">
+      <option name="closed" value="true" />
+      <created>1741843244487</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1741843244487</updated>
+    </task>
+    <task id="LOCAL-00038" summary="레포지토리 Bean 등록">
+      <option name="closed" value="true" />
+      <created>1741843758936</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1741843758936</updated>
+    </task>
+    <task id="LOCAL-00039" summary="Basic 어노테이션 추가">
+      <option name="closed" value="true" />
+      <created>1741843947060</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1741843947060</updated>
+    </task>
+    <task id="LOCAL-00040" summary="Java 어플리케이션 DiscodeitApplication 에서 구현">
+      <option name="closed" value="true" />
+      <created>1741845002452</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1741845002452</updated>
+    </task>
+    <task id="LOCAL-00041" summary="@Getter 추가와 게터 메소드 삭제">
+      <option name="closed" value="true" />
+      <created>1741847779332</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1741847779332</updated>
+    </task>
+    <task id="LOCAL-00042" summary="공동엔티티 클래스 생성 및 jpa gradle 추가">
+      <option name="closed" value="true" />
+      <created>1741851952661</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1741851952661</updated>
+    </task>
+    <task id="LOCAL-00043" summary="ReadStatus 모델 구현">
+      <option name="closed" value="true" />
+      <created>1741853605536</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1741853605536</updated>
+    </task>
+    <task id="LOCAL-00044" summary="UserStatus 구현">
+      <option name="closed" value="true" />
+      <created>1741854261727</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1741854261727</updated>
+    </task>
+    <task id="LOCAL-00045" summary="엔티티 클래스 리팩토링">
+      <option name="closed" value="true" />
+      <created>1741912780893</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1741912780893</updated>
+    </task>
+    <task id="LOCAL-00046" summary="레포지토리 인터페이스 선언">
+      <option name="closed" value="true" />
+      <created>1741914636223</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1741914636223</updated>
+    </task>
+    <task id="LOCAL-00047" summary="UserService 고도화">
+      <option name="closed" value="true" />
+      <created>1742186550335</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1742186550335</updated>
+    </task>
+    <task id="LOCAL-00048" summary="AuthService 구현, 채널 서비스 고도화 구현">
+      <option name="closed" value="true" />
+      <created>1742197820556</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1742197820556</updated>
+    </task>
+    <task id="LOCAL-00049" summary="MessageService 고도화 작업 구현">
+      <option name="closed" value="true" />
+      <created>1742221472674</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1742221472675</updated>
+    </task>
+    <task id="LOCAL-00050" summary="ReadStatusService 구현">
+      <option name="closed" value="true" />
+      <created>1742265543763</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1742265543766</updated>
+    </task>
+    <task id="LOCAL-00051" summary="UserStatusService 고도화 구현">
+      <option name="closed" value="true" />
+      <created>1742275067695</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1742275067695</updated>
+    </task>
+    <task id="LOCAL-00052" summary="BinaryContentService 구현">
+      <option name="closed" value="true" />
+      <created>1742278952402</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1742278952402</updated>
+    </task>
+    <task id="LOCAL-00053" summary="새로운 도메인 Repository 구현체 구현">
+      <option name="closed" value="true" />
+      <created>1742284088907</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1742284088907</updated>
+    </task>
+    <task id="LOCAL-00054" summary="추가 요구 사항 yml 수정">
+      <option name="closed" value="true" />
+      <created>1742286961348</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1742286961349</updated>
+    </task>
+    <task id="LOCAL-00055" summary="PR 전 수정">
+      <option name="closed" value="true" />
+      <created>1742524151601</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1742524151602</updated>
+    </task>
+    <task id="LOCAL-00056" summary="사용자 관리, 권환 관리 구현">
+      <option name="closed" value="true" />
+      <created>1742964129489</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1742964129490</updated>
+    </task>
+    <task id="LOCAL-00057" summary="채널 관리 구현">
+      <option name="closed" value="true" />
+      <created>1742970909781</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1742970909781</updated>
+    </task>
+    <task id="LOCAL-00058" summary="메시지 관리 서비스 구현 완료">
+      <option name="closed" value="true" />
+      <created>1742976446667</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1742976446667</updated>
+    </task>
+    <task id="LOCAL-00059" summary="메시지 수신 정보 관리">
+      <option name="closed" value="true" />
+      <created>1742977739404</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1742977739404</updated>
+    </task>
+    <task id="LOCAL-00060" summary="바이너리 파일 다운로드 구현">
+      <option name="closed" value="true" />
+      <created>1742999863669</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1742999863669</updated>
+    </task>
+    <option name="localTasksCounter" value="61" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="06d0bb61-1d12-403f-8d59-db0e8cfd0850" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="06d0bb61-1d12-403f-8d59-db0e8cfd0850">
+          <value>
+            <State />
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="part1-허재석-sprint5" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="스프링 프로젝트 초기화" />
+    <MESSAGE value="레포지토리 Bean 등록" />
+    <MESSAGE value="Basic 어노테이션 추가" />
+    <MESSAGE value="Java 어플리케이션 DiscodeitApplication 에서 구현" />
+    <MESSAGE value="@Getter 추가와 게터 메소드 삭제" />
+    <MESSAGE value="공동엔티티 클래스 생성 및 jpa gradle 추가" />
+    <MESSAGE value="ReadStatus 모델 구현" />
+    <MESSAGE value="UserStatus 구현" />
+    <MESSAGE value="엔티티 클래스 리팩토링" />
+    <MESSAGE value="레포지토리 인터페이스 선언" />
+    <MESSAGE value="UserService 고도화" />
+    <MESSAGE value="AuthService 구현, 채널 서비스 고도화 구현" />
+    <MESSAGE value="MessageService 고도화 작업 구현" />
+    <MESSAGE value="ReadStatusService 구현" />
+    <MESSAGE value="UserStatusService 고도화 구현" />
+    <MESSAGE value="BinaryContentService 구현" />
+    <MESSAGE value="새로운 도메인 Repository 구현체 구현" />
+    <MESSAGE value="추가 요구 사항 yml 수정" />
+    <MESSAGE value="PR 전 수정" />
+    <MESSAGE value="사용자 관리, 권환 관리 구현" />
+    <MESSAGE value="채널 관리 구현" />
+    <MESSAGE value="메시지 관리 서비스 구현 완료" />
+    <MESSAGE value="메시지 수신 정보 관리" />
+    <MESSAGE value="# 제목은 최대 50글자까지 아래에 작성: ex) Feat: Add Key mapping  &#10;&#10;# 본문은 아래에 작성  &#10;&#10;# 꼬릿말은 아래에 작성: ex) Github issue #23  &#10;&#10;# --- COMMIT END ---  &#10;#   &lt;타입&gt; 리스트  &#10;#   feat        : 기능 (새로운 기능)  &#10;#   fix         : 버그 (버그 수정)  &#10;#   refactor    : 리팩토링  &#10;#   design      : CSS 등 사용자 UI 디자인 변경  &#10;#   comment     : 필요한 주석 추가 및 변경  &#10;#   style       : 스타일 (코드 형식, 세미콜론 추가: 비즈니스 로직에 변경 없음)  &#10;#   docs        : 문서 수정 (문서 추가, 수정, 삭제, README)  &#10;#   test        : 테스트 (테스트 코드 추가, 수정, 삭제: 비즈니스 로직에 변경 없음)  &#10;#   chore       : 기타 변경사항 (빌드 스크립트 수정, assets, 패키지 매니저 등)  &#10;#   init        : 초기 생성  &#10;#   rename      : 파일 혹은 폴더명을 수정하거나 옮기는 작업만 한 경우  &#10;#   remove      : 파일을 삭제하는 작업만 수행한 경우  &#10;# ------------------  &#10;#   제목 첫 글자를 대문자로  &#10;#   제목은 명령문으로  &#10;#   제목 끝에 마침표(.) 금지  &#10;#   제목과 본문을 한 줄 띄워 분리하기  &#10;#   본문은 &quot;어떻게&quot; 보다 &quot;무엇을&quot;, &quot;왜&quot;를 설명한다.  &#10;#   본문에 여러줄의 메시지를 작성할 땐 &quot;-&quot;로 구분  &#10;# ------------------  &#10;#   &lt;꼬리말&gt;  &#10;#   필수가 아닌 optioanl  &#10;#   Fixes        :이슈 수정중 (아직 해결되지 않은 경우)  &#10;#   Resolves     : 이슈 해결했을 때 사용  &#10;#   Ref          : 참고할 이슈가 있을 때 사용  &#10;#   Related to   : 해당 커밋에 관련된 이슈번호 (아직 해결되지 않은 경우)  &#10;#   ex) Fixes: #47 Related to: #32, #21" />
+    <MESSAGE value="바이너리 파일 다운로드 구현" />
+    <option name="LAST_COMMIT_MESSAGE" value="바이너리 파일 다운로드 구현" />
+  </component>
+</project>
