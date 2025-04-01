@@ -20,13 +20,6 @@ public class BasicServerService implements ServerService {
   private final UserRepository userRepository;
   private final ServerRepository serverRepository;
 
-  @Override
-  public void reset(boolean adminAuth) {
-    if (adminAuth) {
-      serverRepository.reset();
-    }
-  }
-
   @CustomLogging
   @Override
   public Server create(ServerCreateRequestDTO serverCreateRequestDTO) {

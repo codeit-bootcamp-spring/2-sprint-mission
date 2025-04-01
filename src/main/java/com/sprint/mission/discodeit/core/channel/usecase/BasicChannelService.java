@@ -36,13 +36,6 @@ public class BasicChannelService implements ChannelService {
   private final MessageRepository messageRepository;
   private final ReadStatusRepository readStatusRepository;
 
-  @Override
-  public void reset(boolean adminAuth) {
-    if (adminAuth) {
-      channelRepository.reset();
-    }
-  }
-
   @CustomLogging
   @Override
   public Channel create(UUID userId, UUID serverId,

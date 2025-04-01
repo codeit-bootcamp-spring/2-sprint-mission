@@ -29,14 +29,6 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
 
-
-  @Override
-  public void reset(boolean adminAuth) {
-    if (adminAuth) {
-      userRepository.reset();
-    }
-  }
-
   @CustomLogging
   @Override
   public UUID create(UserCreateRequestDTO requestDTO,

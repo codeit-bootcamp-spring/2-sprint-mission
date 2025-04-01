@@ -31,13 +31,6 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final BinaryContentRepository binaryContentRepository;
 
-  @Override
-  public void reset(boolean adminAuth) {
-    if (adminAuth) {
-      messageRepository.reset();
-    }
-  }
-
   @CustomLogging
   @Override
   public Message create(UUID userId, UUID channelId, MessageCreateRequestDTO messageWriteDTO,

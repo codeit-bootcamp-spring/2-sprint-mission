@@ -7,7 +7,4 @@ public interface ServerService extends ServerAccessUseCase, CreateServerUseCase,
     UpdateServerUseCase,
     DeleteServerUseCase {
 
-  void reset(boolean adminAuth);
-
-
 }

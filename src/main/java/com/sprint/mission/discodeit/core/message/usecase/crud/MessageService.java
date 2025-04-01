@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 public interface MessageService extends CreateMessageUseCase, FindMessageUseCase,
     UpdateMessageUseCase, DeleteMessageUseCase {
 
-  void reset(boolean adminAuth);
-
 //    void print(UUID channelId);
 
 }
