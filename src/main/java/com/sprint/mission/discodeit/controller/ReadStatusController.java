@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.DTO.ReadStatus.CreateReadStatusDto;
-import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusDto;
-import com.sprint.mission.discodeit.DTO.ReadStatus.UpdateReadStatusDto;
+import com.sprint.mission.discodeit.dto.ReadStatus.CreateReadStatusDto;
+import com.sprint.mission.discodeit.dto.ReadStatus.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.ReadStatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

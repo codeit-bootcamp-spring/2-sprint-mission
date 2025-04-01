@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.DTO.User.UserCreateRequest;
-import com.sprint.mission.discodeit.DTO.User.UserDto;
-import com.sprint.mission.discodeit.DTO.User.UserUpdateRequest;
-import com.sprint.mission.discodeit.DTO.UserStatus.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.dto.User.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.User.UserDto;
+import com.sprint.mission.discodeit.dto.User.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.UserStatus.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserNotFound;

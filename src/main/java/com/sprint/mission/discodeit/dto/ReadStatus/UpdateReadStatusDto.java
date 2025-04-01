@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTO.ReadStatus;
+package com.sprint.mission.discodeit.dto.ReadStatus;
 
 import java.time.Instant;
 import java.util.UUID;

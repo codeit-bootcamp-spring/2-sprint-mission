@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.DTO.Message.CreateMessageDto;
-import com.sprint.mission.discodeit.DTO.Message.MessageDto;
-import com.sprint.mission.discodeit.DTO.Message.UpdateMessageDto;
+import com.sprint.mission.discodeit.dto.Message.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.Message.MessageDto;
+import com.sprint.mission.discodeit.dto.Message.UpdateMessageDto;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

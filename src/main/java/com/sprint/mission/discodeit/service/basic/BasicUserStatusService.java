@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.UserStatus.CreateUserStatusDto;
-import com.sprint.mission.discodeit.DTO.UserStatus.UpdateUserStatusDto;
-import com.sprint.mission.discodeit.entity.Status;
+import com.sprint.mission.discodeit.dto.UserStatus.CreateUserStatusDto;
+import com.sprint.mission.discodeit.dto.UserStatus.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.DTO.Channel.ChannelDetailsDto;
-import com.sprint.mission.discodeit.DTO.Channel.CreatePrivateChannelDto;
-import com.sprint.mission.discodeit.DTO.Channel.CreatePublicChannelDto;
-import com.sprint.mission.discodeit.DTO.Channel.UpdateChannelDto;
+import com.sprint.mission.discodeit.dto.Channel.ChannelDetailsDto;
+import com.sprint.mission.discodeit.dto.Channel.CreatePrivateChannelDto;
+import com.sprint.mission.discodeit.dto.Channel.CreatePublicChannelDto;
+import com.sprint.mission.discodeit.dto.Channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

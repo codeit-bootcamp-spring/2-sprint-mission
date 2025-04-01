@@ -1,6 +1,4 @@
-package com.sprint.mission.discodeit.DTO.ReadStatus;
-
-import lombok.Getter;
+package com.sprint.mission.discodeit.dto.ReadStatus;
 
 import java.util.UUID;
 
