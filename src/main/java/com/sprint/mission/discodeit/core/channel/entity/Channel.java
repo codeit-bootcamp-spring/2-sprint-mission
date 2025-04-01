@@ -14,51 +14,61 @@ import java.util.UUID;
 @ToString
 @Getter
 public class Channel implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
 
-    private UUID channelId;
-    private final UUID serverId;
-    private final UUID userId;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private String name;
-    private List<User> userList = new ArrayList<>();
+  private UUID channelId;
+  private final UUID serverId;
+  private final UUID userId;
 
-    private ChannelType type;
+  private String name;
+  private List<User> userList = new ArrayList<>();
 
-    public final Instant createdAt;
-    public Instant updatedAt;
+  private ChannelType type;
 
-    public Channel(UUID serverId, UUID userId, String name ) {
-        this(UUID.randomUUID(), serverId, userId,Instant.now(), name, ChannelType.PUBLIC);
+  private final Instant createdAt;
+  private Instant updatedAt;
+
+  private Channel(UUID channelId, UUID serverId, UUID userId, Instant createdAt, String name,
+      ChannelType type) {
+    this.channelId = channelId;
+    this.serverId = serverId;
+    this.userId = userId;
+    this.createdAt = createdAt;
+    this.updatedAt = createdAt;
+    this.name = name;
+    this.type = type;
+  }
+
+  public static Channel create(UUID serverId, UUID userId, String name, ChannelType type) {
+    return new Channel(UUID.randomUUID(), serverId, userId, Instant.now(), name,
+        type);
+  }
+
+  public void update(String newName, ChannelType newType) {
+    boolean anyValueUpdated = false;
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
+      anyValueUpdated = true;
+    }
+    if (newType != null && !newType.equals(this.type)) {
+      this.type = newType;
+      anyValueUpdated = true;
+    }
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
+    }
+  }
+
+  public static class Validator {
+
+    public static void validate(String name) {
+      validateName(name);
     }
 
-    public Channel(UUID serverId, UUID userId, String name, ChannelType type) {
-        this(UUID.randomUUID(), serverId, userId,Instant.now(), name, type);
-    }
+    public static void validateName(String name) {
 
-    public Channel(UUID channelId, UUID serverId, UUID userId, Instant createdAt, String name, ChannelType type) {
-        this.channelId = channelId;
-        this.serverId = serverId;
-        this.userId = userId;
-        this.createdAt = createdAt;
-        this.updatedAt = createdAt;
-        this.name = name;
-        this.type = type;
     }
-
-    public void setChannelId(UUID channelId) {
-        this.channelId = channelId;
-        updatedAt = Instant.now();
-    }
-
-    public void setName(String name) {
-        this.name = name;
-        updatedAt = Instant.now();
-    }
-
-    public void setType(ChannelType type) {
-        this.type = type;
-        updatedAt = Instant.now();
-    }
+  }
 }

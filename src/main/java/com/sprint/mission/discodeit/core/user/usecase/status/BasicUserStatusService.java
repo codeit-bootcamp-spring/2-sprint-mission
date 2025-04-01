@@ -27,7 +27,7 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus userStatus = userStatusRepository.findByUserId(userId);
 
     if (userStatus == null) {
-      userStatus = new UserStatus(user.getId());
+      userStatus = UserStatus.create(user.getId());
     } else {
       throw new DuplicateUserStatusException("중복된 유저 상태가 있습니다.");
     }

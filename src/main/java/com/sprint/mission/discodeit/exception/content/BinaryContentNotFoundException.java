@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.exception.content;
 
-import com.sprint.mission.discodeit.adapter.outbound.NotFoundException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 
 public class BinaryContentNotFoundException extends NotFoundException {
 

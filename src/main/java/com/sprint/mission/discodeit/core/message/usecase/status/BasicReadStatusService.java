@@ -80,7 +80,7 @@ public class BasicReadStatusService implements ReadStatusService {
       ReadStatusCreateRequestDTO readStatusCreateRequestDTO) {
     List<ReadStatus> list = readStatusRepository.findAllByUserId(userId);
     if (!list.stream().anyMatch(readStatus -> readStatus.getChannelId().equals(channelId))) {
-      return new ReadStatus(userId, channelId, readStatusCreateRequestDTO.lastReadAt());
+      return ReadStatus.create(userId, channelId, readStatusCreateRequestDTO.lastReadAt());
     } else {
       throw new DuplicateReadStatusException("중복된 읽기 상태 정보가 있습니다.");
     }

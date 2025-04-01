@@ -40,8 +40,8 @@ public class BasicMessageService implements MessageService {
 
     List<UUID> binaryContentIdList = makeBinaryContent(binaryContentDTOs);
 
-    Message message = new Message(user.getId(), user.getName(), channel.getChannelId(),
-        messageWriteDTO.text(), binaryContentIdList);
+    Message message = Message.create(user.getId(), channel.getChannelId(),
+        messageWriteDTO.text());
 
     messageRepository.save(message);
     return message;
@@ -92,7 +92,7 @@ public class BasicMessageService implements MessageService {
   }
 
   private UUID saveBinaryContent(BinaryContentCreateRequestDTO binaryContentCreateDTO) {
-    BinaryContent content = new BinaryContent(
+    BinaryContent content = BinaryContent.create(
         binaryContentCreateDTO.fileName(),
         binaryContentCreateDTO.bytes().length,
         binaryContentCreateDTO.contentType(),

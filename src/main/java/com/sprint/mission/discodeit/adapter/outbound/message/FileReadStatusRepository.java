@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.adapter.outbound.message;
 
 import com.sprint.mission.discodeit.core.message.entity.ReadStatus;
-import com.sprint.mission.discodeit.adapter.outbound.SaveFileNotFoundException;
+import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.message.port.ReadStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,68 +18,73 @@ import java.util.concurrent.ConcurrentHashMap;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
-    private final Path path = Paths.get(System.getProperty("user.dir"), "data", "ReadStatusList.ser");
 
-    private  Map<UUID, ReadStatus> readStatusList = new ConcurrentHashMap<>();
-    private final FileRepositoryImpl<Map<UUID, ReadStatus>> fileRepository;
+  private final Path path = Paths.get(System.getProperty("user.dir"), "data", "ReadStatusList.ser");
 
-    public FileReadStatusRepository() {
-        this.fileRepository = new FileRepositoryImpl<>(path);
-        try {
-            this.readStatusList = fileRepository.load();
-        } catch (SaveFileNotFoundException e) {
-            System.out.println("FileReadStatusRepository init");
-        }
+  private Map<UUID, ReadStatus> readStatusList = new ConcurrentHashMap<>();
+  private final FileRepositoryImpl<Map<UUID, ReadStatus>> fileRepository;
+
+  public FileReadStatusRepository() {
+    this.fileRepository = new FileRepositoryImpl<>(path);
+    try {
+      this.readStatusList = fileRepository.load();
+    } catch (SaveFileNotFoundException e) {
+      System.out.println("FileReadStatusRepository init");
     }
+  }
 
-    @Override
-    public ReadStatus save(ReadStatus readStatus) {
-        readStatusList.put(readStatus.getReadStatusId(), readStatus);
-        fileRepository.save(readStatusList);
-        return readStatus;
-    }
+  @Override
+  public ReadStatus save(ReadStatus readStatus) {
+    readStatusList.put(readStatus.getReadStatusId(), readStatus);
+    fileRepository.save(readStatusList);
+    return readStatus;
+  }
 
-    @Override
-    public Optional<ReadStatus> findById(UUID readStatusId) {
-        return Optional.ofNullable(this.readStatusList.get(readStatusId));
-    }
+  @Override
+  public Optional<ReadStatus> findById(UUID readStatusId) {
+    return Optional.ofNullable(this.readStatusList.get(readStatusId));
+  }
 
-    @Override
-    public ReadStatus findByUserId(UUID userID) {
-        return readStatusList.values().stream().filter(readStatus -> readStatus.getUserId().equals(userID)).findFirst().orElse(null);
-    }
+  @Override
+  public ReadStatus findByUserId(UUID userID) {
+    return readStatusList.values().stream()
+        .filter(readStatus -> readStatus.getUserId().equals(userID)).findFirst().orElse(null);
+  }
 
-    @Override
-    public ReadStatus findByChannelId(UUID channelId) {
-        return readStatusList.values().stream().filter(readStatus -> readStatus.getChannelId().equals(channelId)).findFirst().orElse(null);
-    }
-
-
-    @Override
-    public ReadStatus findByUserAndChannelId(UUID userId, UUID channelId) {
-        return readStatusList.values().stream().filter(readStatus ->readStatus.getUserId().equals(userId) && readStatus.getChannelId().equals(channelId)).findFirst().orElse(null);
-    }
+  @Override
+  public ReadStatus findByChannelId(UUID channelId) {
+    return readStatusList.values().stream()
+        .filter(readStatus -> readStatus.getChannelId().equals(channelId)).findFirst().orElse(null);
+  }
 
 
-    @Override
-    public List<ReadStatus> findAllByUserId(UUID userID) {
-        List<ReadStatus> list = this.readStatusList.values().stream()
-                .filter(readStatus -> readStatus.getUserId().equals(userID))
-                .toList();
-        return list;
-    }
+  @Override
+  public ReadStatus findByUserAndChannelId(UUID userId, UUID channelId) {
+    return readStatusList.values().stream().filter(
+        readStatus -> readStatus.getUserId().equals(userId) && readStatus.getChannelId()
+            .equals(channelId)).findFirst().orElse(null);
+  }
 
-    @Override
-    public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        List<ReadStatus> list = this.readStatusList.values().stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .toList();
-        return list;
-    }
 
-    @Override
-    public void delete(UUID readStatusId) {
-        readStatusList.remove(readStatusId);
-        fileRepository.save(readStatusList);
-    }
+  @Override
+  public List<ReadStatus> findAllByUserId(UUID userID) {
+    List<ReadStatus> list = this.readStatusList.values().stream()
+        .filter(readStatus -> readStatus.getUserId().equals(userID))
+        .toList();
+    return list;
+  }
+
+  @Override
+  public List<ReadStatus> findAllByChannelId(UUID channelId) {
+    List<ReadStatus> list = this.readStatusList.values().stream()
+        .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+        .toList();
+    return list;
+  }
+
+  @Override
+  public void delete(UUID readStatusId) {
+    readStatusList.remove(readStatusId);
+    fileRepository.save(readStatusList);
+  }
 }

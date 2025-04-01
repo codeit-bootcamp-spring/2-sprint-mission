@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.core.server.entity.Server;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.exception.server.EmptyServerListException;
 import com.sprint.mission.discodeit.exception.user.UserListEmptyError;
-import com.sprint.mission.discodeit.adapter.outbound.SaveFileNotFoundException;
+import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.exception.server.ServerNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
@@ -113,16 +113,6 @@ public class FileServerRepository implements ServerRepository {
     }
     return list;
   }
-
-  @Override
-  public Server update(Server server, UpdateServerRequestDTO updateServerRequestDTO) {
-    if (updateServerRequestDTO.replaceName() != null) {
-      server.setName(updateServerRequestDTO.replaceName());
-    }
-    fileRepository.save(serverList);
-    return server;
-  }
-
 
   @Override
   public void remove(UUID serverId) {

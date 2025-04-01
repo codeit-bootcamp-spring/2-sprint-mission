@@ -87,18 +87,6 @@ public class JCFChannelRepository implements ChannelRepository {
     return channels;
   }
 
-
-  @Override
-  public Channel update(Channel channel, UpdateChannelDTO updateChannelDTO) {
-    if (updateChannelDTO.replaceName() != null) {
-      channel.setName(updateChannelDTO.replaceName());
-    }
-    if (updateChannelDTO.replaceType() != channel.getType()) {
-      channel.setType(updateChannelDTO.replaceType());
-    }
-    return channel;
-  }
-
   @Override
   public void remove(UUID channelId) {
     Channel channel = find(channelId);

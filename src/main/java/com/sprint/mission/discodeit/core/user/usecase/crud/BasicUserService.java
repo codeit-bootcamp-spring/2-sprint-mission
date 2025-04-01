@@ -38,7 +38,7 @@ public class BasicUserService implements UserService {
 
     UUID profileId = makeBinaryContent(binaryContentDTO);
     String hashedPassword = BCrypt.hashpw(requestDTO.password(), BCrypt.gensalt());
-    User user = new User(profileId, requestDTO.name(), requestDTO.email(), hashedPassword);
+    User user = User.create(requestDTO.name(), requestDTO.email(), hashedPassword);
     userRepository.save(user);
 
     userStatusService.create(user.getId());
@@ -110,7 +110,7 @@ public class BasicUserService implements UserService {
       byte[] bytes = contentDTO.bytes();
       long size = bytes.length;
 
-      BinaryContent content = new BinaryContent(fileName, size, contentType, bytes);
+      BinaryContent content = BinaryContent.create(fileName, size, contentType, bytes);
       binaryContentRepository.save(content);
 
       return content.getId();

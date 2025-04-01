@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.adapter.outbound.message;
 
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.UpdateMessageDTO;
 import com.sprint.mission.discodeit.core.message.entity.Message;
-import com.sprint.mission.discodeit.adapter.outbound.SaveFileNotFoundException;
+import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.message.port.MessageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -72,14 +72,6 @@ public class FileMessageRepository implements MessageRepository {
     return this.messageList.containsKey(id);
   }
 
-  @Override
-  public Message update(Message message, UpdateMessageDTO updateMessageDTO) {
-    if (updateMessageDTO.replaceText() != null) {
-      message.setText(updateMessageDTO.replaceText());
-    }
-    fileRepository.save(messageList);
-    return message;
-  }
 
   @Override
   public void deleteById(UUID id) {

@@ -47,14 +47,6 @@ public class JCFMessageRepository implements MessageRepository {
   }
 
   @Override
-  public Message update(Message message, UpdateMessageDTO updateMessageDTO) {
-    if (updateMessageDTO.replaceText() != null) {
-      message.setText(updateMessageDTO.replaceText());
-    }
-    return message;
-  }
-
-  @Override
   public void deleteById(UUID id) {
     this.messageList.remove(id);
   }

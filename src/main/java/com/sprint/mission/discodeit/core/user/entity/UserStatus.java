@@ -1,55 +1,45 @@
 package com.sprint.mission.discodeit.core.user.entity;
 
-import lombok.Getter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
 
-@ToString(onlyExplicitlyIncluded = true)
 @Getter
 public class UserStatus implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
 
-    @ToString.Include
-    private UUID userStatusId;
-    @ToString.Include
-    private final UUID userId;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    public final Instant createdAt;
-    public Instant updatedAt;
+  private final UUID userStatusId;
+  private final UUID userId;
 
+  public final Instant createdAt;
+  public Instant updatedAt;
 
-    public UserStatus(UUID userId) {
-        this(UUID.randomUUID(), userId, Instant.now());
-    }
+  private UserStatus(UUID userStatusId, UUID userId, Instant createdAt) {
+    this.userStatusId = userStatusId;
+    this.userId = userId;
+    this.createdAt = createdAt;
+    this.updatedAt = createdAt;
+  }
 
-    public UserStatus(UUID userStatusId, UUID userId, Instant createdAt) {
-        this.userStatusId = userStatusId;
-        this.userId = userId;
-        this.createdAt = createdAt;
-        this.updatedAt = createdAt;
-    }
+  public static UserStatus create(UUID userId) {
+    return new UserStatus(UUID.randomUUID(), userId, Instant.now());
+  }
 
-    public void setUserStatusId(UUID userStatusId) {
-        this.userStatusId = userStatusId;
-        this.updatedAt = Instant.now();
-    }
+  public void updatedTime() {
+    this.updatedAt = Instant.now();
+  }
 
-    public void updatedTime() {
-        this.updatedAt = Instant.now();
-    }
+  public void setOffline() {
+    this.updatedAt = Instant.now().minus(Duration.ofMinutes(6));
+  }
 
-    public void setOffline() {
-        this.updatedAt = Instant.now().minus(Duration.ofMinutes(6));
-    }
-
-    public boolean isOnline() {
-        return Duration.between(updatedAt, Instant.now()).getSeconds() <= 300;
-    }
+  public boolean isOnline() {
+    return Duration.between(updatedAt, Instant.now()).getSeconds() <= 300;
+  }
 
 }

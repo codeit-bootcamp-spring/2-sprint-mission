@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.adapter.outbound.user;
 import com.sprint.mission.discodeit.adapter.inbound.user.dto.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserListEmptyError;
-import com.sprint.mission.discodeit.adapter.outbound.SaveFileNotFoundException;
+import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.user.port.UserRepository;
@@ -73,23 +73,6 @@ public class FileUserRepository implements UserRepository {
     }
     return userList;
   }
-
-
-  @Override
-  public User update(User user, UpdateUserRequestDTO updateUserRequestDTO, UUID newProfileId) {
-    if (updateUserRequestDTO.replaceName() != null) {
-      user.setName(updateUserRequestDTO.replaceName());
-    }
-    if (updateUserRequestDTO.replaceEmail() != null) {
-      user.setEmail(updateUserRequestDTO.replaceEmail());
-    }
-    if (newProfileId != null) {
-      user.setProfileId(newProfileId);
-    }
-    fileRepository.save(userList);
-    return user;
-  }
-
 
   @Override
   public UUID remove(User user) {

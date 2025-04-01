@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.adapter.outbound.user;
 
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.EmptyUserStatusListException;
-import com.sprint.mission.discodeit.adapter.outbound.SaveFileNotFoundException;
+import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.user.port.UserStatusRepository;

@@ -44,7 +44,8 @@ public class BasicChannelService implements ChannelService {
     Server findServer = serverRepository.findById(serverId);
     Channel channel;
 
-    channel = new Channel(findServer.getServerId(), user.getId(), channelCreateDTO.name());
+    channel = Channel.create(findServer.getServerId(), user.getId(), channelCreateDTO.name(),
+        ChannelType.PUBLIC);
 
     channelRepository.save(findServer, channel);
     channelRepository.join(channel, user);
@@ -54,12 +55,12 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel create(UUID userId, UUID serverId, PrivateChannelCreateRequestDTO requestDTO) {
-    Channel channel = new Channel(serverId, userId, null);
+    Channel channel = Channel.create(serverId, userId, null, ChannelType.PRIVATE);
     Server findServer = serverRepository.findById(serverId);
     Channel createdChannel = channelRepository.save(findServer, channel);
 
     requestDTO.participantIds().stream()
-        .map(u -> new ReadStatus(u, createdChannel.getChannelId(), Instant.MIN))
+        .map(u -> ReadStatus.create(u, createdChannel.getChannelId(), Instant.MIN))
         .forEach(readStatusRepository::save);
 
     return createdChannel;

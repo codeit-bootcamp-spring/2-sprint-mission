@@ -1,57 +1,68 @@
 package com.sprint.mission.discodeit.core.server.entity;
 
 import com.sprint.mission.discodeit.core.user.entity.User;
-import lombok.Getter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.ToString;
 
 @ToString
 @Getter
 public class Server implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
 
-    private UUID serverId;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private UUID userId;
+  private UUID serverId;
 
-    private String name;
-    private List<User> userList = new ArrayList<>();
+  private UUID userId;
 
-    public final Instant createdAt;
-    public Instant updatedAt;
+  private String name;
+  private List<User> userList = new ArrayList<>();
 
-    public Server(UUID userId, String name) {
-        this(UUID.randomUUID(), userId, Instant.now(), name);
+  private final Instant createdAt;
+  private Instant updatedAt;
+
+  private Server(UUID serverId, UUID userId, Instant createdAt, String name) {
+    this.serverId = serverId;
+    this.userId = userId;
+    this.createdAt = createdAt;
+    this.updatedAt = createdAt;
+    this.name = name;
+  }
+
+  public static Server create(UUID userId, String name) {
+    return new Server(UUID.randomUUID(), userId, Instant.now(), name);
+  }
+
+  public void update(UUID newOwnerId, String newUserName) {
+    boolean anyValueUpdated = false;
+    if (newOwnerId != null && !newOwnerId.equals(this.userId)) {
+      this.userId = newOwnerId;
+      anyValueUpdated = true;
+    }
+    if (newUserName != null && !newUserName.equals(this.name)) {
+      this.name = newUserName;
+      anyValueUpdated = true;
+    }
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
+    }
+  }
+
+  public static class Validator {
+
+    public static void validate(String name) {
+      validateName(name);
     }
 
-    public Server(UUID serverId, UUID userId, Instant createdAt, String name) {
-        this.serverId = serverId;
-        this.userId = userId;
-        this.createdAt = createdAt;
-        this.updatedAt = createdAt;
-        this.name = name;
-    }
+    public static void validateName(String name) {
 
-    public void setServerId(UUID serverId) {
-        this.serverId = serverId;
-        updatedAt = Instant.now();
     }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-        updatedAt = Instant.now();
-    }
-
-    public void setName(String name) {
-        this.name = name;
-        updatedAt = Instant.now();
-    }
+  }
 }
 

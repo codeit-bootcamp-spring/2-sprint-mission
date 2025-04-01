@@ -19,7 +19,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @CustomLogging
   @Override
   public BinaryContent create(BinaryContentCreateRequestDTO binaryContentCreateRequestDTO) {
-    BinaryContent binaryContent = new BinaryContent(binaryContentCreateRequestDTO.fileName(),
+    BinaryContent binaryContent = BinaryContent.create(binaryContentCreateRequestDTO.fileName(),
         binaryContentCreateRequestDTO.bytes().length, binaryContentCreateRequestDTO.contentType(),
         binaryContentCreateRequestDTO.bytes());
     return binaryContentRepository.save(binaryContent);

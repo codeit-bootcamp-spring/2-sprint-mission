@@ -11,32 +11,41 @@ import java.util.UUID;
 @ToString
 @Getter
 public class ReadStatus implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
 
-    private final UUID readStatusId;
-    private final UUID userId;
-    private final UUID channelId;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private final Instant createdAt;
-    private Instant updatedAt;
-    private Instant lastReadAt;
+  private final UUID readStatusId;
+  private final UUID userId;
+  private final UUID channelId;
 
-    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        this(UUID.randomUUID(), userId, channelId, lastReadAt,Instant.now());
+  private final Instant createdAt;
+  private Instant updatedAt;
+  private Instant lastReadAt;
+
+  private ReadStatus(UUID readStatusId, UUID userId, UUID channelId, Instant lastReadAt,
+      Instant createdAt) {
+    this.readStatusId = readStatusId;
+    this.userId = userId;
+    this.channelId = channelId;
+    this.createdAt = createdAt;
+    this.updatedAt = createdAt;
+    this.lastReadAt = lastReadAt;
+  }
+
+  public static ReadStatus create(UUID userId, UUID channelId, Instant lastReadAt) {
+    return new ReadStatus(UUID.randomUUID(), userId, channelId, lastReadAt, Instant.now());
+  }
+
+  public void update(Instant newLastReadAt) {
+    boolean anyValueUpdated = false;
+    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = newLastReadAt;
+      anyValueUpdated = true;
     }
 
-    public ReadStatus(UUID readStatusId, UUID userId, UUID channelId, Instant lastReadAt, Instant createdAt) {
-        this.readStatusId = readStatusId;
-        this.userId = userId;
-        this.channelId = channelId;
-        this.createdAt = createdAt;
-        this.updatedAt = createdAt;
-        this.lastReadAt = lastReadAt;
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
-
-    public void update(Instant lastReadAt) {
-        this.updatedAt = Instant.now();
-        this.lastReadAt = lastReadAt;
-    }
+  }
 }

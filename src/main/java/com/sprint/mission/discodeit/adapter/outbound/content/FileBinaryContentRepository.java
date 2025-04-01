@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.adapter.outbound.content;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.content.EmptyBinaryContentListException;
 import com.sprint.mission.discodeit.exception.content.BinaryContentNotFoundException;
-import com.sprint.mission.discodeit.adapter.outbound.SaveFileNotFoundException;
+import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepository;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.util.CommonUtils;

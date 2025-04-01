@@ -45,21 +45,6 @@ public class JCFUserRepository implements UserRepository {
   }
 
   @Override
-  public User update(User user, UpdateUserRequestDTO updateUserRequestDTO, UUID newProfileId) {
-    if (updateUserRequestDTO.replaceName() != null) {
-      user.setName(updateUserRequestDTO.replaceName());
-    }
-    if (updateUserRequestDTO.replaceEmail() != null) {
-      user.setEmail(updateUserRequestDTO.replaceEmail());
-    }
-    if (newProfileId != null) {
-      user.setProfileId(newProfileId);
-    }
-    return user;
-  }
-
-
-  @Override
   public UUID remove(User user) {
     if (userList.isEmpty()) {
       throw new UserListEmptyError("유저 리스트가 비어있습니다.");

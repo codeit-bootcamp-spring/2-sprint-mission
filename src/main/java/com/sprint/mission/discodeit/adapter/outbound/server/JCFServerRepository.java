@@ -85,14 +85,6 @@ public class JCFServerRepository implements ServerRepository {
     return list;
   }
 
-  @Override
-  public Server update(Server server, UpdateServerRequestDTO updateServerRequestDTO) {
-    if (updateServerRequestDTO.replaceName() != null) {
-      server.setName(updateServerRequestDTO.replaceName());
-    }
-    return server;
-  }
-
 
   @Override
   public void remove(UUID serverId) {

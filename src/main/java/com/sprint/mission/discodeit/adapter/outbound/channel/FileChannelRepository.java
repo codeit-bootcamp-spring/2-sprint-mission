@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.core.server.entity.Server;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserListEmptyError;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.adapter.outbound.SaveFileNotFoundException;
+import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.util.CommonUtils;
@@ -110,18 +110,6 @@ public class FileChannelRepository implements ChannelRepository {
         .flatMap(List::stream)
         .filter(channel -> channel.getChannelId().equals(channelId)).toList();
     return channels;
-  }
-
-  @Override
-  public Channel update(Channel channel, UpdateChannelDTO updateChannelDTO) {
-    if (updateChannelDTO.replaceName() != null) {
-      channel.setName(updateChannelDTO.replaceName());
-    }
-    if (updateChannelDTO.replaceType() != channel.getType()) {
-      channel.setType(updateChannelDTO.replaceType());
-    }
-    fileRepository.save(channelList);
-    return channel;
   }
 
   @Override

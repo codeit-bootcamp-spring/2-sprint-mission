@@ -24,7 +24,7 @@ public class BasicServerService implements ServerService {
   @Override
   public Server create(ServerCreateRequestDTO serverCreateRequestDTO) {
     User owner = userRepository.findById(serverCreateRequestDTO.userId());
-    Server server = new Server(owner.getId(), serverCreateRequestDTO.name());
+    Server server = Server.create(owner.getId(), serverCreateRequestDTO.name());
 
     serverRepository.save(server, owner);
 

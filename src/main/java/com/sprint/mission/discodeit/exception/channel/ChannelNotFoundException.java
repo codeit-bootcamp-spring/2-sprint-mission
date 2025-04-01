@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.exception.channel;
 
-import com.sprint.mission.discodeit.adapter.outbound.NotFoundException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 
 public class ChannelNotFoundException extends NotFoundException {
 

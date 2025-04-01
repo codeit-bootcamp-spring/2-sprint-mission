@@ -11,56 +11,68 @@ import java.util.UUID;
 @ToString
 @Getter
 public class User implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
 
-    private UUID id;
-    public UUID profileId;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private String name;
-    private String email;
-    @ToString.Exclude
-    private String password;
+  private UUID id;
+  private UUID profileId;
 
-    public final Instant createdAt;
-    public Instant updatedAt;
+  private String name;
+  private String email;
+  private String password;
 
+  private final Instant createdAt;
+  private Instant updatedAt;
 
-    public User(String name, String email, String password) {
-        this(UUID.randomUUID(), null, Instant.now(), name, email, password);
+  private User(UUID id, UUID profileId, Instant createdAt, String name, String email,
+      String password) {
+    this.id = id;
+    this.profileId = profileId;
+    this.createdAt = createdAt;
+    this.updatedAt = createdAt;
+    this.name = name;
+    this.email = email;
+    this.password = password;
+  }
+
+  public static User create(String name, String email, String password) {
+    return new User(UUID.randomUUID(), null, Instant.now(), name, email, password);
+  }
+
+  public void update(String newUserName, String newEmail, UUID newProfileId) {
+    boolean anyValueUpdated = false;
+    if (newUserName != null && !newUserName.equals(this.name)) {
+      this.name = newUserName;
+      anyValueUpdated = true;
+    }
+    if (newEmail != null && !newEmail.equals(this.email)) {
+      this.email = newEmail;
+      anyValueUpdated = true;
+    }
+    if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+      this.profileId = newProfileId;
+      anyValueUpdated = true;
+    }
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
+    }
+  }
+
+  public static class Validator {
+
+    public static void validate(String password, String email) {
+      validatePassword(password);
+      validateEmail(email);
     }
 
-    public User(UUID profileId, String name, String email, String password) {
-        this(UUID.randomUUID(), profileId, Instant.now(), name, email, password);
+    public static void validatePassword(String password) {
+
     }
 
-    public User(UUID id, UUID profileId, Instant createdAt, String name, String email, String password) {
-        this.id = id;
-        this.profileId = profileId;
-        this.createdAt = createdAt;
-        this.updatedAt = createdAt;
-        this.name = name;
-        this.email = email;
-        this.password = password;
+    public static void validateEmail(String email) {
+
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-        updatedAt = Instant.now();
-    }
-
-    public void setName(String name) {
-        this.name = name;
-        updatedAt = Instant.now();
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-        updatedAt = Instant.now();
-    }
-
-    public void setProfileId(UUID profileId) {
-        this.profileId = profileId;
-        updatedAt = Instant.now();
-    }
+  }
 }
