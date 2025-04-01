@@ -10,8 +10,6 @@ import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.message.port.ReadStatusRepository;
-import com.sprint.mission.discodeit.core.server.entity.Server;
-import com.sprint.mission.discodeit.core.server.port.ServerRepositoryPort;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.logging.CustomLogging;
@@ -28,33 +26,30 @@ import org.springframework.stereotype.Service;
 public class BasicChannelService implements ChannelService {
 
   private final UserRepositoryPort userRepositoryPort;
-  private final ServerRepositoryPort serverRepositoryPort;
   private final ChannelRepository channelRepository;
   private final MessageRepositoryPort messageRepositoryPort;
   private final ReadStatusRepository readStatusRepository;
 
   @CustomLogging
   @Override
-  public Channel create(UUID userId, UUID serverId,
+  public Channel create(UUID userId,
       PublicChannelCreateRequestDTO channelCreateDTO) {
     User user = userRepositoryPort.findById(userId);
-    Server findServer = serverRepositoryPort.findById(serverId);
     Channel channel;
 
-    channel = Channel.create(findServer.getServerId(), user.getId(), channelCreateDTO.name(),
+    channel = Channel.create(user.getId(), channelCreateDTO.name(),
         ChannelType.PUBLIC);
 
-    channelRepository.save(findServer, channel);
+    channelRepository.save(channel);
     channelRepository.join(channel, user);
 
     return channel;
   }
 
   @Override
-  public Channel create(UUID userId, UUID serverId, PrivateChannelCreateRequestDTO requestDTO) {
-    Channel channel = Channel.create(serverId, userId, null, ChannelType.PRIVATE);
-    Server findServer = serverRepositoryPort.findById(serverId);
-    Channel createdChannel = channelRepository.save(findServer, channel);
+  public Channel create(UUID userId, PrivateChannelCreateRequestDTO requestDTO) {
+    Channel channel = Channel.create(userId, null, ChannelType.PRIVATE);
+    Channel createdChannel = channelRepository.save(channel);
 
     requestDTO.participantIds().stream()
         .map(u -> ReadStatus.create(u, createdChannel.getChannelId(), Instant.MIN))

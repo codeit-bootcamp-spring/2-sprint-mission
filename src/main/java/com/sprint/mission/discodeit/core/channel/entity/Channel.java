@@ -19,7 +19,6 @@ public class Channel implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private UUID channelId;
-  private final UUID serverId;
   private final UUID userId;
 
   private String name;
@@ -30,10 +29,9 @@ public class Channel implements Serializable {
   private final Instant createdAt;
   private Instant updatedAt;
 
-  private Channel(UUID channelId, UUID serverId, UUID userId, Instant createdAt, String name,
+  private Channel(UUID channelId, UUID userId, Instant createdAt, String name,
       ChannelType type) {
     this.channelId = channelId;
-    this.serverId = serverId;
     this.userId = userId;
     this.createdAt = createdAt;
     this.updatedAt = createdAt;
@@ -41,8 +39,8 @@ public class Channel implements Serializable {
     this.type = type;
   }
 
-  public static Channel create(UUID serverId, UUID userId, String name, ChannelType type) {
-    return new Channel(UUID.randomUUID(), serverId, userId, Instant.now(), name,
+  public static Channel create(UUID userId, String name, ChannelType type) {
+    return new Channel(UUID.randomUUID(), userId, Instant.now(), name,
         type);
   }
 

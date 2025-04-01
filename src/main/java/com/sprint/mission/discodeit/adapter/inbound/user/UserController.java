@@ -52,9 +52,9 @@ public class UserController {
       ));
     }
 
-    UUID id = userService.create(userCreateRequestDTO, binaryContentRequest);
+//    UUID id = userService.create(userCreateRequestDTO, binaryContentRequest);
 
-    return ResponseEntity.ok(new UserCreateResult(id));
+    return ResponseEntity.ok(new UserCreateResult(UUID.randomUUID()));
   }
 
   @PostMapping("/login")

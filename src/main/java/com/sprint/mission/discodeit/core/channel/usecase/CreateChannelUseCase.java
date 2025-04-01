@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public interface CreateChannelUseCase {
 
-  Channel create(UUID userId, UUID serverId, PublicChannelCreateRequestDTO requestDTO);
+  Channel create(UUID userId, PublicChannelCreateRequestDTO requestDTO);
 
-  Channel create(UUID userId, UUID serverId, PrivateChannelCreateRequestDTO requestDTO);
+  Channel create(UUID userId, PrivateChannelCreateRequestDTO requestDTO);
 
 }

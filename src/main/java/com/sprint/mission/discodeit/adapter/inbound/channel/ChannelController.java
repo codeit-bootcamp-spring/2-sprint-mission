@@ -22,15 +22,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/{userId}/{serverId}")
+@RequestMapping("/api/{userId}")
 public class ChannelController {
 
   private final ChannelService channelService;
 
   @PostMapping("/create")
   public ResponseEntity<ChannelCreateResult> create(@PathVariable UUID userId,
-      @PathVariable UUID serverId, @RequestBody PublicChannelCreateRequestDTO channelCreateDTO) {
-    Channel channel = channelService.create(userId, serverId, channelCreateDTO);
+      @RequestBody PublicChannelCreateRequestDTO channelCreateDTO) {
+    Channel channel = channelService.create(userId, channelCreateDTO);
     return ResponseEntity.ok(new ChannelCreateResult(channel.getChannelId()));
   }
 

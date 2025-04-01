@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.core.channel.port;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
-import com.sprint.mission.discodeit.core.server.entity.Server;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import java.util.List;
 import java.util.UUID;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChannelRepository {
 
-  Channel save(Server server, Channel channel);
+  Channel save(Channel channel);
 
   User join(Channel channel, User user);
 
@@ -21,8 +20,6 @@ public interface ChannelRepository {
   List<Channel> findAll();
 
   List<Channel> findAllByChannelId(UUID channelId);
-
-  List<Channel> findAllByServerId(UUID serverId);
 
   void remove(UUID channelId);
 

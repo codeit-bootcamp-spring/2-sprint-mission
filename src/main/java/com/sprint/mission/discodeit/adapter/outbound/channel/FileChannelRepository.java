@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.adapter.outbound.channel;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
-import com.sprint.mission.discodeit.core.server.entity.Server;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
@@ -39,10 +38,10 @@ public class FileChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public Channel save(Server server, Channel channel) {
-    List<Channel> channels = channelList.getOrDefault(server.getServerId(), new ArrayList<>());
+  public Channel save(Channel channel) {
+    List<Channel> channels = channelList.getOrDefault(channel.getChannelId(), new ArrayList<>());
     channels.add(channel);
-    channelList.put(server.getServerId(), channels);
+    channelList.put(channel.getChannelId(), channels);
 
     fileRepository.save(channelList);
     return channel;
@@ -84,12 +83,6 @@ public class FileChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public List<Channel> findAllByServerId(UUID serverId) {
-    List<Channel> channels = channelList.get(serverId);
-    return channels;
-  }
-
-  @Override
   public List<Channel> findAllByChannelId(UUID channelId) {
     List<Channel> channels = channelList.values().stream()
         .flatMap(List::stream)
@@ -100,8 +93,7 @@ public class FileChannelRepository implements ChannelRepository {
   @Override
   public void remove(UUID channelId) {
     Channel channel = find(channelId);
-    UUID serverId = channel.getServerId();
-    List<Channel> list = channelList.get(serverId);
+    List<Channel> list = channelList.get(channelId);
     list.remove(channel);
     fileRepository.save(channelList);
   }

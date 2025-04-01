@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.adapter.outbound.channel;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
-import com.sprint.mission.discodeit.core.server.entity.Server;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserListEmptyError;
@@ -23,12 +22,12 @@ public class JCFChannelRepository implements ChannelRepository {
   private Map<UUID, List<Channel>> channelList = new ConcurrentHashMap<>();
 
   @Override
-  public Channel save(Server server, Channel channel) {
-    List<Channel> channels = channelList.getOrDefault(server.getServerId(), new ArrayList<>());
+  public Channel save(Channel channel) {
+    List<Channel> channels = channelList.getOrDefault(channel.getChannelId(), new ArrayList<>());
 
     channels.add(channel);
 
-    channelList.put(server.getServerId(), channels);
+    channelList.put(channel.getChannelId(), channels);
 
     return channel;
   }
@@ -67,12 +66,6 @@ public class JCFChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public List<Channel> findAllByServerId(UUID serverId) {
-    List<Channel> channels = channelList.get(serverId);
-    return channels;
-  }
-
-  @Override
   public List<Channel> findAllByChannelId(UUID channelId) {
     List<Channel> channels = channelList.values().stream()
         .flatMap(List::stream)
@@ -83,8 +76,7 @@ public class JCFChannelRepository implements ChannelRepository {
   @Override
   public void remove(UUID channelId) {
     Channel channel = find(channelId);
-    UUID serverId = channel.getServerId();
-    List<Channel> list = channelList.get(serverId);
+    List<Channel> list = channelList.get(channelId);
     list.remove(channel);
   }
 
