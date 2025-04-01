@@ -41,11 +41,11 @@ public class UserController {
     }
 
     @PatchMapping(
-            value = "/{update}",
+            value = "/{userId}",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
     )
     public ResponseEntity<User> update(
-            @PathVariable UUID userId,
+            @PathVariable("userId") UUID userId,
             @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+    public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
         userService.delete(userId);
         return ResponseEntity.noContent().build();
     }
@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/status")
-    public ResponseEntity<UserStatus> updateUserStatus(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest request) {
+    public ResponseEntity<UserStatus> updateUserStatus(@PathVariable("userId") UUID userId, @RequestBody UserStatusUpdateRequest request) {
         UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
         return ResponseEntity.ok(updatedUserStatus);
     }

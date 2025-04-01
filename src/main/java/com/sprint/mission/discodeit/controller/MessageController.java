@@ -51,19 +51,19 @@ public class MessageController {
     }
 
     @PutMapping("/{messageId}")
-    public ResponseEntity<Message> update(@PathVariable UUID messageId, @RequestBody MessageUpdateRequest request) {
+    public ResponseEntity<Message> update(@PathVariable("messageId") UUID messageId, @RequestBody MessageUpdateRequest request) {
         Message updatedMessage = messageService.update(messageId, request);
         return ResponseEntity.ok(updatedMessage);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
+    @DeleteMapping("/{messageId}")
+    public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
         messageService.delete(messageId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/channel/{channelId}")
-    public ResponseEntity<List<Message>> findAllByChannelId(@PathVariable UUID channelId) {
+    public ResponseEntity<List<Message>> findAllByChannelId(@PathVariable("channelId") UUID channelId) {
         List<Message> messages = messageService.findAllByChannelId(channelId);
         return ResponseEntity.ok(messages);
     }

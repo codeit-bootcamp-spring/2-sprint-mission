@@ -16,7 +16,7 @@ public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
     @GetMapping("/{binaryContentId}")
-    public ResponseEntity<BinaryContent> find(@PathVariable UUID binaryContentId) {
+    public ResponseEntity<BinaryContent> find(@PathVariable("binaryContentId") UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentService.find(binaryContentId);
         return ResponseEntity.ok(binaryContent);
     }

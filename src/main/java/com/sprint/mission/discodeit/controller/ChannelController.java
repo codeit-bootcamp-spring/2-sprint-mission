@@ -37,13 +37,13 @@ public class ChannelController {
     }
 
     @PutMapping("/{channelId}")
-    public ResponseEntity<Channel> update(@PathVariable UUID channelId, @RequestBody PublicChannelUpdateRequest request) {
+    public ResponseEntity<Channel> update(@PathVariable("channelId") UUID channelId, @RequestBody PublicChannelUpdateRequest request) {
         Channel udpatedChannel = channelService.update(channelId, request);
         return ResponseEntity.ok(udpatedChannel);
     }
 
     @DeleteMapping("/{channelId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
+    public ResponseEntity<Void> delete(@PathVariable("channelId") UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity.noContent().build();
     }

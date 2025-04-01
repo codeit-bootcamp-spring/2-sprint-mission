@@ -27,7 +27,7 @@ public class ReadStatusController {
     }
 
     @PutMapping("/{readStatusId}")
-    public ResponseEntity<ReadStatus> update(@PathVariable UUID readStatusId, @RequestBody ReadStatusUpdateRequest request) {
+    public ResponseEntity<ReadStatus> update(@PathVariable("readStatusId") UUID readStatusId, @RequestBody ReadStatusUpdateRequest request) {
         ReadStatus updatedReadStatus = readStatusService.update(readStatusId, request);
         return ResponseEntity.ok(updatedReadStatus);
     }
