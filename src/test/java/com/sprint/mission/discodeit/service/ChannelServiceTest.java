@@ -56,7 +56,13 @@ class ChannelServiceTest {
     assertThat(setUpPublicChannel.name()).isEqualTo(CHANNEL_NAME);
   }
 
-  @DisplayName("Private 채널 생성 시 readStatus도 같이 생성 됩니다.")
+  @DisplayName("Public 채널 생성 시 멤버는 null을 반환합니다.")
+  @Test
+  void createPublicChannel_NoMember() {
+    assertThat(setUpPublicChannel.privateMemberIds()).isNull();
+  }
+
+  @DisplayName("Private 채널 생성 시 채널 멤버도 같이 반홥합니다.")
   @Test
   void createPrivateChannel() {
     PrivateChannelCreationRequest privateChannelCreationRequest = new PrivateChannelCreationRequest(
