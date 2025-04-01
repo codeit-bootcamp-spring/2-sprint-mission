@@ -1,64 +1,54 @@
 package com.sprint.mission.discodeit.adapter.outbound.user;
 
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.exception.user.UserListEmptyError;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
-import com.sprint.mission.discodeit.util.CommonUtils;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFUserRepositoryPort implements UserRepositoryPort {
 
-  private List<User> userList = new ArrayList<>();
+  private Map<UUID, User> userList = new ConcurrentHashMap<>();
 
   @Override
   public User save(User user) {
-    userList.add(user);
+    userList.put(user.getId(), user);
     return user;
   }
 
   @Override
-  public User findById(UUID userId) {
-    return CommonUtils.findById(userList, userId, User::getId)
-        .orElseThrow(() -> new UserNotFoundError("유저를 찾을 수 없습니다."));
+  public Optional<User> findById(UUID userId) {
+    return Optional.ofNullable(userList.get(userId));
   }
 
   @Override
   public List<User> findAll() {
-    if (userList.isEmpty()) {
-      throw new UserListEmptyError("유저 리스트가 비어있습니다.");
-    }
-    return userList;
+    return userList.values().stream().toList();
   }
 
   @Override
-  public UUID remove(User user) {
-    if (userList.isEmpty()) {
-      throw new UserListEmptyError("유저 리스트가 비어있습니다.");
-    }
-    userList.remove(user);
-    return user.getId();
+  public void delete(UUID id) {
+    userList.remove(id);
   }
 
   @Override
   public boolean existId(UUID id) {
-    return userList.stream().anyMatch(u -> u.getId().equals(id));
+    return userList.values().stream().anyMatch(u -> u.getId().equals(id));
   }
 
   @Override
   public boolean existName(String name) {
-    return userList.stream().anyMatch(u -> u.getName().equalsIgnoreCase(name));
+    return userList.values().stream().anyMatch(u -> u.getName().equalsIgnoreCase(name));
   }
 
   @Override
   public boolean existEmail(String email) {
-    return userList.stream().anyMatch(u -> u.getEmail().equals(email));
+    return userList.values().stream().anyMatch(u -> u.getEmail().equals(email));
   }
 }

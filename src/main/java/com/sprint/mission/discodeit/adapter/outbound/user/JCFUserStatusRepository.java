@@ -2,55 +2,50 @@ package com.sprint.mission.discodeit.adapter.outbound.user;
 
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.port.UserStatusRepository;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFUserStatusRepository implements UserStatusRepository {
 
-  List<UserStatus> userStatusList = new ArrayList<>();
+  Map<UUID, UserStatus> userStatusList = new ConcurrentHashMap<>();
 
   @Override
-  public UserStatus save(UserStatus userStatus) {
-    userStatusList.add(userStatus);
-    return userStatus;
+  public void save(UserStatus userStatus) {
+    userStatusList.put(userStatus.getUserStatusId(), userStatus);
   }
 
   @Override
-  public UserStatus findByUserId(UUID userId) {
-    UserStatus status = userStatusList.stream()
+  public Optional<UserStatus> findByUserId(UUID userId) {
+    return userStatusList.values().stream()
         .filter(userStatus -> userStatus.getUserId().equals(userId))
-        .findFirst().orElse(null);
-    return status;
+        .findFirst();
   }
 
   @Override
-  public UserStatus findByStatusId(UUID userStatusId) {
-    UserStatus status = userStatusList.stream()
-        .filter(userStatus -> userStatus.getUserStatusId().equals(userStatusId))
-        .findFirst().orElse(null);
-    return status;
+  public Optional<UserStatus> findByStatusId(UUID userStatusId) {
+    return Optional.ofNullable(userStatusList.get(userStatusId));
   }
 
   @Override
   public List<UserStatus> findAll() {
-    return userStatusList;
+    return userStatusList.values().stream().toList();
   }
 
   @Override
   public void deleteById(UUID userStatusId) {
-    UserStatus userStatus = findByStatusId(userStatusId);
-    userStatusList.remove(userStatus);
+    userStatusList.remove(userStatusId);
   }
 
-  @Override
-  public void deleteByUserId(UUID userId) {
-    UserStatus userStatus = findByUserId(userId);
-    userStatusList.remove(userStatus);
-  }
+//  @Override
+//  public void deleteByUserId(UUID userId) {
+//    UserStatus userStatus = findByUserId(userId);
+//    userStatusList.remove(userStatus.getUserStatusId());
+//  }
 }

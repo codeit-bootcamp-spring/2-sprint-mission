@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.core.user.port;
 
 import com.sprint.mission.discodeit.core.user.entity.User;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
@@ -11,11 +12,11 @@ public interface UserRepositoryPort {
 
   User save(User user);
 
-  User findById(UUID id);
+  Optional<User> findById(UUID id);
 
   List<User> findAll();
 
-  UUID remove(User user);
+  void delete(UUID id);
 
   boolean existId(UUID id);
 

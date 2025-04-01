@@ -1,16 +1,15 @@
 package com.sprint.mission.discodeit.core.user.usecase.status;
 
-import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.user.DuplicateUserStatusException;
-import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.core.user.port.UserStatusRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
+import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
+import com.sprint.mission.discodeit.exception.user.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.logging.CustomLogging;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -21,31 +20,33 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   @CustomLogging
-  public UserStatus create(UUID userId) {
-
-    User user = userRepositoryPort.findById(userId);
-    UserStatus userStatus = userStatusRepository.findByUserId(userId);
-
-    if (userStatus == null) {
-      userStatus = UserStatus.create(user.getId());
-    } else {
-      throw new DuplicateUserStatusException("중복된 유저 상태가 있습니다.");
+  public void create(UUID userId) {
+    boolean existId = userRepositoryPort.existId(userId);
+    if (!existId) {
+      throw new UserNotFoundError("유저가 존재하지 않습니다.");
     }
-    UserStatus save = userStatusRepository.save(userStatus);
-    return save;
-  }
 
+    userStatusRepository.findByUserId(userId).ifPresentOrElse(userStatus -> {
+
+        },
+        () -> {
+          UserStatus userStatus = UserStatus.create(userId);
+          userStatusRepository.save(userStatus);
+        });
+  }
 
   @Override
   public UserStatus findByUserId(UUID userId) {
-    UserStatus userStatus = userStatusRepository.findByUserId(userId);
-    return userStatus;
+    return userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> new UserStatusNotFoundException("유저 상태를 찾을 수 없습니다."));
+
   }
 
   @Override
   public UserStatus findByStatusId(UUID userStatusId) {
-    UserStatus userStatus = userStatusRepository.findByStatusId(userStatusId);
-    return userStatus;
+    return userStatusRepository.findByStatusId(userStatusId)
+        .orElseThrow(() -> new UserStatusNotFoundException("유저 상태를 찾을 수 없습니다."));
+
   }
 
 
@@ -67,14 +68,13 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   @CustomLogging
   public void deleteById(UUID userStatusId) {
-    userStatusRepository.deleteByUserId(userStatusId);
+    userStatusRepository.deleteById(userStatusId);
   }
 
-  @Override
-  @CustomLogging
-  public void deleteByUserId(UUID userId) {
-    userStatusRepository.deleteByUserId(userId);
-  }
-
+//  @Override
+//  @CustomLogging
+//  public void deleteByUserId(UUID userId) {
+//    userStatusRepository.deleteByUserId(userId);
+//  }
 
 }

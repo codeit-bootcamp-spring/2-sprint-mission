@@ -4,14 +4,13 @@ import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
-import com.sprint.mission.discodeit.exception.user.UserListEmptyError;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
-import com.sprint.mission.discodeit.util.CommonUtils;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -19,8 +18,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class FileUserRepositoryPort implements UserRepositoryPort {
 
-  private final FileRepositoryImpl<List<User>> fileRepository;
-  private List<User> userList = new ArrayList<>();
+  private final FileRepositoryImpl<Map<UUID, User>> fileRepository;
+  private Map<UUID, User> userList = new ConcurrentHashMap<>();
 
   private final Path path = Paths.get(System.getProperty("user.dir"), "data", "UserList.ser");
 
@@ -37,51 +36,41 @@ public class FileUserRepositoryPort implements UserRepositoryPort {
   @Override
   public User save(User user) {
 
-    userList.add(user);
+    userList.put(user.getId(), user);
     fileRepository.save(userList);
     return user;
   }
 
   @Override
-  public User findById(UUID userId) {
-    User user = CommonUtils.findById(userList, userId, User::getId)
-        .orElseThrow(() -> new UserNotFoundError("유저를 찾을 수 없습니다."));
-
-    return user;
+  public Optional<User> findById(UUID userId) {
+    return Optional.ofNullable(userList.get(userId));
   }
 
   @Override
   public List<User> findAll() {
-    if (userList.isEmpty()) {
-      throw new UserListEmptyError("유저 리스트가 비어있습니다.");
-    }
-    return userList;
+    return userList.values().stream().toList();
   }
 
   @Override
-  public UUID remove(User user) {
-    if (userList.isEmpty()) {
-      throw new UserListEmptyError("유저 리스트가 비어있습니다.");
-    }
-    userList.remove(user);
+  public void delete(UUID id) {
+    userList.remove(id);
     fileRepository.save(userList);
-    return user.getId();
   }
 
 
   @Override
   public boolean existId(UUID id) {
-    return userList.stream().anyMatch(u -> u.getId().equals(id));
+    return userList.values().stream().anyMatch(u -> u.getId().equals(id));
   }
 
   @Override
   public boolean existName(String name) {
-    return userList.stream().anyMatch(u -> u.getName().equalsIgnoreCase(name));
+    return userList.values().stream().anyMatch(u -> u.getName().equalsIgnoreCase(name));
   }
 
   @Override
   public boolean existEmail(String email) {
-    return userList.stream().anyMatch(u -> u.getEmail().equals(email));
+    return userList.values().stream().anyMatch(u -> u.getEmail().equals(email));
   }
 
 }

@@ -1,23 +1,23 @@
 package com.sprint.mission.discodeit.core.user.port;
 
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserStatusRepository {
 
-  UserStatus save(UserStatus userStatus);
+  void save(UserStatus userStatus);
 
-  UserStatus findByUserId(UUID userId);
+  Optional<UserStatus> findByUserId(UUID userId);
 
-  UserStatus findByStatusId(UUID userStatusId);
+  Optional<UserStatus> findByStatusId(UUID userStatusId);
 
   List<UserStatus> findAll();
 
   void deleteById(UUID userStatusId);
 
-  void deleteByUserId(UUID userStatusId);
+//  void deleteByUserId(UUID userStatusId);
 }

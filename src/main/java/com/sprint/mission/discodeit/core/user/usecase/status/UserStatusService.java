@@ -10,7 +10,7 @@ import java.util.UUID;
 @Service
 public interface UserStatusService {
 
-  UserStatus create(UUID userId);
+  void create(UUID userId);
 
   UserStatus findByUserId(UUID userId);
 
@@ -22,5 +22,5 @@ public interface UserStatusService {
 
   void deleteById(UUID userStatusId);
 
-  void deleteByUserId(UUID userId);
+//  void deleteByUserId(UUID userId);
 }

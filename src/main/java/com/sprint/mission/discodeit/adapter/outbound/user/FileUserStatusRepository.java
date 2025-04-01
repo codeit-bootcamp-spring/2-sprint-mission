@@ -1,28 +1,27 @@
 package com.sprint.mission.discodeit.adapter.outbound.user;
 
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.user.EmptyUserStatusListException;
-import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
-import com.sprint.mission.discodeit.exception.user.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
+import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.port.UserStatusRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
-
+import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileUserStatusRepository implements UserStatusRepository {
 
-  private final FileRepositoryImpl<List<UserStatus>> fileRepository;
+  private final FileRepositoryImpl<Map<UUID, UserStatus>> fileRepository;
   private final Path path = Paths.get(System.getProperty("user.dir"), "data", "UserStatusList.ser");
 
-  List<UserStatus> userStatusList = new ArrayList<>();
+  Map<UUID, UserStatus> userStatusList = new ConcurrentHashMap<>();
 
   public FileUserStatusRepository() {
     this.fileRepository = new FileRepositoryImpl<>(path);
@@ -35,48 +34,38 @@ public class FileUserStatusRepository implements UserStatusRepository {
   }
 
   @Override
-  public UserStatus save(UserStatus userStatus) {
-    userStatusList.add(userStatus);
+  public void save(UserStatus userStatus) {
+    userStatusList.put(userStatus.getUserStatusId(), userStatus);
     fileRepository.save(userStatusList);
-    return userStatus;
   }
 
   @Override
-  public UserStatus findByUserId(UUID userId) {
-    UserStatus status = userStatusList.stream()
+  public Optional<UserStatus> findByUserId(UUID userId) {
+    return userStatusList.values().stream()
         .filter(userStatus -> userStatus.getUserId().equals(userId))
-        .findFirst().orElseThrow(() -> new UserStatusNotFoundException("유저 상태를 찾지 못했습니다."));
-    return status;
+        .findFirst();
   }
 
   @Override
-  public UserStatus findByStatusId(UUID userStatusId) {
-    UserStatus status = userStatusList.stream()
-        .filter(userStatus -> userStatus.getUserStatusId().equals(userStatusId))
-        .findFirst().orElseThrow(() -> new UserStatusNotFoundException("유저 상태를 찾지 못했습니다."));
-    return status;
+  public Optional<UserStatus> findByStatusId(UUID userStatusId) {
+    return Optional.ofNullable(userStatusList.get(userStatusId));
   }
 
   @Override
   public List<UserStatus> findAll() {
-    if (userStatusList.isEmpty()) {
-      throw new EmptyUserStatusListException("Repository 내 유저 상태 리스트가 비어있습니다.");
-    }
-    return userStatusList;
+    return userStatusList.values().stream().toList();
   }
 
   @Override
   public void deleteById(UUID userStatusId) {
-    UserStatus userStatus = findByStatusId(userStatusId);
-    userStatusList.remove(userStatus);
+    userStatusList.remove(userStatusId);
     fileRepository.save(userStatusList);
   }
 
-
-  @Override
-  public void deleteByUserId(UUID userId) {
-    UserStatus userStatus = findByUserId(userId);
-    userStatusList.remove(userStatus);
-    fileRepository.save(userStatusList);
-  }
+//  @Override
+//  public void deleteByUserId(UUID userId) {
+//    UserStatus userStatus = findByUserId(userId);
+//    userStatusList.remove(userStatus.getUserStatusId());
+//    fileRepository.save(userStatusList);
+//  }
 }
