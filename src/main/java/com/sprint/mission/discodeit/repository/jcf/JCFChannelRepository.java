@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(name = "repository.type", havingValue = "jcf")
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data;
 
@@ -23,34 +23,22 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Optional<Channel> findById(UUID channelId) {
-        return Optional.ofNullable(this.data.get(channelId));
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(this.data.values());
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public Channel update(Channel channel) {
-        if(!this.data.containsKey(channel.getId())) {
-            throw new NoSuchElementException("Channel with id " + channel.getId() + " not found");
-        }
-        this.data.put(channel.getId(), channel);
-        return channel;
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public void delete(UUID channelId) {
-        if(!this.data.containsKey(channelId)) {
-            throw new NoSuchElementException("Channel with id " + channelId + " not found");
-        }
-        this.data.remove(channelId);
-    }
-
-    @Override
-    public boolean existsById(UUID channelId) {
-        return this.data.containsKey(channelId);
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }

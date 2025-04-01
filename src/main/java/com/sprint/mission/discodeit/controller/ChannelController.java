@@ -1,52 +1,64 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.Channel.ChannelDetailsDto;
-import com.sprint.mission.discodeit.dto.Channel.CreatePrivateChannelDto;
-import com.sprint.mission.discodeit.dto.Channel.CreatePublicChannelDto;
-import com.sprint.mission.discodeit.dto.Channel.UpdateChannelDto;
+import com.sprint.mission.discodeit.dto.data.ChannelDto;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
-@RestController
-@RequestMapping("/api/channels")
 @RequiredArgsConstructor
+@Controller
+@ResponseBody
+@RequestMapping("/api/channel")
 public class ChannelController {
     private final ChannelService channelService;
 
-    //공개 채널 생성
-    @RequestMapping(method = RequestMethod.POST, value = "/public")
-    public ChannelDetailsDto createPublicChannel(@RequestBody CreatePublicChannelDto request) {
-        return channelService.createPublicChannel(request);
+    @RequestMapping(path = "createPublic")
+    public ResponseEntity<Channel> create(@RequestBody PublicChannelCreateRequest request) {
+        Channel createdChannel = channelService.create(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdChannel);
     }
 
-    //비공개 채널 생성
-    @RequestMapping(method = RequestMethod.POST, value = "/private")
-    public ChannelDetailsDto createPrivateChannel(@RequestBody CreatePrivateChannelDto request) {
-        return channelService.createPrivateChannel(request);
+    @RequestMapping(path = "createPrivate")
+    public ResponseEntity<Channel> create(@RequestBody PrivateChannelCreateRequest request) {
+        Channel createdChannel = channelService.create(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdChannel);
     }
 
-    //공개 채널 정보 수정
-    @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-    public ChannelDetailsDto updatePubicChannel(@PathVariable UUID id, @RequestBody UpdateChannelDto request) {
-        channelService.update(id, request.name(), request.description());
-        return channelService.find(id);
+    @RequestMapping(path = "update")
+    public ResponseEntity<Channel> update(@RequestParam("channelId") UUID channelId, @RequestBody PublicChannelUpdateRequest request) {
+        Channel udpatedChannel = channelService.update(channelId, request);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(udpatedChannel);
     }
 
-    //채널 삭제
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public void deleteChannel(@PathVariable UUID id) {
-        channelService.delete(id);
+    @RequestMapping(path = "delete")
+    public ResponseEntity<Void> delete(@RequestParam("channelId") UUID channelId) {
+        channelService.delete(channelId);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
-    //특정 사용자가 볼 수 있는 모든 채널 목록 조회
-    @RequestMapping(method = RequestMethod.GET)
-    public List<ChannelDetailsDto> findAllChannelsByUserId(@RequestParam UUID userId) {
-        return channelService.findAllByUserId(userId);
+    @RequestMapping(path = "findAll")
+    public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
+        List<ChannelDto> channels = channelService.findAllByUserId(userId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(channels);
     }
-
 }
-

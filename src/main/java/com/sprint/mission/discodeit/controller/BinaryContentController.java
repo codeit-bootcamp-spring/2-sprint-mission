@@ -1,40 +1,36 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.BinaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
-@RestController
-@RequestMapping("/api/binary-content")
 @RequiredArgsConstructor
+@Controller
+@ResponseBody
+@RequestMapping("/api/binaryContent")
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
-    //바이너리 파일 1개 조회
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public ResponseEntity<BinaryContentDto> getBinaryContent(@PathVariable UUID id){
-        BinaryContentDto binaryContent = binaryContentService.find(id);
-        return ResponseEntity.ok(binaryContent);
+    @RequestMapping(path = "find")
+    public ResponseEntity<BinaryContent> find(@RequestParam("binaryContentId") UUID binaryContentId) {
+        BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(binaryContent);
     }
 
-    //바이너리 파일 여러 개 조회
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContentDto>> getBinaryContent(@RequestParam List<UUID> ids){
-        List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(ids);
-        return ResponseEntity.ok(binaryContents);
+    @RequestMapping(path = "findAllByIdIn")
+    public ResponseEntity<List<BinaryContent>> findAllByIdIn(@RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+        List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(binaryContents);
     }
-
-    //바이너리 파일 조회
-    @RequestMapping(method = RequestMethod.GET, value = "/find")
-    public ResponseEntity<BinaryContent> findBinaryFile(@RequestParam("binaryContentId") UUID binaryContentId){
-        BinaryContent binaryFile = binaryContentService.findRaw(binaryContentId);
-        return ResponseEntity.ok(binaryFile);
-    }
-
 }

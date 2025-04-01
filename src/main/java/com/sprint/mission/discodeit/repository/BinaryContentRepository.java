@@ -9,9 +9,7 @@ import java.util.UUID;
 public interface BinaryContentRepository {
     BinaryContent save(BinaryContent binaryContent);
     Optional<BinaryContent> findById(UUID id);
-    List<BinaryContent> findByFileName(String fileName);
-    List<BinaryContent> findByContentType(String contentType);
-    List<BinaryContent> findAll();
+    List<BinaryContent> findAllByIdIn(List<UUID> ids);
+    boolean existsById(UUID id);
     void deleteById(UUID id);
-    List<BinaryContent> findAllByIds(List<UUID> ids);
 }

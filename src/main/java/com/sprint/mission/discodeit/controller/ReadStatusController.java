@@ -1,37 +1,46 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ReadStatus.CreateReadStatusDto;
-import com.sprint.mission.discodeit.dto.ReadStatus.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.ReadStatus.UpdateReadStatusDto;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
-@RestController
-@RequestMapping("/api/read-status")
 @RequiredArgsConstructor
+@Controller
+@ResponseBody
+@RequestMapping("/api/readStatus")
 public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
-    //메세지 수신 정보 생성
-    @RequestMapping(method = RequestMethod.POST)
-    public ReadStatusDto createReadStatus(@RequestBody CreateReadStatusDto request){
-        return readStatusService.create(request);
+    @RequestMapping(path = "create")
+    public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
+        ReadStatus createdReadStatus = readStatusService.create(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdReadStatus);
     }
 
-    //메세지 수신 정보 수정
-    @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-    public ReadStatusDto updateReadStatus(@PathVariable UUID id, @RequestBody UpdateReadStatusDto request){
-        request = new UpdateReadStatusDto(id, request.lastReadAt());
-        return readStatusService.update(request);
+    @RequestMapping(path = "update")
+    public ResponseEntity<ReadStatus> update(@RequestParam("readStatusId") UUID readStatusId, @RequestBody ReadStatusUpdateRequest request) {
+        ReadStatus updatedReadStatus = readStatusService.update(readStatusId, request);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(updatedReadStatus);
     }
 
-    //특정 사용자의 메세지 수신 정보 조회
-    @RequestMapping(method = RequestMethod.GET, value = "/user/{userId}")
-    public List<ReadStatusDto> findReadStatusByUserId(@PathVariable("userId") UUID userId) {
-        return readStatusService.findAllByUserId(userId);
+    @RequestMapping(path = "findAllByUserId")
+    public ResponseEntity<List<ReadStatus>> findAllByUserId(@RequestParam("userId") UUID userId) {
+        List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(readStatuses);
     }
 }
