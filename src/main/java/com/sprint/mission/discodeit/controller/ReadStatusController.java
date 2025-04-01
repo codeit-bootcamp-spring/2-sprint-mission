@@ -19,19 +19,23 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReadStatusController {
 
-    private final ReadStatusService readStatusService;
+  private final ReadStatusService readStatusService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ReadStatus>> create(@Valid @RequestBody ReadStatusCreateRequest request) {
-        ReadStatus readStatus = readStatusService.create(request);
-        ApiResponse<ReadStatus> response = new ApiResponse<>("체널의 메시지 읽음 상태 생성 성공", readStatus);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+  @GetMapping
+  public ResponseEntity<List<ReadStatus>> findAllByUser(@RequestParam UUID userId) {
+    List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
+    return ResponseEntity.ok(statuses);
+  }
 
-    @PutMapping
-    public ResponseEntity<ApiResponse<ReadStatus>> update(@Valid @RequestBody ReadStatusUpdateRequest request) {
-        ReadStatus updatedStatus = readStatusService.update(request);
-        ApiResponse<ReadStatus> response = new ApiResponse<>("체널의 메시지 읽음 상태 수정 성공", updatedStatus);
-        return ResponseEntity.ok(response);
-    }
+  @PostMapping
+  public ResponseEntity<ReadStatus> create(@Valid @RequestBody ReadStatusCreateRequest request) {
+    ReadStatus readStatus = readStatusService.create(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
+  }
+
+  @PutMapping
+  public ResponseEntity<ReadStatus> update(@Valid @RequestBody ReadStatusUpdateRequest request) {
+    ReadStatus updatedStatus = readStatusService.update(request);
+    return ResponseEntity.ok(updatedStatus);
+  }
 }

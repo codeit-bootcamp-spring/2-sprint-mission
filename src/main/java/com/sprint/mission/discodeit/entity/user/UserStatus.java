@@ -1,46 +1,46 @@
 package com.sprint.mission.discodeit.entity.user;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.UpdatableEntity;
 import lombok.Getter;
-import lombok.ToString;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class UserStatus extends BaseEntity {
-    private static final long ONLINE_THRESHOLD_MINUTES = 5;
+public class UserStatus extends UpdatableEntity {
 
-    private UUID userId;
+  private static final long ONLINE_THRESHOLD_MINUTES = 5;
 
-    private Instant lastLoginAt;
+  private UUID userId;
 
-    public UserStatus(UUID userId) {
-        super();
-        this.userId = userId;
+  private Instant lastActiveAt;
+
+  public UserStatus(UUID userId) {
+    super();
+    this.userId = userId;
+  }
+
+  public void updateLastActiveAt(Instant newLastActiveAt) {
+    this.lastActiveAt = newLastActiveAt;
+  }
+
+  public boolean isOnline() {
+    if (lastActiveAt == null) {
+      return false;
     }
+    long minutesAfterLogin = Duration.between(lastActiveAt, Instant.now()).toMinutes();
+    return minutesAfterLogin < ONLINE_THRESHOLD_MINUTES;
+  }
 
-    public void updateLastLoginAt() {
-        this.lastLoginAt = Instant.now();
-    }
-
-    public boolean isOnline() {
-        if (lastLoginAt == null) {
-            return false;
-        }
-        long minutesAfterLogin = Duration.between(lastLoginAt, Instant.now()).toMinutes();
-        return minutesAfterLogin < ONLINE_THRESHOLD_MINUTES;
-    }
-
-    @Override
-    public String toString() {
-        return "UserStatus{" +
-                "userId=" + userId +
-                ", lastLoginAt=" + lastLoginAt +
-                ", id=" + id +
-                ", createdAt=" + createdAt +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "UserStatus{" +
+        "userId=" + userId +
+        ", lastLoginAt=" + lastActiveAt +
+        ", id=" + id +
+        ", createdAt=" + createdAt +
+        '}';
+  }
 }

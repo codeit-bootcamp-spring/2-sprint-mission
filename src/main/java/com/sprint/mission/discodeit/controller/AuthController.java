@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
 
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthLoginResponse>> login(@Valid @RequestBody AuthLoginRequest request) {
-        AuthLoginResponse response = authService.login(request);
-        ApiResponse<AuthLoginResponse> apiResponse = new ApiResponse<>("로그인 성공", response);
-        return ResponseEntity.ok().body(apiResponse);
-    }
+  private final AuthService authService;
+
+  @PostMapping("/login")
+  public ResponseEntity<AuthLoginResponse> login(
+      @RequestBody AuthLoginRequest request) {
+    AuthLoginResponse response = authService.login(request);
+    return ResponseEntity.ok().body(response);
+  }
 }

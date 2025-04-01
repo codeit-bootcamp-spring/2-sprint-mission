@@ -19,26 +19,23 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MessageController {
 
-    private final MessageService messageService;
+  private final MessageService messageService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<Message>> create(@Valid @RequestBody MessageCreateRequest request) {
-        Message message = messageService.create(request);
-        ApiResponse<Message> apiResponse = new ApiResponse<>("메시지 전송 성공", message);
-        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-    }
+  @PostMapping
+  public ResponseEntity<Message> create(@Valid @RequestBody MessageCreateRequest request) {
+    Message message = messageService.create(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(message);
+  }
 
-    @PutMapping
-    public ResponseEntity<ApiResponse<Message>> update(@Valid @RequestBody MessageUpdateRequest request) {
-        Message updatedMessage = messageService.update(request);
-        ApiResponse<Message> apiResponse = new ApiResponse<>("메시지 수정 성공", updatedMessage);
-        return ResponseEntity.ok(apiResponse);
-    }
+  @PutMapping
+  public ResponseEntity<Message> update(@Valid @RequestBody MessageUpdateRequest request) {
+    Message updatedMessage = messageService.update(request);
+    return ResponseEntity.ok(updatedMessage);
+  }
 
-    @DeleteMapping("/{messageId}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID messageId) {
-        messageService.delete(messageId);
-        ApiResponse<Void> apiResponse = new ApiResponse<>("메시지 삭제 성공", null);
-        return ResponseEntity.ok(apiResponse);
-    }
+  @DeleteMapping("/{messageId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
+    messageService.delete(messageId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
 }
