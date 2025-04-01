@@ -18,23 +18,23 @@ import java.util.Optional;
 
 @SpringBootApplication
 public class DiscodeitApplication {
-	static User setupUser(UserService userService) {
-		UserCreateRequest request = new UserCreateRequest("woody", "woody@codeit.com", "woody1234");
-		User user = userService.create(request, Optional.empty());
-		return user;
-	}
-
-	static Channel setupChannel(ChannelService channelService) {
-		PublicChannelCreateRequest request = new PublicChannelCreateRequest("공지", "공지 채널입니다.");
-		Channel channel = channelService.create(request);
-		return channel;
-	}
-
-	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-		MessageCreateRequest request = new MessageCreateRequest("안녕하세요.", channel.getId(), author.getId());
-		Message message = messageService.create(request, new ArrayList<>());
-		System.out.println("메시지 생성: " + message.getId());
-	}
+//	static User setupUser(UserService userService) {
+//		UserCreateRequest request = new UserCreateRequest("woody", "woody@codeit.com", "woody1234");
+//		User user = userService.create(request, Optional.empty());
+//		return user;
+//	}
+//
+//	static Channel setupChannel(ChannelService channelService) {
+//		PublicChannelCreateRequest request = new PublicChannelCreateRequest("공지", "공지 채널입니다.");
+//		Channel channel = channelService.create(request);
+//		return channel;
+//	}
+//
+//	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+//		MessageCreateRequest request = new MessageCreateRequest("안녕하세요.", channel.getId(), author.getId());
+//		Message message = messageService.create(request, new ArrayList<>());
+//		System.out.println("메시지 생성: " + message.getId());
+//	}
 
 public static void main(String[] args) {
 ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);

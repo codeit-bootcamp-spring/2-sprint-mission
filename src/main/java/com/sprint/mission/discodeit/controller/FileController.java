@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/files")
@@ -20,24 +22,19 @@ import java.util.UUID;
 public class FileController {
     private final BinaryContentService binaryContentService;
 
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            String fileName = file.getOriginalFilename();
-            String contentType = file.getContentType();
-            byte[] bytes = file.getBytes();
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String contentType = file.getContentType();
+        byte[] bytes = file.getBytes();
 
-            BinaryContentCreateRequest request = new BinaryContentCreateRequest(fileName, contentType, bytes);
-            BinaryContent savedBinaryContent = binaryContentService.create(request);
+        BinaryContentCreateRequest request = new BinaryContentCreateRequest(fileName, contentType, bytes);
+        BinaryContent savedBinaryContent = binaryContentService.create(request);
 
-            return ResponseEntity.ok("파일이 업로드되었습니다. 파일 ID: " + savedBinaryContent.getId());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("파일 업로드 중 오류가 발생했습니다.");
-        }
+        return ResponseEntity.ok("파일이 업로드되었습니다. 파일 ID: " + savedBinaryContent.getId());
     }
 
-    @RequestMapping(value = "/{fileId}", method = RequestMethod.GET)
+    @GetMapping("/{fileId}")
     public ResponseEntity<Resource> getFile(@PathVariable UUID fileId) {
         BinaryContent content = binaryContentService.find(fileId);
 
@@ -46,12 +43,22 @@ public class FileController {
                 .body(new ByteArrayResource(content.getBytes()));
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public ResponseEntity<String> getFiles() {
-        return ResponseEntity.ok("여러 파일이 다운로드되었습니다.");
+        List<BinaryContent> files = binaryContentService.findAllByIdIn(List.of());
+
+        if (files.isEmpty()) {
+            return ResponseEntity.status(404).body("저장된 파일이 없습니다.");
+        }
+
+        String fileNames = files.stream()
+                .map(binaryContent -> binaryContent.getId().toString())
+                .collect(Collectors.joining(", "));
+
+        return ResponseEntity.ok("파일 목록: " + fileNames);
     }
 
-    @RequestMapping(value = "/find", method = RequestMethod.GET)
+    @GetMapping("/find")
     public ResponseEntity<Resource> getBinaryContent(@RequestParam UUID binaryContentId) {
         BinaryContent content = binaryContentService.find(binaryContentId);
 
