@@ -12,48 +12,45 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFUserStatusRepository implements UserStatusRepository {
-    List<UserStatus> userStatusList = new ArrayList<>();
 
-    @Override
-    public UserStatus save(UserStatus userStatus) {
-        userStatusList.add(userStatus);
-        return userStatus;
-    }
+  List<UserStatus> userStatusList = new ArrayList<>();
 
-    @Override
-    public UserStatus findByUserId(UUID userId) {
-        UserStatus status = userStatusList.stream().filter(userStatus -> userStatus.getUserId().equals(userId))
-                .findFirst().orElse(null);
-        return status;
-    }
+  @Override
+  public UserStatus save(UserStatus userStatus) {
+    userStatusList.add(userStatus);
+    return userStatus;
+  }
 
-    @Override
-    public UserStatus findByStatusId(UUID userStatusId) {
-        UserStatus status = userStatusList.stream().filter(userStatus -> userStatus.getUserStatusId().equals(userStatusId))
-                .findFirst().orElse(null);
-        return status;
-    }
+  @Override
+  public UserStatus findByUserId(UUID userId) {
+    UserStatus status = userStatusList.stream()
+        .filter(userStatus -> userStatus.getUserId().equals(userId))
+        .findFirst().orElse(null);
+    return status;
+  }
 
-    @Override
-    public List<UserStatus> findAll() {
-        return userStatusList;
-    }
+  @Override
+  public UserStatus findByStatusId(UUID userStatusId) {
+    UserStatus status = userStatusList.stream()
+        .filter(userStatus -> userStatus.getUserStatusId().equals(userStatusId))
+        .findFirst().orElse(null);
+    return status;
+  }
 
-    @Override
-    public UserStatus update(UserStatus userStatus) {
-        userStatus.updatedTime();
-        return userStatus;
-    }
+  @Override
+  public List<UserStatus> findAll() {
+    return userStatusList;
+  }
 
-    @Override
-    public void deleteById(UUID userStatusId) {
-        UserStatus userStatus = findByStatusId(userStatusId);
-        userStatusList.remove(userStatus);
-    }
+  @Override
+  public void deleteById(UUID userStatusId) {
+    UserStatus userStatus = findByStatusId(userStatusId);
+    userStatusList.remove(userStatus);
+  }
 
-    @Override
-    public void deleteByUserId(UUID userId) {
-        UserStatus userStatus = findByUserId(userId);
-        userStatusList.remove(userStatus);
-    }
+  @Override
+  public void deleteByUserId(UUID userId) {
+    UserStatus userStatus = findByUserId(userId);
+    userStatusList.remove(userStatus);
+  }
 }

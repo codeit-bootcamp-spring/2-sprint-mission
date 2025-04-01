@@ -9,7 +9,7 @@ import com.sprint.mission.discodeit.exception.InvalidException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.core.message.port.ReadStatusRepository;
-import com.sprint.mission.discodeit.core.user.port.UserRepository;
+import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
 
-  private final UserRepository userRepository;
+  private final UserRepositoryPort userRepositoryPort;
   private final ReadStatusRepository readStatusRepository;
   private final ChannelRepository channelRepository;
 
@@ -71,7 +71,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
 
   private void checkValid(UUID channelId, UUID userId) {
-    if (!userRepository.existId(userId) && channelRepository.existId(channelId)) {
+    if (!userRepositoryPort.existId(userId) && channelRepository.existId(channelId)) {
       throw new InvalidException("유효하지 않은 아이디입니다.");
     }
   }

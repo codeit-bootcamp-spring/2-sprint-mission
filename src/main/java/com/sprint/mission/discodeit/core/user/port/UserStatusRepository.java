@@ -8,17 +8,16 @@ import java.util.UUID;
 
 @Repository
 public interface UserStatusRepository {
-    UserStatus save(UserStatus userStatus);
 
-    UserStatus findByUserId(UUID userId);
+  UserStatus save(UserStatus userStatus);
 
-    UserStatus findByStatusId(UUID userStatusId);
+  UserStatus findByUserId(UUID userId);
 
-    List<UserStatus> findAll();
+  UserStatus findByStatusId(UUID userStatusId);
 
-    UserStatus update(UserStatus userStatus);
+  List<UserStatus> findAll();
 
-    void deleteById(UUID userStatusId);
+  void deleteById(UUID userStatusId);
 
-    void deleteByUserId(UUID userStatusId);
+  void deleteByUserId(UUID userStatusId);
 }

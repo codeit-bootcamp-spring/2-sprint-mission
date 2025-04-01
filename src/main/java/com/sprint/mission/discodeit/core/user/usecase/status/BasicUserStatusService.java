@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.DuplicateUserStatusException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
-import com.sprint.mission.discodeit.core.user.port.UserRepository;
+import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.core.user.port.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,14 +16,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-  private final UserRepository userRepository;
+  private final UserRepositoryPort userRepositoryPort;
   private final UserStatusRepository userStatusRepository;
 
   @Override
   @CustomLogging
   public UserStatus create(UUID userId) {
 
-    User user = userRepository.findById(userId);
+    User user = userRepositoryPort.findById(userId);
     UserStatus userStatus = userStatusRepository.findByUserId(userId);
 
     if (userStatus == null) {
@@ -55,14 +55,14 @@ public class BasicUserStatusService implements UserStatusService {
     return all;
   }
 
-  @Override
-  @CustomLogging
-  public UUID update(UUID userId) {
-    UserStatus userStatus = userStatusRepository.findByUserId(userId);
-
-    UserStatus update = userStatusRepository.update(userStatus);
-    return update.getUserStatusId();
-  }
+//  @Override
+//  @CustomLogging
+//  public UUID update(UUID userId) {
+//    UserStatus userStatus = userStatusRepository.findByUserId(userId);
+//
+//    UserStatus update = userStatusRepository.update(userStatus);
+//    return update.getUserStatusId();
+//  }
 
   @Override
   @CustomLogging

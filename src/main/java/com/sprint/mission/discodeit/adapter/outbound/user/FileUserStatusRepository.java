@@ -66,13 +66,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
   }
 
   @Override
-  public UserStatus update(UserStatus userStatus) {
-    userStatus.updatedTime();
-    fileRepository.save(userStatusList);
-    return userStatus;
-  }
-
-  @Override
   public void deleteById(UUID userStatusId) {
     UserStatus userStatus = findByStatusId(userStatusId);
     userStatusList.remove(userStatus);

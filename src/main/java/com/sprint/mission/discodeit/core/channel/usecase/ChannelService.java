@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface ChannelService extends ChannelAccessUseCase, CreateChannelUseCase,
-    FindChannelUseCase, UpdateChannelUseCase, DeleteChannelUseCase {
+    FindChannelUseCase, DeleteChannelUseCase {
 
 //    void printChannels(UUID serverId);
 

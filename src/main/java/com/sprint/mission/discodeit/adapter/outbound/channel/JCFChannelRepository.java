@@ -1,33 +1,26 @@
 package com.sprint.mission.discodeit.adapter.outbound.channel;
 
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.UpdateChannelDTO;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
+import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.core.server.entity.Server;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.exception.user.UserListEmptyError;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
+import com.sprint.mission.discodeit.exception.user.UserListEmptyError;
 import com.sprint.mission.discodeit.util.CommonUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFChannelRepository implements ChannelRepository {
 
   private Map<UUID, List<Channel>> channelList = new ConcurrentHashMap<>();
-
-  @Override
-  public void reset() {
-    channelList = new ConcurrentHashMap<>();
-  }
 
   @Override
   public Channel save(Server server, Channel channel) {

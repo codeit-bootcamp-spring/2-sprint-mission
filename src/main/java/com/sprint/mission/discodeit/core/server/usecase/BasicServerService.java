@@ -1,32 +1,30 @@
 package com.sprint.mission.discodeit.core.server.usecase;
 
 import com.sprint.mission.discodeit.adapter.inbound.server.dto.ServerCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.server.dto.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.core.server.entity.Server;
+import com.sprint.mission.discodeit.core.server.port.ServerRepositoryPort;
 import com.sprint.mission.discodeit.core.user.entity.User;
+import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.logging.CustomLogging;
-import com.sprint.mission.discodeit.core.server.port.ServerRepository;
-import com.sprint.mission.discodeit.core.user.port.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class BasicServerService implements ServerService {
 
-  private final UserRepository userRepository;
-  private final ServerRepository serverRepository;
+  private final UserRepositoryPort userRepositoryPort;
+  private final ServerRepositoryPort serverRepositoryPort;
 
   @CustomLogging
   @Override
   public Server create(ServerCreateRequestDTO serverCreateRequestDTO) {
-    User owner = userRepository.findById(serverCreateRequestDTO.userId());
+    User owner = userRepositoryPort.findById(serverCreateRequestDTO.userId());
     Server server = Server.create(owner.getId(), serverCreateRequestDTO.name());
 
-    serverRepository.save(server, owner);
+    serverRepositoryPort.save(server, owner);
 
     return server;
   }
@@ -34,43 +32,43 @@ public class BasicServerService implements ServerService {
   @Override
   @CustomLogging
   public User join(UUID serverId, UUID userId) {
-    Server server = serverRepository.findById(serverId);
-    User user = userRepository.findById(userId);
-    serverRepository.join(server, user);
+    Server server = serverRepositoryPort.findById(serverId);
+    User user = userRepositoryPort.findById(userId);
+    serverRepositoryPort.join(server, user);
     return user;
   }
 
   @Override
   public User quit(UUID serverId, UUID userId) {
-    Server server = serverRepository.findById(serverId);
-    User user = userRepository.findById(userId);
-    serverRepository.quit(server, user);
+    Server server = serverRepositoryPort.findById(serverId);
+    User user = userRepositoryPort.findById(userId);
+    serverRepositoryPort.quit(server, user);
     return user;
   }
 
   @Override
   public Server findById(UUID serverId) {
-    return serverRepository.findById(serverId);
+    return serverRepositoryPort.findById(serverId);
 
   }
 
   @Override
   public List<Server> findServerAll(UUID userId) {
-    List<Server> serverList = serverRepository.findAllByUserId(userId);
+    List<Server> serverList = serverRepositoryPort.findAllByUserId(userId);
     return serverList;
 
   }
 
-  @Override
-  public UUID update(UUID serverId, UUID userId, UpdateServerRequestDTO updateServerRequestDTO) {
-    Server server = serverRepository.findById(serverId);
-    Server update = serverRepository.update(server, updateServerRequestDTO);
-    return update.getServerId();
-
-  }
+//  @Override
+//  public UUID update(UUID serverId, UUID userId, UpdateServerRequestDTO updateServerRequestDTO) {
+//    Server server = serverRepositoryPort.findById(serverId);
+//    Server update = serverRepositoryPort.update(server, updateServerRequestDTO);
+//    return update.getServerId();
+//
+//  }
 
   @Override
   public void delete(UUID serverId, UUID userId) {
-    serverRepository.remove(serverId);
+    serverRepositoryPort.remove(serverId);
   }
 }

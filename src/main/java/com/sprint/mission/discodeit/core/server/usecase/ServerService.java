@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface ServerService extends ServerAccessUseCase, CreateServerUseCase, FindServerUseCase,
-    UpdateServerUseCase,
     DeleteServerUseCase {
 
 }

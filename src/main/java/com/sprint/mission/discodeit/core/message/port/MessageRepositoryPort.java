@@ -1,17 +1,13 @@
 package com.sprint.mission.discodeit.core.message.port;
 
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.UpdateMessageDTO;
 import com.sprint.mission.discodeit.core.message.entity.Message;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MessageRepository {
-
-  void reset();
+public interface MessageRepositoryPort {
 
   Message save(Message message);
 
@@ -21,13 +17,11 @@ public interface MessageRepository {
 
   boolean existsById(UUID id);
 
-  Message update(Message message, UpdateMessageDTO updateMessageDTO);
-
   void deleteById(UUID id);
 
   void deleteAllByChannelId(UUID channelId);
-//
-//    List<Message> findAllByMessageId(UUID messageId);
+
+  //    List<Message> findAllByMessageId(UUID messageId);
 //
 //    void remove(UUID messageId);
 }

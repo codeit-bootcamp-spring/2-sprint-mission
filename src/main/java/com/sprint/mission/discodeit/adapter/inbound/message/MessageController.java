@@ -1,24 +1,28 @@
 package com.sprint.mission.discodeit.adapter.inbound.message;
 
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageFindDTO;
 import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageDisplayList;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateResult;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.UpdateMessageDTO;
+import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageDisplayList;
+import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageFindDTO;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.usecase.crud.MessageService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -58,14 +62,14 @@ public class MessageController {
     return ResponseEntity.ok(new MessageDisplayList(list));
   }
 
-  @PutMapping("/update/{messageId}")
-  public ResponseEntity<UUID> update(
-      @PathVariable UUID messageId,
-      @RequestBody UpdateMessageDTO updateMessageDTO) {
-
-    UUID update = messageService.update(messageId, updateMessageDTO);
-    return ResponseEntity.ok(update);
-  }
+//  @PutMapping("/update/{messageId}")
+//  public ResponseEntity<UUID> update(
+//      @PathVariable UUID messageId,
+//      @RequestBody UpdateMessageDTO updateMessageDTO) {
+//
+//    UUID update = messageService.update(messageId, updateMessageDTO);
+//    return ResponseEntity.ok(update);
+//  }
 
   @DeleteMapping("/delete/{messageId}")
   public ResponseEntity<String> delete(@PathVariable UUID messageId) {

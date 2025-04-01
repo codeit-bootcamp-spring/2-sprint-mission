@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface BinaryContentRepository {
-    BinaryContent save(BinaryContent binaryContent);
+public interface BinaryContentRepositoryPort {
 
-    BinaryContent findById(UUID binaryId);
+  BinaryContent save(BinaryContent binaryContent);
 
-    List<BinaryContent> findAllByIdIn();
+  BinaryContent findById(UUID binaryId);
 
-    void delete( UUID binaryId);
+  List<BinaryContent> findAllByIdIn();
+
+  void delete(UUID binaryId);
 }

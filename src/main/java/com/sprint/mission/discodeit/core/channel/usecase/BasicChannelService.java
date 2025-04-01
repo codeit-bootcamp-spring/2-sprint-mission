@@ -1,47 +1,44 @@
 package com.sprint.mission.discodeit.core.channel.usecase;
 
+import com.sprint.mission.discodeit.adapter.inbound.channel.dto.ChannelFindDTO;
+import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PrivateChannelCreateRequestDTO;
+import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PublicChannelCreateRequestDTO;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.entity.ReadStatus;
-import com.sprint.mission.discodeit.core.message.port.MessageRepository;
+import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.message.port.ReadStatusRepository;
 import com.sprint.mission.discodeit.core.server.entity.Server;
-import com.sprint.mission.discodeit.core.server.port.ServerRepository;
+import com.sprint.mission.discodeit.core.server.port.ServerRepositoryPort;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.port.UserRepository;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.ChannelFindDTO;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PrivateChannelCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PublicChannelCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.UpdateChannelDTO;
-import com.sprint.mission.discodeit.exception.channel.ChannelModificationNotAllowedException;
+import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.logging.CustomLogging;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-  private final UserRepository userRepository;
-  private final ServerRepository serverRepository;
+  private final UserRepositoryPort userRepositoryPort;
+  private final ServerRepositoryPort serverRepositoryPort;
   private final ChannelRepository channelRepository;
-  private final MessageRepository messageRepository;
+  private final MessageRepositoryPort messageRepositoryPort;
   private final ReadStatusRepository readStatusRepository;
 
   @CustomLogging
   @Override
   public Channel create(UUID userId, UUID serverId,
       PublicChannelCreateRequestDTO channelCreateDTO) {
-    User user = userRepository.findById(userId);
-    Server findServer = serverRepository.findById(serverId);
+    User user = userRepositoryPort.findById(userId);
+    Server findServer = serverRepositoryPort.findById(serverId);
     Channel channel;
 
     channel = Channel.create(findServer.getServerId(), user.getId(), channelCreateDTO.name(),
@@ -56,7 +53,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public Channel create(UUID userId, UUID serverId, PrivateChannelCreateRequestDTO requestDTO) {
     Channel channel = Channel.create(serverId, userId, null, ChannelType.PRIVATE);
-    Server findServer = serverRepository.findById(serverId);
+    Server findServer = serverRepositoryPort.findById(serverId);
     Channel createdChannel = channelRepository.save(findServer, channel);
 
     requestDTO.participantIds().stream()
@@ -69,7 +66,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public void join(UUID channelId, UUID userId) {
     Channel findChannel = channelRepository.find(channelId);
-    User user = userRepository.findById(userId);
+    User user = userRepositoryPort.findById(userId);
     channelRepository.join(findChannel, user);
 
   }
@@ -78,7 +75,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public void quit(UUID channelId, UUID userId) {
     Channel findChannel = channelRepository.find(channelId);
-    User user = userRepository.findById(userId);
+    User user = userRepositoryPort.findById(userId);
     channelRepository.quit(findChannel, user);
 
   }
@@ -87,7 +84,7 @@ public class BasicChannelService implements ChannelService {
   public ChannelFindDTO find(UUID channelId) {
     Channel channel = channelRepository.find(channelId);
 
-    Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getChannelId())
+    Instant lastMessageAt = messageRepositoryPort.findAllByChannelId(channel.getChannelId())
         .stream()
         .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
         .map(Message::getCreatedAt)
@@ -119,19 +116,19 @@ public class BasicChannelService implements ChannelService {
         .toList();
   }
 
-  @CustomLogging
-  @Override
-  public UUID update(UUID channelId, UpdateChannelDTO updateChannelDTO) {
-
-    Channel findChannel = channelRepository.find(channelId);
-
-    if (findChannel.getType() == ChannelType.PRIVATE) {
-      throw new ChannelModificationNotAllowedException("private 채널은 수정할 수 없습니다.");
-    }
-
-    Channel update = channelRepository.update(findChannel, updateChannelDTO);
-    return update.getChannelId();
-  }
+//  @CustomLogging
+//  @Override
+//  public UUID update(UUID channelId, UpdateChannelDTO updateChannelDTO) {
+//
+//    Channel findChannel = channelRepository.find(channelId);
+//
+//    if (findChannel.getType() == ChannelType.PRIVATE) {
+//      throw new ChannelModificationNotAllowedException("private 채널은 수정할 수 없습니다.");
+//    }
+//
+//    findChannel.update(updateChannelDTO);
+//    return update.getChannelId();
+//  }
 
 
   @Override
@@ -142,9 +139,9 @@ public class BasicChannelService implements ChannelService {
   }
 
   private void deleteAllMessage(UUID channelId) {
-    List<Message> list = messageRepository.findAllByChannelId(channelId);
+    List<Message> list = messageRepositoryPort.findAllByChannelId(channelId);
     for (Message message : list) {
-      messageRepository.deleteById(message.getMessageId());
+      messageRepositoryPort.deleteById(message.getMessageId());
     }
   }
 

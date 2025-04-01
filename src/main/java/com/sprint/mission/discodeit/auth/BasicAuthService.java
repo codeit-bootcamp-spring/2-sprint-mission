@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
 import com.sprint.mission.discodeit.exception.user.UserLoginFailedError;
 import com.sprint.mission.discodeit.logging.CustomLogging;
-import com.sprint.mission.discodeit.core.user.port.UserRepository;
+import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.util.CommonUtils;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
@@ -17,12 +17,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
-  private final UserRepository userRepository;
+  private final UserRepositoryPort userRepositoryPort;
 
   @CustomLogging
   @Override
   public void loginUser(UserLoginRequestDTO requestDTO) {
-    List<User> list = userRepository.findAll();
+    List<User> list = userRepositoryPort.findAll();
     User user = CommonUtils.findByName(list, requestDTO.userName(), User::getName)
         .orElseThrow(() -> new UserNotFoundError("로그인 실패: 해당 유저를 찾지 못했습니다."));
 

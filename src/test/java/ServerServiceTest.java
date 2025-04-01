@@ -1,11 +1,6 @@
-
-import com.sprint.mission.discodeit.core.user.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Instant;
-import java.util.UUID;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -58,9 +53,9 @@ public class ServerServiceTest {
 //
 
   }
-
-  static User createMockUser(UUID userId) {
-    return new User(userId, null, Instant.now(), null, null, null);
-  }
+//
+//  static User createMockUser(UUID userId) {
+//    return new User(userId, null, Instant.now(), null, null, null);
+//  }
 
 }
