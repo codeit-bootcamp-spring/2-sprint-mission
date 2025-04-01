@@ -57,6 +57,11 @@ public class UserController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<String> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok("로그인 성공");
+        try {
+            String token = userService.login(request.username(), request.password());
+            return ResponseEntity.ok(token);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
     }
 }
