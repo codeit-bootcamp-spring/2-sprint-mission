@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.MessageCreateDto;
-import com.sprint.mission.discodeit.dto.MessageUpdateDto;
+import com.sprint.mission.discodeit.dto.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,15 +32,15 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(MessageCreateDto dto) {
-        UUID channelId = dto.getChannelId();
-        Message message = new Message(dto.getUserId(), channelId, dto.getContent());
+    public Message createMessage(UUID userId, CreateMessageRequest request) {
+        UUID channelId = request.getChannelId();
+        Message message = new Message(userId, channelId, request.getContent());
 
-        channelService.addMessage(channelId, message.getId());
-
-        dto.getFilePath().forEach(filePath ->
-                binaryContentRepository.addBinaryContent(
-                        new BinaryContent(channelId, filePath)));
+//        for (String path : request.getFilePath()) {
+//            BinaryContent binaryContent = new BinaryContent(path);
+//            binaryContentRepository.addBinaryContent(binaryContent);
+//            message.addAttachment(binaryContent.id());
+//        }
 
         messageRepository.addMessage(message);
         return message;
@@ -49,6 +50,17 @@ public class BasicMessageService implements MessageService {
     public Message getMessageById(UUID messageId) {
         validateMessageExists(messageId);
         return messageRepository.findMessageById(messageId);
+    }
+
+    @Override
+    public List<BinaryContent> findAttachmentsById(UUID messageId) {
+        validateMessageExists(messageId);
+        List<BinaryContent> binaryContents = new ArrayList<>();
+        messageRepository.findMessageById(messageId).getAttachmentIds().forEach(attachmentId -> {
+            binaryContents.add(binaryContentRepository.findBinaryContentById(attachmentId));
+        });
+
+        return binaryContents;
     }
 
     @Override
@@ -78,18 +90,24 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(MessageUpdateDto dto) {
-        Message message = messageRepository.findMessageById(dto.getMessageId());
-        message.updateContent(dto.getContent());
+    public void updateMessage(UUID userId, UUID messageId, UpdateMessageRequest request) {
+        Message message = messageRepository.findMessageById(messageId);
+        if (!message.getSenderId().equals(userId)) {
+            throw new RuntimeException("본인의 메시지만 수정할 수 있습니다.");
+        }
+        message.updateContent(request.getContent());
         saveMessageData();
     }
 
     @Override
-    public void deleteMessage(UUID messageId) {
+    public void deleteMessage(UUID userId, UUID messageId) {
         Message message = messageRepository.findMessageById(messageId);
 
-        channelService.removeMessage(message.getChannelId(), messageId);
-        binaryContentRepository.deleteBinaryContent(messageId);
+        if (!message.getSenderId().equals(userId)) {
+            throw new RuntimeException("본인의 메시지만 수정할 수 있습니다.");
+        }
+
+        binaryContentRepository.deleteBinaryContentById(messageId);
 
         messageRepository.deleteMessageById(messageId);
     }

@@ -14,7 +14,7 @@ public class Message extends BaseEntity implements Serializable {
     private final UUID senderId;  // User의 UUID 저장
     private final UUID channelId; // Channel의 UUID 저장
     private String content;
-    private List<UUID> attachmentIds;
+    private List<UUID> attachmentIds = new ArrayList<>();
 
     public Message(UUID senderId, UUID channelId, String content) {
         super();
@@ -40,7 +40,6 @@ public class Message extends BaseEntity implements Serializable {
                 ", sendTime= " + getCreatedAt() + '\'' +
                 ", channelId= " + channelId + '\'' +
                 ", content= '" + content + '\'' +
-                ", lastUpdateTime= " + getUpdatedAt() +
                 '}';
     }
 }

@@ -3,12 +3,17 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@ConditionalOnProperty(
+        name = "discordit.repository.type",
+        havingValue = "file",
+        matchIfMissing = true)
 public class FileMessageRepository implements MessageRepository {
 
     private static final String fileName = "messages.dat";

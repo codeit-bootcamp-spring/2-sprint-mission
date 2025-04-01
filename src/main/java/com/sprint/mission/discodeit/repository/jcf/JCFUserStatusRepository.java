@@ -2,9 +2,15 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(
+        name = "discordit.repository.type",
+        havingValue = "jcf")
 public class JCFUserStatusRepository implements UserStatusRepository {
     private static final Map<UUID, UserStatus> userStatusMap = new HashMap<>();
 
@@ -18,9 +24,10 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findUserStatusById(UUID userId) {
-        return userStatusMap.get(userId);
+    public Optional<UserStatus> findUserStatusById(UUID userId) {
+        return Optional.ofNullable(userStatusMap.get(userId));
     }
+
 
     @Override
     public List<UserStatus> findAllUserStatus() {

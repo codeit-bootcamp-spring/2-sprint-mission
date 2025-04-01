@@ -12,13 +12,9 @@ public interface BinaryContentRepository {
 
     BinaryContent findBinaryContentById(UUID id);
 
-    BinaryContent findBinaryContentByUserId(UUID referenceId);
-
-    List<BinaryContent> findBinaryContentByMessageId(UUID referenceId);
-
     List<BinaryContent> findAllBinaryContents();
 
-    void deleteBinaryContent(UUID binaryContentId);
+    void deleteBinaryContentById(UUID binaryContentId);
 
     boolean existsBinaryContent(UUID binaryContentId);
 }

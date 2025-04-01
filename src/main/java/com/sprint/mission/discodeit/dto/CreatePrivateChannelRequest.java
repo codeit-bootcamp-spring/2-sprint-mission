@@ -2,10 +2,10 @@ package com.sprint.mission.discodeit.dto;
 
 import lombok.Data;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Data
-public class ReadStatusCreateDto {
-    private UUID channelId;
-    private UUID userId;
+public class CreatePrivateChannelRequest {
+    private Set<UUID> users;
 }

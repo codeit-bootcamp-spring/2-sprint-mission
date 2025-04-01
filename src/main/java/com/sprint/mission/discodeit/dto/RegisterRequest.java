@@ -1,14 +1,12 @@
 package com.sprint.mission.discodeit.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
-import java.util.UUID;
-
 @Data
-public class UserUpdateDto {
-    private UUID userid;
+@Builder
+public class RegisterRequest {
     private String username;
     private String email;
     private String password;
-    private String profilePicturePath;
 }

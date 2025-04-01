@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.dto;
 
-import com.sprint.mission.discodeit.entity.UserStatusType;
 import lombok.Data;
 
 import java.util.UUID;
 
 @Data
-public class UserFindDto {
+public class UserInfoDto {
     private UUID userid;
     private String username;
     private String email;
-    private UserStatusType status;
+    private Boolean online;
+    private UUID profileId;
 }
