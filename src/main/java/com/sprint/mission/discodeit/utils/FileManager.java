@@ -1,32 +1,26 @@
 package com.sprint.mission.discodeit.utils;
 
-import com.sprint.mission.discodeit.config.RepositoryProperties;
-import com.sprint.mission.discodeit.constant.ImageType;
 import com.sprint.mission.discodeit.constant.SubDirectory;
-import com.sprint.mission.discodeit.dto.SaveFileDto;
-import com.sprint.mission.discodeit.entity.Message;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.GsonBuilderUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component
-@Configuration
 public class FileManager {
 
-    //private final String BASE_DIR = System.getProperty("user.dir") + "\\src\\main\\resources\\dir\\";
-
-    private String BASE_DIR;
+    private final String BASE_DIR;
     private final String DATA_EXTENSION = ".ser";
 
-    public FileManager(RepositoryProperties repositoryProperties) {
-        this.BASE_DIR = System.getProperty("user.dir") + repositoryProperties.getFileDirectory();
+    public FileManager(@Value("${discodeit.repository.file-directory}") String fileDirectory) {
+        this.BASE_DIR = System.getProperty("user.dir") + fileDirectory;
     }
 
-    public <T extends Serializable> void writeToFile(SubDirectory subDirectory, T object, UUID id) {
+    public <T extends Serializable> T writeToFile(SubDirectory subDirectory, T object, UUID id) {
         String fileName = id.toString() + DATA_EXTENSION;
         String filePath = BASE_DIR + subDirectory.getDirectory() + "\\" + fileName;
 
@@ -40,6 +34,7 @@ public class FileManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return object;
     }
 
     public <T> List<T> readFromFileAll(SubDirectory subDirectory, Class<T> type) {
@@ -57,31 +52,6 @@ public class FileManager {
                 try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                     T object = type.cast(ois.readObject());
                     list.add(object);
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return list;
-    }
-
-    public List<Message> readFromMessageOfChannel(UUID id) {
-        List<Message> list = new ArrayList<>();
-
-        File directory = new File(BASE_DIR + SubDirectory.MESSAGE + "\\");
-
-        if (!directory.exists() || !directory.isDirectory()) {
-            return list;
-        }
-
-        File[] files = directory.listFiles((dir, name) -> name.endsWith(DATA_EXTENSION));
-        if (files != null) {
-            for (File file : files) {
-                try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-                    Message message = (Message) ois.readObject();
-                    if(message.getChannelUUID().equals(id)) {
-                        list.add(message);
-                    }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -121,41 +91,5 @@ public class FileManager {
             return true;
         }
         return false;
-    }
-
-    public SaveFileDto writeToFile(SubDirectory subDirectory, byte[] fileData, String originalFileName) {
-        String extension = getFileExtension(originalFileName);
-        if (subDirectory.equals(SubDirectory.PROFILE)&&!isValidImageExtension(extension)) {
-            throw new IllegalArgumentException("[실패] 허용되지 않은 파일 형식");
-        }
-
-        String fileName = UUID.randomUUID().toString() + "." + extension;
-        String filePath = BASE_DIR + subDirectory.getDirectory() + "\\" + fileName;
-
-        File directory = new File(BASE_DIR + subDirectory.getDirectory());
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
-        try (FileOutputStream fos = new FileOutputStream(filePath)) {
-            fos.write(fileData);
-            fos.flush();
-        } catch (IOException e) {
-            throw new RuntimeException("[실패] 파일 저장 실패", e);
-        }
-        return new SaveFileDto(filePath, fileName);
-    }
-
-    private String getFileExtension(String fileName) {
-        int lastIndex = fileName.lastIndexOf(".");
-        if (lastIndex == -1) {
-            throw new IllegalArgumentException("[실패] 확장자 오류");
-        }
-        return fileName.substring(lastIndex + 1).toLowerCase();
-    }
-
-    private boolean isValidImageExtension(String extension) {
-        return Arrays.stream(ImageType.values())
-                .anyMatch(type -> type.name().equalsIgnoreCase(extension));
     }
 }

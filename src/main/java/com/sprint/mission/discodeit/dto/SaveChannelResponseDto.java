@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.constant.ChannelType;
 import java.time.Instant;
 import java.util.UUID;
 
-public record SaveChannelDto(
+public record SaveChannelResponseDto(
         UUID channelUUID,
         String channelName,
         ChannelType channelType,

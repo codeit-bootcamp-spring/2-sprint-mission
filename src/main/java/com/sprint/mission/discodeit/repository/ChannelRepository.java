@@ -11,6 +11,5 @@ public interface ChannelRepository {
     Channel save(Channel channel);
     Optional<Channel> findChannelById(UUID channelUUID);
     List<Channel> findAllChannel();
-    Channel updateChannelChannelName(UUID channelUUID, String channelName);
-    boolean deleteChannelById(UUID channelUUID);
+    void delete(UUID channelUUID);
 }

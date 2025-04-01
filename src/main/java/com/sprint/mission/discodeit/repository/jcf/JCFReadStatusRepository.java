@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 @Repository
 public class JCFReadStatusRepository implements ReadStatusRepository {
 
@@ -38,14 +40,6 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
         return readStatusList.stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelUUID))
                 .toList();
-    }
-
-    @Override
-    public void update(UUID readStatusUUID) {
-        readStatusList.stream()
-                .filter(readStatus -> readStatus.getId().equals(readStatusUUID))
-                .findAny()
-                .ifPresent(ReadStatus::updateLastReadAt);
     }
 
     @Override

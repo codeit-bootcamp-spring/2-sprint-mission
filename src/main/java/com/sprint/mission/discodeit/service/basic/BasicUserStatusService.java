@@ -2,13 +2,16 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.SaveUserStatusParamDto;
 import com.sprint.mission.discodeit.dto.UpdateUserStatusParamDto;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -16,6 +19,7 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void save(SaveUserStatusParamDto saveUserStatusParamDto) {
@@ -38,18 +42,22 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void update(UpdateUserStatusParamDto updateUserStatusParamDto) {
-        userStatusRepository.update(updateUserStatusParamDto.userStatusUUID());
+        UserStatus userStatus = userStatusRepository.findById(updateUserStatusParamDto.userStatusUUID())
+                        .orElseThrow(() -> new NoSuchElementException("사용자 상태가 존재하지 않습니다."));
+        userStatus.updateLastLoginTime();
+        userStatusRepository.save(userStatus);
     }
 
     @Override
-    public void updateByUserId(UUID userUUID) {
-        userStatusRepository.findAll().stream()
-                .filter(userStatus -> userStatus.getUserUUID().equals(userUUID))
-                .findAny()
-                .ifPresent(userStatus -> {
-                    userStatusRepository.update(userStatus.getId());
-                });
+    public void updateByUserId(UUID userId) {
+        User user = userRepository.findUserById(userId)
+                        .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new NoSuchElementException("사용자 상태 수정 오류"));
+        userStatus.updateLastLoginTime();
+        userStatusRepository.save(userStatus);
     }
+
 
     @Override
     public void delete(UUID userStatusUUID) {

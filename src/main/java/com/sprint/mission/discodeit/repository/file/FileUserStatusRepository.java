@@ -5,12 +5,14 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.utils.FileManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 @RequiredArgsConstructor
 public class FileUserStatusRepository implements UserStatusRepository {
@@ -38,14 +40,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
     public List<UserStatus> findAll() {
         List<UserStatus> userStatusList = fileManager.readFromFileAll(SubDirectory.USER_STATUS, UserStatus.class);
         return userStatusList;
-    }
-
-    @Override
-    public void update(UUID userStatusUUID) {
-        UserStatus userStatus = findById(userStatusUUID)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 상태를 찾을 수 없음"));
-        userStatus.updateLastLoginTime();
-        fileManager.writeToFile(SubDirectory.USER_STATUS, userStatus, userStatus.getId());
     }
 
     @Override

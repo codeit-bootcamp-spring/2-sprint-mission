@@ -1,17 +1,18 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.constant.SubDirectory;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.utils.FileManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 @RequiredArgsConstructor
 public class FileChannelRepository implements ChannelRepository {
@@ -37,16 +38,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel updateChannelChannelName(UUID channelUUID, String channelName) {
-        Channel channel = findChannelById(channelUUID)
-                .orElseThrow(() -> new IllegalArgumentException("채널 찾을 수 없습니다.: " + channelUUID));
-        channel.updateChannelName(channelName);
-        fileManager.writeToFile(SubDirectory.USER, channel, channel.getId());
-        return channel;
-    }
-
-    @Override
-    public boolean deleteChannelById(UUID channelUUID) {
-        return fileManager.deleteFileById(SubDirectory.CHANNEL, channelUUID);
+    public void delete(UUID channelUUID) {
+        fileManager.deleteFileById(SubDirectory.CHANNEL, channelUUID);
     }
 }

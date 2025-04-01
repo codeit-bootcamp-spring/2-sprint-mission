@@ -1,16 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.constant.SubDirectory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class BinaryContent extends BaseEntity implements Serializable {
+public class BinaryContent implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String filePath;
+    private UUID id;
     private String fileName;
-    private String originalFileName;
+    private String contentType;
+    private final Instant createdAt = Instant.now();
 }

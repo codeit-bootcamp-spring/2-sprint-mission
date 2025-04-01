@@ -5,12 +5,14 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.utils.FileManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 @RequiredArgsConstructor
 public class FileUserRepository implements UserRepository {
@@ -49,20 +51,8 @@ public class FileUserRepository implements UserRepository {
         return userList;
     }
 
-
-
     @Override
-    public User update(UUID userUUID, String nickname, UUID profileId) {
-        User user = findUserById(userUUID)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다.: " + userUUID));
-        user.updateNickname(nickname);
-        user.updateProfile(profileId);
-        fileManager.writeToFile(SubDirectory.USER, user, user.getId());
-        return user;
-    }
-
-    @Override
-    public boolean deleteUserById(UUID userUUID) {
-        return fileManager.deleteFileById(SubDirectory.USER, userUUID);
+    public void delete(UUID userUUID) {
+        fileManager.deleteFileById(SubDirectory.USER, userUUID);
     }
 }

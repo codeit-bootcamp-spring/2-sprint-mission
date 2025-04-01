@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.constant.UserStatusType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -27,11 +25,11 @@ public class UserStatus extends BaseEntity implements Serializable {
         super.updateTime();
     }
 
-    public UserStatusType isLastStatus() {
+    public boolean isLastStatus() {
         super.updateTime();
         if(lastLoginTime == null || lastLoginTime.isBefore(Instant.now().minusSeconds(300))) {
-            return UserStatusType.NOTCONNECTIED;
+            return false;
         }
-        return UserStatusType.CONNECTING;
+        return true;
     }
 }

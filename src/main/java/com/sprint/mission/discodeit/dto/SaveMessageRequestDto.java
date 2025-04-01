@@ -3,10 +3,9 @@ package com.sprint.mission.discodeit.dto;
 import java.util.List;
 import java.util.UUID;
 
-public record SaveMessageParamDto(
+public record SaveMessageRequestDto(
         UUID channelId,
         UUID userId,
-        String content,
-        List<UUID> attachmentList
+        String content
 ) {
 }

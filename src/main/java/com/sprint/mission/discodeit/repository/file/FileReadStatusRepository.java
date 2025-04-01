@@ -5,12 +5,14 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.utils.FileManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 @RequiredArgsConstructor
 public class FileReadStatusRepository implements ReadStatusRepository {
@@ -39,14 +41,6 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         return fileManager.readFromFileAll(SubDirectory.READ_STATUS, ReadStatus.class).stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelUUID))
                 .toList();
-    }
-
-    @Override
-    public void update(UUID readStatusUUID) {
-        ReadStatus readStatus = find(readStatusUUID)
-                .orElseThrow(() -> new RuntimeException("채널 접속 상태를 찾을 수 없습니다."));
-        readStatus.updateLastReadAt();
-        fileManager.writeToFile(SubDirectory.READ_STATUS, readStatus, readStatus.getId());
     }
 
     @Override
