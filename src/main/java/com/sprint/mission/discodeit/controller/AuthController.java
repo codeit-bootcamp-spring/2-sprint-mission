@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.application.dto.auth.LoginRequest;
-import com.sprint.mission.discodeit.application.dto.user.UserResponse;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
-import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusResult;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
-    private final UserStatusService userStatusService;
 
-    @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        UserResult userResult = authService.login(loginRequest);
-        UserStatusResult userStatus = userStatusService.getByUserId(userResult.id());
-        UserResponse response = UserResponse.of(userResult, userStatus.isLogin());
+  private final AuthService authService;
 
-        return ResponseEntity.ok(response);
-    }
+  @PostMapping("/login")
+  public ResponseEntity<UserResult> login(@Valid @RequestBody LoginRequest loginRequest) {
+    UserResult userResult = authService.login(loginRequest);
+
+    return ResponseEntity.ok(userResult);
+  }
 }
