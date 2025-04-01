@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
@@ -30,14 +31,14 @@ public class Channel implements Serializable {
         this.type = type;
     }
 
-    public void update(String newName, String newDescription) {
+    public void update(Optional<String> newName, Optional<String> newDescription) {
         boolean anyValueUpdated = false;
-        if (newName != null && !newName.equals(this.name)) {
-            this.name = newName;
+        if (newName.isPresent() && !newName.get().equals(this.name)) {
+            this.name = newName.get();
             anyValueUpdated = true;
         }
-        if (newDescription != null && !newDescription.equals(this.description)) {
-            this.description = newDescription;
+        if (newDescription.isPresent() && !newDescription.get().equals(this.description)) {
+            this.description = newDescription.get();
             anyValueUpdated = true;
         }
 
