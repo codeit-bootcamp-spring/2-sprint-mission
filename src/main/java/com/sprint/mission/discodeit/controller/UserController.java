@@ -23,62 +23,53 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = "multipart/form-data")
-    public ResponseEntity<UserDto> register(@RequestPart("user") UserCreateRequest userCreateRequest, @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
-        Optional<BinaryContentCreateRequest> optionalProfileCreateRequest = Optional.ofNullable(profileFile)
-                .map(file -> {
+    private Optional<BinaryContentCreateRequest> toBinaryContentCreateRequest(MultipartFile file) {
+        return Optional.ofNullable(file)
+                .map(f -> {
                     try {
                         return new BinaryContentCreateRequest(
-                                file.getOriginalFilename(),
-                                file.getContentType(),
-                                file.getBytes()
+                                f.getOriginalFilename(),
+                                f.getContentType(),
+                                f.getBytes()
                         );
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 });
+    }
 
+    @RequestMapping(method = RequestMethod.POST, consumes = "multipart/form-data")
+    public ResponseEntity<UserDto> register(@RequestPart("user") UserCreateRequest userCreateRequest, @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
+        Optional<BinaryContentCreateRequest> optionalProfileCreateRequest = toBinaryContentCreateRequest(profileFile);
         User user = userService.create(userCreateRequest, optionalProfileCreateRequest);
         UserDto userDto = userService.find(user.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }
 
-    @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT, consumes = "multipart/form-data")
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = "multipart/form-data")
     public ResponseEntity<UserDto> update(@PathVariable UUID id, @RequestPart("user") UserUpdateRequest userUpdateRequest, @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
-        Optional<BinaryContentCreateRequest> optionalProfileCreateRequest = Optional.ofNullable(profileFile)
-                .map(file -> {
-                    try {
-                        return new BinaryContentCreateRequest(
-                                file.getOriginalFilename(),
-                                file.getContentType(),
-                                file.getBytes()
-                        );
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-
+        Optional<BinaryContentCreateRequest> optionalProfileCreateRequest = toBinaryContentCreateRequest(profileFile);
         User user = userService.update(id, userUpdateRequest, optionalProfileCreateRequest);
         UserDto userDto = userService.find(user.getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(userDto);
     }
 
-    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<UserDto> delete(@PathVariable UUID id) {
         userService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @RequestMapping(value = "/find/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<UserDto> findById(@PathVariable UUID id) {
         UserDto userDto  = userService.find(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(userDto);
     }
 
-    @RequestMapping(value = "/findAll")
+    @RequestMapping(value = "/list")
     public ResponseEntity<List<UserDto>> findAll() {
         List<UserDto> userDtos = userService.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(userDtos);

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,12 +20,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/messages/")
+@RequestMapping("/api/messages")
 @RequiredArgsConstructor
 public class MessageController {
     private final MessageService messageService;
 
-    @RequestMapping(value = "/send", method = RequestMethod.POST, consumes = "multipart/form-data")
+    @RequestMapping(method = RequestMethod.POST, consumes = "multipart/form-data")
     public ResponseEntity<UUID> create(@RequestPart("message") MessageCreateRequest messageCreateRequest, @RequestPart(value = "attachments", required = false) List<MultipartFile> attachmentFiles) {
         List<BinaryContentCreateRequest> binaryContentCreateRequests = Optional.ofNullable(attachmentFiles)
                 .orElse(List.of())
@@ -37,7 +38,7 @@ public class MessageController {
                                 file.getBytes()
                         );
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일 처리 중 오류 발생", e);
                     }
                 })
                 .collect(Collectors.toList());
@@ -46,25 +47,25 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(message.getId());
     }
 
-    @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public ResponseEntity<Message> update(@PathVariable UUID id, @RequestBody MessageUpdateRequest messageUpdateRequest) {
         Message message = messageService.update(id, messageUpdateRequest);
         return ResponseEntity.ok(message);
     }
 
-    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         messageService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<Message> get(@PathVariable UUID id) {
         Message message = messageService.find(id);
         return ResponseEntity.ok(message);
     }
 
-    @RequestMapping(value = "/getAll/{channelId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/list/{channelId}", method = RequestMethod.GET)
     public ResponseEntity<List<Message>> getAll(@PathVariable UUID channelId) {
         List<Message> messages = messageService.findAllByChannelId(channelId);
         return ResponseEntity.ok(messages);

@@ -13,24 +13,24 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/readStatus/")
+@RequestMapping("/api/readStatus")
 @RequiredArgsConstructor
 public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request){
         ReadStatus readStatus = readStatusService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
     }
 
-    @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public ResponseEntity<ReadStatus> update(@PathVariable UUID id, @RequestBody ReadStatusUpdateRequest request){
         ReadStatus readStatus = readStatusService.update(id, request);
         return ResponseEntity.status(HttpStatus.OK).body(readStatus);
     }
 
-    @RequestMapping(value = "/get/{userId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
     public ResponseEntity<List<ReadStatus>> get(@PathVariable UUID userId){
         List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).body(readStatuses);
