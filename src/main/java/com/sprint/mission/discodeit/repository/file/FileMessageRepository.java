@@ -1,83 +1,129 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileMessageRepository implements MessageRepository {
-    private static final String FILE_NAME = "message.ser";
-    private final Map<UUID, Message> data = new HashMap<>();
-    private final String filePath;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    public FileMessageRepository(String directory) {
-        this.filePath = directory + "/" + FILE_NAME;
-        loadFromFile();
+    public FileMessageRepository(
+            @Value("${discodeit.repository.file-dir:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
     public Message save(Message message) {
-        data.put(message.getUuid(), message);
-        saveToFile();
-
-        return data.get(message.getUuid());
+        Path path = resolvePath(message.getUuid());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return message;
     }
 
     @Override
-    public void delete(UUID messageId) {
-        data.remove(messageId);
-        saveToFile();
+    public void delete(UUID messageKey) {
+        Path path = resolvePath(messageKey);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public Message findByKey(UUID messageKey) {
-        return data.get(messageKey);
+        Path path = resolvePath(messageKey);
+        Message message = null;
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                message = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return message;
     }
 
     @Override
     public List<Message> findAll() {
-        return data.values().stream().toList();
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Message) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public boolean existsByKey(UUID messageKey) {
-        return data.containsKey(messageKey);
+        Path path = resolvePath(messageKey);
+        return Files.exists(path);
     }
 
     @Override
     public List<Message> findAllByChannelKey(UUID channelKey) {
-        return data.values().stream().filter(m -> m.getChannelKey().equals(channelKey)).toList();
-    }
-
-    private void saveToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
-            oos.writeObject(data);
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Message) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .filter(message -> message.getChannelKey().equals(channelKey))
+                    .toList();
         } catch (IOException e) {
-            System.err.println("[Error] 사용자 데이터를 저장하는 중 문제가 발생했습니다.");
+            throw new RuntimeException(e);
         }
     }
 
-    private void loadFromFile() {
-        File file = new File(filePath);
-        if (!file.exists()) return;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            Object obj = ois.readObject();
-            if (obj instanceof Map<?, ?> map) {
-                for (Map.Entry<?, ?> entry : map.entrySet()) {
-                    if (entry.getKey() instanceof UUID key && entry.getValue() instanceof Message value) {
-                        data.put(key, value);
-                    }
-                }
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println("[Error] 사용자 데이터를 불러오는 중 문제가 발생했습니다.");
-        }
-    }
 }

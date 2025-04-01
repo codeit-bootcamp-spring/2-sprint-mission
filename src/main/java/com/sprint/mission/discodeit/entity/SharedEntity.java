@@ -7,7 +7,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public abstract class SharedEntity implements Serializable {
+public abstract class SharedEntity implements Serializable{
+    private static final long serialVersionUID = 1L;
+
     protected final UUID uuid;
     protected Instant createdAt;
     protected Instant updatedAt;

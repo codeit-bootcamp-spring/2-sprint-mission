@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.CreateUserStatusDto;
-import com.sprint.mission.discodeit.dto.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -20,14 +20,14 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public UserStatus create(CreateUserStatusDto dto) {
-        if (userRepository.findByKey(dto.userKey()) == null) {
+    public UserStatus create(UserStatusCreateRequest request) {
+        if (userRepository.findByKey(request.userKey()) == null) {
             throw new IllegalArgumentException("[Error] user is null");
         }
-        if (userStatusRepository.existsByUserKey(dto.userKey())) {
+        if (userStatusRepository.findByUserKey(request.userKey()) != null) {
             throw new IllegalArgumentException("[Error] userStatus is already exists");
         }
-        UserStatus userStatus= new UserStatus(dto.userKey(), Instant.now());
+        UserStatus userStatus= new UserStatus(request.userKey(), Instant.now());
         return userStatusRepository.save(userStatus);
     }
 
@@ -50,13 +50,10 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus update(UpdateUserStatusDto dto) {
-        UserStatus userStatus = userStatusRepository.findByKey(dto.userStatusKey());
+    public UserStatus update(UserStatusUpdateRequest request) {
+        UserStatus userStatus = userStatusRepository.findByUserKey(request.userKey());
         if (userStatus == null) {
             throw new IllegalArgumentException("[Error] userStatus is null");
-        }
-        if (dto.lastActiveAt() == null) {
-            throw new IllegalArgumentException("[Error] lastActiveAt is null");
         }
         userStatus.updateLastActiveAt(Instant.now());
         return userStatusRepository.save(userStatus);

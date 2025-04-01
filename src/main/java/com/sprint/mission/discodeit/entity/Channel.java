@@ -2,12 +2,12 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.io.Serializable;
 
 @Getter
-public class Channel extends SharedEntity {
+public class Channel extends SharedEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String name;
     private String introduction;
     private ChannelType type;

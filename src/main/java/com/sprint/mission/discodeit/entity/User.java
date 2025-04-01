@@ -8,10 +8,13 @@ import java.util.UUID;
 
 @Getter
 public class User extends SharedEntity implements Serializable{
+    private static final long serialVersionUID = 1L;
+
     private String name;
     private String pwd;
     private String email;
-    private final UUID profileId;
+    private UUID profileId;
+    
     public User(String name, String pwd, String email, UUID profileId) {
         super();
         this.name = name;
@@ -33,6 +36,10 @@ public class User extends SharedEntity implements Serializable{
     public void updateEmail(String email) {
         this.email = email;
         setUpdatedAt(Instant.now());
+    }
+
+    public void updateProfileId(UUID profileId) {
+        this.profileId = profileId;
     }
 
     @Override

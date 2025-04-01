@@ -1,24 +1,22 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.UpdateMessageDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -27,18 +25,28 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentService binaryContentService;
 
     @Override
-    public Message create(CreateMessageDto messageDto) {
-        if (!channelRepository.existsByKey(messageDto.channelKey())) {
-            throw new NoSuchElementException("[Error] 채널이 존재하지 않습니다. " + messageDto.channelKey());
+    public Message create(MessageCreateRequest messageRequest) {
+        List<UUID> attachmentKeys = null;
+        if (!channelRepository.existsByKey(messageRequest.channelKey())) {
+            throw new NoSuchElementException("[Error] 채널이 존재하지 않습니다. " + messageRequest.channelKey());
         }
-        if (!userRepository.existsByKey(messageDto.userKey())) {
-            throw new NoSuchElementException("[Error] 유저가 존재하지 않습니다. " + messageDto.userKey());
+        if (!userRepository.existsByKey(messageRequest.authorKey())) {
+            throw new NoSuchElementException("[Error] 유저가 존재하지 않습니다. " + messageRequest.authorKey());
         }
-        Message message = new Message(messageDto.content(), messageDto.userKey(), messageDto.channelKey(), messageDto.attachmentKeys());
-        messageRepository.save(message);
-        return message;
+        if (messageRequest.binaryContentRequests() != null) {
+            attachmentKeys = messageRequest.binaryContentRequests().stream()
+                    .filter(this::isValidBinaryContent)
+                    .map(binaryContentService::create)
+                    .map(BinaryContent::getUuid)
+                    .toList();
+        }
+
+        Message message = new Message(messageRequest.content(), messageRequest.authorKey(), messageRequest.channelKey(), attachmentKeys);
+
+        return messageRepository.save(message);
     }
 
     @Override
@@ -53,22 +61,22 @@ public class BasicMessageService implements MessageService {
     @Override
     public List<Message> readAllByChannelKey(UUID channelKey) {
         List<Message> messages = messageRepository.findAllByChannelKey(channelKey);
-        if (messages.isEmpty()) {
+        if (messages == null || messages.isEmpty()) {
             throw new IllegalStateException("[Error] 읽을 메시지가 없습니다.");
         }
         return messages;
     }
 
     @Override
-    public UpdateMessageDto update(UpdateMessageDto dto) {
-        Message message = messageRepository.findByKey(dto.messageKey());
+    public Message update(MessageUpdateRequest request) {
+        Message message = messageRepository.findByKey(request.messageKey());
         if (message == null) {
             throw new IllegalArgumentException("[Error] 해당 메시지가 존재하지 않습니다");
         }
-        if (!dto.content().isEmpty()) {
-            message.updateContent(dto.content());
+        if (request.newContent() != null && !request.newContent().isEmpty()) {
+            message.updateContent(request.newContent());
         }
-        return new UpdateMessageDto(message.getUuid(), message.getContent());
+        return message;
     }
 
     @Override
@@ -77,11 +85,17 @@ public class BasicMessageService implements MessageService {
         if (message == null) {
             throw new IllegalArgumentException("[Error] 해당 메시지가 존재하지 않습니다");
         }
-        List<UUID> attachmentKeys = message.getAttachmentKeys();
-        for (UUID attachmentKey : attachmentKeys) {
-            binaryContentRepository.delete(attachmentKey);
-        }
+
+        message.getAttachmentKeys().forEach(binaryContentRepository::delete);
 
         messageRepository.delete(messageKey);
+    }
+
+    private boolean isValidBinaryContent(BinaryContentCreateRequest request) {
+        return  request != null &&
+                request.bytes() != null &&
+                request.bytes().length > 0 &&
+                request.fileName() != null &&
+                !request.fileName().isBlank();
     }
 }

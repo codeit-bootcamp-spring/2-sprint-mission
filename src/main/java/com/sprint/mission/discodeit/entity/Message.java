@@ -2,13 +2,16 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Message extends SharedEntity {
+public class Message extends SharedEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String content;
     private final UUID userKey;
     private final UUID channelKey;
