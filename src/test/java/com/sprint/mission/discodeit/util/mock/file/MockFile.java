@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class MockFile {
 
-  public static MultipartFile createAnonymousImageFile(String fileName) {
+  public static MultipartFile createMockImageFile(String fileName) {
     return new MockMultipartFile(MediaType.IMAGE_JPEG_VALUE, loadImageFileFromResource(fileName));
   }
 

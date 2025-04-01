@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
-import static com.sprint.mission.discodeit.util.mock.file.MockFile.createAnonymousImageFile;
+import static com.sprint.mission.discodeit.util.mock.file.MockFile.createMockImageFile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
 import java.util.List;
@@ -28,7 +27,7 @@ class BinaryContentServiceTest {
   @DisplayName("이미지 파일을 저장하면 올바른 경로가 반환된다.")
   @Test
   void createProfileImage() {
-    MultipartFile file = createAnonymousImageFile("dog.jpg");
+    MultipartFile file = createMockImageFile("dog.jpg");
     UUID profileId = binaryContentService.createProfileImage(file);
     BinaryContentResult binaryContent = binaryContentService.getById(profileId);
 
@@ -39,8 +38,8 @@ class BinaryContentServiceTest {
   @Test
   void findAllByIdIn() {
     UUID profileId1 = binaryContentService.createProfileImage(
-        createAnonymousImageFile("Kirby.jpg"));
-    UUID profileId2 = binaryContentService.createProfileImage(createAnonymousImageFile("dog.jpg"));
+        createMockImageFile("Kirby.jpg"));
+    UUID profileId2 = binaryContentService.createProfileImage(createMockImageFile("dog.jpg"));
     List<BinaryContentResult> binaryContentsResults = binaryContentService.getByIdIn(
         List.of(profileId1, profileId2));
 
@@ -56,7 +55,7 @@ class BinaryContentServiceTest {
   @DisplayName("이미지를 삭제하면 로컬 저장소에서도 삭제된다.")
   @Test
   void deleteProfileImage() {
-    MultipartFile file = createAnonymousImageFile("dog.jpg");
+    MultipartFile file = createMockImageFile("dog.jpg");
     UUID profileId = binaryContentService.createProfileImage(file);
 
     binaryContentService.delete(profileId);
