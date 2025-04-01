@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.adapter.inbound.message;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.ReadStatusCreateRequestDTO;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.ReadStatusUpdateRequestDTO;
 import com.sprint.mission.discodeit.core.message.entity.ReadStatus;
-import com.sprint.mission.discodeit.core.message.usecase.ReadStatusService;
+import com.sprint.mission.discodeit.core.message.usecase.status.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

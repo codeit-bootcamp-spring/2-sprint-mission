@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.user.usecase;
+package com.sprint.mission.discodeit.core.user.usecase.status;
 
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;

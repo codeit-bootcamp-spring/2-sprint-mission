@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.message.usecase;
+package com.sprint.mission.discodeit.core.message.usecase.status;
 
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.ReadStatusCreateRequestDTO;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.ReadStatusUpdateRequestDTO;

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.user.usecase;
+package com.sprint.mission.discodeit.core.user.usecase.crud;
 
 import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserFindDTO;
 import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.exception.DuplicateUserException;
+import com.sprint.mission.discodeit.core.user.usecase.status.UserStatusService;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepository;
 import com.sprint.mission.discodeit.core.user.port.UserRepository;

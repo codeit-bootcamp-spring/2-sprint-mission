@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.message.usecase;
+package com.sprint.mission.discodeit.core.message.usecase.crud;
 
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageFindDTO;
 import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;

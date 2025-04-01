@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageDisplayLi
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateResult;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.UpdateMessageDTO;
 import com.sprint.mission.discodeit.core.message.entity.Message;
-import com.sprint.mission.discodeit.core.message.usecase.MessageService;
+import com.sprint.mission.discodeit.core.message.usecase.crud.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
