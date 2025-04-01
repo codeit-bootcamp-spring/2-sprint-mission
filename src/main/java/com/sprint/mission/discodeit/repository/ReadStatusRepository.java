@@ -1,17 +1,17 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public interface ReadStatusRepository {
-    // 사용자와 채널 식별자로 읽음 상태를 조회
-    ReadStatus findByUserAndChannel(UUID userId, UUID channelId);
-    ReadStatus findById(UUID id);
-    List<ReadStatus> findAll();
-    void save(ReadStatus readStatus);
-    void delete(ReadStatus readStatus);
+    ReadStatus save(ReadStatus readStatus);
+    Optional<ReadStatus> findById(UUID id);
+    List<ReadStatus> findAllByUserId(UUID userId);
+    List<ReadStatus> findAllByChannelId(UUID channelId);
+    boolean existsById(UUID id);
+    void deleteById(UUID id);
+    void deleteAllByChannelId(UUID channelId);
 }

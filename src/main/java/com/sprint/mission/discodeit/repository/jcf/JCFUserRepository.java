@@ -7,46 +7,55 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf", matchIfMissing = true)
-// matchIfMissing = true 의 의미는 type지정이 안되어있을 경우
-// 자동으로 file 대신 jcf를 실행한다는 의미
-// file은 type 지정을 무조건 file로 해야만 실행된다
 public class JCFUserRepository implements UserRepository {
-    private Map<UUID, User> users = new HashMap<>();
+    private final Map<UUID, User> data;
 
-    public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(users.get(id));
+    public JCFUserRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public List<User> findAll(){
-        return new ArrayList<>(users.values());
+    public User save(User user) {
+        this.data.put(user.getId(), user);
+        return user;
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return users.values().stream()
+        return this.findAll().stream()
                 .filter(user -> user.getUsername().equals(username))
                 .findFirst();
     }
 
     @Override
+    public List<User> findAll() {
+        return this.data.values().stream().toList();
+    }
+
+    @Override
     public boolean existsById(UUID id) {
-        return users.containsKey(id);
+        return this.data.containsKey(id);
     }
 
     @Override
-    public User save(User user) {
-        if(user.getId() == null){
-            user.setId(UUID.randomUUID());
-        }
-        users.put(user.getId(), user);
-        return user;
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 
     @Override
-    public void deleteById(UUID id){
-        users.remove(id);
+    public boolean existsByEmail(String email) {
+        return this.findAll().stream().anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return this.findAll().stream().anyMatch(user -> user.getUsername().equals(username));
     }
 }

@@ -6,46 +6,41 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf", matchIfMissing = true)
-
 public class JCFBinaryContentRepository implements BinaryContentRepository {
-    // UUID를 key로 인메모리 저장소로 사용
-    private final Map<UUID, BinaryContent> store = new ConcurrentHashMap<>();
+    private final Map<UUID, BinaryContent> data;
 
-    @Override
-    public Optional<BinaryContent> findByUserId(UUID id) {
-        return store.values().stream()
-                .filter(bc -> bc.getUserId() != null && bc.getUserId().equals(id))
-                .findFirst();
+    public JCFBinaryContentRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public List<BinaryContent> findAll() {
-        return new ArrayList<>(store.values());
+    public BinaryContent save(BinaryContent binaryContent) {
+        this.data.put(binaryContent.getId(), binaryContent);
+        return binaryContent;
     }
 
     @Override
-    public List<BinaryContent> findAllById(List<UUID> ids) {
-        return store.entrySet().stream()
-                .filter(entry -> ids.contains(entry.getKey()))
-                .map(Map.Entry::getValue)
-                .collect(Collectors.toList());
+    public Optional<BinaryContent> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public void save(BinaryContent binaryContent) {
-        if (binaryContent.getId() == null) {
-            binaryContent.setId(UUID.randomUUID());
-        }
-        store.put(binaryContent.getId(), binaryContent);
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        return this.data.values().stream()
+                .filter(content -> ids.contains(content.getId()))
+                .toList();
     }
 
     @Override
-    public void delete(BinaryContent binaryContent) {
-        store.remove(binaryContent.getId());
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }

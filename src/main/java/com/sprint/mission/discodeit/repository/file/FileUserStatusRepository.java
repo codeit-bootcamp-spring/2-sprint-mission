@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -14,93 +13,109 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
-@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file")
 public class FileUserStatusRepository implements UserStatusRepository {
-    @Value("${discodeit.repository.file-directory}")
-    private Path directory;
+    private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    private String fileDirectory;
-
-    @PostConstruct
-    public void init() {
-        // 현재 작업 디렉토리 하위에 fileDirectory 및 "UserStatus" 폴더 생성
-        directory = Paths.get(System.getProperty("user.dir"), fileDirectory, UserStatus.class.getSimpleName());
-        try {
-            Files.createDirectories(directory);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create directory: " + directory, e);
+    public FileUserStatusRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, UserStatus.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    // 주어진 id에 해당하는 파일 경로 생성 (예: {directory}/{UUID}.ser)
     private Path resolvePath(UUID id) {
-        return directory.resolve(id.toString() + EXTENSION);
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
+
+    @Override
+    public UserStatus save(UserStatus userStatus) {
+        Path path = resolvePath(userStatus.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(userStatus);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return userStatus;
+    }
+
+    @Override
+    public Optional<UserStatus> findById(UUID id) {
+        UserStatus userStatusNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userStatusNullable = (UserStatus) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(userStatusNullable);
     }
 
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
-        try {
-            return Files.list(directory)
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (FileInputStream fis = new FileInputStream(path.toFile());
-                             ObjectInputStream ois = new ObjectInputStream(fis)) {
-                            return (UserStatus) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException("Failed to read file: " + path, e);
-                        }
-                    })
-                    .filter(us -> us.getId() != null && us.getId().equals(userId))
-                    .findFirst();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to list files in directory: " + directory, e);
-        }
+        return findAll().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .findFirst();
     }
 
     @Override
     public List<UserStatus> findAll() {
-        try {
-            return Files.list(directory)
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
-                        try (FileInputStream fis = new FileInputStream(path.toFile());
-                             ObjectInputStream ois = new ObjectInputStream(fis)) {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
                             return (UserStatus) ois.readObject();
                         } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException("Failed to read file: " + path, e);
+                            throw new RuntimeException(e);
                         }
                     })
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to list files in directory: " + directory, e);
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void save(UserStatus userStatus) {
-        if (userStatus.getId() == null) {
-            userStatus.setId(UUID.randomUUID());
-        }
-        Path path = resolvePath(userStatus.getId());
-        try (FileOutputStream fos = new FileOutputStream(path.toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(userStatus);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save UserStatus: " + userStatus, e);
-        }
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
     @Override
-    public void delete(UserStatus userStatus) {
-        Path path = resolvePath(userStatus.getId());
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
         try {
-            Files.deleteIfExists(path);
+            Files.delete(path);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to delete UserStatus with id: " + userStatus.getId(), e);
+            throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        this.findByUserId(userId)
+                .ifPresent(userStatus -> this.deleteById(userStatus.getId()));
     }
 }

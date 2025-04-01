@@ -6,40 +6,52 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf", matchIfMissing = true)
-
 public class JCFUserStatusRepository implements UserStatusRepository {
+    private final Map<UUID, UserStatus> data;
 
-    // 인메모리 저장소: UUID(유저 아이디)를 키로 사용
-    private final Map<UUID, UserStatus> store = new ConcurrentHashMap<>();
+    public JCFUserStatusRepository() {
+        this.data = new HashMap<>();
+    }
+
+    @Override
+    public UserStatus save(UserStatus userStatus) {
+        this.data.put(userStatus.getId(), userStatus);
+        return userStatus;
+    }
+
+    @Override
+    public Optional<UserStatus> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
+    }
 
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
-        // store에 저장된 UserStatus 중, userId가 일치하는 첫번째를 Optional로 반환
-        return store.values().stream()
-                .filter(us -> us.getId().equals(userId))
+        return this.findAll().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
                 .findFirst();
     }
 
     @Override
     public List<UserStatus> findAll() {
-        return new ArrayList<>(store.values());
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public void save(UserStatus userStatus) {
-        // 만약 userStatus의 id가 null이면 생성 (대개 UserStatus 생성 시 id가 부여된다면 필요 없을 수 있음)
-        if (userStatus.getId() == null) {
-            userStatus.setId(UUID.randomUUID());
-        }
-        store.put(userStatus.getId(), userStatus);
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public void delete(UserStatus userStatus) {
-        store.remove(userStatus.getId());
+    public void deleteById(UUID id) {
+        this.data.remove(id);
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        this.findByUserId(userId)
+                .ifPresent(userStatus -> this.deleteByUserId(userStatus.getId()));
     }
 }

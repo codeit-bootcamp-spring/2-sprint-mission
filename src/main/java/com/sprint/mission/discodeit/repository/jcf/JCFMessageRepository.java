@@ -7,34 +7,44 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf", matchIfMissing = true)
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> messages = new HashMap<>();
+    private final Map<UUID, Message> data;
+
+    public JCFMessageRepository() {
+        this.data = new HashMap<>();
+    }
 
     @Override
     public Message save(Message message) {
-        messages.put(message.getId(), message);
+        this.data.put(message.getId(), message);
         return message;
     }
 
     @Override
     public Optional<Message> findById(UUID id) {
-        return Optional.ofNullable(messages.get(id));
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public List<Message> findAll(){
-        return new ArrayList<>(messages.values());
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return this.data.values().stream().filter(message -> message.getChannelId().equals(channelId)).toList();
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return messages.containsKey(id);
+        return this.data.containsKey(id);
     }
 
     @Override
     public void deleteById(UUID id) {
-        messages.remove(id);
+        this.data.remove(id);
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(message -> this.deleteById(message.getId()));
     }
 }
