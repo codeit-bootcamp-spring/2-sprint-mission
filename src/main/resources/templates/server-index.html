@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>서버 관리 페이지</title>
+</head>
+<body>
+
+<h1>서버 페이지</h1>
+
+<ul id="menuList">
+  <li><a id="createServerLink">📝 서버 생성</a></li>
+  <li><a id="serverListLink">👥 전체 서버 목록</a></li>
+</ul>
+
+<script>
+  // ✅ 토큰을 URL에서 추출
+  function getTokenFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("token");
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const token = getTokenFromURL();
+
+    if (!token) {
+      alert("토큰이 없습니다. 다시 로그인해주세요.");
+      window.location.href = "/login";
+      return;
+    }
+
+    console.log("받은 토큰:", token);
+
+    // ✅ 링크에 토큰 붙이기
+    const createLink = document.getElementById("createServerLink");
+    const listLink = document.getElementById("serverListLink");
+
+    createLink.href = `/server-create?token=${encodeURIComponent(token)}`;
+    listLink.href = `/servers?token=${encodeURIComponent(token)}`;
+  });
+</script>
+
+</body>
+</html>

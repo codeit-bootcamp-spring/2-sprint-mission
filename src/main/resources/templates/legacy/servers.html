@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>서버 목록</title>
+</head>
+<body>
+
+<h1>서버 목록</h1>
+<p>유저 ID: <span id="userIdText" th:text="${userId}"></span></p>
+
+<table border="1">
+  <thead>
+  <tr>
+    <th>서버 ID</th>
+    <th>이름</th>
+    <th>생성일</th>
+    <th>수정일</th>
+    <th>삭제</th>
+    <th>채널 관리</th>
+  </tr>
+  </thead>
+  <tbody id="serverTableBody">
+  <!-- JS로 서버 목록 삽입 -->
+  </tbody>
+</table>
+<br>
+<a id="createServerLink" href="#">
+  <button>➕ 서버 생성</button>
+</a>
+<script>
+  function getUserId() {
+    const span = document.getElementById("userIdText");
+    return span ? span.textContent.trim() : null;
+  }
+
+  function setCreateServerLink() {
+    const userId = getUserId();
+    const link = document.getElementById("createServerLink");
+    if (userId && link) {
+      link.href = `/users/${userId}/servers/create`;
+    }
+  }
+
+  function loadServers() {
+    const userId = getUserId();
+    if (!userId) return;
+
+    fetch(`/api/users/${userId}/servers`)
+            .then(res => {
+              if (!res.ok) throw new Error("서버 목록 요청 실패");
+              return res.json();
+            })
+            .then(data => {
+              const tbody = document.getElementById("serverTableBody");
+              tbody.innerHTML = '';
+
+              data.servers.forEach(server => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+            <td>${server.id}</td>
+            <td>${server.name}</td>
+            <td>${new Date(server.createdAt).toLocaleString()}</td>
+            <td>${new Date(server.updatedAt).toLocaleString()}</td>
+            <td><button onclick="deleteServer('${server.id}')">삭제</button></td>
+            <td><a href="/users/${userId}/servers/${server.id}"> <button>채널 관리</button></a></td>
+          `;
+                tbody.appendChild(row);
+              });
+            })
+            .catch(err => {
+              console.error("서버 목록 불러오기 실패:", err);
+              alert("서버 목록을 불러오지 못했습니다.");
+            });
+  }
+
+  function deleteServer(serverId) {
+    const userId = getUserId();
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+
+    fetch(`/api/users/${userId}/servers/${serverId}`, {
+      method: 'DELETE'
+    })
+            .then(res => {
+              if (!res.ok) throw new Error("삭제 실패");
+              alert("삭제 완료!");
+              loadServers();
+            })
+            .catch(err => {
+              console.error("삭제 오류:", err);
+              alert("삭제에 실패했습니다.");
+            });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadServers();
+    setCreateServerLink(); // ✅ 서버 생성 링크 설정
+  });
+</script>
+
+
+<br>
+<a href="/users">← 유저 목록으로</a>
+
+</body>
+</html>

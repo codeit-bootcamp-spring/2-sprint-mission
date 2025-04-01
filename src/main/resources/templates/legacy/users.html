@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>유저 목록</title>
+</head>
+<body>
+
+<h1>등록된 유저 목록</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>프로필 이미지</th>
+        <th>아이디</th>
+        <th>이름</th>
+        <th>이메일</th>
+        <th>가입일</th>
+        <th>수정일</th>
+        <th>상태</th>
+        <th>삭제</th>
+        <th>서버 관리</th>
+    </tr>
+    </thead>
+    <tbody id="userTableBody">
+    <!-- JavaScript가 데이터를 삽입할 예정 -->
+    </tbody>
+</table>
+
+<script>
+    function loadUsers() {
+        fetch('/api/users')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('서버 응답 오류');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const userTableBody = document.getElementById('userTableBody');
+                userTableBody.innerHTML = ''; // 기존 데이터 초기화
+
+                data.users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <img src="/api/users/${user.id}/profile"
+                                 onerror="this.onerror=null; this.src='/images/default-profile.png';"
+                                 width="50" height="50">
+                        </td>
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${new Date(user.createdAt).toLocaleString()}</td>
+                        <td>${new Date(user.updatedAt).toLocaleString()}</td>
+                        <td>${user.online ? '🟢 온라인' : '🔴 오프라인'}</td>
+                        <td><button onclick="deleteUser('${user.id}')">삭제</button></td>
+                        <td><a href="/users/${user.id}/servers"><button>서버 관리</button></a></td>
+                    `;
+                    userTableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('유저 목록 불러오기 실패:', error);
+                alert('유저 목록을 불러오는데 실패했습니다.');
+            });
+    }
+    function deleteUser(userId) {
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+
+        fetch(`/api/users/${userId}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("삭제 실패");
+                }
+                alert("삭제 성공");
+                loadUsers(); // 목록 다시 불러오기
+            })
+            .catch(error => {
+                console.error("유저 삭제 오류:", error);
+                alert("유저 삭제에 실패했습니다.");
+            });
+    }
+    document.addEventListener('DOMContentLoaded', loadUsers);
+</script>
+<a href="/">🏠 유저 페이지로</a>
+</body>
+</html>
