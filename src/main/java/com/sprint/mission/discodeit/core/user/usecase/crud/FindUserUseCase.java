@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.user.usecase.crud;
 
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserFindDTO;
+import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UserFindDTO;
 import java.util.List;
 import java.util.UUID;
 

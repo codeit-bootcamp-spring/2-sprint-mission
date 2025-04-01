@@ -39,7 +39,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
       return false;
     }
 
-    if (userId != null && jwtUtil.validateToken(jwt)) {
+    if (jwtUtil.validateToken(jwt)) {
       // 사용자 존재 여부 확인
       if (!userService.existsById(userId)) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());

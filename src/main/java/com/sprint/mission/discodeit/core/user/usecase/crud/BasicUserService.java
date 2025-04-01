@@ -1,13 +1,12 @@
 package com.sprint.mission.discodeit.core.user.usecase.crud;
 
 import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserFindDTO;
+import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UserFindDTO;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
+import com.sprint.mission.discodeit.core.user.usecase.crud.dto.CreateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.status.UserStatusService;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsError;
 import com.sprint.mission.discodeit.logging.CustomLogging;
@@ -29,28 +28,46 @@ public class BasicUserService implements UserService {
 
   @CustomLogging
   @Override
-  public UUID create(UserCreateRequestDTO requestDTO,
+  public void create(CreateUserCommand command,
       Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
+    UUID profileId = null;
+    checkDuplicate(command.name(), command.email());
 
-    checkDuplicate(requestDTO.name(), requestDTO.email());
+    String hashedPassword = BCrypt.hashpw(command.password(), BCrypt.gensalt());
+    if (binaryContentDTO.isPresent()) {
+      profileId = makeBinaryContent(binaryContentDTO);
+    }
 
-    UUID profileId = makeBinaryContent(binaryContentDTO);
-    String hashedPassword = BCrypt.hashpw(requestDTO.password(), BCrypt.gensalt());
-    User user = User.create(requestDTO.name(), requestDTO.email(), hashedPassword);
+    User user = User.create(command.name(), command.email(), hashedPassword, profileId);
     userRepositoryPort.save(user);
-
     userStatusService.create(user.getId());
+  }
 
-    return user.getId();
+
+  private UUID makeBinaryContent(Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
+    return binaryContentDTO.map(contentDTO -> {
+      String fileName = contentDTO.fileName();
+      String contentType = contentDTO.contentType();
+      byte[] bytes = contentDTO.bytes();
+      long size = bytes.length;
+
+      BinaryContent content = BinaryContent.create(fileName, size, contentType, bytes);
+      binaryContentRepositoryPort.save(content);
+
+      return content.getId();
+    }).orElse(null);
+  }
+
+  private void checkDuplicate(String name, String email) {
+    if (userRepositoryPort.existName(name) || userRepositoryPort.existEmail(email)) {
+      throw new UserAlreadyExistsError("동일한 유저가 존재합니다.");
+    }
   }
 
   @Override
   public UserFindDTO findById(UUID userId) {
     User user = userRepositoryPort.findById(userId);
-
-    UserStatus userStatus = userStatusService.findByUserId(userId);
-    boolean online = userStatus.isOnline();
-
+    boolean online = userStatusService.findByUserId(userId).isOnline();
     return UserFindDTO.create(user, online);
   }
 
@@ -84,16 +101,13 @@ public class BasicUserService implements UserService {
   @CustomLogging
   @Override
   public void delete(UUID userId) {
-
     User findUser = userRepositoryPort.findById(userId);
 
     Optional.ofNullable(findUser.getProfileId())
         .ifPresent(binaryContentRepositoryPort::delete);
 
     userStatusService.deleteById(findUser.getId());
-
     userRepositoryPort.remove(findUser);
-
   }
 
   @Override
@@ -101,23 +115,4 @@ public class BasicUserService implements UserService {
     return userRepositoryPort.existId(userId);
   }
 
-  private UUID makeBinaryContent(Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
-    return binaryContentDTO.map(contentDTO -> {
-      String fileName = contentDTO.fileName();
-      String contentType = contentDTO.contentType();
-      byte[] bytes = contentDTO.bytes();
-      long size = bytes.length;
-
-      BinaryContent content = BinaryContent.create(fileName, size, contentType, bytes);
-      binaryContentRepositoryPort.save(content);
-
-      return content.getId();
-    }).orElse(null);
-  }
-
-  private void checkDuplicate(String name, String email) {
-    if (userRepositoryPort.existName(name) || userRepositoryPort.existEmail(email)) {
-      throw new UserAlreadyExistsError("동일한 유저가 존재합니다.");
-    }
-  }
 }

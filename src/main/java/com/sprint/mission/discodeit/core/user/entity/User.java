@@ -36,8 +36,8 @@ public class User implements Serializable {
     this.password = password;
   }
 
-  public static User create(String name, String email, String password) {
-    return new User(UUID.randomUUID(), null, Instant.now(), name, email, password);
+  public static User create(String name, String email, String password, UUID profileId) {
+    return new User(UUID.randomUUID(), profileId, Instant.now(), name, email, password);
   }
 
   public void update(String newUserName, String newEmail, UUID newProfileId) {
