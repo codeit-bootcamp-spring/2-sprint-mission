@@ -13,12 +13,12 @@ public class User extends BaseEntity implements Serializable {
 
     private UUID profileId;
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password, UUID profileId) {
         super();
         this.username = username;
         this.email = email;
         this.password = password;
-        this.profileId = null;
+        this.profileId = profileId;
     }
 
     public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {

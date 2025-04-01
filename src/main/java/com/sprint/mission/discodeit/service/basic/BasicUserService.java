@@ -1,19 +1,23 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.handler.custom.user.UserEmailAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.handler.custom.user.UserNameAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.handler.custom.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,20 +31,31 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(UserCreateDto userCreateDto) {
+    public User create(UserCreateDto userCreateDto, Optional<BinaryContentCreateDto> binaryContentCreateDto) {
         List<User> users = userRepository.findAll();
 
         boolean isEmailExist = users.stream().anyMatch(user -> user.getEmail().equals(userCreateDto.email()));
         if (isEmailExist) {
-            throw new RuntimeException(userCreateDto.email() + " 이메일은 이미 가입되었습니다.");
+            throw new UserEmailAlreadyExistsException(userCreateDto.email() + " 이메일은 이미 가입되었습니다.");
         }
 
         boolean isNameExist = users.stream().anyMatch(user -> user.getUsername().equals(userCreateDto.username()));
         if (isNameExist) {
-            throw new RuntimeException(userCreateDto.username() + " 이름은 이미 가입되었습니다.");
+            throw new UserNameAlreadyExistsException(userCreateDto.username() + " 이름은 이미 가입되었습니다.");
         }
 
-        User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password());
+        UUID nullableProfileId = binaryContentCreateDto
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytesImage();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
+
+        User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(),
+                nullableProfileId);
         userRepository.save(newUser);
         userStatusService.create(new UserStatusCreateDto(newUser.getId(), Instant.MIN));
 
@@ -48,23 +63,23 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto findById(UUID userId) {
+    public UserDto findById(UUID userId) {
         User user = userRepository.findById(userId);
 
         if (user == null) {
-            throw new NoSuchElementException(userId + " 유저를 찾을 수 없습니다.");
+            throw new UserNotFoundException(userId + " 유저를 찾을 수 없습니다.");
         }
 
         UserStatus userStatus = userStatusService.findById(user.getId());
 
-        return new UserResponseDto(user, userStatus.isActive());
+        return new UserDto(user, userStatus.isActive());
     }
 
     @Override
-    public List<UserResponseDto> findAll() {
+    public List<UserDto> findAll() {
         return userRepository.findAll().stream().map(user -> {
             UserStatus userStatus = userStatusService.findById(user.getId());
-            return new UserResponseDto(user, userStatus.isActive());
+            return new UserDto(user, userStatus.isActive());
         }).toList();
     }
 
@@ -75,14 +90,14 @@ public class BasicUserService implements UserService {
                 user -> user.getEmail().equals(userUpdateDto.newEmail()));
 
         if (isEmailExist) {
-            throw new RuntimeException(userUpdateDto.newEmail() + " 이메일은 이미 존재하여 수정할 수 없습니다.");
+            throw new UserEmailAlreadyExistsException(userUpdateDto.newEmail() + " 이메일은 이미 존재하여 수정할 수 없습니다.");
         }
 
         boolean isNameExist = users.stream().anyMatch(
                 user -> user.getUsername().equals(userUpdateDto.newUsername()));
 
         if (isNameExist) {
-            throw new RuntimeException(userUpdateDto.newEmail() + " 유저는 이미 존재하여 수정할 수 없습니다.");
+            throw new UserNameAlreadyExistsException(userUpdateDto.newUsername() + " 유저는 이미 존재하여 수정할 수 없습니다.");
         }
 
         User user = userRepository.findById(userUpdateDto.id());

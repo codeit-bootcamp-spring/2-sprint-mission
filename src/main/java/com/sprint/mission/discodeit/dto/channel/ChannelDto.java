@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record ChannelResponseDto(
+public record ChannelDto(
         UUID id,
         String name,
         String description,
@@ -14,7 +14,7 @@ public record ChannelResponseDto(
         Instant lastMessageAt,
         List<UUID> userIds
 ) {
-    public ChannelResponseDto(Channel channel, Instant lastMessageAt, List<UUID> userIds) {
+    public ChannelDto(Channel channel, Instant lastMessageAt, List<UUID> userIds) {
         this(channel.getId(), channel.getName(), channel.getDescription(), channel.getType(), lastMessageAt, userIds);
     }
 }

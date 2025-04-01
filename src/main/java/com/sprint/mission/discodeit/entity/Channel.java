@@ -17,6 +17,14 @@ public class Channel extends BaseEntity implements Serializable {
         this.description = description;
     }
 
+    public static Channel createPrivate() {
+        return new Channel(ChannelType.PRIVATE, null, null);
+    }
+
+    public static Channel createPublic(String name, String description) {
+        return new Channel(ChannelType.PUBLIC, name, description);
+    }
+
     public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
         if (newName != null && !newName.equals(this.name)) {
