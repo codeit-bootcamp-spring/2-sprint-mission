@@ -67,7 +67,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     private boolean canUserAccessChannel(Channel channel, UUID userId) {
-        if (!channel.getName().equals("PRIVATE_CHANNEL")) {
+        if (!channel.isPrivate()) {
             return true;
         }
         // private 채널일 경우 userId가 참여한 경우에만 접근 가능
@@ -105,7 +105,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void updateChannel(UpdateChannelRequest request) {
         channelRepository.getChannelById(request.channelId()).ifPresent(channel -> {
-            if (channel.getName().equals("PRIVATE CHANNEL")) {
+            if (channel.isPrivate()) {
                 throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
             }
             Instant updatedTime = Instant.now();

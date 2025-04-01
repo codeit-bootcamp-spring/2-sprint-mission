@@ -4,8 +4,9 @@ import java.util.UUID;
 
 public record UpdateUserRequest(
         UUID userId,
-        String newName,
-        String newEmail,
+        String username,
+        String password,
+        String email,
         String profileImageFileName,
         String profileImageFilePath
 ) {}

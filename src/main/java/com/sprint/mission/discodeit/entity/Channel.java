@@ -21,6 +21,10 @@ public class Channel extends BaseEntity implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public boolean isPrivate() {
+        return "PRIVATE CHANNEL".equals(this.name);
+    }
+
     @Override
     public String toString() {
         return "Channel{" +
