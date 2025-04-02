@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Builder
-public record ChannelFindDTO(
+public record ChannelResult(
     UUID channelId,
     ChannelType type,
     String name,
@@ -17,9 +17,9 @@ public record ChannelFindDTO(
     Instant lastMessageAt
 ) {
 
-  public static ChannelFindDTO create(Channel channel, List<UUID> userIdList,
+  public static ChannelResult create(Channel channel, List<UUID> userIdList,
       Instant lastMessageAt) {
-    return ChannelFindDTO.builder()
+    return ChannelResult.builder()
         .channelId(channel.getChannelId())
         .type(channel.getType())
         .name(channel.getName())

@@ -29,7 +29,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatus create(UUID userId, UUID channelId,
       ReadStatusCreateRequestDTO readStatusCreateRequestDTO) {
     //채널, 유저가 있는지 체크
-    checkValid(channelId, userId);
+    validateUserAndChannel(channelId, userId);
 
     //이미 생성된 읽기 상태가 있는지 체크
     //없으면 생성하기
@@ -38,6 +38,13 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatusRepository.save(status);
 
     return status;
+  }
+
+  private void validateUserAndChannel(UUID channelId, UUID userId) {
+    if (userRepositoryPort.findById(userId).isEmpty() && channelRepository.findByChannelId(
+        channelId).isEmpty()) {
+      throw new InvalidException("유효하지 않은 아이디입니다.");
+    }
   }
 
   @Override
@@ -69,12 +76,6 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatusRepository.delete(readStatusId);
   }
 
-
-  private void checkValid(UUID channelId, UUID userId) {
-    if (userRepositoryPort.findById(userId).isEmpty() && channelRepository.find(channelId)) {
-      throw new InvalidException("유효하지 않은 아이디입니다.");
-    }
-  }
 
   private ReadStatus checkDuplicatedStatues(UUID channelId, UUID userId,
       ReadStatusCreateRequestDTO readStatusCreateRequestDTO) {

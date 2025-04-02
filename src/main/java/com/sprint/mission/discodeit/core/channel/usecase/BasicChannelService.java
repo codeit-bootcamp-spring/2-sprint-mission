@@ -1,18 +1,20 @@
 package com.sprint.mission.discodeit.core.channel.usecase;
 
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.ChannelFindDTO;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PrivateChannelCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PublicChannelCreateRequestDTO;
+import com.sprint.mission.discodeit.adapter.inbound.channel.dto.ChannelResult;
+import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PrivateChannelCreateCommand;
+import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PublicChannelCreateCommand;
+import com.sprint.mission.discodeit.adapter.inbound.channel.dto.UpdateChannelCommand;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelListResult;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.message.port.ReadStatusRepository;
-import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
+import com.sprint.mission.discodeit.exception.channel.ChannelModificationNotAllowedException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -33,63 +35,37 @@ public class BasicChannelService implements ChannelService {
 
   @CustomLogging
   @Override
-  public Channel create(UUID userId,
-      PublicChannelCreateRequestDTO channelCreateDTO) {
-    User user = userRepositoryPort.findById(userId)
-        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
-    Channel channel;
-
-    channel = Channel.create(user.getId(), channelCreateDTO.name(),
+  public UUID create(PublicChannelCreateCommand command) {
+    Channel channel = Channel.create(command.userId(), command.name(),
         ChannelType.PUBLIC);
 
     channelRepository.save(channel);
-    channelRepository.join(channel, user);
 
-    return channel;
+//    User user = userRepositoryPort.findById(command.userId())
+//        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
+//    channelRepository.join(channel, user);
+
+    return channel.getChannelId();
   }
 
   @Override
-  public Channel create(UUID userId, PrivateChannelCreateRequestDTO requestDTO) {
-    Channel channel = Channel.create(userId, null, ChannelType.PRIVATE);
+  public UUID create(PrivateChannelCreateCommand command) {
+    Channel channel = Channel.create(command.userId(), null, ChannelType.PRIVATE);
     Channel createdChannel = channelRepository.save(channel);
 
-    requestDTO.participantIds().stream()
+    command.participantIds().stream()
         .map(u -> ReadStatus.create(u, createdChannel.getChannelId(), Instant.MIN))
         .forEach(readStatusRepository::save);
 
-    return createdChannel;
+    return createdChannel.getChannelId();
   }
 
   @Override
-  public void join(UUID channelId, UUID userId) {
-    Channel findChannel = channelRepository.find(channelId);
-    User user = userRepositoryPort.findById(userId)
-        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
-    channelRepository.join(findChannel, user);
-
-  }
-
-  @CustomLogging
-  @Override
-  public void quit(UUID channelId, UUID userId) {
-    Channel findChannel = channelRepository.find(channelId);
-    User user = userRepositoryPort.findById(userId)
-        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
-    channelRepository.quit(findChannel, user);
-
-  }
-
-  @Override
-  public ChannelFindDTO find(UUID channelId) {
-    Channel channel = channelRepository.find(channelId);
-
-    Instant lastMessageAt = messageRepositoryPort.findAllByChannelId(channel.getChannelId())
-        .stream()
-        .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
-        .map(Message::getCreatedAt)
-        .limit(1)
-        .findFirst()
-        .orElse(Instant.MIN);
+  public ChannelResult findChannelByChannelId(UUID channelId) {
+    Channel channel = channelRepository.findByChannelId(channelId).orElseThrow(
+        () -> new ChannelNotFoundException("채널이 존재하지 않습니다.")
+    );
+    Instant lastMessageAt = findLastMessageAt(channel);
 
     List<UUID> userIdList = new ArrayList<>();
     if (channel.getType().equals(ChannelType.PRIVATE)) {
@@ -98,37 +74,46 @@ public class BasicChannelService implements ChannelService {
           .forEach(userIdList::add);
     }
 
-    return ChannelFindDTO.create(channel, userIdList, lastMessageAt);
-
+    return ChannelResult.create(channel, userIdList, lastMessageAt);
   }
 
+  private Instant findLastMessageAt(Channel channel) {
+    return messageRepositoryPort.findAllByChannelId(channel.getChannelId())
+        .stream()
+        .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+        .map(Message::getCreatedAt)
+        .limit(1)
+        .findFirst()
+        .orElse(Instant.MIN);
+  }
+
+
   @Override
-  public List<ChannelFindDTO> findAllByUserId(UUID userId) {
+  public ChannelListResult findChannelsByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
         .map(ReadStatus::getChannelId)
         .toList();
 
-    return channelRepository.findAll().stream()
+    return new ChannelListResult(channelRepository.findAll().stream()
         .filter(channel -> channel.getType().equals(ChannelType.PUBLIC)
             || mySubscribedChannelIds.contains(channel.getChannelId()))
-        .map(channel -> find(channel.getChannelId()))
-        .toList();
+        .map(channel -> findChannelByChannelId(channel.getChannelId()))
+        .toList());
   }
 
-//  @CustomLogging
-//  @Override
-//  public UUID update(UUID channelId, UpdateChannelDTO updateChannelDTO) {
-//
-//    Channel findChannel = channelRepository.find(channelId);
-//
-//    if (findChannel.getType() == ChannelType.PRIVATE) {
-//      throw new ChannelModificationNotAllowedException("private 채널은 수정할 수 없습니다.");
-//    }
-//
-//    findChannel.update(updateChannelDTO);
-//    return update.getChannelId();
-//  }
+  @CustomLogging
+  @Override
+  public void update(UpdateChannelCommand command) {
+    Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
+        () -> new ChannelNotFoundException("채널이 존재하지 않습니다.")
+    );
 
+    if (channel.getType() == ChannelType.PRIVATE) {
+      throw new ChannelModificationNotAllowedException("private 채널은 수정할 수 없습니다.");
+    }
+
+    channel.update(command.replaceName(), command.replaceType());
+  }
 
   @Override
   public void delete(UUID channelId) {
@@ -151,26 +136,21 @@ public class BasicChannelService implements ChannelService {
     }
   }
 
-//    @Override
-//    public void printChannels(UUID serverId) {
+//  @Override
+//  public void join(UUID channelId, UUID userId) {
+//    Channel findChannel = channelRepository.find(channelId);
+//    User user = userRepositoryPort.findById(userId)
+//        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
+//    channelRepository.join(findChannel, user);
 //
-//        List<Channel> channels = channelRepository.findAllByServerId(serverId);
-//        channels.forEach(System.out::println);
+//  }
 //
-//    }
-//
-//    @Override
-//    public void printUsersInChannel(UUID channelId) {
-//        Channel channel = channelRepository.find(channelId);
-//        List<User> list = channel.getUserList();
-//        list.forEach(System.out::println);
-//
-//    }
-
-//
-//    private void createReadStatus(User user, Channel channel) {
-//        ReadStatus readStatus = new ReadStatus(user.getId(), channel.getChannelId());
-//        readStatusRepository.save(readStatus);
-//    }
-
+//  @CustomLogging
+//  @Override
+//  public void quit(UUID channelId, UUID userId) {
+//    Channel findChannel = channelRepository.find(channelId);
+//    User user = userRepositoryPort.findById(userId)
+//        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
+//    channelRepository.quit(findChannel, user);
+//  }
 }

@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-public record UserFindDTO(
+public record UserResult(
     UUID id,
     UUID profileId,
     String name,
@@ -17,8 +17,8 @@ public record UserFindDTO(
     boolean online
 ) {
 
-  public static UserFindDTO create(User user, boolean online) {
-    return UserFindDTO.builder()
+  public static UserResult create(User user, boolean online) {
+    return UserResult.builder()
         .id(user.getId())
         .profileId(user.getProfileId())
         .name(user.getName())

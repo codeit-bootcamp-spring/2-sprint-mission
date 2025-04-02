@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.core.channel.usecase;
 
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PrivateChannelCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PublicChannelCreateRequestDTO;
-import com.sprint.mission.discodeit.core.channel.entity.Channel;
+import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PrivateChannelCreateCommand;
+import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PublicChannelCreateCommand;
 import java.util.UUID;
 
 public interface CreateChannelUseCase {
 
-  Channel create(UUID userId, PublicChannelCreateRequestDTO requestDTO);
+  UUID create(PublicChannelCreateCommand command);
 
-  Channel create(UUID userId, PrivateChannelCreateRequestDTO requestDTO);
+  UUID create(PrivateChannelCreateCommand command);
 
 }

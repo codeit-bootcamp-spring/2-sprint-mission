@@ -34,7 +34,7 @@ public class BasicMessageService implements MessageService {
   public Message create(UUID userId, UUID channelId, MessageCreateRequestDTO messageWriteDTO,
       List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
     User user = userRepositoryPort.findById(userId);
-    Channel channel = channelRepository.find(channelId);
+    Channel channel = channelRepository.findByChannelId(channelId);
 
     List<UUID> binaryContentIdList = makeBinaryContent(binaryContentDTOs);
 

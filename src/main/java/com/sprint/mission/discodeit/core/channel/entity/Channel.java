@@ -59,6 +59,7 @@ public class Channel implements Serializable {
     }
   }
 
+  //TODO. Channel Validator 구현해야 함
   public static class Validator {
 
     public static void validate(String name) {

@@ -7,7 +7,8 @@ import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPor
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.core.user.usecase.crud.dto.CreateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UserFindDTO;
+import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UserListResult;
+import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UserResult;
 import com.sprint.mission.discodeit.core.user.usecase.status.UserStatusService;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsError;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
@@ -69,21 +70,21 @@ public class BasicUserService implements UserService {
 
   // TODO. 에러 던질 때 import static 로 하기
   @Override
-  public UserFindDTO findById(UUID userId) {
+  public UserResult findById(UUID userId) {
     User user = userRepositoryPort.findById(userId)
         .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
     boolean online = userStatusService.findByUserId(userId).isOnline();
-    return UserFindDTO.create(user, online);
+    return UserResult.create(user, online);
   }
 
   @Override
-  public List<UserFindDTO> listAllUsers() {
+  public UserListResult findAll() {
     List<User> userList = userRepositoryPort.findAll();
 
-    return userList.stream().map(user -> UserFindDTO.create(
+    return new UserListResult(userList.stream().map(user -> UserResult.create(
         user,
         userStatusService.findByUserId(user.getId()).isOnline())
-    ).toList();
+    ).toList());
   }
 
   @CustomLogging
