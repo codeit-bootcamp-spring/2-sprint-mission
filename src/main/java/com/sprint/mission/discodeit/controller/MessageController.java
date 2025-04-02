@@ -11,24 +11,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping("/api")
 public class MessageController {
 
     private final MessageService messageService;
 
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/messages")
     public ResponseEntity<BaseResponseDto> createMessage(@RequestPart("message") MessageCreateDto messageCreateDto,
                                                          @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         List<BinaryContentCreateDto> binaryDtos = new ArrayList<>();
@@ -54,20 +56,21 @@ public class MessageController {
         return ResponseEntity.ok(BaseResponseDto.success(message.getId() + " 메시지 등록이 완료되었습니다."));
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<BaseResponseDto> updateMessage(@RequestBody MessageUpdateDto messageUpdateDto) {
-        Message message = messageService.update(messageUpdateDto);
+    @PutMapping("/messages/{id}")
+    public ResponseEntity<BaseResponseDto> updateMessage(@PathVariable("id") UUID messageId,
+                                                         @RequestBody MessageUpdateDto messageUpdateDto) {
+        Message message = messageService.update(messageId, messageUpdateDto);
         return ResponseEntity.ok(BaseResponseDto.success(message.getId() + " 메시지 변경이 완료되었습니다."));
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping("/messages/{id}")
     public ResponseEntity<BaseResponseDto> deleteMessage(@PathVariable("id") UUID messageId) {
         messageService.delete(messageId);
         return ResponseEntity.ok(BaseResponseDto.success(messageId + " 메시지 삭제가 완료되었습니다."));
     }
 
-    @RequestMapping(value = "/channel/{id}", method = RequestMethod.GET)
-    public ResponseEntity<List<Message>> getMessages(@PathVariable("id") UUID channelId) {
+    @GetMapping("/channels/{channelId}/messages")
+    public ResponseEntity<List<Message>> getMessages(@PathVariable UUID channelId) {
         return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
     }
 }
