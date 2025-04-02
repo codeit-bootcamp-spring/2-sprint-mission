@@ -15,34 +15,35 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent create(BinaryContentCreateRequest requestDto) {
-        BinaryContent binaryContent = new BinaryContent(
-                requestDto.fileName(),
-                (long)requestDto.bytes().length,
-                requestDto.contentType(),
-                requestDto.bytes());
-        return binaryContentRepository.save(binaryContent);
-    }
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent find(UUID id) {
-        return binaryContentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("해당 BinaryContent 없음"));
-    }
+  @Override
+  public BinaryContent create(BinaryContentCreateRequest requestDto) {
+    BinaryContent binaryContent = new BinaryContent(
+        requestDto.fileName(),
+        (long) requestDto.bytes().length,
+        requestDto.contentType(),
+        requestDto.bytes());
+    return binaryContentRepository.save(binaryContent);
+  }
 
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return binaryContentRepository.findAllByIdIn(ids);
-    }
+  @Override
+  public BinaryContent find(UUID id) {
+    return binaryContentRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("해당 BinaryContent 없음"));
+  }
 
-    @Override
-    public void delete(UUID id) {
-        if (!binaryContentRepository.existsById(id)) {
-            throw new ResourceNotFoundException("해당 BinaryContent 없음");
-        }
-        binaryContentRepository.deleteById(id);
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    return binaryContentRepository.findAllByIdIn(ids);
+  }
+
+  @Override
+  public void delete(UUID id) {
+    if (!binaryContentRepository.existsById(id)) {
+      throw new ResourceNotFoundException("해당 BinaryContent 없음");
     }
+    binaryContentRepository.deleteById(id);
+  }
 }

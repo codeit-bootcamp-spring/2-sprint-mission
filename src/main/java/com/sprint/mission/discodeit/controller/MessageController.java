@@ -22,6 +22,12 @@ public class MessageController {
 
   private final MessageService messageService;
 
+  @GetMapping
+  public ResponseEntity<List<Message>> findAllMessagesByChannel(@RequestParam UUID channelId) {
+    List<Message> messages = messageService.findAllByChannelId(channelId);
+    return ResponseEntity.ok(messages);
+  }
+
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<Message> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
@@ -44,12 +50,6 @@ public class MessageController {
       @RequestBody MessageUpdateRequest messageUpdateRequest) {
     Message updatedMessage = messageService.update(messageId, messageUpdateRequest);
     return ResponseEntity.ok(updatedMessage);
-  }
-
-  @GetMapping
-  public ResponseEntity<List<Message>> findAllMessagesByChannel(@RequestParam UUID channelId) {
-    List<Message> messages = messageService.findAllByChannelId(channelId);
-    return ResponseEntity.ok(messages);
   }
 
   @DeleteMapping("/{messageId}")

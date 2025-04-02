@@ -29,6 +29,18 @@ public class UserController {
   private final ChannelService channelService;
   private final ReadStatusService readStatusService;
 
+  @GetMapping("/{userId}")
+  public ResponseEntity<UserResponse> find(@PathVariable UUID userId) {
+    UserResponse response = userService.find(userId);
+    return ResponseEntity.ok(response);
+  }
+
+  @GetMapping({"", "/"})
+  public ResponseEntity<List<UserResponse>> findAll() {
+    List<UserResponse> response = userService.findAll();
+    return ResponseEntity.ok(response);
+  }
+
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserCreateResponse> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
@@ -64,18 +76,6 @@ public class UserController {
         userStatusUpdateRequest.newLastActiveAt());
 
     UserStatusUpdateResponse response = UserStatusUpdateResponse.fromEntity(updatedStatus);
-    return ResponseEntity.ok(response);
-  }
-
-  @GetMapping("/{userId}")
-  public ResponseEntity<UserResponse> find(@PathVariable UUID userId) {
-    UserResponse response = userService.find(userId);
-    return ResponseEntity.ok(response);
-  }
-
-  @GetMapping({"", "/"})
-  public ResponseEntity<List<UserResponse>> findAll() {
-    List<UserResponse> response = userService.findAll();
     return ResponseEntity.ok(response);
   }
 
