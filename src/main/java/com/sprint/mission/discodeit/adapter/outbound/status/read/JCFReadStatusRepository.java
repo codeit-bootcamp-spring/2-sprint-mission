@@ -1,42 +1,25 @@
-package com.sprint.mission.discodeit.adapter.outbound.message;
+package com.sprint.mission.discodeit.adapter.outbound.status.read;
 
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
-import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-public class FileReadStatusRepository implements ReadStatusRepository {
+public class JCFReadStatusRepository implements ReadStatusRepository {
 
-  private final Path path = Paths.get(System.getProperty("user.dir"), "data", "ReadStatusList.ser");
-
-  private Map<UUID, ReadStatus> readStatusList = new ConcurrentHashMap<>();
-  private final FileRepositoryImpl<Map<UUID, ReadStatus>> fileRepository;
-
-  public FileReadStatusRepository() {
-    this.fileRepository = new FileRepositoryImpl<>(path);
-    try {
-      this.readStatusList = fileRepository.load();
-    } catch (SaveFileNotFoundException e) {
-      System.out.println("FileReadStatusRepository init");
-    }
-  }
+  private final Map<UUID, ReadStatus> readStatusList = new ConcurrentHashMap<>();
 
   @Override
   public ReadStatus save(ReadStatus readStatus) {
     readStatusList.put(readStatus.getReadStatusId(), readStatus);
-    fileRepository.save(readStatusList);
     return readStatus;
   }
 
@@ -46,9 +29,9 @@ public class FileReadStatusRepository implements ReadStatusRepository {
   }
 
   @Override
-  public ReadStatus findByUserId(UUID userID) {
+  public ReadStatus findByUserId(UUID userId) {
     return readStatusList.values().stream()
-        .filter(readStatus -> readStatus.getUserId().equals(userID)).findFirst().orElse(null);
+        .filter(readStatus -> readStatus.getUserId().equals(userId)).findFirst().orElse(null);
   }
 
   @Override
@@ -57,14 +40,12 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         .filter(readStatus -> readStatus.getChannelId().equals(channelId)).findFirst().orElse(null);
   }
 
-
   @Override
   public ReadStatus findByUserAndChannelId(UUID userId, UUID channelId) {
     return readStatusList.values().stream().filter(
         readStatus -> readStatus.getUserId().equals(userId) && readStatus.getChannelId()
             .equals(channelId)).findFirst().orElse(null);
   }
-
 
   @Override
   public List<ReadStatus> findAllByUserId(UUID userID) {
@@ -85,6 +66,5 @@ public class FileReadStatusRepository implements ReadStatusRepository {
   @Override
   public void delete(UUID readStatusId) {
     readStatusList.remove(readStatusId);
-    fileRepository.save(readStatusList);
   }
 }

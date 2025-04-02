@@ -40,11 +40,6 @@ public class BasicChannelService implements ChannelService {
         ChannelType.PUBLIC);
 
     channelRepository.save(channel);
-
-//    User user = userRepositoryPort.findById(command.userId())
-//        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
-//    channelRepository.join(channel, user);
-
     return channel.getChannelId();
   }
 

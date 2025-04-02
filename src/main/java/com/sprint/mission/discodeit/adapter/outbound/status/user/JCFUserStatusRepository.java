@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.adapter.outbound.user;
+package com.sprint.mission.discodeit.adapter.outbound.status.user;
 
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.port.UserStatusRepository;
