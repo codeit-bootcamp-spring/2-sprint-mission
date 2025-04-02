@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.common.ApiResponse;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.common.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
@@ -28,14 +29,16 @@ public class ReadStatusController {
   }
 
   @PostMapping
-  public ResponseEntity<ReadStatus> create(@Valid @RequestBody ReadStatusCreateRequest request) {
+  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
     ReadStatus readStatus = readStatusService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
   }
 
-  @PutMapping
-  public ResponseEntity<ReadStatus> update(@Valid @RequestBody ReadStatusUpdateRequest request) {
-    ReadStatus updatedStatus = readStatusService.update(request);
+  @PatchMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatus> update(@PathVariable UUID readStatusId,
+      @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
+    ReadStatus updatedStatus = readStatusService.update(readStatusId,
+        readStatusUpdateRequest.newLastReadAt());
     return ResponseEntity.ok(updatedStatus);
   }
 }

@@ -42,16 +42,6 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatusUpdateResponse> updateStatus(@PathVariable UUID userId,
-      @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
-    UserStatus updatedStatus = userStatusService.update(userId,
-        userStatusUpdateRequest.newLastActiveAt());
-
-    UserStatusUpdateResponse response = UserStatusUpdateResponse.fromEntity(updatedStatus);
-    return ResponseEntity.ok(response);
-  }
-
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserUpdateResponse> update(
       @PathVariable UUID userId,
@@ -64,6 +54,16 @@ public class UserController {
 
     UserUpdateResponse response = userService.update(userId, userUpdateRequest,
         profileCreateRequest);
+    return ResponseEntity.ok(response);
+  }
+
+  @PatchMapping("/{userId}/userStatus")
+  public ResponseEntity<UserStatusUpdateResponse> updateStatus(@PathVariable UUID userId,
+      @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
+    UserStatus updatedStatus = userStatusService.update(userId,
+        userStatusUpdateRequest.newLastActiveAt());
+
+    UserStatusUpdateResponse response = UserStatusUpdateResponse.fromEntity(updatedStatus);
     return ResponseEntity.ok(response);
   }
 

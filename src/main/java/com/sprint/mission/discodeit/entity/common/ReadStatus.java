@@ -10,30 +10,31 @@ import java.util.UUID;
 
 @Getter
 public class ReadStatus extends BaseEntity {
-    private UUID userId;
-    private UUID channelId;
 
-    private Instant lastReadAt;
+  private UUID userId;
+  private UUID channelId;
 
-    public ReadStatus(UUID userId, UUID channelId) {
-        super();
+  private Instant lastReadAt;
 
-        this.userId = userId;
-        this.channelId = channelId;
-    }
+  public ReadStatus(UUID userId, UUID channelId) {
+    super();
 
-    public void updateLastReadAt() {
-        this.lastReadAt = Instant.now();
-    }
+    this.userId = userId;
+    this.channelId = channelId;
+  }
 
-    @Override
-    public String toString() {
-        return "ReadStatus{" +
-                "userId=" + userId +
-                ", channelId=" + channelId +
-                ", lastReadAt=" + lastReadAt +
-                ", id=" + id +
-                ", createdAt=" + createdAt +
-                '}';
-    }
+  public void updateLastReadAt(Instant newLastReadAt) {
+    this.lastReadAt = newLastReadAt;
+  }
+
+  @Override
+  public String toString() {
+    return "ReadStatus{" +
+        "userId=" + userId +
+        ", channelId=" + channelId +
+        ", lastReadAt=" + lastReadAt +
+        ", id=" + id +
+        ", createdAt=" + createdAt +
+        '}';
+  }
 }
