@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.core.message.usecase.crud;
 
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.UpdateMessageDTO;
-import java.util.UUID;
+import com.sprint.mission.discodeit.adapter.inbound.message.dto.UpdateMessageCommand;
 
 public interface UpdateMessageUseCase {
 
-  UUID update(UUID messageId, UpdateMessageDTO updateMessageDTO);
+  void update(UpdateMessageCommand command);
 
 }

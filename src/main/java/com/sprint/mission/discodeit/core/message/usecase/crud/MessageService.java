@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface MessageService extends CreateMessageUseCase, FindMessageUseCase,
+    UpdateMessageUseCase,
     DeleteMessageUseCase {
-
-//    void print(UUID channelId);
 
 }

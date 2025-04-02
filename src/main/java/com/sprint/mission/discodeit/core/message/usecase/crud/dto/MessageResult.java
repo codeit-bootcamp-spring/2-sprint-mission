@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.adapter.inbound.message.dto;
+package com.sprint.mission.discodeit.core.message.usecase.crud.dto;
 
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import lombok.Builder;
@@ -6,13 +6,13 @@ import lombok.Builder;
 import java.time.Instant;
 
 @Builder
-public record MessageFindDTO(
+public record MessageResult(
     String text,
     Instant createdAt
 ) {
 
-  public static MessageFindDTO create(Message message) {
-    return MessageFindDTO.builder()
+  public static MessageResult create(Message message) {
+    return MessageResult.builder()
         .text(message.getText())
         .createdAt(message.getCreatedAt())
         .build();

@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.adapter.inbound.message;
 
 import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateRequestDTO;
+import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageCreateCommand;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateResult;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageDisplayList;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageFindDTO;
+import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.usecase.crud.MessageService;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class MessageController {
   @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageCreateResult> create(
       @PathVariable UUID userId, @PathVariable UUID channelId,
-      @RequestPart("message") MessageCreateRequestDTO messageDTO,
+      @RequestPart("message") MessageCreateCommand messageDTO,
       @RequestPart(value = "profileImage", required = false) List<MultipartFile> files)
       throws IOException {
     List<Optional<BinaryContentCreateRequestDTO>> list = new ArrayList<>();
@@ -58,7 +58,7 @@ public class MessageController {
 
   @GetMapping
   public ResponseEntity<MessageDisplayList> findAll(@PathVariable UUID channelId) {
-    List<MessageFindDTO> list = messageService.findAllByChannelId(channelId);
+    List<MessageResult> list = messageService.findMessagesByChannelId(channelId);
     return ResponseEntity.ok(new MessageDisplayList(list));
   }
 

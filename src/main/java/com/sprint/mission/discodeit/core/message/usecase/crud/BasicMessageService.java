@@ -1,17 +1,21 @@
 package com.sprint.mission.discodeit.core.message.usecase.crud;
 
 import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageFindDTO;
+import com.sprint.mission.discodeit.adapter.inbound.message.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
+import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageCreateCommand;
+import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageListResult;
+import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageResult;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import java.util.List;
 import java.util.Optional;
@@ -31,54 +35,25 @@ public class BasicMessageService implements MessageService {
 
   @CustomLogging
   @Override
-  public Message create(UUID userId, UUID channelId, MessageCreateRequestDTO messageWriteDTO,
+  public Message create(MessageCreateCommand command,
       List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
-    User user = userRepositoryPort.findById(userId);
-    Channel channel = channelRepository.findByChannelId(channelId);
+    User user = userRepositoryPort.findById(command.userId()).orElseThrow(() ->
+        new UserNotFoundError("유저를 찾을 수 없습니다.")
+    );
+
+    Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
+        () -> new ChannelNotFoundException("채널을 찾을 수 없습니다.")
+    );
 
     List<UUID> binaryContentIdList = makeBinaryContent(binaryContentDTOs);
 
     Message message = Message.create(user.getId(), channel.getChannelId(),
-        messageWriteDTO.text());
+        command.text(), binaryContentIdList);
 
     messageRepositoryPort.save(message);
     return message;
   }
 
-  @Override
-  public MessageFindDTO find(UUID messageId) {
-    return MessageFindDTO.create(messageRepositoryPort.findById(messageId)
-        .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다.")));
-  }
-
-  @Override
-  public List<MessageFindDTO> findAllByChannelId(UUID channelId) {
-    List<Message> list = messageRepositoryPort.findAllByChannelId(channelId);
-    return list.stream().map(MessageFindDTO::create).toList();
-  }
-
-//  @CustomLogging
-//  @Override
-//  public UUID update(UUID messageId, UpdateMessageDTO updateMessageDTO) {
-//
-//    Message message = messageRepositoryPort.findById(messageId)
-//        .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
-//
-//    Message update = messageRepositoryPort.update(message, updateMessageDTO);
-//
-//    return update.getMessageId();
-//  }
-
-  @CustomLogging
-  @Override
-  public void delete(UUID messageId) {
-
-    Message message = messageRepositoryPort.findById(messageId)
-        .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
-
-    messageRepositoryPort.deleteById(messageId);
-    message.getAttachmentIds().forEach(binaryContentRepositoryPort::delete);
-  }
 
   private List<UUID> makeBinaryContent(
       List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
@@ -100,13 +75,37 @@ public class BasicMessageService implements MessageService {
     return content.getId();
   }
 
-//    @Override
-//    public void print(UUID channelId) {
-//        Channel channel = channelRepository.find(channelId);
-//        System.out.println(channel.getName());
-//        List<Message> messages = messageRepository.findAllByChannelId(channel.getChannelId());
-//        for (Message message : messages) {
-//            System.out.println(message.getUserName() + " : " + message.getText());
-//        }
-//    }
+  @Override
+  public MessageResult findMessageByMessageId(UUID messageId) {
+    return MessageResult.create(messageRepositoryPort.findById(messageId)
+        .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다.")));
+  }
+
+  @Override
+  public MessageListResult findMessagesByChannelId(UUID channelId) {
+    return new MessageListResult(
+        messageRepositoryPort.findAllByChannelId(channelId).stream().map(MessageResult::create)
+            .toList());
+  }
+
+  @CustomLogging
+  @Override
+  public void update(UpdateMessageCommand command) {
+
+    Message message = messageRepositoryPort.findById(command.messageId())
+        .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
+
+    message.update(command.replaceText(), null);
+  }
+
+  @CustomLogging
+  @Override
+  public void delete(UUID messageId) {
+
+    Message message = messageRepositoryPort.findById(messageId)
+        .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
+
+    messageRepositoryPort.deleteById(messageId);
+    message.getAttachmentIds().forEach(binaryContentRepositoryPort::delete);
+  }
 }

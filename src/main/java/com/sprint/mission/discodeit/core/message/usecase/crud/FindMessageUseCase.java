@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.core.message.usecase.crud;
 
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageFindDTO;
-import java.util.List;
+import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageResult;
+import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageListResult;
 import java.util.UUID;
 
 public interface FindMessageUseCase {
 
-  MessageFindDTO find(UUID messageId);
+  MessageResult findMessageByMessageId(UUID messageId);
 
-  List<MessageFindDTO> findAllByChannelId(UUID channelId);
+  MessageListResult findMessagesByChannelId(UUID channelId);
 
 }

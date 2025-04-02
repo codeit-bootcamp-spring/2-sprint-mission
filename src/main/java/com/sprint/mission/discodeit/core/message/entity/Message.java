@@ -38,8 +38,8 @@ public class Message implements Serializable {
     this.attachmentIds = attachmentIds;
   }
 
-  public static Message create(UUID userId, UUID channelId, String text) {
-    return new Message(userId, channelId, UUID.randomUUID(), Instant.now(), text, null);
+  public static Message create(UUID userId, UUID channelId, String text, List<UUID> attachmentIds) {
+    return new Message(userId, channelId, UUID.randomUUID(), Instant.now(), text, attachmentIds);
   }
 
   public void update(String newText, List<UUID> newAttachmentIds) {
@@ -57,7 +57,7 @@ public class Message implements Serializable {
     }
   }
 
-  //추후에 구현할 예정
+  //TODO. Message Validator 구현해야함
   public static class Validator {
 
     public static void validate(String text) {
