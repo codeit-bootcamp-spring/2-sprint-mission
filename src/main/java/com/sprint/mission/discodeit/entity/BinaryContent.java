@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class BinaryContent extends BaseEntity {
     private final String filePath;
@@ -11,6 +13,14 @@ public class BinaryContent extends BaseEntity {
 
     public BinaryContent(String filePath, String fileName, String fileType, long fileSize) {
         super();
+        this.filePath = filePath;
+        this.fileName = fileName;
+        this.fileType = fileType;
+        this.fileSize = fileSize;
+    }
+
+    public BinaryContent(UUID id, String filePath, String fileName, String fileType, long fileSize) {
+        super(id);
         this.filePath = filePath;
         this.fileName = fileName;
         this.fileType = fileType;

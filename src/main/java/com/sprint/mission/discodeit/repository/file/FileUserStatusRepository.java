@@ -2,8 +2,11 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.common.NoSuchIdException;
+import com.sprint.mission.discodeit.model.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Paths;
@@ -37,14 +40,14 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
     @Override
     public UserStatus findUserStatusByUserId(UUID userId) {
         if (!existsByUserId(userId)) {
-            throw new NoSuchElementException("해당 userId를 가진 userStatus를 찾을 수 없습니다 : " + userId);
+            throw new NoSuchIdException("해당 userId를 가진 userStatus를 찾을 수 없습니다 : " + userId, HttpStatus.NOT_FOUND);
         }
         return userIdMap.get(userId);
     }
 
     @Override
-    public void updateTimeById(UUID readStatusId, Instant updateTime) {
-        UserStatus findUserStatus = findUserStatusByUserId(readStatusId);
+    public void updateTimeById(UUID userStatusId, Instant updateTime) {
+        UserStatus findUserStatus = findUserStatusByUserId(userStatusId);
         findUserStatus.updateUpdatedAt(updateTime);
         super.saveToFile(directory.resolve(findUserStatus.getId().toString() + ".ser"), findUserStatus);    // file에 반영
     }
@@ -55,6 +58,14 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
         findUserStatus.updateUpdatedAt(updateTime);
         super.saveToFile(directory.resolve(findUserStatus.getId().toString() + ".ser"), findUserStatus);    // file에 반영
     }
+
+    @Override
+    public void updateUserStatusByUserId(UUID id, UserStatusType type) {
+        UserStatus findUserStatus = findUserStatusByUserId(id);
+        findUserStatus.setUserStatusType(type);
+        super.saveToFile(directory.resolve(findUserStatus.getId().toString() + ".ser"), findUserStatus);
+    }
+
 
     @Override
     public void deleteById(UUID userStatusId) {

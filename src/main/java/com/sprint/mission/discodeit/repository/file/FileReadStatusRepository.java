@@ -57,6 +57,13 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
     }
 
     @Override
+    public Optional<ReadStatus> findByUserIdChannelId(UUID userId, UUID channelId) {
+        return findByUserId(userId).stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .findFirst();
+    }
+
+    @Override
     public void updateReadTime(UUID readStatusId, Instant readTime) {
         ReadStatus findReadStatus = this.findById(readStatusId);
         findReadStatus.updateReadTime(readTime);

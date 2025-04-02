@@ -1,19 +1,20 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusFindResponse;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateByUserIdRequest;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.*;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.DuplicateUserIdException;
+import com.sprint.mission.discodeit.exception.common.NoSuchIdException;
+import com.sprint.mission.discodeit.exception.user.DuplicateUserIdException;
+import com.sprint.mission.discodeit.exception.userstatus.UpdateUserStatusException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -47,13 +48,24 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void updateUserStatus(UserStatusUpdateRequest userStatusUpdateRequest) {
-        this.userStatusRepository.updateTimeByUserId(userStatusUpdateRequest.readStatusId(), userStatusUpdateRequest.updateTime());
+    public void updateTimeById(UserStatusTimeUpdateRequest userStatusUpdateRequest) {
+        this.userStatusRepository.updateTimeById(userStatusUpdateRequest.userStatusId(), userStatusUpdateRequest.updateTime());
     }
 
     @Override
-    public void updateUserStatusByUserId(UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
-        this.userStatusRepository.updateTimeByUserId(userStatusUpdateByUserIdRequest.userId(), userStatusUpdateByUserIdRequest.updateTime());
+    public void updateTimeByUserId(UserStatusTimeUpdateByUserIdRequest userStatusTimeUpdateByUserIdRequest) {
+        this.userStatusRepository.updateTimeByUserId(userStatusTimeUpdateByUserIdRequest.userId(), userStatusTimeUpdateByUserIdRequest.updateTime());
+    }
+
+    @Override
+    public void updateUserStatusByUserId(UUID id, UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
+        try {
+            this.userStatusRepository.updateUserStatusByUserId(id, userStatusUpdateByUserIdRequest.type());
+        } catch (NoSuchIdException e) {
+            throw new UpdateUserStatusException(e.getMessage(), e.getStatus(), e);
+        } catch (Exception e) {
+            throw new UpdateUserStatusException("userStatus 업데이트 중 예상치 못한 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
     }
 
     @Override

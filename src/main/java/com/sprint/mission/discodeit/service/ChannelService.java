@@ -15,7 +15,7 @@ public interface ChannelService {
     ChannelReadResponse readChannel(UUID channelId);
     List<ChannelReadResponse> findAllByUserId(UUID userId);
     List<Message> readMessageListByChannelId(UUID channelId);
-    void updateChannel(ChannelUpdateRequest channelUpdateRequest);
+    void updateChannel(UUID id, ChannelUpdateRequest channelUpdateRequest);
     void addChannelParticipant(UUID channelId, UUID newParticipantId);
     void deleteChannel(UUID channelId);
     static void validateChannelId(UUID channelId, ChannelRepository jcfChannelRepository) {

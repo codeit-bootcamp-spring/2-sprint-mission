@@ -12,7 +12,7 @@ public interface UserService {
     UUID createUser(UserCreateRequest userCreateRequest);
     UserReadResponse readUser(UUID id);
     List<UserReadResponse> readAllUsers();
-    void updateUser(UserUpdateRequest userUpdateRequest);
+    void updateUser(UUID id, UserUpdateRequest userUpdateRequest);
     void deleteUser(UUID id);
     static void validateUserId(UUID userId, UserRepository jcfUserRepository) {
         if (!jcfUserRepository.existsById(userId)) {

@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.NoSuchUserEmailException;
+import com.sprint.mission.discodeit.exception.user.NoSuchUserNameException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -9,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Repository
@@ -77,7 +78,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     @Override
     public User findByUserName(String userName) {
         if (!existsByUserName(userName)) {
-            throw new NoSuchElementException("해당 userName을 가진 user 가 존재하지 않습니다.");
+            throw new NoSuchUserNameException(userName);
         }
         return usernames.get(userName);
     }
@@ -85,7 +86,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     @Override
     public User findByEmail(String email) {
         if (!existsByEmail(email)) {
-            throw new NoSuchElementException("해당 email을 가진 user 가 존재하지 않습니다.");
+            throw new NoSuchUserEmailException(email);
         }
         return emails.get(email);
     }

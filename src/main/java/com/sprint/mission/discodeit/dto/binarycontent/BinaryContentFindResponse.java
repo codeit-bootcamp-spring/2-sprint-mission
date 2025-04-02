@@ -6,7 +6,8 @@ public record BinaryContentFindResponse(
         UUID binaryId,
         String filePath,
         String fileName,
-        String fileType,
-        long fileSize
+        String contentType,
+        long fileSize,
+        String bytes        // base64로 인코딩된 이미지 바이트
 ) {
 }

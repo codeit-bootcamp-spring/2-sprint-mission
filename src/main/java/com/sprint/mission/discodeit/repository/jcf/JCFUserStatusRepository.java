@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.model.UserStatusType;
 import com.sprint.mission.discodeit.repository.AbstractRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -49,6 +50,11 @@ public class JCFUserStatusRepository  extends AbstractRepository<UserStatus> imp
     @Override
     public void updateTimeByUserId(UUID userId, Instant updateTime) {
         findUserStatusByUserId(userId).updateUpdatedAt(updateTime);
+    }
+
+    @Override
+    public void updateUserStatusByUserId(UUID id, UserStatusType type) {
+        findUserStatusByUserId(id).setUserStatusType(type);
     }
 
     @Override

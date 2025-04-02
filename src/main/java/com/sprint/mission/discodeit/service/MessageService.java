@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageReadResponse;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -12,8 +13,8 @@ import java.util.UUID;
 public interface MessageService {
     UUID createMessage(MessageCreateRequest messageCreateRequest);
     Message readMessage(UUID messageId);
-    List<Message> findAllByChannelId(UUID channelId);
-    void updateMessage(MessageUpdateRequest messageUpdateRequest);
+    List<MessageReadResponse> findAllByChannelId(UUID channelId);
+    void updateMessage(UUID id, MessageUpdateRequest messageUpdateRequest);
     void deleteBinaryContentInMessage(UUID messageId, UUID binaryContentId);
     void deleteMessage(UUID messageId);
     static void validateMessageId(UUID messageId, MessageRepository jcfMessageRepository) {

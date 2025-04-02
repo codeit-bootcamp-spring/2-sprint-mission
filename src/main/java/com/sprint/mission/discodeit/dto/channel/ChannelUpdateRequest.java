@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-import java.util.UUID;
+import jakarta.validation.constraints.NotBlank;
 
 public record ChannelUpdateRequest(
-        UUID channelId,
+        @NotBlank
         String channelName
 ) {
 }

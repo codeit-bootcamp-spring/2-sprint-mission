@@ -13,9 +13,17 @@ public class BaseEntity implements Serializable {
     private Instant updatedAt;
 
     public BaseEntity() {
-        id = UUID.randomUUID();
-        createdAt = Instant.now();
-        updatedAt = createdAt;
+        this(UUID.randomUUID(), Instant.now());
+    }
+
+    public BaseEntity(UUID id) {
+        this(id, Instant.now());
+    }
+
+    public BaseEntity(UUID id, Instant createdAt) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.updatedAt = createdAt;
     }
 
     public void updateUpdatedAt() {
