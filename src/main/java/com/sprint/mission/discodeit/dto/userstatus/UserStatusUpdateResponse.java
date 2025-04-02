@@ -10,7 +10,7 @@ public record UserStatusUpdateResponse(
     Instant updatedAt,
     UUID userId,
     Instant lastActiveAt,
-    boolean isOnline
+    boolean online
 ) {
 
   public static UserStatusUpdateResponse fromEntity(UserStatus userStatus) {

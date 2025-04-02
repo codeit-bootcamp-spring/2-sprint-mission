@@ -38,7 +38,8 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new IllegalArgumentException("해당 유저의 해당 채널 ReadStatus 이미 존재");
     }
 
-    ReadStatus readStatus = new ReadStatus(requestDto.userId(), requestDto.channelId());
+    ReadStatus readStatus = new ReadStatus(requestDto.userId(), requestDto.channelId(),
+        requestDto.lastReadAt());
     return readStatusRepository.save(readStatus);
   }
 

@@ -135,7 +135,7 @@ public class BasicChannelService implements ChannelService {
 
   private void createParticipantReadStatuses(List<UUID> participantIds, UUID channelId) {
     participantIds.forEach(userId ->
-        readStatusRepository.save(new ReadStatus(userId, channelId)));
+        readStatusRepository.save(new ReadStatus(userId, channelId, Instant.MIN)));
   }
 
   private List<UUID> getParticipantIds(Channel channel) {
