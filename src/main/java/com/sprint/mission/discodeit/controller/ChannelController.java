@@ -47,9 +47,11 @@ public class ChannelController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  @PutMapping
-  public ResponseEntity<Channel> update(@RequestBody ChannelUpdateRequest request) {
-    Channel response = channelService.update(request);
+  @PatchMapping("/{channelId}")
+  public ResponseEntity<Channel> update(
+      @PathVariable("channelId") UUID channelId,
+      @RequestBody ChannelUpdateRequest channelUpdateRequest) {
+    Channel response = channelService.update(channelId, channelUpdateRequest);
     return ResponseEntity.ok(response);
   }
 
