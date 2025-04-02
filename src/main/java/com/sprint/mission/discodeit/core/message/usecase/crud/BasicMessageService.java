@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
-import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageCreateCommand;
+import com.sprint.mission.discodeit.core.message.usecase.crud.dto.CreateMessageCommand;
 import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageListResult;
 import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageResult;
 import com.sprint.mission.discodeit.core.user.entity.User;
@@ -35,7 +35,7 @@ public class BasicMessageService implements MessageService {
 
   @CustomLogging
   @Override
-  public Message create(MessageCreateCommand command,
+  public Message create(CreateMessageCommand command,
       List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
     User user = userRepositoryPort.findById(command.userId()).orElseThrow(() ->
         new UserNotFoundError("유저를 찾을 수 없습니다.")
@@ -95,7 +95,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepositoryPort.findById(command.messageId())
         .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
 
-    message.update(command.replaceText(), null);
+    message.update(command.newText(), null);
   }
 
   @CustomLogging

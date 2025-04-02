@@ -118,8 +118,8 @@ public class FileMessageRepository implements MessageRepositoryPort {
 //
 //    @Override
 //    public Message update(Message message,  UpdateMessageDTO updateMessageDTO) {
-//        if (updateMessageDTO.replaceText() != null) {
-//            message.setText(updateMessageDTO.replaceText());
+//        if (updateMessageDTO.newText() != null) {
+//            message.setText(updateMessageDTO.newText());
 //        }
 //        fileRepository.save(messageList);
 //        return message;
