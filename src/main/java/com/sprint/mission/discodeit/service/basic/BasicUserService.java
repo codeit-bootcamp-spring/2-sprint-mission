@@ -111,6 +111,11 @@ public class BasicUserService implements UserService {
     @Override
     public void delete(UUID userId) {
         User user = userRepository.findById(userId);
+
+        if (user == null) {
+            throw new UserNotFoundException(userId + " 유저를 찾을 수 없습니다.");
+        }
+
         userRepository.delete(user.getId());
 
         UserStatus userStatus = userStatusService.findById(user.getId());
