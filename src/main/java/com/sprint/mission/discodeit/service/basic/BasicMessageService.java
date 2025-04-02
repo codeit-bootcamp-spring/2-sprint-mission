@@ -38,16 +38,21 @@ public class BasicMessageService implements MessageService {
             throw new ChannelNotFoundException("Message 생성 실패: " + e.getMessage());
         }
 
-        List<UUID> attachmentIds = binaryContentCreateDtos.stream()
-                .map(attachmentRequest -> {
-                    String fileName = attachmentRequest.fileName();
-                    String contentType = attachmentRequest.contentType();
-                    byte[] bytes = attachmentRequest.bytesImage();
+        List<BinaryContent> binaryContents = binaryContentCreateDtos.stream()
+                .map(dto -> new BinaryContent(
+                        dto.fileName(),
+                        (long) dto.bytesImage().length,
+                        dto.contentType(),
+                        dto.bytesImage()
+                ))
+                .toList();
 
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
-                    return createdBinaryContent.getId();
-                })
+        List<BinaryContent> savedBinaryContents = binaryContents.stream()
+                .map(binaryContentRepository::save)
+                .toList();
+
+        List<UUID> attachmentIds = savedBinaryContents.stream()
+                .map(BinaryContent::getId)
                 .toList();
 
         Message newMessage = new Message(messageCreateDto.authorId(), messageCreateDto.channelId(),
