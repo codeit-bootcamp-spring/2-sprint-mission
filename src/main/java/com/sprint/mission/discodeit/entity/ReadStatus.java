@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class ReadStatus implements Serializable {
+public class ReadStatus implements Serializable, Identifiable {
     private final UUID id;
     private final UUID userId;
     private final UUID channelId;

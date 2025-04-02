@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.service.userStatus.CreatedUserStatusParam;
-import com.sprint.mission.discodeit.dto.service.userStatus.UpdateUserStatusParam;
-import com.sprint.mission.discodeit.dto.service.userStatus.UserStatusDTO;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,43 +18,36 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public UserStatusDTO create(CreatedUserStatusParam createdUserStatusParam) {
-        checkUserExists(createdUserStatusParam);
-        checkDuplicateUser(createdUserStatusParam);
-        UserStatus userStatus = createUserStatusEntity(createdUserStatusParam);
-        userStatusRepository.save(userStatus);
-        return userStatusEntityToDTO(userStatus);
+    public UserStatus create(UserStatus userStatus) {
+        checkUserExists(userStatus);
+        checkDuplicateUser(userStatus);
+        return userStatusRepository.save(userStatus);
     }
 
     @Override
-    public UserStatusDTO findById(UUID id) {
-        UserStatus userStatus = findUserStatusById(id);
-        return userStatusEntityToDTO(userStatus);
+    public UserStatus findById(UUID id) {
+        return findUserStatusById(id);
     }
 
     @Override
-    public List<UserStatusDTO> findAll() {
+    public UserStatus findByUserId(UUID userId) {
+        return findUserStatusByUserId(userId);
+    }
+
+    @Override
+    public List<UserStatus> findAll() {
         List<UserStatus> userStatuses = userStatusRepository.findAll();
-        return userStatuses.stream()
-                .map(us -> userStatusEntityToDTO(us))
-                .toList();
+        return userStatuses;
     }
 
     @Override
-    public UUID update(UpdateUserStatusParam updateUserStatusParam) {
-        UserStatus userStatus = findUserStatusById(updateUserStatusParam.id());
+    public UserStatus updateByUserId(UUID userId) {
+        UserStatus userStatus = findUserStatusByUserId(userId);
         userStatus.updateUserStatus();
-        userStatusRepository.save(userStatus);
-        return userStatus.getId();
-    }
-
-    @Override
-    public UUID updateByUserId(UUID userId, UpdateUserStatusParam updateUserStatusParam) {
-        UserStatus userStatus = findUserStatusById(updateUserStatusParam.id());
-        userStatus.updateUserStatus();
-        return userStatus.getId();
+        return userStatusRepository.save(userStatus);
     }
 
     @Override
@@ -63,34 +55,40 @@ public class BasicUserStatusService implements UserStatusService {
         userStatusRepository.deleteById(id);
     }
 
-    private void checkUserExists(CreatedUserStatusParam createdUserStatusParam) {
-        userRepository.findById(createdUserStatusParam.userId())
-                .orElseThrow(() -> RestExceptions.USER_NOT_FOUND);
+    @Override
+    public void deleteByUserId(UUID userId) {
+        userStatusRepository.deleteByUserId(userId);
     }
 
-    private void checkDuplicateUser(CreatedUserStatusParam createdUserStatusParam) {
-        if (userStatusRepository.existsByUserId(createdUserStatusParam.userId())) {
+    private void checkUserExists(UserStatus userStatus) {
+        userRepository.findById(userStatus.getUserId())
+                .orElseThrow(() -> {
+                    logger.error("유저상태 생성 중 유저 찾기 실패: {}", userStatus.getUserId());
+                    return RestExceptions.USER_NOT_FOUND;
+                });
+    }
+
+    private void checkDuplicateUser(UserStatus userStatus) {
+        if (userStatusRepository.existsByUserId(userStatus.getUserId())) {
+            logger.error("유저상태 생성 중 유저상태 중복 발생: {}", userStatus.getId());
             throw RestExceptions.DUPLICATE_USER_STATUS;
         }
     }
 
-    private UserStatus createUserStatusEntity(CreatedUserStatusParam createdUserStatusParam) {
-        return UserStatus.builder()
-                .userId(createdUserStatusParam.userId())
-                .build();
-    }
 
-    private UserStatusDTO userStatusEntityToDTO(UserStatus userStatus) {
-        return UserStatusDTO.builder()
-                .cratedAt(userStatus.getCreatedAt())
-                .id(userStatus.getUserId())
-                .updatedAt(userStatus.getUpdatedAt())
-                .userId(userStatus.getUserId())
-                .build();
+    private UserStatus findUserStatusByUserId(UUID userId) {
+        return userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> {
+                    logger.error("유저상태 조회 실패 - userId: {}", userId);
+                    return RestExceptions.USER_STATUS_NOT_FOUND;
+                });
     }
 
     private UserStatus findUserStatusById(UUID id) {
         return userStatusRepository.findById(id)
-                .orElseThrow(() -> RestExceptions.USER_STATUS_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("유저상태 조회 실패: {}", id);
+                    return RestExceptions.USER_STATUS_NOT_FOUND;
+                });
     }
 }

@@ -19,20 +19,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileMessageRepository implements MessageRepository, FileRepository<Message> {
+public class FileMessageRepository implements MessageRepository {
     private final Path directory;
     private final Map<UUID, Message> messageMap;
+    private final FileRepository<Message> fileRepository;
 
-    public FileMessageRepository(@Value("${discodeit.repository.file-directory}") String fileDir) {
+    public FileMessageRepository(@Value("${discodeit.repository.file-directory}") String fileDir, FileRepository<Message> fileRepository) {
         this.directory = Paths.get(System.getProperty("user.dir"), fileDir, "messages");
         SerializationUtil.init(directory);
+        this.fileRepository = fileRepository;
         messageMap = new ConcurrentHashMap<>();
         loadCacheFromFile();
     }
 
     @Override
     public Message save(Message message) {
-        saveToFile(message);
+        fileRepository.saveToFile(message,directory);
         messageMap.put(message.getId(), message);
         return message;
     }
@@ -69,34 +71,12 @@ public class FileMessageRepository implements MessageRepository, FileRepository<
 
     @Override
     public void deleteById(UUID id) {
-        deleteFileById(id);
+        fileRepository.deleteFileById(id, directory);
         messageMap.remove(id);
     }
 
-    @Override
-    public void saveToFile(Message message) {
-        Path filePath = directory.resolve(message.getId() + ".ser");
-        SerializationUtil.init(directory);
-        SerializationUtil.serialization(filePath, message);
-    }
-
-    @Override
-    public List<Message> loadAllFromFile() {
-        return SerializationUtil.reverseSerialization(directory);
-    }
-
-    @Override
-    public void deleteFileById(UUID id) {
-        Path filePath = directory.resolve(id + ".ser");
-        try {
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            System.out.println("메시지 파일 삭제 예외 발생 : " + e.getMessage());
-        }
-    }
-
     private void loadCacheFromFile() {
-        List<Message> messages = loadAllFromFile();
+        List<Message> messages = fileRepository.loadAllFromFile(directory);
         for (Message message : messages) {
             messageMap.put(message.getId(), message);
         }

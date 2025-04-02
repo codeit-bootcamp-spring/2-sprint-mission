@@ -2,13 +2,14 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class User implements Serializable {
+public class User implements Serializable, Identifiable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
     private UUID profileId;
@@ -18,7 +19,6 @@ public class User implements Serializable {
     private String email;
     private String password;
 
-    private static final UUID DEFAULT_PROFILE_ID = UUID.fromString("00000000-0000-0000-0000-000000000000"); // 기본 프로필 이미지 ID
 
     // 클래스가 아니라 생성자에 붙여야 해당 값들에 대해 build가 가능
     // 클래스에 붙이면 모든 필드에 대해 build를 해줘야함 (안하면 null)
@@ -26,7 +26,8 @@ public class User implements Serializable {
     @Builder
     public User(String username, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
-        this.profileId = profileId == null ? DEFAULT_PROFILE_ID : profileId;
+        this.profileId = profileId;
+        this.updatedAt = Instant.now();
         this.createdAt = Instant.now();
         this.username = username;
         this.email = email;
@@ -45,7 +46,7 @@ public class User implements Serializable {
             anyValueUpdated = true;
         }
         if (newPassword != null && !newPassword.equals(this.password)) {
-            this.password = newPassword;
+            this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
             anyValueUpdated = true;
         }
 
@@ -55,12 +56,12 @@ public class User implements Serializable {
     }
 
     public void updateProfile(UUID profileId) {
-        UUID newProfileId = profileId == null ? DEFAULT_PROFILE_ID : profileId;
+        this.profileId = profileId;
+        this.updatedAt = Instant.now();
+    }
 
-        if(!this.profileId.equals(profileId)) {
-            this.profileId = newProfileId;
-            this.updatedAt = Instant.now();
-        }
+    public void updateProfileDefault() {
+        this.profileId = null;
     }
 
 }

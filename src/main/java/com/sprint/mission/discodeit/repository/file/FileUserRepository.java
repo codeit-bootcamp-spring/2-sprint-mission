@@ -18,20 +18,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileUserRepository implements FileRepository<User>, UserRepository {
+public class FileUserRepository implements UserRepository {
     private final Path directory;
     private final Map<UUID, User> userMap;
+    private final FileRepository<User> fileRepository;
 
-    public FileUserRepository(@Value("${discodeit.repository.file-directory}") String fileDir) {
+    public FileUserRepository(@Value("${discodeit.repository.file-directory}") String fileDir, FileRepository<User> fileRepository) {
         this.directory = Paths.get(System.getProperty("user.dir"), fileDir, "users");
         SerializationUtil.init(directory);
+        this.fileRepository = fileRepository;
         userMap = new ConcurrentHashMap<>();
         loadCacheFromFile();
     }
 
     @Override
     public User save(User user) {
-        saveToFile(user);
+        fileRepository.saveToFile(user, directory);
         userMap.put(user.getId(), user);
         return user;
     }
@@ -67,35 +69,12 @@ public class FileUserRepository implements FileRepository<User>, UserRepository 
 
     @Override
     public void deleteById(UUID id) {
-        deleteFileById(id);
+        fileRepository.deleteFileById(id, directory);
         userMap.remove(id);
     }
 
-    @Override
-    public void saveToFile(User user) {
-        Path filePath = directory.resolve(user.getId() + ".ser");
-        SerializationUtil.init(directory);
-        SerializationUtil.serialization(filePath, user);
-    }
-
-
-    @Override
-    public List<User> loadAllFromFile() {
-        return SerializationUtil.reverseSerialization(directory);
-    }
-
-    @Override
-    public void deleteFileById(UUID id) {
-        Path filePath = directory.resolve(id + ".ser");
-        try {
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            System.out.println("유저 파일 삭제 예외 발생 : " + e.getMessage());
-        }
-    }
-
     private void loadCacheFromFile() {
-        List<User> users = loadAllFromFile();
+        List<User> users = fileRepository.loadAllFromFile(directory);
         for (User user : users) {
             userMap.put(user.getId(), user);
         }

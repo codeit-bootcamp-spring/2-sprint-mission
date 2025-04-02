@@ -1,18 +1,14 @@
-package com.sprint.mission.discodeit.dto.service.binaryContent;
-
-import lombok.Builder;
+package com.sprint.mission.discodeit.dto.service.binarycontent;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Builder
 public record BinaryContentDTO(
         UUID id,
         Instant createdAt,
         String filename,
-        String path,
         long size,
-        String type,
+        String contentType,
         byte[] bytes
 ) {
 }

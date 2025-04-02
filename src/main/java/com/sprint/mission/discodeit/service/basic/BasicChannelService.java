@@ -1,18 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.service.channel.ChannelDTO;
-import com.sprint.mission.discodeit.dto.service.channel.CreateChannelParam;
-import com.sprint.mission.discodeit.dto.service.channel.FindChannelDTO;
-import com.sprint.mission.discodeit.dto.service.channel.UpdateChannelParam;
+import com.sprint.mission.discodeit.dto.service.channel.*;
 import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusParam;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,22 +24,22 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusService readStatusService;
     private final MessageRepository messageRepository;
+    private final ChannelMapper channelMapper;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public ChannelDTO createPublicChannel(CreateChannelParam createChannelParam) {
-        validateChannelField(createChannelParam);
         Channel channel = createPublicChannelEntity(createChannelParam);
         channelRepository.save(channel);
-        return channelEntityToDTO(channel);
+        return channelMapper.toChannelDTO(channel);
     }
 
     @Override
-    public ChannelDTO createPrivateChannel(List<UUID> userIds, CreateChannelParam createChannelParam) {
-        validateChannelField(createChannelParam);
-        Channel channel = createPrivateChannelEntity(createChannelParam);
+    public PrivateChannelDTO createPrivateChannel(CreatePrivateChannelParam createPrivateChannelParam) {
+        Channel channel = createPrivateChannelEntity(createPrivateChannelParam);
         channelRepository.save(channel);
-        createReadStatusesForUsers(userIds, channel.getId());
-        return channelEntityToDTO(channel);
+        createReadStatusesForUsers(createPrivateChannelParam.userIds(), channel.getId());
+        return channelMapper.toPrivateChannelDTO(createPrivateChannelParam.userIds(), channel);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = findChannelById(channelId);
         Instant latestMessageTime = findMessageLatestTimeInChannel(channelId);
         List<UUID> userIds = getUserIdsFromChannel(channel);
-        return channelEntityToFindDTO(channel, latestMessageTime, userIds);
+        return channelMapper.toFindChannelDTO(channel, latestMessageTime, userIds);
     }
 
     // PRIVATE의 경우, 참여한 User의 id정보를 포함해야함
@@ -59,21 +59,23 @@ public class BasicChannelService implements ChannelService {
         List<Channel> channels = channelRepository.findAll();
         return channels.stream()
                 .filter(ch -> ch.getType() == ChannelType.PUBLIC || getUserIdsFromChannel(ch).contains(userId))
-                .map(ch -> channelEntityToFindDTO(ch,
+                .map(ch -> channelMapper.toFindChannelDTO(ch,
                         findMessageLatestTimeInChannel(ch.getId()),
                         getUserIdsFromChannel(ch)))
                 .toList();
     }
 
+
     @Override
-    public UUID update(UpdateChannelParam updateChannelParam) {
-        Channel channel = findChannelById(updateChannelParam.id());
+    public UpdateChannelDTO update(UUID id, UpdateChannelParam updateChannelParam) {
+        Channel channel = findChannelById(id);
         if(channel.getType() == ChannelType.PRIVATE) {
+            logger.error("채널 수정 실패 - ID: {}, Type: {} (PRIVATE 채널은 수정 불가)", id, channel.getType());
             throw RestExceptions.UNAUTHORIZED_PRIVATE_CHANNEL;
         }
         channel.update(updateChannelParam.name(), updateChannelParam.description());
-        channelRepository.save(channel);
-        return channel.getId();
+        Channel updatedChannel = channelRepository.save(channel);
+        return channelMapper.toUpdateChannelDTO(updatedChannel);
     }
 
     @Override
@@ -83,58 +85,25 @@ public class BasicChannelService implements ChannelService {
         channelRepository.deleteById(channelId);
     }
 
-    private void validateChannelField(CreateChannelParam createChannelParam) {
-        if (createChannelParam.type() == null || createChannelParam.name() == null || createChannelParam.name().isBlank() || createChannelParam.description() == null || createChannelParam.description().isBlank()) {
-            throw RestExceptions.BAD_REQUEST;
-        }
-    }
 
     private Channel createPublicChannelEntity(CreateChannelParam createChannelParam) {
-        return Channel.builder()
-                .type(createChannelParam.type())
-                .description(createChannelParam.description())
-                .name(createChannelParam.name())
-                .build();
+        return Channel.ofPublic(createChannelParam.type(),
+                createChannelParam.name(),
+                createChannelParam.description());
     }
 
     // private이므로 name과 description 생략 -> null
-    private Channel createPrivateChannelEntity(CreateChannelParam createChannelParam) {
-        return Channel.builder()
-                .type(createChannelParam.type())
-                .build();
+    private Channel createPrivateChannelEntity(CreatePrivateChannelParam createPrivateChannelParam) {
+        return Channel.ofPrivate(createPrivateChannelParam.type());
     }
 
-    private ChannelDTO channelEntityToDTO(Channel channel) {
-        return ChannelDTO.builder()
-                .id(channel.getId())
-                .updatedAt(channel.getUpdatedAt())
-                .createdAt(channel.getCreatedAt())
-                .description(channel.getDescription())
-                .name(channel.getName())
-                .type(channel.getType())
-                .build();
-    }
 
     private void createReadStatusesForUsers(List<UUID> userIds, UUID channelId) {
         List<CreateReadStatusParam> createReadStatusParams = userIds.stream()
-                        .map(userId -> CreateReadStatusParam.builder()
-                                .userId(userId)
-                                .channelId(channelId) // userId와 channelId를 사용하여 createReadStatus DTO 생성
-                                .build())
+                        .map(userId -> new CreateReadStatusParam(userId, channelId)) // userId와 channelId를 사용하여 createReadStatus DTO 생성
                         .toList();
         // DTO를 이용해 readStatus 생성
         createReadStatusParams.forEach(cr -> readStatusService.create(cr));
-    }
-
-    private FindChannelDTO channelEntityToFindDTO(Channel channel, Instant latestMessageTime, List<UUID> userIds) {
-        return FindChannelDTO.builder()
-                .id(channel.getId())
-                .description(channel.getDescription())
-                .name(channel.getName())
-                .type(channel.getType())
-                .lastMessageAt(latestMessageTime)
-                .userIds(userIds)
-                .build();
     }
 
     // PRIVATE 채널일때만 userId 가져오고 아닐떈 빈리스트 반환
@@ -150,12 +119,22 @@ public class BasicChannelService implements ChannelService {
 
     private Channel findChannelById(UUID id) {
         return channelRepository.findById(id)
-                .orElseThrow(() -> RestExceptions.CHANNEL_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("채널 찾기 실패: {}", id);
+                    return RestExceptions.CHANNEL_NOT_FOUND;
+                });
     }
 
     private Instant findMessageLatestTimeInChannel(UUID channelId) {
+        // 채널에 메시지가 없다면 null 반환
+        if(messageRepository.findAllByChannelId(channelId).isEmpty()) {
+            return null;
+        }
         return messageRepository.findLatestMessageTimeByChannelId(channelId)
-                .orElseThrow(() -> RestExceptions.MESSAGE_NOT_FOUND);
+                .orElseThrow(() -> {
+                    logger.error("채널 내 메시지 찾기 실패 - channelId: {}", channelId);
+                    return RestExceptions.MESSAGE_NOT_FOUND;
+                });
     }
 
 

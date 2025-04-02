@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.dto.service.message;
 
-import lombok.Builder;
+import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-@Builder
+
 public record MessageDTO(
         UUID id,
         Instant createdAt,
@@ -14,6 +14,6 @@ public record MessageDTO(
         List<UUID> attachmentIds,
         String content,
         UUID channelId,
-        UUID authorId
+        UserDTO userDTO
 ) {
 }
