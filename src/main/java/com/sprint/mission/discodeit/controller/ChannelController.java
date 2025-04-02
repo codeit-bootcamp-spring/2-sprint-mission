@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PublicChannelRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -60,7 +61,8 @@ public class ChannelController {
           @ExampleObject(value = "{channelId}에 해당하는 Channel이 없음")
       }))
   @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
-  public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
+  public ResponseEntity<Void> delete(
+      @PathVariable @Parameter(description = "삭제할 Channel ID") UUID channelId) {
     channelService.delete(channelId);
     return ResponseEntity.noContent().build();
   }
@@ -78,7 +80,8 @@ public class ChannelController {
           @ExampleObject(value = "{channelId}에 해당하는 Channel이 없음")
       }))
   @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
-  public ResponseEntity<ChannelResponse> updatePublic(@PathVariable UUID channelId,
+  public ResponseEntity<ChannelResponse> updatePublic(
+      @PathVariable @Parameter(description = "수정할 Channel ID") UUID channelId,
       @RequestBody ChannelUpdateRequest request) {
     Channel channel = channelService.update(channelId, request);
     return ResponseEntity.ok(ChannelResponse.of(channel));
@@ -89,7 +92,8 @@ public class ChannelController {
   @ApiResponse(responseCode = "200", description = "Channel 목록 조회 성공",
       content = @Content(mediaType = "*/*", schema = @Schema(implementation = ChannelByUserIdResponse.class)))
   @RequestMapping(method = RequestMethod.GET)
-  public ResponseEntity<List<ChannelByUserIdResponse>> findAllByUserId(@RequestParam UUID userId) {
+  public ResponseEntity<List<ChannelByUserIdResponse>> findAllByUserId(
+      @RequestParam @Parameter(description = "조회할 User ID") UUID userId) {
     List<ChannelByUserIdResponse> response = channelService.findAllByUserId(userId);
     return ResponseEntity.ok(response);
   }
