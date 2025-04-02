@@ -16,56 +16,57 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/channel")
+@RequestMapping("/api/channels")
 public class ChannelController {
-    private final ChannelService channelService;
 
-    @RequestMapping(value = "/public", method = RequestMethod.POST)
-    private ResponseEntity<ChannelDto> createPublicChannel(
-            @RequestBody PublicChannelCreateRequest publicChannelCreateRequest
-    ) {
-        Channel createPublicChannel = channelService.create(publicChannelCreateRequest);
-        ChannelDto channelDto = channelService.find(createPublicChannel.getId());
+  private final ChannelService channelService;
 
-        return new ResponseEntity<>(channelDto, HttpStatus.CREATED);
-    }
+  @PostMapping("/public")
+  private ResponseEntity<ChannelDto> createPublicChannel(
+      @RequestBody PublicChannelCreateRequest publicChannelCreateRequest
+  ) {
+    Channel createPublicChannel = channelService.create(publicChannelCreateRequest);
+    ChannelDto channelDto = channelService.find(createPublicChannel.getId());
 
-    @RequestMapping(value = "/private", method = RequestMethod.POST)
-    private ResponseEntity<ChannelDto> createPrivateChannel(
-            @RequestBody PrivateChannelCreateRequest privateChannelCreateRequest
-    ) {
-        Channel createPrivateChannel = channelService.create(privateChannelCreateRequest);
-        ChannelDto channelDto = channelService.find(createPrivateChannel.getId());
+    return new ResponseEntity<>(channelDto, HttpStatus.CREATED);
+  }
 
-        return new ResponseEntity<>(channelDto, HttpStatus.CREATED);
-    }
+  @PostMapping("/private")
+  private ResponseEntity<ChannelDto> createPrivateChannel(
+      @RequestBody PrivateChannelCreateRequest privateChannelCreateRequest
+  ) {
+    Channel createPrivateChannel = channelService.create(privateChannelCreateRequest);
+    ChannelDto channelDto = channelService.find(createPrivateChannel.getId());
 
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    private ResponseEntity<ChannelDto> updatePublicChannel(
-            @RequestParam UUID channelId,
-            @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
+    return new ResponseEntity<>(channelDto, HttpStatus.CREATED);
+  }
 
-        Channel updatePublicChannel = channelService.update(channelId, publicChannelUpdateRequest);
-        ChannelDto channelDto = channelService.find(updatePublicChannel.getId());
+  @PutMapping("/{channelId}")
+  private ResponseEntity<ChannelDto> updatePublicChannel(
+      @PathVariable UUID channelId,
+      @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
 
-        return new ResponseEntity<>(channelDto, HttpStatus.OK);
-    }
+    Channel updatePublicChannel = channelService.update(channelId, publicChannelUpdateRequest);
+    ChannelDto channelDto = channelService.find(updatePublicChannel.getId());
 
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    private ResponseEntity<Void> deleteChannel(
-            @RequestParam UUID channelId){
+    return new ResponseEntity<>(channelDto, HttpStatus.OK);
+  }
 
-        channelService.delete(channelId);
+  @DeleteMapping("/{channelId}")
+  private ResponseEntity<Void> deleteChannel(
+      @PathVariable UUID channelId) {
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+    channelService.delete(channelId);
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
-    private ResponseEntity<List<ChannelDto>> getChannelByUser(
-            @RequestParam UUID userId) {
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
 
-        List<ChannelDto> channelDtos = channelService.findAllByUserId(userId);
+  @GetMapping("/users/{userId}")
+  private ResponseEntity<List<ChannelDto>> getChannelByUser(
+      @PathVariable UUID userId) {
 
-        return new ResponseEntity<>(channelDtos, HttpStatus.OK);
-    }
+    List<ChannelDto> channelDtos = channelService.findAllByUserId(userId);
+
+    return new ResponseEntity<>(channelDtos, HttpStatus.OK);
+  }
 }

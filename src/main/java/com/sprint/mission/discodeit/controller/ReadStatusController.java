@@ -17,33 +17,33 @@ import java.util.UUID;
 @RequestMapping("/api/readStatus")
 public class ReadStatusController {
 
-    private final BasicReadStatusService readStatusService;
+  private final BasicReadStatusService readStatusService;
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<ReadStatus> createReadStatus(
-            @RequestBody ReadStatusCreateRequest readStatusCreateRequest) {
+  @PostMapping
+  public ResponseEntity<ReadStatus> createReadStatus(
+      @RequestBody ReadStatusCreateRequest readStatusCreateRequest) {
 
-        ReadStatus createdReadStatus = readStatusService.create(readStatusCreateRequest);
+    ReadStatus createdReadStatus = readStatusService.create(readStatusCreateRequest);
 
-        return new ResponseEntity<>(createdReadStatus, HttpStatus.CREATED);
-    }
+    return new ResponseEntity<>(createdReadStatus, HttpStatus.CREATED);
+  }
 
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public ResponseEntity<ReadStatus> updateReadStatus(
-            @RequestParam UUID readStatusId,
-            @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
+  @PutMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatus> updateReadStatus(
+      @PathVariable UUID readStatusId,
+      @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
 
-        ReadStatus updatedReadStatus = readStatusService.update(readStatusId, readStatusUpdateRequest);
+    ReadStatus updatedReadStatus = readStatusService.update(readStatusId, readStatusUpdateRequest);
 
-        return new ResponseEntity<>(updatedReadStatus, HttpStatus.OK);
-    }
+    return new ResponseEntity<>(updatedReadStatus, HttpStatus.OK);
+  }
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ResponseEntity<List<ReadStatus>> getReadStatusByUser(
-            @RequestParam UUID userId) {
+  @GetMapping("/users/{userId}")
+  public ResponseEntity<List<ReadStatus>> getReadStatusByUser(
+      @PathVariable UUID userId) {
 
-        List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
 
-        return new ResponseEntity<>(readStatuses, HttpStatus.OK);
-    }
+    return new ResponseEntity<>(readStatuses, HttpStatus.OK);
+  }
 }

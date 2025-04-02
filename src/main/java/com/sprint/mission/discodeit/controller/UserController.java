@@ -20,78 +20,79 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
-    private final UserService userService;
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<UserDto> createUser(
-            @RequestParam("user") String userJson,
-            @RequestParam("profile") Optional<MultipartFile> profileFile) throws IOException {
+  private final UserService userService;
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        UserCreateRequest userCreateRequest = objectMapper.readValue(userJson, UserCreateRequest.class);
+  @PostMapping("/create")
+  public ResponseEntity<UserDto> createUser(
+      @RequestParam("userCreateRequest") String userJson,
+      @RequestParam("profile") Optional<MultipartFile> profileFile) throws IOException {
 
-        Optional<BinaryContentCreateRequest> profileCreateRequest = profileFile.map(file -> {
-            try {
-                return new BinaryContentCreateRequest(
-                        file.getOriginalFilename(),
-                        file.getContentType(),
-                        file.getBytes()
-                );
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+    ObjectMapper objectMapper = new ObjectMapper();
+    UserCreateRequest userCreateRequest = objectMapper.readValue(userJson, UserCreateRequest.class);
 
-        User createdUser = userService.create(userCreateRequest, profileCreateRequest);
-        UserDto userDto = userService.find(createdUser.getId());
+    Optional<BinaryContentCreateRequest> profileCreateRequest = profileFile.map(file -> {
+      try {
+        return new BinaryContentCreateRequest(
+            file.getOriginalFilename(),
+            file.getContentType(),
+            file.getBytes()
+        );
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
 
-        return new ResponseEntity<>(userDto, HttpStatus.CREATED);
-    }
+    User createdUser = userService.create(userCreateRequest, profileCreateRequest);
+    UserDto userDto = userService.find(createdUser.getId());
 
-    @RequestMapping(value = "/update/", method = RequestMethod.PUT)
-    private ResponseEntity<UserDto> updateUser(
-            @RequestParam UUID userId,
-            @RequestParam("userUpdate") String userJson,
-            @RequestParam("profile") Optional<MultipartFile> profileFile) throws IOException {
+    return new ResponseEntity<>(userDto, HttpStatus.CREATED);
+  }
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        UserUpdateRequest userUpdateRequest = objectMapper.readValue(userJson, UserUpdateRequest.class);
+  @PutMapping("/{userId}")
+  private ResponseEntity<UserDto> updateUser(
+      @PathVariable UUID userId,
+      @RequestParam("userUpdateRequest") String userJson,
+      @RequestParam("profile") Optional<MultipartFile> profileFile) throws IOException {
 
-        Optional<BinaryContentCreateRequest> profileCreateRequest = profileFile.map(file -> {
-            try {
-                return new BinaryContentCreateRequest(
-                        file.getOriginalFilename(),
-                        file.getContentType(),
-                        file.getBytes()
-                );
-            } catch (IOException e) {
-                throw new RuntimeException("File processing error", e);
-            }
-        });
+    ObjectMapper objectMapper = new ObjectMapper();
+    UserUpdateRequest userUpdateRequest = objectMapper.readValue(userJson, UserUpdateRequest.class);
 
-        User updatedUser = userService.update(userId, userUpdateRequest, profileCreateRequest);
-        UserDto userDto = userService.find(updatedUser.getId());
+    Optional<BinaryContentCreateRequest> profileCreateRequest = profileFile.map(file -> {
+      try {
+        return new BinaryContentCreateRequest(
+            file.getOriginalFilename(),
+            file.getContentType(),
+            file.getBytes()
+        );
+      } catch (IOException e) {
+        throw new RuntimeException("File processing error", e);
+      }
+    });
 
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
-    }
+    User updatedUser = userService.update(userId, userUpdateRequest, profileCreateRequest);
+    UserDto userDto = userService.find(updatedUser.getId());
 
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    private ResponseEntity<Void> deleteUser(
-            @RequestParam UUID userId) {
+    return new ResponseEntity<>(userDto, HttpStatus.OK);
+  }
 
-        userService.delete(userId);
+  @DeleteMapping("/{userId}")
+  private ResponseEntity<Void> deleteUser(
+      @PathVariable UUID userId) {
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+    userService.delete(userId);
 
-    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
-    public ResponseEntity<List<UserDto>> getUsers() {
-        List<UserDto> userDtos = userService.findAll();
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
 
-        return new ResponseEntity<>(userDtos, HttpStatus.OK);
-    }
+  @GetMapping
+  public ResponseEntity<List<UserDto>> getUsers() {
+    List<UserDto> userDtos = userService.findAll();
+
+    return new ResponseEntity<>(userDtos, HttpStatus.OK);
+  }
 }
 
 
