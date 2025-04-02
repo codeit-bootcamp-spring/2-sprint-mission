@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.core.message.usecase;
 
+import static com.sprint.mission.discodeit.exception.channel.ChannelErrors.channelIdNotFoundError;
+import static com.sprint.mission.discodeit.exception.message.MessageErrors.messageIdNotFoundError;
+import static com.sprint.mission.discodeit.exception.user.UserErrors.userIdNotFoundError;
+
 import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
-import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
@@ -11,11 +14,9 @@ import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageListResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
+import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
-import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import java.util.List;
 import java.util.Optional;
@@ -38,11 +39,11 @@ public class BasicMessageService implements MessageService {
   public Message create(CreateMessageCommand command,
       List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
     User user = userRepositoryPort.findById(command.userId()).orElseThrow(() ->
-        new UserNotFoundError("유저를 찾을 수 없습니다.")
+        userIdNotFoundError(command.userId())
     );
 
-    Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
-        () -> new ChannelNotFoundException("채널을 찾을 수 없습니다.")
+    Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(() ->
+        channelIdNotFoundError(command.channelId())
     );
 
     List<UUID> binaryContentIdList = makeBinaryContent(binaryContentDTOs);
@@ -78,7 +79,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public MessageResult findMessageByMessageId(UUID messageId) {
     return MessageResult.create(messageRepositoryPort.findById(messageId)
-        .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다.")));
+        .orElseThrow(() -> messageIdNotFoundError(messageId)));
   }
 
   @Override
@@ -93,7 +94,7 @@ public class BasicMessageService implements MessageService {
   public void update(UpdateMessageCommand command) {
 
     Message message = messageRepositoryPort.findById(command.messageId())
-        .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
+        .orElseThrow(() -> messageIdNotFoundError(command.messageId()));
 
     message.update(command.newText(), null);
   }
@@ -103,7 +104,7 @@ public class BasicMessageService implements MessageService {
   public void delete(UUID messageId) {
 
     Message message = messageRepositoryPort.findById(messageId)
-        .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
+        .orElseThrow(() -> messageIdNotFoundError(messageId));
 
     messageRepositoryPort.deleteByMessageId(messageId);
     message.getAttachmentIds().forEach(binaryContentRepositoryPort::delete);

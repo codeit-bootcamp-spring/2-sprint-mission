@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.adapter.inbound.user;
 import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserLoginRequest;
 import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserUpdateRequest;
-import com.sprint.mission.discodeit.core.user.usecase.LoginUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.crud.dto.CreateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UpdateUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
 import java.util.UUID;
 
 public final class UserDtoMapper {

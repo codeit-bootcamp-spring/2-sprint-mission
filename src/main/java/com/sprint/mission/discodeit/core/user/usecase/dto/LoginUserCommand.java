@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.user.usecase;
+package com.sprint.mission.discodeit.core.user.usecase.dto;
 
 public record LoginUserCommand(
     String userName,

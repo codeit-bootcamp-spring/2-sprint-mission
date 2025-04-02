@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.exception.user;
+package com.sprint.mission.discodeit.exception.status.user;
 
 public class UserStatusError extends RuntimeException {
 

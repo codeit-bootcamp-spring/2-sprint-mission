@@ -1,20 +1,20 @@
 package com.sprint.mission.discodeit.core.channel.usecase;
 
-import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
+import static com.sprint.mission.discodeit.exception.channel.ChannelErrors.channelIdNotFoundError;
+import static com.sprint.mission.discodeit.exception.channel.ChannelErrors.unmodifiableChannelError;
+
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelListResult;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
 import com.sprint.mission.discodeit.core.message.entity.Message;
-import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
+import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
-import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
-import com.sprint.mission.discodeit.exception.channel.ChannelModificationNotAllowedException;
-import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-  private final UserRepositoryPort userRepositoryPort;
+  //  private final UserRepositoryPort userRepositoryPort;
   private final ChannelRepository channelRepository;
   private final MessageRepositoryPort messageRepositoryPort;
   private final ReadStatusRepository readStatusRepository;
@@ -58,8 +58,9 @@ public class BasicChannelService implements ChannelService {
   @Override
   public ChannelResult findChannelByChannelId(UUID channelId) {
     Channel channel = channelRepository.findByChannelId(channelId).orElseThrow(
-        () -> new ChannelNotFoundException("채널이 존재하지 않습니다.")
+        () -> channelIdNotFoundError(channelId)
     );
+
     Instant lastMessageAt = findLastMessageAt(channel);
 
     List<UUID> userIdList = new ArrayList<>();
@@ -100,11 +101,11 @@ public class BasicChannelService implements ChannelService {
   @Override
   public void update(UpdateChannelCommand command) {
     Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
-        () -> new ChannelNotFoundException("채널이 존재하지 않습니다.")
+        () -> channelIdNotFoundError(command.channelId())
     );
 
     if (channel.getType() == ChannelType.PRIVATE) {
-      throw new ChannelModificationNotAllowedException("private 채널은 수정할 수 없습니다.");
+      unmodifiableChannelError(channel.getChannelId());
     }
 
     channel.update(command.newName(), command.newType());

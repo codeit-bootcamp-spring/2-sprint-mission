@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.user.usecase.crud.dto;
+package com.sprint.mission.discodeit.core.user.usecase.dto;
 
 public record CreateUserCommand(
     String name,

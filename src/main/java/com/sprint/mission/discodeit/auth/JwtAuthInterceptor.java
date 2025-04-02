@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.auth;
 
-import com.sprint.mission.discodeit.core.user.usecase.crud.UserService;
+import com.sprint.mission.discodeit.core.user.usecase.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;

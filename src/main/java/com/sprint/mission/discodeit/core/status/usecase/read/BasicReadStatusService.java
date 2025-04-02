@@ -1,20 +1,21 @@
 package com.sprint.mission.discodeit.core.status.usecase.read;
 
+import static com.sprint.mission.discodeit.exception.channel.ChannelErrors.channelIdNotFoundError;
+import static com.sprint.mission.discodeit.exception.status.read.ReadStatusErrors.readStatusAlreadyExistsError;
+import static com.sprint.mission.discodeit.exception.status.read.ReadStatusErrors.readStatusNotFoundError;
+import static com.sprint.mission.discodeit.exception.user.UserErrors.userIdNotFoundError;
+
+import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
+import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
+import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
-import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.message.ReadStatusNotFoundException;
-import com.sprint.mission.discodeit.exception.message.DuplicateReadStatusException;
-import com.sprint.mission.discodeit.exception.InvalidException;
-import com.sprint.mission.discodeit.logging.CustomLogging;
-import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
-import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
+import com.sprint.mission.discodeit.logging.CustomLogging;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,10 @@ public class BasicReadStatusService implements ReadStatusService {
 
     //이미 생성된 읽기 상태가 있는지 체크
     //없으면 생성하기
-    ReadStatus status = checkDuplicatedStatues(command);
+    validateReadStatus(command);
+
+    ReadStatus status = ReadStatus.create(command.userId(), command.channelId(),
+        command.lastReadAt());
 
     readStatusRepository.save(status);
 
@@ -40,26 +44,27 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   private void validateUserAndChannel(UUID userId, UUID channelId) {
-    if (userRepositoryPort.findById(userId).isEmpty() && channelRepository.findByChannelId(
-        channelId).isEmpty()) {
-      throw new InvalidException("유효하지 않은 아이디입니다.");
+    if (userRepositoryPort.findById(userId).isEmpty()) {
+      userIdNotFoundError(userId);
+    }
+
+    if (channelRepository.findByChannelId(channelId).isEmpty()) {
+      channelIdNotFoundError(channelId);
     }
   }
 
-  private ReadStatus checkDuplicatedStatues(CreateReadStatusCommand command) {
+  private void validateReadStatus(CreateReadStatusCommand command) {
     List<ReadStatus> list = readStatusRepository.findAllByUserId(command.userId());
     if (list.stream()
-        .noneMatch(readStatus -> readStatus.getChannelId().equals(command.channelId()))) {
-      return ReadStatus.create(command.userId(), command.channelId(), command.lastReadAt());
-    } else {
-      throw new DuplicateReadStatusException("중복된 읽기 상태 정보가 있습니다.");
+        .anyMatch(readStatus -> readStatus.getChannelId().equals(command.channelId()))) {
+      readStatusAlreadyExistsError(command.channelId());
     }
   }
 
   @Override
   public ReadStatus findReadStatusById(UUID readStatusId) {
     return readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new ReadStatusNotFoundException("읽기 상태를 찾을 수 없습니다."));
+        .orElseThrow(() -> readStatusNotFoundError(readStatusId));
   }
 
   @Override
@@ -75,7 +80,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   public void updateReadStatus(UpdateReadStatusCommand command) {
     ReadStatus readStatus = readStatusRepository.findById(command.readStatusId()).orElseThrow(
-        () -> new ReadStatusNotFoundException("읽기 상태를 찾을 수 없습니다.")
+        () -> readStatusNotFoundError(command.readStatusId())
     );
     readStatus.update(command.newLastReadAt());
   }
