@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import org.springframework.context.annotation.Primary;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
 @Repository
-@Primary
+@ConditionalOnProperty(name = "repository.type", havingValue = "file", matchIfMissing = true)
 public class FileUserRepository implements UserRepository {
     private static final String FILE_PATH = "users.ser";
 
@@ -33,14 +33,9 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User update(User user) {
-        return save(user);
-    }
-
-    @Override
-    public void delete(User user) {
+    public void delete(UUID userId) {
         Map<UUID, User> users = loadUsers();
-        users.remove(user.getId());
+        users.remove(userId);
         saveUsers(users);
     }
 
@@ -110,5 +105,14 @@ public class FileUserRepository implements UserRepository {
         }
         return false;
     }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        Map<UUID, User> users = loadUsers();
+        return users.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
 }
 

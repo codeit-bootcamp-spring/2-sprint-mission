@@ -15,17 +15,5 @@ public record UserDto(
         String username,
         String email,
         Status onlineStatus
-) {
-    public static UserDto fromUser(User user, UserStatus userStatus) {
-        return new UserDto(
-                user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getProfileId(),
-                user.getUsername(),
-                user.getEmail(),
-                userStatus.getStatus()
-        );
-    }
-}
+) {}
 

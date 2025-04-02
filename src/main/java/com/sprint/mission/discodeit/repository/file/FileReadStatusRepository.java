@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import org.springframework.context.annotation.Primary;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
 @Repository
-@Primary
+@ConditionalOnProperty(name = "repository.type", havingValue = "file", matchIfMissing = true)
 public class FileReadStatusRepository implements ReadStatusRepository {
     private static final String FILE_PATH = "read_status_storage.ser";
 
@@ -36,50 +36,6 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public List<ReadStatus> findByChannelId(UUID channelId) {
-        Map<UUID, ReadStatus> storage = loadStorage();
-        return storage.values().stream()
-                .filter(status -> status.getChannelId().equals(channelId))
-                .toList();
-    }
-
-    @Override
-    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
-        Map<UUID, ReadStatus> storage = loadStorage();
-        return storage.values().stream()
-                .filter(status -> status.getUserId().equals(userId) && status.getChannelId().equals(channelId))
-                .findFirst();
-    }
-
-    @Override
-    public List<ReadStatus> findAll() {
-        return new ArrayList<>(loadStorage().values());
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        Map<UUID, ReadStatus> storage = loadStorage();
-        if (storage.containsKey(id)) {
-            storage.remove(id);
-            saveStorage(storage);
-        }
-    }
-
-    @Override
-    public void deleteByUserId(UUID userId) {
-        Map<UUID, ReadStatus> storage = loadStorage();
-        storage.entrySet().removeIf(entry -> entry.getValue().getUserId().equals(userId));
-        saveStorage(storage);
-    }
-
-    @Override
-    public void deleteByChannelId(UUID channelId) {
-        Map<UUID, ReadStatus> storage = loadStorage();
-        storage.entrySet().removeIf(entry -> entry.getValue().getChannelId().equals(channelId));
-        saveStorage(storage);
-    }
-
-    @Override
     public List<UUID> findUserIdsByChannelId(UUID channelId) {
         Map<UUID, ReadStatus> storage = loadStorage();
         return storage.values().stream()
@@ -94,6 +50,30 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         Map<UUID, ReadStatus> storage = loadStorage();
         return storage.values().stream()
                 .anyMatch(status -> status.getUserId().equals(userId) && status.getChannelId().equals(channelId));
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        Map<UUID, ReadStatus> storage = loadStorage();
+        storage.entrySet().removeIf(entry -> entry.getValue().getChannelId().equals(channelId));
+        saveStorage(storage);
+    }
+
+    @Override
+    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
+        Map<UUID, ReadStatus> storage = loadStorage();
+        return storage.values().stream()
+                .filter(status -> status.getUserId().equals(userId) && status.getChannelId().equals(channelId))
+                .findFirst();
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Map<UUID, ReadStatus> storage = loadStorage();
+        if (storage.containsKey(id)) {
+            storage.remove(id);
+            saveStorage(storage);
+        }
     }
 
     private Map<UUID, ReadStatus> loadStorage() {

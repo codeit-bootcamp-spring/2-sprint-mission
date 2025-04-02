@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import org.springframework.context.annotation.Primary;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
 @Repository
-@Primary
+@ConditionalOnProperty(name = "repository.type", havingValue = "file", matchIfMissing = true)
 public class FileChannelRepository implements ChannelRepository {
     private static final String FILE_PATH = "channels.ser";
 
@@ -22,9 +22,9 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID channelId) {
+    public Optional<Channel> findById(UUID channelId) {
         Map<UUID, Channel> channels = loadChannels();
-        return channels.get(channelId);
+        return Optional.ofNullable(channels.get(channelId));
     }
 
     @Override
@@ -42,12 +42,6 @@ public class FileChannelRepository implements ChannelRepository {
         Map<UUID, Channel> channels = loadChannels();
         channels.remove(channelId);
         saveChannels(channels);
-    }
-
-    @Override
-    public boolean exists(UUID channelId) {
-        Map<UUID, Channel> channels = loadChannels();
-        return channels.containsKey(channelId);
     }
 
     @Override

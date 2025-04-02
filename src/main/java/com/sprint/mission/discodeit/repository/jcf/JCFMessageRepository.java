@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.*;
 
 @Repository
-@ConditionalOnProperty(name = "repository.type", havingValue = "jcf", matchIfMissing = true)
+@ConditionalOnProperty(name = "repository.type", havingValue = "jcf")
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data = new HashMap<>();
 

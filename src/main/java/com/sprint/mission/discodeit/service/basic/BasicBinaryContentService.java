@@ -19,15 +19,17 @@ public class BasicBinaryContentService implements BinaryContentService {
 
 
     @Override
-    public BinaryContentDto create(BinaryContentCreateRequest request) {
+    public BinaryContent create(BinaryContentCreateRequest request) {
+        String fileName = request.fileName();
+        byte[] bytes = request.bytes();
+        String contentType = request.contentType();
         BinaryContent binaryContent = new BinaryContent(
-                request.fileName(),
-                request.contentType(),
-                request.data()
+                fileName,
+                contentType,
+                bytes,
+                (long) bytes.length
         );
-        BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
-
-        return mapToDto(savedBinaryContent);
+        return binaryContentRepository.save(binaryContent);
     }
 
     @Override
@@ -52,12 +54,17 @@ public class BasicBinaryContentService implements BinaryContentService {
         binaryContentRepository.deleteById(id);
     }
 
+    public BinaryContent findRaw(UUID id){
+        return binaryContentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Binary content not found with ID: " + id));
+    }
+
     private BinaryContentDto mapToDto(BinaryContent binaryContent) {
         return new BinaryContentDto(
                 binaryContent.getId(),
                 binaryContent.getFileName(),
                 binaryContent.getContentType(),
-                binaryContent.getData(),
+                binaryContent.getBytes(),
                 binaryContent.getCreatedAt()
         );
     }

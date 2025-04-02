@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import org.springframework.context.annotation.Primary;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.*;
 
 @Repository
-@Primary
+@ConditionalOnProperty(name = "repository.type", havingValue = "file", matchIfMissing = true)
 public class FileMessageRepository implements MessageRepository {
     private static final String FILE_PATH = "messages.ser";
 
@@ -62,7 +62,9 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void deleteByChannelId(UUID channelId) {
-
+        Map<UUID, Message> messages = loadMessages();
+        messages.entrySet().removeIf(entry -> entry.getValue().getChannelId().equals(channelId));
+        saveMessages(messages);
     }
 
     private Map<UUID, Message> loadMessages() {

@@ -1,11 +1,10 @@
 spring:
   application:
-    name:discodeit
+    name: discodeit
 
 discodeit:
   repository:
-    //type: jcf # jcf | file
     type: file # jcf | file
-    file-directory: data
+    file-directory: bytes
 
 
