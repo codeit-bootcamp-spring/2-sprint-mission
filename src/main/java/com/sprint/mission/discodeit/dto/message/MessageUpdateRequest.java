@@ -6,9 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record MessageUpdateRequest(
-        @NotNull
-        UUID id,
-        @NotBlank
-        String content
+    UUID id,
+    String content
 ) {
+
 }
