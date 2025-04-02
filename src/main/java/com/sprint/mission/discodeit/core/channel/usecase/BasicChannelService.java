@@ -9,9 +9,9 @@ import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelListResult;
 import com.sprint.mission.discodeit.core.message.entity.Message;
-import com.sprint.mission.discodeit.core.message.entity.ReadStatus;
+import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
-import com.sprint.mission.discodeit.core.message.port.ReadStatusRepository;
+import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.exception.channel.ChannelModificationNotAllowedException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
@@ -125,7 +125,7 @@ public class BasicChannelService implements ChannelService {
   private void deleteAllMessage(UUID channelId) {
     List<Message> list = messageRepositoryPort.findAllByChannelId(channelId);
     for (Message message : list) {
-      messageRepositoryPort.deleteById(message.getMessageId());
+      messageRepositoryPort.deleteByMessageId(message.getMessageId());
     }
   }
 

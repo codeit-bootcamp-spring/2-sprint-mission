@@ -1,16 +1,16 @@
-package com.sprint.mission.discodeit.core.message.usecase.crud;
+package com.sprint.mission.discodeit.core.message.usecase;
 
 import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.UpdateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
-import com.sprint.mission.discodeit.core.message.usecase.crud.dto.CreateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageListResult;
-import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageResult;
+import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageListResult;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
@@ -105,7 +105,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepositoryPort.findById(messageId)
         .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
 
-    messageRepositoryPort.deleteById(messageId);
+    messageRepositoryPort.deleteByMessageId(messageId);
     message.getAttachmentIds().forEach(binaryContentRepositoryPort::delete);
   }
 }

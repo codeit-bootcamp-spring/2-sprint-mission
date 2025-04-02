@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.core.user.port;
+package com.sprint.mission.discodeit.core.status.port;
 
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
+import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

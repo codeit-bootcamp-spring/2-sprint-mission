@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.core.user.usecase.status;
+package com.sprint.mission.discodeit.core.status.usecase.user;
 
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
+import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
-import com.sprint.mission.discodeit.core.user.port.UserStatusRepository;
+import com.sprint.mission.discodeit.core.status.port.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
 import com.sprint.mission.discodeit.exception.user.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
@@ -69,11 +69,5 @@ public class BasicUserStatusService implements UserStatusService {
   public void deleteById(UUID userStatusId) {
     userStatusRepository.deleteById(userStatusId);
   }
-
-//  @Override
-//  @CustomLogging
-//  public void deleteByUserId(UUID userId) {
-//    userStatusRepository.deleteByUserId(userId);
-//  }
-
+  
 }

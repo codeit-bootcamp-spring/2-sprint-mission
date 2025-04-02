@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.adapter.inbound.message.dto;
+package com.sprint.mission.discodeit.core.status.usecase.read.dto;
 
 import java.util.UUID;
 

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.adapter.inbound.message;
 
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.ReadStatusCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.ReadStatusUpdateRequestDTO;
-import com.sprint.mission.discodeit.core.message.entity.ReadStatus;
-import com.sprint.mission.discodeit.core.message.usecase.status.ReadStatusService;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
+import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
+import com.sprint.mission.discodeit.core.status.usecase.read.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ public class ReadStatusController {
 
   @PostMapping("/create")
   public ResponseEntity<ReadStatus> createReadStatus(@PathVariable UUID userId,
-      @PathVariable UUID channelId, @RequestBody ReadStatusCreateRequestDTO requestDTO) {
+      @PathVariable UUID channelId, @RequestBody CreateReadStatusCommand requestDTO) {
     ReadStatus status = readStatusService.create(userId, channelId, requestDTO);
 
     return ResponseEntity.ok(status);
@@ -27,14 +27,14 @@ public class ReadStatusController {
 
   @PutMapping("/update")
   public ResponseEntity<ReadStatus> update(@PathVariable UUID channelId,
-      @RequestBody ReadStatusUpdateRequestDTO requestDTO) {
-    ReadStatus status = readStatusService.update(channelId, requestDTO);
+      @RequestBody UpdateReadStatusCommand requestDTO) {
+    ReadStatus status = readStatusService.updateReadStatus(channelId, requestDTO);
     return ResponseEntity.ok(status);
   }
 
   @GetMapping("/find")
   public ResponseEntity<ReadStatus> find(@PathVariable UUID userId) {
-    ReadStatus readStatus = readStatusService.findByUserId(userId);
+    ReadStatus readStatus = readStatusService.findReadStatusByUserId(userId);
     return ResponseEntity.ok(readStatus);
   }
 

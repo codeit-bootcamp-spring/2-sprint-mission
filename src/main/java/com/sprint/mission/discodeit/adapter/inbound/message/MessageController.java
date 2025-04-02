@@ -9,11 +9,11 @@ import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateRes
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageDeleteResponse;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageUpdateResponse;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.UpdateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.crud.MessageService;
-import com.sprint.mission.discodeit.core.message.usecase.crud.dto.CreateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageListResult;
-import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageResult;
+import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.MessageService;
+import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageListResult;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

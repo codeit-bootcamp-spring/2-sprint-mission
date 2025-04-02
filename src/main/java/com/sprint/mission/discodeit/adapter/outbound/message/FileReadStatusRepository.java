@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.adapter.outbound.message;
 
-import com.sprint.mission.discodeit.core.message.entity.ReadStatus;
+import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
-import com.sprint.mission.discodeit.core.message.port.ReadStatusRepository;
+import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 

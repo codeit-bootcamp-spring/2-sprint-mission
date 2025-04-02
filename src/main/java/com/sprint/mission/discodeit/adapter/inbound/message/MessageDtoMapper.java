@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.adapter.inbound.message;
 
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageUpdateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.UpdateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.crud.dto.CreateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
 import java.util.UUID;
 
 public final class MessageDtoMapper {

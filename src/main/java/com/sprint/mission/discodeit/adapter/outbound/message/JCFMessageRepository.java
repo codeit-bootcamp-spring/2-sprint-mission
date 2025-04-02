@@ -41,14 +41,14 @@ public class JCFMessageRepository implements MessageRepositoryPort {
   }
 
   @Override
-  public void deleteById(UUID id) {
+  public void deleteByMessageId(UUID id) {
     this.messageList.remove(id);
   }
 
   @Override
   public void deleteAllByChannelId(UUID channelId) {
     this.findAllByChannelId(channelId)
-        .forEach(message -> this.deleteById(message.getMessageId()));
+        .forEach(message -> this.deleteByMessageId(message.getMessageId()));
   }
 
 //    @Override

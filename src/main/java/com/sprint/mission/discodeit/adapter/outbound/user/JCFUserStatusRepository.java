@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.adapter.outbound.user;
 
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
-import com.sprint.mission.discodeit.core.user.port.UserStatusRepository;
+import com.sprint.mission.discodeit.core.status.entity.UserStatus;
+import com.sprint.mission.discodeit.core.status.port.UserStatusRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

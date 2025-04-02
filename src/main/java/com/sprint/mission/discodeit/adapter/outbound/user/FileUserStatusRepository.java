@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.adapter.outbound.user;
 
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
-import com.sprint.mission.discodeit.core.user.port.UserStatusRepository;
+import com.sprint.mission.discodeit.core.status.entity.UserStatus;
+import com.sprint.mission.discodeit.core.status.port.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;

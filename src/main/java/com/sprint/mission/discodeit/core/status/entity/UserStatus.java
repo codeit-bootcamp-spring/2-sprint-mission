@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.user.entity;
+package com.sprint.mission.discodeit.core.status.entity;
 
 import java.io.Serial;
 import java.io.Serializable;

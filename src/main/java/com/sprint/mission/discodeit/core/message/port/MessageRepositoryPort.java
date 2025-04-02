@@ -17,7 +17,7 @@ public interface MessageRepositoryPort {
 
   boolean existsById(UUID id);
 
-  void deleteById(UUID id);
+  void deleteByMessageId(UUID id);
 
   void deleteAllByChannelId(UUID channelId);
 

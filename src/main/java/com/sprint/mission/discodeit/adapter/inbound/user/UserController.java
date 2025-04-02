@@ -20,7 +20,7 @@ import com.sprint.mission.discodeit.core.user.usecase.crud.dto.CreateUserCommand
 import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UpdateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UserListResult;
 import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UserResult;
-import com.sprint.mission.discodeit.core.user.usecase.status.UserStatusService;
+import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;

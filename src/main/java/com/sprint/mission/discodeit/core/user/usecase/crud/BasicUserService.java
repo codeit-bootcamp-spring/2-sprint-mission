@@ -11,7 +11,7 @@ import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.core.user.usecase.crud.dto.CreateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UserListResult;
 import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UserResult;
-import com.sprint.mission.discodeit.core.user.usecase.status.UserStatusService;
+import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsError;
 import com.sprint.mission.discodeit.exception.user.UserLoginFailedError;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
