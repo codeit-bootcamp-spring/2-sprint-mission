@@ -84,7 +84,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateDto userUpdateDto) {
+    public User update(UUID userId, UserUpdateDto userUpdateDto) {
         List<User> users = userRepository.findAll();
         boolean isEmailExist = users.stream().anyMatch(
                 user -> user.getEmail().equals(userUpdateDto.newEmail()));
@@ -100,7 +100,7 @@ public class BasicUserService implements UserService {
             throw new UserNameAlreadyExistsException(userUpdateDto.newUsername() + " 유저는 이미 존재하여 수정할 수 없습니다.");
         }
 
-        User user = userRepository.findById(userUpdateDto.id());
+        User user = userRepository.findById(userId);
         user.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(),
                 userUpdateDto.newProfileId());
         userRepository.save(user);

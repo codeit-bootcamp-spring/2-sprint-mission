@@ -60,8 +60,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<BaseResponseDto> updateUser(@RequestBody UserUpdateDto userUpdateDto) {
-        User user = userService.update(userUpdateDto);
+    public ResponseEntity<BaseResponseDto> updateUser(
+            @PathVariable("id") UUID userId,
+            @RequestBody UserUpdateDto userUpdateDto) {
+        User user = userService.update(userId, userUpdateDto);
         return ResponseEntity.ok(BaseResponseDto.success(user.getId() + " 유저 변경이 완료되었습니다."));
     }
 
