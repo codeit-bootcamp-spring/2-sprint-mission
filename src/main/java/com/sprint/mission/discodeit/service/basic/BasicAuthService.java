@@ -15,17 +15,18 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
-    private final UserRepository userRepository;
-    private final UserStatusService userStatusService;
 
-    @Override
-    public AuthLoginResponse login(AuthLoginRequest request) {
-        User user = userRepository.findByUsername(request.username())
-                .filter(u -> u.getPassword().equals(request.password()))
-                .orElseThrow(() -> new InvalidCredentialsException("로그인 실패"));
+  private final UserRepository userRepository;
+  private final UserStatusService userStatusService;
 
-        userStatusService.updateByUserId(user.getId());
+  @Override
+  public AuthLoginResponse login(AuthLoginRequest request) {
+    User user = userRepository.findByUsername(request.username())
+        .filter(u -> u.getPassword().equals(request.password()))
+        .orElseThrow(() -> new InvalidCredentialsException("로그인 실패"));
 
-        return new AuthLoginResponse(user.getId(), user.getEmail(), user.getUsername());
-    }
+    userStatusService.updateByUserId(user.getId());
+
+    return AuthLoginResponse.fromEntity(user);
+  }
 }
