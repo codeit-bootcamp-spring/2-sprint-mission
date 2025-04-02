@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="daf1a141-2719-4892-b03e-28252696c9a4" name="Changes" comment="Replace all source files with base code">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/UserNotFoundException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/WrongPasswordException.java" afterDir="false" />
+    <list default="true" id="daf1a141-2719-4892-b03e-28252696c9a4" name="Changes" comment="AuthController RESTful API 구현">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/UserStatusNotFoundException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" afterDir="false" />
@@ -14,15 +13,14 @@
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/AuthController.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/AuthController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/data/UserDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/dto/data/UserDto.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/entity/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicAuthService.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicAuthService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/UserController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicUserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicUserService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicUserStatusService.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicUserStatusService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" afterPath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/data/UserDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/data/UserDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicAuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicAuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/UserNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/UserNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicUserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicUserStatusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicUserStatusService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,6 +54,7 @@
       <list>
         <option value="Interface" />
         <option value="Class" />
+        <option value="Exception" />
       </list>
     </option>
   </component>
@@ -216,15 +215,7 @@
       <workItem from="1742948688463" duration="23241000" />
       <workItem from="1742996931176" duration="4079000" />
       <workItem from="1743323473310" duration="3054000" />
-      <workItem from="1743480744796" duration="7597000" />
-    </task>
-    <task id="LOCAL-00013" summary="JCFMessageService 클래스 구현 및 MessageService">
-      <option name="closed" value="true" />
-      <created>1740116629763</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1740116629763</updated>
+      <workItem from="1743480744796" duration="17122000" />
     </task>
     <task id="LOCAL-00014" summary="JCFChannelService 클래스 구현">
       <option name="closed" value="true" />
@@ -610,7 +601,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743481940191</updated>
     </task>
-    <option name="localTasksCounter" value="62" />
+    <task id="LOCAL-00062" summary="AuthController RESTful API 구현">
+      <option name="closed" value="true" />
+      <created>1743492146451</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1743492146451</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -650,7 +649,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="레포지토리 Bean 등록" />
     <MESSAGE value="Basic 어노테이션 추가" />
     <MESSAGE value="Java 어플리케이션 DiscodeitApplication 에서 구현" />
     <MESSAGE value="@Getter 추가와 게터 메소드 삭제" />
@@ -675,6 +673,7 @@
     <MESSAGE value="# 제목은 최대 50글자까지 아래에 작성: ex) Feat: Add Key mapping  &#10;&#10;# 본문은 아래에 작성  &#10;&#10;# 꼬릿말은 아래에 작성: ex) Github issue #23  &#10;&#10;# --- COMMIT END ---  &#10;#   &lt;타입&gt; 리스트  &#10;#   feat        : 기능 (새로운 기능)  &#10;#   fix         : 버그 (버그 수정)  &#10;#   refactor    : 리팩토링  &#10;#   design      : CSS 등 사용자 UI 디자인 변경  &#10;#   comment     : 필요한 주석 추가 및 변경  &#10;#   style       : 스타일 (코드 형식, 세미콜론 추가: 비즈니스 로직에 변경 없음)  &#10;#   docs        : 문서 수정 (문서 추가, 수정, 삭제, README)  &#10;#   test        : 테스트 (테스트 코드 추가, 수정, 삭제: 비즈니스 로직에 변경 없음)  &#10;#   chore       : 기타 변경사항 (빌드 스크립트 수정, assets, 패키지 매니저 등)  &#10;#   init        : 초기 생성  &#10;#   rename      : 파일 혹은 폴더명을 수정하거나 옮기는 작업만 한 경우  &#10;#   remove      : 파일을 삭제하는 작업만 수행한 경우  &#10;# ------------------  &#10;#   제목 첫 글자를 대문자로  &#10;#   제목은 명령문으로  &#10;#   제목 끝에 마침표(.) 금지  &#10;#   제목과 본문을 한 줄 띄워 분리하기  &#10;#   본문은 &quot;어떻게&quot; 보다 &quot;무엇을&quot;, &quot;왜&quot;를 설명한다.  &#10;#   본문에 여러줄의 메시지를 작성할 땐 &quot;-&quot;로 구분  &#10;# ------------------  &#10;#   &lt;꼬리말&gt;  &#10;#   필수가 아닌 optioanl  &#10;#   Fixes        :이슈 수정중 (아직 해결되지 않은 경우)  &#10;#   Resolves     : 이슈 해결했을 때 사용  &#10;#   Ref          : 참고할 이슈가 있을 때 사용  &#10;#   Related to   : 해당 커밋에 관련된 이슈번호 (아직 해결되지 않은 경우)  &#10;#   ex) Fixes: #47 Related to: #32, #21" />
     <MESSAGE value="바이너리 파일 다운로드 구현" />
     <MESSAGE value="Replace all source files with base code" />
-    <option name="LAST_COMMIT_MESSAGE" value="Replace all source files with base code" />
+    <MESSAGE value="AuthController RESTful API 구현" />
+    <option name="LAST_COMMIT_MESSAGE" value="AuthController RESTful API 구현" />
   </component>
 </project>
