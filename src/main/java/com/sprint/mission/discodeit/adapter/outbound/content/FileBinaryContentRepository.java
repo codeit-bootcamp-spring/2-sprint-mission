@@ -1,29 +1,26 @@
 package com.sprint.mission.discodeit.adapter.outbound.content;
 
-import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.exception.content.EmptyBinaryContentListException;
-import com.sprint.mission.discodeit.exception.content.BinaryContentNotFoundException;
-import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
-import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
-import com.sprint.mission.discodeit.util.CommonUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
-
+import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
+import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepositoryPort {
 
-  private final FileRepositoryImpl<List<BinaryContent>> fileRepository;
+  private final FileRepositoryImpl<Map<UUID, BinaryContent>> fileRepository;
   private final Path path = Paths.get(System.getProperty("user.dir"), "data",
       "BinaryContentList.ser");
-  private List<BinaryContent> binaryContentList = new LinkedList<>();
+  private Map<UUID, BinaryContent> binaryContentList = new ConcurrentHashMap<>();
 
   public FileBinaryContentRepository() {
     this.fileRepository = new FileRepositoryImpl<>(path);
@@ -36,34 +33,24 @@ public class FileBinaryContentRepository implements BinaryContentRepositoryPort 
 
   @Override
   public BinaryContent save(BinaryContent binaryContent) {
-    binaryContentList.add(binaryContent);
+    binaryContentList.put(binaryContent.getId(), binaryContent);
     fileRepository.save(binaryContentList);
     return binaryContent;
   }
 
   @Override
   public BinaryContent findById(UUID binaryId) {
-    BinaryContent content = CommonUtils.findById(binaryContentList, binaryId, BinaryContent::getId)
-        .orElseThrow(() -> new BinaryContentNotFoundException("바이너리 데이터를 찾을 수 없습니다."));
-    return content;
+    return binaryContentList.get(binaryId);
   }
 
   @Override
   public List<BinaryContent> findAllByIdIn() {
-    if (binaryContentList.isEmpty()) {
-      throw new EmptyBinaryContentListException("Repository 내 바이너리 정보 리스트가 비어있습니다.");
-    }
-    return binaryContentList;
+    return binaryContentList.values().stream().toList();
   }
 
   @Override
   public void delete(UUID binaryId) {
-    try {
-      BinaryContent content = findById(binaryId);
-      binaryContentList.remove(content);
-      fileRepository.save(binaryContentList);
-    } catch (BinaryContentNotFoundException e) {
-      System.out.println("해당 바이너리 데이터는 존재하지 않습니다.");
-    }
+    binaryContentList.remove(binaryId);
+    fileRepository.save(binaryContentList);
   }
 }

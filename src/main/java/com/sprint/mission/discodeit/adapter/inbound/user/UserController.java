@@ -5,7 +5,7 @@ import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.to
 import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.toLoginUserCommand;
 import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.toUpdateUserCommand;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserCreateResponse;
 import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserDeleteResponse;
@@ -53,10 +53,10 @@ public class UserController {
       @RequestPart(value = "profileImage", required = false) MultipartFile file
   ) throws IOException {
 
-    Optional<BinaryContentCreateRequestDTO> binaryContentRequest = Optional.empty();
+    Optional<CreateBinaryContentCommand> binaryContentRequest = Optional.empty();
 
     if (file != null && !file.isEmpty()) {
-      binaryContentRequest = Optional.of(new BinaryContentCreateRequestDTO(
+      binaryContentRequest = Optional.of(new CreateBinaryContentCommand(
           file.getOriginalFilename(),
           file.getContentType(),
           file.getBytes()
@@ -91,10 +91,10 @@ public class UserController {
       @RequestPart(value = "profileImage", required = false) MultipartFile file)
       throws IOException {
 
-    Optional<BinaryContentCreateRequestDTO> binaryContentRequest = Optional.empty();
+    Optional<CreateBinaryContentCommand> binaryContentRequest = Optional.empty();
 
     if (file != null && !file.isEmpty()) {
-      binaryContentRequest = Optional.of(new BinaryContentCreateRequestDTO(
+      binaryContentRequest = Optional.of(new CreateBinaryContentCommand(
           file.getOriginalFilename(),
           file.getContentType(),
           file.getBytes()

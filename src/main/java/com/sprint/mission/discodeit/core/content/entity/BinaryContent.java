@@ -19,8 +19,9 @@ public class BinaryContent implements Serializable {
   public final Instant uploadAt;
 
   private String fileName;
-  private long size;
   private String contentType;
+  private String extension;
+  private long size;
   private byte[] bytes;
 
   private BinaryContent(String fileName, long size, String contentType, byte[] bytes) {
@@ -28,14 +29,25 @@ public class BinaryContent implements Serializable {
     this.uploadAt = Instant.now();
 
     this.fileName = fileName;
-    this.size = size;
     this.contentType = contentType;
+    this.extension = extractExtension(fileName);
+
+    this.size = size;
     this.bytes = bytes;
   }
 
   public static BinaryContent create(String fileName, long size, String contentType,
       byte[] bytes) {
     return new BinaryContent(fileName, size, contentType, bytes);
+  }
+
+  private static String extractExtension(String fileName) {
+    String[] nameSplit = fileName.split("\\.");
+    if (nameSplit.length > 1) {
+      return "." + nameSplit[1].toLowerCase();
+    } else {
+      return "";
+    }
   }
 
   private static class Validator {

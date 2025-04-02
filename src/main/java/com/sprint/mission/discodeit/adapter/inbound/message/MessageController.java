@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.adapter.inbound.message;
 import static com.sprint.mission.discodeit.adapter.inbound.message.MessageDtoMapper.toCreateMessageCommand;
 import static com.sprint.mission.discodeit.adapter.inbound.message.MessageDtoMapper.toUpdateMessageCommand;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateResponse;
 import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageDeleteResponse;
@@ -40,31 +40,31 @@ public class MessageController {
 
   private final MessageService messageService;
 
-  //TODO. List<Optional>구조 마음에 안들어서 개편할 예정
   @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageCreateResponse> create(
       @PathVariable UUID userId, @PathVariable UUID channelId,
       @RequestPart("message") MessageCreateRequest requestBody,
-      @RequestPart(value = "profileImage", required = false) List<MultipartFile> files)
+      @RequestPart(value = "profileImage", required = false) List<MultipartFile> attachments)
       throws IOException {
 
-    List<Optional<BinaryContentCreateRequestDTO>> list = new ArrayList<>();
-    if (files != null) {
-      for (MultipartFile file : files) {
-        Optional<BinaryContentCreateRequestDTO> binaryContentRequest = Optional.empty();
-        if (file != null && !file.isEmpty()) {
-          binaryContentRequest = Optional.of(new BinaryContentCreateRequestDTO(
-              file.getOriginalFilename(),
-              file.getContentType(),
-              file.getBytes()
-          ));
-          list.add(binaryContentRequest);
-        }
-      }
-    }
+    List<CreateBinaryContentCommand> attachmentRequests = Optional.ofNullable(attachments)
+        .map(files -> files.stream()
+            .map(file -> {
+              try {
+                return new CreateBinaryContentCommand(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+                );
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+            .toList())
+        .orElse(new ArrayList<>());
     CreateMessageCommand command = toCreateMessageCommand(userId, channelId,
         requestBody);
-    messageService.create(command, list);
+    messageService.create(command, attachmentRequests);
     return ResponseEntity.ok(new MessageCreateResponse(true, "Message Create Successfully"));
   }
 

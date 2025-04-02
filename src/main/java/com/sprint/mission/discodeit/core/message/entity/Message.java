@@ -42,20 +42,31 @@ public class Message implements Serializable {
     return new Message(userId, channelId, UUID.randomUUID(), Instant.now(), text, attachmentIds);
   }
 
-  public void update(String newText, List<UUID> newAttachmentIds) {
+  public void update(String newText) {
     boolean anyValueUpdated = false;
     if (newText != null && !newText.equals(text)) {
       this.text = newText;
-      anyValueUpdated = true;
-    }
-    if (newAttachmentIds != null) {
-      this.attachmentIds = newAttachmentIds;
       anyValueUpdated = true;
     }
     if (anyValueUpdated) {
       this.updatedAt = Instant.now();
     }
   }
+
+//  public void update(String newText, List<UUID> newAttachmentIds) {
+//    boolean anyValueUpdated = false;
+//    if (newText != null && !newText.equals(text)) {
+//      this.text = newText;
+//      anyValueUpdated = true;
+//    }
+//    if (newAttachmentIds != null) {
+//      this.attachmentIds = newAttachmentIds;
+//      anyValueUpdated = true;
+//    }
+//    if (anyValueUpdated) {
+//      this.updatedAt = Instant.now();
+//    }
+//  }
 
   //TODO. Message Validator 구현해야함
   public static class Validator {

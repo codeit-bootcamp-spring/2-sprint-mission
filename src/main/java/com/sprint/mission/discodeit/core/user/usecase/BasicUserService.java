@@ -6,7 +6,7 @@ import static com.sprint.mission.discodeit.exception.user.UserErrors.userLoginFa
 import static com.sprint.mission.discodeit.exception.user.UserErrors.userNameAlreadyExistsError;
 import static com.sprint.mission.discodeit.exception.user.UserErrors.userNameNotFoundError;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
@@ -20,7 +20,6 @@ import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserListResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import com.sprint.mission.discodeit.logging.CustomLogging;
-import com.sprint.mission.discodeit.util.CommonUtils;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -40,18 +39,18 @@ public class BasicUserService implements UserService {
   @CustomLogging
   @Override
   public void create(CreateUserCommand command,
-      Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
+      Optional<CreateBinaryContentCommand> binaryContentDTO) {
     UUID profileId = null;
     validateUser(command.name(), command.email());
 
     String hashedPassword = BCrypt.hashpw(command.password(), BCrypt.gensalt());
+
     if (binaryContentDTO.isPresent()) {
       profileId = makeBinaryContent(binaryContentDTO);
     }
 
     User user = User.create(command.name(), command.email(), hashedPassword, profileId);
     userRepositoryPort.save(user);
-
     userStatusService.create(new CreateUserStatusCommand(user.getId(), Instant.now()));
   }
 
@@ -65,7 +64,7 @@ public class BasicUserService implements UserService {
     }
   }
 
-  private UUID makeBinaryContent(Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
+  private UUID makeBinaryContent(Optional<CreateBinaryContentCommand> binaryContentDTO) {
     return binaryContentDTO.map(contentDTO -> {
       String fileName = contentDTO.fileName();
       String contentType = contentDTO.contentType();
@@ -83,7 +82,7 @@ public class BasicUserService implements UserService {
   @Override
   public LoginUserResult login(LoginUserCommand command) {
     List<User> list = userRepositoryPort.findAll();
-    User user = CommonUtils.findByName(list, command.userName(), User::getName)
+    User user = list.stream().filter(u -> u.getName().equals(command.userName())).findFirst()
         .orElseThrow(() -> userNameNotFoundError(command.userName()));
 
     if (!BCrypt.checkpw(command.password(), user.getPassword())) {
@@ -114,7 +113,7 @@ public class BasicUserService implements UserService {
   @CustomLogging
   @Override
   public void update(UpdateUserCommand command,
-      Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
+      Optional<CreateBinaryContentCommand> binaryContentDTO) {
 
     User user = userRepositoryPort.findById(command.requestUserId())
         .orElseThrow(() -> userIdNotFoundError(command.requestUserId()));

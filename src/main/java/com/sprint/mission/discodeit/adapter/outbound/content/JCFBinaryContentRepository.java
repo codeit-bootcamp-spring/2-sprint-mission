@@ -1,50 +1,38 @@
 package com.sprint.mission.discodeit.adapter.outbound.content;
 
-import com.sprint.mission.discodeit.exception.content.EmptyBinaryContentListException;
-import com.sprint.mission.discodeit.exception.content.BinaryContentNotFoundException;
-import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
-import com.sprint.mission.discodeit.util.CommonUtils;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFBinaryContentRepository implements BinaryContentRepositoryPort {
 
-  private final List<BinaryContent> binaryContentList = new LinkedList<>();
+  private final Map<UUID, BinaryContent> binaryContentList = new ConcurrentHashMap<>();
 
   @Override
   public BinaryContent save(BinaryContent binaryContent) {
-    binaryContentList.add(binaryContent);
+    binaryContentList.put(binaryContent.getId(), binaryContent);
     return binaryContent;
   }
 
   @Override
   public BinaryContent findById(UUID binaryId) {
-    return CommonUtils.findById(binaryContentList, binaryId, BinaryContent::getId)
-        .orElseThrow(() -> new BinaryContentNotFoundException("바이너리 데이터를 찾을 수 없습니다."));
+    return binaryContentList.get(binaryId);
   }
 
   @Override
   public List<BinaryContent> findAllByIdIn() {
-    if (binaryContentList.isEmpty()) {
-      throw new EmptyBinaryContentListException("Repository 내 바이너리 정보 리스트가 비어있습니다.");
-    }
-    return binaryContentList;
+    return binaryContentList.values().stream().toList();
   }
 
   @Override
   public void delete(UUID binaryId) {
-    try {
-      BinaryContent content = findById(binaryId);
-      binaryContentList.remove(content);
-    } catch (BinaryContentNotFoundException e) {
-      System.out.println("해당 바이너리 데이터는 존재하지 않습니다.");
-    }
+    binaryContentList.remove(binaryId);
   }
 }

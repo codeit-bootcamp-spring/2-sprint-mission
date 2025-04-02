@@ -4,7 +4,7 @@ import static com.sprint.mission.discodeit.exception.channel.ChannelErrors.chann
 import static com.sprint.mission.discodeit.exception.message.MessageErrors.messageIdNotFoundError;
 import static com.sprint.mission.discodeit.exception.user.UserErrors.userIdNotFoundError;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
@@ -19,7 +19,6 @@ import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,7 @@ public class BasicMessageService implements MessageService {
   @CustomLogging
   @Override
   public Message create(CreateMessageCommand command,
-      List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
+      List<CreateBinaryContentCommand> binaryContentCommands) {
     User user = userRepositoryPort.findById(command.userId()).orElseThrow(() ->
         userIdNotFoundError(command.userId())
     );
@@ -46,7 +45,7 @@ public class BasicMessageService implements MessageService {
         channelIdNotFoundError(command.channelId())
     );
 
-    List<UUID> binaryContentIdList = makeBinaryContent(binaryContentDTOs);
+    List<UUID> binaryContentIdList = makeBinaryContent(binaryContentCommands);
 
     Message message = Message.create(user.getId(), channel.getChannelId(),
         command.text(), binaryContentIdList);
@@ -57,20 +56,18 @@ public class BasicMessageService implements MessageService {
 
 
   private List<UUID> makeBinaryContent(
-      List<Optional<BinaryContentCreateRequestDTO>> binaryContentDTOs) {
-    return binaryContentDTOs.stream()
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+      List<CreateBinaryContentCommand> commands) {
+    return commands.stream()
         .map(this::saveBinaryContent)
         .collect(Collectors.toList());
   }
 
-  private UUID saveBinaryContent(BinaryContentCreateRequestDTO binaryContentCreateDTO) {
+  private UUID saveBinaryContent(CreateBinaryContentCommand command) {
     BinaryContent content = BinaryContent.create(
-        binaryContentCreateDTO.fileName(),
-        binaryContentCreateDTO.bytes().length,
-        binaryContentCreateDTO.contentType(),
-        binaryContentCreateDTO.bytes()
+        command.fileName(),
+        command.bytes().length,
+        command.contentType(),
+        command.bytes()
     );
     binaryContentRepositoryPort.save(content);
     return content.getId();
@@ -92,11 +89,10 @@ public class BasicMessageService implements MessageService {
   @CustomLogging
   @Override
   public void update(UpdateMessageCommand command) {
-
     Message message = messageRepositoryPort.findById(command.messageId())
         .orElseThrow(() -> messageIdNotFoundError(command.messageId()));
 
-    message.update(command.newText(), null);
+    message.update(command.newText());
   }
 
   @CustomLogging

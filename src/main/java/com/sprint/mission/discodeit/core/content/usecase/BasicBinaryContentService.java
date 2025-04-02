@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.content.usecase;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
@@ -18,10 +18,10 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @CustomLogging
   @Override
-  public BinaryContent create(BinaryContentCreateRequestDTO binaryContentCreateRequestDTO) {
-    BinaryContent binaryContent = BinaryContent.create(binaryContentCreateRequestDTO.fileName(),
-        binaryContentCreateRequestDTO.bytes().length, binaryContentCreateRequestDTO.contentType(),
-        binaryContentCreateRequestDTO.bytes());
+  public BinaryContent create(CreateBinaryContentCommand command) {
+    BinaryContent binaryContent = BinaryContent.create(command.fileName(),
+        command.bytes().length, command.contentType(),
+        command.bytes());
     return binaryContentRepositoryPort.save(binaryContent);
   }
 
