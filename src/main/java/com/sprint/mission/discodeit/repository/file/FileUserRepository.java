@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 @Repository
 public class FileUserRepository implements UserRepository {
     private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
+    private static final String EXTENSION = ".ser";
 
     public FileUserRepository() {
         this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "repositoryToFile", User.class.getSimpleName());

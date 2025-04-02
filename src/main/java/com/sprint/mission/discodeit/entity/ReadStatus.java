@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,7 +13,9 @@ import java.util.UUID;
  */
 
 @Getter
-public class ReadStatus {
+public class ReadStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
@@ -34,13 +37,8 @@ public class ReadStatus {
      * 사용자가 마지막으로 읽은 메시지 시간 업데이트
      */
     public void update(Instant newLastReadAt) {
-        boolean anyValueUpdated = false;
         if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
             this.lastReadAt = newLastReadAt;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
             this.updatedAt = Instant.now();
         }
     }

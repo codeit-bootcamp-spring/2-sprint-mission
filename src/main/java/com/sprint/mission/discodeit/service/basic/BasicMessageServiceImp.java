@@ -38,6 +38,8 @@ public class BasicMessageServiceImp implements MessageService {
             throw new NoSuchElementException("Author with id " + authorId + " does not exist");
         }
 
+        System.out.println("[MessageService] List attachmentIds :" + binaryContentCreateRequests );
+
         List<UUID> attachmentIds = binaryContentCreateRequests.stream()
                 .map(attachmentRequest -> {
                     String fileName = attachmentRequest.fileName();

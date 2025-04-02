@@ -6,3 +6,9 @@ discodeit:
   repository:
     type: file   # jcf | file
     file-directory: .discodeit
+
+servlet:
+  multipart:
+    enabled: true                # 멀티파트 요청 허용 (기본값 true지만 명시해도 OK)
+    max-file-size: 10MB         # 개별 파일 최대 크기
+    max-request-size: 20MB      # 전체 요청 최대 크기 (파일 여러 개 합산)
