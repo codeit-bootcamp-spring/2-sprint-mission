@@ -130,11 +130,11 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(ChannelUpdateDto channelUpdateDto) {
-        Channel channel = channelRepository.findById(channelUpdateDto.id());
+    public Channel update(UUID channelId, ChannelUpdateDto channelUpdateDto) {
+        Channel channel = channelRepository.findById(channelId);
 
         if (channel == null) {
-            throw new ChannelNotFoundException(channelUpdateDto.id() + " 채널은 존재하지 않아 수정할 수 없습니다.");
+            throw new ChannelNotFoundException(channelId + " 채널은 존재하지 않아 수정할 수 없습니다.");
         }
 
         if (channel.getType().equals(ChannelType.PRIVATE)) {
