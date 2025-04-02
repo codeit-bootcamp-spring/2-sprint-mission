@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
+import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -17,15 +18,19 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public BinaryContent create(BinaryContentCreateRequestDto requestDto) {
-        BinaryContent binaryContent = new BinaryContent(requestDto.resourceLink());
+    public BinaryContent create(BinaryContentCreateRequest requestDto) {
+        BinaryContent binaryContent = new BinaryContent(
+                requestDto.fileName(),
+                (long)requestDto.bytes().length,
+                requestDto.contentType(),
+                requestDto.bytes());
         return binaryContentRepository.save(binaryContent);
     }
 
     @Override
     public BinaryContent find(UUID id) {
         return binaryContentRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 BinaryContent 없음"));
+                .orElseThrow(() -> new ResourceNotFoundException("해당 BinaryContent 없음"));
     }
 
     @Override
@@ -36,7 +41,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public void delete(UUID id) {
         if (!binaryContentRepository.existsById(id)) {
-            throw new NoSuchElementException("해당 BinaryContent 없음");
+            throw new ResourceNotFoundException("해당 BinaryContent 없음");
         }
         binaryContentRepository.deleteById(id);
     }

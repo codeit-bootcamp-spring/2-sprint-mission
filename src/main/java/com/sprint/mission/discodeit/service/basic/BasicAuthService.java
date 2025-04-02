@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.auth.AuthLoginRequestDto;
-import com.sprint.mission.discodeit.dto.auth.AuthLoginResponseDto;
+import com.sprint.mission.discodeit.dto.auth.AuthLoginRequest;
+import com.sprint.mission.discodeit.dto.auth.AuthLoginResponse;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.exception.InvalidCredentialsException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -18,13 +19,13 @@ public class BasicAuthService implements AuthService {
     private final UserStatusService userStatusService;
 
     @Override
-    public AuthLoginResponseDto login(AuthLoginRequestDto requestDto) {
-        User user = userRepository.findByUsername(requestDto.username())
-                .filter(u -> u.getPassword().equals(requestDto.password()))
-                .orElseThrow(() -> new NoSuchElementException("로그인 실패"));
+    public AuthLoginResponse login(AuthLoginRequest request) {
+        User user = userRepository.findByUsername(request.username())
+                .filter(u -> u.getPassword().equals(request.password()))
+                .orElseThrow(() -> new InvalidCredentialsException("로그인 실패"));
 
         userStatusService.updateByUserId(user.getId());
 
-        return new AuthLoginResponseDto(user.getId(), user.getEmail(), user.getUsername());
+        return new AuthLoginResponse(user.getId(), user.getEmail(), user.getUsername());
     }
 }

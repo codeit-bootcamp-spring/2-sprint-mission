@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.common.ReadStatus;
-import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.exception.MissingArgumentException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -28,9 +27,16 @@ public class FileReadStatusRepository extends AbstractFileRepository<Map<UUID, R
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
+        assertNotNull(readStatus);
         data.put(readStatus.getId(), readStatus);
         saveData(data);
         return readStatus;
+    }
+
+    private static void assertNotNull(ReadStatus readStatus) {
+        if (readStatus == null) {
+            throw new MissingArgumentException("저장할 readStatus를 제공받지 못했습니다.");
+        }
     }
 
     @Override

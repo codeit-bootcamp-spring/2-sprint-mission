@@ -2,7 +2,8 @@ package com.sprint.mission.discodeit.dto.user;
 
 import java.util.UUID;
 
-public record UserCreateRequestDto(
+public record UserUpdateRequest(
+        UUID id,
         String username,
         String email,
         String password,
