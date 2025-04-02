@@ -10,7 +10,8 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 
-import static com.sprint.mission.util.FileUtils.*;
+import static com.sprint.mission.discodeit.util.FileUtils.loadAndSave;
+import static com.sprint.mission.discodeit.util.FileUtils.loadObjectsFromFile;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
@@ -23,7 +24,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message save(Message message) {
-        loadAndSaveConsumer(messagePath, (Map<UUID, Message> messages) ->
+        loadAndSave(messagePath, (Map<UUID, Message> messages) ->
                 messages.put(message.getId(), message)
         );
 
@@ -47,29 +48,21 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message updateContext(UUID id, String context) {
-        return loadAndSave(messagePath, (Map<UUID, Message> messages) -> {
-                    Message message = messages.get(id);
-                    message.updateContext(context);
-                    return message;
-                }
-        );
+    public List<Message> findByChannelId(UUID channelId) {
+        Map<UUID, Message> messages = loadObjectsFromFile(messagePath);
+
+        return messages.values()
+                .stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
     public void delete(UUID id) {
-        loadAndSaveConsumer(messagePath, (Map<UUID, Message> messages) ->
+        loadAndSave(messagePath, (Map<UUID, Message> messages) ->
                 messages.remove(id)
         );
     }
-
-    @Override
-    public void deleteByChannelId(UUID channelId) {
-        loadAndSaveConsumer(messagePath, (Map<UUID, Message> messages) ->
-                messages.values().removeIf(message -> message.getChannelId().equals(channelId))
-        );
-    }
-
 
     @Override
     public Instant findLastMessageCreatedAtByChannelId(UUID channelId) {

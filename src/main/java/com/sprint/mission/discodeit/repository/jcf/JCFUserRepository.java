@@ -48,12 +48,6 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void updateName(UUID id, String name) {
-        User user = users.get(id);
-        user.updateName(name);
-    }
-
-    @Override
     public void delete(UUID id) {
         users.remove(id);
     }

@@ -1,34 +1,38 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import static com.sprint.mission.discodeit.util.mock.message.MessageInfo.MESSAGE_CONTENT;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 
 
 class FileBinaryContentRepositoryTest {
-    @TempDir
-    private Path path;
 
-    private BinaryContentRepository binaryContentRepository;
+  @TempDir
+  private Path path;
 
-    @BeforeEach
-    void setUp() {
-        binaryContentRepository = new FileBinaryContentRepository(path.resolve("binaryContent.ser"));
-    }
+  private BinaryContentRepository binaryContentRepository;
 
-    @Test
-    void save() {
-        BinaryContent binaryContent = new BinaryContent(Paths.get(UUID.randomUUID().toString()));
-        BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+  @BeforeEach
+  void setUp() {
+    binaryContentRepository = new FileBinaryContentRepository(path.resolve("binaryContent.ser"));
+  }
 
-        assertThat(binaryContent.getId()).isEqualTo(savedBinaryContent.getId());
-    }
+  @Test
+  void save() {
+    MockMultipartFile file = new MockMultipartFile(MediaType.IMAGE_JPEG_VALUE,
+        MESSAGE_CONTENT.getBytes());
+
+    BinaryContent binaryContent = new BinaryContent(file);
+    BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+
+    assertThat(binaryContent.getId()).isEqualTo(savedBinaryContent.getId());
+  }
 }

@@ -1,45 +1,80 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.application.dto.channel.ChannelRegisterDto;
-import com.sprint.mission.discodeit.application.dto.user.UserDto;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest;
+import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
+import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelAddMemeberRequest;
+import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelCreationRequest;
+import com.sprint.mission.discodeit.application.dto.channel.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
+@RequestMapping("/channels")
 @RequiredArgsConstructor
 public class ChannelController {
-    private final ChannelService channelService;
-    private final UserService userService;
 
-    public ChannelDto createPublicChannel(ChannelRegisterDto channelRegisterDto) {
-        return channelService.createPublic(channelRegisterDto);
-    }
+  private final ChannelService channelService;
+  private final UserService userService;
 
-    public ChannelDto createPrivateChannel(ChannelRegisterDto channelRegisterDto, List<UUID> memberIds) {
-        return channelService.createPrivate(channelRegisterDto, memberIds);
-    }
+  @PostMapping("/public")
+  public ResponseEntity<ChannelResult> createPublicChannel(
+      @Valid @RequestBody ChannelCreateRequest channelRegisterRequest) {
+    return ResponseEntity.ok(channelService.createPublic(channelRegisterRequest));
+  }
 
-    public List<ChannelDto> findAllByUserId(UUID userId) {
-        return channelService.findAllByUserId(userId);
-    }
+  @PostMapping("/private")
+  public ResponseEntity<ChannelResult> createPrivateChannel(
+      @Valid @RequestBody PrivateChannelCreationRequest privateChannelCreationRequest) {
+    return ResponseEntity.ok(channelService.createPrivate(privateChannelCreationRequest));
+  }
 
-    public ChannelDto updatePublicChannelName(UUID channelId, String channelName) {
-        return channelService.updatePublicChannelName(channelId, channelName);
-    }
+  @GetMapping("/user/{userId}")
+  public ResponseEntity<List<ChannelResult>> getAllByUserId(@PathVariable UUID userId) {
+    return ResponseEntity.ok(channelService.getAllByUserId(userId));
+  }
 
-    public ChannelDto addPrivateChannelMember(UUID channelId, String friendEmail) {
-        UserDto friend = userService.findByEmail(friendEmail);
+  @PutMapping("/public/update")
+  public ResponseEntity<ChannelResult> updatePublicChannelName(
+      @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
+    ChannelResult channelResult = channelService.updatePublicChannelName(
+        publicChannelUpdateRequest.channelId(), publicChannelUpdateRequest.channelName());
 
-        return channelService.addPrivateChannelMember(channelId, friend.id());
-    }
+    return ResponseEntity.ok(channelResult);
+  }
 
-    public ChannelDto findById(UUID channelId) {
-        return channelService.findById(channelId);
-    }
+  @PostMapping("/private/members")
+  public ResponseEntity<ChannelResult> addPrivateChannelMember(
+      @RequestBody PrivateChannelAddMemeberRequest privateChannelAddMemeberRequest) {
+    UserResult friend = userService.getByEmail(privateChannelAddMemeberRequest.friendEmail());
+
+    return ResponseEntity.ok(
+        channelService.addPrivateChannelMember(privateChannelAddMemeberRequest.channelId(),
+            friend.id()));
+  }
+
+  @GetMapping("/{channelId}")
+  public ResponseEntity<ChannelResult> getById(@PathVariable UUID channelId) {
+    return ResponseEntity.ok(channelService.getById(channelId));
+  }
+
+  @DeleteMapping("/{channelId}")
+  public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId) {
+    channelService.delete(channelId);
+
+    return ResponseEntity.noContent().build();
+  }
 }

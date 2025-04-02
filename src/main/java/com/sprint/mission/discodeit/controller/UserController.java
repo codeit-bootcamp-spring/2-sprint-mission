@@ -1,55 +1,86 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.user.UserDto;
-import com.sprint.mission.discodeit.application.dto.user.UserRegisterDto;
-import com.sprint.mission.discodeit.application.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.application.dto.userStatus.UserStatusDto;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.application.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.application.dto.user.UserResult;
+import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusResult;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.multipart.MultipartFile;
-
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-@Controller
+@Slf4j
+@RestController
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
-    private final BinaryContentService binaryContentService;
-    private final UserStatusService userStatusService;
 
-    public UserDto register(UserRegisterDto userRegisterDto, MultipartFile multipartFile) {
-        UUID profileId = binaryContentService.createProfileImage(multipartFile);
+  private final UserService userService;
+  private final UserStatusService userStatusService;
 
-        return userService.register(userRegisterDto, profileId);
-    }
+  @PostMapping
+  public ResponseEntity<UserResult> register(@Valid @RequestPart UserCreateRequest userRequest,
+      @RequestPart(required = false) MultipartFile profileImage) {
+    UserResult user = userService.register(userRequest, profileImage);
 
-    public UserResponseDto findById(UUID userId) {
-        UserDto userDto = userService.findById(userId);
-        UserStatusDto userStatusDto = userStatusService.findByUserId(userDto.id());
+    return ResponseEntity.ok(user);
+  }
 
-        return UserResponseDto.of(userDto, userStatusDto.isLogin());
-    }
+  @GetMapping("/{userId}")
+  public ResponseEntity<UserResult> getById(@PathVariable UUID userId) {
+    UserResult user = userService.getById(userId);
 
-    public List<UserDto> findAll() {
-        return userService.findAll();
-    }
+    return ResponseEntity.ok(user);
+  }
 
-    public UserDto updateProfile(UUID userId, MultipartFile multipartFile) {
-        UserDto beforeUpdatedUser = userService.findById(userId);
-        UUID profileId = binaryContentService.createProfileImage(multipartFile);
-        UserDto user = userService.updateProfileImage(userId, profileId);
-        binaryContentService.delete(beforeUpdatedUser.profileId());
+  @GetMapping
+  public ResponseEntity<List<UserResult>> getAll() {
+    return ResponseEntity.ok(userService.getAll());
+  }
 
-        return user;
-    }
+  @PutMapping(value = "/{userId}")
+  public ResponseEntity<UserResult> updateUser(@PathVariable UUID userId,
+      @RequestBody UserCreateRequest userRequest) {
+    UserResult updatedUser = userService.updateName(userId, userRequest.name());
 
-    public void delete(UUID userId) {
-        UserDto beforeUpdatedUser = userService.findById(userId);
-        userService.delete(userId);
-        binaryContentService.delete(beforeUpdatedUser.profileId());
-    }
+    return ResponseEntity.ok(updatedUser);
+  }
+
+
+  @PutMapping("/{userId}/profile-image")
+  public ResponseEntity<UserResult> updateProfileImage(@PathVariable UUID userId,
+      @RequestPart MultipartFile profileImage) {
+    UserResult user = userService.updateProfileImage(userId, profileImage);
+
+    return ResponseEntity.ok(user);
+  }
+
+  @PutMapping("/{userId}/status")
+  public ResponseEntity<UserStatusResult> updateOnlineStatus(@PathVariable UUID userId) {
+    UserStatusResult status = userStatusService.updateByUserId(userId);
+
+    return ResponseEntity.ok(status);
+  }
+
+  @DeleteMapping("/{userId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+    userService.delete(userId);
+
+    return ResponseEntity.noContent()
+        .build();
+  }
+
 }

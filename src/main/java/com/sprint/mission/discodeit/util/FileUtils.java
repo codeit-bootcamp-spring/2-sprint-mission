@@ -1,13 +1,10 @@
-package com.sprint.mission.util;
-
-import org.springframework.web.multipart.MultipartFile;
+package com.sprint.mission.discodeit.util;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class FileUtils {
@@ -19,12 +16,6 @@ public final class FileUtils {
         T result = operation.apply(objects);
         saveObjectsToFile(objectPath, objects);
         return result;
-    }
-
-    public static <U, T> void loadAndSaveConsumer(Path objectPath, Consumer<Map<U, T>> operation) {
-        Map<U, T> objects = loadObjectsFromFile(objectPath);
-        operation.accept(objects);
-        saveObjectsToFile(objectPath, objects);
     }
 
     public static <U, T> Map<U, T> loadObjectsFromFile(Path filePath) {
@@ -49,15 +40,6 @@ public final class FileUtils {
             Files.deleteIfExists(imageFilePath);
         } catch (IOException e) {
             throw new UncheckedIOException("프로필이미지 파일을 삭제할 수 없습니다.", e);
-        }
-    }
-
-    public static void saveImageFileToPath(MultipartFile multipartFile, Path imageFilePath) {
-        try {
-            init(imageFilePath);
-            Files.write(imageFilePath, multipartFile.getBytes());
-        } catch (IOException e) {
-            throw new UncheckedIOException("프로필이미지 파일을 저장할 수 없습니다.", e);
         }
     }
 
@@ -91,7 +73,6 @@ public final class FileUtils {
             throw new UncheckedIOException("파일에 저장하는 작업을 실패했습니다.", e);
         }
     }
-
 
     private static void creatDirectory(Path directory) {
         try {

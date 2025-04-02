@@ -1,39 +1,54 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.message.MessageCreationDto;
-import com.sprint.mission.discodeit.application.dto.message.MessageDto;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
+import com.sprint.mission.discodeit.application.dto.message.MessageResult;
 import com.sprint.mission.discodeit.service.MessageService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.multipart.MultipartFile;
-
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-@Controller
+@RestController
+@RequestMapping("/messages")
 @RequiredArgsConstructor
 public class MessageController {
-    private final MessageService messageService;
-    private final BinaryContentService binaryContentService;
 
-    public MessageDto createMessage(MessageCreationDto messageCreationDto, List<MultipartFile> files) {
-        List<UUID> profileImageIds = files.stream()
-                .map(binaryContentService::createProfileImage)
-                .toList();
+  private final MessageService messageService;
 
-        return messageService.create(messageCreationDto, profileImageIds);
-    }
+  @PostMapping
+  public ResponseEntity<MessageResult> createMessage(
+      @Valid @RequestPart("message") MessageCreationRequest messageCreationRequest,
+      @RequestPart(value = "files", required = false) List<MultipartFile> files) {
 
-    public List<MessageDto> findByChannelId(UUID channelId) {
-        return messageService.findAllByChannelId(channelId);
-    }
+    return ResponseEntity.ok(messageService.create(messageCreationRequest, files));
+  }
 
-    public MessageDto updateContent(UUID messageId, String context) {
-        return messageService.updateContext(messageId, context);
-    }
+  @GetMapping("/channel/{channelId}")
+  public ResponseEntity<List<MessageResult>> getByChannelId(@PathVariable UUID channelId) {
+    return ResponseEntity.ok(messageService.getAllByChannelId(channelId));
+  }
 
-    public void delete(UUID messageId) {
-        messageService.delete(messageId);
-    }
+  @PutMapping("/{messageId}")
+  public ResponseEntity<MessageResult> updateContent(@PathVariable UUID messageId,
+      @RequestBody MessageCreationRequest messageCreationRequest) {
+    return ResponseEntity.ok(
+        messageService.updateContext(messageId, messageCreationRequest.context()));
+  }
+
+  @DeleteMapping("/{messageId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
+    messageService.delete(messageId);
+    return ResponseEntity.noContent().build();
+  }
 }
