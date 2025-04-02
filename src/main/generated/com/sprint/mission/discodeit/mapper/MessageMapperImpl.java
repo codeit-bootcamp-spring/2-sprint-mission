@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-29T13:41:15+0900",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
+    date = "2025-04-02T10:45:02+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
 public class MessageMapperImpl implements MessageMapper {
@@ -111,9 +111,7 @@ public class MessageMapperImpl implements MessageMapper {
             channelId = message.getChannelId();
         }
         UserDTO userDTO1 = null;
-        if ( userDTO != null ) {
-            userDTO1 = userDTO;
-        }
+        userDTO1 = userDTO;
 
         MessageDTO messageDTO = new MessageDTO( id, createdAt, updatedAt, attachmentIds, content, channelId, userDTO1 );
 
@@ -142,9 +140,7 @@ public class MessageMapperImpl implements MessageMapper {
             channelId = message.getChannelId();
         }
         UserDTO userDTO1 = null;
-        if ( userDTO != null ) {
-            userDTO1 = userDTO;
-        }
+        userDTO1 = userDTO;
 
         UpdateMessageDTO updateMessageDTO = new UpdateMessageDTO( id, updatedAt, attachmentIds, content, channelId, userDTO1 );
 

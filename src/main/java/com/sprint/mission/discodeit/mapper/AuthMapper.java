@@ -12,11 +12,12 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface AuthMapper {
 
-    AuthMapper INSTANCE = Mappers.getMapper(AuthMapper.class);
+  AuthMapper INSTANCE = Mappers.getMapper(AuthMapper.class);
 
-    LoginParam toLoginParam(LoginRequestDTO loginRequestDTO);
-    LoginResponseDTO toLoginResponseDTO(LoginDTO loginDTO);
+  LoginParam toLoginParam(LoginRequestDTO loginRequestDTO);
 
-    LoginDTO toLoginDTO(User user);
+  LoginResponseDTO toLoginResponseDTO(LoginDTO loginDTO);
+
+  LoginDTO toLoginDTO(User user);
 
 }

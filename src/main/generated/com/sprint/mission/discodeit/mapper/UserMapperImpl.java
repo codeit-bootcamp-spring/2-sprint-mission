@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-29T13:31:28+0900",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
+    date = "2025-04-02T10:45:02+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
 public class UserMapperImpl implements UserMapper {
@@ -153,9 +153,7 @@ public class UserMapperImpl implements UserMapper {
             email = user.getEmail();
         }
         BinaryContentDTO binaryContentDTO1 = null;
-        if ( binaryContentDTO != null ) {
-            binaryContentDTO1 = binaryContentDTO;
-        }
+        binaryContentDTO1 = binaryContentDTO;
 
         Boolean isLogin = userStatus.isLoginUser();
 
@@ -181,9 +179,7 @@ public class UserMapperImpl implements UserMapper {
             email = user.getEmail();
         }
         BinaryContentDTO binaryContentDTO1 = null;
-        if ( binaryContentDTO != null ) {
-            binaryContentDTO1 = binaryContentDTO;
-        }
+        binaryContentDTO1 = binaryContentDTO;
 
         UpdateUserDTO updateUserDTO = new UpdateUserDTO( id, binaryContentDTO1, updatedAt, username, email );
 

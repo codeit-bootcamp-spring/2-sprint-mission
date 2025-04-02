@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusParam
 import com.sprint.mission.discodeit.dto.service.readStatus.ReadStatusDTO;
 import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.ReadStatus.ReadStatusBuilder;
 import java.time.Instant;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
@@ -15,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-29T13:22:28+0900",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
+    date = "2025-04-02T10:45:02+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
 public class ReadStatusMapperImpl implements ReadStatusMapper {
@@ -80,7 +79,7 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
             return null;
         }
 
-        ReadStatusBuilder readStatus = ReadStatus.builder();
+        ReadStatus.ReadStatusBuilder readStatus = ReadStatus.builder();
 
         readStatus.userId( createReadStatusParam.userId() );
         readStatus.channelId( createReadStatusParam.channelId() );

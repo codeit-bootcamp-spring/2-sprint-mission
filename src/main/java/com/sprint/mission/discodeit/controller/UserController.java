@@ -36,8 +36,7 @@ public class UserController {
       @RequestPart("user") @Valid CreateUserRequestDTO createUserRequestDTO,
       @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
     CreateUserParam createUserParam = userMapper.toCreateUserParam(createUserRequestDTO);
-    UserDTO userDTO = null;
-    userDTO = userService.create(createUserParam, multipartFile);
+    UserDTO userDTO = userService.create(createUserParam, multipartFile);
     CreateUserResponseDTO createUserResponseDTO = userMapper.toCreateUserResponseDTO(userDTO);
 
     return ResponseEntity.ok(createUserResponseDTO);
