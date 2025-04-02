@@ -17,3 +17,10 @@ discodeit:
 springdoc:
   api-docs:
     path: /v3/api-docs
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet: DEBUG
+    org.springframework.web.multipart: DEBUG
+    org.springframework.http.converter: DEBUG

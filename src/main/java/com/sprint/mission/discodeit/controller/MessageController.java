@@ -28,9 +28,9 @@ public class MessageController {
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<Message> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+      @RequestPart(value = "profile", required = false) List<MultipartFile> profile
   ) {
-    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
+    List<BinaryContentCreateRequest> profileRequests = Optional.ofNullable(profile)
         .map(files -> files.stream()
             .map(file -> {
               try {
@@ -45,7 +45,7 @@ public class MessageController {
             })
             .toList())
         .orElse(new ArrayList<>());
-    Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    Message createdMessage = messageService.create(messageCreateRequest, profileRequests);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdMessage);
