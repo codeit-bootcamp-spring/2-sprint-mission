@@ -9,8 +9,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.handler.custom.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.handler.custom.channel.PrivateChannelUpdateException;
+import com.sprint.mission.discodeit.exception.custom.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.custom.channel.PrivateChannelUpdateNotSupportedException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -56,7 +56,7 @@ public class BasicChannelService implements ChannelService {
                 );
 
         if (isExistChannel) {
-            throw new PrivateChannelUpdateException(channelCreatePublicDto.name() + " 채널은 이미 존재합니다.");
+            throw new PrivateChannelUpdateNotSupportedException(channelCreatePublicDto.name() + " 채널은 이미 존재합니다.");
         }
 
         Channel newChannel = Channel.createPublic(channelCreatePublicDto.name(), channelCreatePublicDto.description());
@@ -138,7 +138,7 @@ public class BasicChannelService implements ChannelService {
         }
 
         if (channel.getType().equals(ChannelType.PRIVATE)) {
-            throw new PrivateChannelUpdateException("Private 채널은 수정할 수 없습니다.");
+            throw new PrivateChannelUpdateNotSupportedException("Private 채널은 수정할 수 없습니다.");
         }
 
         channel.update(channelUpdateDto.newName(), channelUpdateDto.newDescription());
