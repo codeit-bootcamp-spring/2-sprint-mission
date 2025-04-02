@@ -4,61 +4,64 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.jwt.JwtUtil;
 import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/readStatus")
 @RequiredArgsConstructor
 public class ReadStatusController {
 
-    private final ReadStatusService readStatusService;
-    private final JwtUtil jwtUtil;
+  private final ReadStatusService readStatusService;
+  private final JwtUtil jwtUtil;
 
-    @RequiresAuth
-    @RequestMapping(value = "/channel/{channelId}", method = RequestMethod.POST)
-    public ResponseEntity<?> createReadStatus(
-            @PathVariable UUID channelId,
-            @RequestHeader("Authorization") String authHeader
-    ) {
+  @RequiresAuth
+  @RequestMapping(value = "/{channelId}", method = RequestMethod.POST)
+  public ResponseEntity<?> createReadStatus(
+      @PathVariable UUID channelId,
+      @RequestHeader("Authorization") String authHeader
+  ) {
 
-        String token = authHeader.replace("Bearer ", "");
-        UUID userId = UUID.fromString(jwtUtil.extractUserId(token));
+    String token = authHeader.replace("Bearer ", "");
+    UUID userId = UUID.fromString(jwtUtil.extractUserId(token));
 
-        readStatusService.createReadStatus(userId, channelId);
+    readStatusService.createReadStatus(userId, channelId);
 
-        return ResponseEntity.ok("채널 가입이 완료되었습니다.");
-    }
+    return ResponseEntity.ok("채널 가입이 완료되었습니다.");
+  }
 
-    @RequiresAuth
-    @RequestMapping(value = "/channel/{channelId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateReadStatus(
-            @PathVariable UUID channelId,
-            @RequestHeader("Authorization") String authHeader
-    ) {
-        String token = authHeader.replace("Bearer ", "");
-        UUID userId = UUID.fromString(jwtUtil.extractUserId(token));
+  @RequiresAuth
+  @RequestMapping(value = "/{channelId}", method = RequestMethod.PUT)
+  public ResponseEntity<?> updateReadStatus(
+      @PathVariable UUID channelId,
+      @RequestHeader("Authorization") String authHeader
+  ) {
+    String token = authHeader.replace("Bearer ", "");
+    UUID userId = UUID.fromString(jwtUtil.extractUserId(token));
 
-        readStatusService.updateReadStatus(userId, channelId);
+    readStatusService.updateReadStatus(userId, channelId);
 
-        return ResponseEntity.ok("유저 메세지 수신정보 업데이트 완료되었습니다.");
-    }
+    return ResponseEntity.ok("유저 메세지 수신정보 업데이트 완료되었습니다.");
+  }
 
-    @RequiresAuth
-    @RequestMapping(value = "/channel/{channelId}", method = RequestMethod.GET)
-    public ResponseEntity<?> getReadStatus(
-            @PathVariable UUID channelId,
-            @RequestHeader("Authorization") String authHeader
-    ) {
-        String token = authHeader.replace("Bearer ", "");
-        UUID userId = UUID.fromString(jwtUtil.extractUserId(token));
+  @RequiresAuth
+  @RequestMapping(value = "/{channelId}", method = RequestMethod.GET)
+  public ResponseEntity<?> getReadStatus(
+      @PathVariable UUID channelId,
+      @RequestHeader("Authorization") String authHeader
+  ) {
+    String token = authHeader.replace("Bearer ", "");
+    UUID userId = UUID.fromString(jwtUtil.extractUserId(token));
 
-        ReadStatus readStatus = readStatusService.findReadStatusById(userId, channelId);
+    ReadStatus readStatus = readStatusService.findReadStatusById(userId, channelId);
 
-        return ResponseEntity.ok(readStatus);
-    }
+    return ResponseEntity.ok(readStatus);
+  }
 
 }

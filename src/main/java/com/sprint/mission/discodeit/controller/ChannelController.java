@@ -7,56 +7,62 @@ import com.sprint.mission.discodeit.dto.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.ChannelService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/channel")
 public class ChannelController {
 
-    private final ChannelService channelService;
+  private final ChannelService channelService;
 
-    @RequestMapping(value = "/create/private", method = RequestMethod.POST)
-    public ResponseEntity<?> createPrivateChannel(@RequestBody CreatePrivateChannelRequest channelDto) {
-        Channel channel = channelService.createPrivateChannel(channelDto);
+  @RequestMapping(value = "/private", method = RequestMethod.POST)
+  public ResponseEntity<?> createPrivateChannel(
+      @RequestBody CreatePrivateChannelRequest channelDto) {
+    Channel channel = channelService.createPrivateChannel(channelDto);
 
-        return ResponseEntity.ok(channel.getId());
-    }
+    return ResponseEntity.ok(channel.getId());
+  }
 
-    @RequestMapping(value = "/create/public", method = RequestMethod.POST)
-    public ResponseEntity<?> createPublicChannel(@RequestBody CreatePublicChannelRequest channelDto) {
-        Channel channel = channelService.createPublicChannel(channelDto);
+  @RequestMapping(value = "/public", method = RequestMethod.POST)
+  public ResponseEntity<?> createPublicChannel(@RequestBody CreatePublicChannelRequest channelDto) {
+    Channel channel = channelService.createPublicChannel(channelDto);
 
-        return ResponseEntity.ok("Public 채널이 생성되었습니다.");
-    }
+    return ResponseEntity.ok("Public 채널이 생성되었습니다.");
+  }
 
-    @RequestMapping(value = "/{channelId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateChannel(@PathVariable UUID channelId, @RequestBody UpdateChannelRequest channelDto) {
-        channelService.updateChannel(channelId, channelDto);
+  @RequestMapping(value = "/{channelId}", method = RequestMethod.PUT)
+  public ResponseEntity<?> updateChannel(@PathVariable UUID channelId,
+      @RequestBody UpdateChannelRequest channelDto) {
+    channelService.updateChannel(channelId, channelDto);
 
-        return ResponseEntity.ok("채널 수정이 완료되었습니다.");
-    }
+    return ResponseEntity.ok("채널 수정이 완료되었습니다.");
+  }
 
-    @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteChannel(@PathVariable UUID channelId) {
-        channelService.deleteChannel(channelId);
+  @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
+  public ResponseEntity<?> deleteChannel(@PathVariable UUID channelId) {
+    channelService.deleteChannel(channelId);
 
-        return ResponseEntity.ok("채널이 삭제되었습니다.");
-    }
+    return ResponseEntity.ok("채널이 삭제되었습니다.");
+  }
 
-    @RequiresAuth
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<?> getAllChannels(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        UUID userId = UUID.fromString(token);
+  @RequiresAuth
+  @RequestMapping(value = "", method = RequestMethod.GET)
+  public ResponseEntity<?> getAllChannels(@RequestHeader("Authorization") String authHeader) {
+    String token = authHeader.replace("Bearer ", "");
+    UUID userId = UUID.fromString(token);
 
-        List<ChannelInfoDto> channels = channelService.findAllByUserId(userId);
+    List<ChannelInfoDto> channels = channelService.findAllByUserId(userId);
 
-        return ResponseEntity.ok(channels);
-    }
+    return ResponseEntity.ok(channels);
+  }
 }
