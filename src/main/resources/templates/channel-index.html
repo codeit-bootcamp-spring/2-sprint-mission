@@ -1,56 +1,56 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>채널 관리 페이지</title>
+  <meta charset="UTF-8">
+  <title>채널 관리 페이지</title>
 </head>
 <body>
 
 <h1>채널 페이지</h1>
 
 <ul id="menuList">
-    <!-- 버튼 대신 a 태그로 구성 -->
-    <li><a id="createChannelLink" href="#">📝 채널 생성</a></li>
-    <li><a id="channelListLink" href="#">👥 전체 채널 목록</a></li>
+  <!-- 버튼 대신 a 태그로 구성 -->
+  <li><a id="createChannelLink" href="#">📝 채널 생성</a></li>
+  <li><a id="channelListLink" href="#">👥 전체 채널 목록</a></li>
 </ul>
 
 <script>
-    // ✅ URL 파라미터에서 토큰과 서버 ID 추출
-    function getParam(key) {
-        const params = new URLSearchParams(window.location.search);
-        return params.get(key);
+  // ✅ URL 파라미터에서 토큰과 서버 ID 추출
+  function getParam(key) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(key);
+  }
+
+  function getParams() {
+    const params = new URLSearchParams(location.search);
+    return {
+      serverId: params.get("serverId"),
+      token: params.get("token")
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const token = getParam("token");
+    const serverId = getParam("serverId");
+
+    if (!token || !serverId) {
+      alert("토큰 또는 서버 ID가 누락되었습니다.");
+      window.location.href = "/login";
+      return;
     }
 
-    function getParams() {
-        const params = new URLSearchParams(location.search);
-        return {
-            serverId: params.get("serverId"),
-            token: params.get("token")
-        };
-    }
+    // ✅ 링크 설정
+    // document.getElementById("createChannelLink").href =
+    //     `/servers/${serverId}/channel-index?token=${token}`;
+    //
+    // document.getElementById("channelListLink").href =
+    //     `/servers/${serverId}/channelList?token=${token}`;
+    document.getElementById("createChannelLink").href =
+        `/channels/create?serverId=${serverId}&token=${token}`;
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const token = getParam("token");
-        const serverId = getParam("serverId");
-
-        if (!token || !serverId) {
-            alert("토큰 또는 서버 ID가 누락되었습니다.");
-            window.location.href = "/login";
-            return;
-        }
-
-        // ✅ 링크 설정
-        // document.getElementById("createChannelLink").href =
-        //     `/servers/${serverId}/channel-index?token=${token}`;
-        //
-        // document.getElementById("channelListLink").href =
-        //     `/servers/${serverId}/channels?token=${token}`;
-        document.getElementById("createChannelLink").href =
-            `/channels/create?serverId=${serverId}&token=${token}`;
-
-        document.getElementById("channelListLink").href =
-            `/channels?serverId=${serverId}&token=${token}`;
-    });
+    document.getElementById("channelListLink").href =
+        `/channels?serverId=${serverId}&token=${token}`;
+  });
 
 </script>
 

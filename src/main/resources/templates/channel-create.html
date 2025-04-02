@@ -35,7 +35,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    const { serverId, token } = getParams();
+    const {serverId, token} = getParams();
 
     if (!serverId || !token) {
       alert("토큰 또는 서버 ID가 누락되었습니다.");
@@ -44,10 +44,11 @@
     }
 
     // 뒤로가기 링크 설정
-    document.getElementById("backLink").href = `/servers/${serverId}/channels?token=${encodeURIComponent(token)}`;
+    document.getElementById(
+        "backLink").href = `/servers/${serverId}/channels?token=${encodeURIComponent(token)}`;
 
     // 폼 제출 이벤트
-    document.getElementById("channelForm").addEventListener("submit", function(event) {
+    document.getElementById("channelForm").addEventListener("submit", function (event) {
       event.preventDefault();
 
       const name = document.getElementById("channelName").value;
@@ -65,19 +66,21 @@
           type: type
         })
       })
-              .then(res => {
-                if (!res.ok) throw new Error("채널 생성 실패");
-                return res.json();
-              })
-              .then(data => {
-                alert(`채널 생성 완료! ID: ${data}`);
-                // window.location.href = `/servers/${serverId}/channels?token=${encodeURIComponent(token)}`;
-                window.location.href = `/channels?serverId=${serverId}&token=${encodeURIComponent(token)}`;
-              })
-              .catch(err => {
-                console.error("에러:", err);
-                alert("채널 생성에 실패했습니다.");
-              });
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("채널 생성 실패");
+        }
+        return res.json();
+      })
+      .then(data => {
+        alert(`채널 생성 완료! ID: ${data}`);
+        // window.location.href = `/servers/${serverId}/channelList?token=${encodeURIComponent(token)}`;
+        window.location.href = `/channels?serverId=${serverId}&token=${encodeURIComponent(token)}`;
+      })
+      .catch(err => {
+        console.error("에러:", err);
+        alert("채널 생성에 실패했습니다.");
+      });
     });
   });
 </script>

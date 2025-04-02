@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.core.channel.usecase;
 
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.ChannelResult;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PrivateChannelCreateCommand;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PublicChannelCreateCommand;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.UpdateChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
@@ -35,7 +35,7 @@ public class BasicChannelService implements ChannelService {
 
   @CustomLogging
   @Override
-  public UUID create(PublicChannelCreateCommand command) {
+  public UUID create(CreatePublicChannelCommand command) {
     Channel channel = Channel.create(command.userId(), command.name(),
         ChannelType.PUBLIC);
 
@@ -49,7 +49,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public UUID create(PrivateChannelCreateCommand command) {
+  public UUID create(CreatePrivateChannelCommand command) {
     Channel channel = Channel.create(command.userId(), null, ChannelType.PRIVATE);
     Channel createdChannel = channelRepository.save(channel);
 
@@ -112,7 +112,7 @@ public class BasicChannelService implements ChannelService {
       throw new ChannelModificationNotAllowedException("private 채널은 수정할 수 없습니다.");
     }
 
-    channel.update(command.replaceName(), command.replaceType());
+    channel.update(command.newName(), command.newType());
   }
 
   @Override
