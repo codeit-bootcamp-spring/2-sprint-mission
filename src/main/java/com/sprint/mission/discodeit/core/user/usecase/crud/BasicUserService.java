@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.core.user.usecase.crud;
 
 import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UpdateUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.LoginUserResult;
+import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UpdateUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.LoginUserCommand;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
 import com.sprint.mission.discodeit.core.user.entity.User;
@@ -11,8 +13,10 @@ import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UserListResult;
 import com.sprint.mission.discodeit.core.user.usecase.crud.dto.UserResult;
 import com.sprint.mission.discodeit.core.user.usecase.status.UserStatusService;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsError;
+import com.sprint.mission.discodeit.exception.user.UserLoginFailedError;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
 import com.sprint.mission.discodeit.logging.CustomLogging;
+import com.sprint.mission.discodeit.util.CommonUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +29,6 @@ import org.springframework.stereotype.Service;
 public class BasicUserService implements UserService {
 
   private final UserStatusService userStatusService;
-
   private final UserRepositoryPort userRepositoryPort;
   private final BinaryContentRepositoryPort binaryContentRepositoryPort;
 
@@ -68,6 +71,20 @@ public class BasicUserService implements UserService {
     }).orElse(null);
   }
 
+  @CustomLogging
+  @Override
+  public LoginUserResult login(LoginUserCommand command) {
+    List<User> list = userRepositoryPort.findAll();
+    User user = CommonUtils.findByName(list, command.userName(), User::getName)
+        .orElseThrow(() -> new UserNotFoundError("로그인 실패: 해당 유저를 찾지 못했습니다."));
+
+    if (!BCrypt.checkpw(command.password(), user.getPassword())) {
+      throw new UserLoginFailedError("로그인 실패: 비밀번호가 틀립니다.");
+    }
+    //미구현으로 임시로 "-1"값 넣어둠
+    return new LoginUserResult("-1");
+  }
+
   // TODO. 에러 던질 때 import static 로 하기
   @Override
   public UserResult findById(UUID userId) {
@@ -89,7 +106,7 @@ public class BasicUserService implements UserService {
 
   @CustomLogging
   @Override
-  public void update(UUID userId, UpdateUserCommand command,
+  public void update(UpdateUserCommand command,
       Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
 
     User user = userRepositoryPort.findById(command.requestUserId())
@@ -99,7 +116,7 @@ public class BasicUserService implements UserService {
       binaryContentRepositoryPort.delete(profileId);
     }
     UUID newProfileId = makeBinaryContent(binaryContentDTO);
-    user.update(command.replaceName(), command.replaceEmail(), newProfileId);
+    user.update(command.newName(), command.newEmail(), newProfileId);
 
   }
 

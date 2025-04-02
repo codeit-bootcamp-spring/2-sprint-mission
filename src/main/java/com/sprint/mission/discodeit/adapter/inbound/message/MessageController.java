@@ -1,28 +1,13 @@
 package com.sprint.mission.discodeit.adapter.inbound.message;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.BinaryContentCreateRequestDTO;
-import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageCreateCommand;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateResult;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageDisplayList;
-import com.sprint.mission.discodeit.core.message.usecase.crud.dto.MessageResult;
-import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.usecase.crud.MessageService;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,37 +15,37 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController {
 
   private final MessageService messageService;
+//
+//  @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//  public ResponseEntity<MessageCreateResult> create(
+//      @PathVariable UUID userId, @PathVariable UUID channelId,
+//      @RequestPart("message") MessageCreateCommand messageDTO,
+//      @RequestPart(value = "profileImage", required = false) List<MultipartFile> files)
+//      throws IOException {
+//    List<Optional<BinaryContentCreateRequestDTO>> list = new ArrayList<>();
+//    if (files != null) {
+//      for (MultipartFile file : files) {
+//        Optional<BinaryContentCreateRequestDTO> binaryContentRequest = Optional.empty();
+//        if (file != null && !file.isEmpty()) {
+//          binaryContentRequest = Optional.of(new BinaryContentCreateRequestDTO(
+//              file.getOriginalFilename(),
+//              file.getContentType(),
+//              file.getBytes()
+//          ));
+//          list.add(binaryContentRequest);
+//        }
+//      }
+//    }
+//
+//    Message message = messageService.create(userId, channelId, messageDTO, list);
+//    return ResponseEntity.ok(new MessageCreateResult(message.getMessageId()));
+//  }
 
-  @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<MessageCreateResult> create(
-      @PathVariable UUID userId, @PathVariable UUID channelId,
-      @RequestPart("message") MessageCreateCommand messageDTO,
-      @RequestPart(value = "profileImage", required = false) List<MultipartFile> files)
-      throws IOException {
-    List<Optional<BinaryContentCreateRequestDTO>> list = new ArrayList<>();
-    if (files != null) {
-      for (MultipartFile file : files) {
-        Optional<BinaryContentCreateRequestDTO> binaryContentRequest = Optional.empty();
-        if (file != null && !file.isEmpty()) {
-          binaryContentRequest = Optional.of(new BinaryContentCreateRequestDTO(
-              file.getOriginalFilename(),
-              file.getContentType(),
-              file.getBytes()
-          ));
-          list.add(binaryContentRequest);
-        }
-      }
-    }
-
-    Message message = messageService.create(userId, channelId, messageDTO, list);
-    return ResponseEntity.ok(new MessageCreateResult(message.getMessageId()));
-  }
-
-  @GetMapping
-  public ResponseEntity<MessageDisplayList> findAll(@PathVariable UUID channelId) {
-    List<MessageResult> list = messageService.findMessagesByChannelId(channelId);
-    return ResponseEntity.ok(new MessageDisplayList(list));
-  }
+//  @GetMapping
+//  public ResponseEntity<MessageDisplayList> findAll(@PathVariable UUID channelId) {
+//    List<MessageResult> list = messageService.findMessagesByChannelId(channelId);
+//    return ResponseEntity.ok(new MessageDisplayList(list));
+//  }
 
 //  @PutMapping("/update/{messageId}")
 //  public ResponseEntity<UUID> update(
