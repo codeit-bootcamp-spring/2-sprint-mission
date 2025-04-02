@@ -82,9 +82,8 @@ public class UserController {
 
     @PutMapping("{id}/status")
     public ResponseEntity<BaseResponseDto> updateUserStatus(@PathVariable("id") UUID userId) {
-        UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto = new UserStatusUpdateByUserIdDto(userId,
-                Instant.now());
-        userStatusService.updateByUserId(userStatusUpdateByUserIdDto);
+        UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto = new UserStatusUpdateByUserIdDto(Instant.now());
+        userStatusService.updateByUserId(userId, userStatusUpdateByUserIdDto);
         return ResponseEntity.ok(BaseResponseDto.success(userId + " 유저의 상태가 업데이트 되었습니다."));
     }
 }

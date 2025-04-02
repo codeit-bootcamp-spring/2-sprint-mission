@@ -29,9 +29,8 @@ public class BasicAuthService implements AuthService {
             throw new UserNotFoundException("로그인 실패: 유저를 찾을 수 없습니다.");
         }
 
-        UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto = new UserStatusUpdateByUserIdDto(foundUser.getId(),
-                Instant.now());
-        userStatusService.updateByUserId(userStatusUpdateByUserIdDto);
+        UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto = new UserStatusUpdateByUserIdDto(Instant.now());
+        userStatusService.updateByUserId(foundUser.getId(), userStatusUpdateByUserIdDto);
 
         return foundUser;
     }
