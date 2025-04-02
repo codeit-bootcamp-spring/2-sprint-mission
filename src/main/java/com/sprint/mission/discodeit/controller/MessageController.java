@@ -56,7 +56,8 @@ public class MessageController {
       @RequestBody MessageUpdateRequest request) {
     Message updatedMessage = messageService.update(messageId, request);
     return ResponseEntity
-        .ok(updatedMessage);
+        .status(HttpStatus.OK)
+        .body(updatedMessage);
   }
 
   @DeleteMapping("/{messageId}")
@@ -72,6 +73,7 @@ public class MessageController {
       @RequestParam("channelId") UUID channelId) {
     List<Message> messages = messageService.findAllByChannelId(channelId);
     return ResponseEntity
-        .ok(messages);
+        .status(HttpStatus.OK)
+        .body(messages);
   }
 }

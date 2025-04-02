@@ -39,13 +39,15 @@ public class ReadStatusController {
       @RequestBody ReadStatusUpdateRequest request) {
     ReadStatus updatedReadStatus = readStatusService.update(readStatusId, request);
     return ResponseEntity
-        .ok(updatedReadStatus);
+        .status(HttpStatus.OK)
+        .body(updatedReadStatus);
   }
 
   @GetMapping
   public ResponseEntity<List<ReadStatus>> findAllByUserId(@RequestParam UUID userId) {
     List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
     return ResponseEntity
-        .ok(readStatuses);
+        .status(HttpStatus.OK)
+        .body(readStatuses);
   }
 }

@@ -50,7 +50,8 @@ public class ChannelController {
       @RequestBody PublicChannelUpdateRequest request) {
     Channel updatedChannel = channelService.update(channelId, request);
     return ResponseEntity
-        .ok(updatedChannel);
+        .status(HttpStatus.OK)
+        .body(updatedChannel);
   }
 
   @DeleteMapping("/{channelId}")
@@ -64,6 +65,8 @@ public class ChannelController {
   @GetMapping
   public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
     List<ChannelDto> channels = channelService.findAllByUserId(userId);
-    return ResponseEntity.ok(channels);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(channels);
   }
 }

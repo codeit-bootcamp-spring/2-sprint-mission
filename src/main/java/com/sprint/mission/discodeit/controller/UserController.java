@@ -52,7 +52,8 @@ public class UserController {
         .flatMap(this::resolveProfileRequest);
     User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
     return ResponseEntity
-        .ok(updatedUser);
+        .status(HttpStatus.OK)
+        .body(updatedUser);
   }
 
   @DeleteMapping("/{userId}")
@@ -67,7 +68,8 @@ public class UserController {
   public ResponseEntity<List<UserDto>> findAll() {
     List<UserDto> users = userService.findAll();
     return ResponseEntity
-        .ok(users);
+        .status(HttpStatus.OK)
+        .body(users);
   }
 
   @PatchMapping("/{userId}/userStatus")
@@ -75,7 +77,8 @@ public class UserController {
       @RequestBody UserStatusUpdateRequest request) {
     UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
     return ResponseEntity
-        .ok(updatedUserStatus);
+        .status(HttpStatus.OK)
+        .body(updatedUserStatus);
   }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
