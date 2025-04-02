@@ -59,6 +59,7 @@ public class User implements Serializable {
     }
   }
 
+  // 추후에 구현할 예정
   public static class Validator {
 
     public static void validate(String password, String email) {

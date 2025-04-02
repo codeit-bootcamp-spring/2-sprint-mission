@@ -71,7 +71,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
 
   private void checkValid(UUID channelId, UUID userId) {
-    if (!userRepositoryPort.existId(userId) && channelRepository.existId(channelId)) {
+    if (userRepositoryPort.findById(userId).isEmpty() && channelRepository.find(channelId)) {
       throw new InvalidException("유효하지 않은 아이디입니다.");
     }
   }

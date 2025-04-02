@@ -14,16 +14,13 @@ public interface UserRepositoryPort {
 
   Optional<User> findById(UUID id);
 
+  Optional<User> findByName(String name);
+
+  Optional<User> findByEmail(String email);
+
   List<User> findAll();
 
   void delete(UUID id);
-
-  boolean existId(UUID id);
-
-  boolean existName(String name);
-
-  boolean existEmail(String email);
-
 }
 
 // 하나로 묶은 서비스 인터페이스 만들어 되지만

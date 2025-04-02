@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
-public class FileUserRepositoryPort implements UserRepositoryPort {
+public class FileUserRepository implements UserRepositoryPort {
 
   private final FileRepositoryImpl<Map<UUID, User>> fileRepository;
   private Map<UUID, User> userList = new ConcurrentHashMap<>();
@@ -24,7 +24,7 @@ public class FileUserRepositoryPort implements UserRepositoryPort {
   private final Path path = Paths.get(System.getProperty("user.dir"), "data", "UserList.ser");
 
 
-  public FileUserRepositoryPort() {
+  public FileUserRepository() {
     this.fileRepository = new FileRepositoryImpl<>(path);
     try {
       this.userList = fileRepository.load();
@@ -47,6 +47,16 @@ public class FileUserRepositoryPort implements UserRepositoryPort {
   }
 
   @Override
+  public Optional<User> findByName(String name) {
+    return userList.values().stream().filter(user -> user.getName().equals(name)).findFirst();
+  }
+
+  @Override
+  public Optional<User> findByEmail(String email) {
+    return userList.values().stream().filter(user -> user.getEmail().equals(email)).findFirst();
+  }
+
+  @Override
   public List<User> findAll() {
     return userList.values().stream().toList();
   }
@@ -56,22 +66,5 @@ public class FileUserRepositoryPort implements UserRepositoryPort {
     userList.remove(id);
     fileRepository.save(userList);
   }
-
-
-  @Override
-  public boolean existId(UUID id) {
-    return userList.values().stream().anyMatch(u -> u.getId().equals(id));
-  }
-
-  @Override
-  public boolean existName(String name) {
-    return userList.values().stream().anyMatch(u -> u.getName().equalsIgnoreCase(name));
-  }
-
-  @Override
-  public boolean existEmail(String email) {
-    return userList.values().stream().anyMatch(u -> u.getEmail().equals(email));
-  }
-
 }
 

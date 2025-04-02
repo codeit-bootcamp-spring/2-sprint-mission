@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.message.port.ReadStatusRepository;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -34,7 +35,8 @@ public class BasicChannelService implements ChannelService {
   @Override
   public Channel create(UUID userId,
       PublicChannelCreateRequestDTO channelCreateDTO) {
-    User user = userRepositoryPort.findById(userId);
+    User user = userRepositoryPort.findById(userId)
+        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
     Channel channel;
 
     channel = Channel.create(user.getId(), channelCreateDTO.name(),
@@ -61,7 +63,8 @@ public class BasicChannelService implements ChannelService {
   @Override
   public void join(UUID channelId, UUID userId) {
     Channel findChannel = channelRepository.find(channelId);
-    User user = userRepositoryPort.findById(userId);
+    User user = userRepositoryPort.findById(userId)
+        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
     channelRepository.join(findChannel, user);
 
   }
@@ -70,7 +73,8 @@ public class BasicChannelService implements ChannelService {
   @Override
   public void quit(UUID channelId, UUID userId) {
     Channel findChannel = channelRepository.find(channelId);
-    User user = userRepositoryPort.findById(userId);
+    User user = userRepositoryPort.findById(userId)
+        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
     channelRepository.quit(findChannel, user);
 
   }

@@ -12,9 +12,9 @@ import org.springframework.stereotype.Repository;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-public class JCFUserRepositoryPort implements UserRepositoryPort {
+public class JCFUserRepository implements UserRepositoryPort {
 
-  private Map<UUID, User> userList = new ConcurrentHashMap<>();
+  private final Map<UUID, User> userList = new ConcurrentHashMap<>();
 
   @Override
   public User save(User user) {
@@ -28,6 +28,16 @@ public class JCFUserRepositoryPort implements UserRepositoryPort {
   }
 
   @Override
+  public Optional<User> findByName(String name) {
+    return userList.values().stream().filter(user -> user.getName().equals(name)).findFirst();
+  }
+
+  @Override
+  public Optional<User> findByEmail(String email) {
+    return userList.values().stream().filter(user -> user.getEmail().equals(email)).findFirst();
+  }
+
+  @Override
   public List<User> findAll() {
     return userList.values().stream().toList();
   }
@@ -35,20 +45,5 @@ public class JCFUserRepositoryPort implements UserRepositoryPort {
   @Override
   public void delete(UUID id) {
     userList.remove(id);
-  }
-
-  @Override
-  public boolean existId(UUID id) {
-    return userList.values().stream().anyMatch(u -> u.getId().equals(id));
-  }
-
-  @Override
-  public boolean existName(String name) {
-    return userList.values().stream().anyMatch(u -> u.getName().equalsIgnoreCase(name));
-  }
-
-  @Override
-  public boolean existEmail(String email) {
-    return userList.values().stream().anyMatch(u -> u.getEmail().equals(email));
   }
 }

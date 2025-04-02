@@ -57,6 +57,7 @@ public class Message implements Serializable {
     }
   }
 
+  //추후에 구현할 예정
   public static class Validator {
 
     public static void validate(String text) {

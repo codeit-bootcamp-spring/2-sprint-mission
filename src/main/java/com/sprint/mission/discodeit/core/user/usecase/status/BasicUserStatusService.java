@@ -21,8 +21,7 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   @CustomLogging
   public void create(UUID userId) {
-    boolean existId = userRepositoryPort.existId(userId);
-    if (!existId) {
+    if (userRepositoryPort.findById(userId).isEmpty()) {
       throw new UserNotFoundError("유저가 존재하지 않습니다.");
     }
 
