@@ -11,6 +11,9 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "User-Controller", description = "User 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -31,6 +35,16 @@ public class UserController {
   private final UserMapper userMapper;
   private final UserStatusMapper userStatusMapper;
 
+  @Operation(summary = "회원가입",
+      description = "User를 생성합니다.",
+      responses = {
+          @ApiResponse(responseCode = "200", description = "유저 회원가입 성공"),
+          @ApiResponse(responseCode = "400", description = "필드가 올바르게 입력되지 않음 (DTO 유효성 검증 실패)"),
+          @ApiResponse(responseCode = "404", description = "binaryContentId에 해당하는 BinaryContent를 찾지 못함"),
+          @ApiResponse(responseCode = "409", description = "중복된 username 또는 email 입력됨"),
+          @ApiResponse(responseCode = "500", description = "프로필 파일 읽기에 실패함"),
+
+      })
   @PostMapping
   public ResponseEntity<CreateUserResponseDTO> createUser(
       @RequestPart("user") @Valid CreateUserRequestDTO createUserRequestDTO,
@@ -42,6 +56,12 @@ public class UserController {
     return ResponseEntity.ok(createUserResponseDTO);
   }
 
+  @Operation(summary = "유저 단건 조회",
+      description = "userId에 해당하는 유저를 조회합니다.",
+      responses = {
+          @ApiResponse(responseCode = "200", description = "유저 단건 조회 성공"),
+          @ApiResponse(responseCode = "404", description = "userId에 해당하는 User를 찾지 못함")
+      })
   @GetMapping("/{userId}")
   public ResponseEntity<UserResponseDTO> getUser(@PathVariable("userId") UUID id) {
     UserDTO userDTO = userService.find(id);
@@ -50,6 +70,11 @@ public class UserController {
     return ResponseEntity.ok(userResponseDTO);
   }
 
+  @Operation(summary = "유저 다건 조회",
+      description = "모든 유저를 조회합니다.",
+      responses = {
+          @ApiResponse(responseCode = "200", description = "유저 다건 조회 성공")
+      })
   @GetMapping
   public ResponseEntity<UserListResponseDTO> getUserAll() {
     List<UserDTO> userDTOList = userService.findAll();
@@ -58,6 +83,12 @@ public class UserController {
     return ResponseEntity.ok(userListResponseDTO);
   }
 
+  @Operation(summary = "유저 수정",
+      description = "userId에 해당하는 유저를 수정합니다.",
+      responses = {
+          @ApiResponse(responseCode = "200", description = "유저 수정 성공"),
+          @ApiResponse(responseCode = "404", description = "userId에 해당하는 User를 찾지 못함")
+      })
   @PutMapping("/{userId}")
   public ResponseEntity<UpdateUserResponseDTO> updateUser(@PathVariable("userId") UUID id,
       @RequestPart("user") @Valid UpdateUserRequestDTO updateUserRequestDTO,
@@ -68,6 +99,12 @@ public class UserController {
     return ResponseEntity.ok(userMapper.toUpdateUserResponseDTO(updateUserDTO));
   }
 
+  @Operation(summary = "유저상태 수정",
+      description = "userId에 해당하는 유저상태를 수정합니다.",
+      responses = {
+          @ApiResponse(responseCode = "200", description = "유저상태 수정 성공"),
+          @ApiResponse(responseCode = "404", description = "userStatusId에 해당하는 UserStatus를 찾지 못함")
+      })
   @PutMapping("/{userId}/userstatus")
   public ResponseEntity<UpdateUserStatusResponseDTO> updateUserStatus(
       @PathVariable("userId") UUID id) {
@@ -75,6 +112,11 @@ public class UserController {
     return ResponseEntity.ok(userStatusMapper.toUpdateUserStatusResponseDTO(userStatus));
   }
 
+  @Operation(summary = "유저 삭제",
+      description = "userId로 유저를 삭제합니다.",
+      responses = {
+          @ApiResponse(responseCode = "200", description = "유저 삭제 성공")
+      })
   @DeleteMapping("/{userId}")
   public ResponseEntity<DeleteUserResponseDTO> deleteUser(@PathVariable("userId") UUID id) {
     userService.delete(id);
