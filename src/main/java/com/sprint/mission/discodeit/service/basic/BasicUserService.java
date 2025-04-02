@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
-import com.sprint.mission.discodeit.dto.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.UserCreateDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.dto.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user.request.UserCreateDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.request.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -12,12 +11,14 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
@@ -27,31 +28,29 @@ public class BasicUserService implements UserService {
 
     @Override
     public void create(UserCreateDto userCreateDto) {
-        if (userRepository.findById(userCreateDto.id()).isPresent() ) {
-            throw new IllegalArgumentException("이미 존재하는 ID입니다: " + userCreateDto.id());
-        }
-
         if (userRepository.findByUserName(userCreateDto.userName()).isPresent() ) {
-            throw new IllegalArgumentException("이미 존재하는 이름입니다: " + userCreateDto.id());
+            throw new IllegalArgumentException("이미 존재하는 이름입니다: " + userCreateDto.userName());
         }
 
         if (userRepository.findByEmail(userCreateDto.userEmail()).isPresent() ) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다: " + userCreateDto.id());
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다: " + userCreateDto.userEmail());
         }
+
 
         String encodedPassword = passwordEncoder.encode(userCreateDto.password());
 
+        UUID userId = UUID.randomUUID();
         UUID binaryID = UUID.randomUUID();
 
         BinaryContent binaryContent = new BinaryContent(
                 binaryID,
-                userCreateDto.id(),
+                userId,
                 userCreateDto.uploadFileName(),
                 userCreateDto.storeFileName()
         );
 
         User user = new User(
-                userCreateDto.id(),
+                userId,
                 Instant.now(),
                 userCreateDto.userName(),
                 encodedPassword,
@@ -59,7 +58,7 @@ public class BasicUserService implements UserService {
                 binaryID
         );
 
-        UserStatus userStatus = new UserStatus(UUID.randomUUID(), userCreateDto.id(), Boolean.FALSE);
+        UserStatus userStatus = new UserStatus(UUID.randomUUID(), userId, Boolean.FALSE);
 
         binaryContentRepository.save(binaryContent);
         userStatusRepository.save(userStatus);
@@ -111,11 +110,11 @@ public class BasicUserService implements UserService {
     @Override
     public void update(UserUpdateDto userUpdateDto) {
         User user = userRepository
-                .findById(userUpdateDto.id())
+                .findById(userUpdateDto.userId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         if (userRepository.findByUserName(userUpdateDto.userName()).isPresent() ) {
-            throw new IllegalArgumentException("이미 존재하는 이름입니다: " + userUpdateDto.id());
+            throw new IllegalArgumentException("이미 존재하는 이름입니다: " + userUpdateDto.userName());
         }
 
         if (userRepository.findByEmail(userUpdateDto.userEmail()).isPresent() ) {

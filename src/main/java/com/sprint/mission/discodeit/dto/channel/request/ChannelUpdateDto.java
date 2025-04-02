@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.channel.request;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -12,9 +12,6 @@ public record ChannelUpdateDto(
         @NotNull
         String name,
         @NotNull
-        String description,
-
-        @NotNull
-        Instant updatedAt
+        String description
 ) {
 }

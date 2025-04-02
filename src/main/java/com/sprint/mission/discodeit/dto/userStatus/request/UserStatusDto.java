@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.userStatus.request;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import jakarta.validation.constraints.NotNull;

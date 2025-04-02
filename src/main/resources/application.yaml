@@ -5,3 +5,7 @@ spring:
 discodeit:
   repository:
     type: file
+
+logging:
+  level:
+    root=info:
