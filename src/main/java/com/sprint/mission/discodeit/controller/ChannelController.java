@@ -5,63 +5,76 @@ import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/channel")
+@RequestMapping("/channels")
 @RequiredArgsConstructor
 public class ChannelController {
-    private final ChannelService channelService;
 
-    @RequiresAuth
-    @PostMapping("/public")
-    public ResponseEntity<ChannelDto.Response> createPublicChannel(@Valid @RequestBody ChannelDto.CreatePublic channelDto) {
-        return ResponseEntity.ok(channelService.createPublicChannel(channelDto));
-    }
-    
-    @RequiresAuth
-    @PostMapping("/private")
-    public ResponseEntity<ChannelDto.Response> createPrivateChannel(@Valid @RequestBody ChannelDto.CreatePrivate channelDto) {
-        return ResponseEntity.ok(channelService.createPrivateChannel(channelDto));
-    }
-    
-    @RequiresAuth
-    @PutMapping("/update/{channelId}")
-    public ResponseEntity<ChannelDto.Response> updateChannel(
-            @PathVariable UUID channelId,
-            @Valid @RequestBody ChannelDto.Update channelDto) {
+  private final ChannelService channelService;
 
-        ChannelDto.Response updatedChannel = channelService.updateChannel(channelDto, channelId);
-        return ResponseEntity.ok(updatedChannel);
-    }
-    
-    @RequiresAuth
-    @DeleteMapping("/delete/{channelId}")
-    public ResponseEntity<ChannelDto.DeleteResponse> deleteChannel(
-          @Valid  @PathVariable UUID channelId,HttpServletRequest httpRequest) {
-        String ownerId = (String) httpRequest.getAttribute("userId");
-        boolean success = channelService.deleteChannel(channelId, UUID.fromString(ownerId));
+  @RequiresAuth
+  @PostMapping("/public")
+  public ResponseEntity<ChannelDto.Response> createPublicChannel(
+      @Valid @RequestBody ChannelDto.CreatePublic channelDto) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(channelService.createPublicChannel(channelDto));
+  }
 
-        return ResponseEntity.ok(new ChannelDto.DeleteResponse(channelId, String.valueOf(success)));
+  @RequiresAuth
+  @PostMapping("/private")
+  public ResponseEntity<ChannelDto.Response> createPrivateChannel(
+      @Valid @RequestBody ChannelDto.CreatePrivate channelDto) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(channelService.createPrivateChannel(channelDto));
+  }
 
-    }
-    @GetMapping("/find/{userId}")
-    public ResponseEntity<List<ChannelDto.Response>> getChannelsForUser(@Valid @PathVariable UUID userId) {
+  @RequiresAuth
+  @PutMapping("/{channelId}")
+  public ResponseEntity<ChannelDto.Response> updateChannel(
+      @Valid @PathVariable UUID channelId,
+      @Valid @RequestBody ChannelDto.Update channelDto) {
 
-        List<ChannelDto.Response> channels = channelService.getAccessibleChannels(userId);
-        return ResponseEntity.ok(channels);
-    }
-    
-    @GetMapping("/{channelId}")
-    public ResponseEntity<ChannelDto.Response> getChannel(@Valid @PathVariable UUID channelId) {
-        
-        ChannelDto.Response channel = channelService.findById(channelId);
-        return ResponseEntity.ok(channel);
-    }
+    return ResponseEntity.ok(channelService.updateChannel(channelDto, channelId));
+  }
+
+  @RequiresAuth
+  @DeleteMapping("/{channelId}")
+  public ResponseEntity<Void> deleteChannel(
+      @Valid @PathVariable UUID channelId, HttpServletRequest httpRequest) {
+    String ownerId = (String) httpRequest.getAttribute("userId");
+    channelService.deleteChannel(channelId, UUID.fromString(ownerId));
+
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+  }
+
+  @GetMapping
+  public ResponseEntity<List<ChannelDto.Response>> getChannelsForUser(
+      @Valid @RequestParam("userId") UUID userId) {
+
+    List<ChannelDto.Response> channels = channelService.getAccessibleChannels(userId);
+    return ResponseEntity.ok(channels);
+  }
+
+  @GetMapping("/{channelId}")
+  public ResponseEntity<ChannelDto.Response> getChannel(@Valid @PathVariable UUID channelId) {
+
+    ChannelDto.Response channel = channelService.getChannelDetails(channelId);
+    return ResponseEntity.ok(channel);
+  }
 }
