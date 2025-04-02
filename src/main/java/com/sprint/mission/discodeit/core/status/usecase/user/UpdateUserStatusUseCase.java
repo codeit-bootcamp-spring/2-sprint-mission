@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.core.status.usecase.user;
 
-import java.util.UUID;
+import com.sprint.mission.discodeit.core.status.entity.UserStatus;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UpdateUserStatusCommand;
 
 public interface UpdateUserStatusUseCase {
 
-  UUID update(UUID userId);
+  UserStatus update(UpdateUserStatusCommand command);
 
 
 }

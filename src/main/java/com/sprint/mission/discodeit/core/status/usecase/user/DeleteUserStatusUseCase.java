@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public interface DeleteUserStatusUseCase {
 
-  void deleteById(UUID userStatusId);
+  void delete(UUID userStatusId);
 
 
 }

@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.core.status.usecase.user;
 
-import java.util.UUID;
+import com.sprint.mission.discodeit.core.status.entity.UserStatus;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
 
 public interface CreateUserStatusUseCase {
 
-  void create(UUID userId);
+  UserStatus create(CreateUserStatusCommand command);
 
 }

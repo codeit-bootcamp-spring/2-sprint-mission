@@ -130,7 +130,7 @@ public class BasicUserService implements UserService {
     Optional.ofNullable(user.getProfileId())
         .ifPresent(binaryContentRepositoryPort::delete);
 
-    userStatusService.deleteById(user.getId());
+    userStatusService.delete(user.getId());
     userRepositoryPort.delete(user.getId());
   }
 

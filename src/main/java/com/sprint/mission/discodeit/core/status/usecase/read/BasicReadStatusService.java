@@ -74,7 +74,9 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public void updateReadStatus(UpdateReadStatusCommand command) {
-    ReadStatus readStatus = readStatusRepository.findByChannelId(command.channelId());
+    ReadStatus readStatus = readStatusRepository.findById(command.readStatusId()).orElseThrow(
+        () -> new ReadStatusNotFoundException("읽기 상태를 찾을 수 없습니다.")
+    );
     readStatus.update(command.newLastReadAt());
   }
 
