@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.adapter.inbound.error;
 
 import com.sprint.mission.discodeit.exception.status.user.UserStatusAlreadyExistsError;
-import com.sprint.mission.discodeit.exception.status.user.UserStatusError;
 import com.sprint.mission.discodeit.exception.status.user.UserStatusNotFoundError;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,10 +9,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class UserStatusErrorAdvice {
 
-  @ExceptionHandler(UserStatusError.class)
-  public ResponseEntity<ErrorResponse> handleReadStatusError(UserStatusError error) {
-    return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));
-  }
 
   @ExceptionHandler(UserStatusNotFoundError.class)
   public ResponseEntity<ErrorResponse> handleUserNotFoundError(UserStatusNotFoundError error) {
@@ -26,4 +21,8 @@ public class UserStatusErrorAdvice {
     return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));
   }
 
+//  @ExceptionHandler(UserStatusError.class)
+//  public ResponseEntity<ErrorResponse> handleReadStatusError(UserStatusError error) {
+//    return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));
+//  }
 }
