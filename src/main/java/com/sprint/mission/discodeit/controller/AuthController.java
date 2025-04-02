@@ -1,26 +1,26 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.auth.request.UserLoginDto;
-import com.sprint.mission.discodeit.dto.auth.reslonse.UserLoginResponse;
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.auth.AuthService;
+import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
-@RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RestController
+@RequestMapping("/api/auth")
 public class AuthController {
-    private final AuthService authService;
 
-    @PostMapping
-    public ResponseEntity<UserLoginResponse> login(@RequestBody @Validated UserLoginDto userLoginDto){
-        authService.login(userLoginDto);
-        return ResponseEntity.ok(new UserLoginResponse(true, "로그인 성공"));
-    }
+  private final AuthService authService;
 
+  @PostMapping(path = "login")
+  public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
+    User user = authService.login(loginRequest);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(user);
+  }
 }

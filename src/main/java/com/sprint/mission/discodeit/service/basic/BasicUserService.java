@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
-import com.sprint.mission.discodeit.dto.user.request.UserCreateDto;
-import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.user.request.UserUpdateDto;
+
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -10,137 +12,133 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class BasicUserService implements UserService {
-    private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
-    private final BinaryContentRepository binaryContentRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
 
-    @Override
-    public void create(UserCreateDto userCreateDto) {
-        if (userRepository.findByUserName(userCreateDto.userName()).isPresent() ) {
-            throw new IllegalArgumentException("이미 존재하는 이름입니다: " + userCreateDto.userName());
-        }
+  private final UserRepository userRepository;
+  //
+  private final BinaryContentRepository binaryContentRepository;
+  private final UserStatusRepository userStatusRepository;
 
-        if (userRepository.findByEmail(userCreateDto.userEmail()).isPresent() ) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다: " + userCreateDto.userEmail());
-        }
+  @Override
+  public User create(UserCreateRequest userCreateRequest,
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    String username = userCreateRequest.username();
+    String email = userCreateRequest.email();
 
-
-        String encodedPassword = passwordEncoder.encode(userCreateDto.password());
-
-        UUID userId = UUID.randomUUID();
-        UUID binaryID = UUID.randomUUID();
-
-        BinaryContent binaryContent = new BinaryContent(
-                binaryID,
-                userId,
-                userCreateDto.uploadFileName(),
-                userCreateDto.storeFileName()
-        );
-
-        User user = new User(
-                userId,
-                Instant.now(),
-                userCreateDto.userName(),
-                encodedPassword,
-                userCreateDto.userEmail(),
-                binaryID
-        );
-
-        UserStatus userStatus = new UserStatus(UUID.randomUUID(), userId, Boolean.FALSE);
-
-        binaryContentRepository.save(binaryContent);
-        userStatusRepository.save(userStatus);
-        userRepository.save(user);
+    if (userRepository.existsByEmail(email)) {
+      throw new IllegalArgumentException("User with email " + email + " already exists");
+    }
+    if (userRepository.existsByUsername(username)) {
+      throw new IllegalArgumentException("User with username " + username + " already exists");
     }
 
-    @Override
-    public UserDto findById(UUID id) {
-        User user = userRepository
-                .findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    UUID nullableProfileId = optionalProfileCreateRequest
+        .map(profileRequest -> {
+          String fileName = profileRequest.fileName();
+          String contentType = profileRequest.contentType();
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType, bytes);
+          return binaryContentRepository.save(binaryContent).getId();
+        })
+        .orElse(null);
+    String password = userCreateRequest.password();
 
-        UserStatus userStatus = userStatusRepository
-                .findByUserId(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("상태를 찾을 수 없습니다."));
+    User user = new User(username, email, password, nullableProfileId);
+    User createdUser = userRepository.save(user);
 
-        return new UserDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                userStatus.getOnlineStatus()
-        );
-    };
+    Instant now = Instant.now();
+    UserStatus userStatus = new UserStatus(createdUser.getId(), now);
+    userStatusRepository.save(userStatus);
 
-    @Override
-    public List<UserDto> findAll() {
-        // 모든 User를 조회
-        List<User> users = userRepository.findAll()
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    return createdUser;
+  }
 
-        // User와 UserStatus를 결합하여 UserDto 생성
-        return users.stream()
-                .map(user -> {
-                    // UserStatus 조회
-                    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                            .orElseThrow(() -> new IllegalArgumentException("사용자 상태를 찾을 수 없습니다. 사용자 ID: " + user.getId()));
+  @Override
+  public UserDto find(UUID userId) {
+    return userRepository.findById(userId)
+        .map(this::toDto)
+        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+  }
 
-                    // User와 UserStatus를 결합하여 UserDto 생성
-                    return new UserDto(
-                            user.getId(),
-                            user.getUsername(),
-                            user.getEmail(),
-                            userStatus.getOnlineStatus()
-                    );
-                })
-                .collect(Collectors.toList());
+  @Override
+  public List<UserDto> findAll() {
+    return userRepository.findAll()
+        .stream()
+        .map(this::toDto)
+        .toList();
+  }
+
+  @Override
+  public User update(UUID userId, UserUpdateRequest userUpdateRequest,
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+
+    String newUsername = userUpdateRequest.newUsername();
+    String newEmail = userUpdateRequest.newEmail();
+    if (userRepository.existsByEmail(newEmail)) {
+      throw new IllegalArgumentException("User with email " + newEmail + " already exists");
+    }
+    if (userRepository.existsByUsername(newUsername)) {
+      throw new IllegalArgumentException("User with username " + newUsername + " already exists");
     }
 
-    @Override
-    public void update(UserUpdateDto userUpdateDto) {
-        User user = userRepository
-                .findById(userUpdateDto.userId())
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    UUID nullableProfileId = optionalProfileCreateRequest
+        .map(profileRequest -> {
+          Optional.ofNullable(user.getProfileId())
+              .ifPresent(binaryContentRepository::deleteById);
 
-        if (userRepository.findByUserName(userUpdateDto.userName()).isPresent() ) {
-            throw new IllegalArgumentException("이미 존재하는 이름입니다: " + userUpdateDto.userName());
-        }
+          String fileName = profileRequest.fileName();
+          String contentType = profileRequest.contentType();
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType, bytes);
+          return binaryContentRepository.save(binaryContent).getId();
+        })
+        .orElse(null);
 
-        if (userRepository.findByEmail(userUpdateDto.userEmail()).isPresent() ) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다: " + userUpdateDto.userEmail());
-        }
+    String newPassword = userUpdateRequest.newPassword();
+    user.update(newUsername, newEmail, newPassword, nullableProfileId);
 
-        user.userUpdate(Instant.now(), userUpdateDto.userName(), userUpdateDto.userEmail());
-        userRepository.update(user);
-    }
+    return userRepository.save(user);
+  }
 
-    @Override
-    public void delete(UUID id) {
-        this.findById(id);
-        userRepository.delete(id);
+  @Override
+  public void delete(UUID userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-        UserStatus userStatus = userStatusRepository.findByUserId(id).orElseThrow(() -> new IllegalArgumentException("사용자 상태를 찾을 수 없습니다."));
+    Optional.ofNullable(user.getProfileId())
+        .ifPresent(binaryContentRepository::deleteById);
+    userStatusRepository.deleteByUserId(userId);
 
-        userStatusRepository.delete(userStatus.getId());
+    userRepository.deleteById(userId);
+  }
 
-        BinaryContent binaryContent = binaryContentRepository
-                .findAllByIdIn(id)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 상태를 찾을 수 없습니다."))
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("사용자 상태를 찾을 수 없습니다."));
+  private UserDto toDto(User user) {
+    Boolean online = userStatusRepository.findByUserId(user.getId())
+        .map(UserStatus::isOnline)
+        .orElse(null);
 
-        binaryContentRepository.delete(binaryContent.getId());
-    }
+    return new UserDto(
+        user.getId(),
+        user.getCreatedAt(),
+        user.getUpdatedAt(),
+        user.getUsername(),
+        user.getEmail(),
+        user.getProfileId(),
+        online
+    );
+  }
 }

@@ -1,7 +1,1 @@
-pluginManagement {
-    plugins {
-        id 'org.jetbrains.kotlin.jvm' version '2.1.0'
-    }
-}
-rootProject.name = '2-sprint-mission'
-
+rootProject.name = 'discodeit'

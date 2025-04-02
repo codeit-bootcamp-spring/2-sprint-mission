@@ -1,49 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.groups.ChannelType;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Channel extends BaseEntity {
-    private String name;
-    private String description;
-    private List<UUID> userIds = new ArrayList<>();
-    private ChannelType channelType;
+public class Channel implements Serializable {
 
-    public Channel(Instant createdAt, UUID userId, ChannelType channelType) {
-        super(UUID.randomUUID(), createdAt);
-        userIds.add(userId);
-        this.channelType = channelType;
+  private static final long serialVersionUID = 1L;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private ChannelType type;
+  private String name;
+  private String description;
+
+  public Channel(ChannelType type, String name, String description) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
+
+  public void update(String newName, String newDescription) {
+    boolean anyValueUpdated = false;
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
+      anyValueUpdated = true;
+    }
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
+      anyValueUpdated = true;
     }
 
-    public Channel(Instant createdAt, String name, String description, UUID userId, ChannelType channelType) {
-        super(UUID.randomUUID(), createdAt);
-        this.name = name;
-        this.description = description;
-        userIds.add(userId);
-        this.channelType = channelType;
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Channel{" +
-                super.toString() +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
-    }
+  }
 }

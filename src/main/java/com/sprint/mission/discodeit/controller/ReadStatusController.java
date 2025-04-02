@@ -1,47 +1,47 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusCreatRequest;
-import com.sprint.mission.discodeit.dto.readStatus.request.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusFindAllByUserIdResponse;
-import com.sprint.mission.discodeit.dto.readStatus.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
-@RestController
 @RequiredArgsConstructor
-@RequestMapping("/channel/readStatus")
+@RestController
+@RequestMapping("/api/readStatus")
 public class ReadStatusController {
-    private final ReadStatusService readStatusService;
 
-    @PostMapping
-    public ResponseEntity<ReadStatusResponse> readStatusCreate(
-            @RequestBody @Validated ReadStatusCreatRequest readStatusCreatRequest){
+  private final ReadStatusService readStatusService;
 
-        readStatusService.create(readStatusCreatRequest);
-        return ResponseEntity.ok(new ReadStatusResponse(true, "읽기 상태 생성 성공"));
-    }
+  @PostMapping
+  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
+    ReadStatus createdReadStatus = readStatusService.create(request);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdReadStatus);
+  }
 
-    @PatchMapping
-    public ResponseEntity<ReadStatusResponse> readStatusUpdate(
-            @RequestBody @Validated ReadStatusUpdateRequest readStatusUpdateRequest
-    ){
-        readStatusService.update(readStatusUpdateRequest);
-        return ResponseEntity.ok(new ReadStatusResponse(true, "읽기 상태 업데이트 성공"));
-    }
+  @PatchMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatus> update(@PathVariable("readStatusId") UUID readStatusId,
+      @RequestBody ReadStatusUpdateRequest request) {
+    ReadStatus updatedReadStatus = readStatusService.update(readStatusId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedReadStatus);
+  }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<ReadStatusFindAllByUserIdResponse>> readStatusFindByUser(
-            @PathVariable("userId") UUID userId
-    ){
-        return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
-    }
-
+  @GetMapping
+  public ResponseEntity<List<ReadStatus>> findAllByUserId(@RequestParam("userId") UUID userId) {
+    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(readStatuses);
+  }
 }
