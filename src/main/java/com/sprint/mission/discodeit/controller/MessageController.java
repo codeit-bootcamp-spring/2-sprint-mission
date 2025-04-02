@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,20 +20,16 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
+@Tag(name = "Message", description = "Message API")
 public class MessageController {
 
   private final BasicMessageService messageService;
 
   @PostMapping
   public ResponseEntity<Message> createMessage(
-      @RequestParam("content") String content,
-      @RequestParam("channelId") UUID channelId,
-      @RequestParam("authorId") UUID authorId,
-      @RequestParam("binaryContents") Optional<List<MultipartFile>> binaryContentFiles)
+      @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+      @RequestPart("binaryContents") Optional<List<MultipartFile>> binaryContentFiles)
       throws IOException {
-
-    MessageCreateRequest messageCreateRequest = new MessageCreateRequest(content, channelId,
-        authorId);
 
     List<BinaryContentCreateRequest> binaryContents = binaryContentFiles.map(files -> {
       return files.stream().map(file -> {
@@ -53,7 +50,7 @@ public class MessageController {
     return new ResponseEntity<>(createdMessage, HttpStatus.CREATED);
   }
 
-  @PutMapping("/{messageId}")
+  @PatchMapping("/{messageId}")
   public ResponseEntity<Message> updateMessage(
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest) {

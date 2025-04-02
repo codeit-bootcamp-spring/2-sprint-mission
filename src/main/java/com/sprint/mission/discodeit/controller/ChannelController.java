@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/channels")
+@Tag(name = "Channel", description = "Channel API")
 public class ChannelController {
 
   private final ChannelService channelService;
@@ -61,9 +63,9 @@ public class ChannelController {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  @GetMapping("/users/{userId}")
+  @GetMapping
   private ResponseEntity<List<ChannelDto>> getChannelByUser(
-      @PathVariable UUID userId) {
+      @RequestParam UUID userId) {
 
     List<ChannelDto> channelDtos = channelService.findAllByUserId(userId);
 
