@@ -11,45 +11,49 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/channels")
+@RequestMapping("/api")
 public class ChannelController {
 
     private final ChannelService channelService;
 
-    @RequestMapping(value = "/public", method = RequestMethod.POST)
+    @PostMapping("/channels/public")
     public ResponseEntity<BaseResponseDto> createUser(@RequestBody ChannelCreatePublicDto channelCreatePublicDto) {
         Channel channel = channelService.createPublic(channelCreatePublicDto);
         return ResponseEntity.ok(BaseResponseDto.success(channel.getId() + " 채널 생성이 완료되었습니다."));
     }
 
-    @RequestMapping(value = "/private", method = RequestMethod.POST)
+    @PostMapping("/channels/private")
     public ResponseEntity<BaseResponseDto> createUser(@RequestBody ChannelCreatePrivateDto channelCreatePrivateDto) {
         Channel channel = channelService.createPrivate(channelCreatePrivateDto);
         return ResponseEntity.ok(BaseResponseDto.success(channel.getId() + " 채널 생성이 완료되었습니다."));
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<BaseResponseDto> updateChannel(@RequestBody ChannelUpdateDto channelUpdateDto) {
-        Channel channel = channelService.update(channelUpdateDto);
+    @PutMapping("/channels/{id}")
+    public ResponseEntity<BaseResponseDto> updateChannel(@PathVariable("id") UUID channelId,
+                                                         @RequestBody ChannelUpdateDto channelUpdateDto) {
+        Channel channel = channelService.update(channelId, channelUpdateDto);
         return ResponseEntity.ok(BaseResponseDto.success(channel.getId() + " 채널 변경이 완료되었습니다."));
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping("/channels/{id}")
     public ResponseEntity<BaseResponseDto> deleteChannel(@PathVariable("id") UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity.ok(BaseResponseDto.success(channelId + " 채널 삭제가 완료되었습니다."));
     }
 
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
-    public ResponseEntity<List<ChannelDto>> getChannelByUserId(@PathVariable("id") UUID userId) {
+    @GetMapping("/users/{userId}/channels")
+    public ResponseEntity<List<ChannelDto>> getChannelsByUserId(@PathVariable("userId") UUID userId) {
         return ResponseEntity.ok(channelService.findAllByUserId(userId));
     }
 }
