@@ -46,6 +46,13 @@ public class MessageController {
     return ResponseEntity.ok(updatedMessage);
   }
 
+  @GetMapping("{channelId}")
+  public ResponseEntity<List<Message>> findAllMessagesByChannel(
+      @PathVariable UUID channelId) {
+    List<Message> messages = messageService.findAllByChannelId(channelId);
+    return ResponseEntity.ok(messages);
+  }
+
   @DeleteMapping("/{messageId}")
   public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
     messageService.delete(messageId);

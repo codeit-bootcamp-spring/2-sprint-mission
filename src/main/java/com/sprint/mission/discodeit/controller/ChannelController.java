@@ -24,7 +24,6 @@ import java.util.UUID;
 public class ChannelController {
 
   private final ChannelService channelService;
-  private final MessageService messageService;
 
   @GetMapping
   public ResponseEntity<List<ChannelFindResponse>> findAllChannelByUser(
@@ -59,12 +58,5 @@ public class ChannelController {
   public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
     channelService.delete(channelId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-  }
-
-  @GetMapping("{channelId}/messages")
-  public ResponseEntity<List<Message>> findAllMessagesByChannel(
-      @PathVariable UUID channelId) {
-    List<Message> messages = messageService.findAllByChannelId(channelId);
-    return ResponseEntity.ok(messages);
   }
 }
