@@ -15,12 +15,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +35,7 @@ public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     public ResponseEntity<BaseResponseDto> createUser(@RequestPart("user") UserCreateDto userCreateDto,
                                                       @RequestPart(value = "file", required = false) MultipartFile file) {
 
@@ -59,7 +61,7 @@ public class UserController {
         return ResponseEntity.ok(BaseResponseDto.success(user.getId() + " 유저 등록이 완료되었습니다."));
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @PutMapping("/{id}")
     public ResponseEntity<BaseResponseDto> updateUser(
             @PathVariable("id") UUID userId,
             @RequestBody UserUpdateDto userUpdateDto) {
@@ -67,18 +69,18 @@ public class UserController {
         return ResponseEntity.ok(BaseResponseDto.success(user.getId() + " 유저 변경이 완료되었습니다."));
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponseDto> deleteUser(@PathVariable("id") UUID userId) {
         userService.delete(userId);
         return ResponseEntity.ok(BaseResponseDto.success(userId + " 유저 삭제가 완료되었습니다."));
     }
 
-    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
+    @GetMapping
     public ResponseEntity<List<UserDto>> getUsers() {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @RequestMapping(value = "{id}/status", method = RequestMethod.PUT)
+    @PutMapping("{id}/status")
     public ResponseEntity<BaseResponseDto> updateUserStatus(@PathVariable("id") UUID userId) {
         UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto = new UserStatusUpdateByUserIdDto(userId,
                 Instant.now());
