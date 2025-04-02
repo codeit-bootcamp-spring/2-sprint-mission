@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/binaryContent")
-public class BynaryContentController {
+public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
