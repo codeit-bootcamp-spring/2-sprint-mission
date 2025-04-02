@@ -31,7 +31,7 @@ public class UserController {
   private final UserService userService;
   private final UserStatusService userStatusService;
 
-  @PostMapping()
+  @PostMapping
   public ResponseEntity<User> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
