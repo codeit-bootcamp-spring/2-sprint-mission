@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.CreateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -24,7 +25,10 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public void createReadStatus(UUID userId, UUID channelId) {
+  public void createReadStatus(CreateReadStatusRequest request) {
+    UUID channelId = request.getChannelId();
+    UUID userId = request.getUserId();
+
     if (!channelRepository.existsById(channelId)) {
       throw new IllegalArgumentException("Channel " + channelId + "이 존재하지 않습니다.");
     }
@@ -38,7 +42,7 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new IllegalStateException("이미 존재하는 ReadStatus입니다.");
     }
 
-    ReadStatus readStatus = new ReadStatus(channelId, userId);
+    ReadStatus readStatus = new ReadStatus(channelId, userId, request.getLastReadAt());
     readStatusRepository.addReadStatus(readStatus);
   }
 

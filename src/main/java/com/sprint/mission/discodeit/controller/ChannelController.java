@@ -7,20 +7,20 @@ import com.sprint.mission.discodeit.dto.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/channel")
+@RequestMapping("/api/channels")
 public class ChannelController {
 
   private final ChannelService channelService;
@@ -57,9 +57,8 @@ public class ChannelController {
 
   @RequiresAuth
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllChannels(@RequestHeader("Authorization") String authHeader) {
-    String token = authHeader.replace("Bearer ", "");
-    UUID userId = UUID.fromString(token);
+  public ResponseEntity<?> getAllChannels(HttpServletRequest httpRequest) {
+    UUID userId = (UUID) httpRequest.getAttribute("userId");
 
     List<ChannelInfoDto> channels = channelService.findAllByUserId(userId);
 

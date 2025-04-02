@@ -1,38 +1,37 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
 
 @Getter
 public class ReadStatus extends BaseEntity implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    private final UUID channelId;
-    private final UUID userId;
-    private Instant readTime;
-    //private final Map<UUID, Instant> userIds = new ConcurrentHashMap<>();
+  private static final long serialVersionUID = 1L;
+  private final UUID channelId;
+  private final UUID userId;
+  private Instant lastReadAt;
+  //private final Map<UUID, Instant> userIds = new ConcurrentHashMap<>();
 
-    public ReadStatus(UUID userId, UUID channelId) {
-        super();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.readTime = Instant.now();
-    }
+  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+    super();
+    this.userId = userId;
+    this.channelId = channelId;
+    this.lastReadAt = lastReadAt;
+  }
 
-    public void updateLastAccessTime() {
-        this.readTime = Instant.now();
-    }
+  public void updateLastAccessTime() {
+    this.lastReadAt = Instant.now();
+  }
 
-    @Override
-    public String toString() {
-        return "ReadStatus{" +
-                "id=" + getId() +
-                ", channelId=" + channelId +
-                ", userIds=" + userId +
-                ", readTime=" + readTime +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "ReadStatus{" +
+        "id=" + getId() +
+        ", channelId=" + channelId +
+        ", userIds=" + userId +
+        ", readTime=" + lastReadAt +
+        '}';
+  }
 }
