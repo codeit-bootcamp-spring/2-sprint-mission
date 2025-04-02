@@ -1,15 +1,13 @@
 package com.sprint.mission.discodeit.entity.user;
 
-import com.sprint.mission.discodeit.entity.base.UpdatableEntity;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import lombok.Getter;
-import lombok.ToString;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class User extends UpdatableEntity {
+public class User extends BaseEntity {
 
   private String username;
   private String email;

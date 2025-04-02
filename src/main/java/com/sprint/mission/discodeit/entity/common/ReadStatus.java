@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.entity.common;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import lombok.Getter;
-import lombok.ToString;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 

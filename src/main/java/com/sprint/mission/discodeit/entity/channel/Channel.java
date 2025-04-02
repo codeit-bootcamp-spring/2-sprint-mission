@@ -1,16 +1,13 @@
 package com.sprint.mission.discodeit.entity.channel;
 
-import com.sprint.mission.discodeit.entity.base.UpdatableEntity;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
-import lombok.ToString;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
-public class Channel extends UpdatableEntity {
+public class Channel extends BaseEntity {
 
   private final ChannelType type;
 
