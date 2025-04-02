@@ -1,97 +1,33 @@
-# Part1-sprint4
+# Part2-sprint5
 
 ## 기본 요구사항
 
 1. git 브랜치 관리
 
-- [x] 브랜치 변경 : part1-황지환-sprint4
-- [ ] git rebase를 통한 커밋 관리
-- [ ] git push를 통해 내 레포지토리 상태 동기화
+- [x] 브랜치 변경 : part2-황지환-sprint5
+- [x] git rebase를 통한 커밋 관리
+- [x] git push를 통해 내 레포지토리 상태 동기화
 
-### 컨트롤러 레이어 구현
+2. 기본 요구사항
 
-- [x]  지금까지 구현한 서비스 로직을 활용해 웹 API를 구현하세요.
-- 이때 @RequestMapping만 사용해 구현해보세요.
+- [ ] 스프린트 미션#4에서 구현한 API를 RESTful API로 다시 설계해보세요.
+    - API 스펙을 확인하고 본인이 설계한 API와 비교해보세요.
+    - oasdiff를 활용하면 좀 더 수월하게 비교할 수 있어요.
+    - API 설계에 정답은 없지만, 이어지는 요구사항과 미션을 원활히 수행하기 위해 제공된 API 스펙에 맞추어 구현해주세요.
+    - 특히, 심화 요구사항에서 제공되는 프론트엔드 코드는 제공된 API 스펙을 준수해야 연동할 수 있습니다.
+- [ ] Postman을 활용해 컨트롤러를 테스트 하세요.
+    - Postman API 테스트 결과를 export하여 PR에 첨부해주세요.
+- [ ] springdoc-openapi를 활용하여 Swagger 기반의 API 문서를 생성하세요.
+- [ ] Swagger-UI를 활용해 API를 테스트해보세요.
 
-3. 웹 API 요구사항
+3. 심화 요구사항
 
-- [x]  웹 API의 예외를 전역으로 처리하세요.
-
-4. API 테스트
-
-- [x] Postman을 활용해 컨트롤러를 테스트 하세요.
-    - Postman API 테스트 결과를 다음과 같이 export하여 PR에 첨부해주세요.
-
-### 웹 API 요구사항
-
-1. 사용자 관리
-
-- [x] 사용자를 등록할 수 있다.
-- [x] 사용자 정보를 수정할 수 있다.
-- [x] 사용자를 삭제할 수 있다.
-- [x] 모든 사용자를 조회할 수 있다.
-- [x] 사용자의 온라인 상태를 업데이트할 수 있다.
-
-2. 권한 관리
-
-- [x] 사용자는 로그인할 수 있다.
-
-3. 채널 관리
-
-- [x] 공개 채널을 생성할 수 있다.
-- [x] 비공개 채널을 생성할 수 있다.
-- [x] 공개 채널의 정보를 수정할 수 있다.
-- [x] 채널을 삭제할 수 있다.
-- [x] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
-
-4. 메시지 관리
-
-- [x] 메시지를 보낼 수 있다.
-- [x] 메시지를 수정할 수 있다.
-- [x] 메시지를 삭제할 수 있다.
-- [x] 특정 채널의 메시지 목록을 조회할 수 있다.
-
-5. 메시지 수신 정보 관리
-
-- [x] 특정 채널의 메시지 수신 정보를 생성할 수 있다.
-- [x] 특정 채널의 메시지 수신 정보를 수정할 수 있다.
-- [x] 특정 사용자의 메시지 수신 정보를 조회할 수 있다.
-
-6. 바이너리 파일 다운로드
-
-- [x] 바이너리 파일을 1개 또는 여러 개 조회할 수 있다.
-
-### 심화 요구사항
-
-1. 정적 리소스 서빙
-
-- [ ]  사용자 목록 조회, BinaryContent 파일 조회 API를 다음의 조건을 만족하도록 수정하세요.
-- [ ]  사용자 목록 조회
-  - url: /api/user/findAll
-
-- 요청
-    - 파라미터, 바디 없음
-- 응답
-    - ResponseEntity<List<UserDto>>
-      ~~~java
-          public record UserDto(
-              UUID id,
-              Instant createdAt,
-              Instant updatedAt,
-              String username,
-              String email,
-              UUID profileId,
-              Boolean online
-          ) {
-          }
-      ~~~
-    - [ ]  BinaryContent 파일 조회
-    - url: /api/binaryContent/find
-    - 요청
-        - 파라미터: binaryContentId
-        - 바디 없음
-        - 응답: ResponseEntity<BinaryContent>
-- [ ]  주어진 static 파일을 활용하여 사용자 목록을 보여주는 화면을 서빙해보세요.
+- [ ]  다음의 정적 리소스를 서빙하여 프론트엔드와 통합해보세요. API 스펙을 준수했다면 잘 동작할거예요.
+- [ ]  Railway.app을 활용하여 애플리케이션을 배포해보세요.
+- Railway.app은 애플리케이션을 쉽게 배포할 수 있도록 도와주는 PaaS입니다.
+- [ ] Railway.app에 가입하고, 배포할 GitHub 레포지토리를 연결하세요.
+- [ ] Settings > Network 섹션에서 Generate Domain 버튼을 통해 도메인을 생성하세요.
+- [ ] 생성된 도메인에 접속해 배포된 애플리케이션을 테스트해보세요.
 
 ## 미완성 및 개선해야할 부분
 
@@ -104,25 +40,3 @@
 - [ ] Protocol Buffer 사용
 - [ ] 생산성을 방해하지 않을 정도의 테스트를 작성하는 법 탐구하기
 - [ ] 트랜잭션 학습
-- [ ] 컨트롤러말고 
-
-### 멘토님 피드백
-
-- [x] DTO 다형성 삭제 : 명확해야 관리하기가 쉽다
-- [x] DTOs 관리하기할때 내부에서 선언하여 관리하는 법 학습
-- [x] DTO 네이밍 규칙 반영
-  - 컨트롤러 : Request/Response
-  - Service 응답 : Info/Result
-- [x] UserStatues Dto, 안에 메서드 넣어 놓은 부분 수정
-- [x] serialVersionUID 수정
-- [x] loadAndSave 수정 : 문제 - 같은 동작을 하는 메서드2개 정의
-- [x] Repository는
-  - 조회 (Read)
-  - 저장 (Create/Update)
-  - 삭제 (Delete)
-- [x] 서비스계층에서는 최대한 도메인 객체를 그대로 사용하다가 마지막에 DTO로 반환하는 방식으로 -> for 유지보수
-- [x] 이미지 파일을 바이트 자체로 저장하는 로직으로 수정
-- [ ] application.yaml파일 수정
-- [ ] 시간 Instant.now
-
-
