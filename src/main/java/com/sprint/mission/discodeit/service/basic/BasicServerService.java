@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.create.CreateServerRequestDTO;
+import com.sprint.mission.discodeit.dto.create.ServerCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -22,22 +22,20 @@ public class BasicServerService implements ServerService {
 
     @Override
     public void reset(boolean adminAuth) {
-        if (adminAuth == true) {
+        if (adminAuth) {
             serverRepository.reset();
         }
     }
 
     @CustomLogging
     @Override
-    public Server create(CreateServerRequestDTO createServerRequestDTO) {
+    public Server create(ServerCreateRequestDTO serverCreateRequestDTO) {
+        User owner = userRepository.findById(serverCreateRequestDTO.userId());
+        Server server = new Server(owner.getId(), serverCreateRequestDTO.name());
 
-        User owner = userRepository.findById(createServerRequestDTO.userId());
-        Server server = new Server(owner.getId(), createServerRequestDTO.name());
         serverRepository.save(server, owner);
-        serverRepository.join(server, owner);
 
         return server;
-
     }
 
     @Override
@@ -59,21 +57,19 @@ public class BasicServerService implements ServerService {
 
     @Override
     public Server findById(UUID serverId) {
-        Server server = serverRepository.findById(serverId);
-        return server;
+        return serverRepository.findById(serverId);
 
     }
 
     @Override
-    public List<Server> findServerAll(UUID ownerId) {
-        List<Server> serverList = serverRepository.findAllByUserId(ownerId);
+    public List<Server> findServerAll(UUID userId) {
+        List<Server> serverList = serverRepository.findAllByUserId(userId);
         return serverList;
 
     }
 
     @Override
-    public UUID update(UUID serverId, UpdateServerRequestDTO updateServerRequestDTO) {
-
+    public UUID update(UUID serverId, UUID userId, UpdateServerRequestDTO updateServerRequestDTO) {
         Server server = serverRepository.findById(serverId);
         Server update = serverRepository.update(server, updateServerRequestDTO);
         return update.getServerId();
@@ -81,8 +77,7 @@ public class BasicServerService implements ServerService {
     }
 
     @Override
-    public void delete(UUID serverId) {
+    public void delete(UUID serverId, UUID userId) {
         serverRepository.remove(serverId);
     }
-
 }

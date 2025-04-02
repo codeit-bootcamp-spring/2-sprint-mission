@@ -21,6 +21,8 @@ public interface ChannelRepository {
 
     Channel find(UUID channelId);
 
+    List<Channel> findAll();
+
     List<Channel> findAllByChannelId(UUID channelId);
 
     List<Channel> findAllByServerId(UUID serverId);
@@ -28,4 +30,8 @@ public interface ChannelRepository {
     Channel update(Channel channel, UpdateChannelDTO updateChannelDTO);
 
     void remove(UUID channelId);
+
+    boolean existId(UUID id);
+
+    boolean existName(String name);
 }

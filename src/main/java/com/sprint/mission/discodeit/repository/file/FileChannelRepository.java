@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.Empty.EmptyChannelListException;
 import com.sprint.mission.discodeit.exception.Empty.EmptyUserListException;
 import com.sprint.mission.discodeit.exception.NotFound.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.NotFound.SaveFileNotFoundException;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
@@ -91,30 +91,23 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findAllByServerId(UUID serverId) {
-        if (channelList.isEmpty()) {
-            throw new EmptyChannelListException("Repository 에 저장된 채널 리스트가 없습니다.");
-        }
-        List<Channel> channels = channelList.get(serverId);
+    public List<Channel> findAll() {
+        return channelList.values().stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
 
-        if (channels.isEmpty()) {
-            throw new EmptyChannelListException("해당 서버에 저장된 채널 리스트가 없습니다.");
-        }
+    @Override
+    public List<Channel> findAllByServerId(UUID serverId) {
+        List<Channel> channels = channelList.get(serverId);
         return channels;
     }
 
     @Override
     public List<Channel> findAllByChannelId(UUID channelId) {
-        if (channelList.isEmpty()) {
-            throw new EmptyChannelListException("Repository 에 저장된 채널 리스트가 없습니다.");
-        }
         List<Channel> channels = channelList.values().stream()
                 .flatMap(List::stream)
                 .filter(channel -> channel.getChannelId().equals(channelId)).toList();
-        if (channels.isEmpty()) {
-            throw new EmptyChannelListException("해당 서버에 저장된 채널 리스트가 없습니다.");
-        }
-
         return channels;
     }
 
@@ -138,4 +131,15 @@ public class FileChannelRepository implements ChannelRepository {
         list.remove(channel);
         fileRepository.save(channelList);
     }
+
+    @Override
+    public boolean existId(UUID id) {
+        return channelList.keySet().stream().anyMatch(u -> u.equals(id));
+    }
+
+    @Override
+    public boolean existName(String name) {
+        return channelList.values().stream().flatMap(List::stream).anyMatch(c -> c.getName().equalsIgnoreCase(name));
+    }
+
 }

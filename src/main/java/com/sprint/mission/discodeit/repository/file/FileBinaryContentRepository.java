@@ -55,15 +55,13 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public boolean delete(UUID binaryId) {
+    public void delete(UUID binaryId) {
         try {
             BinaryContent content = findById(binaryId);
             binaryContentList.remove(content);
             fileRepository.save(binaryContentList);
-            return true;
         } catch (BinaryContentNotFoundException e) {
             System.out.println("해당 바이너리 데이터는 존재하지 않습니다.");
-            return false;
         }
     }
 }

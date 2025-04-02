@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.create.CreateServerRequestDTO;
+import com.sprint.mission.discodeit.dto.create.ServerCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateServerRequestDTO;
 import com.sprint.mission.discodeit.entity.Server;
 import com.sprint.mission.discodeit.entity.User;
@@ -14,7 +14,7 @@ public interface ServerService {
 
     void reset(boolean adminAuth);
 
-    Server create(CreateServerRequestDTO createServerRequestDTO);
+    Server create(ServerCreateRequestDTO serverCreateRequestDTO);
 
     User join(UUID serverId, UUID userId);
 
@@ -22,10 +22,10 @@ public interface ServerService {
 
     Server findById(UUID serverId);
 
-    List<Server> findServerAll(UUID ownerId);
+    List<Server> findServerAll(UUID userId);
 
-    UUID update(UUID serverId, UpdateServerRequestDTO updateServerRequestDTO);
+    UUID update(UUID serverId, UUID userId, UpdateServerRequestDTO updateServerRequestDTO);
 
-    void delete(UUID serverId);
+    void delete(UUID serverId, UUID userId);
 
 }

@@ -1,15 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
 
-import com.sprint.mission.discodeit.dto.UserFindDTO;
+import com.sprint.mission.discodeit.dto.create.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.create.UserCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.display.UserDisplayList;
-import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
-import com.sprint.mission.discodeit.dto.create.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.result.UserCreateResult;
 import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
-import com.sprint.mission.discodeit.dto.result.CreateUserResult;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.update.UserLoginRequestDTO;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -27,59 +26,45 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
-    private final BinaryContentService binaryContentService;
     private final UserStatusService userStatusService;
+    private final AuthService authService;
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CreateUserResult> register(
-            @RequestPart("user") CreateUserRequestDTO createUserRequestDTO,
+    public ResponseEntity<UserCreateResult> register(
+            @RequestPart("user") UserCreateRequestDTO userCreateRequestDTO,
             @RequestPart(value = "profileImage", required = false) MultipartFile file
     ) throws IOException {
 
-        Optional<CreateBinaryContentRequestDTO> binaryContentRequest = Optional.empty();
+        Optional<BinaryContentCreateRequestDTO> binaryContentRequest = Optional.empty();
 
         if (file != null && !file.isEmpty()) {
-            binaryContentRequest = Optional.of(new CreateBinaryContentRequestDTO(
+            binaryContentRequest = Optional.of(new BinaryContentCreateRequestDTO(
                     file.getOriginalFilename(),
                     file.getContentType(),
                     file.getBytes()
             ));
         }
 
-        UUID id = userService.create(createUserRequestDTO, binaryContentRequest);
+        UUID id = userService.create(userCreateRequestDTO, binaryContentRequest);
 
-        return ResponseEntity.ok(new CreateUserResult(id));
+        return ResponseEntity.ok(new UserCreateResult(id));
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody UserLoginRequestDTO userLoginDTO) {
+        authService.loginUser(userLoginDTO);
+        return ResponseEntity.ok("로그인 성공");
+    }
 
-    @GetMapping
+    @GetMapping("/findAll")
     public ResponseEntity<UserDisplayList> findAll() {
         UserDisplayList displayList = new UserDisplayList(userService.listAllUsers());
         return ResponseEntity.ok(displayList);
     }
 
-    @GetMapping("/{id}/profile")
-    public ResponseEntity<byte[]> getUserProfile(@PathVariable UUID id) {
-        UserFindDTO user = userService.findById(id);
-
-        if (user.profileId() == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        BinaryContent profileImage = binaryContentService.findById(user.profileId());
-
-        if (profileImage == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(profileImage.getContentType()))
-                .body(profileImage.getBytes());
-    }
-
-
     @DeleteMapping("/{userId}")
     public ResponseEntity<String> delete(@PathVariable UUID userId) {
+
         userService.delete(userId);
         return ResponseEntity.ok("Delete successful");
     }
@@ -92,7 +77,6 @@ public class UserController {
         return ResponseEntity.ok(userStatus.getUserStatusId());
     }
 
-
     @PutMapping("/offline/{userId}")
     public ResponseEntity<UUID> offline(@PathVariable UUID userId) {
         UserStatus userStatus = userStatusService.findByUserId(userId);
@@ -101,22 +85,21 @@ public class UserController {
         return ResponseEntity.ok(userStatus.getUserStatusId());
     }
 
-
-    @PostMapping(value = "/update/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/update/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UUID> update(@PathVariable UUID userId,
-                                         @RequestPart("user") UpdateUserRequestDTO updateUserRequestDTO,
-                                         @RequestPart(value = "profileImage", required = false) MultipartFile file) throws IOException {
+                                       @RequestPart("user") UpdateUserRequestDTO updateUserRequestDTO,
+                                       @RequestPart(value = "profileImage", required = false) MultipartFile file) throws IOException {
 
-        Optional<CreateBinaryContentRequestDTO> binaryContentRequest = Optional.empty();
+
+        Optional<BinaryContentCreateRequestDTO> binaryContentRequest = Optional.empty();
 
         if (file != null && !file.isEmpty()) {
-            binaryContentRequest = Optional.of(new CreateBinaryContentRequestDTO(
+            binaryContentRequest = Optional.of(new BinaryContentCreateRequestDTO(
                     file.getOriginalFilename(),
                     file.getContentType(),
                     file.getBytes()
             ));
         }
-
 
         UUID update = userService.update(userId, updateUserRequestDTO, binaryContentRequest);
 

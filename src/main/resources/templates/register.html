@@ -39,6 +39,7 @@
               .then(data => {
                 alert(`회원가입 성공! 사용자 ID: ${data.id}`);
                 form.reset();
+                window.location.href = "/"; // 메인 페이지로 이동
               })
               .catch(error => {
                 console.error('Error:', error);
@@ -50,6 +51,7 @@
       document.getElementById('registerForm').addEventListener('submit', submitRegisterForm);
     });
   </script>
+  <link rel="stylesheet" href="/css/register.css">
 
 </head>
 <body>

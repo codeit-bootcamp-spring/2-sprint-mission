@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
+import com.sprint.mission.discodeit.dto.create.BinaryContentCreateRequestDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -18,27 +18,23 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @CustomLogging
     @Override
-    public BinaryContent create(CreateBinaryContentRequestDTO createBinaryContentRequestDTO) {
-        BinaryContent binaryContent = new BinaryContent(createBinaryContentRequestDTO.fileName(),(long) createBinaryContentRequestDTO.bytes().length, createBinaryContentRequestDTO.contentType(),createBinaryContentRequestDTO.bytes());
-        binaryContentRepository.save(binaryContent);
-        return binaryContent;
+    public BinaryContent create(BinaryContentCreateRequestDTO binaryContentCreateRequestDTO) {
+        BinaryContent binaryContent = new BinaryContent(binaryContentCreateRequestDTO.fileName(), binaryContentCreateRequestDTO.bytes().length, binaryContentCreateRequestDTO.contentType(), binaryContentCreateRequestDTO.bytes());
+        return binaryContentRepository.save(binaryContent);
     }
 
     @Override
     public BinaryContent findById(UUID binaryId) {
-        BinaryContent binaryContent = binaryContentRepository.findById(binaryId);
-        return binaryContent;
+        return binaryContentRepository.findById(binaryId);
     }
     @Override
     public List<BinaryContent> findAllByIdIn() {
-        List<BinaryContent> contentList = binaryContentRepository.findAllByIdIn();
-        return contentList;
+        return binaryContentRepository.findAllByIdIn();
     }
 
     @CustomLogging
     @Override
-    public boolean delete(UUID binaryId) {
-        boolean delete = binaryContentRepository.delete(binaryId);
-        return delete;
+    public void delete(UUID binaryId) {
+        binaryContentRepository.delete(binaryId);
     }
 }

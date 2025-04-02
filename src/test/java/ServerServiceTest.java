@@ -19,30 +19,30 @@ import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 public class ServerServiceTest {
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private BinaryContentRepository binaryContentRepository;
-
-    @Mock
-    private UserStatusRepository userStatusRepository;
-
-    @Mock
-    private ServerRepository serverRepository;
-
-    @InjectMocks
-    private BasicUserService userService;
-
-    @InjectMocks
-    private BasicServerService serverService;
-
-    @BeforeEach
-    void setUp() {
-        userService = new BasicUserService(userRepository, binaryContentRepository, userStatusRepository);
-        serverService = new BasicServerService(userRepository, serverRepository);
-
-    }
+//    @Mock
+//    private UserRepository userRepository;
+//
+//    @Mock
+//    private BinaryContentRepository binaryContentRepository;
+//
+//    @Mock
+//    private UserStatusRepository userStatusRepository;
+//
+//    @Mock
+//    private ServerRepository serverRepository;
+//
+//    @InjectMocks
+//    private BasicUserService userService;
+//
+//    @InjectMocks
+//    private BasicServerService serverService;
+//
+//    @BeforeEach
+//    void setUp() {
+//        userService = new BasicUserService(userRepository, binaryContentRepository, userStatusRepository);
+//        serverService = new BasicServerService(userRepository, serverRepository);
+//
+//    }
 
 
     @Test

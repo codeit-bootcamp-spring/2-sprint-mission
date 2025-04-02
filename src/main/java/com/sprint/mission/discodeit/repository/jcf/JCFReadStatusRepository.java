@@ -1,71 +1,65 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.Empty.EmptyReadStatusListException;
-import com.sprint.mission.discodeit.exception.NotFound.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.util.CommonUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFReadStatusRepository implements ReadStatusRepository {
-    private final List<ReadStatus> readStatusList = new ArrayList<>();
+    private final Map<UUID, ReadStatus> readStatusList = new ConcurrentHashMap<>();
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        readStatusList.add(readStatus);
+        readStatusList.put(readStatus.getReadStatusId(), readStatus);
         return readStatus;
     }
 
     @Override
-    public ReadStatus find(UUID readStatusId) {
-        ReadStatus status = CommonUtils.findById(readStatusList, readStatusId, ReadStatus::getReadStatusId)
-                .orElseThrow(() -> new ReadStatusNotFoundException("읽기 상태를 찾을 수 없습니다."));
-        return status;
+    public Optional<ReadStatus> findById(UUID readStatusId) {
+        return Optional.ofNullable(this.readStatusList.get(readStatusId));
+    }
+
+    @Override
+    public ReadStatus findByUserId(UUID userId) {
+        return readStatusList.values().stream().filter(readStatus -> readStatus.getUserId().equals(userId)).findFirst().orElse(null);
+    }
+
+    @Override
+    public ReadStatus findByChannelId(UUID channelId) {
+        return readStatusList.values().stream().filter(readStatus -> readStatus.getChannelId().equals(channelId)).findFirst().orElse(null);
+    }
+
+    @Override
+    public ReadStatus findByUserAndChannelId(UUID userId, UUID channelId) {
+        return readStatusList.values().stream().filter(readStatus ->readStatus.getUserId().equals(userId) && readStatus.getChannelId().equals(channelId)).findFirst().orElse(null);
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userID) {
-        if (readStatusList.isEmpty()) {
-            throw new EmptyReadStatusListException("Repository 에 저장된 읽기 상태 리스트가 없습니다.");
-        }
-        List<ReadStatus> list = CommonUtils.findAllById(readStatusList, userID, ReadStatus::getUserId);
-
-        if (list.isEmpty()) {
-            throw new EmptyReadStatusListException("해당 서버에 저장된 읽기 상태 리스트가 없습니다.");
-        }
+        List<ReadStatus> list = this.readStatusList.values().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userID))
+                .toList();
         return list;
     }
 
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        if (readStatusList.isEmpty()) {
-            throw new EmptyReadStatusListException("Repository 에 저장된 읽기 상태 리스트가 없습니다.");
-        }
-
-        List<ReadStatus> list = CommonUtils.findAllById(readStatusList, channelId, ReadStatus::getChannelId);
-
-        if (list.isEmpty()) {
-            throw new EmptyReadStatusListException("해당 서버에 저장된 읽기 상태 리스트가 없습니다.");
-        }
+        List<ReadStatus> list = this.readStatusList.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .toList();
         return list;
     }
 
-//    @Override
-//    public ReadStatus update(ReadStatus readStatus) {
-//        readStatus.
-//        return readStatus;
-//    }
-
     @Override
     public void delete(UUID readStatusId) {
-        ReadStatus status = find(readStatusId);
-        readStatusList.remove(status);
+        readStatusList.remove(readStatusId);
     }
 }

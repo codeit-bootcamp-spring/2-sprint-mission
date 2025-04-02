@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelFindDTO;
-import com.sprint.mission.discodeit.dto.create.CreateChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.create.PrivateChannelCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.create.PublicChannelCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateChannelDTO;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.exception.Empty.EmptyMessageListException;
-import com.sprint.mission.discodeit.exception.NotFound.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.Valid.ChannelModificationNotAllowedException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.*;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,91 +29,105 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void reset(boolean adminAuth) {
-        if (adminAuth == true) {
+        if (adminAuth) {
             channelRepository.reset();
         }
     }
 
     @CustomLogging
     @Override
-    public UUID create(CreateChannelRequestDTO channelCreateDTO) {
-        User user = userRepository.findById(channelCreateDTO.userId());
-        Server findServer = serverRepository.findById(channelCreateDTO.serverId());
+    public Channel create(UUID userId, UUID serverId,PublicChannelCreateRequestDTO channelCreateDTO) {
+        User user = userRepository.findById(userId);
+        Server findServer = serverRepository.findById(serverId);
         Channel channel;
 
-        if (channelCreateDTO.type() == ChannelType.PRIVATE) {
-            channel = new Channel(findServer.getServerId(), user.getId(), null, ChannelType.PRIVATE);
-            createReadStatus(user, channel);
-        } else {
-            channel = new Channel(findServer.getServerId(), user.getId(), channelCreateDTO.name());
-        }
+        channel = new Channel(findServer.getServerId(), user.getId(), channelCreateDTO.name());
 
         channelRepository.save(findServer, channel);
         channelRepository.join(channel, user);
 
-        return channel.getChannelId();
+        return channel;
+    }
+
+    @Override
+    public Channel create(UUID userId, UUID serverId,PrivateChannelCreateRequestDTO requestDTO) {
+        Channel channel = new Channel(serverId, userId, null);
+        Server findServer = serverRepository.findById(serverId);
+        Channel createdChannel = channelRepository.save(findServer, channel);
+
+        requestDTO.participantIds().stream()
+                .map(u -> new ReadStatus(u, createdChannel.getChannelId(), Instant.MIN))
+                .forEach(readStatusRepository::save);
+
+        return createdChannel;
+    }
+
+    @Override
+    public void join(UUID channelId, UUID userId) {
+        Channel findChannel = channelRepository.find(channelId);
+        User user = userRepository.findById(userId);
+        channelRepository.join(findChannel, user);
 
     }
 
-//    @Override
-//    public UserFindDTO join(JoinQuitChannelRequestDTO channelJoinQuitDTO) {
-//        Channel findChannel = channelRepository.find(channelJoinQuitDTO.channelId());
-//        User user = userRepository.findById(channelJoinQuitDTO.userId());
-//        User join = channelRepository.join(findChannel, user);
-//
-//        if (findChannel.getType() == ChannelType.PRIVATE) {
-//            createReadStatus(user, findChannel);
-//        }
-//
-//        return new UserFindDTO(join.getId(),join.getProfileId(),join.getName(),join.getEmail(),join.getCreatedAt(),join.getUpdatedAt());
-//    }
-//
-//    @CustomLogging
-//    @Override
-//    public UserFindDTO quit(JoinQuitChannelRequestDTO channelJoinQuitDTO) {
-//        Channel findChannel = channelRepository.find(channelJoinQuitDTO.channelId());
-//        User user = userRepository.findById(channelJoinQuitDTO.userId());
-//
-//        User quit = channelRepository.quit(findChannel, user);
-//
-//        return new UserFindDTO(quit.getId(),quit.getProfileId(),quit.getName(),quit.getEmail(),quit.getCreatedAt(),quit.getUpdatedAt());
-//    }
+    @CustomLogging
+    @Override
+    public void quit(UUID channelId, UUID userId) {
+        Channel findChannel = channelRepository.find(channelId);
+        User user = userRepository.findById(userId);
+        channelRepository.quit(findChannel, user);
+
+    }
 
     @Override
     public ChannelFindDTO find(UUID channelId) {
         Channel channel = channelRepository.find(channelId);
-        Instant lastMessageTime = null;
 
-        try {
-            List<Message> messageList = messageRepository.findAllByChannelId(channelId);
-            Message message = messageList.get(messageList.size() - 1);
-            lastMessageTime = message.createdAt;
-        } catch (EmptyMessageListException e) {
+        Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getChannelId())
+                .stream()
+                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+                .map(Message::getCreatedAt)
+                .limit(1)
+                .findFirst()
+                .orElse(Instant.MIN);
 
-        } catch (MessageNotFoundException e) {
-
+        List<UUID> userIdList = new ArrayList<>();
+        if (channel.getType().equals(ChannelType.PRIVATE)) {
+            readStatusRepository.findAllByChannelId(channelId)
+                    .stream().map(ReadStatus::getUserId)
+                    .forEach(userIdList::add);
         }
 
-        if (channel.getType() == ChannelType.PUBLIC) {
-            return new ChannelFindDTO(channel.getChannelId(), channel.getName(), null, lastMessageTime);
-        } else {
-            List<User> userList = channel.getUserList();
-            List<UUID> userIdList = userList.stream().map(User::getId).toList();
-            return new ChannelFindDTO(channel.getChannelId(), channel.getName(), userIdList, lastMessageTime);
-        }
+        return ChannelFindDTO.create(channel, userIdList, lastMessageAt);
+
     }
 
     @Override
-    public List<ChannelFindDTO> findAllByServerAndUser(UUID serverId) {
-        List<Channel> channelList = channelRepository.findAllByServerId(serverId);
-        List<ChannelFindDTO> findDTOList = new ArrayList<>();
+    public List<ChannelFindDTO> findAllByUserId(UUID userId) {
+        List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+                .map(ReadStatus::getChannelId)
+                .toList();
 
-        for (Channel channel : channelList) {
-            ChannelFindDTO channelFindDTO = find(channel.getChannelId());
-            findDTOList.add(channelFindDTO);
-        }
-        return findDTOList;
+        return channelRepository.findAll().stream()
+                .filter(channel -> channel.getType().equals(ChannelType.PUBLIC) || mySubscribedChannelIds.contains(channel.getChannelId()))
+                .map(channel -> find(channel.getChannelId()))
+                .toList();
     }
+
+    @CustomLogging
+    @Override
+    public UUID update(UUID channelId, UpdateChannelDTO updateChannelDTO) {
+
+        Channel findChannel = channelRepository.find(channelId);
+
+        if (findChannel.getType() == ChannelType.PRIVATE) {
+            throw new ChannelModificationNotAllowedException("private 채널은 수정할 수 없습니다.");
+        }
+
+        Channel update = channelRepository.update(findChannel, updateChannelDTO);
+        return update.getChannelId();
+    }
+
 
     @Override
     public void delete(UUID channelId) {
@@ -122,43 +136,10 @@ public class BasicChannelService implements ChannelService {
         deleteAllReadStatus(channelId);
     }
 
-    @CustomLogging
-    @Override
-    public UUID update(UUID channelId, UpdateChannelDTO updateChannelDTO) {
-        Channel findChannel = channelRepository.find(channelId);
-        if (findChannel.getType() == ChannelType.PRIVATE) {
-            throw new ChannelModificationNotAllowedException("private 채널은 수정할 수 없습니다.");
-        }
-        Channel update = channelRepository.update(findChannel, updateChannelDTO);
-        return update.getChannelId();
-    }
-
-    @Override
-    public void printChannels(UUID serverId) {
-
-        List<Channel> channels = channelRepository.findAllByServerId(serverId);
-        channels.forEach(System.out::println);
-
-    }
-
-    @Override
-    public void printUsersInChannel(UUID channelId) {
-        Channel channel = channelRepository.find(channelId);
-        List<User> list = channel.getUserList();
-        list.forEach(System.out::println);
-
-    }
-
-
-    private void createReadStatus(User user, Channel channel) {
-        ReadStatus readStatus = new ReadStatus(user.getId(), channel.getChannelId());
-        readStatusRepository.save(readStatus);
-    }
-
     private void deleteAllMessage(UUID channelId) {
         List<Message> list = messageRepository.findAllByChannelId(channelId);
         for (Message message : list) {
-            messageRepository.remove(message.getMessageId());
+            messageRepository.deleteById(message.getMessageId());
         }
     }
 
@@ -168,4 +149,28 @@ public class BasicChannelService implements ChannelService {
             readStatusRepository.delete(status.getReadStatusId());
         }
     }
+
+
+//    @Override
+//    public void printChannels(UUID serverId) {
+//
+//        List<Channel> channels = channelRepository.findAllByServerId(serverId);
+//        channels.forEach(System.out::println);
+//
+//    }
+//
+//    @Override
+//    public void printUsersInChannel(UUID channelId) {
+//        Channel channel = channelRepository.find(channelId);
+//        List<User> list = channel.getUserList();
+//        list.forEach(System.out::println);
+//
+//    }
+
+//
+//    private void createReadStatus(User user, Channel channel) {
+//        ReadStatus readStatus = new ReadStatus(user.getId(), channel.getChannelId());
+//        readStatusRepository.save(readStatus);
+//    }
+
 }

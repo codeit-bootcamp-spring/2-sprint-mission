@@ -3,25 +3,27 @@ package com.sprint.mission.discodeit.controller.page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
 @Controller
-@RequestMapping("/users/{userId}/servers/{serverId}")
 public class ChannelPageController {
-    @GetMapping
-    public String getChannelPage(@PathVariable UUID userId, @PathVariable UUID serverId, Model model) {
-        model.addAttribute("userId", userId);
+    @GetMapping("/channel-index")
+    public String getChannelPage(@RequestParam UUID serverId, Model model) {
         model.addAttribute("serverId", serverId);
-        return "channels";
+        return "channel-index";
     }
 
-    @GetMapping("/create")
-    public String getCreateChannelForm(@PathVariable UUID userId, @PathVariable UUID serverId, Model model) {
-        model.addAttribute("userId", userId);
+    @GetMapping("/channels/create")
+    public String getCreateChannelForm(@RequestParam UUID serverId, Model model) {
         model.addAttribute("serverId", serverId);
-        return "create-channel";
+        return "channel-create";
+    }
+
+    @GetMapping("/channels")
+    public String getChannelListPage(@RequestParam UUID serverId, Model model) {
+        model.addAttribute("serverId", serverId);
+        return "channels";
     }
 }

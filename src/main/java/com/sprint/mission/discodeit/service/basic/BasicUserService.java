@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.UserFindDTO;
-import com.sprint.mission.discodeit.dto.create.CreateBinaryContentRequestDTO;
-import com.sprint.mission.discodeit.dto.create.CreateUserRequestDTO;
+import com.sprint.mission.discodeit.dto.create.BinaryContentCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.create.UserCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.update.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -11,9 +11,10 @@ import com.sprint.mission.discodeit.exception.Valid.DuplicateUserException;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,30 +24,31 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
+    private final UserStatusService userStatusService;
+
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final UserStatusRepository userStatusRepository;
+
 
     @Override
     public void reset(boolean adminAuth) {
-        if (adminAuth == true) {
+        if (adminAuth) {
             userRepository.reset();
         }
     }
 
     @CustomLogging
     @Override
-    public UUID create(CreateUserRequestDTO userCreateDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+    public UUID create(UserCreateRequestDTO requestDTO, Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
 
-        checkDuplicate(userCreateDTO.name(), userCreateDTO.email());
+        checkDuplicate(requestDTO.name(), requestDTO.email());
 
-        User user = new User(userCreateDTO.name(), userCreateDTO.email(), userCreateDTO.password());
         UUID profileId = makeBinaryContent(binaryContentDTO);
-        user.setProfileId(profileId);
+        String hashedPassword = BCrypt.hashpw(requestDTO.password(), BCrypt.gensalt());
+        User user = new User(profileId, requestDTO.name(), requestDTO.email(), hashedPassword);
         userRepository.save(user);
 
-        UserStatus userStatus = new UserStatus(user.getId());
-        userStatusRepository.save(userStatus);
+        userStatusService.create(user.getId());
 
         return user.getId();
     }
@@ -55,39 +57,28 @@ public class BasicUserService implements UserService {
     public UserFindDTO findById(UUID userId) {
         User user = userRepository.findById(userId);
 
-        UserStatus userStatus = userStatusRepository.findByUserId(userId);
+        UserStatus userStatus = userStatusService.findByUserId(userId);
         boolean online = userStatus.isOnline();
-        UserFindDTO userFindDTO = new UserFindDTO(
-                user.getId(),
-                user.getProfileId(),
-                user.getName(),
-                user.getEmail(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                online
-        );
 
-        return userFindDTO;
+        return UserFindDTO.create(user, online);
     }
 
     @Override
     public List<UserFindDTO> listAllUsers() {
         List<User> userList = userRepository.findAll();
 
-        return userList.stream().map(user -> new UserFindDTO(
-                user.getId(),
-                user.getProfileId(),
-                user.getName(),
-                user.getEmail(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                userStatusRepository.findByUserId(user.getId()).isOnline()
-        )).toList();
+        return userList.stream().map(user -> UserFindDTO.create(
+                user,
+                userStatusService.findByUserId(user.getId()).isOnline())
+        ).toList();
     }
 
     @CustomLogging
     @Override
-    public UUID update(UUID userId, UpdateUserRequestDTO updateUserRequestDTO, Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+    public UUID update(UUID userId, UpdateUserRequestDTO updateUserRequestDTO, Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
+
+
+
         User user = userRepository.findById(userId);
         UUID profileId = user.getProfileId();
         if (profileId != null) {
@@ -103,25 +94,34 @@ public class BasicUserService implements UserService {
     @CustomLogging
     @Override
     public void delete(UUID userId) {
+
+
         User findUser = userRepository.findById(userId);
-        userRepository.remove(findUser);
-        userStatusRepository.delete(findUser.getId());
 
         Optional.ofNullable(findUser.getProfileId())
                 .ifPresent(binaryContentRepository::delete);
 
+        userStatusService.deleteById(findUser.getId());
+
+        userRepository.remove(findUser);
+
     }
 
-    private UUID makeBinaryContent(Optional<CreateBinaryContentRequestDTO> binaryContentDTO) {
+    @Override
+    public boolean existsById(UUID userId) {
+        return userRepository.existId(userId);
+    }
 
+    private UUID makeBinaryContent(Optional<BinaryContentCreateRequestDTO> binaryContentDTO) {
         return binaryContentDTO.map(contentDTO -> {
             String fileName = contentDTO.fileName();
             String contentType = contentDTO.contentType();
             byte[] bytes = contentDTO.bytes();
-            long size = (long) bytes.length;
+            long size = bytes.length;
 
             BinaryContent content = new BinaryContent(fileName, size, contentType, bytes);
             binaryContentRepository.save(content);
+
             return content.getId();
         }).orElse(null);
     }

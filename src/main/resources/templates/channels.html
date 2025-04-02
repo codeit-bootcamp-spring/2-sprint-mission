@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>채널 목록</title>
@@ -7,9 +7,6 @@
 <body>
 
 <h1>채널 목록</h1>
-
-<p>유저 ID: <span th:text="${userId}" id="userIdText"></span></p>
-<p>서버 ID: <span th:text="${serverId}" id="serverIdText"></span></p>
 
 <table border="1">
     <thead>
@@ -26,30 +23,42 @@
 </table>
 
 <br>
-<a id="createChannelLink" href="#">
-    <button>➕ 채널 생성하기</button>
-</a><br><br>
-<a href="/users">← 유저 목록으로</a>
+<a id="createChannelLink" href="#"></a>
+<br>
+
+<a id="backLink" href="#">← 채널 관리 페이지로</a>
 
 <script>
-    function getIds() {
+    function getParams() {
+        const params = new URLSearchParams(location.search);
         return {
-            userId: document.getElementById("userIdText").textContent.trim(),
-            serverId: document.getElementById("serverIdText").textContent.trim()
+            token: params.get("token"),
+            serverId: params.get("serverId")
         };
     }
 
-    function setCreateChannelLink() {
-        const { userId, serverId } = getIds();
-        const link = document.getElementById("createChannelLink");
-        link.href = `/users/${userId}/servers/${serverId}/create`;
+    function setLinks() {
+        const { token, serverId } = getParams();
+
+        const createLink = document.getElementById("createChannelLink");
+        const backLink = document.getElementById("backLink");
+
+        createLink.href = `/channels/create?serverId=${serverId}&token=${token}`;
+        backLink.href = `/channel-index?serverId=${serverId}&token=${token}`;
     }
 
     function loadChannels() {
-        const { userId, serverId } = getIds();  // ✅ 여기서 가져오고
+        const { token, serverId } = getParams();
 
-        fetch(`/api/servers/${serverId}/channels`)
-            .then(res => res.json())
+        fetch(`/api/servers/${serverId}/channels`, {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("채널 목록 불러오기 실패");
+                return res.json();
+            })
             .then(data => {
                 const tbody = document.getElementById("channelTableBody");
                 tbody.innerHTML = '';
@@ -57,15 +66,15 @@
                 data.channels.forEach(channel => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                    <td>${channel.channelId}</td>
-                    <td>
-                      <a href="/users/${userId}/servers/${serverId}/channels/${channel.channelId}/messages">
-                        ${channel.name || '(비공개 채널)'}
-                      </a>
-                    </td>
-                    <td>${channel.userIdList ? channel.userIdList.length : 0}명</td>
-                    <td>${channel.lastMessageAt ? new Date(channel.lastMessageAt).toLocaleString() : '-'}</td>
-                `;
+          <td>${channel.channelId}</td>
+          <td>
+            <a href="/messages?serverId=${serverId}&channelId=${channel.channelId}&token=${token}">
+              ${channel.name || '(비공개 채널)'}
+            </a>
+          </td>
+          <td>${channel.userIdList ? channel.userIdList.length : 0}명</td>
+          <td>${channel.lastMessageAt ? new Date(channel.lastMessageAt).toLocaleString() : '-'}</td>
+        `;
                     tbody.appendChild(row);
                 });
             })
@@ -75,12 +84,12 @@
             });
     }
 
-
     document.addEventListener("DOMContentLoaded", () => {
-        setCreateChannelLink();
+        setLinks();
         loadChannels();
     });
 </script>
 
 </body>
 </html>
+
