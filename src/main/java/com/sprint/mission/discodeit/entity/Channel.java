@@ -1,55 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
+@Getter
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private String name;
-    private final List<UUID> userIds = new ArrayList<>();
+    private ChannelType type;
 
-    public Channel(String name, UUID ownerId) {
+    public Channel(ChannelType channelType, String name) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().toEpochMilli();
+        this.createdAt = ZonedDateTime.now().toInstant();
         this.updatedAt = createdAt;
         this.name = name;
-        this.userIds.add(ownerId);
-    }
-
-    public void addMember(UUID userId) {
-        userIds.add(userId);
-        updateTimestamp();
+        this.type = channelType;
     }
 
     public void updateName(String name) {
+        if (this.type == ChannelType.PRIVATE) {
+            throw new IllegalArgumentException("Private 파일은 수정할 수 없습니다.");
+        }
+
         this.name = name;
-        updateTimestamp();
+        updateLastModified();
     }
 
-    private void updateTimestamp() {
-        this.updatedAt = Instant.now().toEpochMilli();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public List<UUID> getUserIds() {
-        return Collections.unmodifiableList(userIds);
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
+    private void updateLastModified() {
+        this.updatedAt = ZonedDateTime.now().toInstant();
     }
 }
