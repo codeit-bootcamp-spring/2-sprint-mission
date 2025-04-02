@@ -1,29 +1,29 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.auth.LoginRequest;
-import com.sprint.mission.discodeit.dto.auth.LoginResponse;
-import com.sprint.mission.discodeit.dto.common.ApiResponse;
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@RestController
-@RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Controller
+@ResponseBody
+@RequestMapping("/api/auth")
 public class AuthController {
-    private final AuthService authService;
 
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
-        LoginResponse loginResponse = authService.login(loginRequest);
-        ApiResponse<LoginResponse> response = new ApiResponse<>(true, "로그인 성공", loginResponse);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(response);
-    }
+  private final AuthService authService;
+
+  @RequestMapping(path = "login")
+  public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
+    User user = authService.login(loginRequest);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(user);
+  }
 }

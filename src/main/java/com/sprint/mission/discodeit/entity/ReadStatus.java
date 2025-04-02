@@ -2,23 +2,40 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class ReadStatus extends BaseEntity {
-    private final UUID userId;
-    private final UUID channelId;
-    private Instant readTime;
+public class ReadStatus implements Serializable {
 
-    public ReadStatus(UUID userId, UUID channelId) {
-        super();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.readTime = null;           // null을 넣는게 맞는가?
+  private static final long serialVersionUID = 1L;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private UUID userId;
+  private UUID channelId;
+  private Instant lastReadAt;
+
+  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.userId = userId;
+    this.channelId = channelId;
+    this.lastReadAt = lastReadAt;
+  }
+
+  public void update(Instant newLastReadAt) {
+    boolean anyValueUpdated = false;
+    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = newLastReadAt;
+      anyValueUpdated = true;
     }
 
-    public void updateReadTime(Instant readTime) {
-        this.readTime = readTime;
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 }

@@ -1,61 +1,69 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channel.*;
-import com.sprint.mission.discodeit.dto.common.ApiResponse;
+import com.sprint.mission.discodeit.dto.data.ChannelDto;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-@RestController
-@RequestMapping("/api/channel")
 @RequiredArgsConstructor
+@Controller
+@ResponseBody
+@RequestMapping("/api/channel")
 public class ChannelController {
-    private final ChannelService channelService;
 
-    @PostMapping("/createPrivate")
-    public ResponseEntity<ApiResponse<ChannelCreateResponse>> cratePrivateChannel(@Valid @RequestBody PrivateChannelCreateRequest request) {
-        UUID channelId = channelService.createPrivateChannel(request);
-        ApiResponse<ChannelCreateResponse> response = new ApiResponse<>(true, "Private 채널 생성 성공", new ChannelCreateResponse(channelId));
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(response);
-    }
+  private final ChannelService channelService;
 
-    @PostMapping("/createPublic")
-    public ResponseEntity<ApiResponse<ChannelCreateResponse>> createPublicChannel(@Valid @RequestBody PublicChannelCreateRequest request) {
-        UUID channelId = channelService.createPublicChannel(request.channelName());
-        ApiResponse<ChannelCreateResponse> response = new ApiResponse<>(true, "Public 채널 생성 성공", new ChannelCreateResponse(channelId));
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(response);
-    }
+  @RequestMapping(path = "createPublic")
+  public ResponseEntity<Channel> create(@RequestBody PublicChannelCreateRequest request) {
+    Channel createdChannel = channelService.create(request);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdChannel);
+  }
 
-    @PutMapping("{id}/updatePublic")
-    public ResponseEntity<ApiResponse<ChannelUpdateResponse>> updatePublicChannel(@PathVariable UUID id, @Valid @RequestBody ChannelUpdateRequest request) {
-        channelService.updateChannel(id, request);
-        ApiResponse<ChannelUpdateResponse> response = new ApiResponse<>(true, "Public 채널 업데이트 성공", new ChannelUpdateResponse(id));
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(response);
-    }
+  @RequestMapping(path = "createPrivate")
+  public ResponseEntity<Channel> create(@RequestBody PrivateChannelCreateRequest request) {
+    Channel createdChannel = channelService.create(request);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdChannel);
+  }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<ChannelDeleteResponse>> deleteChannel(@PathVariable UUID id) {
-        channelService.deleteChannel(id);
-        ApiResponse<ChannelDeleteResponse> response = new ApiResponse<>(true, "채널 삭제 성공", new ChannelDeleteResponse(id, Instant.now()));
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(response);
-    }
+  @RequestMapping(path = "update")
+  public ResponseEntity<Channel> update(@RequestParam("channelId") UUID channelId,
+      @RequestBody PublicChannelUpdateRequest request) {
+    Channel udpatedChannel = channelService.update(channelId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(udpatedChannel);
+  }
 
-    @GetMapping("/{userId}/channelList")
-    public ResponseEntity<ApiResponse<List<ChannelReadResponse>>> findAllByUserId(@PathVariable UUID userId) {
-        List<ChannelReadResponse> readResponses = channelService.findAllByUserId(userId);
-        ApiResponse<List<ChannelReadResponse>> response = new ApiResponse<>(true, "채널 불러오기 성공", readResponses);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(response);
-    }
+  @RequestMapping(path = "delete")
+  public ResponseEntity<Void> delete(@RequestParam("channelId") UUID channelId) {
+    channelService.delete(channelId);
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
+  }
+
+  @RequestMapping(path = "findAll")
+  public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
+    List<ChannelDto> channels = channelService.findAllByUserId(userId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(channels);
+  }
 }

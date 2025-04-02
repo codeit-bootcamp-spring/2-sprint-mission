@@ -1,65 +1,58 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.model.UserStatusType;
-import com.sprint.mission.discodeit.repository.AbstractRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
-public class JCFUserStatusRepository  extends AbstractRepository<UserStatus> implements UserStatusRepository {
-    private Map<UUID, UserStatus> userIdMap = new HashMap<>();
+public class JCFUserStatusRepository implements UserStatusRepository {
 
-    public JCFUserStatusRepository() {
-        super(UserStatus.class, new ConcurrentHashMap<>());
-    }
+  private final Map<UUID, UserStatus> data;
 
-    @Override
-    public void add(UserStatus newUserStatus) {
-        super.add(newUserStatus);
-        userIdMap.put(newUserStatus.getUserId(), newUserStatus);
-    }
+  public JCFUserStatusRepository() {
+    this.data = new HashMap<>();
+  }
 
-    @Override
-    public boolean existsByUserId(UUID userId) {
-        return userIdMap.containsKey(userId);
-    }
+  @Override
+  public UserStatus save(UserStatus userStatus) {
+    this.data.put(userStatus.getId(), userStatus);
+    return userStatus;
+  }
 
-    @Override
-    public UserStatus findUserStatusByUserId(UUID userId) {
-        if (!existsByUserId(userId)) {
-            throw new NoSuchElementException("해당 userId를 가진 userStatus를 찾을 수 없습니다 : " + userId);
-        }
-        return userIdMap.get(userId);
-    }
+  @Override
+  public Optional<UserStatus> findById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
+  }
 
-    @Override
-    public void updateTimeById(UUID readStatusId, Instant updateTime) {
-        super.storage.get(readStatusId).updateUpdatedAt(updateTime);
-    }
+  @Override
+  public Optional<UserStatus> findByUserId(UUID userId) {
+    return this.findAll().stream()
+        .filter(userStatus -> userStatus.getUserId().equals(userId))
+        .findFirst();
+  }
 
-    @Override
-    public void updateTimeByUserId(UUID userId, Instant updateTime) {
-        findUserStatusByUserId(userId).updateUpdatedAt(updateTime);
-    }
+  @Override
+  public List<UserStatus> findAll() {
+    return this.data.values().stream().toList();
+  }
 
-    @Override
-    public void updateUserStatusByUserId(UUID id, UserStatusType type) {
-        findUserStatusByUserId(id).setUserStatusType(type);
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
+  }
 
-    @Override
-    public void deleteById(UUID userStatusId) {
-        super.deleteById(userStatusId);
-        userIdMap.remove(userStatusId);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    this.data.remove(id);
+  }
+
+  @Override
+  public void deleteByUserId(UUID userId) {
+    this.findByUserId(userId)
+        .ifPresent(userStatus -> this.deleteByUserId(userStatus.getId()));
+  }
 }

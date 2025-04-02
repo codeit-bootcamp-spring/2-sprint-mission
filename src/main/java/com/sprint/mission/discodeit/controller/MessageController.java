@@ -1,53 +1,84 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.common.ApiResponse;
-import com.sprint.mission.discodeit.dto.message.*;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@RestController
-@RequestMapping("/api/message")
 @RequiredArgsConstructor
+@Controller
+@ResponseBody
+@RequestMapping("/api/message")
 public class MessageController {
-    private final MessageService messageService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<MessageCreateResponse>> sendMessage(@Valid @RequestBody MessageCreateRequest request) {
-        UUID messageId = messageService.createMessage(request);
-        ApiResponse<MessageCreateResponse> response = new ApiResponse<>(true, "메세지 전송 성공", new MessageCreateResponse(messageId));
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(response);
-    }
+  private final MessageService messageService;
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<MessageUpdateResponse>> updateMessage(@PathVariable UUID id, @Valid @RequestBody MessageUpdateRequest request) {
-        messageService.updateMessage(id, request);
-        ApiResponse<MessageUpdateResponse> response = new ApiResponse<>(true, "메세지 업데이트 성공", new MessageUpdateResponse(id));
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(response);
-    }
+  @RequestMapping(
+      path = "create",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+  )
+  public ResponseEntity<Message> create(
+      @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+  ) {
+    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
+        .map(files -> files.stream()
+            .map(file -> {
+              try {
+                return new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+                );
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+            .toList())
+        .orElse(new ArrayList<>());
+    Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdMessage);
+  }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<MessageDeleteResponse>> deleteMessage(@PathVariable UUID id) {
-        messageService.deleteMessage(id);
-        ApiResponse<MessageDeleteResponse> response = new ApiResponse<>(true, "메세지 삭제 성공", new MessageDeleteResponse(id, Instant.now()));
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(response);
-    }
+  @RequestMapping(path = "update")
+  public ResponseEntity<Message> update(@RequestParam("messageId") UUID messageId,
+      @RequestBody MessageUpdateRequest request) {
+    Message updatedMessage = messageService.update(messageId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedMessage);
+  }
 
-    @GetMapping("/{channelId}/messages")
-    public ResponseEntity<ApiResponse<List<MessageReadResponse>>> findMessageList(@PathVariable UUID channelId) {
-        List<MessageReadResponse> readResponses=  messageService.findAllByChannelId(channelId);
-        ApiResponse<List<MessageReadResponse>> response = new ApiResponse<>(true, "메세지 리스트 불러오기 성공", readResponses);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(response);
-    }
+  @RequestMapping(path = "delete")
+  public ResponseEntity<Void> delete(@RequestParam("messageId") UUID messageId) {
+    messageService.delete(messageId);
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
+  }
+
+  @RequestMapping("findAllByChannelId")
+  public ResponseEntity<List<Message>> findAllByChannelId(
+      @RequestParam("channelId") UUID channelId) {
+    List<Message> messages = messageService.findAllByChannelId(channelId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(messages);
+  }
 }

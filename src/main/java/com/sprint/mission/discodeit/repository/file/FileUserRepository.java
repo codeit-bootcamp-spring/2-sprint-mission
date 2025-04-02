@@ -1,101 +1,129 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.user.NoSuchUserEmailException;
-import com.sprint.mission.discodeit.exception.user.NoSuchUserNameException;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
-@Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository {
-    // userName과 email의 빠른 중복 확인을 위한 필드
-    private Map<String, User> usernames;
-    private Map<String, User> emails;
+@Repository
+public class FileUserRepository implements UserRepository {
 
-    public FileUserRepository(RepositoryProperties repositoryProperties) {
-        super(User.class, Paths.get(repositoryProperties.getFileDirectory()).resolve("UserData"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
-        usernames = new HashMap<>();
-        emails = new HashMap<>();
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
+
+  public FileUserRepository(
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        User.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
+  }
 
-    @Override
-    public void add(User newUser) {
-        super.add(newUser);                                                                 // users에 반영
-        super.saveToFile(directory.resolve(newUser.getId().toString() + ".ser"), newUser);    // file에 반영
-        usernames.put(newUser.getUserName(), newUser);
-        emails.put(newUser.getUserEmail(), newUser);
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
+  }
+
+  @Override
+  public User save(User user) {
+    Path path = resolvePath(user.getId());
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
+      oos.writeObject(user);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+    return user;
+  }
 
-    // existsById(),findById(), getAll()  굳이 file을 탐색할 필요 없다고 생각해 storage를 통해 정보 확인, -> super.add, super.findById, super.getAll 사용
-
-    @Override
-    public void updateUserName(UUID userId, String newUserName) {
-        User findUser = super.findById(userId);     // findById 에서 예외 처리
-        findUser.updateUserName(newUserName);
-        saveToFile(directory.resolve(userId.toString() + ".ser"), findUser);
-        usernames.remove(findUser.getUserName());
-        usernames.put(newUserName, findUser);
+  @Override
+  public Optional<User> findById(UUID id) {
+    User userNullable = null;
+    Path path = resolvePath(id);
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        userNullable = (User) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
     }
+    return Optional.ofNullable(userNullable);
+  }
 
-    @Override
-    public void updatePassword(UUID userId, String newPassword) {
-        User findUser = super.findById(userId);     // findById 에서 예외 처리
-        findUser.updateUserPassword(newPassword);
-        saveToFile(directory.resolve(userId.toString() + ".ser"), findUser);
-    }
+  @Override
+  public Optional<User> findByUsername(String username) {
+    return this.findAll().stream()
+        .filter(user -> user.getUsername().equals(username))
+        .findFirst();
+  }
 
-    @Override
-    public void updateProfileId(UUID userId, UUID newProfileId) {
-        User findUser = super.findById(userId);
-        findUser.updateProfileId(newProfileId);
-        saveToFile(directory.resolve(userId.toString() + ".ser"), findUser);
+  @Override
+  public List<User> findAll() {
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public boolean existsByUserName(String userName) {
-        if (userName == null) {
-            throw new NullPointerException("userName is null");
-        }
-        return usernames.containsKey(userName);
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
+  }
 
-    @Override
-    public boolean existsByEmail(String email) {
-        if (email == null) {
-            throw new NullPointerException("email is null");
-        }
-        return emails.containsKey(email);
+  @Override
+  public void deleteById(UUID id) {
+    Path path = resolvePath(id);
+    try {
+      Files.delete(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public User findByUserName(String userName) {
-        if (!existsByUserName(userName)) {
-            throw new NoSuchUserNameException(userName);
-        }
-        return usernames.get(userName);
-    }
+  @Override
+  public boolean existsByEmail(String email) {
+    return this.findAll().stream()
+        .anyMatch(user -> user.getEmail().equals(email));
+  }
 
-    @Override
-    public User findByEmail(String email) {
-        if (!existsByEmail(email)) {
-            throw new NoSuchUserEmailException(email);
-        }
-        return emails.get(email);
-    }
-
-    @Override
-    public void deleteById(UUID userId) {
-        usernames.remove(super.findById(userId).getUserName());
-        emails.remove(super.findById(userId).getUserName());
-        super.deleteById(userId);                 //users에서 삭제
-        super.deleteFile(userId);                 //file 삭제
-    }
+  @Override
+  public boolean existsByUsername(String username) {
+    return this.findAll().stream()
+        .anyMatch(user -> user.getUsername().equals(username));
+  }
 }
