@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.common.ReadStatus;
 
 import java.time.Instant;
@@ -10,13 +9,13 @@ import java.util.UUID;
 
 public interface ReadStatusService {
 
-  ReadStatus create(ReadStatusCreateRequest readStatusCreateRequest);
+  ReadStatus create(ReadStatusCreateRequest request);
 
-  ReadStatus find(UUID id);
+  ReadStatus find(UUID readStatusId);
 
   List<ReadStatus> findAllByUserId(UUID userId);
 
   ReadStatus update(UUID readStatusId, Instant newLastReadAt);
 
-  void delete(UUID id);
+  void delete(UUID readStatusId);
 }

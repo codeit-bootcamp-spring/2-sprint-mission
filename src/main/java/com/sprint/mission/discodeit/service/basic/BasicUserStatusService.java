@@ -22,21 +22,21 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserStatusRepository userStatusRepository;
 
   @Override
-  public UserStatus create(UserStatusCreateRequest requestDto) {
-    User user = userRepository.findById(requestDto.userId())
+  public UserStatus create(UserStatusCreateRequest request) {
+    User user = userRepository.findById(request.userId())
         .orElseThrow(() -> new ResourceNotFoundException("해당 유저 없음"));
 
-    if (userStatusRepository.findByUserId(requestDto.userId()).isPresent()) {
+    if (userStatusRepository.findByUserId(request.userId()).isPresent()) {
       throw new IllegalArgumentException("해당 유저의 userStatus 이미 존재");
     }
 
-    UserStatus userStatus = new UserStatus(requestDto.userId());
+    UserStatus userStatus = new UserStatus(request.userId());
     return userStatusRepository.save(userStatus);
   }
 
   @Override
-  public UserStatus find(UUID id) {
-    return userStatusRepository.findById(id)
+  public UserStatus find(UUID userStatusId) {
+    return userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new ResourceNotFoundException("해당 유저 상태 없음"));
   }
 
@@ -52,8 +52,8 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public UserStatus update(UUID userId, Instant newLastActiveAt) {
-    UserStatus userStatus = userStatusRepository.findByUserId(userId)
+  public UserStatus update(UUID userStatusId, Instant newLastActiveAt) {
+    UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new ResourceNotFoundException("해당 유저 상태 없음"));
 
     userStatus.updateLastActiveAt(newLastActiveAt);
@@ -62,15 +62,19 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatus updateByUserId(UUID userId) {
-    return update(userId, Instant.now());
+    UserStatus userStatus = userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> new ResourceNotFoundException("해당 유저 상태 없음"));
+
+    userStatus.updateLastActiveAt(Instant.now());
+    return userStatusRepository.save(userStatus);
   }
 
   @Override
-  public void delete(UUID id) {
-    if (!userStatusRepository.existsById(id)) {
+  public void delete(UUID userStatusId) {
+    if (!userStatusRepository.existsById(userStatusId)) {
       throw new ResourceNotFoundException("해당 유저 상태 없음");
     }
-    userStatusRepository.deleteById(id);
+    userStatusRepository.deleteById(userStatusId);
   }
 
   @Override
