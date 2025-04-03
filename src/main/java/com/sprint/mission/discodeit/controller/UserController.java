@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.RegisterResponse;
 import com.sprint.mission.discodeit.dto.UpdateUserRequest;
 import com.sprint.mission.discodeit.jwt.JwtUtil;
-import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -41,21 +40,19 @@ public class UserController {
 
   }
 
-  @RequiresAuth
   @RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateUser(
       @RequestBody UpdateUserRequest request,
-      @PathVariable UUID userId
+      @PathVariable("userId") UUID userId
   ) {
     userService.updateUser(userId, request);
     return ResponseEntity.ok("회원정보 수정 완료");
   }
 
-  @RequiresAuth
   @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
   public ResponseEntity<?> updateUserProfile(
       @RequestParam("file") MultipartFile profile,
-      @PathVariable UUID userId
+      @PathVariable("userId") UUID userId
   ) throws IOException {
     CreateBinaryContentRequest request = CreateBinaryContentRequest.builder()
         .fileName(profile.getOriginalFilename())
@@ -72,9 +69,8 @@ public class UserController {
   }
 
 
-  @RequiresAuth
   @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
+  public ResponseEntity<?> deleteUser(@PathVariable("userId") UUID userId) {
     userService.deleteUser(userId);
     return ResponseEntity.ok("회원 탈퇴 완료");
   }
@@ -84,9 +80,8 @@ public class UserController {
     return ResponseEntity.ok(userService.getAllUsers());
   }
 
-  @RequiresAuth
   @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
-  public ResponseEntity<?> updateStatus(@PathVariable UUID userId) {
+  public ResponseEntity<?> updateStatus(@PathVariable("userId") UUID userId) {
     userStatusService.update(userId);
     return ResponseEntity.ok("온라인 상태 갱신 완료");
   }

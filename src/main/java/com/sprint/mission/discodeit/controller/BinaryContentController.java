@@ -40,7 +40,7 @@ public class BinaryContentController {
   }
 
   @RequestMapping(value = "{binaryContentId}", method = RequestMethod.GET)
-  public ResponseEntity<?> getBinaryContent(@PathVariable UUID binaryContentId) {
+  public ResponseEntity<?> getBinaryContent(@PathVariable("binaryContentId") UUID binaryContentId) {
     return ResponseEntity.ok(binaryContentService.findBinaryContent(binaryContentId));
   }
 

@@ -39,7 +39,7 @@ public class MessageController {
   @RequiresAuth
   @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
   public ResponseEntity<?> updateMessage(
-      @PathVariable UUID messageId,
+      @PathVariable("messageId") UUID messageId,
       @RequestBody UpdateMessageRequest request,
       HttpServletRequest httpRequest) {
     UUID userId = (UUID) httpRequest.getAttribute("user_id");
@@ -52,7 +52,7 @@ public class MessageController {
   @RequiresAuth
   @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteMessage(
-      @PathVariable UUID messageId,
+      @PathVariable("messageId") UUID messageId,
       HttpServletRequest httpRequest) {
     UUID userId = (UUID) httpRequest.getAttribute("user_id");
     messageService.deleteMessage(userId, messageId);

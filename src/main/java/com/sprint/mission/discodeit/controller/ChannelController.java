@@ -41,7 +41,7 @@ public class ChannelController {
   }
 
   @RequestMapping(value = "/{channelId}", method = RequestMethod.PUT)
-  public ResponseEntity<?> updateChannel(@PathVariable UUID channelId,
+  public ResponseEntity<?> updateChannel(@PathVariable("channelId") UUID channelId,
       @RequestBody UpdateChannelRequest channelDto) {
     channelService.updateChannel(channelId, channelDto);
 
@@ -49,7 +49,7 @@ public class ChannelController {
   }
 
   @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteChannel(@PathVariable UUID channelId) {
+  public ResponseEntity<?> deleteChannel(@PathVariable("channelId") UUID channelId) {
     channelService.deleteChannel(channelId);
 
     return ResponseEntity.ok("채널이 삭제되었습니다.");
