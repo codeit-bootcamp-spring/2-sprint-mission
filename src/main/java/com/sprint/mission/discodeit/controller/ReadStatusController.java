@@ -55,7 +55,6 @@ public class ReadStatusController {
     @Operation(summary = "User의 Message 읽음 상태 목록 조회")
     @ApiResponse(responseCode = "200", description = "Message 읽음 상태 목록 조회 성공")
     public ResponseEntity<List<ReadStatus>> findAllByUserId(
-//            @RequestBody ReadStatusFindDto readStatusFindRequest
             @RequestParam @Parameter(description = "조회할 User ID") UUID userId
     ) {
         List<ReadStatus> findAllByUserId = readStatusService.findAllByUserId(userId);

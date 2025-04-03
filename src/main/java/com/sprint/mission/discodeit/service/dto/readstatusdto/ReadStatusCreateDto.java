@@ -6,7 +6,7 @@ import java.util.UUID;
 public record ReadStatusCreateDto(
        UUID userId,
        UUID channelId,
-       Instant lastReadTime
+       Instant lastReadAt
 ) {
 
 }

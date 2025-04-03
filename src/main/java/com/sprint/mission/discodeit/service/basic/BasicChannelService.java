@@ -30,9 +30,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
-        List<UUID> userIds = channelCreatePrivateDto.userId();
+        List<UUID> userIds = channelCreatePrivateDto.participantIds();
         List<User> users = userRepository.load().stream()
-                .filter(m ->channelCreatePrivateDto.userId().contains(m.getId()))
+                .filter(m ->channelCreatePrivateDto.participantIds().contains(m.getId()))
                 .toList();
         if (users.size() != userIds.size()) {
             throw new InvalidInputException("User does not exist.");
@@ -42,7 +42,7 @@ public class BasicChannelService implements ChannelService {
         Channel createdPirvateChannel = channelRepository.save(channel);
 
         // Read Status 생성
-        channelCreatePrivateDto.userId().stream()
+        channelCreatePrivateDto.participantIds().stream()
                 .map(userId -> new ReadStatus(userId, createdPirvateChannel.getId(), Instant.MIN))
                 .forEach(readStatusRepository::save);
 
@@ -54,12 +54,12 @@ public class BasicChannelService implements ChannelService {
     public Channel createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
         List<Channel> channelList = channelRepository.load();
         Optional<Channel> matchingChannel = channelList.stream()
-                .filter(c -> c.getChannelName().equals(channelCreatePublicDto.channelName()))
+                .filter(c -> c.getChannelName().equals(channelCreatePublicDto.name()))
                 .findAny();
         if (matchingChannel.isPresent()) {
             throw new InvalidInputException("A channel already exists.");
         }
-        Channel channel = new Channel(ChannelType.PUBLIC, channelCreatePublicDto.channelName(), channelCreatePublicDto.description());
+        Channel channel = new Channel(ChannelType.PUBLIC, channelCreatePublicDto.name(), channelCreatePublicDto.description());
         Channel createdPublicChannel = channelRepository.save(channel);
         System.out.println(createdPublicChannel);
         return createdPublicChannel;
@@ -117,7 +117,7 @@ public class BasicChannelService implements ChannelService {
         if (matchingChannel.getType().equals(ChannelType.PRIVATE)) {
             throw new InvalidInputException("Private channels cannot be changed.");
         }
-        matchingChannel.updateChannel(channelUpdateDto.changeChannel(), channelUpdateDto.changeDescription());
+        matchingChannel.updateChannel(channelUpdateDto.newName(), channelUpdateDto.newDescription());
         channelRepository.save(matchingChannel);
         return matchingChannel;
 

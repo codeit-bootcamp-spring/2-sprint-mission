@@ -36,7 +36,7 @@ public class BasicUserService implements UserService {
     public User create(UserCreateDto userCreateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
         List<User> userList = userRepository.load();
         Optional<User> validateName = userList.stream()
-                .filter(u -> u.getName().equals(userCreateDto.name()))
+                .filter(u -> u.getName().equals(userCreateDto.username()))
                 .findAny();
         Optional<User> validateEmail = userList.stream()
                 .filter(u -> u.getEmail().equals(userCreateDto.email()))
@@ -59,7 +59,7 @@ public class BasicUserService implements UserService {
                 .orElse(null);
 
         // profile ID 추가 후 user 생성
-        User user = new User(userCreateDto.name(), userCreateDto.email(), userCreateDto.password(), nullableProfileId);
+        User user = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(), nullableProfileId);
         User createdUser = userRepository.save(user);
         System.out.println(createdUser);
 
@@ -125,7 +125,7 @@ public class BasicUserService implements UserService {
         BinaryContentDeleteDto binaryContentDeleteDto = new BinaryContentDeleteDto(matchingUser.getProfileId());
         binaryContentService.delete(binaryContentDeleteDto);
 
-        matchingUser.update(userUpdateDto.changeName(), userUpdateDto.changeEmail(), userUpdateDto.changePassword(), nullableProfileId);
+        matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(), nullableProfileId);
         userRepository.save(matchingUser);
         
         return matchingUser;

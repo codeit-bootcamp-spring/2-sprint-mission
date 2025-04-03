@@ -37,7 +37,7 @@ public class BasicMessageService implements MessageService {
         List<User> userList = userRepository.load();
         List<Channel> channelList = channelRepository.load();
         Optional<User> user = userList.stream()
-                .filter(u -> u.getId().equals(messageCreateDto.senderId()))
+                .filter(u -> u.getId().equals(messageCreateDto.authorId()))
                 .findAny();
         Optional<Channel> channel = channelList.stream()
                 .filter(c -> c.getId().equals(messageCreateDto.channelId()))
@@ -60,7 +60,7 @@ public class BasicMessageService implements MessageService {
                 })
                 .toList();
 
-        Message messages = new Message(messageCreateDto.message(), messageCreateDto.channelId(), messageCreateDto.senderId(), attachmentIds);
+        Message messages = new Message(messageCreateDto.content(), messageCreateDto.channelId(), messageCreateDto.authorId(), attachmentIds);
         messageRepository.save(messages);
 
         return messages;
@@ -93,7 +93,7 @@ public class BasicMessageService implements MessageService {
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("Message does not exist."));
         
-        message.updateMessage(messageUpdateDto.changeMessage());
+        message.updateMessage(messageUpdateDto.newContent());
         return messageRepository.save(message);
     }
 

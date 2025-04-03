@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,26 +37,26 @@ public class UserController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "User 등록")
-    @ApiResponse(responseCode = "200", description = "user가 성공적으로 생성됨")
+    @ApiResponse(responseCode = "201", description = "user가 성공적으로 생성됨")
     @ApiResponse(responseCode = "400", description = "같은 email 또는 username을 사용하는 User가 이미 존재함", content = @Content(examples = @ExampleObject(value = "User already exists or Email already exists")))
     public ResponseEntity<User> createUser(
-            @RequestPart("userInfo") UserCreateDto userCreateRequest,
-            @RequestPart(value = "file", required = false) @Parameter(description = "User 프로필 이미지") MultipartFile file
+            @RequestPart("userCreateRequest") UserCreateDto userCreateRequest,
+            @RequestPart(value = "profile", required = false) @Parameter(description = "User 프로필 이미지") MultipartFile profile
     ) {
         Optional<BinaryContentCreateDto> contentCreate = Optional.empty();
-        if (file != null && !file.isEmpty()) {
+        if (profile != null && !profile.isEmpty()) {
             try {
                 contentCreate = Optional.of(new BinaryContentCreateDto(
-                        file.getOriginalFilename(),
-                        file.getContentType(),
-                        file.getBytes()
+                        profile.getOriginalFilename(),
+                        profile.getContentType(),
+                        profile.getBytes()
                 ));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
         User user = userService.create(userCreateRequest, contentCreate);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
 
@@ -78,16 +79,16 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "User 정보가 성공적으로 수정됨")
     public ResponseEntity<User> updateUser(
             @PathVariable @Parameter(description = "수정 할 User ID") UUID userId,
-            @RequestPart("newUserInfo") UserUpdateDto userUpdateRequest,
-            @RequestPart(value = "file", required = false) @Parameter(description = "수정 할 User 프로필 이미지") MultipartFile file
+            @RequestPart("userUpdateRequest") UserUpdateDto userUpdateRequest,
+            @RequestPart(value = "profile", required = false) @Parameter(description = "수정 할 User 프로필 이미지") MultipartFile profile
     ) {
         Optional<BinaryContentCreateDto> contentCreate = Optional.empty();
-        if (file != null && !file.isEmpty()) {
+        if (profile != null && !profile.isEmpty()) {
             try {
                 contentCreate = Optional.of(new BinaryContentCreateDto(
-                        file.getOriginalFilename(),
-                        file.getContentType(),
-                        file.getBytes()
+                        profile.getOriginalFilename(),
+                        profile.getContentType(),
+                        profile.getBytes()
                 ));
             } catch (IOException e) {
                 throw new RuntimeException(e);

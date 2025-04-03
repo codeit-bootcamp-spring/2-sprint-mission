@@ -50,7 +50,7 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new InvalidInputException("Read status already exists");
         }
 
-        Instant lastReadAt = readStatusCreateDto.lastReadTime();
+        Instant lastReadAt = readStatusCreateDto.lastReadAt();
 //        Instant lastReadAt = Instant.now();
         ReadStatus readStatus = new ReadStatus(matchingUser.getId(), matchingChannel.getId(), lastReadAt);
         readStatusRepository.save(readStatus);
@@ -82,8 +82,8 @@ public class BasicReadStatusService implements ReadStatusService {
                 .filter(m -> m.getId().equals(readStatusId))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("readStatus not found"));
-        Instant newLastReadTime = readStatusUpdateDto.newLastReadTime();
-//        Instant newLastReadTime = Instant.now();
+        Instant newLastReadTime = readStatusUpdateDto.newLastReadAt();
+//        Instant newLastReadAt = Instant.now();
         matchingReadStatus.readStatusUpdate(newLastReadTime);
         return readStatusRepository.save(matchingReadStatus);
     }

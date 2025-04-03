@@ -11,19 +11,19 @@ public class ReadStatus extends BaseEntity {
 
     private final UUID userId;
     private final UUID channelId;
-    private Instant lastReadTime;
+    private Instant lastReadAt;
 
 
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadTime) {
         this.userId = userId;
         this.channelId = channelId;
-        this.lastReadTime = lastReadTime;
+        this.lastReadAt = lastReadTime;
     }
 
     public void readStatusUpdate(Instant newLastReadTime) {
         boolean anyValueUpdated = false;
-        if (newLastReadTime != null && !newLastReadTime.equals(this.lastReadTime)) {
-            this.lastReadTime = newLastReadTime;
+        if (newLastReadTime != null && !newLastReadTime.equals(this.lastReadAt)) {
+            this.lastReadAt = newLastReadTime;
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {
@@ -32,7 +32,7 @@ public class ReadStatus extends BaseEntity {
     }
 
     public String getReadAttFormatted() {
-        return TimeUtil.convertToFormattedDate(lastReadTime);
+        return TimeUtil.convertToFormattedDate(lastReadAt);
     }
 
     @Override

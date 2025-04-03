@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.service.dto.messagedto;
 import java.util.UUID;
 
 public record MessageCreateDto(
-        String message,
+        String content,
         UUID channelId,
-        UUID senderId
+        UUID authorId
 
 ) {
 
