@@ -4,16 +4,18 @@ import static com.sprint.mission.discodeit.adapter.inbound.message.MessageDtoMap
 import static com.sprint.mission.discodeit.adapter.inbound.message.MessageDtoMapper.toUpdateMessageCommand;
 
 import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateResponse;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageDeleteResponse;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageUpdateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageUpdateResponse;
+import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageCreateResponse;
+import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageDeleteResponse;
+import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageUpdateResponse;
+import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.message.usecase.MessageService;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageListResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
+import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageResult;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,7 @@ public class MessageController {
 
   private final MessageService messageService;
 
-  @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageCreateResponse> create(
       @PathVariable UUID userId, @PathVariable UUID channelId,
       @RequestPart("message") MessageCreateRequest requestBody,
@@ -64,8 +66,8 @@ public class MessageController {
         .orElse(new ArrayList<>());
     CreateMessageCommand command = toCreateMessageCommand(userId, channelId,
         requestBody);
-    messageService.create(command, attachmentRequests);
-    return ResponseEntity.ok(new MessageCreateResponse(true, "Message Create Successfully"));
+    CreateMessageResult result = messageService.create(command, attachmentRequests);
+    return ResponseEntity.ok(MessageCreateResponse.create(result.message()));
   }
 
   @GetMapping
@@ -81,8 +83,8 @@ public class MessageController {
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest requestBody) {
     UpdateMessageCommand command = toUpdateMessageCommand(messageId, requestBody);
-    messageService.update(command);
-    return ResponseEntity.ok(new MessageUpdateResponse(true));
+    UpdateMessageResult result = messageService.update(command);
+    return ResponseEntity.ok(MessageUpdateResponse.create(result.message()));
   }
 
   @DeleteMapping("/{messageId}")

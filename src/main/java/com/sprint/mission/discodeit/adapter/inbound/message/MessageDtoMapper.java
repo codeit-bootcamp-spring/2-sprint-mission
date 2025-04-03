@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.adapter.inbound.message;
 
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.message.dto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
 import java.util.UUID;

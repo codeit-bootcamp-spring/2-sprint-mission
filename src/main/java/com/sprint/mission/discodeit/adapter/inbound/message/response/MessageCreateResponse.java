@@ -1,14 +1,17 @@
-package com.sprint.mission.discodeit.core.message.usecase.dto;
+package com.sprint.mission.discodeit.adapter.inbound.message.response;
 
 import com.sprint.mission.discodeit.core.message.entity.Message;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 
-import java.time.Instant;
-
 @Builder
-public record MessageResult(
+@Schema(description = "Message 성공적으로 생성됨")
+public record MessageCreateResponse(
+//    boolean success,
+//    String message
     UUID id,
     Instant createdAt,
     Instant updatedAt,
@@ -18,8 +21,8 @@ public record MessageResult(
     List<UUID> attachmentIds
 ) {
 
-  public static MessageResult create(Message message) {
-    return MessageResult.builder()
+  public static MessageCreateResponse create(Message message) {
+    return MessageCreateResponse.builder()
         .id(message.getMessageId())
         .createdAt(message.getCreatedAt())
         .updatedAt(message.getUpdatedAt())

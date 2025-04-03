@@ -12,9 +12,11 @@ import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPor
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageListResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageResult;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.logging.CustomLogging;
@@ -35,7 +37,7 @@ public class BasicMessageService implements MessageService {
 
   @CustomLogging
   @Override
-  public Message create(CreateMessageCommand command,
+  public CreateMessageResult create(CreateMessageCommand command,
       List<CreateBinaryContentCommand> binaryContentCommands) {
     User user = userRepositoryPort.findById(command.userId()).orElseThrow(() ->
         userIdNotFoundError(command.userId())
@@ -51,7 +53,7 @@ public class BasicMessageService implements MessageService {
         command.text(), binaryContentIdList);
 
     messageRepositoryPort.save(message);
-    return message;
+    return new CreateMessageResult(message);
   }
 
 
@@ -88,11 +90,12 @@ public class BasicMessageService implements MessageService {
 
   @CustomLogging
   @Override
-  public void update(UpdateMessageCommand command) {
+  public UpdateMessageResult update(UpdateMessageCommand command) {
     Message message = messageRepositoryPort.findById(command.messageId())
         .orElseThrow(() -> messageIdNotFoundError(command.messageId()));
 
     message.update(command.newText());
+    return new UpdateMessageResult(message);
   }
 
   @CustomLogging
