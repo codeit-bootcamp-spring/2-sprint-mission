@@ -13,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +51,7 @@ public class BasicChannelService implements ChannelService {
     public Channel createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
         List<Channel> channelList = channelRepository.load();
         Optional<Channel> matchingChannel = channelList.stream()
-                .filter(c -> c.getChannelName().equals(channelCreatePublicDto.name()))
+                .filter(c -> c.getType().equals(ChannelType.PUBLIC) && c.getName().equals(channelCreatePublicDto.name()))
                 .findAny();
         if (matchingChannel.isPresent()) {
             throw new InvalidInputException("A channel already exists.");
@@ -83,28 +80,35 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelFindAllByUserIdResponseDto> findAllByUserId(UUID userId) {
-        List<Channel> channelList = channelRepository.load();
-        List<ReadStatus> readStatusList = readStatusRepository.load();
-        // public channel list 조회
-        List<Channel> publicChannelList = channelList.stream()
-                .filter(c -> c.getType().equals(ChannelType.PUBLIC))
+        List<UUID> matchingChannelIdList = readStatusRepository.load().stream()
+                .filter(m -> m.getUserId().equals(userId))
+                .map(ReadStatus::getChannelId)
                 .toList();
 
-        // readStatus list 를 userId로 조회
-        List<ReadStatus> readStatusListByUser = readStatusList.stream()
-                .filter(c -> c.getUserId().equals(userId))
+        List<ChannelFindAllByUserIdResponseDto> channelByUserID = channelRepository.load().stream()
+                .filter(channel -> channel.getType().equals(ChannelType.PUBLIC)
+                                || matchingChannelIdList.contains(channel.getId())
+                )
+                .map(channel -> {
+                    List<UUID> participantIds = new ArrayList<>();
+                    if (channel.getType().equals(ChannelType.PRIVATE)) {
+                        readStatusRepository.load().stream()
+                                .filter(r -> r.getChannelId().equals(channel.getId()))
+                                .map(ReadStatus::getUserId)
+                                .forEach(participantIds::add);
+                    }
+                    Instant lastMessageAt = messageRepository.load().stream()
+                            .filter(f -> f.getChannelId().equals(channel.getId()))
+                            .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+                            .map(Message::getCreatedAt)
+                            .limit(1)
+                            .findFirst()
+                            .orElse(Instant.MIN);
+                    return ChannelFindAllByUserIdResponseDto.fromChannel(channel, participantIds, lastMessageAt);
+                })
                 .toList();
 
-        // channel list 에서 readStatus list 의 channelId로 조회
-        List<Channel> privateChannelList = channelList.stream().filter(c -> c.getType().equals(ChannelType.PRIVATE))
-                .filter(f -> readStatusListByUser.stream().anyMatch(r -> r.getChannelId().equals(f.getId())))
-                .toList();
-
-        List<Channel> AllChannelByUserId = new ArrayList<>();
-        AllChannelByUserId.addAll(publicChannelList);
-        AllChannelByUserId.addAll(privateChannelList);
-
-        return ChannelFindAllByUserIdResponseDto.fromChannel(AllChannelByUserId);
+        return channelByUserID;
     }
 
 

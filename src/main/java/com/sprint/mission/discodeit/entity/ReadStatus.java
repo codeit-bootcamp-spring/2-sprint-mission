@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.utils.TimeUtil;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -9,21 +8,21 @@ import java.util.UUID;
 @Getter
 public class ReadStatus extends BaseEntity {
 
-    private final UUID userId;
-    private final UUID channelId;
+    private UUID userId;
+    private UUID channelId;
     private Instant lastReadAt;
 
 
-    public ReadStatus(UUID userId, UUID channelId, Instant lastReadTime) {
+    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
         this.userId = userId;
         this.channelId = channelId;
-        this.lastReadAt = lastReadTime;
+        this.lastReadAt = lastReadAt;
     }
 
-    public void readStatusUpdate(Instant newLastReadTime) {
+    public void readStatusUpdate(Instant newLastReadAt) {
         boolean anyValueUpdated = false;
-        if (newLastReadTime != null && !newLastReadTime.equals(this.lastReadAt)) {
-            this.lastReadAt = newLastReadTime;
+        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = newLastReadAt;
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {
@@ -31,16 +30,13 @@ public class ReadStatus extends BaseEntity {
         }
     }
 
-    public String getReadAttFormatted() {
-        return TimeUtil.convertToFormattedDate(lastReadAt);
-    }
 
     @Override
     public String toString() {
         return "\nID: " + getId() +
                 "\nUser ID: " + userId +
                 "\nChannel ID: " + channelId+
-                "\nLast Read Time: " + getReadAttFormatted();
+                "\nLast Read Time: " + getLastReadAt();
     }
 
 }

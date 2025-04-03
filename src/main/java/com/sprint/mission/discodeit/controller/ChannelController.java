@@ -88,7 +88,6 @@ public class ChannelController {
     @Operation(summary = "User가 참여 중인 Channel 목록 조회")
     @ApiResponse(responseCode = "200", description = "Channel 목록 조회 성공")
     public ResponseEntity<List<ChannelFindAllByUserIdResponseDto>> findChannelByUserId(
-//            @RequestBody ChannelFindAllByUserIdRequestDto channelFindAllByUserIdRequest
             @RequestParam @Parameter(description = "조회 할 User ID") UUID userId
     ) {
         List<ChannelFindAllByUserIdResponseDto> channelFindAllByUserIdResponse = channelService.findAllByUserId(userId);

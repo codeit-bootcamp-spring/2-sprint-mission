@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.service.dto.messagedto;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,9 +16,9 @@ public record MessageFindResponseDto(
     public static MessageFindResponseDto fromMessage(Message message) {
         return new MessageFindResponseDto(
                 message.getId(),
-                message.getMessage(),
+                message.getContent(),
                 message.getChannelId(),
-                message.getSenderId(),
+                message.getAuthorId(),
                 message.getAttachmentIds()
 
                 );

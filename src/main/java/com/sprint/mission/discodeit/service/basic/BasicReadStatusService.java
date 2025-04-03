@@ -51,7 +51,6 @@ public class BasicReadStatusService implements ReadStatusService {
         }
 
         Instant lastReadAt = readStatusCreateDto.lastReadAt();
-//        Instant lastReadAt = Instant.now();
         ReadStatus readStatus = new ReadStatus(matchingUser.getId(), matchingChannel.getId(), lastReadAt);
         readStatusRepository.save(readStatus);
         return readStatus;
@@ -83,7 +82,6 @@ public class BasicReadStatusService implements ReadStatusService {
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("readStatus not found"));
         Instant newLastReadTime = readStatusUpdateDto.newLastReadAt();
-//        Instant newLastReadAt = Instant.now();
         matchingReadStatus.readStatusUpdate(newLastReadTime);
         return readStatusRepository.save(matchingReadStatus);
     }

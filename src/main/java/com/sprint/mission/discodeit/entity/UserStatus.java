@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.utils.TimeUtil;
 import lombok.Getter;
 
 import java.time.Duration;
@@ -11,39 +10,38 @@ import java.util.UUID;
 public class UserStatus extends BaseEntity {
 
     private final UUID userId;
-    private Instant lastConnectionTime;
+    private Instant lastActiveAt;
+    boolean online;
 
-    public UserStatus(UUID userId, Instant LastConnectionTime) {
+    public UserStatus(UUID userId, Instant lastActiveAt) {
         super();
         this.userId = userId;
-        this.lastConnectionTime = LastConnectionTime;
+        this.lastActiveAt = lastActiveAt;
     }
 
     // 마지막 접속시간과 현재시간을 계산했을 때 300보다 작으면 : 5분 이내 -> true
     // 마지막 접속시간과 현재시간을 계산했을 때 300보다 크면 : 5분 초과 -> false
     public boolean currentUserStatus() {
-        if (Duration.between(lastConnectionTime, Instant.now()).getSeconds() < 300) {
+        if (Duration.between(lastActiveAt, Instant.now()).getSeconds() < 300) {
+            online = true;
             return true;
         } else {
+            online = false;
             return false;
         }
     }
 
     public void updateLastConnectionTime(Instant LastConnectionTime) {
-        this.lastConnectionTime = LastConnectionTime;
+        this.lastActiveAt = LastConnectionTime;
+        currentUserStatus();
+
     }
-
-
-    public String getLastConnectionTimeAtFormatted() {
-        return TimeUtil.convertToFormattedDate(lastConnectionTime);
-    }
-
 
     @Override
     public String toString() {
         return "\nID: " + getId() +
                 "\nUser ID: " + userId +
-                "\nLastConnectionTime: " + getLastConnectionTimeAtFormatted() +
+                "\nLastConnectionTime: " + getLastActiveAt() +
                 "\nUser Status: " + currentUserStatus();
 
     }

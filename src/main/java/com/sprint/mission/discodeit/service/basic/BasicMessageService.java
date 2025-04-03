@@ -13,7 +13,10 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
-import com.sprint.mission.discodeit.service.dto.messagedto.*;
+import com.sprint.mission.discodeit.service.dto.messagedto.MessageCreateDto;
+import com.sprint.mission.discodeit.service.dto.messagedto.MessageFindRequestDto;
+import com.sprint.mission.discodeit.service.dto.messagedto.MessageFindResponseDto;
+import com.sprint.mission.discodeit.service.dto.messagedto.MessageUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -78,11 +81,11 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public List<MessageFindAllByChannelIdResponseDto> findAllByChannelId(UUID channelId) {
-        List<Message> messageList = messageRepository.load().stream()
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.load().stream()
                 .filter(m -> m.getChannelId().equals(channelId))
                 .toList();
-        return MessageFindAllByChannelIdResponseDto.fromChannel(messageList);
+
     }
 
 

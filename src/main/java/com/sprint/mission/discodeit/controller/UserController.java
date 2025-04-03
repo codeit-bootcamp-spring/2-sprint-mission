@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.service.dto.userdto.*;
+import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusUpdateDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -65,9 +67,10 @@ public class UserController {
     @ApiResponse(responseCode = "404", description = "해당 User의 UserStatus를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = "User does not exist")))
     @ApiResponse(responseCode = "200", description = "User 온라인 상태가 성공적으로 업데이트됨")
     public ResponseEntity<UserStatus> updateUserStatusByUserId(
-            @PathVariable @Parameter(description = "상태를 변경할 User ID") UUID userId
+            @PathVariable @Parameter(description = "상태를 변경할 User ID") UUID userId,
+            @RequestBody UserStatusUpdateDto userStatusUpdateRequest
     ) {
-        UserStatus updateUserStatusResponse = userStatusService.updateByUserId(userId);
+        UserStatus updateUserStatusResponse = userStatusService.updateByUserId(userId, userStatusUpdateRequest);
         return ResponseEntity.ok(updateUserStatusResponse);
     }
 
@@ -79,7 +82,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "User 정보가 성공적으로 수정됨")
     public ResponseEntity<User> updateUser(
             @PathVariable @Parameter(description = "수정 할 User ID") UUID userId,
-            @RequestPart("userUpdateRequest") UserUpdateDto userUpdateRequest,
+            @RequestPart("userUpdateRequest") @Valid UserUpdateDto userUpdateRequest,
             @RequestPart(value = "profile", required = false) @Parameter(description = "수정 할 User 프로필 이미지") MultipartFile profile
     ) {
         Optional<BinaryContentCreateDto> contentCreate = Optional.empty();

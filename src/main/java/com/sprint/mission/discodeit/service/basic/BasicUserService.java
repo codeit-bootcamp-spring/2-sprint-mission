@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
 import com.sprint.mission.discodeit.service.dto.userdto.*;
@@ -18,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +29,6 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentService binaryContentService;
-    private final UserStatusService userStatusService;
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
@@ -53,7 +52,7 @@ public class BasicUserService implements UserService {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
                     return binaryContentRepository.save(binaryContent).getId();
                 })
                 .orElse(null);
@@ -100,7 +99,6 @@ public class BasicUserService implements UserService {
         if (userStatusList.isEmpty()) {
             throw new NotFoundException("User Status list is empty.");
         }
-
         return UserFindAllResponseDto.UserFindAllResponse(userList, userStatusList);
     }
 
@@ -117,7 +115,7 @@ public class BasicUserService implements UserService {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
                     return binaryContentRepository.save(binaryContent).getId();
                 })
                 .orElse(null);
@@ -125,9 +123,13 @@ public class BasicUserService implements UserService {
         BinaryContentDeleteDto binaryContentDeleteDto = new BinaryContentDeleteDto(matchingUser.getProfileId());
         binaryContentService.delete(binaryContentDeleteDto);
 
-        matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(), nullableProfileId);
+        if (userUpdateDto.newPassword() == null) {
+            matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), matchingUser.getPassword(), nullableProfileId);
+        } else {
+            matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(), nullableProfileId);
+        }
         userRepository.save(matchingUser);
-        
+
         return matchingUser;
     }
 

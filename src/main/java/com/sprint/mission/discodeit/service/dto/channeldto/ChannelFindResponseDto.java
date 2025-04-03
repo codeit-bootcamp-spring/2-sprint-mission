@@ -22,7 +22,7 @@ public record ChannelFindResponseDto(
         return new ChannelFindResponseDto(
                 channel.getId(),
                 channel.getType(),
-                channel.getChannelName(),
+                channel.getName(),
                 channel.getDescription(),
                 channel.getCreatedAt(),
                 channel.getUpdatedAt(),
