@@ -11,8 +11,6 @@ import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
-
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
@@ -26,7 +24,7 @@ public class BasicAuthService implements AuthService {
         .filter(u -> u.getPassword().equals(request.password()))
         .orElseThrow(() -> new InvalidCredentialsException("로그인 실패"));
 
-    userStatusService.updateByUserId(user.getId());
+    userStatusService.updateByUserId(user.getId(), Instant.now());
 
     return AuthLoginResponse.fromEntity(user);
   }

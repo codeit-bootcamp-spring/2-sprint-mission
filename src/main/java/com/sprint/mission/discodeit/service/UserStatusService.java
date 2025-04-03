@@ -19,7 +19,7 @@ public interface UserStatusService {
 
   UserStatus update(UUID userStatusId, Instant newLastActiveAt);
 
-  UserStatus updateByUserId(UUID userId);
+  UserStatus updateByUserId(UUID userId, Instant newLastActiveAt);
 
   void delete(UUID userStatusId);
 

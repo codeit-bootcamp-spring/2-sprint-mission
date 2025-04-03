@@ -61,7 +61,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public UserStatus updateByUserId(UUID userId) {
+  public UserStatus updateByUserId(UUID userId, Instant newLastActiveAt) {
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new ResourceNotFoundException("해당 유저 상태 없음"));
 
