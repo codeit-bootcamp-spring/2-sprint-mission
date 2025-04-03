@@ -37,7 +37,10 @@ public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> imp
             if (readStatusMap.containsKey(id)) {
                 throw new IllegalArgumentException("[DEBUG] 동일한 UUID의 데이터가 이미 존재하므로 추가하지 않음: " + id);
             }
-            readStatusMap.put(id, readStatus);
+        }
+
+        for (ReadStatus readStatus : readStatusList) {
+            readStatusMap.put(readStatus.getId(), readStatus);
         }
 
         writeToFile(readStatusMap);
