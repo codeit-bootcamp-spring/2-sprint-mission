@@ -15,7 +15,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 @RequiredArgsConstructor
 @Controller
 @ResponseBody
-@RequestMapping("/api/auth")
+//RequestMapping("/api/auth")
 public class AuthController implements AuthApi {
 
   private final AuthService authService;

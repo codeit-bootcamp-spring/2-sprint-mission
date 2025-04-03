@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/readStatus")
+//@RequestMapping("/api/readStatus")
 public class MessageReceiptController {
 
   private final ReadStatusService readStatusService;
@@ -25,10 +25,10 @@ public class MessageReceiptController {
     return ResponseEntity.ok(receipt);
   }
 
-  @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatus> updateReceipt(@PathVariable UUID receiptId,
+  @PatchMapping(value = "/{readStatusId}")
+  public ResponseEntity<ReadStatus> updateReceipt(@PathVariable UUID readStatusId,
       @RequestParam ReadStatusUpdateRequest request) {
-    return ResponseEntity.ok(readStatusService.update(receiptId, request));
+    return ResponseEntity.ok(readStatusService.update(readStatusId, request));
   }
 
   @GetMapping("/{readStatusId}")

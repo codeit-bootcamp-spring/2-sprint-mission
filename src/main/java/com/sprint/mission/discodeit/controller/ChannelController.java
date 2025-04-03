@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Controller
 @ResponseBody
-@RequestMapping("/api/channel")
+//@RequestMapping("/api/channel")
 public class ChannelController implements ChannelApi {
 
   private final ChannelService channelService;

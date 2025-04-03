@@ -19,7 +19,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 @RequiredArgsConstructor
 @Controller
 @ResponseBody
-@RequestMapping("/api/binaryContent")
+//@RequestMapping("/api/binaryContent")
 public class BinaryContentController implements BinaryContentApi {
 
   private final BinaryContentService binaryContentService;

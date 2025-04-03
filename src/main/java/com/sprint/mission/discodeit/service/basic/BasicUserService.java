@@ -32,8 +32,8 @@ public class BasicUserService implements UserService {
   @Override
   public User create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-    String username = userCreateRequest.username().toString();
-    String email = userCreateRequest.email().toString();
+    String username = userCreateRequest.username();
+    String email = userCreateRequest.email();
 
     if (userRepository.existsByEmail(email)) {
       throw new IllegalArgumentException("User with email " + email + " already exists");
@@ -52,7 +52,7 @@ public class BasicUserService implements UserService {
           return binaryContentRepository.save(binaryContent).getId();
         })
         .orElse(null);
-    String password = userCreateRequest.password().toString();
+    String password = userCreateRequest.password();
 
     User user = new User(username, email, password, nullableProfileId);
     User createdUser = userRepository.save(user);
