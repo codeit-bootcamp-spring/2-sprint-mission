@@ -25,34 +25,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Controller
 @ResponseBody
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
 
-  @PostMapping(
-      path = "/api/users",
-      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
-  )
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> createUser(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-    User createdUser = userService.create(userCreateRequest, profileRequest);
-    UserDto userDto = UserDto.from(createdUser);
 
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(userDto);
+    User createdUser = userService.create(userCreateRequest, profileRequest);
+    return ResponseEntity.status(HttpStatus.CREATED).body(UserDto.from(createdUser));
   }
 
-  @PostMapping(
-      path = "/api/users/{userId}",
-      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
-  )
+  @PatchMapping(path = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> updateUser(
       @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
@@ -62,30 +53,28 @@ public class UserController {
         .flatMap(this::resolveProfileRequest);
 
     User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
-    UserDto userDto = UserDto.from(updatedUser);
-
-    return ResponseEntity.ok(userDto);
+    return ResponseEntity.ok(UserDto.from(updatedUser));
   }
 
-  @DeleteMapping("/api/users/{userId}")
+  @DeleteMapping("/{userId}")
   public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
     userService.delete(userId);
-    return ResponseEntity.noContent().build(); // 204 No Content
+    return ResponseEntity.noContent().build(); // 204
   }
 
-  @GetMapping("/api/users")
+  @GetMapping
   public ResponseEntity<List<UserDto>> getAllUsers() {
     List<UserDto> users = userService.findAll();
     return ResponseEntity.ok(users);
   }
 
-  @PatchMapping("/api/users/{userId}/userStatus")
+  @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UserStatus> updateUserStatus(
       @PathVariable UUID userId,
       @RequestBody UserStatusUpdateRequest request
   ) {
-    UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
-    return ResponseEntity.ok(updatedUserStatus);
+    UserStatus updated = userStatusService.updateByUserId(userId, request);
+    return ResponseEntity.ok(updated);
   }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
@@ -93,12 +82,11 @@ public class UserController {
       return Optional.empty();
     } else {
       try {
-        BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
+        return Optional.of(new BinaryContentCreateRequest(
             profileFile.getOriginalFilename(),
             profileFile.getContentType(),
             profileFile.getBytes()
-        );
-        return Optional.of(binaryContentCreateRequest);
+        ));
       } catch (IOException e) {
         throw new RuntimeException(e);
       }

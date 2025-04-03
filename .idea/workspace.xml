@@ -4,8 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="daf1a141-2719-4892-b03e-28252696c9a4" name="Changes" comment="MessageController RESTful API">
+    <list default="true" id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/config/SwaggerConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/resourceHashesCache.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/discodeit.main.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/BinaryContentController.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/BinaryContentController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/UserController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/reports/problems/problems-report.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/ReadStatusController.class.uniqueId0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" afterPath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/BinaryContentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/BinaryContentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/UserController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,115 +60,45 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
-        <option value="Exception" />
         <option value="Class" />
       </list>
     </option>
   </component>
-  <component name="FormatOnSaveOptions">
-    <option name="myRunOnSave" value="true" />
-  </component>
   <component name="Git.Settings">
-    <option name="PUSH_TAGS">
-      <GitPushTagMode>
-        <option name="argument" value="--tags" />
-        <option name="title" value="All" />
-      </GitPushTagMode>
-    </option>
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="part1-허재석" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
-  </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 7
-}</component>
-  <component name="ProjectId" id="2tHomV7dc4pEnLsLoHO06nbJyoO" />
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="2vChKGLAvlbJkB9xkHnW5Z3OUzB" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Gradle.2-sprint-mission [:Main.main()].executor": "Run",
-    "Gradle.2-sprint-mission [:com.sprint.mission.discodeit.JavaApplication.main()].executor": "Run",
-    "Gradle.2-sprint-mission [:com.sprint.mission.discodeit.JavaApplication_Basic.main()].executor": "Run",
-    "Gradle.2-sprint-mission [:com.sprint.mission.discodeit.JavaApplication_FileIO.main()].executor": "Run",
-    "Gradle.2-sprint-mission [:com.sprint.mission.discodeit.JavaApplication_Message.main()].executor": "Run",
-    "Gradle.2-sprint-mission [:com.sprint.mission.discodeit.JavaApplication_Switch.main()].executor": "Run",
-    "Gradle.2-sprint-mission [:com.sprint.mission.discodeit.User_READTEST.main()].executor": "Run",
     "Gradle.Build 2-sprint-mission.executor": "Run",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.DiscodeitApplication.executor": "Run",
     "git-widget-placeholder": "part1-허재석-sprint5",
     "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "actions.on.save",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RecentsManager">
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="com.sprint.mission.discodeit.repository" />
-      <recent name="com.sprint.mission.discodeit.service" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$" />
-    </key>
-  </component>
-  <component name="RunManager" selected="Spring Boot.DiscodeitApplication">
-    <configuration name="JavaApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.discodeit.JavaApplication" />
-      <module name="2-sprint-mission.main" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.sprint.mission.discodeit.dto.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="JavaApplication_Message" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.discodeit.JavaApplication_Message" />
-      <module name="2-sprint-mission.main" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.sprint.mission.discodeit.dto.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
-      <module name="2-sprint-mission" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="2-sprint-mission" />
       <option name="filePath" />
       <method v="2" />
     </configuration>
@@ -156,12 +109,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Application.JavaApplication" />
-        <item itemvalue="Application.JavaApplication_Message" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -172,495 +119,29 @@
     </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
-  <component name="StructureViewState">
-    <option name="selectedTab" value="Logical" />
-  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="daf1a141-2719-4892-b03e-28252696c9a4" name="Changes" comment="" />
-      <created>1740018520055</created>
+      <changelist id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="" />
+      <created>1743654898078</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1740018520055</updated>
-      <workItem from="1740018520977" duration="48954000" />
-      <workItem from="1740354425134" duration="14324000" />
-      <workItem from="1740466069638" duration="4230000" />
-      <workItem from="1740553518345" duration="192000" />
-      <workItem from="1740614172332" duration="7658000" />
-      <workItem from="1740751839564" duration="1605000" />
-      <workItem from="1740909130692" duration="91000" />
-      <workItem from="1741062435132" duration="30376000" />
-      <workItem from="1741241901374" duration="3618000" />
-      <workItem from="1741245598430" duration="8353000" />
-      <workItem from="1741832155320" duration="11850000" />
-      <workItem from="1741849384033" duration="23604000" />
-      <workItem from="1742170660241" duration="63522000" />
-      <workItem from="1742517137707" duration="3433000" />
-      <workItem from="1742524461997" duration="778000" />
-      <workItem from="1742894884068" duration="1165000" />
-      <workItem from="1742948688463" duration="23241000" />
-      <workItem from="1742996931176" duration="4079000" />
-      <workItem from="1743323473310" duration="3054000" />
-      <workItem from="1743480744796" duration="26449000" />
-      <workItem from="1743567049531" duration="6512000" />
+      <updated>1743654898078</updated>
+      <workItem from="1743654899800" duration="238000" />
     </task>
-    <task id="LOCAL-00017" summary="User 클래스 직렬화 적용(Serializable 구현) / FileUserService에서 객체 저장 가능하도록 변경 완료 / User_READTEST.java로 기능 구현 확인(삭제 예정)">
-      <option name="closed" value="true" />
-      <created>1741072224664</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1741072224664</updated>
-    </task>
-    <task id="LOCAL-00018" summary="UserRepository 인터페이스 생성">
-      <option name="closed" value="true" />
-      <created>1741072659824</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1741072659824</updated>
-    </task>
-    <task id="LOCAL-00019" summary="JCFUserRepository 구현">
-      <option name="closed" value="true" />
-      <created>1741073081103</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1741073081103</updated>
-    </task>
-    <task id="LOCAL-00020" summary="FileUserRepository 구현">
-      <option name="closed" value="true" />
-      <created>1741073822624</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1741073822624</updated>
-    </task>
-    <task id="LOCAL-00021" summary="JCFUserService 에서 레포지토리 사용하도록 변경">
-      <option name="closed" value="true" />
-      <created>1741073998324</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1741073998324</updated>
-    </task>
-    <task id="LOCAL-00022" summary="FileUserService 레포지토리 사용하도록 변경">
-      <option name="closed" value="true" />
-      <created>1741074261744</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1741074261744</updated>
-    </task>
-    <task id="LOCAL-00023" summary="MessageRepository 인터페이스 구현">
-      <option name="closed" value="true" />
-      <created>1741075556058</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1741075556058</updated>
-    </task>
-    <task id="LOCAL-00024" summary="JCFMessageRepository">
-      <option name="closed" value="true" />
-      <created>1741076515986</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1741076515986</updated>
-    </task>
-    <task id="LOCAL-00025" summary="FileMessageRepository 구현 완료">
-      <option name="closed" value="true" />
-      <created>1741077114156</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1741077114156</updated>
-    </task>
-    <task id="LOCAL-00026" summary="ChannelRepository 인터페이스 정의">
-      <option name="closed" value="true" />
-      <created>1741077225301</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1741077225301</updated>
-    </task>
-    <task id="LOCAL-00027" summary="JCFChannelRepository 구현">
-      <option name="closed" value="true" />
-      <created>1741077605832</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1741077605832</updated>
-    </task>
-    <task id="LOCAL-00028" summary="FileChannelRepository 구현">
-      <option name="closed" value="true" />
-      <created>1741077676834</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1741077676834</updated>
-    </task>
-    <task id="LOCAL-00029" summary="Channel, Message, User 채널에 Serializble 구현/ 자바어플리케이션으로 저장 및 로드 테스트 구현 완료">
-      <option name="closed" value="true" />
-      <created>1741080596546</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1741080596546</updated>
-    </task>
-    <task id="LOCAL-00030" summary="직렬화 확장자 .ser로 변경">
-      <option name="closed" value="true" />
-      <created>1741081711159</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1741081711159</updated>
-    </task>
-    <task id="LOCAL-00031" summary="refactor(mentor): 싱글톤 패턴 적용">
-      <option name="closed" value="true" />
-      <created>1741222079968</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1741222079968</updated>
-    </task>
-    <task id="LOCAL-00032" summary="refractor(mentor): ConcurrentHashMap 사용">
-      <option name="closed" value="true" />
-      <created>1741223427342</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1741223427342</updated>
-    </task>
-    <task id="LOCAL-00033" summary="refractor(mentor): throw new 구현">
-      <option name="closed" value="true" />
-      <created>1741224194234</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1741224194234</updated>
-    </task>
-    <task id="LOCAL-00034" summary="레포리지트리타입 추가 (FILE/JCF 결정)">
-      <option name="closed" value="true" />
-      <created>1741243124876</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1741243124876</updated>
-    </task>
-    <task id="LOCAL-00035" summary="Basic 서비스 구현 및 코드 템플릿 테스트">
-      <option name="closed" value="true" />
-      <created>1741247360605</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1741247360605</updated>
-    </task>
-    <task id="LOCAL-00036" summary="보완 : UUID 구현 추가">
-      <option name="closed" value="true" />
-      <created>1741254563266</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1741254563266</updated>
-    </task>
-    <task id="LOCAL-00037" summary="스프링 프로젝트 초기화">
-      <option name="closed" value="true" />
-      <created>1741843244487</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1741843244487</updated>
-    </task>
-    <task id="LOCAL-00038" summary="레포지토리 Bean 등록">
-      <option name="closed" value="true" />
-      <created>1741843758936</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1741843758936</updated>
-    </task>
-    <task id="LOCAL-00039" summary="Basic 어노테이션 추가">
-      <option name="closed" value="true" />
-      <created>1741843947060</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1741843947060</updated>
-    </task>
-    <task id="LOCAL-00040" summary="Java 어플리케이션 DiscodeitApplication 에서 구현">
-      <option name="closed" value="true" />
-      <created>1741845002452</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1741845002452</updated>
-    </task>
-    <task id="LOCAL-00041" summary="@Getter 추가와 게터 메소드 삭제">
-      <option name="closed" value="true" />
-      <created>1741847779332</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1741847779332</updated>
-    </task>
-    <task id="LOCAL-00042" summary="공동엔티티 클래스 생성 및 jpa gradle 추가">
-      <option name="closed" value="true" />
-      <created>1741851952661</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1741851952661</updated>
-    </task>
-    <task id="LOCAL-00043" summary="ReadStatus 모델 구현">
-      <option name="closed" value="true" />
-      <created>1741853605536</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1741853605536</updated>
-    </task>
-    <task id="LOCAL-00044" summary="UserStatus 구현">
-      <option name="closed" value="true" />
-      <created>1741854261727</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1741854261727</updated>
-    </task>
-    <task id="LOCAL-00045" summary="엔티티 클래스 리팩토링">
-      <option name="closed" value="true" />
-      <created>1741912780893</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1741912780893</updated>
-    </task>
-    <task id="LOCAL-00046" summary="레포지토리 인터페이스 선언">
-      <option name="closed" value="true" />
-      <created>1741914636223</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1741914636223</updated>
-    </task>
-    <task id="LOCAL-00047" summary="UserService 고도화">
-      <option name="closed" value="true" />
-      <created>1742186550335</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1742186550335</updated>
-    </task>
-    <task id="LOCAL-00048" summary="AuthService 구현, 채널 서비스 고도화 구현">
-      <option name="closed" value="true" />
-      <created>1742197820556</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1742197820556</updated>
-    </task>
-    <task id="LOCAL-00049" summary="MessageService 고도화 작업 구현">
-      <option name="closed" value="true" />
-      <created>1742221472674</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1742221472675</updated>
-    </task>
-    <task id="LOCAL-00050" summary="ReadStatusService 구현">
-      <option name="closed" value="true" />
-      <created>1742265543763</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1742265543766</updated>
-    </task>
-    <task id="LOCAL-00051" summary="UserStatusService 고도화 구현">
-      <option name="closed" value="true" />
-      <created>1742275067695</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1742275067695</updated>
-    </task>
-    <task id="LOCAL-00052" summary="BinaryContentService 구현">
-      <option name="closed" value="true" />
-      <created>1742278952402</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1742278952402</updated>
-    </task>
-    <task id="LOCAL-00053" summary="새로운 도메인 Repository 구현체 구현">
-      <option name="closed" value="true" />
-      <created>1742284088907</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1742284088907</updated>
-    </task>
-    <task id="LOCAL-00054" summary="추가 요구 사항 yml 수정">
-      <option name="closed" value="true" />
-      <created>1742286961348</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1742286961349</updated>
-    </task>
-    <task id="LOCAL-00055" summary="PR 전 수정">
-      <option name="closed" value="true" />
-      <created>1742524151601</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1742524151602</updated>
-    </task>
-    <task id="LOCAL-00056" summary="사용자 관리, 권환 관리 구현">
-      <option name="closed" value="true" />
-      <created>1742964129489</created>
-      <option name="number" value="00056" />
-      <option name="presentableId" value="LOCAL-00056" />
-      <option name="project" value="LOCAL" />
-      <updated>1742964129490</updated>
-    </task>
-    <task id="LOCAL-00057" summary="채널 관리 구현">
-      <option name="closed" value="true" />
-      <created>1742970909781</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
-      <option name="project" value="LOCAL" />
-      <updated>1742970909781</updated>
-    </task>
-    <task id="LOCAL-00058" summary="메시지 관리 서비스 구현 완료">
-      <option name="closed" value="true" />
-      <created>1742976446667</created>
-      <option name="number" value="00058" />
-      <option name="presentableId" value="LOCAL-00058" />
-      <option name="project" value="LOCAL" />
-      <updated>1742976446667</updated>
-    </task>
-    <task id="LOCAL-00059" summary="메시지 수신 정보 관리">
-      <option name="closed" value="true" />
-      <created>1742977739404</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
-      <option name="project" value="LOCAL" />
-      <updated>1742977739404</updated>
-    </task>
-    <task id="LOCAL-00060" summary="바이너리 파일 다운로드 구현">
-      <option name="closed" value="true" />
-      <created>1742999863669</created>
-      <option name="number" value="00060" />
-      <option name="presentableId" value="LOCAL-00060" />
-      <option name="project" value="LOCAL" />
-      <updated>1742999863669</updated>
-    </task>
-    <task id="LOCAL-00061" summary="Replace all source files with base code">
-      <option name="closed" value="true" />
-      <created>1743481940191</created>
-      <option name="number" value="00061" />
-      <option name="presentableId" value="LOCAL-00061" />
-      <option name="project" value="LOCAL" />
-      <updated>1743481940191</updated>
-    </task>
-    <task id="LOCAL-00062" summary="AuthController RESTful API 구현">
-      <option name="closed" value="true" />
-      <created>1743492146451</created>
-      <option name="number" value="00062" />
-      <option name="presentableId" value="LOCAL-00062" />
-      <option name="project" value="LOCAL" />
-      <updated>1743492146451</updated>
-    </task>
-    <task id="LOCAL-00063" summary="UserController RESTful API">
-      <option name="closed" value="true" />
-      <created>1743552910236</created>
-      <option name="number" value="00063" />
-      <option name="presentableId" value="LOCAL-00063" />
-      <option name="project" value="LOCAL" />
-      <updated>1743552910237</updated>
-    </task>
-    <task id="LOCAL-00064" summary="ChannelController RESTful API">
-      <option name="closed" value="true" />
-      <created>1743560161694</created>
-      <option name="number" value="00064" />
-      <option name="presentableId" value="LOCAL-00064" />
-      <option name="project" value="LOCAL" />
-      <updated>1743560161694</updated>
-    </task>
-    <task id="LOCAL-00065" summary="MessageController RESTful API">
-      <option name="closed" value="true" />
-      <created>1743583770222</created>
-      <option name="number" value="00065" />
-      <option name="presentableId" value="LOCAL-00065" />
-      <option name="project" value="LOCAL" />
-      <updated>1743583770223</updated>
-    </task>
-    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
-    <option name="OPEN_GENERIC_TABS">
-      <map>
-        <entry key="06d0bb61-1d12-403f-8d59-db0e8cfd0850" value="TOOL_WINDOW" />
-      </map>
-    </option>
     <option name="TAB_STATES">
       <map>
-        <entry key="06d0bb61-1d12-403f-8d59-db0e8cfd0850">
+        <entry key="MAIN">
           <value>
             <State />
           </value>
         </entry>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="part1-허재석-sprint5" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
-          </value>
-        </entry>
       </map>
     </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="공동엔티티 클래스 생성 및 jpa gradle 추가" />
-    <MESSAGE value="ReadStatus 모델 구현" />
-    <MESSAGE value="UserStatus 구현" />
-    <MESSAGE value="엔티티 클래스 리팩토링" />
-    <MESSAGE value="레포지토리 인터페이스 선언" />
-    <MESSAGE value="UserService 고도화" />
-    <MESSAGE value="AuthService 구현, 채널 서비스 고도화 구현" />
-    <MESSAGE value="MessageService 고도화 작업 구현" />
-    <MESSAGE value="ReadStatusService 구현" />
-    <MESSAGE value="UserStatusService 고도화 구현" />
-    <MESSAGE value="BinaryContentService 구현" />
-    <MESSAGE value="새로운 도메인 Repository 구현체 구현" />
-    <MESSAGE value="추가 요구 사항 yml 수정" />
-    <MESSAGE value="PR 전 수정" />
-    <MESSAGE value="사용자 관리, 권환 관리 구현" />
-    <MESSAGE value="채널 관리 구현" />
-    <MESSAGE value="메시지 관리 서비스 구현 완료" />
-    <MESSAGE value="메시지 수신 정보 관리" />
-    <MESSAGE value="# 제목은 최대 50글자까지 아래에 작성: ex) Feat: Add Key mapping  &#10;&#10;# 본문은 아래에 작성  &#10;&#10;# 꼬릿말은 아래에 작성: ex) Github issue #23  &#10;&#10;# --- COMMIT END ---  &#10;#   &lt;타입&gt; 리스트  &#10;#   feat        : 기능 (새로운 기능)  &#10;#   fix         : 버그 (버그 수정)  &#10;#   refactor    : 리팩토링  &#10;#   design      : CSS 등 사용자 UI 디자인 변경  &#10;#   comment     : 필요한 주석 추가 및 변경  &#10;#   style       : 스타일 (코드 형식, 세미콜론 추가: 비즈니스 로직에 변경 없음)  &#10;#   docs        : 문서 수정 (문서 추가, 수정, 삭제, README)  &#10;#   test        : 테스트 (테스트 코드 추가, 수정, 삭제: 비즈니스 로직에 변경 없음)  &#10;#   chore       : 기타 변경사항 (빌드 스크립트 수정, assets, 패키지 매니저 등)  &#10;#   init        : 초기 생성  &#10;#   rename      : 파일 혹은 폴더명을 수정하거나 옮기는 작업만 한 경우  &#10;#   remove      : 파일을 삭제하는 작업만 수행한 경우  &#10;# ------------------  &#10;#   제목 첫 글자를 대문자로  &#10;#   제목은 명령문으로  &#10;#   제목 끝에 마침표(.) 금지  &#10;#   제목과 본문을 한 줄 띄워 분리하기  &#10;#   본문은 &quot;어떻게&quot; 보다 &quot;무엇을&quot;, &quot;왜&quot;를 설명한다.  &#10;#   본문에 여러줄의 메시지를 작성할 땐 &quot;-&quot;로 구분  &#10;# ------------------  &#10;#   &lt;꼬리말&gt;  &#10;#   필수가 아닌 optioanl  &#10;#   Fixes        :이슈 수정중 (아직 해결되지 않은 경우)  &#10;#   Resolves     : 이슈 해결했을 때 사용  &#10;#   Ref          : 참고할 이슈가 있을 때 사용  &#10;#   Related to   : 해당 커밋에 관련된 이슈번호 (아직 해결되지 않은 경우)  &#10;#   ex) Fixes: #47 Related to: #32, #21" />
-    <MESSAGE value="바이너리 파일 다운로드 구현" />
-    <MESSAGE value="Replace all source files with base code" />
-    <MESSAGE value="AuthController RESTful API 구현" />
-    <MESSAGE value="UserController RESTful API" />
-    <MESSAGE value="ChannelController RESTful API" />
-    <MESSAGE value="MessageController RESTful API" />
-    <option name="LAST_COMMIT_MESSAGE" value="MessageController RESTful API" />
   </component>
 </project>
