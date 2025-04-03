@@ -41,9 +41,9 @@ public class BasicMessageService implements MessageService {
         List<BinaryContent> binaryContents = binaryContentCreateDtos.stream()
                 .map(dto -> new BinaryContent(
                         dto.fileName(),
-                        (long) dto.bytesImage().length,
+                        (long) dto.bytes().length,
                         dto.contentType(),
-                        dto.bytesImage()
+                        dto.bytes()
                 ))
                 .toList();
 
