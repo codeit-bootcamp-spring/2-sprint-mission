@@ -21,7 +21,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatusResult create(UUID userId) {
-    userRepository.findById(userId)
+    userRepository.findByUserId(userId)
         .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
 
     userStatusRepository.findByUserId(userId)
@@ -37,7 +37,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatusResult getByStatusId(UUID userStatusId) {
-    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+    UserStatus userStatus = userStatusRepository.findByUserStatusId(userStatusId)
         .orElseThrow(() -> new IllegalArgumentException("해당 유저상태가 존재하지 않습니다."));
 
     return UserStatusResult.fromEntity(userStatus, userStatus.isLogin(Instant.now()));
@@ -62,7 +62,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatusResult updateByStatusId(UUID userStatusId) {
-    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+    UserStatus userStatus = userStatusRepository.findByUserStatusId(userStatusId)
         .orElseThrow(() -> new IllegalArgumentException("해당 유저상태가 존재하지 않습니다."));
 
     userStatus.updateLastLoginAt();

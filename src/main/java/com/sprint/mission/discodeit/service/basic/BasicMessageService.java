@@ -30,7 +30,7 @@ public class BasicMessageService implements MessageService {
   public MessageResult create(MessageCreationRequest messageCreationRequest,
       List<MultipartFile> files) {
 
-    Channel channel = channelRepository.findById(messageCreationRequest.channelId())
+    Channel channel = channelRepository.findByChannelId(messageCreationRequest.channelId())
         .orElseThrow(() -> new IllegalArgumentException("해당 ID의 채널이 존재하지 않습니다."));
 
     List<UUID> attachmentsIds = files.stream()
@@ -47,7 +47,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public MessageResult getById(UUID id) {
-    Message message = messageRepository.findById(id)
+    Message message = messageRepository.findByMessageId(id)
         .orElseThrow(
             () -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
@@ -66,7 +66,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public MessageResult updateContext(UUID id, String context) {
-    Message message = messageRepository.findById(id)
+    Message message = messageRepository.findByMessageId(id)
         .orElseThrow(
             () -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
@@ -78,7 +78,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public void delete(UUID id) {
-    Message message = messageRepository.findById(id)
+    Message message = messageRepository.findByMessageId(id)
         .orElseThrow(
             () -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 

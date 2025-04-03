@@ -55,7 +55,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public UserResult getById(UUID userId) {
-    User user = userRepository.findById(userId)
+    User user = userRepository.findByUserId(userId)
         .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
@@ -110,7 +110,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public UserResult updateName(UUID userId, String name) {
-    User user = userRepository.findById(userId)
+    User user = userRepository.findByUserId(userId)
         .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
     user.updateName(name);
     User savedUser = userRepository.save(user);
@@ -123,7 +123,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public UserResult updateProfileImage(UUID userId, MultipartFile profileImage) {
-    User user = userRepository.findById(userId)
+    User user = userRepository.findByUserId(userId)
         .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
     binaryContentRepository.delete(user.getProfileId());
 

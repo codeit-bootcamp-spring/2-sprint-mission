@@ -34,7 +34,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = new Channel(ChannelType.PUBLIC, channelRegisterRequest.channelName());
     Channel savedChannel = channelRepository.save(channel);
 
-    return ChannelResult.fromPublic(savedChannel, Instant.ofEpochSecond(0));
+    return ChannelResult.fromPublic(savedChannel, null);
   }
 
   @Override
@@ -53,17 +53,19 @@ public class BasicChannelService implements ChannelService {
         .map(ReadStatus::getUserId)
         .toList();
 
-    return ChannelResult.fromPrivate(savedChannel, Instant.ofEpochSecond(0), channelMemberIds);
+    return ChannelResult.fromPrivate(savedChannel, null, channelMemberIds);
   }
 
   @Override
   public ChannelResult getById(UUID id) {
-    Channel channel = channelRepository.findById(id)
+    Channel channel = channelRepository.findByChannelId(id)
         .orElseThrow(
             () -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
     Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(
-        channel.getId());
+            channel.getId())
+        .orElse(null);
+
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId())
           .stream()
@@ -85,7 +87,7 @@ public class BasicChannelService implements ChannelService {
 
     List<Channel> privateChannels = readStatusRepository.findByUserId(userId)
         .stream()
-        .map(readStatus -> channelRepository.findById(readStatus.getChannelId())
+        .map(readStatus -> channelRepository.findByChannelId(readStatus.getChannelId())
             .orElseThrow(
                 () -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent())))
         .toList();
@@ -96,6 +98,7 @@ public class BasicChannelService implements ChannelService {
     List<ChannelResult> privateChannelResults = privateChannels.stream()
         .map(channel -> this.getById(channel.getId()))
         .toList();
+
     List<ChannelResult> totalChannels = new ArrayList<>(publicChannelResults);
     totalChannels.addAll(privateChannelResults);
 
@@ -104,7 +107,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public ChannelResult updatePublicChannelName(UUID id, String name) {
-    Channel channel = channelRepository.findById(id)
+    Channel channel = channelRepository.findByChannelId(id)
         .orElseThrow(
             () -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
@@ -112,7 +115,8 @@ public class BasicChannelService implements ChannelService {
 
     Channel updatedChannel = channelRepository.save(channel);
     Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(
-        channel.getId());
+            channel.getId())
+        .orElse(null);
 
     return ChannelResult.fromPublic(updatedChannel, lastMessageCreatedAt);
   }
@@ -143,13 +147,14 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public ChannelResult addPrivateChannelMember(UUID channelId, UUID friendId) {
-    Channel channel = channelRepository.findById(channelId)
+    Channel channel = channelRepository.findByChannelId(channelId)
         .orElseThrow(
             () -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
     readStatusRepository.save(new ReadStatus(friendId, channel.getId()));
     Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(
-        channel.getId());
+            channel.getId())
+        .orElse(null);
 
     List<UUID> userId = readStatusRepository.findByChannelId(channel.getId()).stream().toList()
         .stream()

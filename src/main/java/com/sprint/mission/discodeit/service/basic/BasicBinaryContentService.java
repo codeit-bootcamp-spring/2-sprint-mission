@@ -4,45 +4,46 @@ import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentR
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
 
-    public UUID createProfileImage(MultipartFile multipartFile) {
-        if (multipartFile == null) {
-            return null;
-        }
+  private final BinaryContentRepository binaryContentRepository;
 
-        BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(multipartFile));
-
-        return savedBinaryContent.getId();
+  public UUID createProfileImage(MultipartFile multipartFile) {
+    if (multipartFile == null) {
+      return null;
     }
 
-    @Override
-    public BinaryContentResult getById(UUID id) {
-        BinaryContent binaryContent = binaryContentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
+    BinaryContent savedBinaryContent = binaryContentRepository.save(
+        new BinaryContent(multipartFile));
 
-        return BinaryContentResult.fromEntity(binaryContent);
-    }
+    return savedBinaryContent.getId();
+  }
 
-    @Override
-    public List<BinaryContentResult> getByIdIn(List<UUID> ids) {
-        return ids.stream()
-                .map(this::getById)
-                .toList();
-    }
+  @Override
+  public BinaryContentResult getById(UUID id) {
+    BinaryContent binaryContent = binaryContentRepository.findByBinaryContentId(id)
+        .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
 
-    @Override
-    public void delete(UUID id) {
-        binaryContentRepository.delete(id);
-    }
+    return BinaryContentResult.fromEntity(binaryContent);
+  }
+
+  @Override
+  public List<BinaryContentResult> getByIdIn(List<UUID> ids) {
+    return ids.stream()
+        .map(this::getById)
+        .toList();
+  }
+
+  @Override
+  public void delete(UUID id) {
+    binaryContentRepository.delete(id);
+  }
 }
