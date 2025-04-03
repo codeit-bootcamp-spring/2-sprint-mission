@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.controller.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.controller.dto.UserUpdateRequest;
-import com.sprint.mission.discodeit.controller.dto.UserDto;
-import com.sprint.mission.discodeit.controller.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.entity._BinaryContent;
-import com.sprint.mission.discodeit.entity._User;
-import com.sprint.mission.discodeit.entity._UserStatus;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -30,10 +30,10 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
 
   @Override
-  public _User create(UserCreateRequest userCreateRequest,
+  public User create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-    String username = userCreateRequest.getUsername().toString();
-    String email = userCreateRequest.getEmail().toString();
+    String username = userCreateRequest.username().toString();
+    String email = userCreateRequest.email().toString();
 
     if (userRepository.existsByEmail(email)) {
       throw new IllegalArgumentException("User with email " + email + " already exists");
@@ -47,18 +47,18 @@ public class BasicUserService implements UserService {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
-          _BinaryContent binaryContent = new _BinaryContent(fileName, (long) bytes.length,
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType, bytes);
           return binaryContentRepository.save(binaryContent).getId();
         })
         .orElse(null);
-    String password = userCreateRequest.getPassword().toString();
+    String password = userCreateRequest.password().toString();
 
-    _User user = new _User(username, email, password, nullableProfileId);
-    _User createdUser = userRepository.save(user);
+    User user = new User(username, email, password, nullableProfileId);
+    User createdUser = userRepository.save(user);
 
     OffsetDateTime now = OffsetDateTime.now();
-    _UserStatus userStatus = new _UserStatus(createdUser.getId(), now);
+    UserStatus userStatus = new UserStatus(createdUser.getId(), now);
     userStatusRepository.save(userStatus);
 
     return createdUser;
@@ -80,13 +80,13 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public _User update(UUID userId, UserUpdateRequest userUpdateRequest,
+  public User update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-    _User user = userRepository.findById(userId)
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-    String newUsername = userUpdateRequest.getNewUsername().toString();
-    String newEmail = userUpdateRequest.getNewEmail().toString();
+    String newUsername = userUpdateRequest.newUsername().toString();
+    String newEmail = userUpdateRequest.newEmail().toString();
     if (userRepository.existsByEmail(newEmail)) {
       throw new IllegalArgumentException("User with email " + newEmail + " already exists");
     }
@@ -102,13 +102,13 @@ public class BasicUserService implements UserService {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
-          _BinaryContent binaryContent = new _BinaryContent(fileName, (long) bytes.length,
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType, bytes);
           return binaryContentRepository.save(binaryContent).getId();
         })
         .orElse(null);
 
-    String newPassword = userUpdateRequest.getNewPassword().toString();
+    String newPassword = userUpdateRequest.newPassword().toString();
     user.update(newUsername, newEmail, newPassword, nullableProfileId);
 
     return userRepository.save(user);
@@ -116,7 +116,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public void delete(UUID userId) {
-    _User user = userRepository.findById(userId)
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
     Optional.ofNullable(user.getProfileId())
@@ -126,9 +126,9 @@ public class BasicUserService implements UserService {
     userRepository.deleteById(userId);
   }
 
-  private UserDto toDto(_User user) {
+  private UserDto toDto(User user) {
     Boolean online = userStatusRepository.findByUserId(user.getId())
-        .map(_UserStatus::isOnline)
+        .map(UserStatus::isOnline)
         .orElse(null);
 
     return new UserDto(

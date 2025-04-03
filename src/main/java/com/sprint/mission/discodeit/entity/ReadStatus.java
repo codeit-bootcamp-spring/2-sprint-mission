@@ -4,38 +4,33 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class _Message implements Serializable {
+public class ReadStatus implements Serializable {
 
   private static final long serialVersionUID = 1L;
-
   private UUID id;
   private OffsetDateTime createdAt;
   private OffsetDateTime updatedAt;
   //
-  private String content;
-  //
+  private UUID userId;
   private UUID getChannelId;
-  private UUID authorId;
-  private List<UUID> attachmentIds;
+  private OffsetDateTime lastReadAt;
 
-  public _Message(String content, UUID getChannelId, UUID authorId, List<UUID> attachmentIds) {
+  public ReadStatus(UUID userId, UUID getChannelId, OffsetDateTime lastReadAt) {
     this.id = UUID.randomUUID();
     this.createdAt = OffsetDateTime.now();
     //
-    this.content = content;
+    this.userId = userId;
     this.getChannelId = getChannelId;
-    this.authorId = authorId;
-    this.attachmentIds = attachmentIds;
+    this.lastReadAt = lastReadAt;
   }
 
-  public void update(String newContent) {
+  public void update(OffsetDateTime newLastReadAt) {
     boolean anyValueUpdated = false;
-    if (newContent != null && !newContent.equals(this.content)) {
-      this.content = newContent;
+    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = newLastReadAt;
       anyValueUpdated = true;
     }
 

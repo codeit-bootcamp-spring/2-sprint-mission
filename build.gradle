@@ -14,7 +14,7 @@ openApiGenerate {
 // JSON 파일 경로
     outputDir = "${buildDir}/generated"
     apiPackage = "com.sprint.mission.discodeit.controller" // API 클래스 패키지 경로
-    modelPackage = "com.sprint.mission.discodeit.controller.dto" // 모델 클래스 패키지 경로
+    modelPackage = "import com.sprint.mission.discodeit.dto" // 모델 클래스 패키지 경로
     configOptions = [
             useSpringBoot3: "true",
             useSpringController: "true",

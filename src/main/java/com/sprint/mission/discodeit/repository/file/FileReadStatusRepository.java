@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity._ReadStatus;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,7 +26,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
       @Value("${discodeit.repository.file-directory:data}") String fileDirectory
   ) {
     this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
-        _ReadStatus.class.getSimpleName());
+        ReadStatus.class.getSimpleName());
     if (Files.notExists(DIRECTORY)) {
       try {
         Files.createDirectories(DIRECTORY);
@@ -41,7 +41,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
   }
 
   @Override
-  public _ReadStatus save(_ReadStatus readStatus) {
+  public ReadStatus save(ReadStatus readStatus) {
     Path path = resolvePath(readStatus.getId());
     try (
         FileOutputStream fos = new FileOutputStream(path.toFile());
@@ -55,15 +55,15 @@ public class FileReadStatusRepository implements ReadStatusRepository {
   }
 
   @Override
-  public Optional<_ReadStatus> findById(UUID id) {
-    _ReadStatus readStatusNullable = null;
+  public Optional<ReadStatus> findById(UUID id) {
+    ReadStatus readStatusNullable = null;
     Path path = resolvePath(id);
     if (Files.exists(path)) {
       try (
           FileInputStream fis = new FileInputStream(path.toFile());
           ObjectInputStream ois = new ObjectInputStream(fis)
       ) {
-        readStatusNullable = (_ReadStatus) ois.readObject();
+        readStatusNullable = (ReadStatus) ois.readObject();
       } catch (IOException | ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
@@ -72,7 +72,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
   }
 
   @Override
-  public List<_ReadStatus> findAllByUserId(UUID userId) {
+  public List<ReadStatus> findAllByUserId(UUID userId) {
     try (Stream<Path> paths = Files.list(DIRECTORY)) {
       return paths
           .filter(path -> path.toString().endsWith(EXTENSION))
@@ -81,7 +81,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
                 FileInputStream fis = new FileInputStream(path.toFile());
                 ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-              return (_ReadStatus) ois.readObject();
+              return (ReadStatus) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
               throw new RuntimeException(e);
             }
@@ -94,7 +94,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
   }
 
   @Override
-  public List<_ReadStatus> findAllBygetChannelId(UUID getChannelId) {
+  public List<ReadStatus> findAllBygetChannelId(UUID getChannelId) {
     try (Stream<Path> paths = Files.list(DIRECTORY)) {
       return paths
           .filter(path -> path.toString().endsWith(EXTENSION))
@@ -103,7 +103,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
                 FileInputStream fis = new FileInputStream(path.toFile());
                 ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-              return (_ReadStatus) ois.readObject();
+              return (ReadStatus) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
               throw new RuntimeException(e);
             }

@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.entity._Message;
-import com.sprint.mission.discodeit.controller.dto.Message;
-import com.sprint.mission.discodeit.controller.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.controller.dto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +26,8 @@ public class MessageController implements MessageApi {
   private final MessageService messageService;
 
   @Override
-  public ResponseEntity<Message> create2(MessageCreateRequest messageCreateRequest
+  public ResponseEntity<Message> create2(
+      MessageCreateRequest messageCreateRequest
       ,@RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
     if (messageCreateRequest == null) {
       return ResponseEntity.badRequest().build();
@@ -48,7 +48,7 @@ public class MessageController implements MessageApi {
             .toList())
         .orElse(new ArrayList<>());
 
-    _Message message = messageService.create(messageCreateRequest, attachmentRequests);
+    Message message = messageService.create(messageCreateRequest, attachmentRequests);
 
     ModelMapper modelMapper = new ModelMapper();
     Message apiMessage = modelMapper.map(message, Message.class);
@@ -66,10 +66,10 @@ public class MessageController implements MessageApi {
   @Override
   public ResponseEntity<Object> findAllByChannelId(Object ChannelId) {
     UUID uuid = UUID.fromString(String.valueOf(ChannelId));
-    List<_Message> messages = messageService.findAllBygetChannelId(uuid);
+    List<Message> messages = messageService.findAllBygetChannelId(uuid);
     ModelMapper modelMapper = new ModelMapper();
     List<Message> apiMessages = new ArrayList<>();
-    for (_Message message : messages) {
+    for (Message message : messages) {
       Message apiMessage = modelMapper.map(message, Message.class);
       apiMessages.add(apiMessage);
     }
@@ -81,7 +81,7 @@ public class MessageController implements MessageApi {
   public ResponseEntity<Message> update2(Object messageId,
       MessageUpdateRequest messageUpdateRequest) {
     UUID uuid = UUID.fromString(String.valueOf(messageId));
-    _Message updatedMessage = messageService.update(uuid,
+    Message updatedMessage = messageService.update(uuid,
         messageUpdateRequest);
 
     ModelMapper modelMapper = new ModelMapper();

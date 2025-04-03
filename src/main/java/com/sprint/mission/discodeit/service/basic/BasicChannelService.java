@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.controller.dto.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.controller.dto.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.controller.dto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
-import com.sprint.mission.discodeit.entity._Channel;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity._Message;
-import com.sprint.mission.discodeit.entity._ReadStatus;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -28,21 +28,21 @@ public class BasicChannelService implements ChannelService {
   private final MessageRepository messageRepository;
 
   @Override
-  public _Channel create(PublicChannelCreateRequest request) {
-    String name = request.getName();
-    String description = request.getDescription();
-    _Channel channel = new _Channel(ChannelType.PUBLIC, name, description);
+  public Channel create(PublicChannelCreateRequest request) {
+    String name = request.name();
+    String description = request.description();
+    Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
     return channelRepository.save(channel);
   }
 
   @Override
-  public _Channel create(PrivateChannelCreateRequest request) {
-    _Channel channel = new _Channel(ChannelType.PRIVATE, null, null);
-    _Channel createdChannel = channelRepository.save(channel);
+  public Channel create(PrivateChannelCreateRequest request) {
+    Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+    Channel createdChannel = channelRepository.save(channel);
 
-    request.getParticipantIds().stream()
-        .map(userId -> new _ReadStatus(userId, createdChannel.getId(), OffsetDateTime.MIN))
+    request.participantIds().stream()
+        .map(userId -> new ReadStatus(userId, createdChannel.getId(), OffsetDateTime.MIN))
         .forEach(readStatusRepository::save);
 
     return createdChannel;
@@ -59,7 +59,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
     List<UUID> mySubscribedgetChannelIds = readStatusRepository.findAllByUserId(userId).stream()
-        .map(_ReadStatus::getGetChannelId)
+        .map(ReadStatus::getGetChannelId)
         .toList();
 
     return channelRepository.findAll().stream()
@@ -72,10 +72,10 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public _Channel update(UUID getChannelId, PublicChannelUpdateRequest request) {
-    String newName = request.getNewName();
-    String newDescription = request.getNewDescription();
-    _Channel channel = channelRepository.findById(getChannelId)
+  public Channel update(UUID getChannelId, PublicChannelUpdateRequest request) {
+    String newName = request.newName();
+    String newDescription = request.newDescription();
+    Channel channel = channelRepository.findById(getChannelId)
         .orElseThrow(
             () -> new NoSuchElementException("Channel with id " + getChannelId + " not found"));
     if (channel.getType().equals(ChannelType.PRIVATE)) {
@@ -87,7 +87,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void delete(UUID getChannelId) {
-    _Channel channel = channelRepository.findById(getChannelId)
+    Channel channel = channelRepository.findById(getChannelId)
         .orElseThrow(
             () -> new NoSuchElementException("Channel with id " + getChannelId + " not found"));
 
@@ -97,11 +97,11 @@ public class BasicChannelService implements ChannelService {
     channelRepository.deleteById(getChannelId);
   }
 
-  private ChannelDto toDto(_Channel channel) {
+  private ChannelDto toDto(Channel channel) {
     OffsetDateTime lastMessageAt = messageRepository.findAllBygetChannelId(channel.getId())
         .stream()
-        .sorted(Comparator.comparing(_Message::getCreatedAt).reversed())
-        .map(_Message::getCreatedAt)
+        .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+        .map(Message::getCreatedAt)
         .limit(1)
         .findFirst()
         .orElse(OffsetDateTime.MIN);
@@ -110,7 +110,7 @@ public class BasicChannelService implements ChannelService {
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       readStatusRepository.findAllBygetChannelId(channel.getId())
           .stream()
-          .map(_ReadStatus::getUserId)
+          .map(ReadStatus::getUserId)
           .forEach(participantIds::add);
     }
 

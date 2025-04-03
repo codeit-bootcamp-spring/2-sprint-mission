@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.controller.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.entity._BinaryContent;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +18,11 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public _BinaryContent create(BinaryContentCreateRequest request) {
+  public BinaryContent create(BinaryContentCreateRequest request) {
     String fileName = request.fileName();
     byte[] bytes = request.bytes();
     String contentType = request.contentType();
-    _BinaryContent binaryContent = new _BinaryContent(
+    BinaryContent binaryContent = new BinaryContent(
         fileName,
         (long) bytes.length,
         contentType,
@@ -32,14 +32,14 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
-  public _BinaryContent find(UUID binaryContentId) {
+  public BinaryContent find(UUID binaryContentId) {
     return binaryContentRepository.findById(binaryContentId)
         .orElseThrow(() -> new NoSuchElementException(
             "BinaryContent with id " + binaryContentId + " not found"));
   }
 
   @Override
-  public List<_BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
     return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
         .toList();
   }

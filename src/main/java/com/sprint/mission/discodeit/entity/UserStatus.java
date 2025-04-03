@@ -3,11 +3,12 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
-public class _ReadStatus implements Serializable {
+public class UserStatus implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private UUID id;
@@ -15,27 +16,31 @@ public class _ReadStatus implements Serializable {
   private OffsetDateTime updatedAt;
   //
   private UUID userId;
-  private UUID getChannelId;
-  private OffsetDateTime lastReadAt;
+  private OffsetDateTime lastActiveAt;
 
-  public _ReadStatus(UUID userId, UUID getChannelId, OffsetDateTime lastReadAt) {
+  public UserStatus(UUID userId, OffsetDateTime lastActiveAt) {
     this.id = UUID.randomUUID();
     this.createdAt = OffsetDateTime.now();
     //
     this.userId = userId;
-    this.getChannelId = getChannelId;
-    this.lastReadAt = lastReadAt;
+    this.lastActiveAt = lastActiveAt;
   }
 
-  public void update(OffsetDateTime newLastReadAt) {
+  public void update(OffsetDateTime lastActiveAt) {
     boolean anyValueUpdated = false;
-    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
-      this.lastReadAt = newLastReadAt;
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
       anyValueUpdated = true;
     }
 
     if (anyValueUpdated) {
       this.updatedAt = OffsetDateTime.now();
     }
+  }
+
+  public Boolean isOnline() {
+    OffsetDateTime OffsetDateTimeFiveMinutesAgo = OffsetDateTime.now().minus(Duration.ofMinutes(5));
+
+    return lastActiveAt.isAfter(OffsetDateTimeFiveMinutesAgo);
   }
 }

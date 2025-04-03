@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
-public class _Channel implements Serializable {
+public class Channel implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private UUID id;
@@ -18,7 +18,7 @@ public class _Channel implements Serializable {
   private String name;
   private String description;
 
-  public _Channel(ChannelType type, String name, String description) {
+  public Channel(ChannelType type, String name, String description) {
     this.id = UUID.randomUUID();
     this.createdAt = OffsetDateTime.now();
     //

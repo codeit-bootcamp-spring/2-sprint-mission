@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
-public class _User implements Serializable {
+public class User implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -20,7 +20,7 @@ public class _User implements Serializable {
   private String password;
   private UUID profileId;     // BinaryContent
 
-  public _User(String username, String email, String password, UUID profileId) {
+  public User(String username, String email, String password, UUID profileId) {
     this.id = UUID.randomUUID();
     this.createdAt = OffsetDateTime.now();
     //

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller.dto;
+package com.sprint.mission.discodeit.dto.request;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

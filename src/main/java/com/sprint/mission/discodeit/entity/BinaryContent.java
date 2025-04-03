@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
-public class _BinaryContent implements Serializable {
+public class BinaryContent implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private UUID id;
@@ -18,7 +18,7 @@ public class _BinaryContent implements Serializable {
   private String contentType;
   private byte[] bytes;
 
-  public _BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
+  public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
     this.id = UUID.randomUUID();
     this.createdAt = OffsetDateTime.now();
     //

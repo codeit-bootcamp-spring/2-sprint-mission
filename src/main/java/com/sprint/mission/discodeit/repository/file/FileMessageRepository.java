@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity._Message;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,7 +26,7 @@ public class FileMessageRepository implements MessageRepository {
       @Value("${discodeit.repository.file-directory:data}") String fileDirectory
   ) {
     this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
-        _Message.class.getSimpleName());
+        Message.class.getSimpleName());
     if (Files.notExists(DIRECTORY)) {
       try {
         Files.createDirectories(DIRECTORY);
@@ -41,7 +41,7 @@ public class FileMessageRepository implements MessageRepository {
   }
 
   @Override
-  public _Message save(_Message message) {
+  public Message save(Message message) {
     Path path = resolvePath(message.getId());
     try (
         FileOutputStream fos = new FileOutputStream(path.toFile());
@@ -55,15 +55,15 @@ public class FileMessageRepository implements MessageRepository {
   }
 
   @Override
-  public Optional<_Message> findById(UUID id) {
-    _Message messageNullable = null;
+  public Optional<Message> findById(UUID id) {
+    Message messageNullable = null;
     Path path = resolvePath(id);
     if (Files.exists(path)) {
       try (
           FileInputStream fis = new FileInputStream(path.toFile());
           ObjectInputStream ois = new ObjectInputStream(fis)
       ) {
-        messageNullable = (_Message) ois.readObject();
+        messageNullable = (Message) ois.readObject();
       } catch (IOException | ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
@@ -72,7 +72,7 @@ public class FileMessageRepository implements MessageRepository {
   }
 
   @Override
-  public List<_Message> findAllBygetChannelId(UUID getChannelId) {
+  public List<Message> findAllBygetChannelId(UUID getChannelId) {
     try (Stream<Path> paths = Files.list(DIRECTORY)) {
       return paths
           .filter(path -> path.toString().endsWith(EXTENSION))
@@ -81,7 +81,7 @@ public class FileMessageRepository implements MessageRepository {
                 FileInputStream fis = new FileInputStream(path.toFile());
                 ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-              return (_Message) ois.readObject();
+              return (Message) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
               throw new RuntimeException(e);
             }
