@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity._User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,7 +26,7 @@ public class FileUserRepository implements UserRepository {
       @Value("${discodeit.repository.file-directory:data}") String fileDirectory
   ) {
     this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
-        User.class.getSimpleName());
+        _User.class.getSimpleName());
     if (Files.notExists(DIRECTORY)) {
       try {
         Files.createDirectories(DIRECTORY);
@@ -41,7 +41,7 @@ public class FileUserRepository implements UserRepository {
   }
 
   @Override
-  public User save(User user) {
+  public _User save(_User user) {
     Path path = resolvePath(user.getId());
     try (
         FileOutputStream fos = new FileOutputStream(path.toFile());
@@ -55,15 +55,15 @@ public class FileUserRepository implements UserRepository {
   }
 
   @Override
-  public Optional<User> findById(UUID id) {
-    User userNullable = null;
+  public Optional<_User> findById(UUID id) {
+    _User userNullable = null;
     Path path = resolvePath(id);
     if (Files.exists(path)) {
       try (
           FileInputStream fis = new FileInputStream(path.toFile());
           ObjectInputStream ois = new ObjectInputStream(fis)
       ) {
-        userNullable = (User) ois.readObject();
+        userNullable = (_User) ois.readObject();
       } catch (IOException | ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
@@ -72,14 +72,14 @@ public class FileUserRepository implements UserRepository {
   }
 
   @Override
-  public Optional<User> findByUsername(String username) {
+  public Optional<_User> findByUsername(String username) {
     return this.findAll().stream()
         .filter(user -> user.getUsername().equals(username))
         .findFirst();
   }
 
   @Override
-  public List<User> findAll() {
+  public List<_User> findAll() {
     try (Stream<Path> paths = Files.list(DIRECTORY)) {
       return paths
           .filter(path -> path.toString().endsWith(EXTENSION))
@@ -88,7 +88,7 @@ public class FileUserRepository implements UserRepository {
                 FileInputStream fis = new FileInputStream(path.toFile());
                 ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-              return (User) ois.readObject();
+              return (_User) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
               throw new RuntimeException(e);
             }

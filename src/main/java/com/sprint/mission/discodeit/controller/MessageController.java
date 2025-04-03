@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.controller.dto.ApiMessage;
+import com.sprint.mission.discodeit.entity._Message;
+import com.sprint.mission.discodeit.controller.dto.Message;
 import com.sprint.mission.discodeit.controller.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.controller.dto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -27,7 +27,7 @@ public class MessageController implements MessageApi {
   private final MessageService messageService;
 
   @Override
-  public ResponseEntity<ApiMessage> create2(MessageCreateRequest messageCreateRequest,
+  public ResponseEntity<Message> create2(MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
     if (messageCreateRequest == null) {
       return ResponseEntity.badRequest().build();
@@ -47,10 +47,10 @@ public class MessageController implements MessageApi {
             })
             .toList())
         .orElse(new ArrayList<>());
-    Message message = messageService.create(messageCreateRequest, attachmentRequests);
+    _Message message = messageService.create(messageCreateRequest, attachmentRequests);
 
     ModelMapper modelMapper = new ModelMapper();
-    ApiMessage apiMessage = modelMapper.map(message, ApiMessage.class);
+    Message apiMessage = modelMapper.map(message, Message.class);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(apiMessage);
   }
@@ -62,12 +62,12 @@ public class MessageController implements MessageApi {
   }
 
   @Override
-  public ResponseEntity<List<ApiMessage>> findAllBygetChannelId(UUID getChannelId) {
-    List<Message> messages = messageService.findAllBygetChannelId(getChannelId);
+  public ResponseEntity<List<Message>> findAllBygetChannelId(UUID getChannelId) {
+    List<_Message> messages = messageService.findAllBygetChannelId(getChannelId);
     ModelMapper modelMapper = new ModelMapper();
-    List<ApiMessage> apiMessages = new ArrayList<>();
-    for (Message message : messages) {
-      ApiMessage apiMessage = modelMapper.map(message, ApiMessage.class);
+    List<Message> apiMessages = new ArrayList<>();
+    for (_Message message : messages) {
+      Message apiMessage = modelMapper.map(message, Message.class);
       apiMessages.add(apiMessage);
     }
 
@@ -75,13 +75,13 @@ public class MessageController implements MessageApi {
   }
 
   @Override
-  public ResponseEntity<ApiMessage> update2(UUID messageId,
+  public ResponseEntity<Message> update2(UUID messageId,
       MessageUpdateRequest messageUpdateRequest) {
-    Message updatedMessage = messageService.update(messageId,
+    _Message updatedMessage = messageService.update(messageId,
         messageUpdateRequest);
 
     ModelMapper modelMapper = new ModelMapper();
-    ApiMessage updateApiMessage = modelMapper.map(updatedMessage, ApiMessage.class);
+    Message updateApiMessage = modelMapper.map(updatedMessage, Message.class);
     return ResponseEntity.ok(updateApiMessage);
   }
 }

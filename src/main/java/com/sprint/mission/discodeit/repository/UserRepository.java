@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity._User;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public interface UserRepository {
 
-  User save(User user);
+  _User save(_User user);
 
-  Optional<User> findById(UUID id);
+  Optional<_User> findById(UUID id);
 
-  Optional<User> findByUsername(String username);
+  Optional<_User> findByUsername(String username);
 
-  List<User> findAll();
+  List<_User> findAll();
 
   boolean existsById(UUID id);
 

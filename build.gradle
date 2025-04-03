@@ -10,18 +10,24 @@ version = '0.0.1-SNAPSHOT'
 
 openApiGenerate {
     generatorName = "spring" // 사용할 generator 이름
-    inputSpec = "C:/Users/dlwns/2-sprint-mission/src/main/resources/api-docs1.json"
+    inputSpec = "C:/Users/dlwns/2-sprint-mission/src/main/resources/api-docs.json"
 // JSON 파일 경로
     outputDir = "${buildDir}/generated"
     apiPackage = "com.sprint.mission.discodeit.controller" // API 클래스 패키지 경로
     modelPackage = "com.sprint.mission.discodeit.controller.dto" // 모델 클래스 패키지 경로
     configOptions = [
+            useSpringBoot3: "true",
+            useSpringController: "true",
+            supportingFiles: "ApiUtil.java",
             interfaceOnly    : "true", // API 인터페이스만 생성 (구현 클래스 제외)
             generateModels   : "true",// DTO 생성 활성화
             useBeanValidation: "true",
             generateApis     : "true", // API 인터페이스 생성 활성화
             dateLibrary      : "java8", // 날짜 라이브러리 설정
             useTags          : "true"
+    ]
+    importMappings = [
+            "MultipartFile": "org.springframework.web.multipart.MultipartFile"
     ]
 }
 

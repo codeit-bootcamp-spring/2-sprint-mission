@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity._Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,7 +26,7 @@ public class FileChannelRepository implements ChannelRepository {
       @Value("${discodeit.repository.file-directory:data}") String fileDirectory
   ) {
     this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
-        Channel.class.getSimpleName());
+        _Channel.class.getSimpleName());
     if (Files.notExists(DIRECTORY)) {
       try {
         Files.createDirectories(DIRECTORY);
@@ -41,7 +41,7 @@ public class FileChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public Channel save(Channel channel) {
+  public _Channel save(_Channel channel) {
     Path path = resolvePath(channel.getId());
     try (
         FileOutputStream fos = new FileOutputStream(path.toFile());
@@ -55,15 +55,15 @@ public class FileChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public Optional<Channel> findById(UUID id) {
-    Channel channelNullable = null;
+  public Optional<_Channel> findById(UUID id) {
+    _Channel channelNullable = null;
     Path path = resolvePath(id);
     if (Files.exists(path)) {
       try (
           FileInputStream fis = new FileInputStream(path.toFile());
           ObjectInputStream ois = new ObjectInputStream(fis)
       ) {
-        channelNullable = (Channel) ois.readObject();
+        channelNullable = (_Channel) ois.readObject();
       } catch (IOException | ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
@@ -72,7 +72,7 @@ public class FileChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public List<Channel> findAll() {
+  public List<_Channel> findAll() {
     try (Stream<Path> paths = Files.list(DIRECTORY)) {
       return paths
           .filter(path -> path.toString().endsWith(EXTENSION))
@@ -81,7 +81,7 @@ public class FileChannelRepository implements ChannelRepository {
                 FileInputStream fis = new FileInputStream(path.toFile());
                 ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-              return (Channel) ois.readObject();
+              return (_Channel) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
               throw new RuntimeException(e);
             }

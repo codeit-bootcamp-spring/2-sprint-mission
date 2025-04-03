@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.controller.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.controller.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.controller.dto.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity._BinaryContent;
+import com.sprint.mission.discodeit.entity._Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -28,7 +28,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public Message create(MessageCreateRequest messageCreateRequest,
+  public _Message create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
     UUID getChannelId = messageCreateRequest.getgetChannelId();
     UUID authorId = messageCreateRequest.getAuthorId();
@@ -46,15 +46,15 @@ public class BasicMessageService implements MessageService {
           String contentType = attachmentRequest.contentType();
           byte[] bytes = attachmentRequest.bytes();
 
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+          _BinaryContent binaryContent = new _BinaryContent(fileName, (long) bytes.length,
               contentType, bytes);
-          BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+          _BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
           return createdBinaryContent.getId();
         })
         .toList();
 
     String content = messageCreateRequest.getContent();
-    Message message = new Message(
+    _Message message = new _Message(
         content,
         getChannelId,
         authorId,
@@ -64,22 +64,22 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public Message find(UUID messageId) {
+  public _Message find(UUID messageId) {
     return messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
   }
 
   @Override
-  public List<Message> findAllBygetChannelId(UUID getChannelId) {
+  public List<_Message> findAllBygetChannelId(UUID getChannelId) {
     return messageRepository.findAllBygetChannelId(getChannelId).stream()
         .toList();
   }
 
   @Override
-  public Message update(UUID messageId, MessageUpdateRequest request) {
+  public _Message update(UUID messageId, MessageUpdateRequest request) {
     String newContent = request.getNewContent();
-    Message message = messageRepository.findById(messageId)
+    _Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
     message.update(newContent);
@@ -88,7 +88,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public void delete(UUID messageId) {
-    Message message = messageRepository.findById(messageId)
+    _Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
 

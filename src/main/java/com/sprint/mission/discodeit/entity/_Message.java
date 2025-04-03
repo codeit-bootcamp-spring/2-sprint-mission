@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Message implements Serializable {
+public class _Message implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -22,7 +22,7 @@ public class Message implements Serializable {
   private UUID authorId;
   private List<UUID> attachmentIds;
 
-  public Message(String content, UUID getChannelId, UUID authorId, List<UUID> attachmentIds) {
+  public _Message(String content, UUID getChannelId, UUID authorId, List<UUID> attachmentIds) {
     this.id = UUID.randomUUID();
     this.createdAt = OffsetDateTime.now();
     //

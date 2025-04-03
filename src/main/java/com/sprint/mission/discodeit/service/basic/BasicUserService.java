@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.controller.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.controller.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.controller.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity._BinaryContent;
+import com.sprint.mission.discodeit.entity._User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -30,7 +30,7 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
 
   @Override
-  public User create(UserCreateRequest userCreateRequest,
+  public _User create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     String username = userCreateRequest.getUsername();
     String email = userCreateRequest.getEmail();
@@ -47,15 +47,15 @@ public class BasicUserService implements UserService {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+          _BinaryContent binaryContent = new _BinaryContent(fileName, (long) bytes.length,
               contentType, bytes);
           return binaryContentRepository.save(binaryContent).getId();
         })
         .orElse(null);
     String password = userCreateRequest.getPassword();
 
-    User user = new User(username, email, password, nullableProfileId);
-    User createdUser = userRepository.save(user);
+    _User user = new _User(username, email, password, nullableProfileId);
+    _User createdUser = userRepository.save(user);
 
     OffsetDateTime now = OffsetDateTime.now();
     UserStatus userStatus = new UserStatus(createdUser.getId(), now);
@@ -80,9 +80,9 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public User update(UUID userId, UserUpdateRequest userUpdateRequest,
+  public _User update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-    User user = userRepository.findById(userId)
+    _User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
     String newUsername = userUpdateRequest.getNewUsername();
@@ -102,7 +102,7 @@ public class BasicUserService implements UserService {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+          _BinaryContent binaryContent = new _BinaryContent(fileName, (long) bytes.length,
               contentType, bytes);
           return binaryContentRepository.save(binaryContent).getId();
         })
@@ -116,7 +116,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public void delete(UUID userId) {
-    User user = userRepository.findById(userId)
+    _User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
     Optional.ofNullable(user.getProfileId())
@@ -126,7 +126,7 @@ public class BasicUserService implements UserService {
     userRepository.deleteById(userId);
   }
 
-  private UserDto toDto(User user) {
+  private UserDto toDto(_User user) {
     Boolean online = userStatusRepository.findByUserId(user.getId())
         .map(UserStatus::isOnline)
         .orElse(null);
