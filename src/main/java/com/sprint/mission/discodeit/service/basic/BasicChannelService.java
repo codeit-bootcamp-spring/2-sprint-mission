@@ -90,14 +90,14 @@ public class BasicChannelService implements ChannelService {
 
 
   private Channel createPublicChannelEntity(CreateChannelParam createChannelParam) {
-    return Channel.ofPublic(createChannelParam.type(),
+    return Channel.ofPublic(
         createChannelParam.name(),
         createChannelParam.description());
   }
 
   // private이므로 name과 description 생략 -> null
   private Channel createPrivateChannelEntity(CreatePrivateChannelParam createPrivateChannelParam) {
-    return Channel.ofPrivate(createPrivateChannelParam.type());
+    return Channel.ofPrivate();
   }
 
 
