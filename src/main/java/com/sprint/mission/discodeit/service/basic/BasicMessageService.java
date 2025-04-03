@@ -78,18 +78,18 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public List<MessageFindAllByChannelIdResponseDto> findAllByChannelId(MessageFindAllByChannelIdRequestDto messageFindAllByChannelIdRequestDto) {
+    public List<MessageFindAllByChannelIdResponseDto> findAllByChannelId(UUID channelId) {
         List<Message> messageList = messageRepository.load().stream()
-                .filter(m -> m.getChannelId().equals(messageFindAllByChannelIdRequestDto.channelId()))
+                .filter(m -> m.getChannelId().equals(channelId))
                 .toList();
         return MessageFindAllByChannelIdResponseDto.fromChannel(messageList);
     }
 
 
     @Override
-    public Message update(MessageUpdateDto messageUpdateDto) {
+    public Message update(UUID messageId, MessageUpdateDto messageUpdateDto) {
         Message message = messageRepository.load().stream()
-                .filter(m -> m.getId().equals(messageUpdateDto.messageId()))
+                .filter(m -> m.getId().equals(messageId))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("Message does not exist."));
         
@@ -99,9 +99,9 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public void delete(MessageDeleteDto messageDeleteDto) {
+    public void delete(UUID messageId) {
         Message message = messageRepository.load().stream()
-                .filter(m -> m.getId().equals(messageDeleteDto.messageId()))
+                .filter(m -> m.getId().equals(messageId))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("Message does not exist."));
 

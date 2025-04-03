@@ -9,17 +9,18 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
 import com.sprint.mission.discodeit.service.dto.userdto.*;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -105,12 +106,11 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public User update(UserUpdateDto userUpdateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
+    public User update(UUID userId, UserUpdateDto userUpdateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
         User matchingUser = userRepository.load().stream()
-                .filter(u -> u.getId().equals(userUpdateDto.userId()))
+                .filter(u -> u.getId().equals(userId))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
-
 
         UUID nullableProfileId = optionalBinaryContentCreateDto
                 .map(profileRequest -> {
@@ -127,18 +127,15 @@ public class BasicUserService implements UserService {
 
         matchingUser.update(userUpdateDto.changeName(), userUpdateDto.changeEmail(), userUpdateDto.changePassword(), nullableProfileId);
         userRepository.save(matchingUser);
-
-        UserStatusUpdateDto userStatusUpdateDto = new UserStatusUpdateDto(matchingUser.getId());
-        userStatusService.updateByUserId(userStatusUpdateDto);
         
         return matchingUser;
     }
 
 
     @Override
-    public void delete(UserDeleteDto userDeleteDto) {
+    public void delete(UUID userId) {
         User matchingUser = userRepository.load().stream()
-                .filter(u -> u.getId().equals(userDeleteDto.userId()))
+                .filter(u -> u.getId().equals(userId))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
 

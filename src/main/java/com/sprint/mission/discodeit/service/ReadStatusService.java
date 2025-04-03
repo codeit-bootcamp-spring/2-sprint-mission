@@ -8,12 +8,13 @@ import com.sprint.mission.discodeit.service.dto.readstatusdto.ReadStatusUpdateDt
 
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ReadStatusService {
 
     ReadStatus create(ReadStatusCreateDto readStatusCreateDto);
     ReadStatus find(ReadStatusFindDto readStatusFindDto);
-    List<ReadStatus> findAllByUserId(ReadStatusFindDto readStatusFindDto);
-    ReadStatus update(ReadStatusUpdateDto readStatusUpdateDto);
+    List<ReadStatus> findAllByUserId(UUID userId);
+    ReadStatus update(UUID readStatusId, ReadStatusUpdateDto readStatusUpdateDto);
     void delete(ReadStatusDeleteDto readStatusDeleteDto);
 }

@@ -5,12 +5,13 @@ import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCr
 import com.sprint.mission.discodeit.service.dto.messagedto.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 public interface MessageService {
     Message create(MessageCreateDto messageCreateDto, List<BinaryContentCreateDto>binaryContentCreateDtoList);
     MessageFindResponseDto find(MessageFindRequestDto messageFindRequestDto);
-    List<MessageFindAllByChannelIdResponseDto> findAllByChannelId(MessageFindAllByChannelIdRequestDto messageFindAllByChannelIdRequestDto);
-    Message update(MessageUpdateDto messageUpdateDto);
-    void delete(MessageDeleteDto messageDeleteDto);
+    List<MessageFindAllByChannelIdResponseDto> findAllByChannelId(UUID channelId);
+    Message update(UUID messageId, MessageUpdateDto messageUpdateDto);
+    void delete(UUID messageId);
 }

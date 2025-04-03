@@ -9,14 +9,13 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusCreateDto;
 import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusDeleteDto;
 import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusFindDto;
-import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -61,9 +60,9 @@ public class BasicUserStatusService implements UserStatusService {
 
 
     @Override
-    public UserStatus updateByUserId(UserStatusUpdateDto userStatusUpdateDto) {
+    public UserStatus updateByUserId(UUID userId) {
         UserStatus matchingUserStatus = userStatusRepository.load().stream()
-                .filter(u -> u.getUserId().equals(userStatusUpdateDto.userId()))
+                .filter(u -> u.getUserId().equals(userId))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
         Instant currentTime = Instant.now();

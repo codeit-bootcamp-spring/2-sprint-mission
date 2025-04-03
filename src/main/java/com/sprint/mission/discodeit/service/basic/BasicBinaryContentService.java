@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentUp
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,17 +42,19 @@ public class BasicBinaryContentService implements BinaryContentService {
         return binaryContentRepository.load().stream()
                 .filter(m -> m.getId().equals(binaryContentId))
                 .findAny()
-                .orElseThrow(() -> new NotFoundException("Profile not found."));
+                .orElseThrow(() -> new NotFoundException("Profile not found"));
     }
 
 
     @Override
-    public List<BinaryContent> findAll() {
+    public List<BinaryContent> findAll(List<UUID> binaryContentIds) {
         List<BinaryContent> binaryContentList = binaryContentRepository.load();
         if (binaryContentList.isEmpty()) {
             throw new NotFoundException("Profile not found.");
         }
-        return binaryContentList;
+        return binaryContentList.stream()
+                .filter(m -> binaryContentIds.contains(m.getId()))
+                .toList();
     }
 
 

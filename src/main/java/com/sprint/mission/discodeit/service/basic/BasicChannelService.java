@@ -1,16 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exceptions.InvalidInputException;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.dto.channeldto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +16,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,10 +25,19 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
 
 
     @Override
-    public Channel createPrivate(ChannelCreateDto channelCreatePrivateDto) {
+    public Channel createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
+        List<UUID> userIds = channelCreatePrivateDto.userId();
+        List<User> users = userRepository.load().stream()
+                .filter(m ->channelCreatePrivateDto.userId().contains(m.getId()))
+                .toList();
+        if (users.size() != userIds.size()) {
+            throw new InvalidInputException("User does not exist.");
+        }
+
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         Channel createdPirvateChannel = channelRepository.save(channel);
 
@@ -44,7 +51,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public Channel createPublic(ChannelCreateDto channelCreatePublicDto) {
+    public Channel createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
         List<Channel> channelList = channelRepository.load();
         Optional<Channel> matchingChannel = channelList.stream()
                 .filter(c -> c.getChannelName().equals(channelCreatePublicDto.channelName()))
@@ -75,7 +82,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public List<ChannelFindAllByUserIdResponseDto> findAllByUserId(ChannelFindAllByUserIdRequestDto channelFindAllByUserIdRequestDto) {
+    public List<ChannelFindAllByUserIdResponseDto> findAllByUserId(UUID userId) {
         List<Channel> channelList = channelRepository.load();
         List<ReadStatus> readStatusList = readStatusRepository.load();
         // public channel list 조회
@@ -85,7 +92,7 @@ public class BasicChannelService implements ChannelService {
 
         // readStatus list 를 userId로 조회
         List<ReadStatus> readStatusListByUser = readStatusList.stream()
-                .filter(c -> c.getUserId().equals(channelFindAllByUserIdRequestDto.userId()))
+                .filter(c -> c.getUserId().equals(userId))
                 .toList();
 
         // channel list 에서 readStatus list 의 channelId로 조회
@@ -102,9 +109,9 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public Channel update(ChannelUpdateDto channelUpdateDto) {
+    public Channel update(UUID channelId, ChannelUpdateDto channelUpdateDto) {
         Channel matchingChannel = channelRepository.load().stream()
-                .filter(c -> c.getId().equals(channelUpdateDto.channelId()))
+                .filter(c -> c.getId().equals(channelId))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("A channel does not exist"));
         if (matchingChannel.getType().equals(ChannelType.PRIVATE)) {
@@ -118,18 +125,18 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public void delete(ChannelDeleteDto channelDeleteDto) {
+    public void delete(UUID channelId) {
         Channel matchingChannel = channelRepository.load().stream()
-                .filter(c -> c.getId().equals(channelDeleteDto.channelId()))
+                .filter(c -> c.getId().equals(channelId))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("A channel does not exist"));
 
         List<Message> messageList = messageRepository.load().stream()
-                .filter(m -> m.getChannelId().equals(channelDeleteDto.channelId()))
+                .filter(m -> m.getChannelId().equals(channelId))
                 .toList();
 
         List<ReadStatus> readStatusList = readStatusRepository.load().stream()
-                .filter(r -> r.getChannelId().equals(channelDeleteDto.channelId()))
+                .filter(r -> r.getChannelId().equals(channelId))
                 .toList();
 
         for (Message message : messageList) {

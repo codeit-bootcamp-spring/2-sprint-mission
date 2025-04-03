@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.sprint.mission.discodeit.utils.TimeUtil;
 import lombok.Getter;
 
