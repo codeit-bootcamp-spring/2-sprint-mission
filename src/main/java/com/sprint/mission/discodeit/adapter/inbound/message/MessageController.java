@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.adapter.inbound.message;
 import static com.sprint.mission.discodeit.adapter.inbound.message.MessageDtoMapper.toCreateMessageCommand;
 import static com.sprint.mission.discodeit.adapter.inbound.message.MessageDtoMapper.toUpdateMessageCommand;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageCreateResponse;
 import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageDeleteResponse;

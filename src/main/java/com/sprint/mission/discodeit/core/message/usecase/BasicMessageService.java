@@ -4,7 +4,7 @@ import static com.sprint.mission.discodeit.exception.channel.ChannelErrors.chann
 import static com.sprint.mission.discodeit.exception.message.MessageErrors.messageIdNotFoundError;
 import static com.sprint.mission.discodeit.exception.user.UserErrors.userIdNotFoundError;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;

@@ -78,11 +78,12 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public void updateReadStatus(UpdateReadStatusCommand command) {
+  public ReadStatus updateReadStatus(UpdateReadStatusCommand command) {
     ReadStatus readStatus = readStatusRepository.findById(command.readStatusId()).orElseThrow(
         () -> readStatusNotFoundError(command.readStatusId())
     );
     readStatus.update(command.newLastReadAt());
+    return readStatus;
   }
 
   @CustomLogging

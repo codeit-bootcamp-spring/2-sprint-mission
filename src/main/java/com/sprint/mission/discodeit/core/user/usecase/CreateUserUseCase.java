@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.user.usecase;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserResult;
 import java.util.Optional;

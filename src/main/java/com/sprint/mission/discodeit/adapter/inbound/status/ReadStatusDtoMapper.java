@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.adapter.inbound.status;
 
-import com.sprint.mission.discodeit.adapter.inbound.status.dto.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.status.dto.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.status.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.status.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
 import java.util.UUID;

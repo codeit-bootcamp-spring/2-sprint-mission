@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.content.usecase;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;

@@ -5,14 +5,17 @@ import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.to
 import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.toLoginUserCommand;
 import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.toUpdateUserCommand;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.adapter.inbound.user.request.UserCreateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.user.request.UserStatusRequest;
 import com.sprint.mission.discodeit.adapter.inbound.user.response.UserCreateResponse;
 import com.sprint.mission.discodeit.adapter.inbound.user.response.UserDeleteResponse;
 import com.sprint.mission.discodeit.adapter.inbound.user.request.UserLoginRequest;
 import com.sprint.mission.discodeit.adapter.inbound.user.response.UserLoginResponse;
 import com.sprint.mission.discodeit.adapter.inbound.user.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.user.response.UserStatusResponse;
 import com.sprint.mission.discodeit.adapter.inbound.user.response.UserUpdateResponse;
+import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserResult;
@@ -113,14 +116,19 @@ public class UserController {
     userService.delete(userId);
     return ResponseEntity.ok(new UserDeleteResponse(true));
   }
-//  TODO. 25.04.02 online 상태 구현해야 함
-//  @PutMapping("/online/{userId}")
-//  public ResponseEntity<UUID> online(@PathVariable UUID userId) {
-//    UserStatus userStatus = userStatusService.findByUserId(userId);
-//    userStatus.updatedTime();
-//
-//    return ResponseEntity.ok(userStatus.getUserStatusId());
-//  }
+
+//  TODO . 25.04.02  online 상태 구현해야 함
+
+  @PutMapping("/{userId}/userStatus")
+  public ResponseEntity<UserStatusResponse> online(@PathVariable UUID userId,
+      @RequestBody UserStatusRequest requestBody) {
+    UserStatus status = userStatusService.findByUserId(userId);
+
+    status.update(requestBody.newLastActiveAt());
+    boolean online = status.isOnline();
+
+    return ResponseEntity.ok(UserStatusResponse.create(status, online));
+  }
 //
 //  @PutMapping("/offline/{userId}")
 //  public ResponseEntity<UUID> offline(@PathVariable UUID userId) {

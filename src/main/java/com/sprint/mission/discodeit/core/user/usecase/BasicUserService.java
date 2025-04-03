@@ -6,7 +6,7 @@ import static com.sprint.mission.discodeit.exception.user.UserErrors.userLoginFa
 import static com.sprint.mission.discodeit.exception.user.UserErrors.userNameAlreadyExistsError;
 import static com.sprint.mission.discodeit.exception.user.UserErrors.userNameNotFoundError;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
