@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
+import static com.sprint.mission.discodeit.util.FileUtils.getBinaryContent;
 
 import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
@@ -34,7 +35,12 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new IllegalArgumentException("해당 ID의 채널이 존재하지 않습니다."));
 
     List<UUID> attachmentsIds = files.stream()
-        .map(file -> binaryContentRepository.save(new BinaryContent(file)))
+        .map(multipartFile -> {
+          BinaryContent binaryContent = new BinaryContent(multipartFile.getName(),
+              multipartFile.getContentType(),
+              multipartFile.getSize(), getBinaryContent(multipartFile));
+          return binaryContentRepository.save(binaryContent);
+        })
         .map(BinaryContent::getId)
         .toList();
 

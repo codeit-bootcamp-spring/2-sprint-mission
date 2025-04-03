@@ -1,34 +1,27 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @RestController
-@RequestMapping("/binary")
+@RequestMapping("/binary-contents")
 @RequiredArgsConstructor
 public class BinaryContentController {
-    private final BinaryContentService binaryContentService;
 
-    @GetMapping("/{fileId}")
-    public ResponseEntity<Resource> downloadSingleFile(@PathVariable UUID fileId) {
-        byte[] fileData = binaryContentService.getById(fileId).bytes();
+  private final BinaryContentService binaryContentService;
 
-        ByteArrayResource resource = new ByteArrayResource(fileData);
+  @GetMapping("/{fileId}")
+  public ResponseEntity<BinaryContentResult> downloadSingleFile(@PathVariable UUID fileId) {
+    BinaryContentResult binaryContentResult = binaryContentService.getById(fileId);
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"image.jpg\"")
-                .body(resource);
-    }
+    return ResponseEntity.ok()
+        .body(binaryContentResult);
+  }
 }

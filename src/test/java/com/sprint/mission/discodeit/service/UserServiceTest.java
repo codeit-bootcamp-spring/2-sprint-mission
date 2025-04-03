@@ -72,18 +72,19 @@ class UserServiceTest {
     assertThat(setUpUser.profileId()).isNull();
   }
 
-  @DisplayName("프로필 사진을 저장하면 ID로 저장합니다.")
+  @DisplayName("프로필 사진을 저장할 경우, 유저 객체에 ID로 저장한 결과를 반환합니다..")
   @Test
   void register() {
     MultipartFile imageFile = createMockImageFile("dog.jpg");
     UserCreateRequest mockUserRequest = createMockUserRequest(OTHER_USER.getName(),
         OTHER_USER.getEmail());
 
-    UserResult otherUser = userService.register(mockUserRequest, imageFile);
-    BinaryContent binaryContent = binaryContentRepository.findByBinaryContentId(
-        otherUser.profileId()).get();
+    UserResult userWithImage = userService.register(mockUserRequest, imageFile);
+    Optional<BinaryContent> binaryContent = binaryContentRepository.findByBinaryContentId(
+        userWithImage.profileId());
 
-    assertThat(otherUser.profileId()).isEqualTo(binaryContent.getId());
+    assertThat(binaryContent).map(BinaryContent::getId)
+        .hasValue(userWithImage.profileId());
   }
 
   @DisplayName("유저 등롟시 프로필 사진 저장을 하지 않은 경우, 프로필 아이디를 null을 반환합니다.")

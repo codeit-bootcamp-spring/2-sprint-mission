@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
+import static com.sprint.mission.discodeit.util.FileUtils.getBinaryContent;
 
 import com.sprint.mission.discodeit.application.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
@@ -36,9 +37,14 @@ public class BasicUserService implements UserService {
 
     UUID binaryContentId = null;
     if (profileImage != null) {
-      log.warn("getIn");
-      BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(profileImage));
-      binaryContentId = binaryContent.getId();
+      BinaryContent binaryContent = new BinaryContent(
+          profileImage.getName(),
+          profileImage.getContentType(),
+          profileImage.getSize(),
+          getBinaryContent(profileImage));
+      BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+
+      binaryContentId = savedBinaryContent.getId();
     }
 
     User savedUser = userRepository.save(new User(
@@ -129,8 +135,12 @@ public class BasicUserService implements UserService {
 
     UUID binaryContentId = null;
     if (profileImage != null) {
-      BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(profileImage));
-      binaryContentId = binaryContent.getId();
+      BinaryContent binaryContent = new BinaryContent(profileImage.getName(),
+          profileImage.getContentType(),
+          profileImage.getSize(), getBinaryContent(profileImage));
+
+      BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+      binaryContentId = savedBinaryContent.getId();
     }
 
     user.updateProfileImage(binaryContentId);

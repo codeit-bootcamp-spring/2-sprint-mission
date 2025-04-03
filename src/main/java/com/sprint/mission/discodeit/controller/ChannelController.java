@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -42,8 +43,9 @@ public class ChannelController {
     return ResponseEntity.ok(channelService.createPrivate(privateChannelCreationRequest));
   }
 
-  @GetMapping("/user/{userId}")
-  public ResponseEntity<List<ChannelResult>> getAllByUserId(@PathVariable UUID userId) {
+  @GetMapping
+  public ResponseEntity<List<ChannelResult>> getAllByUserId(
+      @RequestParam(value = "userId", required = false) UUID userId) {
     return ResponseEntity.ok(channelService.getAllByUserId(userId));
   }
 

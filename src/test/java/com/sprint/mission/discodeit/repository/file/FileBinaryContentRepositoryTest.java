@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import static com.sprint.mission.discodeit.util.FileUtils.getBinaryContent;
 import static com.sprint.mission.discodeit.util.mock.file.MockFile.createMockImageFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.web.multipart.MultipartFile;
 
 
 class FileBinaryContentRepositoryTest {
@@ -26,7 +28,11 @@ class FileBinaryContentRepositoryTest {
   @BeforeEach
   void setUp() {
     binaryContentRepository = new FileBinaryContentRepository(path.resolve(BINARY_FILE));
-    setUpBinaryContent = new BinaryContent(createMockImageFile("dog.jpg"));
+    MultipartFile imageFile = createMockImageFile("dog.jpg");
+    setUpBinaryContent = new BinaryContent(imageFile.getName(),
+        imageFile.getContentType(),
+        imageFile.getSize(), getBinaryContent(imageFile));
+
     savedSetUpBinaryContent = binaryContentRepository.save(setUpBinaryContent);
   }
 
