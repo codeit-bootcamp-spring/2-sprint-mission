@@ -46,9 +46,10 @@ public class UserController {
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileRequest) {
 
-    BinaryContentCreateRequest profileCreateRequest = (profileRequest == null)
-        ? null
-        : BinaryContentCreateRequest.fromMultipartFile(profileRequest);
+    BinaryContentCreateRequest profileCreateRequest =
+        (profileRequest == null || profileRequest.isEmpty())
+            ? null
+            : BinaryContentCreateRequest.fromMultipartFile(profileRequest);
 
     UserCreateResponse response = userService.create(userCreateRequest, profileCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -60,9 +61,10 @@ public class UserController {
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileRequest
   ) {
-    BinaryContentCreateRequest profileCreateRequest = (profileRequest == null)
-        ? null
-        : BinaryContentCreateRequest.fromMultipartFile(profileRequest);
+    BinaryContentCreateRequest profileCreateRequest =
+        (profileRequest == null || profileRequest.isEmpty())
+            ? null
+            : BinaryContentCreateRequest.fromMultipartFile(profileRequest);
 
     UserUpdateResponse response = userService.update(userId, userUpdateRequest,
         profileCreateRequest);

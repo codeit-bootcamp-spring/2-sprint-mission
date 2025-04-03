@@ -36,6 +36,7 @@ public class MessageController {
     List<BinaryContentCreateRequest> attachmentsCreateRequest = null;
     if (attachmentFiles != null) {
       attachmentsCreateRequest = attachmentFiles.stream()
+          .filter(file -> !file.isEmpty())
           .map(BinaryContentCreateRequest::fromMultipartFile)
           .toList();
     }
