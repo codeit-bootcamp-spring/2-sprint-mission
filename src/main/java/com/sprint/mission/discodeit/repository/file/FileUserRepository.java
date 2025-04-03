@@ -11,63 +11,65 @@ import java.util.*;
 
 @Repository
 @ConditionalOnProperty(value = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
-public class FileUserRepository extends AbstractFileRepository<Map<UUID, User>> implements UserRepository {
-    private Map<UUID, User> data;
+public class FileUserRepository extends AbstractFileRepository<Map<UUID, User>> implements
+    UserRepository {
 
-    public FileUserRepository(@Value("${discodeit.repository.file-directory}") String directory) {
-        super(directory, User.class.getSimpleName()+".ser");
-        this.data = loadData();
-    }
+  private Map<UUID, User> data;
 
-    @Override
-    protected Map<UUID, User> getEmptyData() {
-        return new HashMap<>();
-    }
+  public FileUserRepository(@Value("${discodeit.repository.file-directory}") String directory) {
+    super(directory, User.class.getSimpleName() + ".ser");
+    this.data = loadData();
+  }
 
-    @Override
-    public User save(User user) {
-        data.put(user.getId(), user);
-        saveData(data);
-        return user;
-    }
+  @Override
+  protected Map<UUID, User> getEmptyData() {
+    return new HashMap<>();
+  }
 
-    @Override
-    public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
-    }
+  @Override
+  public User save(User user) {
+    data.put(user.getId(), user);
+    saveData(data);
+    return user;
+  }
 
-    @Override
-    public List<User> findAll() {
-        return new ArrayList<>(data.values());
-    }
+  @Override
+  public Optional<User> findById(UUID id) {
+    return Optional.ofNullable(data.get(id));
+  }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return data.containsKey(id);
-    }
+  @Override
+  public List<User> findAll() {
+    return new ArrayList<>(data.values());
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        data.remove(id);
-        saveData(data);
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return data.containsKey(id);
+  }
 
-    @Override
-    public Optional<User> findByUsername(String username) {
-        return data.values().stream()
-                .filter(user -> user.getUsername().equals(username))
-                .findFirst();
-    }
+  @Override
+  public void deleteById(UUID id) {
+    data.remove(id);
+    saveData(data);
+  }
 
-    @Override
-    public boolean existsByUsername(String username) {
-        return data.values().stream()
-                .anyMatch(user -> user.getUsername().equals(username));
-    }
+  @Override
+  public Optional<User> findByUsername(String username) {
+    return data.values().stream()
+        .filter(user -> user.getUsername().equals(username))
+        .findFirst();
+  }
 
-    @Override
-    public boolean existsByEmail(String email) {
-        return data.values().stream()
-                .anyMatch(user -> user.getEmail().equals(email));
-    }
+  @Override
+  public boolean existsByUsername(String username) {
+    return data.values().stream()
+        .anyMatch(user -> user.getUsername().equals(username));
+  }
+
+  @Override
+  public boolean existsByEmail(String email) {
+    return data.values().stream()
+        .anyMatch(user -> user.getEmail().equals(email));
+  }
 }

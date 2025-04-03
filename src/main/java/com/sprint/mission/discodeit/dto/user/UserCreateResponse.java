@@ -6,21 +6,22 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record UserCreateResponse(
-        UUID id,
-        Instant createdAt,
-        Instant updatedAt,
-        String username,
-        String email,
-        UUID profileId
+    UUID id,
+    Instant createdAt,
+    Instant updatedAt,
+    String username,
+    String email,
+    UUID profileId
 ) {
-    public static UserCreateResponse fromEntity(User user) {
-        return new UserCreateResponse(
-                user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getProfileId()
-        );
-    }
+
+  public static UserCreateResponse fromEntity(User user) {
+    return new UserCreateResponse(
+        user.getId(),
+        user.getCreatedAt(),
+        user.getUpdatedAt(),
+        user.getUsername(),
+        user.getEmail(),
+        user.getProfileId()
+    );
+  }
 }

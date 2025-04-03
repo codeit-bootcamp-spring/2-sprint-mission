@@ -12,45 +12,46 @@ import java.util.*;
 
 @Repository
 @ConditionalOnProperty(value = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
-public class FileChannelRepository extends AbstractFileRepository<Map<UUID, Channel>> implements ChannelRepository {
+public class FileChannelRepository extends AbstractFileRepository<Map<UUID, Channel>> implements
+    ChannelRepository {
 
-    private Map<UUID, Channel> data;
+  private Map<UUID, Channel> data;
 
-    public FileChannelRepository(@Value("${discodeit.repository.file-directory}") String directory) {
-        super(directory, Channel.class.getSimpleName()+".ser");
-        this.data = loadData();
-    }
+  public FileChannelRepository(@Value("${discodeit.repository.file-directory}") String directory) {
+    super(directory, Channel.class.getSimpleName() + ".ser");
+    this.data = loadData();
+  }
 
-    @Override
-    protected Map<UUID, Channel> getEmptyData() {
-        return new HashMap<>();
-    }
+  @Override
+  protected Map<UUID, Channel> getEmptyData() {
+    return new HashMap<>();
+  }
 
-    @Override
-    public Channel save(Channel channel) {
-        data.put(channel.getId(), channel);
-        saveData(data);
-        return channel;
-    }
+  @Override
+  public Channel save(Channel channel) {
+    data.put(channel.getId(), channel);
+    saveData(data);
+    return channel;
+  }
 
-    @Override
-    public Optional<Channel> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
-    }
+  @Override
+  public Optional<Channel> findById(UUID id) {
+    return Optional.ofNullable(data.get(id));
+  }
 
-    @Override
-    public List<Channel> findAll() {
-        return new ArrayList<>(data.values());
-    }
+  @Override
+  public List<Channel> findAll() {
+    return new ArrayList<>(data.values());
+  }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return data.containsKey(id);
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return data.containsKey(id);
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        data.remove(id);
-        saveData(data);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    data.remove(id);
+    saveData(data);
+  }
 }

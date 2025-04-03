@@ -13,69 +13,70 @@ import java.util.Comparator;
 
 @Repository
 @ConditionalOnProperty(value = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
-public class FileMessageRepository extends AbstractFileRepository<Map<UUID, Message>> implements MessageRepository {
+public class FileMessageRepository extends AbstractFileRepository<Map<UUID, Message>> implements
+    MessageRepository {
 
-    private Map<UUID, Message> data;
+  private Map<UUID, Message> data;
 
-    public FileMessageRepository(@Value("${discodeit.repository.file-directory}") String directory) {
-        super(directory, Message.class.getSimpleName()+".ser");
-        this.data = loadData();
-    }
+  public FileMessageRepository(@Value("${discodeit.repository.file-directory}") String directory) {
+    super(directory, Message.class.getSimpleName() + ".ser");
+    this.data = loadData();
+  }
 
-    @Override
-    protected Map<UUID, Message> getEmptyData() {
-        return new HashMap<>();
-    }
+  @Override
+  protected Map<UUID, Message> getEmptyData() {
+    return new HashMap<>();
+  }
 
-    @Override
-    public Message save(Message message) {
-        data.put(message.getId(), message);
-        saveData(data);
-        return message;
-    }
+  @Override
+  public Message save(Message message) {
+    data.put(message.getId(), message);
+    saveData(data);
+    return message;
+  }
 
-    @Override
-    public Optional<Message> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
-    }
+  @Override
+  public Optional<Message> findById(UUID id) {
+    return Optional.ofNullable(data.get(id));
+  }
 
-    @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(data.values());
-    }
+  @Override
+  public List<Message> findAll() {
+    return new ArrayList<>(data.values());
+  }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return data.containsKey(id);
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return data.containsKey(id);
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        data.remove(id);
-        saveData(data);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    data.remove(id);
+    saveData(data);
+  }
 
-    @Override
-    public Optional<Message> findLatestMessageByChannelId(UUID channelId) {
-        return data.values().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
-                .max(Comparator.comparing(Message::getCreatedAt));
-    }
+  @Override
+  public Optional<Message> findLatestMessageByChannelId(UUID channelId) {
+    return data.values().stream()
+        .filter(message -> message.getChannelId().equals(channelId))
+        .max(Comparator.comparing(Message::getCreatedAt));
+  }
 
-    @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return data.values().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
-                .toList();
-    }
+  @Override
+  public List<Message> findAllByChannelId(UUID channelId) {
+    return data.values().stream()
+        .filter(message -> message.getChannelId().equals(channelId))
+        .toList();
+  }
 
-    @Override
-    public void deleteByChannelId(UUID channelId) {
-        List<UUID> keysToRemove = data.values().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
-                .map(Message::getId)
-                .toList();
-        keysToRemove.forEach(data::remove);
-        saveData(data);
-    }
+  @Override
+  public void deleteByChannelId(UUID channelId) {
+    List<UUID> keysToRemove = data.values().stream()
+        .filter(message -> message.getChannelId().equals(channelId))
+        .map(Message::getId)
+        .toList();
+    keysToRemove.forEach(data::remove);
+    saveData(data);
+  }
 }
