@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.adapter.inbound.channel.dto;
+package com.sprint.mission.discodeit.adapter.inbound.channel.request;
 
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 

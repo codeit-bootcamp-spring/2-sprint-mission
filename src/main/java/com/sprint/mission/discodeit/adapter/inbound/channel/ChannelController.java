@@ -5,12 +5,12 @@ import static com.sprint.mission.discodeit.adapter.inbound.channel.ChannelDtoMap
 import static com.sprint.mission.discodeit.adapter.inbound.channel.ChannelDtoMapper.toCreatePublicChannelCommand;
 import static com.sprint.mission.discodeit.adapter.inbound.channel.ChannelDtoMapper.toUpdateChannelCommand;
 
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.ChannelCreateResponse;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.ChannelDeleteResponse;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.ChannelUpdateResponse;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.channel.dto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.channel.response.ChannelCreateResponse;
+import com.sprint.mission.discodeit.adapter.inbound.channel.response.ChannelDeleteResponse;
+import com.sprint.mission.discodeit.adapter.inbound.channel.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.channel.response.ChannelUpdateResponse;
+import com.sprint.mission.discodeit.adapter.inbound.channel.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.channel.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.core.channel.usecase.ChannelService;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelListResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
@@ -37,7 +37,7 @@ public class ChannelController {
 
   private final ChannelService channelService;
 
-  @PostMapping("/createPublic")
+  @PostMapping("/public")
   public ResponseEntity<ChannelCreateResponse> create(@PathVariable UUID userId,
       @RequestBody PublicChannelCreateRequest requestBody) {
     CreatePublicChannelCommand command = toCreatePublicChannelCommand(userId,
@@ -47,7 +47,7 @@ public class ChannelController {
     return ResponseEntity.ok(new ChannelCreateResponse(true, "Public Channel Create Successfully"));
   }
 
-  @PostMapping("/createPrivate")
+  @PostMapping("/private")
   public ResponseEntity<ChannelCreateResponse> create(@PathVariable UUID userId,
       @RequestBody PrivateChannelCreateRequest requestBody) {
     CreatePrivateChannelCommand command = toCreatePrivateChannelCommand(userId,

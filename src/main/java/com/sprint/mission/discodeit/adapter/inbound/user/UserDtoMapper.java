@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.adapter.inbound.user;
 
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserLoginRequest;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserUpdateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.user.request.UserCreateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.user.request.UserLoginRequest;
+import com.sprint.mission.discodeit.adapter.inbound.user.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;

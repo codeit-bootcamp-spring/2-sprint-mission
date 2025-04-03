@@ -6,18 +6,20 @@ import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.to
 import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.toUpdateUserCommand;
 
 import com.sprint.mission.discodeit.adapter.inbound.content.dto.CreateBinaryContentCommand;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserCreateResponse;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserDeleteResponse;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserLoginRequest;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserLoginResponse;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserUpdateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.user.dto.UserUpdateResponse;
+import com.sprint.mission.discodeit.adapter.inbound.user.request.UserCreateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.user.response.UserCreateResponse;
+import com.sprint.mission.discodeit.adapter.inbound.user.response.UserDeleteResponse;
+import com.sprint.mission.discodeit.adapter.inbound.user.request.UserLoginRequest;
+import com.sprint.mission.discodeit.adapter.inbound.user.response.UserLoginResponse;
+import com.sprint.mission.discodeit.adapter.inbound.user.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.user.response.UserUpdateResponse;
+import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.UserService;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserListResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
@@ -47,7 +49,7 @@ public class UserController {
   private final UserService userService;
   private final UserStatusService userStatusService;
 
-  @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserCreateResponse> register(
       @RequestPart("user") UserCreateRequest requestBody,
       @RequestPart(value = "profileImage", required = false) MultipartFile file
@@ -64,16 +66,16 @@ public class UserController {
     }
 
     CreateUserCommand command = toCreateUserCommand(requestBody);
-    userService.create(command, binaryContentRequest);
-    return ResponseEntity.ok(new UserCreateResponse(true, "User Create Successfully"));
+    CreateUserResult result = userService.create(command, binaryContentRequest);
+    return ResponseEntity.ok(UserCreateResponse.create(result.user()));
   }
 
   @PostMapping("/login")
   public ResponseEntity<UserLoginResponse> login(@RequestBody UserLoginRequest requestBody) {
     LoginUserCommand command = toLoginUserCommand(requestBody);
     LoginUserResult result = userService.login(command);
-    //TODO. 25.04.02 현재 토큰 미구현으로 -1값을 넣어둠
-    return ResponseEntity.ok(new UserLoginResponse(true, result.token()));
+
+    return ResponseEntity.ok(UserLoginResponse.create(result.user()));
   }
 
   @GetMapping
@@ -102,8 +104,8 @@ public class UserController {
     }
     UpdateUserCommand command = toUpdateUserCommand(userId, requestBody);
 
-    userService.update(command, binaryContentRequest);
-    return ResponseEntity.ok(new UserUpdateResponse(true));
+    UpdateUserResult result = userService.update(command, binaryContentRequest);
+    return ResponseEntity.ok(UserUpdateResponse.create(result.user()));
   }
 
   @DeleteMapping("/{userId}")

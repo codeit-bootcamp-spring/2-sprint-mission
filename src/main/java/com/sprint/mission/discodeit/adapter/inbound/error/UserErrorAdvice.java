@@ -3,10 +3,13 @@ package com.sprint.mission.discodeit.adapter.inbound.error;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsError;
 import com.sprint.mission.discodeit.exception.user.UserLoginFailedError;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+
+@Hidden
 @RestControllerAdvice
 public class UserErrorAdvice {
 

@@ -14,9 +14,11 @@ import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatu
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserListResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import com.sprint.mission.discodeit.logging.CustomLogging;
@@ -38,7 +40,7 @@ public class BasicUserService implements UserService {
 
   @CustomLogging
   @Override
-  public void create(CreateUserCommand command,
+  public CreateUserResult create(CreateUserCommand command,
       Optional<CreateBinaryContentCommand> binaryContentDTO) {
     UUID profileId = null;
     validateUser(command.name(), command.email());
@@ -52,6 +54,8 @@ public class BasicUserService implements UserService {
     User user = User.create(command.name(), command.email(), hashedPassword, profileId);
     userRepositoryPort.save(user);
     userStatusService.create(new CreateUserStatusCommand(user.getId(), Instant.now()));
+
+    return new CreateUserResult(user);
   }
 
   private void validateUser(String name, String email) {
@@ -88,8 +92,7 @@ public class BasicUserService implements UserService {
     if (!BCrypt.checkpw(command.password(), user.getPassword())) {
       userLoginFailedError(user.getId(), "Password mismatch");
     }
-    //TODO. 미구현으로 임시로 "-1"값 넣어둠
-    return new LoginUserResult("-1");
+    return new LoginUserResult(user);
   }
 
   @Override
@@ -112,7 +115,7 @@ public class BasicUserService implements UserService {
 
   @CustomLogging
   @Override
-  public void update(UpdateUserCommand command,
+  public UpdateUserResult update(UpdateUserCommand command,
       Optional<CreateBinaryContentCommand> binaryContentDTO) {
 
     User user = userRepositoryPort.findById(command.requestUserId())
@@ -123,7 +126,7 @@ public class BasicUserService implements UserService {
     }
     UUID newProfileId = makeBinaryContent(binaryContentDTO);
     user.update(command.newName(), command.newEmail(), newProfileId);
-
+    return new UpdateUserResult(user);
   }
 
   @CustomLogging

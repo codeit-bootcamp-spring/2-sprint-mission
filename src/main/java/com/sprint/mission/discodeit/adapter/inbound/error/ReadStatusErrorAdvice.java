@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.adapter.inbound.error;
 
 import com.sprint.mission.discodeit.exception.status.read.ReadStatusAlreadyExistsError;
 import com.sprint.mission.discodeit.exception.status.read.ReadStatusNotFoundError;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Hidden
 @RestControllerAdvice
 public class ReadStatusErrorAdvice {
 
