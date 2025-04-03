@@ -25,8 +25,9 @@ public class BasicMessageService implements MessageService {
   private final BasicBinaryContentService basicBinaryContentService;
 
   @Override
-  public Message create(UUID channelId, MessageCreateRequest createRequest,
+  public Message create(MessageCreateRequest createRequest,
       List<BinaryContentCreateRequest> binaryRequestList) {
+    UUID channelId = createRequest.channelId();
     UUID authorId = createRequest.authorId();
     if (!channelRepository.existsById(channelId)) {
       throw new NoSuchElementException(channelId + "에 해당하는 Channel을 찾을 수 없음");
