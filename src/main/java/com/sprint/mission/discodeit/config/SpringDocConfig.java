@@ -4,7 +4,10 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.ArrayList;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 @OpenAPIDefinition(
     info = @Info(
@@ -29,4 +32,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SpringDocConfig {
 
+  public SpringDocConfig(MappingJackson2HttpMessageConverter converter) {
+    var supportedMediaTypes = new ArrayList<>(converter.getSupportedMediaTypes());
+    supportedMediaTypes.add(new MediaType("application", "octet-stream"));
+    converter.setSupportedMediaTypes(supportedMediaTypes);
+  }
 }

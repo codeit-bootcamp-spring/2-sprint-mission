@@ -1,10 +1,13 @@
 spring:
   application:
-    name:discodeit
-
+    name: discodeit
 
 discodeit:
   repository:
     type: file
     file-directory: \src\main\resources\dir\
 
+springdoc:
+  api-docs:
+    enabled: true
+    version: openapi_3_1
