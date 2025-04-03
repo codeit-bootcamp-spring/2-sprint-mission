@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -82,8 +83,7 @@ public class MessageController {
   // 메시지 삭제
   @Operation(summary = "Message 삭제")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "Message가 성공적으로 삭제됨",
-          content = @Content(mediaType = "*/*", schema = @Schema(implementation = MessageResponse.class))),
+      @ApiResponse(responseCode = "204", description = "Message가 성공적으로 삭제됨"),
       @ApiResponse(responseCode = "404", description = "Message를 찾을 수 없음",
           content = @Content(mediaType = "*/*", examples = {
               @ExampleObject(value = "{messageId}에 해당하는 Message를 찾을 수 없음")
@@ -99,7 +99,8 @@ public class MessageController {
   // 특정 채널의 메시지 목록 조회
   @Operation(summary = "Channel의 Message 목록 조회")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Message 목록 조회 성공"),
+      @ApiResponse(responseCode = "200", description = "Message 목록 조회 성공",
+          content = @Content(mediaType = "*/*", array = @ArraySchema(schema = @Schema(implementation = MessageResponse.class)))),
       @ApiResponse(responseCode = "404", description = "Channel을 찾을 수 없음",
           content = @Content(mediaType = "*/*", examples = {
               @ExampleObject(value = "{channelId}에 해당하는 Channel을 찾을 수 없음")
