@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.auth.AuthLoginRequest;
 import com.sprint.mission.discodeit.dto.auth.AuthLoginResponse;
-import com.sprint.mission.discodeit.dto.common.ApiResponse;
 import com.sprint.mission.discodeit.service.AuthService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

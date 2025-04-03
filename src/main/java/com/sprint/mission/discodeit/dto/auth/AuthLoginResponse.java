@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.dto.auth;
 
-import com.sprint.mission.discodeit.dto.user.UserCreateResponse;
 import com.sprint.mission.discodeit.entity.user.User;
 import java.time.Instant;
 import java.util.UUID;
