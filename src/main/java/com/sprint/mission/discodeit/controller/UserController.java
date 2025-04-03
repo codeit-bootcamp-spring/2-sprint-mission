@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.dto.FindUserDto;
 import com.sprint.mission.discodeit.dto.SaveBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.SaveUserRequestDto;
 import com.sprint.mission.discodeit.dto.UpdateUserRequestDto;
-import com.sprint.mission.discodeit.dto.UpdateUserStatusRequestDto;
+import com.sprint.mission.discodeit.dto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
@@ -59,7 +59,7 @@ public class UserController {
           description = "User가 성공적으로 생성됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = ApiResponse.class)
+              schema = @Schema(implementation = User.class)
           )
       ),
       @ApiResponse(
@@ -67,7 +67,7 @@ public class UserController {
           description = "같은 email 또는 username을 사용하는 User가 이미 존재함",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = ApiResponse.class)
+              examples = @ExampleObject(value = "User with email {email} already exists")
           )
       )
   })
@@ -105,7 +105,7 @@ public class UserController {
           description = "같은 email 또는 username을 사용하는 User가 이미 존재함",
           content = @Content(
               mediaType = "*.*",
-              schema = @Schema(implementation = ApiResponse.class)
+              examples = @ExampleObject(value = "user with email {newEmail} already exists")
           )
       ),
       @ApiResponse(
@@ -113,7 +113,7 @@ public class UserController {
           description = "*/*",
           content = @Content(
               mediaType = "application/json",
-              schema = @Schema(implementation = ApiResponse.class)
+              examples = @ExampleObject(value = "user with email {newEmail} already exists")
           )
       )
   })
@@ -187,15 +187,12 @@ public class UserController {
           schema = @Schema(type = "String", format = "uuid")
       )
   )
+  @io.swagger.v3.oas.annotations.parameters.RequestBody(
+      content = @Content(
+          schema = @Schema(implementation = UserStatusUpdateRequest.class)
+      )
+  )
   @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "404",
-          description = "해당 User의 UserStatus를 찾을 수 없음",
-          content = @Content(
-              mediaType = "*/*",
-              examples = @ExampleObject(value = "UserStatus with userId {userId} not found")
-          )
-      ),
       @ApiResponse(
           responseCode = "200",
           description = "User 온라인 상태가 성공적으로 업데이트됨",
@@ -203,14 +200,22 @@ public class UserController {
               mediaType = "*/*",
               schema = @Schema(implementation = UserStatus.class)
           )
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "해당 User의 UserStatus를 찾을 수 없음",
+          content = @Content(
+              mediaType = "*/*",
+              examples = @ExampleObject(value = "UserStatus with userId {userId} not found")
+          )
       )
   })
-  public ResponseEntity<ApiDataResponse<Void>> updateUserStatusByUserId(
+  public ResponseEntity<ApiDataResponse<UserStatus>> updateUserStatusByUserId(
       @PathVariable("userId") UUID userId,
-      @RequestBody() UpdateUserStatusRequestDto dto
+      @RequestBody() UserStatusUpdateRequest dto
   ) {
     System.out.println(dto.loginTime());
-    userStatusService.updateByUserId(userId, dto);
-    return ResponseEntity.ok(ApiDataResponse.success());
+    UserStatus userStatus = userStatusService.updateByUserId(userId, dto);
+    return ResponseEntity.status(HttpStatus.OK).body(ApiDataResponse.success(userStatus));
   }
 }

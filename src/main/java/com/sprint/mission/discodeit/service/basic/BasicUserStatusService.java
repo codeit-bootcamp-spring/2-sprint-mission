@@ -1,20 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.SaveUserStatusParamDto;
-import com.sprint.mission.discodeit.dto.UpdateUserRequestDto;
-import com.sprint.mission.discodeit.dto.UpdateUserStatusParamDto;
-import com.sprint.mission.discodeit.dto.UpdateUserStatusRequestDto;
+import com.sprint.mission.discodeit.dto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -43,13 +40,17 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public void updateByUserId(UUID userId, UpdateUserStatusRequestDto updateUserStatusRequestDto) {
+  public UserStatus updateByUserId(UUID userId,
+      UserStatusUpdateRequest userStatusUpdateRequest) {
     User user = userRepository.findUserById(userId)
-        .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+        .orElseThrow(() -> new NoSuchElementException(
+            String.format("User with userId %s not found", userId)));
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-        .orElseThrow(() -> new NoSuchElementException("사용자 상태 수정 오류"));
-    userStatus.updateLastLoginTime(updateUserStatusRequestDto.loginTime());
+        .orElseThrow(() -> new NoSuchElementException(
+            String.format("UserStatus with userId %s not found", userId)));
+    userStatus.updateLastLoginTime(userStatusUpdateRequest.loginTime());
     userStatusRepository.save(userStatus);
+    return userStatus;
   }
 
 

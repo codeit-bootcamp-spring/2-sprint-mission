@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.dto;
 
 import java.time.Instant;
 
-public record UpdateUserStatusRequestDto(
+public record UserStatusUpdateRequest(
     Instant loginTime
 ) {
 

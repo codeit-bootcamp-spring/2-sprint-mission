@@ -101,7 +101,15 @@ public class BasicUserService implements UserService {
         orElseThrow(
             () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
 
-    user.updateNickname(updateUserDto.nickname());
+    if (userRepository.findUserByEmail(updateUserDto.email()).isPresent()) {
+      throw new IllegalArgumentException(
+          String.format("User with email %s already exists", updateUserDto.email()));
+    }
+
+    user.updateUsername(updateUserDto.username());
+    user.updatePassword(updateUserDto.password());
+    user.updateEmail(updateUserDto.email());
+
     UUID profileId = saveBinaryContentRequestDto
         .map(profile -> {
           String fileName = profile.fileName();
