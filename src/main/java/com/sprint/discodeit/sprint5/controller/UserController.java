@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserServiceV1 basicUserService;
-    private UserResponseDto userResponseDto;
 
     @Operation(summary = "회원가입", description = "회원 정보를 입력받아 회원가입을 진행합니다.")
     @ApiResponses({
@@ -73,7 +72,7 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDto> get(
             @Parameter(description = "조회할 회원의 UUID") @PathVariable String userId) {
-        userResponseDto = basicUserService.find(UUID.fromString(userId));
+        UserResponseDto userResponseDto = basicUserService.find(UUID.fromString(userId));
         return ResponseEntity.ok(userResponseDto);
     }
 
