@@ -12,7 +12,7 @@ public interface MessageService {
   // CRUD(생성, 읽기, 모두 읽기, 수정, 삭제)
   Message createMessage(CreateMessageRequest request);
 
-  Message getMessageById(UUID messageId); // 메세지 조회
+  Message findMessageById(UUID messageId); // 메세지 조회
 
   List<Message> findMessagesByUserAndChannel(UUID senderId,
       UUID channelId); // 특정 유저가 특정 채널에서 작성한 메세지 확인

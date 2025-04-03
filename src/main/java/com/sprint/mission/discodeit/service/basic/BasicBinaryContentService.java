@@ -4,33 +4,37 @@ import com.sprint.mission.discodeit.dto.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
 
-    public UUID createBinaryContent(CreateBinaryContentRequest request) {
-        BinaryContent binaryContent = new BinaryContent(request.getFileName(), request.getSize(), request.getContentType(), request.getBytes());
-        binaryContentRepository.addBinaryContent(binaryContent);
+  private final BinaryContentRepository binaryContentRepository;
 
-        return binaryContent.getId();
-    }
+  public UUID createBinaryContent(CreateBinaryContentRequest request) {
+    BinaryContent binaryContent = new BinaryContent(request.getFileName(), request.getSize(),
+        request.getContentType(), request.getBytes());
+    binaryContentRepository.addBinaryContent(binaryContent);
 
-    public BinaryContent findBinaryContent(UUID binaryContentId) {
-        return binaryContentRepository.findBinaryContentById(binaryContentId);
-    }
+    return binaryContent.getId();
+  }
 
-    public List<BinaryContent> findAllBinaryContent() {
-        return binaryContentRepository.findAllBinaryContents();
-    }
+  public BinaryContent findBinaryContent(UUID binaryContentId) {
+    return binaryContentRepository.findBinaryContentById(binaryContentId)
+        .orElseThrow(() -> new NoSuchElementException(
+            "BinaryContent with id: " + binaryContentId + "not found"));
+  }
 
-    public void deleteBinaryContent(UUID binaryContentId) {
-        binaryContentRepository.deleteBinaryContentById(binaryContentId);
-    }
+  public List<BinaryContent> findAllBinaryContent() {
+    return binaryContentRepository.findAllBinaryContents();
+  }
+
+  public void deleteBinaryContent(UUID binaryContentId) {
+    binaryContentRepository.deleteBinaryContentById(binaryContentId);
+  }
 }

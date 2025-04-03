@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -36,23 +37,22 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new IllegalArgumentException("User " + userId + "이 존재하지 않습니다.");
     }
 
-    ReadStatus existingReadStatus = readStatusRepository.findByUserIdAndChannelId(channelId,
-        userId);
-    if (existingReadStatus != null) {
-      throw new IllegalStateException("이미 존재하는 ReadStatus입니다.");
-    }
+    findReadStatusByUserIdAndChannelId(channelId, userId);
 
     ReadStatus readStatus = new ReadStatus(channelId, userId, request.getLastReadAt());
     readStatusRepository.addReadStatus(readStatus);
   }
 
   @Override
-  public ReadStatus findReadStatusById(UUID userId, UUID channelId) {
-    ReadStatus readStatus = readStatusRepository.findByUserIdAndChannelId(userId, channelId);
-    if (readStatus == null) {
-      throw new IllegalArgumentException("해당하는 ReadStatus를 찾을 수 없습니다.");
-    }
-    return readStatus;
+  public ReadStatus findReadStatusById(UUID readStatusId) {
+    return readStatusRepository.findReadStatusById(readStatusId)
+        .orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
+  }
+
+  @Override
+  public ReadStatus findReadStatusByUserIdAndChannelId(UUID userId, UUID channelId) {
+    return readStatusRepository.findByUserIdAndChannelId(userId, channelId)
+        .orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
   }
 
   @Override
@@ -63,19 +63,13 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public void updateReadStatus(UUID readStatusId) {
-    ReadStatus readStatus = readStatusRepository.findReadStatusById(readStatusId);
-    if (readStatus == null) {
-      throw new IllegalArgumentException("ReadStatus을 찾을 수 없습니다.");
-    }
+    ReadStatus readStatus = findReadStatusById(readStatusId);
     readStatus.updateLastAccessTime();
     readStatusRepository.addReadStatus(readStatus);
   }
 
   public void updateReadStatusByIds(UUID userId, UUID channelId) {
-    ReadStatus readStatus = readStatusRepository.findByUserIdAndChannelId(userId, channelId);
-    if (readStatus == null) {
-      throw new IllegalArgumentException("ReadStatus을 찾을 수 없습니다.");
-    }
+    ReadStatus readStatus = findReadStatusByUserIdAndChannelId(userId, channelId);
     readStatus.updateLastAccessTime();
     readStatusRepository.addReadStatus(readStatus);
   }

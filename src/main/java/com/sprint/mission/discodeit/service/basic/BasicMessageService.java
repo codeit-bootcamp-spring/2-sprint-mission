@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -47,17 +48,17 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public Message getMessageById(UUID messageId) {
-    validateMessageExists(messageId);
-    return messageRepository.findMessageById(messageId);
+  public Message findMessageById(UUID messageId) {
+    return messageRepository.findMessageById(messageId)
+        .orElseThrow(() -> new NoSuchElementException(
+            "Message with id: " + messageId + "not found"));
   }
 
   @Override
   public List<BinaryContent> findAttachmentsById(UUID messageId) {
-    validateMessageExists(messageId);
     List<BinaryContent> binaryContents = new ArrayList<>();
-    messageRepository.findMessageById(messageId).getAttachmentIds().forEach(attachmentId -> {
-      binaryContents.add(binaryContentRepository.findBinaryContentById(attachmentId));
+    findMessageById(messageId).getAttachmentIds().forEach(attachmentId -> {
+      binaryContents.add(binaryContentRepository.findBinaryContentById(attachmentId).orElse(null));
     });
 
     return binaryContents;
@@ -91,7 +92,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public void updateMessage(UUID userId, UUID messageId, UpdateMessageRequest request) {
-    Message message = messageRepository.findMessageById(messageId);
+    Message message = findMessageById(messageId);
     if (!message.getAuthorId().equals(userId)) {
       throw new RuntimeException("본인의 메시지만 수정할 수 있습니다.");
     }
@@ -101,7 +102,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public void deleteMessage(UUID userId, UUID messageId) {
-    Message message = messageRepository.findMessageById(messageId);
+    Message message = findMessageById(messageId);
 
     if (!message.getAuthorId().equals(userId)) {
       throw new RuntimeException("본인의 메시지만 수정할 수 있습니다.");

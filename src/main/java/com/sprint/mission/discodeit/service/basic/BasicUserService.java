@@ -12,7 +12,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -52,47 +52,45 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserInfoDto getUserById(UUID userId) {
-    return mapToUserFindDto(userRepository.findUserById(userId));
+  public User findUserById(UUID userId) {
+    return userRepository.findUserById(userId)
+        .orElseThrow(() -> new NoSuchElementException("User with id: " + userId + "not found"));
   }
 
   @Override
-  public String getUserNameById(UUID userId) {
-    return userRepository.findUserById(userId).getUsername();
+  public String findUserNameById(UUID userId) {
+    return findUserById(userId).getUsername();
   }
 
   @Override
   public List<UserInfoDto> findUsersByIds(Set<UUID> userIds) {
     return userRepository.findUsersByIds(userIds).stream()
-        .map(this::mapToUserFindDto)
+        .map(this::mapToDto)
         .collect(Collectors.toList());
   }
 
   @Override
   public List<UserInfoDto> getAllUsers() {
     return userRepository.findUserAll().stream()
-        .map(this::mapToUserFindDto)
+        .map(this::mapToDto)
         .collect(Collectors.toList());
   }
 
   @Override
   public BinaryContent findProfileById(UUID userId) {
-    return Optional.ofNullable(userRepository.findUserById(userId))
-        .map(User::getProfileId)
-        .map(binaryContentRepository::findBinaryContentById)
+    return binaryContentRepository.findBinaryContentById(findUserById(userId).getProfileId())
         .orElse(null);
   }
 
   @Override
   public void updateProfile(UUID userId, UUID profileId) {
-    userRepository.findUserById(userId).updateProfile(profileId);
+    findUserById(userId).updateProfile(profileId);
     userRepository.save();
   }
 
   @Override
   public void updateUser(UUID userId, UpdateUserRequest request) {
-    validateUserExists(userId);
-    User user = userRepository.findUserById(userId);
+    User user = findUserById(userId);
 
     if (request.getUsername() != null) {
       user.updateUsername(request.getUsername());
@@ -119,7 +117,8 @@ public class BasicUserService implements UserService {
     }
   }
 
-  private UserInfoDto mapToUserFindDto(User user) {
+  @Override
+  public UserInfoDto mapToDto(User user) {
     Boolean isOnline = userStatusRepository.findUserStatusById(user.getId())
         .map(UserStatus::isUserOnline)
         .orElse(null);

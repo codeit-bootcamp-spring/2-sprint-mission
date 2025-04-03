@@ -9,7 +9,9 @@ public interface ReadStatusService {
 
   public void createReadStatus(CreateReadStatusRequest request);
 
-  ReadStatus findReadStatusById(UUID userId, UUID channelId);
+  ReadStatus findReadStatusById(UUID readStatusId);
+
+  ReadStatus findReadStatusByUserIdAndChannelId(UUID userId, UUID channelId);
 
   List<ReadStatus> findAll();
 
