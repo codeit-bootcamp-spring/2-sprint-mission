@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -85,7 +86,7 @@ class UserServiceTest {
     assertThat(otherUser.profileId()).isEqualTo(binaryContent.getId());
   }
 
-  @DisplayName("프로필 사진 저장을 선택하지 않았을 때 프로필 아이디가 null을 반환합니다.")
+  @DisplayName("유저 등롟시 프로필 사진 저장을 하지 않은 경우, 프로필 아이디를 null을 반환합니다.")
   @Test
   void registerException() {
     UserCreateRequest mockUserRequest = createMockUserRequest(OTHER_USER.getName(),
@@ -95,12 +96,13 @@ class UserServiceTest {
     assertThat(user.profileId()).isNull();
   }
 
-  @DisplayName("처음 등록한 유저의 로그인 상태는 false를 반환한다.")
+  @DisplayName("처음 등록된 유저의 경우, 로그인 상태는 false를 반환합니다.")
   @Test
   void registerValidateUserStatus() {
     UserCreateRequest mockUserRequest = createMockUserRequest(OTHER_USER.getName(),
         OTHER_USER.getEmail());
     UserResult user = userService.register(mockUserRequest, null);
+
     assertThat(user.isLogin()).isFalse();
   }
 
@@ -113,7 +115,7 @@ class UserServiceTest {
         .isInstanceOf(IllegalArgumentException.class);
   }
 
-  @DisplayName("유저 ID로 조회시 해당 Id를 가진 유저를 반환합니다.")
+  @DisplayName("유저 ID로 조회할 경우, 해당 Id를 가진 유저를 반환합니다.")
   @Test
   void getByIdReturnsUser() {
     UserResult userResult = userService.getById(setUpUser.id());
@@ -121,7 +123,7 @@ class UserServiceTest {
     assertThat(userResult.id()).isEqualTo(setUpUser.id());
   }
 
-  @DisplayName("유저 이름으로 조회시 해당 이름을 가진 유저를 반환합니다.")
+  @DisplayName("유저 이름으로 조회할 경우, 같은 이름을 가진 유저를 반환합니다.")
   @Test
   void getByNameReturnsUser() {
     UserResult user = userService.getByName(LOGIN_USER.getName());
@@ -129,7 +131,7 @@ class UserServiceTest {
     assertThat(user.name()).isEqualTo(LOGIN_USER.getName());
   }
 
-  @DisplayName("유저 이름을 다른 이름으로 업데이트 하면 변경된 이름을 반환합니다.")
+  @DisplayName("다른 이름으로 업데이트할 경우, 변경된 이름을 반환합니다.")
   @Test
   void updateUserName() {
     UserResult user = userService.updateName(setUpUser.id(), OTHER_USER.getName());
@@ -137,7 +139,7 @@ class UserServiceTest {
     assertThat(user.name()).isEqualTo(OTHER_USER.getName());
   }
 
-  @DisplayName("유저 프로필 이미지를 업데이트하면 변경된 이미지를 반환합니다.")
+  @DisplayName("유저 프로필 이미지를 업데이트할 경우, 변경된 이미지를 반환하고 이전 이미지는 삭제합니다.")
   @Test
   void updateProfileImage() {
     UserCreateRequest mockUserRequest = createMockUserRequest(OTHER_USER.getName(),
@@ -146,18 +148,18 @@ class UserServiceTest {
 
     MultipartFile otherImageFile = createMockImageFile("Kirby.jpg");
     UserResult updateProfileUser = userService.updateProfileImage(user.id(), otherImageFile);
-    BinaryContent binaryContent = binaryContentRepository.findByBinaryContentId(
-            updateProfileUser.profileId())
-        .get();
+    Optional<BinaryContent> binaryContent = binaryContentRepository.findByBinaryContentId(
+        updateProfileUser.profileId());
 
     assertAll(
-        () -> assertThat(otherImageFile.getBytes()).isEqualTo(binaryContent.getBytes()),
+        () -> assertThat(binaryContent).map(BinaryContent::getBytes)
+            .hasValue(otherImageFile.getBytes()),
         () -> assertThat(binaryContentRepository.findByBinaryContentId(user.profileId())).isEmpty()
     );
   }
 
 
-  @DisplayName("유저가 삭제된다면 연관된 userStatus랑 binaryContent도 삭제됩니다.")
+  @DisplayName("유저가 삭제할 경우, 연관된 유저 상태와 유저 프로필 이미지도 삭제됩니다.")
   @Test
   void deleteWithUserStatus() {
     userService.delete(setUpUser.id());
@@ -170,7 +172,7 @@ class UserServiceTest {
     );
   }
 
-  @DisplayName("유저를 삭제 후에 조회 한다면 예외를 반환합니다.")
+  @DisplayName("유저를 삭제 할 경우, 반환값은 없습니다.")
   @Test
   void deleteUserAndVerifyNotFound() {
     UUID setUpUserId = setUpUser.id();

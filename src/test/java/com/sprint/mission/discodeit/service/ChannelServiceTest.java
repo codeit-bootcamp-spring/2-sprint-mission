@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateRequest
 import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
 import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelCreationRequest;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -50,19 +51,19 @@ class ChannelServiceTest {
         setUpUser.getId()));
   }
 
-  @DisplayName("Public 채널 생성 시 채널 이름과 정보를 반환합니다.")
+  @DisplayName("Public 채널을 생성할 경우, 저장한 채널 정보를 반환합니다.")
   @Test
   void createPublicChannel() {
     assertThat(setUpPublicChannel.name()).isEqualTo(CHANNEL_NAME);
   }
 
-  @DisplayName("Public 채널 생성 시 멤버는 null을 반환합니다.")
+  @DisplayName("Public 채널을 생성할 경우, 채널내 멤버는 null을 반환합니다.")
   @Test
   void createPublicChannel_NoMember() {
     assertThat(setUpPublicChannel.privateMemberIds()).isNull();
   }
 
-  @DisplayName("Private 채널 생성 시 채널 멤버도 같이 반홥합니다.")
+  @DisplayName("Private 채널을 생성할 경우, 채널 멤버도 반홥합니다.")
   @Test
   void createPrivateChannel() {
     PrivateChannelCreationRequest privateChannelCreationRequest = new PrivateChannelCreationRequest(
@@ -72,7 +73,7 @@ class ChannelServiceTest {
     assertThat(privateChannel.privateMemberIds()).containsExactlyInAnyOrder(setUpUser.getId());
   }
 
-  @DisplayName("채널 ID로 조회하면 해당하는 채널을 반환합니다.")
+  @DisplayName("채널 ID로 조회할 경우, 같은 ID를 가진 채널을 반환합니다.")
   @Test
   void getChannelById() {
     ChannelResult channel = channelService.getById(setUpPublicChannel.id());
@@ -80,7 +81,7 @@ class ChannelServiceTest {
     assertThat(setUpPublicChannel.id()).isEqualTo(channel.id());
   }
 
-  @DisplayName("채널을 조회하면 가장 최근 메시지의 생성 시간을 반환합니다.")
+  @DisplayName("채널을 조회할 경우, 채널내 가장 최근 메시지의 생성 시간을 반환합니다.")
   @Test
   void getChannelByIdReturnsLastMessageTimestamp() {
     Message message = messageRepository.save(
@@ -88,26 +89,27 @@ class ChannelServiceTest {
             List.of()));
 
     ChannelResult channel = channelService.getById(setUpPublicChannel.id());
+
     assertThat(channel.lastMessageCreatedAt()).isEqualTo(message.getCreatedAt());
   }
 
-
-  @DisplayName("유저 Id로 채널을 조회한다면 Public 채널과 유저에게만 속한 Private 채널만 반환합니다.")
+  @DisplayName("전체 채널을 조회할 경우, Public 채널과 사용자가 속한 Private 채널만 반환합니다.")
   @Test
-  void getAll() {
-    PrivateChannelCreationRequest privateChannelCreationRequest = new PrivateChannelCreationRequest(
-        CHANNEL_NAME, setUpUser.getId(), List.of());
-    ChannelResult privateChannel = channelService.createPrivate(privateChannelCreationRequest);
+  void getAllChannelsForUser() {
+    User otherUser = userRepository.save(
+        new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
+    channelService.createPrivate(
+        new PrivateChannelCreationRequest(CHANNEL_NAME, otherUser.getId(), List.of()));
+    ChannelResult userPrivateChannel = channelService.createPrivate(
+        new PrivateChannelCreationRequest(CHANNEL_NAME, setUpUser.getId(), List.of()));
 
-    List<UUID> channelIds = channelService.getAllByUserId(setUpUser.getId())
-        .stream()
-        .map(ChannelResult::id)
-        .toList();
+    List<ChannelResult> channels = channelService.getAllByUserId(setUpUser.getId());
 
-    assertThat(channelIds).containsExactlyInAnyOrder(privateChannel.id(), setUpPublicChannel.id());
+    assertThat(channels).extracting(ChannelResult::id)
+        .containsExactlyInAnyOrder(setUpPublicChannel.id(), userPrivateChannel.id());
   }
 
-  @DisplayName("Private 채널에 맴버를 추가하면 추가된 멤버들의 Id를 반환합니다.")
+  @DisplayName("Private 채널에 맴버를 추가할 경우, 해당 Private 채널의 추가된 전체 멤버들을 반환합니다.")
   @Test
   void getByIdPrivateChannel_MemberTogether() {
     User friend = userRepository.save(
@@ -119,32 +121,11 @@ class ChannelServiceTest {
     ChannelResult addedPrivateChannel = channelService.addPrivateChannelMember(privateChannel.id(),
         friend.getId());
 
-    assertThat(addedPrivateChannel.privateMemberIds()).containsExactlyInAnyOrder(setUpUser.getId(),
-        friend.getId());
+    assertThat(addedPrivateChannel.privateMemberIds())
+        .containsExactlyInAnyOrder(setUpUser.getId(), friend.getId());
   }
 
-  @DisplayName("전체 채널을 조회한다면 공개 채널과 사용자가 속한 비공개 채널만 반환합니다.")
-  @Test
-  void getAllChannelsForUser() {
-    User otherUser = userRepository.save(
-        new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
-
-    channelService.createPrivate(
-        new PrivateChannelCreationRequest(CHANNEL_NAME, otherUser.getId(), List.of()));
-
-    ChannelResult userPrivateChannel = channelService.createPrivate(
-        new PrivateChannelCreationRequest(CHANNEL_NAME, setUpUser.getId(), List.of()));
-
-    List<UUID> setUpUserChannelIds = channelService.getAllByUserId(setUpUser.getId())
-        .stream()
-        .map(ChannelResult::id)
-        .toList();
-
-    assertThat(setUpUserChannelIds).containsExactlyInAnyOrder(setUpPublicChannel.id(),
-        userPrivateChannel.id());
-  }
-
-  @DisplayName("Public 채널의 이름을 업데이트하면 변경된 정보가 반환합니다.")
+  @DisplayName("Public 채널의 이름을 업데이트할 경우, 변경된 정보가 반환합니다.")
   @Test
   void updatePublicChannelName() {
     channelService.updatePublicChannelName(setUpPublicChannel.id(), UPDATED_CHANNEL_NAME);
@@ -153,7 +134,7 @@ class ChannelServiceTest {
         UPDATED_CHANNEL_NAME);
   }
 
-  @DisplayName("Private 채널의 이름을 업데이트 시도 한다면 예외를 반환합니다.")
+  @DisplayName("Private 채널의 이름을 업데이트할 경우, 예외를 반환합니다.")
   @Test
   void updatePrivateChannelNameThrowsException() {
     PrivateChannelCreationRequest privateChannelDto = new PrivateChannelCreationRequest(
@@ -166,7 +147,7 @@ class ChannelServiceTest {
   }
 
 
-  @DisplayName("채널 삭제 시 조회한다면 예외를 반환합니다.")
+  @DisplayName("채널을 삭제할 경우, 반환값은 없습니다..")
   @Test
   void deleteChannelRemovesMessagesAndReadStatus() {
     UUID channelId = setUpPublicChannel.id();
@@ -176,20 +157,18 @@ class ChannelServiceTest {
         IllegalArgumentException.class);
   }
 
-  @DisplayName("채널 삭제 시 채널에 속한 메시지도 함께 삭제됩니다.")
+  @DisplayName("채널을 삭제할 경우, 채널에 속한 메시지도 함께 삭제됩니다.")
   @Test
   void deleteChannelRemovesMessages() {
     UUID channelId = setUpPublicChannel.id();
     channelService.delete(channelId);
 
-    boolean isExisting = messageRepository.findAll()
-        .stream()
-        .anyMatch(message -> message.getChannelId().equals(channelId));
+    List<Message> messages = messageRepository.findByChannelId(channelId);
 
-    assertThat(isExisting).isFalse();
+    assertThat(messages).isEmpty();
   }
 
-  @DisplayName("비공개 채널 삭제 시 읽음 상태도 함께 삭제됩니다.")
+  @DisplayName("비공개 채널을 삭제할 경우, 채널내 유저의 메세지 읽음 상태도 함께 삭제됩니다.")
   @Test
   void deletePrivateChannelRemovesReadStatus() {
     ChannelResult privateChannel = channelService.createPrivate(
@@ -197,11 +176,8 @@ class ChannelServiceTest {
 
     UUID privateChannelId = privateChannel.id();
     channelService.delete(privateChannelId);
+    List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(privateChannelId);
 
-    boolean isExisting = readStatusRepository.findByChannelId(privateChannelId)
-        .stream()
-        .anyMatch(status -> status.getChannelId().equals(privateChannelId));
-
-    assertThat(isExisting).isFalse();
+    assertThat(readStatuses).isEmpty();
   }
 }

@@ -71,6 +71,7 @@ class MessageServiceTest {
   @Test
   void getMessageById() {
     MessageResult message = messageService.getById(setUpMessage.messageId());
+
     assertThat(message.context()).isEqualTo(MESSAGE_CONTENT);
   }
 
