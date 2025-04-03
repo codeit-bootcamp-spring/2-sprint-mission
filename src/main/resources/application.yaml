@@ -2,3 +2,23 @@ discodeit:
   repository:
     type: file   # jcf | file
     file-directory: ./discodeit-files/
+
+server:
+  port: 8080
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    groups:
+      enabled: true
+  swagger-ui:
+    path: /swagger-ui-custom.html
+    enabled: true
+    groups-order: ASC
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    doc-expansion: none
+  cache:
+    disabled: true
+  model-and-view-allowed: true
