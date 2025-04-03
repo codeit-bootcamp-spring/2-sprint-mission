@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.IdResponse;
-import com.sprint.mission.discodeit.dto.UserStatusUpdateResponse;
 import com.sprint.mission.discodeit.dto.user.*;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.User;
@@ -9,6 +7,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,17 +22,16 @@ public class UserController {
     private final UserStatusService userStatusService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<IdResponse> create(@RequestBody UserCreateRequestDto userRequest) {
+    public ResponseEntity<User> create(@RequestBody UserCreateRequestDto userRequest) {
         User user = userService.create(userRequest);
-        return ResponseEntity.ok(IdResponse.of(true, user.getId()));
+        return ResponseEntity.ok(user);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<IdResponse> update(
-            @PathVariable("id") UUID userId,
+    @RequestMapping(method = RequestMethod.PATCH)
+    public ResponseEntity<User> update(
             @RequestBody UserUpdateRequestDto request) {
         User user = userService.update(request);
-        return ResponseEntity.ok(IdResponse.of(true, user.getId()));
+        return ResponseEntity.ok(user);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -44,16 +42,15 @@ public class UserController {
 
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     public ResponseEntity<List<UserResponseDto>> findAll() {
-        List<UserResponseDto> response = userService.findAll();
-        return ResponseEntity.ok(response);
+        List<UserResponseDto> users = userService.findAll();
+        return ResponseEntity.ok(users);
     }
 
     @RequestMapping(value = "/status/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<UserStatusUpdateResponse> updateStatus(
-            @PathVariable("id") UUID userId, @RequestBody UserStatusUpdateRequestDto request
+    public ResponseEntity<UserStatus> updateStatus(
+            @RequestBody UserStatusUpdateRequestDto request
     ) {
         UserStatus userStatus = userStatusService.update(request);
-        UserStatusUpdateResponse response = new UserStatusUpdateResponse(true, userStatus.isOnline());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userStatus);
     }
 }

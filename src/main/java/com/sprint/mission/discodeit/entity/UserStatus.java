@@ -9,6 +9,7 @@ import lombok.Getter;
 @Getter
 public class UserStatus extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final int ONLINE_TIME = 5;
     //
     private UUID id;
     private Instant createdAt;
@@ -38,7 +39,7 @@ public class UserStatus extends BaseEntity implements Serializable {
 
     public boolean isOnline() {
         Duration duration = Duration.between(activatedAt, Instant.now());
-        if (duration.toMinutes() <= 5) {
+        if (duration.toMinutes() <= ONLINE_TIME) {
             if (type != UserStatusType.ONLINE) {
                 type = UserStatusType.ONLINE;
             }
