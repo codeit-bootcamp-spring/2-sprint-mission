@@ -21,6 +21,7 @@ public class AuthController implements AuthApi {
   @PostMapping("/login")
   public ResponseEntity<User> login(
       @RequestBody LoginRequest loginRequest) {
+
     User user = authService.login(loginRequest);
 
     return ResponseEntity

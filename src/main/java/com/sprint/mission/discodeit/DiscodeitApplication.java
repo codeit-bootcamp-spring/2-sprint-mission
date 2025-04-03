@@ -7,16 +7,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-@OpenAPIDefinition(
-    info = @Info(
-        title = "Discodeit API 문서",
-        description = "Discodeit 프로젝트의 Swagger API 문서입니다.",
-        version = "1.0.0"
-    ),
-    servers = {
-        @Server(url = "http://localhost:8080", description = "로컬 서버")
-    }
-)
+@OpenAPIDefinition(info = @Info(
+    title = "Discodeit API 문서",
+    description = "Discodeit 프로젝트의 Swagger API 문서입니다.",
+    version = "1.0.0"), servers = {
+    @Server(url = "http://localhost:8080", description = "로컬 서버")})
 @SpringBootApplication
 public class DiscodeitApplication {
 

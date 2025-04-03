@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -15,45 +16,29 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/binaryContents")
-@Tag(name = "BinaryContent", description = "첨부 파일 API")
-public class BinaryContentController {
+public class BinaryContentController implements BinaryContentApi {
 
   private final BinaryContentService binaryContentService;
 
-  @PostMapping("/create")
-  public ResponseEntity<BinaryContent> createBinaryContent(
-      @RequestParam("fileName") String fileName,
-      @RequestParam("contentType") String contentType,
-      @RequestParam("file") byte[] fileBytes) {
-
-    BinaryContent binaryContent = binaryContentService.create(
-        new BinaryContentCreateRequest(fileName, contentType, fileBytes));
-
-    return new ResponseEntity<>(binaryContent, HttpStatus.CREATED);
-  }
-
-  @GetMapping("/find/{binaryContentId}")
-  public ResponseEntity<BinaryContent> findBinaryContent(
-      @RequestParam UUID binaryContentId) {
+  @GetMapping(path = "{binaryContentId}")
+  public ResponseEntity<BinaryContent> find(
+      @PathVariable("binaryContentId") UUID binaryContentId) {
 
     BinaryContent binaryContent = binaryContentService.find(binaryContentId);
 
-    return new ResponseEntity<>(binaryContent, HttpStatus.OK);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContent);
   }
 
-  @GetMapping("/findAll")
-  public ResponseEntity<List<BinaryContent>> findMultipleBinaryContent(
-      @RequestParam List<UUID> binaryContentIds) {
+  @GetMapping
+  public ResponseEntity<List<BinaryContent>> findAllByIdIn(
+      @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+
     List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
-    return new ResponseEntity<>(binaryContents, HttpStatus.OK);
-  }
 
-  @DeleteMapping("/delete/{binaryContentId}")
-  public ResponseEntity<Void> deleteBinaryContent(
-      @PathVariable UUID binaryContentId) {
-
-    binaryContentService.delete(binaryContentId);
-
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContents);
   }
 }
