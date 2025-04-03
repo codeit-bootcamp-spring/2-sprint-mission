@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Builder
-@Schema(description = "Channel List")
+@Schema(description = "Channel Item")
 public record ChannelResult(
     @Schema(description = "Channel Id", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     UUID channelId,

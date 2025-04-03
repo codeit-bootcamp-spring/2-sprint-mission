@@ -10,12 +10,22 @@ import lombok.Builder;
 @Builder
 @Schema(description = "Message 성공적으로 수정됨")
 public record MessageUpdateResponse(
+    @Schema(description = "Message Id", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     UUID id,
+    @Schema(description = "Message 생성 시각", example = "2025-04-03T01:49:44.983Z")
     Instant createdAt,
+    @Schema(description = "Message 수정 시각", example = "2025-04-03T01:49:44.983Z")
     Instant updatedAt,
+    @Schema(description = "Message content", example = "string")
     String content,
+    @Schema(description = "Channel Id", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     UUID channelId,
+    @Schema(description = "User Id", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     UUID authorId,
+    @Schema(
+        description = "Binary Content ID 목록",
+        example = "[\"3fa85f64-5717-4562-b3fc-2c963f66afa6\"]"
+    )
     List<UUID> attachmentIds
 ) {
 
