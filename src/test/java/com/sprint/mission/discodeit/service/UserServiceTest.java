@@ -79,7 +79,8 @@ class UserServiceTest {
         OTHER_USER.getEmail());
 
     UserResult otherUser = userService.register(mockUserRequest, imageFile);
-    BinaryContent binaryContent = binaryContentRepository.findById(otherUser.profileId()).get();
+    BinaryContent binaryContent = binaryContentRepository.findByBinaryContentId(
+        otherUser.profileId()).get();
 
     assertThat(otherUser.profileId()).isEqualTo(binaryContent.getId());
   }
@@ -145,12 +146,13 @@ class UserServiceTest {
 
     MultipartFile otherImageFile = createMockImageFile("Kirby.jpg");
     UserResult updateProfileUser = userService.updateProfileImage(user.id(), otherImageFile);
-    BinaryContent binaryContent = binaryContentRepository.findById(updateProfileUser.profileId())
+    BinaryContent binaryContent = binaryContentRepository.findByBinaryContentId(
+            updateProfileUser.profileId())
         .get();
 
     assertAll(
         () -> assertThat(otherImageFile.getBytes()).isEqualTo(binaryContent.getBytes()),
-        () -> assertThat(binaryContentRepository.findById(user.profileId())).isEmpty()
+        () -> assertThat(binaryContentRepository.findByBinaryContentId(user.profileId())).isEmpty()
     );
   }
 
@@ -161,9 +163,10 @@ class UserServiceTest {
     userService.delete(setUpUser.id());
 
     assertAll(
-        () -> assertThat(userRepository.findById(setUpUser.id())).isEmpty(),
+        () -> assertThat(userRepository.findByUserId(setUpUser.id())).isEmpty(),
         () -> assertThat(userStatusRepository.findByUserId(setUpUser.id())).isEmpty(),
-        () -> assertThat(binaryContentRepository.findById(setUpUser.profileId())).isEmpty()
+        () -> assertThat(
+            binaryContentRepository.findByBinaryContentId(setUpUser.profileId())).isEmpty()
     );
   }
 

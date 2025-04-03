@@ -113,6 +113,7 @@ class MessageServiceTest {
 
     messageService.delete(message.messageId());
 
-    assertThat(binaryContentRepository.findById(message.attachmentIds().get(0))).isEmpty();
+    assertThat(
+        binaryContentRepository.findByBinaryContentId(message.attachmentIds().get(0))).isEmpty();
   }
 }

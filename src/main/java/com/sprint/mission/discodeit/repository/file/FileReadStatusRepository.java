@@ -34,7 +34,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
   }
 
   @Override
-  public Optional<ReadStatus> find(UUID readStatusId) {
+  public Optional<ReadStatus> findByReadStatusId(UUID readStatusId) {
     Map<UUID, ReadStatus> readStatuses = loadObjectsFromFile(readStatusPath);
 
     return Optional.ofNullable(readStatuses.get(readStatusId));
@@ -57,6 +57,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     return readStatuses.values()
         .stream()
+        .filter(readStatus -> readStatus.getChannelId().equals(channelId))
         .toList();
   }
 

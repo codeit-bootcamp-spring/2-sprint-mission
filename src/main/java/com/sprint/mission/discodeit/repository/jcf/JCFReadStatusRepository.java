@@ -24,7 +24,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
   }
 
   @Override
-  public Optional<ReadStatus> find(UUID readStatusId) {
+  public Optional<ReadStatus> findByReadStatusId(UUID readStatusId) {
     return Optional.ofNullable(readStatuses.get(readStatusId));
   }
 

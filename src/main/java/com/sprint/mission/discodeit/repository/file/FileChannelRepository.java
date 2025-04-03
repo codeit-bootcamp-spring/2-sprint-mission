@@ -1,58 +1,59 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import static com.sprint.mission.discodeit.util.FileUtils.loadAndSave;
+import static com.sprint.mission.discodeit.util.FileUtils.loadObjectsFromFile;
+
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
-
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
-import static com.sprint.mission.discodeit.util.FileUtils.loadAndSave;
-import static com.sprint.mission.discodeit.util.FileUtils.loadObjectsFromFile;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
-    private final Path channelPath;
 
-    public FileChannelRepository(@Value("${discodeit.repository.file-directory.channel-path}") Path channelPath) {
-        this.channelPath = channelPath;
-    }
+  private final Path channelPath;
 
-    @Override
-    public Channel save(Channel channel) {
-        loadAndSave(channelPath, (Map<UUID, Channel> channels) ->
-                channels.put(channel.getId(), channel)
-        );
+  public FileChannelRepository(
+      @Value("${discodeit.repository.file-directory.channel-path}") Path channelPath) {
+    this.channelPath = channelPath;
+  }
 
-        return channel;
-    }
+  @Override
+  public Channel save(Channel channel) {
+    loadAndSave(channelPath, (Map<UUID, Channel> channels) ->
+        channels.put(channel.getId(), channel)
+    );
 
-    @Override
-    public Optional<Channel> findById(UUID id) {
-        Map<UUID, Channel> channels = loadObjectsFromFile(channelPath);
+    return channel;
+  }
 
-        return Optional.ofNullable(channels.get(id));
-    }
+  @Override
+  public Optional<Channel> findByChannelId(UUID id) {
+    Map<UUID, Channel> channels = loadObjectsFromFile(channelPath);
 
-    @Override
-    public List<Channel> findAll() {
-        Map<UUID, Channel> channels = loadObjectsFromFile(channelPath);
+    return Optional.ofNullable(channels.get(id));
+  }
 
-        return channels.values()
-                .stream()
-                .toList();
-    }
+  @Override
+  public List<Channel> findAll() {
+    Map<UUID, Channel> channels = loadObjectsFromFile(channelPath);
 
-    @Override
-    public void delete(UUID id) {
-        loadAndSave(channelPath, (Map<UUID, Channel> channels) ->
-                channels.remove(id)
-        );
-    }
+    return channels.values()
+        .stream()
+        .toList();
+  }
+
+  @Override
+  public void delete(UUID id) {
+    loadAndSave(channelPath, (Map<UUID, Channel> channels) ->
+        channels.remove(id)
+    );
+  }
 }

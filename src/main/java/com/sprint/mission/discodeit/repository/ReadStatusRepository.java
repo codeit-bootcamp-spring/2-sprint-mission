@@ -9,7 +9,7 @@ public interface ReadStatusRepository {
 
   ReadStatus save(ReadStatus readStatus);
 
-  Optional<ReadStatus> find(UUID readStatusId);
+  Optional<ReadStatus> findByReadStatusId(UUID readStatusId);
 
   Optional<ReadStatus> findByChannelIdAndUserId(UUID channelId, UUID userId);
 
