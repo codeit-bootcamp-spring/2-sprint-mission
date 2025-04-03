@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-02T10:45:02+0900",
+    date = "2025-04-03T20:22:36+0900",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
@@ -28,11 +28,13 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
 
         UUID userId = null;
         UUID channelId = null;
+        Instant lastReadAt = null;
 
         userId = createReadStatusRequestDTO.userId();
         channelId = createReadStatusRequestDTO.channelId();
+        lastReadAt = createReadStatusRequestDTO.lastReadAt();
 
-        CreateReadStatusParam createReadStatusParam = new CreateReadStatusParam( userId, channelId );
+        CreateReadStatusParam createReadStatusParam = new CreateReadStatusParam( userId, channelId, lastReadAt );
 
         return createReadStatusParam;
     }
@@ -51,7 +53,9 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         userId = readStatusDTO.userId();
         channelId = readStatusDTO.channelId();
 
-        CreateReadStatusResponseDTO createReadStatusResponseDTO = new CreateReadStatusResponseDTO( id, userId, channelId );
+        Instant lastReadAt = null;
+
+        CreateReadStatusResponseDTO createReadStatusResponseDTO = new CreateReadStatusResponseDTO( id, userId, channelId, lastReadAt );
 
         return createReadStatusResponseDTO;
     }
@@ -63,12 +67,15 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         }
 
         UUID id = null;
-        Instant updatedAt = null;
+        Instant lastReadAt = null;
 
         id = updateReadStatusDTO.id();
-        updatedAt = updateReadStatusDTO.updatedAt();
+        lastReadAt = updateReadStatusDTO.lastReadAt();
 
-        UpdateReadStatusResponseDTO updateReadStatusResponseDTO = new UpdateReadStatusResponseDTO( id, updatedAt );
+        UUID userId = null;
+        UUID channelId = null;
+
+        UpdateReadStatusResponseDTO updateReadStatusResponseDTO = new UpdateReadStatusResponseDTO( id, userId, channelId, lastReadAt );
 
         return updateReadStatusResponseDTO;
     }
@@ -83,6 +90,7 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
 
         readStatus.userId( createReadStatusParam.userId() );
         readStatus.channelId( createReadStatusParam.channelId() );
+        readStatus.lastReadAt( createReadStatusParam.lastReadAt() );
 
         return readStatus.build();
     }
@@ -96,12 +104,12 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         UUID id = null;
         UUID userId = null;
         UUID channelId = null;
-        Instant updatedAt = null;
 
         id = readStatus.getId();
         userId = readStatus.getUserId();
         channelId = readStatus.getChannelId();
-        updatedAt = readStatus.getUpdatedAt();
+
+        Instant updatedAt = null;
 
         ReadStatusDTO readStatusDTO = new ReadStatusDTO( id, userId, channelId, updatedAt );
 

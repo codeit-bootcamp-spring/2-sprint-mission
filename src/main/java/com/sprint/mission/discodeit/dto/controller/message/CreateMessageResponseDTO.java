@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.UUID;
 
 public record CreateMessageResponseDTO(
-        UUID id,
-        Instant createdAt,
-        List<UUID> attachmentIds,
-        String content,
-        UUID channelId,
-        UserResponseDTO userResponseDTO
+    UUID id,
+    Instant createdAt,
+    List<UUID> attachmentIds,
+    String content,
+    UUID channelId,
+    UUID authorId
 ) {
+
 }

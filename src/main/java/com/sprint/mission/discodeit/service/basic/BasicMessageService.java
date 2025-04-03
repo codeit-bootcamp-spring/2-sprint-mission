@@ -53,7 +53,7 @@ public class BasicMessageService implements MessageService {
     findChannelById(createMessageParam.channelId());
 
     List<BinaryContent> binaryContentList = createBinaryContentList(multipartFiles);
-    if (binaryContentList.get(0).getSize() != 0) {
+    if (binaryContentList.isEmpty()) {
       binaryContentList.forEach(binaryContentService::create);
     }
 
@@ -83,7 +83,7 @@ public class BasicMessageService implements MessageService {
   public UpdateMessageDTO update(UUID id, UpdateMessageParam updateMessageParam,
       List<MultipartFile> multipartFiles) {
     Message message = findMessageById(id);
-    message.updateMessageInfo(updateMessageParam.content());
+    message.updateMessageInfo(updateMessageParam.newContent());
     replaceMessageAttachments(message, multipartFiles);
     Message updatedMessage = messageRepository.save(message);
     UserDTO userDTO = createUserDTO(updatedMessage.getAuthorId());
@@ -146,7 +146,7 @@ public class BasicMessageService implements MessageService {
     UserStatus userStatus = userStatusService.findByUserId(user.getId());
     BinaryContentDTO binaryContentDTO =
         user.getProfileId() != null ? binaryContentService.find(user.getProfileId()) : null;
-    return userMapper.toUserDTO(user, userStatus, binaryContentDTO);
+    return userMapper.toUserDTO(user, userStatus);
   }
 
 

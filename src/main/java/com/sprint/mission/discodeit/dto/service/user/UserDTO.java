@@ -7,12 +7,13 @@ import java.util.UUID;
 
 
 public record UserDTO(
-        UUID id,
-        BinaryContentDTO binaryContentDTO,
-        Instant createdAt,
-        Instant updatedAt,
-        String username,
-        String email,
-        Boolean isLogin
+    UUID id,
+    UUID profileId,
+    Instant createdAt,
+    Instant updatedAt,
+    String username,
+    String email,
+    Boolean online
 ) {
+
 }

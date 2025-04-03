@@ -7,13 +7,12 @@ import java.util.List;
 import java.util.UUID;
 
 public record PrivateChannelDTO(
-        UUID id,
-        Instant createdAt,
-        Instant updatedAt,
-        ChannelType type,
-        String name,
-        String description,
-        List<UUID> userIds
+    UUID id,
+    ChannelType type,
+    String name,
+    String description,
+    List<UUID> participantIds,
+    Instant lastMessageAt
 ) {
 
 }

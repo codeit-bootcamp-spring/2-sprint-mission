@@ -5,8 +5,9 @@ import java.util.UUID;
 
 
 public record CreateMessageParam(
-        String content,
-        UUID channelId,
-        UUID authorId
+    String content,
+    UUID channelId,
+    UUID authorId
 ) {
+
 }

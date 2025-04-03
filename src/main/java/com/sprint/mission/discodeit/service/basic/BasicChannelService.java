@@ -40,8 +40,9 @@ public class BasicChannelService implements ChannelService {
       CreatePrivateChannelParam createPrivateChannelParam) {
     Channel channel = createPrivateChannelEntity(createPrivateChannelParam);
     channelRepository.save(channel);
-    createReadStatusesForUsers(createPrivateChannelParam.userIds(), channel.getId());
-    return channelMapper.toPrivateChannelDTO(createPrivateChannelParam.userIds(), channel);
+    createReadStatusesForUsers(createPrivateChannelParam.participantIds(), channel.getId());
+    return channelMapper.toPrivateChannelDTO(createPrivateChannelParam.participantIds(), channel,
+        findMessageLatestTimeInChannel(channel.getId()));
   }
 
   @Override
@@ -76,7 +77,7 @@ public class BasicChannelService implements ChannelService {
       logger.error("채널 수정 실패 - ID: {}, Type: {} (PRIVATE 채널은 수정 불가)", id, channel.getType());
       throw RestExceptions.FORBIDDEN_PRIVATE_CHANNEL;
     }
-    channel.update(updateChannelParam.name(), updateChannelParam.description());
+    channel.update(updateChannelParam.newName(), updateChannelParam.newDescription());
     Channel updatedChannel = channelRepository.save(channel);
     return channelMapper.toUpdateChannelDTO(updatedChannel);
   }
@@ -104,7 +105,7 @@ public class BasicChannelService implements ChannelService {
   private void createReadStatusesForUsers(List<UUID> userIds, UUID channelId) {
     List<CreateReadStatusParam> createReadStatusParams = userIds.stream()
         .map(userId -> new CreateReadStatusParam(userId,
-            channelId)) // userId와 channelId를 사용하여 createReadStatus DTO 생성
+            channelId, Instant.now())) // userId와 channelId를 사용하여 createReadStatus DTO 생성
         .toList();
     // DTO를 이용해 readStatus 생성
     createReadStatusParams.forEach(cr -> readStatusService.create(cr));

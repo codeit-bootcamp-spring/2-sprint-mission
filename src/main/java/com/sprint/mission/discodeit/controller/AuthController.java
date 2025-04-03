@@ -40,9 +40,9 @@ public class AuthController {
       @RequestBody @Valid LoginRequestDTO loginRequestDTO) {
     LoginParam loginParam = authMapper.toLoginParam(loginRequestDTO);
     LoginDTO loginDTO = authService.login(loginParam);
-    LoginResponseDTO loginResponseDTO = authMapper.toLoginResponseDTO(loginDTO);
+    LoginResponseDTO user = authMapper.toLoginResponseDTO(loginDTO);
 
-    return ResponseEntity.ok(loginResponseDTO);
+    return ResponseEntity.ok(user);
   }
 
 }

@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 
 
 public record CreateChannelParam(
-        ChannelType type,
-        String name,
-        String description
-){
+    String name,
+    String description
+) {
+
 }

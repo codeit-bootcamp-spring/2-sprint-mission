@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-02T10:45:02+0900",
+    date = "2025-04-03T20:22:35+0900",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
@@ -35,15 +35,13 @@ public class ChannelMapperImpl implements ChannelMapper {
             return null;
         }
 
-        ChannelType type = null;
         String name = null;
         String description = null;
 
-        type = createChannelRequestDTO.type();
         name = createChannelRequestDTO.name();
         description = createChannelRequestDTO.description();
 
-        CreateChannelParam createChannelParam = new CreateChannelParam( type, name, description );
+        CreateChannelParam createChannelParam = new CreateChannelParam( name, description );
 
         return createChannelParam;
     }
@@ -55,18 +53,23 @@ public class ChannelMapperImpl implements ChannelMapper {
         }
 
         UUID id = null;
-        Instant createdAt = null;
         ChannelType type = null;
         String name = null;
         String description = null;
+        List<UUID> participantIds = null;
+        Instant lastMessageAt = null;
 
         id = channelDTO.id();
-        createdAt = channelDTO.createdAt();
         type = channelDTO.type();
         name = channelDTO.name();
         description = channelDTO.description();
+        List<UUID> list = channelDTO.participantIds();
+        if ( list != null ) {
+            participantIds = new ArrayList<UUID>( list );
+        }
+        lastMessageAt = channelDTO.lastMessageAt();
 
-        CreatePublicChannelResponseDTO createPublicChannelResponseDTO = new CreatePublicChannelResponseDTO( id, createdAt, type, name, description );
+        CreatePublicChannelResponseDTO createPublicChannelResponseDTO = new CreatePublicChannelResponseDTO( id, type, name, description, participantIds, lastMessageAt );
 
         return createPublicChannelResponseDTO;
     }
@@ -77,20 +80,14 @@ public class ChannelMapperImpl implements ChannelMapper {
             return null;
         }
 
-        ChannelType type = null;
-        String name = null;
-        String description = null;
-        List<UUID> userIds = null;
+        List<UUID> participantIds = null;
 
-        type = createPrivateChannelRequestDTO.type();
-        name = createPrivateChannelRequestDTO.name();
-        description = createPrivateChannelRequestDTO.description();
-        List<UUID> list = createPrivateChannelRequestDTO.userIds();
+        List<UUID> list = createPrivateChannelRequestDTO.participantIds();
         if ( list != null ) {
-            userIds = new ArrayList<UUID>( list );
+            participantIds = new ArrayList<UUID>( list );
         }
 
-        CreatePrivateChannelParam createPrivateChannelParam = new CreatePrivateChannelParam( type, name, description, userIds );
+        CreatePrivateChannelParam createPrivateChannelParam = new CreatePrivateChannelParam( participantIds );
 
         return createPrivateChannelParam;
     }
@@ -102,23 +99,23 @@ public class ChannelMapperImpl implements ChannelMapper {
         }
 
         UUID id = null;
-        Instant createdAt = null;
         ChannelType type = null;
         String name = null;
         String description = null;
-        List<UUID> userIds = null;
+        List<UUID> participantIds = null;
+        Instant lastMessageAt = null;
 
         id = privateChannelDTO.id();
-        createdAt = privateChannelDTO.createdAt();
         type = privateChannelDTO.type();
         name = privateChannelDTO.name();
         description = privateChannelDTO.description();
-        List<UUID> list = privateChannelDTO.userIds();
+        List<UUID> list = privateChannelDTO.participantIds();
         if ( list != null ) {
-            userIds = new ArrayList<UUID>( list );
+            participantIds = new ArrayList<UUID>( list );
         }
+        lastMessageAt = privateChannelDTO.lastMessageAt();
 
-        CreatePrivateChannelResponseDTO createPrivateChannelResponseDTO = new CreatePrivateChannelResponseDTO( id, createdAt, type, name, description, userIds );
+        CreatePrivateChannelResponseDTO createPrivateChannelResponseDTO = new CreatePrivateChannelResponseDTO( id, type, name, description, participantIds, lastMessageAt );
 
         return createPrivateChannelResponseDTO;
     }
@@ -129,13 +126,13 @@ public class ChannelMapperImpl implements ChannelMapper {
             return null;
         }
 
-        String name = null;
-        String description = null;
+        String newName = null;
+        String newDescription = null;
 
-        name = updateChannelRequestDTO.name();
-        description = updateChannelRequestDTO.description();
+        newName = updateChannelRequestDTO.newName();
+        newDescription = updateChannelRequestDTO.newDescription();
 
-        UpdateChannelParam updateChannelParam = new UpdateChannelParam( name, description );
+        UpdateChannelParam updateChannelParam = new UpdateChannelParam( newName, newDescription );
 
         return updateChannelParam;
     }
@@ -147,18 +144,23 @@ public class ChannelMapperImpl implements ChannelMapper {
         }
 
         UUID id = null;
-        Instant updatedAt = null;
         ChannelType type = null;
         String name = null;
         String description = null;
+        List<UUID> participantIds = null;
+        Instant lastMessageAt = null;
 
         id = updateChannelDTO.id();
-        updatedAt = updateChannelDTO.updatedAt();
         type = updateChannelDTO.type();
         name = updateChannelDTO.name();
         description = updateChannelDTO.description();
+        List<UUID> list = updateChannelDTO.participantIds();
+        if ( list != null ) {
+            participantIds = new ArrayList<UUID>( list );
+        }
+        lastMessageAt = updateChannelDTO.lastMessageAt();
 
-        UpdateChannelResponseDTO updateChannelResponseDTO = new UpdateChannelResponseDTO( id, updatedAt, type, name, description );
+        UpdateChannelResponseDTO updateChannelResponseDTO = new UpdateChannelResponseDTO( id, type, name, description, participantIds, lastMessageAt );
 
         return updateChannelResponseDTO;
     }
@@ -170,20 +172,19 @@ public class ChannelMapperImpl implements ChannelMapper {
         }
 
         UUID id = null;
-        Instant createdAt = null;
-        Instant updatedAt = null;
         ChannelType type = null;
         String name = null;
         String description = null;
 
         id = channel.getId();
-        createdAt = channel.getCreatedAt();
-        updatedAt = channel.getUpdatedAt();
         type = channel.getType();
         name = channel.getName();
         description = channel.getDescription();
 
-        ChannelDTO channelDTO = new ChannelDTO( id, createdAt, updatedAt, type, name, description );
+        List<UUID> participantIds = null;
+        Instant lastMessageAt = null;
+
+        ChannelDTO channelDTO = new ChannelDTO( id, type, name, description, participantIds, lastMessageAt );
 
         return channelDTO;
     }
@@ -195,18 +196,19 @@ public class ChannelMapperImpl implements ChannelMapper {
         }
 
         UUID id = null;
-        Instant updatedAt = null;
         ChannelType type = null;
         String name = null;
         String description = null;
 
         id = channel.getId();
-        updatedAt = channel.getUpdatedAt();
         type = channel.getType();
         name = channel.getName();
         description = channel.getDescription();
 
-        UpdateChannelDTO updateChannelDTO = new UpdateChannelDTO( id, updatedAt, type, name, description );
+        List<UUID> participantIds = null;
+        Instant lastMessageAt = null;
+
+        UpdateChannelDTO updateChannelDTO = new UpdateChannelDTO( id, type, name, description, participantIds, lastMessageAt );
 
         return updateChannelDTO;
     }

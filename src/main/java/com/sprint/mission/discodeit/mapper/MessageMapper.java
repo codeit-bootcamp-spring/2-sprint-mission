@@ -20,43 +20,43 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface MessageMapper {
-    MessageMapper INSTANCE = Mappers.getMapper(MessageMapper.class);
 
-    CreateMessageParam toMessageParam(CreateMessageRequestDTO createMessageRequestDTO);
+  MessageMapper INSTANCE = Mappers.getMapper(MessageMapper.class);
 
-    default CreateMessageResponseDTO toMessageResponseDTO(MessageDTO messageDTO) {
-        return new CreateMessageResponseDTO(messageDTO.id(),
-                messageDTO.createdAt(),
-                messageDTO.attachmentIds(),
-                messageDTO.content(),
-                messageDTO.channelId(),
-                new UserResponseDTO(messageDTO.userDTO().id(),
-                        messageDTO.userDTO().binaryContentDTO(),
-                        messageDTO.userDTO().username(),
-                        messageDTO.userDTO().email(),
-                        messageDTO.userDTO().createdAt(),
-                        messageDTO.userDTO().isLogin()));
-    }
+  CreateMessageParam toMessageParam(CreateMessageRequestDTO createMessageRequestDTO);
 
-    UpdateMessageParam toUpdateMessageParam(UpdateMessageRequestDTO updateMessageRequestDTO);
-    UpdateMessageResponseDTO toUpdateMessageResponseDTO(UpdateMessageDTO updateMessageDTO);
+  default CreateMessageResponseDTO toMessageResponseDTO(MessageDTO messageDTO) {
+    return new CreateMessageResponseDTO(
+        messageDTO.id(),
+        messageDTO.createdAt(),
+        messageDTO.attachmentIds(),
+        messageDTO.content(),
+        messageDTO.channelId(),
+        messageDTO.authorId());
+  }
 
-    default Message toEntity(CreateMessageParam createMessageParam, List<BinaryContent> binaryContentList) {
-        return Message.builder()
-                .attachmentIds(binaryContentList.get(0).getSize() != 0 ? binaryContentList.stream().map(BinaryContent::getId).toList() : null)
-                .authorId(createMessageParam.authorId())
-                .channelId(createMessageParam.channelId())
-                .content(createMessageParam.content())
-                .build();
-    }
+  UpdateMessageParam toUpdateMessageParam(UpdateMessageRequestDTO updateMessageRequestDTO);
 
-    @Mapping(source = "message.id", target = "id")
-    @Mapping(source = "message.createdAt", target = "createdAt")
-    @Mapping(source = "message.updatedAt", target = "updatedAt")
-    MessageDTO toMessageDTO(Message message, UserDTO userDTO);
+  UpdateMessageResponseDTO toUpdateMessageResponseDTO(UpdateMessageDTO updateMessageDTO);
 
-    @Mapping(source = "message.id", target = "id")
-    @Mapping(source = "message.updatedAt", target = "updatedAt")
-    UpdateMessageDTO toUpdateMessageDTO(Message message, UserDTO userDTO);
+  default Message toEntity(CreateMessageParam createMessageParam,
+      List<BinaryContent> binaryContentList) {
+    return Message.builder()
+        .attachmentIds(!binaryContentList.isEmpty() ? binaryContentList.stream()
+            .map(BinaryContent::getId).toList() : null)
+        .authorId(createMessageParam.authorId())
+        .channelId(createMessageParam.channelId())
+        .content(createMessageParam.content())
+        .build();
+  }
+
+  @Mapping(source = "message.id", target = "id")
+  @Mapping(source = "message.createdAt", target = "createdAt")
+  @Mapping(source = "message.updatedAt", target = "updatedAt")
+  MessageDTO toMessageDTO(Message message, UserDTO userDTO);
+
+  @Mapping(source = "message.id", target = "id")
+  @Mapping(source = "message.updatedAt", target = "updatedAt")
+  UpdateMessageDTO toUpdateMessageDTO(Message message, UserDTO userDTO);
 
 }

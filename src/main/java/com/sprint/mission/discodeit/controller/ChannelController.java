@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,8 @@ public class ChannelController {
       @RequestBody @Valid CreatePublicChannelRequestDTO createChannelRequestDTO) {
     ChannelDTO channelDTO =
         channelService.createPublicChannel(channelMapper.toChannelParam(createChannelRequestDTO));
-    return ResponseEntity.ok(channelMapper.toChannelResponseDTO(channelDTO));
+    CreatePublicChannelResponseDTO createdChannel = channelMapper.toChannelResponseDTO(channelDTO);
+    return ResponseEntity.ok(createdChannel);
   }
 
   @Operation(summary = "비공개 채널 생성",
@@ -56,7 +58,9 @@ public class ChannelController {
     PrivateChannelDTO privateChannelDTO =
         channelService.createPrivateChannel(
             channelMapper.toPrivateChannelParam(createPrivateChannelRequestDTO));
-    return ResponseEntity.ok(channelMapper.toPrivateChannelResponseDTO(privateChannelDTO));
+    CreatePrivateChannelResponseDTO createdChannel = channelMapper.toPrivateChannelResponseDTO(
+        privateChannelDTO);
+    return ResponseEntity.ok(createdChannel);
   }
 
   @Operation(summary = "공개 채널 수정",
@@ -67,14 +71,16 @@ public class ChannelController {
           @ApiResponse(responseCode = "403", description = "비밀 채널은 수정이 불가능"),
           @ApiResponse(responseCode = "404", description = "수정하려는 channelId에 해당하는 Channel이 존재하지 않음")
       })
-  @PutMapping("/{channelId}")
+  @PatchMapping("/{channelId}")
   public ResponseEntity<UpdateChannelResponseDTO> updateChannel(
       @PathVariable("channelId") UUID channelId,
       @RequestBody @Valid UpdateChannelRequestDTO updateChannelRequestDTO) {
     UpdateChannelDTO updateChannelDTO =
         channelService.update(channelId,
             channelMapper.toUpdateChannelParam(updateChannelRequestDTO));
-    return ResponseEntity.ok(channelMapper.toUpdateChannelResponseDTO(updateChannelDTO));
+    UpdateChannelResponseDTO updatedChannel = channelMapper.toUpdateChannelResponseDTO(
+        updateChannelDTO);
+    return ResponseEntity.ok(updatedChannel);
   }
 
   @Operation(summary = "채널 삭제",
@@ -83,10 +89,12 @@ public class ChannelController {
           @ApiResponse(responseCode = "200", description = "채널 삭제 성공")
       })
   @DeleteMapping("/{channelId}")
-  public ResponseEntity<DeleteChannelResponseDTO> deleteChannel(
+  public ResponseEntity<Void> deleteChannel(
       @PathVariable("channelId") UUID channelId) {
     channelService.delete(channelId);
-    return ResponseEntity.ok(new DeleteChannelResponseDTO(channelId, channelId + "번 채널이 삭제되었습니다."));
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 
   @Operation(summary = "유저가 포함된 채널 조회",
@@ -94,12 +102,11 @@ public class ChannelController {
       responses = {
           @ApiResponse(responseCode = "200", description = "유저가 포함된 채널 조회 성공")
       })
-  @GetMapping("/{userId}")
-  // 현재는 로그인을 유지하는 기능이나 토큰이 없으므로, 임시로 userId를 PathVariable 받아서 검색
-  public ResponseEntity<ChannelListResponseDTO> getChannelsByUserId(
-      @PathVariable("userId") UUID userId) {
-    List<FindChannelDTO> findChannelDTO = channelService.findAllByUserId(userId);
-    return ResponseEntity.ok(new ChannelListResponseDTO(findChannelDTO));
+  @GetMapping
+  public ResponseEntity<List<FindChannelDTO>> findAll(@RequestParam("userId") UUID userId) {
+    List<FindChannelDTO> channels = channelService.findAllByUserId(userId);
+    return ResponseEntity.ok(channels);
   }
-
 }
+
+

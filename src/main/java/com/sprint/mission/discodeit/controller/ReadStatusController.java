@@ -23,7 +23,7 @@ import java.util.UUID;
 @Tag(name = "Read-Status-Controller", description = "ReadStatus 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/readstatus")
+@RequestMapping("/api/readStatuses")
 public class ReadStatusController {
 
   private final ReadStatusService readStatusService;
@@ -41,7 +41,9 @@ public class ReadStatusController {
       @RequestBody @Valid CreateReadStatusRequestDTO createReadStatusRequestDTO) {
     ReadStatusDTO readStatusDTO = readStatusService.create(
         readStatusMapper.toReadStatusParam(createReadStatusRequestDTO));
-    return ResponseEntity.ok(readStatusMapper.toReadStatusResponseDTO(readStatusDTO));
+    CreateReadStatusResponseDTO createdReadStatus = readStatusMapper.toReadStatusResponseDTO(
+        readStatusDTO);
+    return ResponseEntity.ok(createdReadStatus);
   }
 
   @Operation(summary = "읽음상태 수정",
@@ -50,12 +52,15 @@ public class ReadStatusController {
           @ApiResponse(responseCode = "200", description = "읽음상태 수정 성공"),
           @ApiResponse(responseCode = "404", description = "readStatusId에 해당하는 ReadStatus가 존재하지 않음")
       })
-  @PutMapping("/{readStatusId}")
+  @PatchMapping("/{readStatusId}")
   public ResponseEntity<UpdateReadStatusResponseDTO> updateReadStatus(
-      @PathVariable("readStatusId") UUID id) {
+      @PathVariable("readStatusId") UUID id,
+      @RequestBody UpdateReadStatusParam request) {
     UpdateReadStatusDTO updateReadStatusDTO = readStatusService.update(
-        new UpdateReadStatusParam(id));
-    return ResponseEntity.ok(readStatusMapper.toUpdateReadStatusResponseDTO(updateReadStatusDTO));
+        id, request);
+    UpdateReadStatusResponseDTO updatedReadStatus = readStatusMapper.toUpdateReadStatusResponseDTO(
+        updateReadStatusDTO);
+    return ResponseEntity.ok(updatedReadStatus);
   }
 
   @Operation(summary = "유저의 읽음상태 조회",
@@ -63,9 +68,10 @@ public class ReadStatusController {
       responses = {
           @ApiResponse(responseCode = "200", description = "유저의 읽음상태 조회 성공")
       })
-  @GetMapping("/{userId}")
-  public ResponseEntity<ReadStatusListDTO> getUserReadStatus(@PathVariable("userId") UUID userId) {
-    List<ReadStatusDTO> readStatusDTOList = readStatusService.findAllByUserId(userId);
-    return ResponseEntity.ok(new ReadStatusListDTO(readStatusDTOList));
+  @GetMapping
+  public ResponseEntity<List<ReadStatusDTO>> getUserReadStatus(
+      @RequestParam("userId") UUID userId) {
+    List<ReadStatusDTO> readStatuses = readStatusService.findAllByUserId(userId);
+    return ResponseEntity.ok(readStatuses);
   }
 }

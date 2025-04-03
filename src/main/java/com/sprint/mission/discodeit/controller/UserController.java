@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,13 +48,13 @@ public class UserController {
       })
   @PostMapping
   public ResponseEntity<CreateUserResponseDTO> createUser(
-      @RequestPart("user") @Valid CreateUserRequestDTO createUserRequestDTO,
-      @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
+      @RequestPart("userCreateRequest") @Valid CreateUserRequestDTO createUserRequestDTO,
+      @RequestPart(value = "profile", required = false) MultipartFile multipartFile) {
     CreateUserParam createUserParam = userMapper.toCreateUserParam(createUserRequestDTO);
     UserDTO userDTO = userService.create(createUserParam, multipartFile);
-    CreateUserResponseDTO createUserResponseDTO = userMapper.toCreateUserResponseDTO(userDTO);
+    CreateUserResponseDTO createdUser = userMapper.toCreateUserResponseDTO(userDTO);
 
-    return ResponseEntity.ok(createUserResponseDTO);
+    return ResponseEntity.ok(createdUser);
   }
 
   @Operation(summary = "유저 단건 조회",
@@ -76,11 +77,10 @@ public class UserController {
           @ApiResponse(responseCode = "200", description = "유저 다건 조회 성공")
       })
   @GetMapping
-  public ResponseEntity<UserListResponseDTO> getUserAll() {
-    List<UserDTO> userDTOList = userService.findAll();
-    UserListResponseDTO userListResponseDTO = new UserListResponseDTO(userDTOList);
+  public ResponseEntity<List<UserDTO>> getUserAll() {
+    List<UserDTO> users = userService.findAll();
 
-    return ResponseEntity.ok(userListResponseDTO);
+    return ResponseEntity.ok(users);
   }
 
   @Operation(summary = "유저 수정",
@@ -89,14 +89,15 @@ public class UserController {
           @ApiResponse(responseCode = "200", description = "유저 수정 성공"),
           @ApiResponse(responseCode = "404", description = "userId에 해당하는 User를 찾지 못함")
       })
-  @PutMapping("/{userId}")
+  @PatchMapping("/{userId}")
   public ResponseEntity<UpdateUserResponseDTO> updateUser(@PathVariable("userId") UUID id,
       @RequestPart("user") @Valid UpdateUserRequestDTO updateUserRequestDTO,
       @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
     UpdateUserParam updateUserParam = userMapper.toUpdateUserParam(updateUserRequestDTO);
     UpdateUserDTO updateUserDTO = userService.update(id, updateUserParam, multipartFile);
+    UpdateUserResponseDTO updatedUser = userMapper.toUpdateUserResponseDTO(updateUserDTO);
 
-    return ResponseEntity.ok(userMapper.toUpdateUserResponseDTO(updateUserDTO));
+    return ResponseEntity.ok(updatedUser);
   }
 
   @Operation(summary = "유저상태 수정",
@@ -105,11 +106,13 @@ public class UserController {
           @ApiResponse(responseCode = "200", description = "유저상태 수정 성공"),
           @ApiResponse(responseCode = "404", description = "userStatusId에 해당하는 UserStatus를 찾지 못함")
       })
-  @PutMapping("/{userId}/userstatus")
+  @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UpdateUserStatusResponseDTO> updateUserStatus(
       @PathVariable("userId") UUID id) {
     UserStatus userStatus = userStatusService.updateByUserId(id);
-    return ResponseEntity.ok(userStatusMapper.toUpdateUserStatusResponseDTO(userStatus));
+    UpdateUserStatusResponseDTO updatedUserStatus = userStatusMapper.toUpdateUserStatusResponseDTO(
+        userStatus);
+    return ResponseEntity.ok(updatedUserStatus);
   }
 
   @Operation(summary = "유저 삭제",
@@ -118,8 +121,10 @@ public class UserController {
           @ApiResponse(responseCode = "200", description = "유저 삭제 성공")
       })
   @DeleteMapping("/{userId}")
-  public ResponseEntity<DeleteUserResponseDTO> deleteUser(@PathVariable("userId") UUID id) {
+  public ResponseEntity<Void> deleteUser(@PathVariable("userId") UUID id) {
     userService.delete(id);
-    return ResponseEntity.ok(new DeleteUserResponseDTO(id, id + "번 회원 삭제 완료"));
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 }

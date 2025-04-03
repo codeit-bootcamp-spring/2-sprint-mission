@@ -20,7 +20,7 @@ import java.util.UUID;
 @Tag(name = "Binary-Content-Controller", description = "BinaryContent 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/binarycontents")
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
@@ -36,7 +36,9 @@ public class BinaryContentController {
   public ResponseEntity<FindBinaryContentResponseDTO> getBinaryContent(
       @PathVariable("binaryContentId") UUID id) {
     BinaryContentDTO binaryContentDTO = binaryContentService.find(id);
-    return ResponseEntity.ok(binaryContentMapper.toBinaryContentResponseDTO(binaryContentDTO));
+    FindBinaryContentResponseDTO binaryContent = binaryContentMapper.toBinaryContentResponseDTO(
+        binaryContentDTO);
+    return ResponseEntity.ok(binaryContent);
   }
 
   @Operation(summary = "BinaryContent 다건 조회",
@@ -47,11 +49,9 @@ public class BinaryContentController {
           @ApiResponse(responseCode = "404", description = "binaryContentId에 해당하는 BinaryContnet가 존재하지 않음")
       })
   @GetMapping
-  // GetMapping엔 @RequestBody를 사용하지 못했었지만, 요새는 사용하는 추세
-  public ResponseEntity<BinaryContentListDTO> getBinaryContentAllIn(
-      @RequestBody @Valid FindAllBinaryContentInRequestDTO findAllBinaryContentInRequestDTO) {
-    List<BinaryContentDTO> binaryContentDTOList = binaryContentService.findAllByIdIn(
-        findAllBinaryContentInRequestDTO.attachmentIds());
-    return ResponseEntity.ok(new BinaryContentListDTO(binaryContentDTOList));
+  public ResponseEntity<List<BinaryContentDTO>> getBinaryContentAllIn(
+      @RequestParam("binaryContnetsIds") List<UUID> binaryContentIds) {
+    List<BinaryContentDTO> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+    return ResponseEntity.ok(binaryContents);
   }
 }
