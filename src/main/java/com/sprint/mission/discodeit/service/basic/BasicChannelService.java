@@ -37,8 +37,8 @@ public class BasicChannelService implements ChannelService {
         Channel newChannel = Channel.createPrivate();
         channelRepository.save(newChannel);
 
-        channelCreatePrivateDto.participantIds().forEach(user -> {
-            ReadStatusCreateDto readStatusCreateDto = new ReadStatusCreateDto(user.getId(), newChannel.getId(), null);
+        channelCreatePrivateDto.participantIds().forEach(userId -> {
+            ReadStatusCreateDto readStatusCreateDto = new ReadStatusCreateDto(userId, newChannel.getId(), null);
             readStatusService.create(readStatusCreateDto);
         });
 
@@ -79,14 +79,14 @@ public class BasicChannelService implements ChannelService {
 
         boolean isPrivate = channel.getType().equals(ChannelType.PRIVATE);
 
-        List<UUID> userIds = isPrivate ?
+        List<UUID> participantIds = isPrivate ?
                 readStatusService.findAll().stream()
                         .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                         .map(ReadStatus::getUserId)
                         .toList()
                 : List.of();
 
-        return new ChannelDto(channel, lastMessageAt, userIds);
+        return new ChannelDto(channel, lastMessageAt, participantIds);
     }
 
     @Override
@@ -102,11 +102,11 @@ public class BasicChannelService implements ChannelService {
                         joinedChannelIds.contains(channel.getId()))
                 .map(channel -> {
                     Instant lastMessageAt = findLastMessageAt(channel.getId());
-                    List<UUID> userIds = readStatusService.findAll().stream()
+                    List<UUID> participantIds = readStatusService.findAll().stream()
                             .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
                             .map(ReadStatus::getUserId)
                             .toList();
-                    return new ChannelDto(channel, lastMessageAt, userIds);
+                    return new ChannelDto(channel, lastMessageAt, participantIds);
                 })
                 .toList();
 
