@@ -15,7 +15,7 @@ public final class ChannelDtoMapper {
 
   static CreatePublicChannelCommand toCreatePublicChannelCommand(UUID userId,
       PublicChannelCreateRequest requestBody) {
-    return new CreatePublicChannelCommand(userId, requestBody.name());
+    return new CreatePublicChannelCommand(userId, requestBody.name(), requestBody.description());
   }
 
   static CreatePrivateChannelCommand toCreatePrivateChannelCommand(
@@ -26,7 +26,8 @@ public final class ChannelDtoMapper {
 
   static UpdateChannelCommand toUpdateChannelCommand(UUID channelId,
       ChannelUpdateRequest requestBody) {
-    return new UpdateChannelCommand(channelId, requestBody.newName(), requestBody.newType());
+    return new UpdateChannelCommand(channelId, requestBody.newName(), requestBody.newDescription());
+//    return new UpdateChannelCommand(channelId, requestBody.newName(), requestBody.newType());
   }
 
 }

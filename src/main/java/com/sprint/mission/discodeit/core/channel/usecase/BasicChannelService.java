@@ -9,8 +9,11 @@ import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelListResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelResult;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
@@ -35,24 +38,24 @@ public class BasicChannelService implements ChannelService {
 
   @CustomLogging
   @Override
-  public UUID create(CreatePublicChannelCommand command) {
-    Channel channel = Channel.create(command.userId(), command.name(),
+  public CreatePublicChannelResult create(CreatePublicChannelCommand command) {
+    Channel channel = Channel.create(command.userId(), command.name(), command.description(),
         ChannelType.PUBLIC);
 
     channelRepository.save(channel);
-    return channel.getChannelId();
+    return new CreatePublicChannelResult(channel);
   }
 
   @Override
-  public UUID create(CreatePrivateChannelCommand command) {
-    Channel channel = Channel.create(command.userId(), null, ChannelType.PRIVATE);
+  public CreatePrivateChannelResult create(CreatePrivateChannelCommand command) {
+    Channel channel = Channel.create(command.userId(), null, null, ChannelType.PRIVATE);
     Channel createdChannel = channelRepository.save(channel);
 
     command.participantIds().stream()
         .map(u -> ReadStatus.create(u, createdChannel.getChannelId(), Instant.MIN))
         .forEach(readStatusRepository::save);
 
-    return createdChannel.getChannelId();
+    return new CreatePrivateChannelResult(channel);
   }
 
   @Override
@@ -99,7 +102,7 @@ public class BasicChannelService implements ChannelService {
 
   @CustomLogging
   @Override
-  public void update(UpdateChannelCommand command) {
+  public UpdateChannelResult update(UpdateChannelCommand command) {
     Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
         () -> channelIdNotFoundError(command.channelId())
     );
@@ -108,7 +111,8 @@ public class BasicChannelService implements ChannelService {
       unmodifiableChannelError(channel.getChannelId());
     }
 
-    channel.update(command.newName(), command.newType());
+    channel.update(command.newName(), command.description());
+    return new UpdateChannelResult(channel);
   }
 
   @Override

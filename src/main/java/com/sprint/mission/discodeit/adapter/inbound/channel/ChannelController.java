@@ -15,8 +15,11 @@ import com.sprint.mission.discodeit.core.channel.usecase.ChannelService;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelListResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelResult;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -42,9 +45,9 @@ public class ChannelController {
       @RequestBody PublicChannelCreateRequest requestBody) {
     CreatePublicChannelCommand command = toCreatePublicChannelCommand(userId,
         requestBody);
-    channelService.create(command);
+    CreatePublicChannelResult result = channelService.create(command);
 
-    return ResponseEntity.ok(new ChannelCreateResponse(true, "Public Channel Create Successfully"));
+    return ResponseEntity.ok(ChannelCreateResponse.create(result.channel()));
   }
 
   @PostMapping("/private")
@@ -52,10 +55,9 @@ public class ChannelController {
       @RequestBody PrivateChannelCreateRequest requestBody) {
     CreatePrivateChannelCommand command = toCreatePrivateChannelCommand(userId,
         requestBody);
-    channelService.create(command);
+    CreatePrivateChannelResult result = channelService.create(command);
 
-    return ResponseEntity.ok(
-        new ChannelCreateResponse(true, "Private Channel Create Successfully"));
+    return ResponseEntity.ok(ChannelCreateResponse.create(result.channel()));
   }
 
   @GetMapping
@@ -69,8 +71,8 @@ public class ChannelController {
   public ResponseEntity<ChannelUpdateResponse> update(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateRequest requestBody) {
     UpdateChannelCommand command = toUpdateChannelCommand(channelId, requestBody);
-    channelService.update(command);
-    return ResponseEntity.ok(new ChannelUpdateResponse(true));
+    UpdateChannelResult result = channelService.update(command);
+    return ResponseEntity.ok(ChannelUpdateResponse.create(result.channel()));
   }
 
   @DeleteMapping("/{channelId}")

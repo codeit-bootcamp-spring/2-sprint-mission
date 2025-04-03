@@ -13,6 +13,7 @@ public record ChannelResult(
     UUID channelId,
     ChannelType type,
     String name,
+    String description,
     List<UUID> userIdList,
     Instant lastMessageAt
 ) {
@@ -23,8 +24,10 @@ public record ChannelResult(
         .channelId(channel.getChannelId())
         .type(channel.getType())
         .name(channel.getName())
+        .description(channel.getDescription())
         .userIdList(userIdList)
         .lastMessageAt(lastMessageAt)
         .build();
   }
+
 }

@@ -22,6 +22,7 @@ public class Channel implements Serializable {
   private final UUID userId;
 
   private String name;
+  private String description;
   private List<User> userList = new ArrayList<>();
 
   private ChannelType type;
@@ -29,31 +30,37 @@ public class Channel implements Serializable {
   private final Instant createdAt;
   private Instant updatedAt;
 
-  private Channel(UUID channelId, UUID userId, Instant createdAt, String name,
+  private Channel(UUID channelId, UUID userId, Instant createdAt, String name, String description,
       ChannelType type) {
     this.channelId = channelId;
     this.userId = userId;
     this.createdAt = createdAt;
     this.updatedAt = createdAt;
     this.name = name;
+    this.description = description;
     this.type = type;
   }
 
-  public static Channel create(UUID userId, String name, ChannelType type) {
-    return new Channel(UUID.randomUUID(), userId, Instant.now(), name,
+  public static Channel create(UUID userId, String name, String description, ChannelType type) {
+    return new Channel(UUID.randomUUID(), userId, Instant.now(), name, description,
         type);
   }
 
-  public void update(String newName, ChannelType newType) {
+  public void update(String newName, String newDescription) {
     boolean anyValueUpdated = false;
     if (newName != null && !newName.equals(this.name)) {
       this.name = newName;
       anyValueUpdated = true;
     }
-    if (newType != null && !newType.equals(this.type)) {
-      this.type = newType;
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
       anyValueUpdated = true;
     }
+
+//    if (newType != null && !newType.equals(this.type)) {
+//      this.type = newType;
+//      anyValueUpdated = true;
+//    }
     if (anyValueUpdated) {
       this.updatedAt = Instant.now();
     }
