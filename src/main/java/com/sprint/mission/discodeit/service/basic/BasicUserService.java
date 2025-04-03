@@ -2,11 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.controller.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.controller.dto.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.controller.dto.UserDto;
 import com.sprint.mission.discodeit.controller.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity._BinaryContent;
 import com.sprint.mission.discodeit.entity._User;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity._UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -58,7 +58,7 @@ public class BasicUserService implements UserService {
     _User createdUser = userRepository.save(user);
 
     OffsetDateTime now = OffsetDateTime.now();
-    UserStatus userStatus = new UserStatus(createdUser.getId(), now);
+    _UserStatus userStatus = new _UserStatus(createdUser.getId(), now);
     userStatusRepository.save(userStatus);
 
     return createdUser;
@@ -128,7 +128,7 @@ public class BasicUserService implements UserService {
 
   private UserDto toDto(_User user) {
     Boolean online = userStatusRepository.findByUserId(user.getId())
-        .map(UserStatus::isOnline)
+        .map(_UserStatus::isOnline)
         .orElse(null);
 
     return new UserDto(

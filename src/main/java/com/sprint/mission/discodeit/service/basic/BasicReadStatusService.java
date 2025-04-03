@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.controller.dto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.controller.dto.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity._ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -28,7 +28,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ChannelRepository channelRepository;
 
   @Override
-  public ReadStatus create(ReadStatusCreateRequest request) {
+  public _ReadStatus create(ReadStatusCreateRequest request) {
     UUID userId = UUID.fromString(request.getUserId().toString());
     UUID getChannelId = UUID.fromString(request.getChannelId().toString());
 
@@ -47,27 +47,27 @@ public class BasicReadStatusService implements ReadStatusService {
 
     OffsetDateTime lastReadAt = parse(request.getLastReadAt().toString());
 
-    ReadStatus readStatus = new ReadStatus(userId, getChannelId, lastReadAt);
+    _ReadStatus readStatus = new _ReadStatus(userId, getChannelId, lastReadAt);
     return readStatusRepository.save(readStatus);
   }
 
   @Override
-  public ReadStatus find(UUID readStatusId) {
+  public _ReadStatus find(UUID readStatusId) {
     return readStatusRepository.findById(readStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
   }
 
   @Override
-  public List<ReadStatus> findAllByUserId(UUID userId) {
+  public List<_ReadStatus> findAllByUserId(UUID userId) {
     return readStatusRepository.findAllByUserId(userId).stream()
         .toList();
   }
 
   @Override
-  public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
+  public _ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
     OffsetDateTime newLastReadAt = parse(request.getNewLastReadAt().toString());
-    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
+    _ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
     readStatus.update(newLastReadAt);

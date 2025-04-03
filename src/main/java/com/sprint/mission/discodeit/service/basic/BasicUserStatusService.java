@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.controller.dto.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity._UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -26,7 +26,7 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserRepository userRepository;
 
   @Override
-  public UserStatus create(UserStatusCreateRequest request) {
+  public _UserStatus create(UserStatusCreateRequest request) {
     UUID userId = request.userId();
 
     if (!userRepository.existsById(userId)) {
@@ -37,28 +37,28 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     OffsetDateTime lastActiveAt = request.lastActiveAt();
-    UserStatus userStatus = new UserStatus(userId, lastActiveAt);
+    _UserStatus userStatus = new _UserStatus(userId, lastActiveAt);
     return userStatusRepository.save(userStatus);
   }
 
   @Override
-  public UserStatus find(UUID userStatusId) {
+  public _UserStatus find(UUID userStatusId) {
     return userStatusRepository.findById(userStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
   }
 
   @Override
-  public List<UserStatus> findAll() {
+  public List<_UserStatus> findAll() {
     return userStatusRepository.findAll().stream()
         .toList();
   }
 
   @Override
-  public UserStatus update(UUID userStatusId, UserStatusUpdateRequest request) {
+  public _UserStatus update(UUID userStatusId, UserStatusUpdateRequest request) {
     OffsetDateTime newLastActiveAt = parse(request.getNewLastActiveAt().toString());
 
-    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+    _UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
     userStatus.update(newLastActiveAt);
@@ -67,10 +67,10 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+  public _UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
     OffsetDateTime newLastActiveAt = parse(request.getNewLastActiveAt().toString());
 
-    UserStatus userStatus = userStatusRepository.findByUserId(userId)
+    _UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(
             () -> new NoSuchElementException("UserStatus with userId " + userId + " not found"));
     userStatus.update(newLastActiveAt);
