@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,21 +24,29 @@ public class ReadStatusController implements ReadStatusApi {
 
   @Override
   public ResponseEntity<ReadStatus> create1(ReadStatusCreateRequest readStatusCreateRequest) {
-    readStatusService.create(readStatusCreateRequest);
-    return ReadStatusApi.super.create1(readStatusCreateRequest);
+    ReadStatus createdReadStatus =  readStatusService.create(readStatusCreateRequest);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdReadStatus);
   }
 
   @Override
   public ResponseEntity<Object> findAllByUserId(Object userId) {
     UUID uuid = UUID.fromString(userId.toString());
-    return ReadStatusApi.super.findAllByUserId(uuid);
+    List<ReadStatus> readStatuses =  readStatusService.findAllByUserId(uuid);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(readStatuses);
   }
 
   @Override
   public ResponseEntity<ReadStatus> update1(Object readStatusId,
       ReadStatusUpdateRequest readStatusUpdateRequest) {
     UUID uuid = UUID.fromString(readStatusId.toString());
-    return ReadStatusApi.super.update1(uuid, readStatusUpdateRequest);
+    ReadStatus updatedReadStatus = readStatusService.update(uuid, readStatusUpdateRequest);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedReadStatus);
   }
 
   /*

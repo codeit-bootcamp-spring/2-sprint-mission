@@ -50,10 +50,7 @@ public class MessageController implements MessageApi {
 
     Message message = messageService.create(messageCreateRequest, attachmentRequests);
 
-    ModelMapper modelMapper = new ModelMapper();
-    Message apiMessage = modelMapper.map(message, Message.class);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(apiMessage);
+    return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 
   @Override
@@ -67,14 +64,8 @@ public class MessageController implements MessageApi {
   public ResponseEntity<Object> findAllByChannelId(Object ChannelId) {
     UUID uuid = UUID.fromString(String.valueOf(ChannelId));
     List<Message> messages = messageService.findAllBygetChannelId(uuid);
-    ModelMapper modelMapper = new ModelMapper();
-    List<Message> apiMessages = new ArrayList<>();
-    for (Message message : messages) {
-      Message apiMessage = modelMapper.map(message, Message.class);
-      apiMessages.add(apiMessage);
-    }
 
-    return ResponseEntity.ok(apiMessages);
+    return ResponseEntity.ok(messages);
   }
 
   @Override
@@ -84,9 +75,7 @@ public class MessageController implements MessageApi {
     Message updatedMessage = messageService.update(uuid,
         messageUpdateRequest);
 
-    ModelMapper modelMapper = new ModelMapper();
-    Message updateApiMessage = modelMapper.map(updatedMessage, Message.class);
-    return ResponseEntity.ok(updateApiMessage);
+    return ResponseEntity.ok(updatedMessage);
   }
 }
 

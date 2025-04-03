@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +27,10 @@ public class AuthController implements AuthApi {
 
   @Override
   public ResponseEntity<User> login(LoginRequest loginRequest) {
-    authService.login(loginRequest);
-    return AuthApi.super.login(loginRequest);
+    User user = authService.login(loginRequest);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(user);
   }
 
   /*@RequestMapping(path = "login")

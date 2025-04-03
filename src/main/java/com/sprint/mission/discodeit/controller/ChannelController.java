@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,29 +24,37 @@ public class ChannelController implements ChannelApi {
 
   @Override
   public ResponseEntity<Channel> create3(PublicChannelCreateRequest publicChannelCreateRequest) {
-    channelService.create(publicChannelCreateRequest);
-    return ChannelApi.super.create3(publicChannelCreateRequest);
+    Channel createdChannel =  channelService.create(publicChannelCreateRequest);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdChannel);
   }
 
   @Override
   public ResponseEntity<Channel> create4(PrivateChannelCreateRequest privateChannelCreateRequest) {
-    channelService.create(privateChannelCreateRequest);
-    return ChannelApi.super.create4(privateChannelCreateRequest);
+    Channel createdChannel =  channelService.create(privateChannelCreateRequest);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdChannel);
   }
 
   @Override
   public ResponseEntity<Void> delete2(Object ChannelId) {
     UUID uuid = UUID.fromString(ChannelId.toString());
     channelService.delete(uuid);
-    return ChannelApi.super.delete2(uuid);
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 
   @Override
   public ResponseEntity<Channel> update3(Object getChannelId,
       PublicChannelUpdateRequest publicChannelUpdateRequest) {
     UUID uuid = UUID.fromString(getChannelId.toString());
-    channelService.update(uuid, publicChannelUpdateRequest);
-    return ChannelApi.super.update3(uuid, publicChannelUpdateRequest);
+    Channel updatedChannel =  channelService.update(uuid, publicChannelUpdateRequest);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedChannel);
   }
 
   @Override
@@ -63,13 +72,7 @@ public class ChannelController implements ChannelApi {
         .body(createdChannel);
   }
 
-  @RequestMapping(path = "createPrivate")
-  public ResponseEntity<Channel> create(@RequestBody PrivateChannelCreateRequest request) {
-    Channel createdChannel = channelService.create(request);
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(createdChannel);
-  }
+
 
   @RequestMapping(path = "update")
   public ResponseEntity<Channel> update(@RequestParam("getChannelId") UUID getChannelId,

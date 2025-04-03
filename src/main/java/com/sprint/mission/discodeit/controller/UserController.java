@@ -47,10 +47,9 @@ public class UserController implements UserApi {
         user.getId(), user.getCreatedAt()
     );
     userStatusService.create(userStatusCreateRequest);
-    ModelMapper modelMapper = new ModelMapper();
-    User apiUser = modelMapper.map(user, User.class);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(apiUser);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
 
   @Override
@@ -66,15 +65,8 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<Object> findAll() {
     List<UserDto> userDtos =   userService.findAll();
-    ModelMapper modelMapper = new ModelMapper();
-    List<User> users = new ArrayList<>();
-    for(UserDto userDto : userDtos) {
-      users.add(modelMapper.map(userService.find(UUID.fromString
-              (userDto.id().toString())),
-          User.class));
-    }
 
-    return ResponseEntity.status(HttpStatus.OK).body(users);
+    return ResponseEntity.status(HttpStatus.OK).body(userDtos);
   }
 
   @Override
@@ -90,12 +82,10 @@ public class UserController implements UserApi {
     );
 
     userStatusService.update(uuid, userStatusUpdateRequest);
-    ModelMapper modelMapper = new ModelMapper();
-    User apiUser = modelMapper.map(updatedUser, User.class);
 
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(apiUser);
+        .body(updatedUser);
   }
 
   @Override
@@ -105,12 +95,10 @@ public class UserController implements UserApi {
 
     UserStatus updatedUserStatus = userStatusService.update(uuid, userStatusUpdateRequest);
 
-    ModelMapper modelMapper = new ModelMapper();
-    UserStatus apiUserStatus = modelMapper.map(userStatusUpdateRequest, UserStatus.class);
 
     return  ResponseEntity
         .status(HttpStatus.OK)
-        .body(apiUserStatus);
+        .body(updatedUserStatus);
   }
 
   /*

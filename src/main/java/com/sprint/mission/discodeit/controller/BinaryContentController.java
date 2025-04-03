@@ -27,22 +27,27 @@ public class BinaryContentController implements BinaryContentApi {
   @Override
   public ResponseEntity<BinaryContent> find(Object binaryContentId) {
     UUID uuid = UUID.fromString(binaryContentId.toString());
-    binaryContentService.find(uuid);
-    return BinaryContentApi.super.find(uuid);
+    BinaryContent binaryContent =  binaryContentService.find(uuid);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContent);
   }
 
   @Override
   public ResponseEntity<Object> findAllByIdIn(Object binaryContentIds) {
     List<UUID> uuids = new ArrayList<>();
+    List<BinaryContent> binaryContents = new ArrayList<>();
     try{
       if(binaryContentIds instanceof ArrayList) {
         uuids = (ArrayList<UUID>) binaryContentIds;
-        binaryContentService.findAllByIdIn(uuids);
+        binaryContents =  binaryContentService.findAllByIdIn(uuids);
       }
     }catch (Exception e) {
       throw new RuntimeException(e);
     }
-    return BinaryContentApi.super.findAllByIdIn(uuids);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContents);
   }
   /*@RequestMapping(path = "find")
   public ResponseEntity<BinaryContent> find(@RequestParam("binaryContentId") UUID binaryContentId) {
