@@ -1,5 +1,7 @@
 package com.sprint.discodeit.sprint5.service.basic.users;
 
+import com.sprint.discodeit.sprint5.domain.dto.userDto.UserLoginRequestDto;
+import com.sprint.discodeit.sprint5.domain.dto.userDto.UserLoginResponseDto;
 import com.sprint.discodeit.sprint5.domain.dto.userDto.UserNameStatusResponseDto;
 import com.sprint.discodeit.sprint5.domain.dto.userDto.UserProfileImgResponseDto;
 import com.sprint.discodeit.sprint5.domain.dto.userDto.UserRequestDto;
@@ -16,4 +18,5 @@ public interface UserServiceV1 {
     List<User> findAll();
     UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, String userId);
     void delete(UUID userId);
+    UserLoginResponseDto login(UserLoginRequestDto userLoginRequestDto);
 }

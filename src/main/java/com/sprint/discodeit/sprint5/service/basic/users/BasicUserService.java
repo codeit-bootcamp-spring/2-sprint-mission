@@ -6,6 +6,7 @@ import com.sprint.discodeit.sprint5.domain.entity.BinaryContent;
 import com.sprint.discodeit.sprint5.domain.entity.User;
 import com.sprint.discodeit.sprint5.domain.entity.UserStatus;
 import com.sprint.discodeit.sprint5.domain.mapper.UserMapper;
+import com.sprint.discodeit.sprint5.global.AuthException;
 import com.sprint.discodeit.sprint5.global.ErrorCode;
 import com.sprint.discodeit.sprint5.global.RequestException;
 import com.sprint.discodeit.sprint5.repository.file.BaseBinaryContentRepository;
@@ -108,4 +109,16 @@ public class BasicUserService implements UserServiceV1 {
             throw new RequestException(ErrorCode.ALREADY_DELETED_USER);
         }
     }
+
+    @Override
+    public UserLoginResponseDto login(UserLoginRequestDto userLoginRequestDto) {
+            User user = fileUserRepository.findByUsername(userLoginRequestDto.username())
+                    .orElseThrow(() -> new AuthException(ErrorCode.UNAUTHORIZED));
+
+            if (!user.getPassword().equals(userLoginRequestDto.password())) {
+                throw new AuthException(ErrorCode.UNAUTHORIZED);
+            }
+            return new UserLoginResponseDto(user.getId().toString(), user.getUsername());
+        }
+
 }

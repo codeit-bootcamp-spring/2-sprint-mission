@@ -1,6 +1,8 @@
 package com.sprint.discodeit.sprint5.controller;
 
 import com.sprint.discodeit.sprint5.domain.StatusType;
+import com.sprint.discodeit.sprint5.domain.dto.userDto.UserLoginRequestDto;
+import com.sprint.discodeit.sprint5.domain.dto.userDto.UserLoginResponseDto;
 import com.sprint.discodeit.sprint5.domain.dto.userDto.UserNameStatusResponseDto;
 import com.sprint.discodeit.sprint5.domain.dto.userDto.UserProfileImgResponseDto;
 import com.sprint.discodeit.sprint5.domain.dto.userDto.UserRequestDto;
@@ -46,6 +48,12 @@ public class UserController {
             @Parameter(description = "프로필 이미지 정보") UserProfileImgResponseDto userProfileImgResponseDto) {
         UserNameStatusResponseDto userNameStatusResponseDto = basicUserService.create(userRequestDto, userProfileImgResponseDto);
         return ResponseEntity.ok(userNameStatusResponseDto);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserLoginResponseDto> login(@RequestBody UserLoginRequestDto userLoginRequestDto) {
+        UserLoginResponseDto login = basicUserService.login(userLoginRequestDto);
+        return ResponseEntity.ok(login);
     }
 
     @Operation(summary = "회원 정보 수정", description = "회원 정보를 수정합니다.")
