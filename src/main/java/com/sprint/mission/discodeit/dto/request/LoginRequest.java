@@ -1,7 +1,8 @@
-package com.sprint.mission.discodeit.dto.request;
+package com.sprint.mission.discodeit.controller.dto;
 
 public record LoginRequest(
-        String username,
-        String password
+    String username,
+    String password
 ) {
+
 }
