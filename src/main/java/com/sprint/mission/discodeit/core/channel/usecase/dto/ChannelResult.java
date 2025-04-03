@@ -24,7 +24,7 @@ public record ChannelResult(
         description = "사용자 ID 목록",
         example = "[\"3fa85f64-5717-4562-b3fc-2c963f66afa6\"]"
     )
-    List<UUID> userIdList,
+    List<UUID> participantIds,
     @Schema(description = "최근 메시지 시각", example = "2025-04-03T01:49:44.983Z")
     Instant lastMessageAt
 ) {
@@ -36,7 +36,7 @@ public record ChannelResult(
         .type(channel.getType())
         .name(channel.getName())
         .description(channel.getDescription())
-        .userIdList(userIdList)
+        .participantIds(userIdList)
         .lastMessageAt(lastMessageAt)
         .build();
   }

@@ -53,8 +53,9 @@ public class BasicMessageService implements MessageService {
         binaryContentIdList);
 
     messageRepositoryPort.save(message);
-    logger.info("Message Created {}", message.getId());
-    
+    logger.info("Message Created: Message Id {}, Channel Id {}, Author Id {}, content {}",
+        message.getId(), message.getChannelId(), message.getUserId(), message.getContent());
+
     return new CreateMessageResult(message);
   }
 

@@ -62,7 +62,7 @@ public class ChannelController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ChannelResult>> findAll(@RequestParam UUID userId) {
+  public ResponseEntity<List<ChannelResult>> findAll(@RequestParam("userId") UUID userId) {
     ChannelListResult result = channelService.findChannelsByUserId(userId);
 
     return ResponseEntity.ok(result.channelList());
