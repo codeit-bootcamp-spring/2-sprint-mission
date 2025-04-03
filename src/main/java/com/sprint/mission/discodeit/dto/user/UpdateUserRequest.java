@@ -6,9 +6,7 @@ public record UpdateUserRequest(
     UUID userId,
     String newUsername,
     String newPassword,
-    String newEmail,
-    String profileImageFileName,
-    String profileImageFilePath
+    String newEmail
 ) {
 
 }

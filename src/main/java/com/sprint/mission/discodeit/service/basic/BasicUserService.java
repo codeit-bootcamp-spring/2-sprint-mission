@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.file.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
@@ -17,6 +18,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +29,8 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public User createUser(CreateUserRequest request) {
+  public User createUser(CreateUserRequest request,
+      Optional<CreateBinaryContentRequest> profileOpt) {
     if (userRepository.getAllUsers().stream().anyMatch(
         user -> user.getUsername().equals(request.username()) || user.getEmail()
             .equals(request.email())
@@ -35,23 +38,25 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
     }
 
-    User user = new User(request.username(), request.password(), request.email(), null);
+    UUID profileId = profileOpt.map(profile -> {
+      BinaryContent binaryContent = new BinaryContent(
+          profile.fileName(),
+          (long) profile.bytes().length,
+          profile.contentType(),
+          profile.bytes()
+      );
+      return binaryContentRepository.save(binaryContent).getId();
+    }).orElse(null);
+
+    User user = new User(
+        request.username(),
+        request.password(),
+        request.email(),
+        profileId
+    );
     userRepository.save(user);
 
-    if (request.profileImageFileName() != null && request.profileImageFilePath() != null) {
-      BinaryContent profileImage = new BinaryContent(
-          user.getId(),
-          null,
-          request.profileImageFileName(),
-          request.profileImageFilePath()
-      );
-      binaryContentRepository.save(profileImage);
-      user.setProfileId(profileImage.getId());  // User의 profileId 업데이트
-      userRepository.save(user);
-    }
-
-    UserStatus userStatus = new UserStatus(user.getId());
-    userStatusRepository.save(userStatus);
+    userStatusRepository.save(new UserStatus(user.getId()));
 
     return user;
   }
@@ -109,23 +114,34 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public void updateUser(UpdateUserRequest request) {
+  public void updateUser(UpdateUserRequest request,
+      Optional<CreateBinaryContentRequest> profileOpt) {
     userRepository.getUserById(request.userId()).ifPresent(user -> {
       Instant updatedTime = Instant.now();
-      user.update(request.newUsername(), request.newPassword(), request.newEmail(), updatedTime);
-      userRepository.save(user);
 
-      if (request.profileImageFileName() != null && request.profileImageFilePath() != null) {
-        BinaryContent profileImage = new BinaryContent(
-            user.getId(),
-            null,
-            request.profileImageFileName(),
-            request.profileImageFilePath()
+      UUID newProfileId = profileOpt.map(profile -> {
+        Optional.ofNullable(user.getProfileId())
+            .ifPresent(binaryContentRepository::deleteById);
+
+        BinaryContent binaryContent = new BinaryContent(
+            profile.fileName(),
+            (long) profile.bytes().length,
+            profile.contentType(),
+            profile.bytes()
         );
-        binaryContentRepository.save(profileImage);
-        user.setProfileId(profileImage.getId());
-        userRepository.save(user);
-      }
+
+        return binaryContentRepository.save(binaryContent).getId();
+      }).orElse(user.getProfileId());
+
+      user.update(
+          request.newUsername(),
+          request.newPassword(),
+          request.newEmail(),
+          updatedTime,
+          newProfileId
+      );
+
+      userRepository.save(user);
     });
   }
 
