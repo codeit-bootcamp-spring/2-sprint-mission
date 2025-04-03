@@ -84,7 +84,8 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, UserUpdateDto userUpdateDto) {
+    public User update(UUID userId, UserUpdateDto userUpdateDto,
+                       Optional<BinaryContentCreateDto> binaryContentCreateDto) {
         List<User> users = userRepository.findAll();
         boolean isEmailExist = users.stream().anyMatch(
                 user -> user.getEmail().equals(userUpdateDto.newEmail()));
@@ -101,8 +102,23 @@ public class BasicUserService implements UserService {
         }
 
         User user = userRepository.findById(userId);
+
+        if (user == null) {
+            throw new UserNotFoundException(userId + " 유저를 찾을 수 없습니다.");
+        }
+
+        UUID nullableProfileId = binaryContentCreateDto
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytesImage();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
+
         user.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(),
-                userUpdateDto.newProfileId());
+                nullableProfileId);
         userRepository.save(user);
 
         return user;
