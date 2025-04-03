@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,7 @@ public class ChannelController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Public Channel이 성공적으로 생성됨")
   })
-  public ResponseEntity<Channel> create(@RequestBody PublicChannelCreateRequest request) {
+  public ResponseEntity<Channel> create(@Valid @RequestBody PublicChannelCreateRequest request) {
     Channel createdChannel = channelService.create(request);
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -53,7 +54,7 @@ public class ChannelController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Private Channel이 성공적으로 생성됨")
   })
-  public ResponseEntity<Channel> create(@RequestBody PrivateChannelCreateRequest request) {
+  public ResponseEntity<Channel> create(@Valid @RequestBody PrivateChannelCreateRequest request) {
     Channel createdChannel = channelService.create(request);
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -68,7 +69,7 @@ public class ChannelController {
       @ApiResponse(responseCode = "200", description = "Channel 정보가 성공적으로 수정됨")
   })
   public ResponseEntity<Channel> update(@PathVariable UUID channelId,
-      @RequestBody PublicChannelUpdateRequest request) {
+      @Valid @RequestBody PublicChannelUpdateRequest request) {
     Channel udpatedChannel = channelService.update(channelId, request);
     return ResponseEntity
         .status(HttpStatus.OK)
