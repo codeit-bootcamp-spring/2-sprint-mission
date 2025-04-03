@@ -70,14 +70,16 @@ public class BasicUserService implements UserService {
   @Override
   public FindUserDto findByUser(UUID userId) {
     User user = userRepository.findUserById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원"));
+        .orElseThrow(
+            () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-        .orElseThrow(() -> new IllegalArgumentException("사용자 상태 확인 불가"));
+        .orElseThrow(() -> new NoSuchElementException(
+            String.format("User with userId %s not found", userId)));
 
     FindUserDto findUserDto = new FindUserDto(
         user.getId(), user.getUsername(), user.getEmail(),
         user.getProfile(), user.getCreatedAt(),
-        user.getUpdatedAt(), userStatus.getUpdatedAt(),
+        user.getUpdatedAt(), userStatus.getLastLoginTime(),
         userStatus.isLastStatus());
 
     return findUserDto;
@@ -96,7 +98,8 @@ public class BasicUserService implements UserService {
   public void update(UUID userId, UpdateUserRequestDto updateUserDto,
       Optional<SaveBinaryContentRequestDto> saveBinaryContentRequestDto) {
     User user = userRepository.findUserById(userId).
-        orElseThrow(() -> new NullPointerException("사용자가 존재하지 않습니다."));
+        orElseThrow(
+            () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
 
     user.updateNickname(updateUserDto.nickname());
     UUID profileId = saveBinaryContentRequestDto

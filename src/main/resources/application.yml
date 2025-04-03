@@ -11,3 +11,9 @@ springdoc:
   api-docs:
     enabled: true
     version: openapi_3_1
+
+#logging:
+#  level:
+#    root: INFO
+#    org.springframework: INFO
+#    org.springframework.web: DEBUG
