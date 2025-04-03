@@ -13,6 +13,8 @@ public interface MessageRepository {
 
   Optional<Message> findMessageById(UUID messageId); // 메시지 조회
 
+  Optional<Message> findLatestMessageByChannelId(UUID channelId);
+
   List<Message> findMessageAll(); // 모든 메시지 조회
 
   void deleteMessageById(UUID messageId); // 메시지 삭제
@@ -21,5 +23,4 @@ public interface MessageRepository {
 
   void deleteMessageByChannelId(UUID channelId);
 
-  Message findLatestMessageByChannelId(UUID channelId);
 }

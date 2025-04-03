@@ -37,10 +37,8 @@ public class ReadStatusController {
   @RequiresAuth
   @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PUT)
   public ResponseEntity<?> updateReadStatus(
-      @PathVariable("readStatusId") UUID readStatusId,
-      HttpServletRequest httpRequest
+      @PathVariable("readStatusId") UUID readStatusId
   ) {
-    UUID userId = (UUID) httpRequest.getAttribute("userId");
 
     readStatusService.updateReadStatus(readStatusId);
 
@@ -55,7 +53,7 @@ public class ReadStatusController {
   ) {
     UUID userId = (UUID) httpRequest.getAttribute("userId");
 
-    ReadStatus readStatus = readStatusService.findReadStatusById(userId, channelId);
+    ReadStatus readStatus = readStatusService.findReadStatusByUserIdAndChannelId(userId, channelId);
 
     return ResponseEntity.ok(readStatus);
   }

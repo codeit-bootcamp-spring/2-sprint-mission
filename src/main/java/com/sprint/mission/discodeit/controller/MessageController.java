@@ -5,9 +5,7 @@ import com.sprint.mission.discodeit.dto.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.jwt.JwtUtil;
-import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.MessageService;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +25,6 @@ public class MessageController {
   private final MessageService messageService;
   private final JwtUtil jwtUtil;
 
-  @RequiresAuth
   @RequestMapping(value = "", method = RequestMethod.POST)
   public ResponseEntity<?> createMessage(
       @RequestBody CreateMessageRequest request) {
@@ -36,33 +33,26 @@ public class MessageController {
     return ResponseEntity.ok("메세지가 성공적으로 생성되었습니다.");
   }
 
-  @RequiresAuth
   @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
   public ResponseEntity<?> updateMessage(
       @PathVariable("messageId") UUID messageId,
-      @RequestBody UpdateMessageRequest request,
-      HttpServletRequest httpRequest) {
-    UUID userId = (UUID) httpRequest.getAttribute("user_id");
-
-    messageService.updateMessage(userId, messageId, request);
+      @RequestBody UpdateMessageRequest request) {
+    messageService.updateMessage(messageId, request);
 
     return ResponseEntity.ok("메세지가 업데이트 되었습니다.");
   }
 
-  @RequiresAuth
   @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteMessage(
-      @PathVariable("messageId") UUID messageId,
-      HttpServletRequest httpRequest) {
-    UUID userId = (UUID) httpRequest.getAttribute("user_id");
-    messageService.deleteMessage(userId, messageId);
+      @PathVariable("messageId") UUID messageId) {
+    messageService.deleteMessage(messageId);
 
     return ResponseEntity.ok("메세지가 삭제 되었습니다.");
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
   public ResponseEntity<?> getChannelMessage(
-      @RequestParam UUID channelId) {
+      @RequestParam("channelId") UUID channelId) {
     List<Message> messages = messageService.findallByChannelId(channelId);
 
     return ResponseEntity.ok(messages);

@@ -34,6 +34,12 @@ public class JCFMessageRepository implements MessageRepository {
     return Optional.ofNullable(messages.get(messageId));
   }
 
+  @Override
+  public Optional<Message> findLatestMessageByChannelId(UUID channelId) {
+    return messages.values().stream()
+        .filter(message -> message.getChannelId().equals(channelId))
+        .max(Comparator.comparing(Message::getCreatedAt));
+  }
 
   @Override
   public List<Message> findMessageAll() {
@@ -53,13 +59,5 @@ public class JCFMessageRepository implements MessageRepository {
   @Override
   public void deleteMessageByChannelId(UUID channelId) {
     messages.values().removeIf(message -> message.getChannelId().equals(channelId));
-  }
-
-  @Override
-  public Message findLatestMessageByChannelId(UUID channelId) {
-    return messages.values().stream()
-        .filter(message -> message.getChannelId().equals(channelId))
-        .max(Comparator.comparing(Message::getCreatedAt))
-        .orElse(null);
   }
 }

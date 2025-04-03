@@ -45,6 +45,7 @@ public class BasicChannelService implements ChannelService {
       }
       readStatusRepository.addReadStatus(new ReadStatus(userId, channelId, Instant.now()));
     });
+    channelRepository.addChannel(channel);
     return channel;
   }
 
@@ -136,18 +137,23 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public ChannelInfoDto mapToDto(Channel channel) {
-
     ChannelInfoDto dto = new ChannelInfoDto();
     dto.setChannelId(channel.getId());
     dto.setChannelName(channel.getChannelName());
     dto.setDescription(channel.getDescription());
     dto.setChannelType(channel.getType());
-    dto.setLastMessageTime(
-        messageRepository.findLatestMessageByChannelId(channel.getId()).getCreatedAt());
+
+    messageRepository.findLatestMessageByChannelId(channel.getId())
+        .ifPresentOrElse(
+            message -> dto.setLastMessageTime(message.getCreatedAt()),
+            () -> dto.setLastMessageTime(null)  // 메시지가 없으면 null로 설정
+        );
+
     dto.setParticipantsUserIds(readStatusRepository.findAllReadStatus().stream()
         .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
         .map(ReadStatus::getUserId)
         .toList());
+
     return dto;
   }
 }

@@ -5,9 +5,7 @@ import com.sprint.mission.discodeit.dto.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.ChannelService;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -55,11 +54,8 @@ public class ChannelController {
     return ResponseEntity.ok("채널이 삭제되었습니다.");
   }
 
-  @RequiresAuth
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<?> getAllChannels(HttpServletRequest httpRequest) {
-    UUID userId = (UUID) httpRequest.getAttribute("userId");
-
+  public ResponseEntity<?> getAllChannels(@RequestParam(name = "userId") UUID userId) {
     List<ChannelInfoDto> channels = channelService.findAllByUserId(userId);
 
     return ResponseEntity.ok(channels);

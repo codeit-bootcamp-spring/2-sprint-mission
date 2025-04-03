@@ -28,6 +28,7 @@ public class ReadStatus extends BaseEntity implements Serializable {
   @Override
   public String toString() {
     return "ReadStatus{" +
+
         "id=" + getId() +
         ", channelId=" + channelId +
         ", userIds=" + userId +

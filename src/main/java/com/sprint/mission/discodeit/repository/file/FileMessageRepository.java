@@ -47,6 +47,13 @@ public class FileMessageRepository implements MessageRepository {
   }
 
   @Override
+  public Optional<Message> findLatestMessageByChannelId(UUID channelId) {
+    return messages.values().stream()
+        .filter(message -> message.getChannelId().equals(channelId))
+        .max(Comparator.comparing(Message::getCreatedAt));
+  }
+
+  @Override
   public List<Message> findMessageAll() {
     return new ArrayList<>(messages.values());
   }
@@ -66,13 +73,5 @@ public class FileMessageRepository implements MessageRepository {
   @Override
   public boolean existsById(UUID messageId) {
     return messages.containsKey(messageId);
-  }
-
-  @Override
-  public Message findLatestMessageByChannelId(UUID channelId) {
-    return messages.values().stream()
-        .filter(message -> message.getChannelId().equals(channelId))
-        .max(Comparator.comparing(Message::getCreatedAt))
-        .orElse(null);
   }
 }
