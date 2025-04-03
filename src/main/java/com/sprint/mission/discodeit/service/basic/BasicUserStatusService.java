@@ -6,6 +6,10 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +56,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatus update(UUID userStatusId, UserStatusUpdateRequest request) {
-    OffsetDateTime newLastActiveAt = request.getNewLastActiveAt();
+    OffsetDateTime newLastActiveAt = parse(request.getNewLastActiveAt().toString());
 
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(
@@ -64,7 +68,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
-    OffsetDateTime newLastActiveAt = request.getNewLastActiveAt();
+    OffsetDateTime newLastActiveAt = parse(request.getNewLastActiveAt().toString());
 
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(
@@ -80,5 +84,12 @@ public class BasicUserStatusService implements UserStatusService {
       throw new NoSuchElementException("UserStatus with id " + userStatusId + " not found");
     }
     userStatusRepository.deleteById(userStatusId);
+  }
+
+  private OffsetDateTime parse(String date) {
+    LocalDateTime parse = LocalDateTime.parse(date,
+        DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));  // Stirng to Instant
+    Instant instant = parse.atZone(ZoneId.systemDefault()).toInstant();
+    return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
   }
 }

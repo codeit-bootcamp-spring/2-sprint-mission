@@ -32,8 +32,8 @@ public class BasicUserService implements UserService {
   @Override
   public _User create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-    String username = userCreateRequest.getUsername();
-    String email = userCreateRequest.getEmail();
+    String username = userCreateRequest.getUsername().toString();
+    String email = userCreateRequest.getEmail().toString();
 
     if (userRepository.existsByEmail(email)) {
       throw new IllegalArgumentException("User with email " + email + " already exists");
@@ -52,7 +52,7 @@ public class BasicUserService implements UserService {
           return binaryContentRepository.save(binaryContent).getId();
         })
         .orElse(null);
-    String password = userCreateRequest.getPassword();
+    String password = userCreateRequest.getPassword().toString();
 
     _User user = new _User(username, email, password, nullableProfileId);
     _User createdUser = userRepository.save(user);
@@ -85,8 +85,8 @@ public class BasicUserService implements UserService {
     _User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-    String newUsername = userUpdateRequest.getNewUsername();
-    String newEmail = userUpdateRequest.getNewEmail();
+    String newUsername = userUpdateRequest.getNewUsername().toString();
+    String newEmail = userUpdateRequest.getNewEmail().toString();
     if (userRepository.existsByEmail(newEmail)) {
       throw new IllegalArgumentException("User with email " + newEmail + " already exists");
     }
@@ -108,7 +108,7 @@ public class BasicUserService implements UserService {
         })
         .orElse(null);
 
-    String newPassword = userUpdateRequest.getNewPassword();
+    String newPassword = userUpdateRequest.getNewPassword().toString();
     user.update(newUsername, newEmail, newPassword, nullableProfileId);
 
     return userRepository.save(user);

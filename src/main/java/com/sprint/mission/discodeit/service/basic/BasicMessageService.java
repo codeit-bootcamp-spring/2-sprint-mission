@@ -30,8 +30,8 @@ public class BasicMessageService implements MessageService {
   @Override
   public _Message create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
-    UUID getChannelId = messageCreateRequest.getgetChannelId();
-    UUID authorId = messageCreateRequest.getAuthorId();
+    UUID getChannelId = UUID.fromString(messageCreateRequest.getChannelId().toString());
+    UUID authorId = UUID.fromString(messageCreateRequest.getAuthorId().toString());
 
     if (!channelRepository.existsById(getChannelId)) {
       throw new NoSuchElementException("Channel with id " + getChannelId + " does not exist");
@@ -53,7 +53,7 @@ public class BasicMessageService implements MessageService {
         })
         .toList();
 
-    String content = messageCreateRequest.getContent();
+    String content = messageCreateRequest.getContent().toString();
     _Message message = new _Message(
         content,
         getChannelId,
@@ -78,7 +78,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public _Message update(UUID messageId, MessageUpdateRequest request) {
-    String newContent = request.getNewContent();
+    String newContent = request.getNewContent().toString();
     _Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
