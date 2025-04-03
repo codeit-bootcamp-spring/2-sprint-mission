@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -38,17 +39,16 @@ public class FileReadStatusRepository implements ReadStatusRepository {
   }
 
   @Override
-  public ReadStatus findReadStatusById(UUID readStatusId) {
-    return readStatusMap.get(readStatusId);
+  public Optional<ReadStatus> findReadStatusById(UUID readStatusId) {
+    return Optional.ofNullable(readStatusMap.get(readStatusId));
   }
 
   @Override
-  public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
+  public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
     return readStatusMap.values().stream()
         .filter(readStatus -> readStatus.getChannelId().equals(channelId))
         .filter(readStatus -> readStatus.getUserId().equals(userId))
-        .findFirst()
-        .orElse(null);
+        .findFirst();
   }
 
   @Override

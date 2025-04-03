@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -28,17 +29,16 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
   }
 
   @Override
-  public ReadStatus findReadStatusById(UUID readStatusId) {
-    return readStatusMap.get(readStatusId);
+  public Optional<ReadStatus> findReadStatusById(UUID readStatusId) {
+    return Optional.ofNullable(readStatusMap.get(readStatusId));
   }
 
   @Override
-  public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
+  public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
     return readStatusMap.values().stream()
         .filter(readStatus -> readStatus.getChannelId().equals(channelId))
         .filter(readStatus -> readStatus.getUserId().equals(userId))
-        .findFirst()
-        .orElse(null);
+        .findFirst();
   }
 
   @Override
