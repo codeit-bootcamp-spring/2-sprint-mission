@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class AuthController {
       @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content(examples = @ExampleObject("User with username {username} not found"))),
       @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않음", content = @Content(examples = @ExampleObject("Wrong password")))
   })
-  public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
+  public ResponseEntity<User> login(@Valid @RequestBody LoginRequest loginRequest) {
     User user = authService.login(loginRequest);
     return ResponseEntity
         .status(HttpStatus.OK)
