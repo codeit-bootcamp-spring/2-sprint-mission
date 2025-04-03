@@ -17,7 +17,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RequestException.class)
     public ResponseEntity<ErrorResponse> requestException(RequestException e) {
         return buildErrorResponse(e);
-
     }
 
     @ExceptionHandler(ServerException.class)
