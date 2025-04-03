@@ -38,7 +38,7 @@ public class UserController implements UserApi {
   @Override
 
   public ResponseEntity<User> create(
-      @RequestPart(value = "UserCreateRequest", required = false) @Valid
+      @RequestPart(value = "userCreateRequest", required = false) @Valid
       UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
     if (userCreateRequest == null) {
@@ -59,35 +59,34 @@ public class UserController implements UserApi {
   }
 
   @Override
-  public ResponseEntity<Void> delete(Object userId) {
-    UUID uuid = UUID.fromString(userId.toString());
-    userService.delete(uuid);
-    userStatusService.delete(uuid);
+  public ResponseEntity<Void> delete(UUID userId) {
+    userService.delete(userId);
+    userStatusService.delete(userId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
   }
 
   @Override
-  public ResponseEntity<Object> findAll() {
-    List<UserDto> userDtos =   userService.findAll();
+  public ResponseEntity<List<UserDto>> findAll() {
+    List<UserDto> userDtos =  userService.findAll(); // Spring ImmutableCollections$ListN
 
     return ResponseEntity.status(HttpStatus.OK).body(userDtos);
   }
 
   @Override
-  public ResponseEntity<User> update(Object userId, UserUpdateRequest userUpdateRequest,
+  public ResponseEntity<User> update(UUID userId, UserUpdateRequest userUpdateRequest,
   @RequestPart(value = "profile", required = false) MultipartFile profile) {
-    UUID uuid = UUID.fromString(userId.toString());
+
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
 
-    User updatedUser = userService.update(uuid, userUpdateRequest, profileRequest);
+    User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
     UserStatusUpdateRequest userStatusUpdateRequest = new UserStatusUpdateRequest(
         updatedUser.getUpdatedAt()
     );
 
-    userStatusService.update(uuid, userStatusUpdateRequest);
+    userStatusService.update(userId, userStatusUpdateRequest);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -95,11 +94,10 @@ public class UserController implements UserApi {
   }
 
   @Override
-  public ResponseEntity<UserStatus> updateUserStatusByUserId(Object userId,
+  public ResponseEntity<UserStatus> updateUserStatusByUserId(UUID userId,
       UserStatusUpdateRequest userStatusUpdateRequest) {
-    UUID uuid = UUID.fromString(userId.toString());
 
-    UserStatus updatedUserStatus = userStatusService.update(uuid, userStatusUpdateRequest);
+    UserStatus updatedUserStatus = userStatusService.update(userId, userStatusUpdateRequest);
 
 
     return  ResponseEntity

@@ -56,24 +56,22 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatus update(UUID userStatusId, UserStatusUpdateRequest request) {
-    OffsetDateTime newLastActiveAt = parse(request.newLastActiveAt().toString());
 
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
-    userStatus.update(newLastActiveAt);
+    userStatus.update(request.newLastActiveAt());
 
     return userStatusRepository.save(userStatus);
   }
 
   @Override
   public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
-    OffsetDateTime newLastActiveAt = parse(request.newLastActiveAt().toString());
 
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(
             () -> new NoSuchElementException("UserStatus with userId " + userId + " not found"));
-    userStatus.update(newLastActiveAt);
+    userStatus.update(request.newLastActiveAt());
 
     return userStatusRepository.save(userStatus);
   }
@@ -86,10 +84,4 @@ public class BasicUserStatusService implements UserStatusService {
     userStatusRepository.deleteById(userStatusId);
   }
 
-  private OffsetDateTime parse(String date) {
-    LocalDateTime parse = LocalDateTime.parse(date,
-        DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));  // Stirng to Instant
-    Instant instant = parse.atZone(ZoneId.systemDefault()).toInstant();
-    return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
-  }
 }
