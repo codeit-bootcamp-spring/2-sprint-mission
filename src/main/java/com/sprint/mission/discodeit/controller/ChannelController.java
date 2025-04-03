@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.dto.Channel;
 import com.sprint.mission.discodeit.controller.dto.ChannelDto;
+import com.sprint.mission.discodeit.controller.dto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.controller.dto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.controller.dto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,22 +36,25 @@ public class ChannelController implements ChannelApi {
   }
 
   @Override
-  public ResponseEntity<Void> delete2(UUID getChannelId) {
-    channelService.delete(getChannelId);
-    return ChannelApi.super.delete2(getChannelId);
+  public ResponseEntity<Void> delete2(Object ChannelId) {
+    UUID uuid = UUID.fromString(ChannelId.toString());
+    channelService.delete(uuid);
+    return ChannelApi.super.delete2(uuid);
   }
 
   @Override
-  public ResponseEntity<Channel> update3(UUID getChannelId,
+  public ResponseEntity<Channel> update3(Object getChannelId,
       PublicChannelUpdateRequest publicChannelUpdateRequest) {
-    channelService.update(getChannelId, publicChannelUpdateRequest);
-    return ChannelApi.super.update3(getChannelId, publicChannelUpdateRequest);
+    UUID uuid = UUID.fromString(getChannelId.toString());
+    channelService.update(uuid, publicChannelUpdateRequest);
+    return ChannelApi.super.update3(uuid, publicChannelUpdateRequest);
   }
 
   @Override
-  public ResponseEntity<List<ChannelDto>> findAll1(UUID userId) {
-    channelService.findAllByUserId(userId);
-    return ChannelApi.super.findAll1(userId);
+  public ResponseEntity<Object> findAll1(Object userId) {
+    UUID uuid = UUID.fromString(userId.toString());
+    channelService.findAllByUserId(uuid);
+    return ChannelApi.super.findAll1(uuid);
   }
 /*
   @RequestMapping(path = "createPublic")

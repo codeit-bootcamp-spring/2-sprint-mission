@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.dto.ReadStatus;
+import com.sprint.mission.discodeit.controller.dto.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.controller.dto.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +28,16 @@ public class ReadStatusController implements ReadStatusApi {
   }
 
   @Override
-  public ResponseEntity<List<ReadStatus>> findAllByUserId(UUID userId) {
-    return ReadStatusApi.super.findAllByUserId(userId);
+  public ResponseEntity<Object> findAllByUserId(Object userId) {
+    UUID uuid = UUID.fromString(userId.toString());
+    return ReadStatusApi.super.findAllByUserId(uuid);
   }
 
   @Override
-  public ResponseEntity<ReadStatus> update1(UUID readStatusId,
+  public ResponseEntity<ReadStatus> update1(Object readStatusId,
       ReadStatusUpdateRequest readStatusUpdateRequest) {
-    return ReadStatusApi.super.update1(readStatusId, readStatusUpdateRequest);
+    UUID uuid = UUID.fromString(readStatusId.toString());
+    return ReadStatusApi.super.update1(uuid, readStatusUpdateRequest);
   }
 
   /*

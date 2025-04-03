@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.dto.ApiUser;
+import com.sprint.mission.discodeit.controller.dto.User;
+import com.sprint.mission.discodeit.controller.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.controller.dto.UserDto;
 import com.sprint.mission.discodeit.controller.dto.UserStatus;
+import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.controller.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -25,30 +28,33 @@ public class UserController implements UserApi {
 
   @Override
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ApiUser> create(
+  public ResponseEntity<User> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest) {
     return UserApi.super.create(userCreateRequest);
   }
 
   @Override
-  public ResponseEntity<Void> delete(UUID userId) {
-    return UserApi.super.delete(userId);
+  public ResponseEntity<Void> delete(Object userId) {
+    UUID uuid = UUID.fromString(userId.toString());
+    return UserApi.super.delete(uuid);
   }
 
   @Override
-  public ResponseEntity<List<UserDto>> findAll() {
+  public ResponseEntity<Object> findAll() {
     return UserApi.super.findAll();
   }
 
   @Override
-  public ResponseEntity<ApiUser> update(UUID userId, UserUpdateRequest userUpdateRequest) {
-    return UserApi.super.update(userId, userUpdateRequest);
+  public ResponseEntity<User> update(Object userId, UserUpdateRequest userUpdateRequest) {
+    UUID uuid = UUID.fromString(userId.toString());
+    return UserApi.super.update(uuid, userUpdateRequest);
   }
 
   @Override
-  public ResponseEntity<UserStatus> updateUserStatusByUserId(UUID userId,
+  public ResponseEntity<UserStatus> updateUserStatusByUserId(Object userId,
       UserStatusUpdateRequest userStatusUpdateRequest) {
-    return UserApi.super.updateUserStatusByUserId(userId, userStatusUpdateRequest);
+    UUID uuid = UUID.fromString(userId.toString());
+    return UserApi.super.updateUserStatusByUserId(uuid, userStatusUpdateRequest);
   }
 
   /*

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.dto.LoginRequest;
-import com.sprint.mission.discodeit.controller.dto.ApiUser;
+import com.sprint.mission.discodeit.controller.dto.User;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

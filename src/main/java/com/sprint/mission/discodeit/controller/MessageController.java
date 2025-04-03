@@ -27,8 +27,8 @@ public class MessageController implements MessageApi {
   private final MessageService messageService;
 
   @Override
-  public ResponseEntity<Message> create2(MessageCreateRequest messageCreateRequest,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
+  public ResponseEntity<Message> create2(MessageCreateRequest messageCreateRequest
+      /*,@RequestPart(value = "attachments", required = false) List<MultipartFile> attachments*/) {
     if (messageCreateRequest == null) {
       return ResponseEntity.badRequest().build();
     }
@@ -56,14 +56,16 @@ public class MessageController implements MessageApi {
   }
 
   @Override
-  public ResponseEntity<Void> delete1(UUID messageId) {
-    messageService.delete(messageId);
+  public ResponseEntity<Void> delete1(Object messageId) {
+    UUID uuid = UUID.fromString(String.valueOf(messageId));
+    messageService.delete(uuid);
     return ResponseEntity.noContent().build();
   }
 
   @Override
-  public ResponseEntity<List<Message>> findAllBygetChannelId(UUID getChannelId) {
-    List<_Message> messages = messageService.findAllBygetChannelId(getChannelId);
+  public ResponseEntity<Object> findAllByChannelId(Object ChannelId) {
+    UUID uuid = UUID.fromString(String.valueOf(ChannelId));
+    List<_Message> messages = messageService.findAllBygetChannelId(uuid);
     ModelMapper modelMapper = new ModelMapper();
     List<Message> apiMessages = new ArrayList<>();
     for (_Message message : messages) {
@@ -75,9 +77,10 @@ public class MessageController implements MessageApi {
   }
 
   @Override
-  public ResponseEntity<Message> update2(UUID messageId,
+  public ResponseEntity<Message> update2(Object messageId,
       MessageUpdateRequest messageUpdateRequest) {
-    _Message updatedMessage = messageService.update(messageId,
+    UUID uuid = UUID.fromString(String.valueOf(messageId));
+    _Message updatedMessage = messageService.update(uuid,
         messageUpdateRequest);
 
     ModelMapper modelMapper = new ModelMapper();

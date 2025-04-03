@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.dto.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import java.util.ArrayList;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,15 +25,24 @@ public class BinaryContentController implements BinaryContentApi {
   private final BinaryContentService binaryContentService;
 
   @Override
-  public ResponseEntity<BinaryContent> find(UUID binaryContentId) {
-    binaryContentService.find(binaryContentId);
-    return BinaryContentApi.super.find(binaryContentId);
+  public ResponseEntity<BinaryContent> find(Object binaryContentId) {
+    UUID uuid = UUID.fromString(binaryContentId.toString());
+    binaryContentService.find(uuid);
+    return BinaryContentApi.super.find(uuid);
   }
 
   @Override
-  public ResponseEntity<List<BinaryContent>> findAllByIdIn(List<UUID> binaryContentIds) {
-    binaryContentService.findAllByIdIn(binaryContentIds);
-    return BinaryContentApi.super.findAllByIdIn(binaryContentIds);
+  public ResponseEntity<Object> findAllByIdIn(Object binaryContentIds) {
+    List<UUID> uuids = new ArrayList<>();
+    try{
+      if(binaryContentIds instanceof ArrayList) {
+        uuids = (ArrayList<UUID>) binaryContentIds;
+        binaryContentService.findAllByIdIn(uuids);
+      }
+    }catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    return BinaryContentApi.super.findAllByIdIn(uuids);
   }
   /*@RequestMapping(path = "find")
   public ResponseEntity<BinaryContent> find(@RequestParam("binaryContentId") UUID binaryContentId) {
