@@ -32,17 +32,4 @@ public class BinaryContentController {
     List<BinaryContent> contents = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity.ok(contents);
   }
-
-  @PostMapping("/upload")
-  public ResponseEntity<BinaryContent> upload(@RequestParam("file") MultipartFile file)
-      throws IOException {
-    if (file.isEmpty()) {
-      return ResponseEntity.badRequest().build();
-    }
-
-    BinaryContentCreateRequest request = BinaryContentCreateRequest.fromMultipartFile(file);
-    BinaryContent content = binaryContentService.create(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(content);
-  }
-
 }

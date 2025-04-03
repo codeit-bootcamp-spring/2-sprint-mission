@@ -35,7 +35,7 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-  @GetMapping({"", "/"})
+  @GetMapping
   public ResponseEntity<List<UserResponse>> findAll() {
     List<UserResponse> response = userService.findAll();
     return ResponseEntity.ok(response);
