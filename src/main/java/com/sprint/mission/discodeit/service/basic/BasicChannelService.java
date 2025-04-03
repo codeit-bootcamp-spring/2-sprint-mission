@@ -37,7 +37,7 @@ public class BasicChannelService implements ChannelService {
         Channel newChannel = Channel.createPrivate();
         channelRepository.save(newChannel);
 
-        channelCreatePrivateDto.users().forEach(user -> {
+        channelCreatePrivateDto.participantIds().forEach(user -> {
             ReadStatusCreateDto readStatusCreateDto = new ReadStatusCreateDto(user.getId(), newChannel.getId(), null);
             readStatusService.create(readStatusCreateDto);
         });
