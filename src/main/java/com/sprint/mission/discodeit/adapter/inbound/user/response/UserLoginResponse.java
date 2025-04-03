@@ -9,15 +9,27 @@ import lombok.Builder;
 @Builder
 @Schema(description = "로그인 성공 응답")
 public record UserLoginResponse(
-//    boolean success,
-//    String token
+
+    @Schema(description = "User Id", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     UUID id,
+
+    @Schema(description = "User 생성 시각", example = "2025-04-03T01:38:38.006Z")
     Instant createdAt,
+
+    @Schema(description = "User 수정 시각", example = "2025-04-03T01:38:38.006Z")
     Instant updatedAt,
+
+    @Schema(description = "User 이름", example = "string")
     String username,
+
+    @Schema(description = "User 이메일", example = "string")
     String email,
+
+    @Schema(description = "User 비밀번호", example = "string")
     String password,
-    String profiledId
+
+    @Schema(description = "User 프로필 Id", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    UUID profileId
 ) {
 
   public static UserLoginResponse create(User user) {
@@ -28,7 +40,7 @@ public record UserLoginResponse(
         .username(user.getName())
         .email(user.getEmail())
         .password(user.getPassword())
-        .profiledId(user.getPassword()).build();
+        .profileId(user.getProfileId()).build();
   }
 
 }

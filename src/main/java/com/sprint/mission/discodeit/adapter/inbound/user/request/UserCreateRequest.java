@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-@Schema(description = "User 등록")
+@Schema(description = "User 생성 정보")
 public record UserCreateRequest(
     @NotBlank String name,
     @NotBlank String email,
