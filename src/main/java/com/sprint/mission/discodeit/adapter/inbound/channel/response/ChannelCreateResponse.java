@@ -26,10 +26,12 @@ public record ChannelCreateResponse(
 
   public static ChannelCreateResponse create(Channel channel) {
     return ChannelCreateResponse.builder()
-        .id(channel.getChannelId())
+        .id(channel.getId())
         .createdAt(channel.getCreatedAt())
         .updatedAt(channel.getUpdatedAt())
         .type(channel.getType())
-        .name(channel.getName()).build();
+        .name(channel.getName())
+        .description(channel.getDescription())
+        .build();
   }
 }

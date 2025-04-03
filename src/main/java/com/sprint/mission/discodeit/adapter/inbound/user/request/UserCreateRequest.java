@@ -6,8 +6,13 @@ import jakarta.validation.constraints.Size;
 
 @Schema(description = "User 생성 정보")
 public record UserCreateRequest(
-    @NotBlank String name,
+    @Schema(description = "User name", example = "string")
+    @NotBlank String username,
+
+    @Schema(description = "User email", example = "string")
     @NotBlank String email,
+
+    @Schema(description = "User password", example = "string")
     @NotBlank @Size(min = 1) String password
 ) {
 

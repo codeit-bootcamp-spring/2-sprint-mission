@@ -34,7 +34,7 @@ public class FileMessageRepository implements MessageRepositoryPort {
 
   @Override
   public Message save(Message message) {
-    messageList.put(message.getMessageId(), message);
+    messageList.put(message.getId(), message);
     fileRepository.save(messageList);
     return message;
   }
@@ -65,7 +65,7 @@ public class FileMessageRepository implements MessageRepositoryPort {
   @Override
   public void deleteAllByChannelId(UUID channelId) {
     this.findAllByChannelId(channelId)
-        .forEach(message -> this.deleteByMessageId(message.getMessageId()));
+        .forEach(message -> this.deleteByMessageId(message.getId()));
     fileRepository.save(messageList);
   }
 }

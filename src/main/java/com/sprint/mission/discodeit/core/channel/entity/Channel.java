@@ -1,15 +1,11 @@
 package com.sprint.mission.discodeit.core.channel.entity;
 
-import com.sprint.mission.discodeit.core.user.entity.User;
-import lombok.Getter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.ToString;
 
 @ToString
 @Getter
@@ -18,32 +14,27 @@ public class Channel implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
-  private UUID channelId;
-  private final UUID userId;
+  private final UUID id;
 
   private String name;
   private String description;
-  private List<User> userList = new ArrayList<>();
 
   private ChannelType type;
 
   private final Instant createdAt;
   private Instant updatedAt;
 
-  private Channel(UUID channelId, UUID userId, Instant createdAt, String name, String description,
-      ChannelType type) {
-    this.channelId = channelId;
-    this.userId = userId;
-    this.createdAt = createdAt;
-    this.updatedAt = createdAt;
+  private Channel(String name, String description, ChannelType type) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+
     this.name = name;
     this.description = description;
     this.type = type;
   }
 
-  public static Channel create(UUID userId, String name, String description, ChannelType type) {
-    return new Channel(UUID.randomUUID(), userId, Instant.now(), name, description,
-        type);
+  public static Channel create(String name, String description, ChannelType type) {
+    return new Channel(name, description, type);
   }
 
   public void update(String newName, String newDescription) {
@@ -57,10 +48,6 @@ public class Channel implements Serializable {
       anyValueUpdated = true;
     }
 
-//    if (newType != null && !newType.equals(this.type)) {
-//      this.type = newType;
-//      anyValueUpdated = true;
-//    }
     if (anyValueUpdated) {
       this.updatedAt = Instant.now();
     }

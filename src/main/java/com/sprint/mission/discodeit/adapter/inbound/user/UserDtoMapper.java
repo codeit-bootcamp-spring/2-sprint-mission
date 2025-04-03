@@ -15,7 +15,8 @@ public final class UserDtoMapper {
   }
 
   static CreateUserCommand toCreateUserCommand(UserCreateRequest requestBody) {
-    return new CreateUserCommand(requestBody.name(), requestBody.email(), requestBody.password());
+    return new CreateUserCommand(requestBody.username(), requestBody.email(),
+        requestBody.password());
   }
 
   static LoginUserCommand toLoginUserCommand(UserLoginRequest requestBody) {

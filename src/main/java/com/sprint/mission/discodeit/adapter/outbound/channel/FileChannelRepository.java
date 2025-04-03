@@ -34,7 +34,7 @@ public class FileChannelRepository implements ChannelRepository {
 
   @Override
   public Channel save(Channel channel) {
-    channelList.put(channel.getChannelId(), channel);
+    channelList.put(channel.getId(), channel);
     fileRepository.save(channelList);
     return channel;
   }
@@ -52,7 +52,7 @@ public class FileChannelRepository implements ChannelRepository {
 
   @Override
   public List<Channel> findAllByChannelId(UUID channelId) {
-    return channelList.values().stream().filter(channel -> channel.getChannelId().equals(channelId))
+    return channelList.values().stream().filter(channel -> channel.getId().equals(channelId))
         .toList();
   }
 

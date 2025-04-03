@@ -32,7 +32,7 @@ public record ChannelResult(
   public static ChannelResult create(Channel channel, List<UUID> userIdList,
       Instant lastMessageAt) {
     return ChannelResult.builder()
-        .channelId(channel.getChannelId())
+        .channelId(channel.getId())
         .type(channel.getType())
         .name(channel.getName())
         .description(channel.getDescription())

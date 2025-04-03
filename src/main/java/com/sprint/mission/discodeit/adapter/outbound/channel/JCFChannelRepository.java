@@ -18,7 +18,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
   @Override
   public Channel save(Channel channel) {
-    channelList.put(channel.getChannelId(), channel);
+    channelList.put(channel.getId(), channel);
     return channel;
   }
 
@@ -34,7 +34,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
   @Override
   public List<Channel> findAllByChannelId(UUID channelId) {
-    return channelList.values().stream().filter(channel -> channel.getChannelId().equals(channelId))
+    return channelList.values().stream().filter(channel -> channel.getId().equals(channelId))
         .toList();
   }
 
@@ -42,22 +42,5 @@ public class JCFChannelRepository implements ChannelRepository {
   public void remove(UUID channelId) {
     channelList.remove(channelId);
   }
-
-//  @Override
-//  public User join(Channel channel, User user) {
-//    List<User> list = channel.getUserList();
-//    list.add(user);
-//
-//    return user;
-//  }
-//
-//  @Override
-//  public User quit(Channel channel, User user) {
-//    List<User> list = channel.getUserList();
-//    if (list.isEmpty()) {
-//      throw new UserListEmptyError("채널 내 유저 리스트가 비어있습니다.");
-//    }
-//    list.remove(user);
-//    return user;
-//  }
+  
 }

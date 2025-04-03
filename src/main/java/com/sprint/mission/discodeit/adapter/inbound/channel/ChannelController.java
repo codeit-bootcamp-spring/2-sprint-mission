@@ -5,12 +5,12 @@ import static com.sprint.mission.discodeit.adapter.inbound.channel.ChannelDtoMap
 import static com.sprint.mission.discodeit.adapter.inbound.channel.ChannelDtoMapper.toCreatePublicChannelCommand;
 import static com.sprint.mission.discodeit.adapter.inbound.channel.ChannelDtoMapper.toUpdateChannelCommand;
 
-import com.sprint.mission.discodeit.adapter.inbound.channel.response.ChannelCreateResponse;
-import com.sprint.mission.discodeit.adapter.inbound.channel.response.ChannelDeleteResponse;
 import com.sprint.mission.discodeit.adapter.inbound.channel.request.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.channel.response.ChannelUpdateResponse;
 import com.sprint.mission.discodeit.adapter.inbound.channel.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.channel.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.channel.response.ChannelCreateResponse;
+import com.sprint.mission.discodeit.adapter.inbound.channel.response.ChannelDeleteResponse;
+import com.sprint.mission.discodeit.adapter.inbound.channel.response.ChannelUpdateResponse;
 import com.sprint.mission.discodeit.core.channel.usecase.ChannelService;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelListResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
@@ -26,24 +26,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users/{userId}/channels")
+@RequestMapping("/api/channels")
 public class ChannelController {
 
   private final ChannelService channelService;
 
   @PostMapping("/public")
-  public ResponseEntity<ChannelCreateResponse> create(@PathVariable UUID userId,
+  public ResponseEntity<ChannelCreateResponse> create(
       @RequestBody PublicChannelCreateRequest requestBody) {
-    CreatePublicChannelCommand command = toCreatePublicChannelCommand(userId,
+    CreatePublicChannelCommand command = toCreatePublicChannelCommand(
         requestBody);
     CreatePublicChannelResult result = channelService.create(command);
 
@@ -51,9 +52,9 @@ public class ChannelController {
   }
 
   @PostMapping("/private")
-  public ResponseEntity<ChannelCreateResponse> create(@PathVariable UUID userId,
+  public ResponseEntity<ChannelCreateResponse> create(
       @RequestBody PrivateChannelCreateRequest requestBody) {
-    CreatePrivateChannelCommand command = toCreatePrivateChannelCommand(userId,
+    CreatePrivateChannelCommand command = toCreatePrivateChannelCommand(
         requestBody);
     CreatePrivateChannelResult result = channelService.create(command);
 
@@ -61,13 +62,13 @@ public class ChannelController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ChannelResult>> findAll(@PathVariable UUID userId) {
+  public ResponseEntity<List<ChannelResult>> findAll(@RequestParam UUID userId) {
     ChannelListResult result = channelService.findChannelsByUserId(userId);
-    //TODO. 25.04.02 Channel findAll 더 좋은 API 설계가 떠오르지 않아 임시로 List<ChannelResult> 반환
+
     return ResponseEntity.ok(result.channelList());
   }
 
-  @PutMapping("/{channelId}")
+  @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelUpdateResponse> update(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateRequest requestBody) {
     UpdateChannelCommand command = toUpdateChannelCommand(channelId, requestBody);

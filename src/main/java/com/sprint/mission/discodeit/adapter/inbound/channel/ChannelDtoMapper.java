@@ -13,15 +13,14 @@ public final class ChannelDtoMapper {
   private ChannelDtoMapper() {
   }
 
-  static CreatePublicChannelCommand toCreatePublicChannelCommand(UUID userId,
+  static CreatePublicChannelCommand toCreatePublicChannelCommand(
       PublicChannelCreateRequest requestBody) {
-    return new CreatePublicChannelCommand(userId, requestBody.name(), requestBody.description());
+    return new CreatePublicChannelCommand(requestBody.name(), requestBody.description());
   }
 
   static CreatePrivateChannelCommand toCreatePrivateChannelCommand(
-      UUID userId,
       PrivateChannelCreateRequest requestBody) {
-    return new CreatePrivateChannelCommand(userId, requestBody.participantIds());
+    return new CreatePrivateChannelCommand(requestBody.participantIds());
   }
 
   static UpdateChannelCommand toUpdateChannelCommand(UUID channelId,

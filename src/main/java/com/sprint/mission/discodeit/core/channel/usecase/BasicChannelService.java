@@ -39,20 +39,19 @@ public class BasicChannelService implements ChannelService {
   @CustomLogging
   @Override
   public CreatePublicChannelResult create(CreatePublicChannelCommand command) {
-    Channel channel = Channel.create(command.userId(), command.name(), command.description(),
+    Channel channel = Channel.create(command.name(), command.description(),
         ChannelType.PUBLIC);
 
-    channelRepository.save(channel);
-    return new CreatePublicChannelResult(channel);
+    return new CreatePublicChannelResult(channelRepository.save(channel));
   }
 
   @Override
   public CreatePrivateChannelResult create(CreatePrivateChannelCommand command) {
-    Channel channel = Channel.create(command.userId(), null, null, ChannelType.PRIVATE);
+    Channel channel = Channel.create(null, null, ChannelType.PRIVATE);
     Channel createdChannel = channelRepository.save(channel);
 
     command.participantIds().stream()
-        .map(u -> ReadStatus.create(u, createdChannel.getChannelId(), Instant.MIN))
+        .map(u -> ReadStatus.create(u, createdChannel.getId(), Instant.MIN))
         .forEach(readStatusRepository::save);
 
     return new CreatePrivateChannelResult(channel);
@@ -77,7 +76,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   private Instant findLastMessageAt(Channel channel) {
-    return messageRepositoryPort.findAllByChannelId(channel.getChannelId())
+    return messageRepositoryPort.findAllByChannelId(channel.getId())
         .stream()
         .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
         .map(Message::getCreatedAt)
@@ -95,8 +94,8 @@ public class BasicChannelService implements ChannelService {
 
     return new ChannelListResult(channelRepository.findAll().stream()
         .filter(channel -> channel.getType().equals(ChannelType.PUBLIC)
-            || mySubscribedChannelIds.contains(channel.getChannelId()))
-        .map(channel -> findChannelByChannelId(channel.getChannelId()))
+            || mySubscribedChannelIds.contains(channel.getId()))
+        .map(channel -> findChannelByChannelId(channel.getId()))
         .toList());
   }
 
@@ -108,11 +107,11 @@ public class BasicChannelService implements ChannelService {
     );
 
     if (channel.getType() == ChannelType.PRIVATE) {
-      unmodifiableChannelError(channel.getChannelId());
+      unmodifiableChannelError(channel.getId());
     }
 
     channel.update(command.newName(), command.description());
-    return new UpdateChannelResult(channel);
+    return new UpdateChannelResult(channelRepository.save(channel));
   }
 
   @Override
@@ -125,7 +124,7 @@ public class BasicChannelService implements ChannelService {
   private void deleteAllMessage(UUID channelId) {
     List<Message> list = messageRepositoryPort.findAllByChannelId(channelId);
     for (Message message : list) {
-      messageRepositoryPort.deleteByMessageId(message.getMessageId());
+      messageRepositoryPort.deleteByMessageId(message.getId());
     }
   }
 

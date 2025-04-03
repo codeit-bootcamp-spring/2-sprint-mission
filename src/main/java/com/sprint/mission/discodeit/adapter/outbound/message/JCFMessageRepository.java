@@ -15,12 +15,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 public class JCFMessageRepository implements MessageRepositoryPort {
 
-  private Map<UUID, Message> messageList = new ConcurrentHashMap<>();
+  private final Map<UUID, Message> messageList = new ConcurrentHashMap<>();
 //    private Map<UUID, List<Message>> messageList = new ConcurrentHashMap<>();
 
   @Override
   public Message save(Message message) {
-    messageList.put(message.getMessageId(), message);
+    messageList.put(message.getId(), message);
     return message;
   }
 
@@ -48,7 +48,7 @@ public class JCFMessageRepository implements MessageRepositoryPort {
   @Override
   public void deleteAllByChannelId(UUID channelId) {
     this.findAllByChannelId(channelId)
-        .forEach(message -> this.deleteByMessageId(message.getMessageId()));
+        .forEach(message -> this.deleteByMessageId(message.getId()));
   }
 
 //    @Override

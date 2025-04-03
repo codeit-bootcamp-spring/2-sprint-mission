@@ -11,9 +11,9 @@ public final class MessageDtoMapper {
   private MessageDtoMapper() {
   }
 
-  static CreateMessageCommand toCreateMessageCommand(UUID userId, UUID channelId,
-      MessageCreateRequest requestBody) {
-    return new CreateMessageCommand(userId, channelId, requestBody.text());
+  static CreateMessageCommand toCreateMessageCommand(MessageCreateRequest requestBody) {
+    return new CreateMessageCommand(requestBody.authorId(), requestBody.channelId(),
+        requestBody.content());
   }
 
   static UpdateMessageCommand toUpdateMessageCommand(UUID messageId,

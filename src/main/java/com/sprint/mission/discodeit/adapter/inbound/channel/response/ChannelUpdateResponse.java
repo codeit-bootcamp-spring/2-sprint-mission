@@ -26,7 +26,7 @@ public record ChannelUpdateResponse(
 
   public static ChannelUpdateResponse create(Channel channel) {
     return ChannelUpdateResponse.builder()
-        .id(channel.getChannelId())
+        .id(channel.getId())
         .createdAt(channel.getCreatedAt())
         .updatedAt(channel.getUpdatedAt())
         .type(channel.getType())

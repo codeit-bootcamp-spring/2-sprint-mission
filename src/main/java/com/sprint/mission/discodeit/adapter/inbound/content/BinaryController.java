@@ -21,7 +21,7 @@ public class BinaryController {
   private final BinaryContentService binaryContentService;
 
   @GetMapping
-  public ResponseEntity<List<BinaryContentResponse>> findBinaryContent(
+  public ResponseEntity<List<BinaryContentResponse>> findBinaryContents(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
     List<BinaryContentResponse> list = new ArrayList<>();
     for (UUID binaryContentId : binaryContentIds) {
@@ -33,8 +33,9 @@ public class BinaryController {
   }
 
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContentResponse> findBinaryContents(
-      @PathVariable UUID binaryContentId) {
+  public ResponseEntity<BinaryContentResponse> findBinaryContent
+      (
+          @PathVariable UUID binaryContentId) {
 
     return ResponseEntity.ok(
         BinaryContentResponse.create(binaryContentService.findById(binaryContentId)));

@@ -10,7 +10,7 @@ import lombok.Builder;
 @Schema(description = "Read Status Find")
 public record ReadStatusFindResponse(
     @Schema(description = "ReadStatus Id", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
-    UUID readStatusId,
+    UUID id,
     @Schema(description = "ReadStatus 생성 시각", example = "2025-04-03T01:49:44.983Z")
     Instant createdAt,
     @Schema(description = "ReadStatus 수정 시각", example = "2025-04-03T01:49:44.983Z")
@@ -25,7 +25,7 @@ public record ReadStatusFindResponse(
 
   public static ReadStatusFindResponse create(ReadStatus readStatus) {
     return ReadStatusFindResponse.builder()
-        .readStatusId(readStatus.getReadStatusId())
+        .id(readStatus.getReadStatusId())
         .createdAt(readStatus.getCreatedAt())
         .updatedAt(readStatus.getUpdatedAt())
         .userId(readStatus.getUserId())

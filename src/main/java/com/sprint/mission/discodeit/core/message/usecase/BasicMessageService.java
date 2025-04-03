@@ -49,7 +49,7 @@ public class BasicMessageService implements MessageService {
 
     List<UUID> binaryContentIdList = makeBinaryContent(binaryContentCommands);
 
-    Message message = Message.create(user.getId(), channel.getChannelId(),
+    Message message = Message.create(user.getId(), channel.getId(),
         command.text(), binaryContentIdList);
 
     messageRepositoryPort.save(message);

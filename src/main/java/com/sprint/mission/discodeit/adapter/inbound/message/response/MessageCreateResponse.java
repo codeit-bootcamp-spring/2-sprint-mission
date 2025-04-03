@@ -31,10 +31,10 @@ public record MessageCreateResponse(
 
   public static MessageCreateResponse create(Message message) {
     return MessageCreateResponse.builder()
-        .id(message.getMessageId())
+        .id(message.getId())
         .createdAt(message.getCreatedAt())
         .updatedAt(message.getUpdatedAt())
-        .content(message.getText())
+        .content(message.getContent())
         .channelId(message.getChannelId())
         .authorId(message.getUserId())
         .build();

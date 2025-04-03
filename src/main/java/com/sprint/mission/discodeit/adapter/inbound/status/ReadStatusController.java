@@ -34,13 +34,11 @@ public class ReadStatusController {
     return ResponseEntity.ok(ReadStatusCreateResponse.create(status));
   }
 
-  @PutMapping
+  @PatchMapping
   public ResponseEntity<ReadStatusUpdateResponse> updateReadStatus(
-      @RequestParam("readStatusId") UUID readStatusId,
-      @RequestBody
-      ReadStatusUpdateRequest requestBody) {
-    UpdateReadStatusCommand command = toUpdateReadStatusCommand(readStatusId,
-        requestBody);
+      @RequestParam UUID readStatusId,
+      @RequestBody ReadStatusUpdateRequest requestBody) {
+    UpdateReadStatusCommand command = toUpdateReadStatusCommand(readStatusId, requestBody);
     ReadStatus status = readStatusService.updateReadStatus(command);
     return ResponseEntity.ok(ReadStatusUpdateResponse.create(status));
   }
