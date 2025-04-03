@@ -1,13 +1,16 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.MessageApi;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,61 +23,73 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
-@Tag(name = "Message", description = "Message API")
-public class MessageController {
+public class MessageController implements MessageApi {
 
   private final BasicMessageService messageService;
 
-  @PostMapping
-  public ResponseEntity<Message> createMessage(
+  @Override
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<Message> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
-      @RequestPart("binaryContents") Optional<List<MultipartFile>> binaryContentFiles)
-      throws IOException {
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> binaryContentFiles) {
 
-    List<BinaryContentCreateRequest> binaryContents = binaryContentFiles.map(files -> {
-      return files.stream().map(file -> {
-        try {
-          return new BinaryContentCreateRequest(
-              file.getOriginalFilename(),
-              file.getContentType(),
-              file.getBytes()
-          );
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-      }).toList();
-    }).orElse(List.of());
+    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(binaryContentFiles)
+        .map(files -> files.stream()
+            .map(file -> {
+              try {
+                return new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+                );
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+            .toList())
+        .orElse(new ArrayList<>());
 
-    Message createdMessage = messageService.create(messageCreateRequest, binaryContents);
+    Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
 
-    return new ResponseEntity<>(createdMessage, HttpStatus.CREATED);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdMessage);
   }
 
+  @Override
   @PatchMapping("/{messageId}")
-  public ResponseEntity<Message> updateMessage(
-      @PathVariable UUID messageId,
+  public ResponseEntity<Message> update(
+      @PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest) {
 
     Message updatedMessage = messageService.update(messageId, messageUpdateRequest);
 
-    return new ResponseEntity<>(updatedMessage, HttpStatus.OK);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedMessage);
   }
 
+  @Override
   @DeleteMapping("/{messageId}")
-  public ResponseEntity<Void> deleteMessage(
-      @PathVariable UUID messageId) {
+  public ResponseEntity<Void> delete(
+      @PathVariable("messageId") UUID messageId) {
 
     messageService.delete(messageId);
 
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 
-  @GetMapping("/channels/{channelId}")
-  public ResponseEntity<List<Message>> getMessagesByChannel(
-      @PathVariable UUID channelId) {
+  @Override
+  @GetMapping
+  public ResponseEntity<List<Message>> findAllByChannelId(
+      @RequestParam("channelId") UUID channelId) {
 
     List<Message> messages = messageService.findAllByChannelId(channelId);
 
-    return new ResponseEntity<>(messages, HttpStatus.OK);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(messages);
   }
 }
