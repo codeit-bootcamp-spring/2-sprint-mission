@@ -9,6 +9,7 @@ public record UserCreateRequest(
     @NotBlank(message = "username이 공백일 수 없습니다.")
     String username,
 
+    @NotBlank
     @Email(message = "email이 올바른 이메일 형식이 아닙니다.")
     String email,
 

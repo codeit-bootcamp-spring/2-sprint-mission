@@ -9,6 +9,7 @@ public record UserUpdateRequest(
     @NotBlank(message = "newUsername이 공백일 수 없습니다.")
     String newUsername,
 
+    @NotBlank
     @Email(message = "newEmail이 유효한 이메일 형식이 아닙니다.")
     String newEmail,
 
