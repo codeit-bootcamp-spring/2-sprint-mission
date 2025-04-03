@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public class RequestException extends BaseException {
 
-    protected RequestException(ErrorCode errorCode) {
+    public RequestException(ErrorCode errorCode) {
         super(errorCode);
     }
 }
