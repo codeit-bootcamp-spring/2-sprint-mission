@@ -7,35 +7,43 @@ import java.util.UUID;
 import java.io.Serializable;
 
 @Getter
-public class UserStatus implements Serializable{
-    private static final long serialVersionUID = 1L;
+public class UserStatus implements Serializable {
 
-    private final UUID id;
-    private final UUID userId;
-    private final Instant craetedAt;
-    private Instant updatedAt;
-    private Instant lastOnlineAt;
-    private boolean online;
+  private static final long serialVersionUID = 1L;
 
-    public UserStatus(UUID userId, Instant lastOnlineAt) {
-        this.id = UUID.randomUUID();
-        this.userId = userId;
-        this.craetedAt = Instant.now();
-        this.updatedAt = Instant.now();
-        this.lastOnlineAt = lastOnlineAt;
-        this.online = isOnline();
+  private final UUID id;
+  private final UUID userId;
+  private final Instant craetedAt;
+  private Instant updatedAt;
+  private Instant lastActiveAt;
+  private boolean online;
+
+  public UserStatus(UUID userId, Instant lastActiveAt) {
+    this.id = UUID.randomUUID();
+    this.userId = userId;
+    this.craetedAt = Instant.now();
+    this.updatedAt = Instant.now();
+    this.lastActiveAt = lastActiveAt;
+    this.online = isOnline();
+  }
+
+  public void updateLastActiveAt(Instant lastActiveAt) {
+    boolean anyValueUpdated = false;
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
+      anyValueUpdated = true;
     }
+    this.online = isOnline();
 
-    public Instant updateLastOnline(Instant lastOnlineAt) {
-        this.lastOnlineAt = lastOnlineAt;
-        this.online = isOnline();
-        return lastOnlineAt;
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 
-    public boolean isOnline(){
-        Instant fiveMinuteAgo = Instant.now().minusSeconds(5 * 60);
+  public boolean isOnline() {
+    Instant fiveMinuteAgo = Instant.now().minusSeconds(5 * 60);
 
-        return lastOnlineAt.isAfter(fiveMinuteAgo);
-    }
+    return lastActiveAt.isAfter(fiveMinuteAgo);
+  }
 
 }
