@@ -36,7 +36,7 @@ public interface MessageApi {
       @ApiResponse(responseCode = "404", description = "Message를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = "Message with id {messageId} not found"))),})
   ResponseEntity<Message> update(
       @Parameter(description = "수정할 Message ID") UUID messageId,
-      @Parameter(description = "수정할 Message 내용") MessageUpdateRequest request);
+      @Parameter(description = "수정할 Message 내용") MessageUpdateRequest messageUpdateRequest);
 
   @Operation(summary = "Message 삭제")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Message가 성공적으로 삭제됨"),

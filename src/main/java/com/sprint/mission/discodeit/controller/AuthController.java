@@ -17,6 +17,7 @@ public class AuthController implements AuthApi {
 
   private final AuthService authService;
 
+  @Override
   @PostMapping("/login")
   public ResponseEntity<User> login(
       @RequestBody LoginRequest loginRequest) {

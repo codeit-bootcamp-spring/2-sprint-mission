@@ -32,7 +32,7 @@ public interface ChannelApi {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Private Channel이 성공적으로 생성됨", content = @Content(schema = @Schema(implementation = Channel.class)))})
   ResponseEntity<Channel> create(
-      @Parameter(description = "Private Channel 생성 정보") PrivateChannelCreateRequest PrivateChannelCreateRequest);
+      @Parameter(description = "Private Channel 생성 정보") PrivateChannelCreateRequest privateChannelCreateRequest);
 
   @Operation(summary = "Channel 정보 수정")
   @ApiResponses(value = {
@@ -41,7 +41,7 @@ public interface ChannelApi {
       @ApiResponse(responseCode = "400", description = "Private Channel은 수정할 수 없음", content = @Content(examples = @ExampleObject(value = "Private channel cannot be updated")))})
   ResponseEntity<Channel> update(
       @Parameter(description = "수정할 Channel ID") UUID channelId,
-      @Parameter(description = "수정할 Channel 정보") PublicChannelUpdateRequest PublicChannelUpdateRequest);
+      @Parameter(description = "수정할 Channel 정보") PublicChannelUpdateRequest publicChannelUpdateRequest);
 
   @Operation(summary = "Channel 삭제")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Channel이 성공적으로 삭제됨"),
