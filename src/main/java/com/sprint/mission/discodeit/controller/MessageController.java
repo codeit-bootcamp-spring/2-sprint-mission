@@ -32,7 +32,7 @@ public class MessageController implements MessageApi {
     if (messageCreateRequest == null) {
       return ResponseEntity.badRequest().build();
     }
-    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
+    /*List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
             .map(file -> {
               try {
@@ -47,6 +47,8 @@ public class MessageController implements MessageApi {
             })
             .toList())
         .orElse(new ArrayList<>());
+        */
+    List<BinaryContentCreateRequest> attachmentRequests = new ArrayList<>(); //임시용 테스트 후 삭제
     _Message message = messageService.create(messageCreateRequest, attachmentRequests);
 
     ModelMapper modelMapper = new ModelMapper();

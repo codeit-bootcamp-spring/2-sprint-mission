@@ -25,7 +25,7 @@ public class AuthController implements AuthApi {
   }
 
   @Override
-  public ResponseEntity<ApiUser> login(LoginRequest loginRequest) {
+  public ResponseEntity<User> login(LoginRequest loginRequest) {
     authService.login(loginRequest);
     return AuthApi.super.login(loginRequest);
   }
