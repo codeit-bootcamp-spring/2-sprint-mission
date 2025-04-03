@@ -82,17 +82,4 @@ public class ChannelController {
     return ResponseEntity.ok(new ChannelDeleteResponse(true));
   }
 
-  //  @PutMapping("/join/{channelId}")
-//  public ResponseEntity<String> join(@PathVariable UUID userId, @PathVariable UUID channelId) {
-//    channelService.join(channelId, userId);
-//
-//    return ResponseEntity.ok("Success");
-//  }
-//
-//  @PutMapping("/quit/{channelId}")
-//  public ResponseEntity<String> quit(@PathVariable UUID userId, @PathVariable UUID channelId) {
-//    channelService.quit(channelId, userId);
-//
-//    return ResponseEntity.ok("Success");
-//  }
 }

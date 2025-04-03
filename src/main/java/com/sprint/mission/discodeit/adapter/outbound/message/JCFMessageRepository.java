@@ -67,8 +67,8 @@ public class JCFMessageRepository implements MessageRepositoryPort {
 //    }
 //
 //    @Override
-//    public List<Message> findAllByChannelId(UUID channelId) {
-//        return messageList.get(channelId);
+//    public List<Message> findAllByChannelId(UUID id) {
+//        return messageList.get(id);
 //    }
 //
 //    @Override

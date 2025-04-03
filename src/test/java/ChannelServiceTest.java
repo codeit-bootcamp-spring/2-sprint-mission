@@ -16,29 +16,29 @@ class ChannelServiceTest {
 //  @InjectMocks
 //  private BasicChannelService channelService;
 //
-//  private UUID channelId;
+//  private UUID id;
 //  private UUID userId;
 //
 //  @BeforeEach
 //  void setup() {
-//    channelId = UUID.randomUUID();
+//    id = UUID.randomUUID();
 //    userId = UUID.randomUUID();
 //  }
 //
 //  @Test
 //  void find_shouldReturnChannelFindDTO_whenPublicChannel() {
 //    Channel channel = new Channel(UUID.randomUUID(), userId, "general");
-//    ReflectionTestUtils.setField(channel, "channelId", channelId);
-//    when(channelRepository.find(channelId)).thenReturn(channel);
-//    when(messageRepository.findAllByChannelId(channelId)).thenReturn(List.of(
-//        new Message(userId, "general", channelId, "hi"),
-//        new Message(userId, "general", channelId, "hello")
+//    ReflectionTestUtils.setField(channel, "id", id);
+//    when(channelRepository.find(id)).thenReturn(channel);
+//    when(messageRepository.findAllByChannelId(id)).thenReturn(List.of(
+//        new Message(userId, "general", id, "hi"),
+//        new Message(userId, "general", id, "hello")
 //    ));
 //
-//    ChannelFindDTO result = channelService.find(channelId);
+//    ChannelFindDTO result = channelService.find(id);
 //
 //    assertNotNull(result);
-//    assertEquals(channelId, result.channelId());
+//    assertEquals(id, result.id());
 //    assertEquals("general", result.name());
 //    assertTrue(result.userIdList().isEmpty()); // Public channel일 경우
 //  }
@@ -46,15 +46,15 @@ class ChannelServiceTest {
 //  @Test
 //  void find_shouldIncludeUserList_whenPrivateChannel() {
 //    Channel channel = new Channel(UUID.randomUUID(), userId, null);
-//    ReflectionTestUtils.setField(channel, "channelId", channelId);
+//    ReflectionTestUtils.setField(channel, "id", id);
 //    channel.setType(ChannelType.PRIVATE);
-//    when(channelRepository.find(channelId)).thenReturn(channel);
-//    when(messageRepository.findAllByChannelId(channelId)).thenReturn(Collections.emptyList());
-//    when(readStatusRepository.findAllByChannelId(channelId)).thenReturn(List.of(
-//        new ReadStatus(userId, channelId, Instant.now())
+//    when(channelRepository.find(id)).thenReturn(channel);
+//    when(messageRepository.findAllByChannelId(id)).thenReturn(Collections.emptyList());
+//    when(readStatusRepository.findAllByChannelId(id)).thenReturn(List.of(
+//        new ReadStatus(userId, id, Instant.now())
 //    ));
 //
-//    ChannelFindDTO result = channelService.find(channelId);
+//    ChannelFindDTO result = channelService.find(id);
 //
 //    assertNotNull(result);
 //    assertEquals(1, result.userIdList().size());
@@ -67,11 +67,11 @@ class ChannelServiceTest {
 //    UUID publicChannelId = UUID.randomUUID();
 //
 //    Channel privateChannel = new Channel(UUID.randomUUID(), userId, null);
-//    ReflectionTestUtils.setField(privateChannel, "channelId", privateChannelId);
+//    ReflectionTestUtils.setField(privateChannel, "id", privateChannelId);
 //    privateChannel.setType(ChannelType.PRIVATE);
 //
 //    Channel publicChannel = new Channel(UUID.randomUUID(), userId, "public");
-//    ReflectionTestUtils.setField(publicChannel, "channelId", publicChannelId);
+//    ReflectionTestUtils.setField(publicChannel, "id", publicChannelId);
 //
 //    when(readStatusRepository.findAllByUserId(userId)).thenReturn(List.of(
 //        new ReadStatus(userId, privateChannelId, Instant.now())

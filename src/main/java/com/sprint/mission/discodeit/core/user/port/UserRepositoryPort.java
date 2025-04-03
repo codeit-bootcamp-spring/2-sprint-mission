@@ -21,6 +21,8 @@ public interface UserRepositoryPort {
   List<User> findAll();
 
   void delete(UUID id);
+
+  boolean existId(UUID id);
 }
 
 // 하나로 묶은 서비스 인터페이스 만들어 되지만

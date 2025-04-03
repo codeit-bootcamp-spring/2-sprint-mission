@@ -26,7 +26,7 @@ public final class ChannelDtoMapper {
   static UpdateChannelCommand toUpdateChannelCommand(UUID channelId,
       ChannelUpdateRequest requestBody) {
     return new UpdateChannelCommand(channelId, requestBody.newName(), requestBody.newDescription());
-//    return new UpdateChannelCommand(channelId, requestBody.newName(), requestBody.newType());
+//    return new UpdateChannelCommand(id, requestBody.newName(), requestBody.newType());
   }
 
 }

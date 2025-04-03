@@ -46,4 +46,10 @@ public class JCFUserRepository implements UserRepositoryPort {
   public void delete(UUID id) {
     userList.remove(id);
   }
+
+  @Override
+  public boolean existId(UUID id) {
+    return userList.containsKey(id);
+  }
+
 }

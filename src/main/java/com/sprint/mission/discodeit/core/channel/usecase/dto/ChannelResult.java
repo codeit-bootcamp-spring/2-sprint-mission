@@ -13,7 +13,7 @@ import java.util.UUID;
 @Schema(description = "Channel Item")
 public record ChannelResult(
     @Schema(description = "Channel Id", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
-    UUID channelId,
+    UUID id,
     @Schema(description = "Channel Type", example = "PUBLIC")
     ChannelType type,
     @Schema(description = "Channel name", example = "string")
@@ -32,7 +32,7 @@ public record ChannelResult(
   public static ChannelResult create(Channel channel, List<UUID> userIdList,
       Instant lastMessageAt) {
     return ChannelResult.builder()
-        .channelId(channel.getId())
+        .id(channel.getId())
         .type(channel.getType())
         .name(channel.getName())
         .description(channel.getDescription())

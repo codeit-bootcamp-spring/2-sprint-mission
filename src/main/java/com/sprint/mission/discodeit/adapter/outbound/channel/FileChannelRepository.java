@@ -57,28 +57,14 @@ public class FileChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public void remove(UUID channelId) {
+  public void delete(UUID channelId) {
     channelList.remove(channelId);
     fileRepository.save(channelList);
   }
 
-//  @Override
-//  public User join(Channel channel, User user) {
-//    List<User> list = channel.getUserList();
-//    list.add(user);
-//
-//    return user;
-//  }
-//
-//  @Override
-//  public User quit(Channel channel, User user) {
-//    List<User> list = channel.getUserList();
-//    if (list.isEmpty()) {
-//      throw new UserListEmptyError("채널 내 유저 리스트가 비어있습니다.");
-//    }
-//    list.remove(user);
-//
-//    fileRepository.save(channelList);
-//    return user;
-//  }
+  @Override
+  public boolean existId(UUID channelId) {
+    return channelList.containsKey(channelId);
+  }
+
 }

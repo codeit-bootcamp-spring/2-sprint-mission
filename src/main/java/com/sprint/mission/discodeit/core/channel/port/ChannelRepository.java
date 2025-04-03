@@ -17,9 +17,7 @@ public interface ChannelRepository {
 
   List<Channel> findAllByChannelId(UUID channelId);
 
-  void remove(UUID channelId);
+  void delete(UUID channelId);
 
-//  User join(Channel channel, User user);
-//
-//  User quit(Channel channel, User user);
+  boolean existId(UUID channelId);
 }

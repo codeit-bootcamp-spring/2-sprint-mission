@@ -63,7 +63,9 @@ public class MessageController {
         .orElse(new ArrayList<>());
 
     CreateMessageCommand command = toCreateMessageCommand(requestBody);
+    
     CreateMessageResult result = messageService.create(command, attachmentRequests);
+
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(MessageCreateResponse.create(result.message()));
   }

@@ -18,29 +18,32 @@ import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
-import com.sprint.mission.discodeit.logging.CustomLogging;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
+  private static final Logger logger = LoggerFactory.getLogger(BasicChannelService.class);
+
   //  private final UserRepositoryPort userRepositoryPort;
   private final ChannelRepository channelRepository;
   private final MessageRepositoryPort messageRepositoryPort;
   private final ReadStatusRepository readStatusRepository;
 
-  @CustomLogging
   @Override
   public CreatePublicChannelResult create(CreatePublicChannelCommand command) {
     Channel channel = Channel.create(command.name(), command.description(),
         ChannelType.PUBLIC);
+    logger.info("Public Channel created {}", channel.getId());
 
     return new CreatePublicChannelResult(channelRepository.save(channel));
   }
@@ -54,7 +57,9 @@ public class BasicChannelService implements ChannelService {
         .map(u -> ReadStatus.create(u, createdChannel.getId(), Instant.MIN))
         .forEach(readStatusRepository::save);
 
-    return new CreatePrivateChannelResult(channel);
+    logger.info("Private Channel created {}", channel.getId());
+
+    return new CreatePrivateChannelResult(channelRepository.save(channel));
   }
 
   @Override
@@ -99,7 +104,6 @@ public class BasicChannelService implements ChannelService {
         .toList());
   }
 
-  @CustomLogging
   @Override
   public UpdateChannelResult update(UpdateChannelCommand command) {
     Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
@@ -111,20 +115,25 @@ public class BasicChannelService implements ChannelService {
     }
 
     channel.update(command.newName(), command.description());
+
+    logger.info("Channel Updated: name {}, description {}", channel.getName(),
+        channel.getDescription());
     return new UpdateChannelResult(channelRepository.save(channel));
   }
 
   @Override
   public void delete(UUID channelId) {
-    channelRepository.remove(channelId);
+    channelRepository.delete(channelId);
     deleteAllMessage(channelId);
     deleteAllReadStatus(channelId);
+    logger.info("Channel deleted {}", channelId);
   }
 
   private void deleteAllMessage(UUID channelId) {
     List<Message> list = messageRepositoryPort.findAllByChannelId(channelId);
     for (Message message : list) {
       messageRepositoryPort.deleteByMessageId(message.getId());
+      logger.info("message deleted {}", message.getId());
     }
   }
 
@@ -132,24 +141,7 @@ public class BasicChannelService implements ChannelService {
     List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channelId);
     for (ReadStatus status : readStatusList) {
       readStatusRepository.delete(status.getReadStatusId());
+      logger.info("Read Status deleted {}", status.getReadStatusId());
     }
   }
-
-//  @Override
-//  public void join(UUID channelId, UUID userId) {
-//    Channel findChannel = channelRepository.find(channelId);
-//    User user = userRepositoryPort.findById(userId)
-//        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
-//    channelRepository.join(findChannel, user);
-//
-//  }
-//
-//  @CustomLogging
-//  @Override
-//  public void quit(UUID channelId, UUID userId) {
-//    Channel findChannel = channelRepository.find(channelId);
-//    User user = userRepositoryPort.findById(userId)
-//        .orElseThrow(() -> new UserNotFoundError("유저가 존재하지 않습니다."));
-//    channelRepository.quit(findChannel, user);
-//  }
 }

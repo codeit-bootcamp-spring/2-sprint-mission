@@ -20,7 +20,7 @@ public final class UserDtoMapper {
   }
 
   static LoginUserCommand toLoginUserCommand(UserLoginRequest requestBody) {
-    return new LoginUserCommand(requestBody.name(), requestBody.password());
+    return new LoginUserCommand(requestBody.username(), requestBody.password());
   }
 
   static UpdateUserCommand toUpdateUserCommand(UUID userId, UserUpdateRequest requestBody) {

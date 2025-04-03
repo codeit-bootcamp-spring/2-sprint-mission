@@ -66,5 +66,10 @@ public class FileUserRepository implements UserRepositoryPort {
     userList.remove(id);
     fileRepository.save(userList);
   }
+
+  @Override
+  public boolean existId(UUID id) {
+    return userList.containsKey(id);
+  }
 }
 
