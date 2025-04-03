@@ -72,14 +72,14 @@ public class BasicUserService implements UserService {
 
         UserStatus userStatus = userStatusService.findById(user.getId());
 
-        return new UserDto(user, userStatus.isActive());
+        return new UserDto(user, userStatus.isOnline());
     }
 
     @Override
     public List<UserDto> findAll() {
         return userRepository.findAll().stream().map(user -> {
             UserStatus userStatus = userStatusService.findById(user.getId());
-            return new UserDto(user, userStatus.isActive());
+            return new UserDto(user, userStatus.isOnline());
         }).toList();
     }
 
