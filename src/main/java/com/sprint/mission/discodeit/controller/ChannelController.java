@@ -48,8 +48,13 @@ public class ChannelController {
   }
 
 
-  @PatchMapping(path = "/{channelId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @ApiResponse(responseCode = "200", description = "채널 수정 성공")
+  @Operation(summary = "채널 수정")
+  @ApiResponse(
+      responseCode = "200",
+      description = "채널 수정 성공",
+      content = @Content(mediaType = "*/*")
+  )
+  @PatchMapping(path = "/{channelId}")
   public ResponseEntity<ChannelResponse> updateChannel(
       @PathVariable UUID channelId,
       @RequestBody UpdateChannelRequest request) {
