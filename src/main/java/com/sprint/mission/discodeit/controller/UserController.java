@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ApiDataResponse;
-import com.sprint.mission.discodeit.dto.FindUserDto;
-import com.sprint.mission.discodeit.dto.SaveBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.SaveUserRequestDto;
-import com.sprint.mission.discodeit.dto.UpdateUserRequestDto;
-import com.sprint.mission.discodeit.dto.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.FindUserDto;
+import com.sprint.mission.discodeit.dto.binaryContent.SaveBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.user.SaveUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;

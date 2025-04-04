@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.FindBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.SaveBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.binaryContent.FindBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.binaryContent.SaveBinaryContentRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryData;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;

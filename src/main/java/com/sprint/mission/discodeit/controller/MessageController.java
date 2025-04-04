@@ -3,10 +3,10 @@ package com.sprint.mission.discodeit.controller;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 import com.sprint.mission.discodeit.dto.ApiDataResponse;
-import com.sprint.mission.discodeit.dto.FindMessageByChannelIdResponseDto;
-import com.sprint.mission.discodeit.dto.SaveBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.message.FindMessageByChannelIdResponseDto;
+import com.sprint.mission.discodeit.dto.binaryContent.SaveBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
