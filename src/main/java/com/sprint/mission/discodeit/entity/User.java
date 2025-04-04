@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -17,7 +18,9 @@ public class User implements Serializable {
     private String username;
     private String email;
     private String password;
-    private UUID profileId;
+    private UUID profileId;     // BinaryContent
+    @Setter
+    private boolean online;
 
     public User(String username, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
@@ -27,6 +30,7 @@ public class User implements Serializable {
         this.email = email;
         this.password = password;
         this.profileId = profileId;
+        this.online = false;
     }
 
     public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
@@ -43,7 +47,6 @@ public class User implements Serializable {
             this.password = newPassword;
             anyValueUpdated = true;
         }
-
         if (newProfileId != null && !newProfileId.equals(this.profileId)) {
             this.profileId = newProfileId;
             anyValueUpdated = true;
@@ -53,4 +56,9 @@ public class User implements Serializable {
             this.updatedAt = Instant.now();
         }
     }
+
+    public Boolean isOnline() {
+        return online;
+    }
+
 }
