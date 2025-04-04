@@ -30,7 +30,7 @@ public class UserStatus implements Serializable, Identifiable {
   }
 
   public boolean isLoginUser() {
-    if (Duration.between(lastActiveAt, Instant.now()).toMinutes() < 5) {
+    if (Duration.between(this.lastActiveAt, Instant.now()).toMinutes() < 5) {
       return true;
     } else {
       return false;

@@ -12,13 +12,17 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface ReadStatusMapper {
-    ReadStatusMapper INSTANCE = Mappers.getMapper(ReadStatusMapper.class);
 
-    CreateReadStatusParam toReadStatusParam(CreateReadStatusRequestDTO createReadStatusRequestDTO);
-    CreateReadStatusResponseDTO toReadStatusResponseDTO(ReadStatusDTO readStatusDTO);
+  ReadStatusMapper INSTANCE = Mappers.getMapper(ReadStatusMapper.class);
 
-    UpdateReadStatusResponseDTO toUpdateReadStatusResponseDTO(UpdateReadStatusDTO updateReadStatusDTO);
+  CreateReadStatusParam toReadStatusParam(CreateReadStatusRequestDTO createReadStatusRequestDTO);
 
-    ReadStatus toEntity(CreateReadStatusParam createReadStatusParam);
-    ReadStatusDTO toReadStatusDTO(ReadStatus readStatus);
+  CreateReadStatusResponseDTO toReadStatusResponseDTO(ReadStatusDTO readStatusDTO);
+
+  UpdateReadStatusResponseDTO toUpdateReadStatusResponseDTO(
+      UpdateReadStatusDTO updateReadStatusDTO);
+
+  ReadStatus toEntity(CreateReadStatusParam createReadStatusParam);
+
+  ReadStatusDTO toReadStatusDTO(ReadStatus readStatus);
 }

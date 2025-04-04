@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-03T20:22:36+0900",
+    date = "2025-04-03T21:09:18+0900",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
@@ -25,7 +25,6 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         if ( createReadStatusRequestDTO == null ) {
             return null;
         }
-
         UUID userId = null;
         UUID channelId = null;
         Instant lastReadAt = null;
@@ -48,12 +47,12 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         UUID id = null;
         UUID userId = null;
         UUID channelId = null;
+        Instant lastReadAt = null;
 
         id = readStatusDTO.id();
         userId = readStatusDTO.userId();
         channelId = readStatusDTO.channelId();
-
-        Instant lastReadAt = null;
+        lastReadAt = readStatusDTO.lastReadAt();
 
         CreateReadStatusResponseDTO createReadStatusResponseDTO = new CreateReadStatusResponseDTO( id, userId, channelId, lastReadAt );
 
@@ -104,14 +103,14 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         UUID id = null;
         UUID userId = null;
         UUID channelId = null;
+        Instant lastReadAt = null;
 
         id = readStatus.getId();
         userId = readStatus.getUserId();
         channelId = readStatus.getChannelId();
+        lastReadAt = readStatus.getLastReadAt();
 
-        Instant updatedAt = null;
-
-        ReadStatusDTO readStatusDTO = new ReadStatusDTO( id, userId, channelId, updatedAt );
+        ReadStatusDTO readStatusDTO = new ReadStatusDTO( id, userId, channelId, lastReadAt );
 
         return readStatusDTO;
     }

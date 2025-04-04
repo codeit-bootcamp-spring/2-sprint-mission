@@ -6,7 +6,7 @@ import java.util.UUID;
 public record UpdateUserStatusResponseDTO(
     UUID id,
     UUID userId,
-    Instant updatedAt
+    Instant lastActiveAt
 ) {
 
 }

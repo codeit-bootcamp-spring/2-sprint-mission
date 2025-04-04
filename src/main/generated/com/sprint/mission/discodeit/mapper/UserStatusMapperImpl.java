@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-03T20:22:36+0900",
+    date = "2025-04-03T21:07:51+0900",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
@@ -23,13 +23,13 @@ public class UserStatusMapperImpl implements UserStatusMapper {
 
         UUID id = null;
         UUID userId = null;
+        Instant lastActiveAt = null;
 
         id = userStatus.getId();
         userId = userStatus.getUserId();
+        lastActiveAt = userStatus.getLastActiveAt();
 
-        Instant updatedAt = null;
-
-        UpdateUserStatusResponseDTO updateUserStatusResponseDTO = new UpdateUserStatusResponseDTO( id, userId, updatedAt );
+        UpdateUserStatusResponseDTO updateUserStatusResponseDTO = new UpdateUserStatusResponseDTO( id, userId, lastActiveAt );
 
         return updateUserStatusResponseDTO;
     }

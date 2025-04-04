@@ -11,5 +11,4 @@ public interface UserStatusMapper {
   UserStatusMapper INSTANCE = Mappers.getMapper(UserStatusMapper.class);
 
   UpdateUserStatusResponseDTO toUpdateUserStatusResponseDTO(UserStatus userStatus);
-
 }
