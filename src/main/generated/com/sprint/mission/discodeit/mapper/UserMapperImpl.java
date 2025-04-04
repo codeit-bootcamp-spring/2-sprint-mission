@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-03T20:22:36+0900",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
+    date = "2025-04-04T10:27:12+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
 )
 @Component
 public class UserMapperImpl implements UserMapper {
@@ -98,6 +98,7 @@ public class UserMapperImpl implements UserMapper {
 
         UUID id = null;
         UUID profileId = null;
+        Instant createdAt = null;
         Instant updatedAt = null;
         String username = null;
         String email = null;
@@ -105,12 +106,11 @@ public class UserMapperImpl implements UserMapper {
 
         id = updateUserDTO.id();
         profileId = updateUserDTO.profileId();
+        createdAt = updateUserDTO.createdAt();
         updatedAt = updateUserDTO.updatedAt();
         username = updateUserDTO.username();
         email = updateUserDTO.email();
         online = updateUserDTO.online();
-
-        Instant createdAt = null;
 
         UpdateUserResponseDTO updateUserResponseDTO = new UpdateUserResponseDTO( id, profileId, createdAt, updatedAt, username, email, online );
 
@@ -173,27 +173,29 @@ public class UserMapperImpl implements UserMapper {
     }
 
     @Override
-    public UpdateUserDTO toUpdateUserDTO(User user, BinaryContentDTO binaryContentDTO) {
+    public UpdateUserDTO toUpdateUserDTO(User user, boolean online, BinaryContentDTO binaryContentDTO) {
         if ( user == null && binaryContentDTO == null ) {
             return null;
         }
 
         UUID id = null;
-        UUID profileId = null;
+        Instant createdAt = null;
         Instant updatedAt = null;
+        UUID profileId = null;
         String username = null;
         String email = null;
         if ( user != null ) {
             id = user.getId();
-            profileId = user.getProfileId();
+            createdAt = user.getCreatedAt();
             updatedAt = user.getUpdatedAt();
+            profileId = user.getProfileId();
             username = user.getUsername();
             email = user.getEmail();
         }
+        Boolean online1 = null;
+        online1 = online;
 
-        Boolean online = null;
-
-        UpdateUserDTO updateUserDTO = new UpdateUserDTO( id, profileId, updatedAt, username, email, online );
+        UpdateUserDTO updateUserDTO = new UpdateUserDTO( id, profileId, createdAt, updatedAt, username, email, online1 );
 
         return updateUserDTO;
     }

@@ -11,7 +11,7 @@ public record LoginDTO(
     Instant updatedAt,
     String username,
     String email,
-    Boolean isLogin
+    Boolean online
 ) {
 
 }

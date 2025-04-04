@@ -42,15 +42,14 @@ public class BinaryContentController {
   }
 
   @Operation(summary = "BinaryContent 다건 조회",
-      description = "attachmentIds에 포함된 binaryContentId에 해당하는 BinaryContent들을 조회합니다.",
+      description = "binaryContentIds에 해당하는 BinaryContent들을 조회합니다.",
       responses = {
           @ApiResponse(responseCode = "200", description = "BinaryContent 다건 조회 성공"),
-          @ApiResponse(responseCode = "400", description = "attachmentIds가 입력되지 않음 (DTO 유효성 검증 실패)"),
           @ApiResponse(responseCode = "404", description = "binaryContentId에 해당하는 BinaryContnet가 존재하지 않음")
       })
   @GetMapping
   public ResponseEntity<List<BinaryContentDTO>> getBinaryContentAllIn(
-      @RequestParam("binaryContnetsIds") List<UUID> binaryContentIds) {
+      @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
     List<BinaryContentDTO> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity.ok(binaryContents);
   }

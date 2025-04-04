@@ -8,6 +8,7 @@ import java.util.UUID;
 public record UpdateUserDTO(
     UUID id,
     UUID profileId,
+    Instant createdAt,
     Instant updatedAt,
     String username,
     String email,

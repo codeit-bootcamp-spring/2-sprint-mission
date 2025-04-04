@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-03T20:22:36+0900",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
+    date = "2025-04-04T11:27:04+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
 )
 @Component
 public class MessageMapperImpl implements MessageMapper {
@@ -87,8 +87,8 @@ public class MessageMapperImpl implements MessageMapper {
     }
 
     @Override
-    public MessageDTO toMessageDTO(Message message, UserDTO userDTO) {
-        if ( message == null && userDTO == null ) {
+    public MessageDTO toMessageDTO(Message message) {
+        if ( message == null ) {
             return null;
         }
 
@@ -99,18 +99,17 @@ public class MessageMapperImpl implements MessageMapper {
         String content = null;
         UUID channelId = null;
         UUID authorId = null;
-        if ( message != null ) {
-            id = message.getId();
-            createdAt = message.getCreatedAt();
-            updatedAt = message.getUpdatedAt();
-            List<UUID> list = message.getAttachmentIds();
-            if ( list != null ) {
-                attachmentIds = new ArrayList<UUID>( list );
-            }
-            content = message.getContent();
-            channelId = message.getChannelId();
-            authorId = message.getAuthorId();
+
+        id = message.getId();
+        createdAt = message.getCreatedAt();
+        updatedAt = message.getUpdatedAt();
+        List<UUID> list = message.getAttachmentIds();
+        if ( list != null ) {
+            attachmentIds = new ArrayList<UUID>( list );
         }
+        content = message.getContent();
+        channelId = message.getChannelId();
+        authorId = message.getAuthorId();
 
         MessageDTO messageDTO = new MessageDTO( id, createdAt, updatedAt, attachmentIds, content, channelId, authorId );
 

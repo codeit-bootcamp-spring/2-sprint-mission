@@ -7,12 +7,12 @@ import java.util.UUID;
 
 public record LoginResponseDTO(
     UUID id,
-    BinaryContentDTO binaryContentDTO,
+    UUID profileId,
     Instant createdAt,
     Instant updatedAt,
     String username,
     String email,
-    Boolean isLogin
+    Boolean online
 ) {
 
 }

@@ -91,8 +91,8 @@ public class UserController {
       })
   @PatchMapping("/{userId}")
   public ResponseEntity<UpdateUserResponseDTO> updateUser(@PathVariable("userId") UUID id,
-      @RequestPart("user") @Valid UpdateUserRequestDTO updateUserRequestDTO,
-      @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
+      @RequestPart("userUpdateRequest") @Valid UpdateUserRequestDTO updateUserRequestDTO,
+      @RequestPart(value = "profile", required = false) MultipartFile multipartFile) {
     UpdateUserParam updateUserParam = userMapper.toUpdateUserParam(updateUserRequestDTO);
     UpdateUserDTO updateUserDTO = userService.update(id, updateUserParam, multipartFile);
     UpdateUserResponseDTO updatedUser = userMapper.toUpdateUserResponseDTO(updateUserDTO);

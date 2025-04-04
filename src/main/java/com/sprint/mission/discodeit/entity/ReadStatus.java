@@ -10,6 +10,7 @@ import java.util.UUID;
 @Getter
 public class ReadStatus implements Serializable, Identifiable {
 
+  private static final long serialVersionUID = 1L;
   private final UUID id;
   private final UUID userId;
   private final UUID channelId;
@@ -25,7 +26,7 @@ public class ReadStatus implements Serializable, Identifiable {
     this.lastReadAt = lastReadAt;
   }
 
-  public void updateReadStatus() {
-    this.lastReadAt = Instant.now();
+  public void updateReadStatus(Instant newLastReadAt) {
+    this.lastReadAt = newLastReadAt;
   }
 }

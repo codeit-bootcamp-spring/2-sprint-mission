@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-03T20:22:35+0900",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
+    date = "2025-04-04T10:27:12+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
 )
 @Component
 public class ChannelMapperImpl implements ChannelMapper {
@@ -190,8 +190,8 @@ public class ChannelMapperImpl implements ChannelMapper {
     }
 
     @Override
-    public UpdateChannelDTO toUpdateChannelDTO(Channel channel) {
-        if ( channel == null ) {
+    public UpdateChannelDTO toUpdateChannelDTO(Channel channel, Instant lastMessageAt) {
+        if ( channel == null && lastMessageAt == null ) {
             return null;
         }
 
@@ -199,16 +199,18 @@ public class ChannelMapperImpl implements ChannelMapper {
         ChannelType type = null;
         String name = null;
         String description = null;
-
-        id = channel.getId();
-        type = channel.getType();
-        name = channel.getName();
-        description = channel.getDescription();
+        if ( channel != null ) {
+            id = channel.getId();
+            type = channel.getType();
+            name = channel.getName();
+            description = channel.getDescription();
+        }
+        Instant lastMessageAt1 = null;
+        lastMessageAt1 = lastMessageAt;
 
         List<UUID> participantIds = null;
-        Instant lastMessageAt = null;
 
-        UpdateChannelDTO updateChannelDTO = new UpdateChannelDTO( id, type, name, description, participantIds, lastMessageAt );
+        UpdateChannelDTO updateChannelDTO = new UpdateChannelDTO( id, type, name, description, participantIds, lastMessageAt1 );
 
         return updateChannelDTO;
     }

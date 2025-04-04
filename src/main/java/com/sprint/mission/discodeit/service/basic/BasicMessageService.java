@@ -53,29 +53,28 @@ public class BasicMessageService implements MessageService {
     findChannelById(createMessageParam.channelId());
 
     List<BinaryContent> binaryContentList = createBinaryContentList(multipartFiles);
-    if (binaryContentList.isEmpty()) {
+    if (!binaryContentList.isEmpty() && binaryContentList != null) {
       binaryContentList.forEach(binaryContentService::create);
     }
 
     Message message = messageMapper.toEntity(createMessageParam, binaryContentList);
     messageRepository.save(message);
 
-    UserDTO userDTO = createUserDTO(message.getAuthorId());
-    return messageMapper.toMessageDTO(message, userDTO);
+    return messageMapper.toMessageDTO(message);
   }
 
   @Override
   public MessageDTO find(UUID messageId) {
     Message message = findMessageById(messageId);
     UserDTO userDTO = createUserDTO(message.getAuthorId());
-    return messageMapper.toMessageDTO(message, userDTO);
+    return messageMapper.toMessageDTO(message);
   }
 
   @Override
   public List<MessageDTO> findAllByChannelId(UUID channelId) {
     List<Message> messages = messageRepository.findAllByChannelId(channelId);
     return messages.stream()
-        .map(message -> messageMapper.toMessageDTO(message, createUserDTO(message.getAuthorId())))
+        .map(message -> messageMapper.toMessageDTO(message))
         .toList();
   }
 
@@ -120,7 +119,8 @@ public class BasicMessageService implements MessageService {
   }
 
   private List<BinaryContent> createBinaryContentList(List<MultipartFile> multipartFiles) {
-    if (multipartFiles == null || multipartFiles.isEmpty()) {
+    if (multipartFiles == null || multipartFiles.isEmpty()
+        || multipartFiles.get(0).getSize() == 0) {
       return Collections.emptyList();
     }
     return multipartFiles.stream()
@@ -128,7 +128,7 @@ public class BasicMessageService implements MessageService {
           try {
             return BinaryContent.builder()
                 .contentType(multipartFile.getContentType())
-                .bytes(multipartFile.getBytes()) // IOException 처리됨
+                .bytes(multipartFile.getBytes())
                 .size(multipartFile.getSize())
                 .filename(multipartFile.getOriginalFilename())
                 .build();

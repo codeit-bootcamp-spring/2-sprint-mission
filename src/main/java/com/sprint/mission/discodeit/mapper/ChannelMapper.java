@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.controller.channel.*;
 import com.sprint.mission.discodeit.dto.service.channel.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -44,7 +45,7 @@ public interface ChannelMapper {
     );
   }
 
-  UpdateChannelDTO toUpdateChannelDTO(Channel channel);
+  UpdateChannelDTO toUpdateChannelDTO(Channel channel, Instant lastMessageAt);
 
   default FindChannelDTO toFindChannelDTO(Channel channel, Instant latestMessageTime,
       List<UUID> userIds) {

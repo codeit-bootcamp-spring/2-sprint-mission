@@ -37,7 +37,6 @@ public class MessageController {
   public ResponseEntity<CreateMessageResponseDTO> createMessage(
       @RequestPart("messageCreateRequest") @Valid CreateMessageRequestDTO createMessageRequestDTO,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> multipartFileList) {
-
     MessageDTO messageDTO = messageService.create(
         messageMapper.toMessageParam(createMessageRequestDTO), multipartFileList);
     CreateMessageResponseDTO createdMessage = messageMapper.toMessageResponseDTO(messageDTO);
@@ -53,8 +52,8 @@ public class MessageController {
       })
   @PatchMapping("/{messageId}")
   public ResponseEntity<UpdateMessageResponseDTO> updateMessage(@PathVariable("messageId") UUID id,
-      @RequestPart("message") @Valid UpdateMessageRequestDTO updateMessageRequestDTO,
-      @RequestPart(value = "file", required = false) List<MultipartFile> multipartFileList) {
+      @RequestPart("messageUpdateRequest") @Valid UpdateMessageRequestDTO updateMessageRequestDTO,
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> multipartFileList) {
 
     UpdateMessageDTO updateMessageDTO = messageService.update(id,
         messageMapper.toUpdateMessageParam(updateMessageRequestDTO), multipartFileList);

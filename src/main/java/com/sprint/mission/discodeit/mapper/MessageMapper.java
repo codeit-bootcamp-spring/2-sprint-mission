@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.dto.service.message.UpdateMessageParam;
 import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import java.util.UUID;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -50,10 +51,7 @@ public interface MessageMapper {
         .build();
   }
 
-  @Mapping(source = "message.id", target = "id")
-  @Mapping(source = "message.createdAt", target = "createdAt")
-  @Mapping(source = "message.updatedAt", target = "updatedAt")
-  MessageDTO toMessageDTO(Message message, UserDTO userDTO);
+  MessageDTO toMessageDTO(Message message);
 
   @Mapping(source = "message.id", target = "id")
   @Mapping(source = "message.updatedAt", target = "updatedAt")

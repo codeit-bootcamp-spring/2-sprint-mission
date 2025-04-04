@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.controller.auth.LoginRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.auth.LoginResponseDTO;
 import com.sprint.mission.discodeit.dto.service.auth.LoginDTO;
 import com.sprint.mission.discodeit.dto.service.auth.LoginParam;
-import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDTO;
 import com.sprint.mission.discodeit.entity.User;
 import java.time.Instant;
 import java.util.UUID;
@@ -13,8 +12,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-03T20:22:36+0900",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
+    date = "2025-04-04T10:27:12+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
 )
 @Component
 public class AuthMapperImpl implements AuthMapper {
@@ -43,28 +42,28 @@ public class AuthMapperImpl implements AuthMapper {
         }
 
         UUID id = null;
+        UUID profileId = null;
         Instant createdAt = null;
         Instant updatedAt = null;
         String username = null;
         String email = null;
-        Boolean isLogin = null;
+        Boolean online = null;
 
         id = loginDTO.id();
+        profileId = loginDTO.profileId();
         createdAt = loginDTO.createdAt();
         updatedAt = loginDTO.updatedAt();
         username = loginDTO.username();
         email = loginDTO.email();
-        isLogin = loginDTO.isLogin();
+        online = loginDTO.online();
 
-        BinaryContentDTO binaryContentDTO = null;
-
-        LoginResponseDTO loginResponseDTO = new LoginResponseDTO( id, binaryContentDTO, createdAt, updatedAt, username, email, isLogin );
+        LoginResponseDTO loginResponseDTO = new LoginResponseDTO( id, profileId, createdAt, updatedAt, username, email, online );
 
         return loginResponseDTO;
     }
 
     @Override
-    public LoginDTO toLoginDTO(User user) {
+    public LoginDTO toLoginDTO(User user, boolean online) {
         if ( user == null ) {
             return null;
         }
@@ -75,17 +74,18 @@ public class AuthMapperImpl implements AuthMapper {
         Instant updatedAt = null;
         String username = null;
         String email = null;
+        if ( user != null ) {
+            id = user.getId();
+            profileId = user.getProfileId();
+            createdAt = user.getCreatedAt();
+            updatedAt = user.getUpdatedAt();
+            username = user.getUsername();
+            email = user.getEmail();
+        }
+        Boolean online1 = null;
+        online1 = online;
 
-        id = user.getId();
-        profileId = user.getProfileId();
-        createdAt = user.getCreatedAt();
-        updatedAt = user.getUpdatedAt();
-        username = user.getUsername();
-        email = user.getEmail();
-
-        Boolean isLogin = null;
-
-        LoginDTO loginDTO = new LoginDTO( id, profileId, createdAt, updatedAt, username, email, isLogin );
+        LoginDTO loginDTO = new LoginDTO( id, profileId, createdAt, updatedAt, username, email, online1 );
 
         return loginDTO;
     }

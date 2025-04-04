@@ -79,7 +79,8 @@ public class BasicChannelService implements ChannelService {
     }
     channel.update(updateChannelParam.newName(), updateChannelParam.newDescription());
     Channel updatedChannel = channelRepository.save(channel);
-    return channelMapper.toUpdateChannelDTO(updatedChannel);
+    return channelMapper.toUpdateChannelDTO(updatedChannel,
+        findMessageLatestTimeInChannel(updatedChannel.getId()));
   }
 
   @Override

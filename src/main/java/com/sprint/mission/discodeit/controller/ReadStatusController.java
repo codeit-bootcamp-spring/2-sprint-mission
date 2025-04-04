@@ -33,8 +33,7 @@ public class ReadStatusController {
       description = "userId와 channelId를 기반으로 읽음상태를 생성합니다.",
       responses = {
           @ApiResponse(responseCode = "200", description = "읽음상태 생성 성공"),
-          @ApiResponse(responseCode = "404", description = "userId, channelId에 해당하는 리소스가 존재하지 않음"),
-          @ApiResponse(responseCode = "409", description = "중복된 읽음상태는 생성할 수 없음")
+          @ApiResponse(responseCode = "404", description = "userId, channelId에 해당하는 리소스가 존재하지 않음")
       })
   @PostMapping
   public ResponseEntity<CreateReadStatusResponseDTO> createReadStatus(

@@ -36,5 +36,7 @@ public interface UserMapper {
   UserDTO toUserDTO(User user, UserStatus userStatus);
 
   @Mapping(source = "user.id", target = "id")
-  UpdateUserDTO toUpdateUserDTO(User user, BinaryContentDTO binaryContentDTO);
+  @Mapping(source = "user.createdAt", target = "createdAt")
+  @Mapping(source = "user.updatedAt", target = "updatedAt")
+  UpdateUserDTO toUpdateUserDTO(User user, boolean online, BinaryContentDTO binaryContentDTO);
 }
