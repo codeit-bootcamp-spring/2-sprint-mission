@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.auth.LoginRequest;
+import com.sprint.mission.discodeit.dto.auth.LoginResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -17,13 +18,14 @@ public class BasicAuthService implements AuthService {
   private final UserStatusRepository userStatusRepository;
 
   @Override
-  public void login(LoginRequest loginRequest) {
-    User userInfo = userRepository.findUserByUsername(loginRequest.username())
+  public LoginResponse login(LoginRequest loginRequest) {
+    User user = userRepository.findUserByUsername(loginRequest.username())
         .orElseThrow(() -> new NoSuchElementException(
             String.format("User with username %s not found", loginRequest.username())));
 
-    if (!userInfo.getPassword().equals(loginRequest.password())) {
+    if (!user.getPassword().equals(loginRequest.password())) {
       throw new IllegalArgumentException("Wrong password");
     }
+    return new LoginResponse(user.getId(), user.getUsername(), user.getEmail(), user.getProfile());
   }
 }

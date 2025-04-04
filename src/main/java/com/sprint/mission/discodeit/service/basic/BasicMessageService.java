@@ -79,7 +79,7 @@ public class BasicMessageService implements MessageService {
         .sorted(Comparator.comparing(Message::getCreatedAt))
         .map((message) -> {
           String nickname = userRepository.findUserById(message.getUserUUID())
-              .map(User::getNickname)
+              .map(User::getUsername)
               .orElse("알 수 없음");
 
           return new FindMessageByChannelIdResponseDto(

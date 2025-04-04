@@ -60,8 +60,7 @@ public class BasicUserService implements UserService {
 
     User user = new User(
         saveUserParamDto.username(), saveUserParamDto.password(),
-        saveUserParamDto.nickname(), saveUserParamDto.email(),
-        profileId);
+        saveUserParamDto.email(), profileId);
     userRepository.save(user);
     UserStatus userStatus = UserStatus.builder()
         .userUUID(user.getId())

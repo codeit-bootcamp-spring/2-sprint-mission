@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ApiDataResponse;
 import com.sprint.mission.discodeit.dto.auth.LoginRequest;
+import com.sprint.mission.discodeit.dto.auth.LoginResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,10 +62,10 @@ public class AuthController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<Void>> login(
+  public ResponseEntity<ApiDataResponse<LoginResponse>> login(
       @RequestBody() LoginRequest loginRequest
   ) {
-    authService.login(loginRequest);
-    return ResponseEntity.status(HttpStatus.OK).body(ApiDataResponse.success());
+    LoginResponse loginResponse = authService.login(loginRequest);
+    return ResponseEntity.status(HttpStatus.OK).body(ApiDataResponse.success(loginResponse));
   }
 }
