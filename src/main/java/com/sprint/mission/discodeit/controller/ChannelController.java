@@ -46,7 +46,7 @@ public class ChannelController {
         return ResponseEntity.ok(channelService.getAllByUserId(userId));
     }
 
-    @PutMapping("/public/update")
+    @PutMapping("/public")
     public ResponseEntity<ChannelResult> updatePublicChannelName(
             @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
         ChannelResult channelResult = channelService.updatePublicChannelName(

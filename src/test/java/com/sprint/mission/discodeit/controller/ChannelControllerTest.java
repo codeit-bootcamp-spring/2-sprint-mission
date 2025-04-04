@@ -109,7 +109,7 @@ class ChannelControllerTest {
         when(channelService.updatePublicChannelName(any(), any())).thenReturn(stubResult);
 
         assertThat(mockMvc.put()
-                .uri("/api/channels/public/update")
+                .uri("/api/channels/public")
                 .content(JsonConvertor.asString(new PublicChannelUpdateRequest(channel.getId(), UPDATED_CHANNEL_NAME)))
                 .contentType(MediaType.APPLICATION_JSON))
                 .hasStatusOk()
