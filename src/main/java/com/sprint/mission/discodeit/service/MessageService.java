@@ -12,6 +12,8 @@ public interface MessageService {
   // CRUD(생성, 읽기, 모두 읽기, 수정, 삭제)
   Message createMessage(CreateMessageRequest request);
 
+  void addAttachment(UUID messageId, UUID attachmentId);
+
   Message findMessageById(UUID messageId); // 메세지 조회
 
   List<Message> findMessagesByUserAndChannel(UUID senderId,

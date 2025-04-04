@@ -4,7 +4,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.jwt.JwtUtil;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,12 +25,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class MessageController {
 
   private final MessageService messageService;
-  private final JwtUtil jwtUtil;
+  private final BinaryContentService binaryContentService;
 
   @RequestMapping(value = "", method = RequestMethod.POST)
   public ResponseEntity<?> createMessage(
-      @RequestBody CreateMessageRequest request) {
-    messageService.createMessage(request);
+      @RequestPart("messageCreateRequest") CreateMessageRequest request,
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+  ) {
+    UUID messageId = messageService.createMessage(request).getId();
+    if (!attachments.isEmpty()) {
+      attachments.stream()
+          .map(binaryContentService::createBinaryContent)
+          .forEach(binaryId -> messageService.addAttachment(messageId, binaryId));
+    }
 
     return ResponseEntity.ok("메세지가 성공적으로 생성되었습니다.");
   }

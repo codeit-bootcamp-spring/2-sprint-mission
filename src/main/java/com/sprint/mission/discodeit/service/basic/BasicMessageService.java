@@ -39,14 +39,14 @@ public class BasicMessageService implements MessageService {
     channelService.validateChannelExists(channelId);
     Message message = new Message(authorId, channelId, request.getContent());
 
-//        for (String path : request.getFilePath()) {
-//            BinaryContent binaryContent = new BinaryContent(path);
-//            binaryContentRepository.addBinaryContent(binaryContent);
-//            message.addAttachment(binaryContent.id());
-//        }
-
     messageRepository.addMessage(message);
     return message;
+  }
+
+  @Override
+  public void addAttachment(UUID messageId, UUID attachmentId) {
+    findMessageById(messageId).addAttachment(attachmentId);
+    messageRepository.save();
   }
 
   @Override
