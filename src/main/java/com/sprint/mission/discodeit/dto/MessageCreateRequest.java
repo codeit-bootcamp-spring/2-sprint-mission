@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.dto;
 
-import java.util.List;
 import java.util.UUID;
 
-public record SaveMessageRequestDto(
+public record MessageCreateRequest(
         UUID channelId,
         UUID userId,
         String content
