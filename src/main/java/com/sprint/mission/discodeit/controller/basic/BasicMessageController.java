@@ -51,9 +51,9 @@ public class BasicMessageController {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<Message> create(
       @Parameter(description = "Message 생성 요청 정보")
-      @RequestPart("message") MessageCreateRequest request,
+      @RequestPart("messageCreateRequest") MessageCreateRequest request,
       @Parameter(description = "Message 첨부 파일들(선택 사항)")
-      @RequestPart(value = "binaryContent", required = false) Optional<List<MultipartFile>> attachments) {
+      @RequestPart(value = "attachments", required = false) Optional<List<MultipartFile>> attachments) {
 
     List<BinaryContentCreateRequest> binaryContentCreateRequests = attachments
         .map(contents -> contents.stream()
