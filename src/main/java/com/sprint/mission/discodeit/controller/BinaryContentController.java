@@ -18,7 +18,7 @@ public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
     @PostMapping
-    public ResponseEntity<BinaryContentResult> createProfileImage(MultipartFile multipartFile) {
+    public ResponseEntity<BinaryContentResult> createProfileImage(@RequestPart MultipartFile multipartFile) {
         BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(
                 multipartFile);
 

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,42 +28,43 @@ import static org.mockito.Mockito.when;
 class BinaryContentControllerTest {
 
     @Autowired
-    private MockMvcTester mockMvcTester;
+    private MockMvcTester mockMvc;
     @MockitoBean
     private BinaryContentService binaryContentService;
 
-    private UUID binaryContentId;
+    private BinaryContent binaryContent;
     private BinaryContentResult stubResult;
 
     @BeforeEach
     void setUp() {
         MultipartFile imageFile = createMockImageFile(IMAGE_NAME_DOG);
-        binaryContentId = UUID.randomUUID();
-        stubResult = new BinaryContentResult(binaryContentId, imageFile.getName(),
-                imageFile.getContentType(), imageFile.getSize(),
-                getBytesFromMultiPartFile(imageFile));
+        binaryContent = new BinaryContent(imageFile.getName(), imageFile.getContentType(), imageFile.getSize(), getBytesFromMultiPartFile(imageFile));
+        stubResult = BinaryContentResult.fromEntity(binaryContent);
     }
 
     @Test
-    void createProfileImage() {
+    void createProfileImage() throws IOException {
         when(binaryContentService.createProfileImage(any())).thenReturn(stubResult);
 
-        assertThat(mockMvcTester.post().uri("/api/binary-contents"))
+        assertThat(mockMvc.post()
+                .uri("/api/binary-contents")
+                .multipart()
+                .file("multipartFile", createMockImageFile(IMAGE_NAME_DOG).getBytes()))
                 .hasStatusOk()
                 .bodyJson()
                 .extractingPath("$.id")
-                .isEqualTo(binaryContentId.toString());
+                .isEqualTo(binaryContent.getId().toString());
     }
 
     @Test
     void getById() {
         when(binaryContentService.getById(any())).thenReturn(stubResult);
 
-        assertThat(mockMvcTester.get().uri("/api/binary-contents/{fileId}", binaryContentId))
+        assertThat(mockMvc.get().uri("/api/binary-contents/{fileId}", binaryContent.getId()))
                 .hasStatusOk()
                 .bodyJson()
                 .extractingPath("$.id")
-                .isEqualTo(binaryContentId.toString());
+                .isEqualTo(binaryContent.getId().toString());
     }
 
     @Test
@@ -76,20 +79,20 @@ class BinaryContentControllerTest {
         when(binaryContentService.getByIdIn(any())).thenReturn(List.of(otherStubResult, stubResult));
 
 
-        assertThat(mockMvcTester.get()
-                .queryParam("ids", binaryContentId.toString(), otherBinaryContentId.toString())
-                .uri("/api/binary-contents"))
+        assertThat(mockMvc.get()
+                .uri("/api/binary-contents")
+                .queryParam("ids", binaryContent.getId().toString(), otherBinaryContentId.toString()))
                 .hasStatusOk()
                 .bodyJson()
                 .extractingPath("$[*].id")
                 .asList()
-                .containsExactlyInAnyOrder(binaryContentId.toString(), otherBinaryContentId.toString());
+                .containsExactlyInAnyOrder(binaryContent.getId().toString(), otherBinaryContentId.toString());
     }
 
     @Test
     void delete() {
         UUID fileId = UUID.randomUUID();
-        assertThat(mockMvcTester.delete().uri("/api/binary-contents/{fileId}", fileId))
+        assertThat(mockMvc.delete().uri("/api/binary-contents/{fileId}", fileId))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 }

@@ -4,5 +4,5 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public record ChannelCreateRequest(@NotNull String channelName, @NotNull UUID creatorId) {
+public record PublicChannelCreateRequest(@NotNull String channelName, @NotNull UUID creatorId) {
 }
