@@ -4,17 +4,16 @@ import com.sprint.mission.discodeit.constant.ChannelType;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-public record FindChannelDto(
+public record ChannelDto(
         UUID channelUUID,
         String channelName,
         ChannelType channelType,
         List<UUID> joinUserId,
         Instant lastMessageTime
 ) {
-    public FindChannelDto(UUID channelUUID, String channelName, ChannelType channelType,Instant lastMessageTime) {
+    public ChannelDto(UUID channelUUID, String channelName, ChannelType channelType,Instant lastMessageTime) {
         this(channelUUID ,channelName, channelType, List.of(), lastMessageTime);
     }
 }
