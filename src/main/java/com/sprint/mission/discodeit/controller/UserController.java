@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ApiDataResponse;
-import com.sprint.mission.discodeit.dto.user.FindUserDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.user.FindUserDto;
 import com.sprint.mission.discodeit.dto.user.SaveUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusResponse;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -210,12 +211,14 @@ public class UserController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<UserStatus>> updateUserStatusByUserId(
+  public ResponseEntity<ApiDataResponse<UpdateUserStatusResponse>> updateUserStatusByUserId(
       @PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest dto
   ) {
     System.out.println(dto.loginTime());
-    UserStatus userStatus = userStatusService.updateByUserId(userId, dto);
-    return ResponseEntity.status(HttpStatus.OK).body(ApiDataResponse.success(userStatus));
+    UpdateUserStatusResponse updateUserStatusResponse = userStatusService.updateByUserId(userId,
+        dto);
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(ApiDataResponse.success(updateUserStatusResponse));
   }
 }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userStatus.SaveUserStatusParamDto;
+import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusResponse;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -23,7 +24,7 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   public void save(SaveUserStatusParamDto saveUserStatusParamDto) {
     UserStatus userStatus = UserStatus.builder()
-        .userUUID(saveUserStatusParamDto.userUUID())
+        .userId(saveUserStatusParamDto.userUUID())
         .build();
     userStatusRepository.save(userStatus);
   }
@@ -40,7 +41,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public UserStatus updateByUserId(UUID userId,
+  public UpdateUserStatusResponse updateByUserId(UUID userId,
       UserStatusUpdateRequest userStatusUpdateRequest) {
     User user = userRepository.findUserById(userId)
         .orElseThrow(() -> new NoSuchElementException(
@@ -50,7 +51,9 @@ public class BasicUserStatusService implements UserStatusService {
             String.format("UserStatus with userId %s not found", userId)));
     userStatus.updateLastLoginTime(userStatusUpdateRequest.loginTime());
     userStatusRepository.save(userStatus);
-    return userStatus;
+    return new UpdateUserStatusResponse(userStatus.getId(), userStatus.getUserId(),
+        userStatus.getLastActiveAt(), userStatus.isLastStatus(), userStatus.getCreatedAt(),
+        userStatus.getUpdatedAt());
   }
 
 

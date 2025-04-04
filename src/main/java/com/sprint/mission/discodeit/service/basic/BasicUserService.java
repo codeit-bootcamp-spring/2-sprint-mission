@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.user.FindUserDto;
 import com.sprint.mission.discodeit.dto.user.SaveUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.BinaryData;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -64,7 +63,7 @@ public class BasicUserService implements UserService {
         saveUserParamDto.email(), profileId);
     userRepository.save(user);
     UserStatus userStatus = UserStatus.builder()
-        .userUUID(user.getId())
+        .userId(user.getId())
         .build();
     userStatusRepository.save(userStatus);
     return user;
@@ -82,7 +81,7 @@ public class BasicUserService implements UserService {
     FindUserDto findUserDto = new FindUserDto(
         user.getId(), user.getUsername(), user.getEmail(),
         user.getProfileId(), user.getCreatedAt(),
-        user.getUpdatedAt(), userStatus.getLastLoginTime(),
+        user.getUpdatedAt(), userStatus.getLastActiveAt(),
         userStatus.isLastStatus());
 
     return findUserDto;

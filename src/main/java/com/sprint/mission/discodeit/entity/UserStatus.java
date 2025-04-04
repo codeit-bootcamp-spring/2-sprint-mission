@@ -6,8 +6,6 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Getter
@@ -16,19 +14,19 @@ import java.util.UUID;
 public class UserStatus extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  private UUID userUUID;
+  private UUID userId;
 
   @Builder.Default
-  private Instant lastLoginTime = null;
+  private Instant lastActiveAt = null;
 
   public void updateLastLoginTime(Instant lastLoginTime) {
-    this.lastLoginTime = lastLoginTime;
+    this.lastActiveAt = lastLoginTime;
     super.updateTime();
   }
 
   public boolean isLastStatus() {
     super.updateTime();
-    if (lastLoginTime == null || lastLoginTime.isBefore(Instant.now().minusSeconds(300))) {
+    if (lastActiveAt == null || lastActiveAt.isBefore(Instant.now().minusSeconds(300))) {
       return false;
     }
     return true;
