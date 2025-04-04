@@ -105,7 +105,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public void updateChannel(UUID channelId, PublicChannelUpdateRequest channelUpdateParamDto) {
+  public Channel updateChannel(UUID channelId, PublicChannelUpdateRequest channelUpdateParamDto) {
     Channel channel = channelRepository.findChannelById(channelId)
         .orElseThrow(
             () -> new NoSuchElementException(channelId + "에 해당하는 채널을 찾을 수 없습니다."));
@@ -116,7 +116,7 @@ public class BasicChannelService implements ChannelService {
 
     channel.updateChannelName(channelUpdateParamDto.newName());
     channel.updateChannelDescription(channelUpdateParamDto.newDescription());
-    channelRepository.save(channel);
+    return channelRepository.save(channel);
   }
 
   @Override

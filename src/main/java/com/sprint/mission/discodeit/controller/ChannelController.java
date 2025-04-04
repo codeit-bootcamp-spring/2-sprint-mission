@@ -54,13 +54,13 @@ public class ChannelController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<SaveChannelResponseDto>> createPublic(
+  public ResponseEntity<SaveChannelResponseDto> createPublic(
       @RequestBody PublicChannelCreateRequest publicChannelCreateRequest
   ) {
     SaveChannelResponseDto saveChannelResponseDto = channelService.createPublicChannel(
         publicChannelCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(ApiDataResponse.success(saveChannelResponseDto));
+        .body(saveChannelResponseDto);
   }
 
   @PostMapping("/private")
@@ -81,13 +81,13 @@ public class ChannelController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<SaveChannelResponseDto>> createPrivate(
+  public ResponseEntity<SaveChannelResponseDto> createPrivate(
       @RequestBody PrivateChannelCreateRequest privateChannelCreateRequest
   ) {
     SaveChannelResponseDto saveChannelResponseDto = channelService.createPrivateChannel(
         privateChannelCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(ApiDataResponse.success(saveChannelResponseDto));
+        .body(saveChannelResponseDto);
   }
 
   @PatchMapping("/{channelId}")
@@ -133,12 +133,12 @@ public class ChannelController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<Void>> update(
+  public ResponseEntity<Channel> update(
       @PathVariable(name = "channelId") UUID channelId,
       @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest
   ) {
-    channelService.updateChannel(channelId, publicChannelUpdateRequest);
-    return ResponseEntity.status(HttpStatus.OK).body(ApiDataResponse.success());
+    Channel channel = channelService.updateChannel(channelId, publicChannelUpdateRequest);
+    return ResponseEntity.status(HttpStatus.OK).body(channel);
   }
 
   @DeleteMapping("/{channelId}")
@@ -194,10 +194,10 @@ public class ChannelController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<List<ChannelDto>>> findMyChannel(
+  public ResponseEntity<List<ChannelDto>> findMyChannel(
       @RequestParam("userId") UUID userId
   ) {
     List<ChannelDto> findMyChannelList = channelService.findAllByUserId(userId);
-    return ResponseEntity.status(HttpStatus.OK).body(ApiDataResponse.success(findMyChannelList));
+    return ResponseEntity.status(HttpStatus.OK).body(findMyChannelList);
   }
 }
