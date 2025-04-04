@@ -9,21 +9,16 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
 
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
-
-  public BasicReadStatusService(ReadStatusRepository readStatusRepository,
-      UserRepository userRepository, ChannelRepository channelRepository) {
-    this.readStatusRepository = readStatusRepository;
-    this.userRepository = userRepository;
-    this.channelRepository = channelRepository;
-  }
 
   @Override
   public void createReadStatus(CreateReadStatusRequest request) {

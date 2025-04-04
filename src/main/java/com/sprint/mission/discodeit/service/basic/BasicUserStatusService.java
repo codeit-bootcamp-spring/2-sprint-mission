@@ -9,19 +9,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
-
-  public BasicUserStatusService(UserStatusRepository userStatusRepository,
-      UserRepository userRepository) {
-    this.userStatusRepository = userStatusRepository;
-    this.userRepository = userRepository;
-  }
 
   @Override
   public UserStatusInfoDto findById(UUID id) {

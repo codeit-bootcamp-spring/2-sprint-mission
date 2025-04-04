@@ -5,11 +5,12 @@ import com.sprint.mission.discodeit.dto.LoginRequest;
 import com.sprint.mission.discodeit.dto.LoginResponse;
 import com.sprint.mission.discodeit.dto.RegisterResponse;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.jwt.JwtUtil;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserService;
+import java.time.Instant;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
@@ -20,15 +21,26 @@ import org.springframework.stereotype.Service;
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
-  private final UserService userService;
   private final UserStatusRepository userStatusRepository;
   private final JwtUtil jwtUtil;
 
   @Override
   public RegisterResponse register(CreateUserRequest request) {
-    User user = userService.createUser(request);
+    String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
+
+    if (userRepository.existsByEmail(request.getEmail())) {
+      throw new IllegalArgumentException("이미 존재하는 Email입니다");
+    }
+    if (userRepository.existsByUsername(request.getUsername())) {
+      throw new IllegalArgumentException("이미 존재하는 Username입니다");
+    }
+
+    User user = new User(request.getUsername(), request.getEmail(), hashedPassword);
+    userRepository.addUser(user);
+    userStatusRepository.addUserStatus(new UserStatus(user.getId(), Instant.now()));
 
     return RegisterResponse.builder()
+        .userId(user.getId())
         .success(true)
         .message("회원 가입이 완료되었습니다.")
         .build();

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.RegisterResponse;
 import com.sprint.mission.discodeit.dto.UpdateUserRequest;
@@ -9,7 +8,6 @@ import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,11 +32,15 @@ public class UserController {
   private final BinaryContentService binaryContentService;
 
   @RequestMapping(value = "", method = RequestMethod.POST)
-  public ResponseEntity<?> register(@RequestBody CreateUserRequest request) {
+  public ResponseEntity<?> register(@RequestPart("userCreateRequest") CreateUserRequest request,
+      @RequestPart(value = "profile", required = false) MultipartFile profileImage) {
 
     RegisterResponse response = authService.register(request);
+    if (!profileImage.isEmpty()) {
+      UUID binaryId = binaryContentService.createBinaryContent(profileImage);
+      userService.updateProfile(response.getUserId(), binaryId);
+    }
     return ResponseEntity.ok(response);
-
   }
 
   @RequestMapping(value = "/{userId}", method = RequestMethod.PUT)
@@ -51,17 +54,10 @@ public class UserController {
 
   @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
   public ResponseEntity<?> updateUserProfile(
-      @RequestParam("file") MultipartFile profile,
+      @RequestParam("profile") MultipartFile profile,
       @PathVariable("userId") UUID userId
-  ) throws IOException {
-    CreateBinaryContentRequest request = CreateBinaryContentRequest.builder()
-        .fileName(profile.getOriginalFilename())
-        .size(profile.getSize())
-        .contentType(profile.getContentType())
-        .bytes(profile.getBytes())
-        .build();
-
-    UUID binaryId = binaryContentService.createBinaryContent(request);
+  ) {
+    UUID binaryId = binaryContentService.createBinaryContent(profile);
 
     userService.updateProfile(userId, binaryId);
 
@@ -85,4 +81,6 @@ public class UserController {
     userStatusService.update(userId);
     return ResponseEntity.ok("온라인 상태 갱신 완료");
   }
+
+
 }
