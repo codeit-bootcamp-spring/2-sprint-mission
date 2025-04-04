@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.service.dto.channel;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record PublicChannelRequest(
-        String name,
-        String description
+    @NotBlank String name,
+    String description
 ) {
+
 }

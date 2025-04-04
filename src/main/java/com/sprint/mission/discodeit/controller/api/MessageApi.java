@@ -11,11 +11,14 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+@Tag(name = "Message", description = "Message API")
 public interface MessageApi {
 
   // 메시지 생성
@@ -29,7 +32,7 @@ public interface MessageApi {
           })),
   })
   ResponseEntity<MessageResponse> create(
-      @Parameter(description = "Message 생성 정보") MessageCreateRequest request,
+      @Parameter(description = "Message 생성 정보") @Valid MessageCreateRequest request,
       @Parameter(description = "Message 첨부 파일들") List<MultipartFile> files);
 
   // 메시지 수정

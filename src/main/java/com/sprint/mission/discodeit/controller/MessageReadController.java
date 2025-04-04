@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusUpdateRequest;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/readStatuses")
-@Tag(name = "ReadStatus", description = "Message 읽음 상태 API")
 public class MessageReadController implements MessageReadApi {
 
   private final ReadStatusService readStatusService;
@@ -33,7 +32,7 @@ public class MessageReadController implements MessageReadApi {
   @Override
   @PostMapping
   public ResponseEntity<ReadStatusResponse> createByChannelId(
-      @RequestBody ReadStatusCreateRequest request) {
+      @RequestBody @Valid ReadStatusCreateRequest request) {
     ReadStatus status = readStatusService.create(request);
     return ResponseEntity.ok(ReadStatusResponse.of(status));
   }
@@ -42,7 +41,7 @@ public class MessageReadController implements MessageReadApi {
   @Override
   @PatchMapping("/{readStatusId}")
   public ResponseEntity<ReadStatusResponse> updateByChannelId(@PathVariable("readStatusId") UUID id,
-      @RequestBody ReadStatusUpdateRequest request) {
+      @RequestBody @Valid ReadStatusUpdateRequest request) {
     ReadStatus status = readStatusService.update(id, request);
     return ResponseEntity.ok(ReadStatusResponse.of(status));
   }

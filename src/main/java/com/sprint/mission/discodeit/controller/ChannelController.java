@@ -8,11 +8,12 @@ import com.sprint.mission.discodeit.service.dto.channel.ChannelByUserIdResponse;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PublicChannelRequest;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,8 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/channels")
-@Tag(name = "Channel", description = "Channel API")
 public class ChannelController implements ChannelApi {
 
   private final ChannelService channelService;
@@ -34,7 +35,8 @@ public class ChannelController implements ChannelApi {
   // 공개 채널 생성
   @Override
   @PostMapping("/public")
-  public ResponseEntity<ChannelResponse> createPublic(@RequestBody PublicChannelRequest request) {
+  public ResponseEntity<ChannelResponse> createPublic(
+      @RequestBody @Valid PublicChannelRequest request) {
     Channel channel = channelService.create(request);
     return ResponseEntity.ok(ChannelResponse.of(channel));
   }
@@ -42,7 +44,8 @@ public class ChannelController implements ChannelApi {
   // 비공개 채널 생성
   @Override
   @PostMapping("/private")
-  public ResponseEntity<ChannelResponse> createPrivate(@RequestBody PrivateChannelRequest request) {
+  public ResponseEntity<ChannelResponse> createPrivate(
+      @RequestBody @Valid PrivateChannelRequest request) {
     Channel channel = channelService.create(request);
     return ResponseEntity.ok(ChannelResponse.of(channel));
   }

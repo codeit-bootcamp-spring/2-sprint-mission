@@ -7,13 +7,14 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,8 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/messages")
-@Tag(name = "Message", description = "Message API")
 public class MessageController implements MessageApi {
 
   private final MessageService messageService;
@@ -38,7 +39,7 @@ public class MessageController implements MessageApi {
   @Override
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageResponse> create(
-      @RequestPart("messageCreateRequest") MessageCreateRequest request,
+      @RequestPart("messageCreateRequest") @Valid MessageCreateRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> files) {
     List<BinaryContentCreateRequest> binaryContentList = new ArrayList<>();
     if (files != null) {

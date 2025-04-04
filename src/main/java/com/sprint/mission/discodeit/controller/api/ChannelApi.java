@@ -13,23 +13,26 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 
+@Tag(name = "Channel", description = "Channel API")
 public interface ChannelApi {
 
   // 공개 채널 생성
   @Operation(summary = "Public Channel 생성")
   @ApiResponse(responseCode = "201", description = "Public Channel이 성공적으로 생성됨",
       content = @Content(mediaType = "*/*", schema = @Schema(implementation = ChannelResponse.class)))
-  ResponseEntity<ChannelResponse> createPublic(PublicChannelRequest request);
+  ResponseEntity<ChannelResponse> createPublic(@Valid PublicChannelRequest request);
 
   // 비공개 채널 생성
   @Operation(summary = "Private Channel 생성")
   @ApiResponse(responseCode = "201", description = "Private Channel이 성공적으로 생성됨",
       content = @Content(mediaType = "*/*", schema = @Schema(implementation = ChannelResponse.class)))
-  ResponseEntity<ChannelResponse> createPrivate(PrivateChannelRequest request);
+  ResponseEntity<ChannelResponse> createPrivate(@Valid PrivateChannelRequest request);
 
   // 채널 삭제
   @Operation(summary = "Channel 삭제")

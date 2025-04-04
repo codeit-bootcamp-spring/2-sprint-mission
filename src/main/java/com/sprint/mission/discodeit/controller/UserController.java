@@ -12,11 +12,13 @@ import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -30,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/users")
 public class UserController implements UserApi {
 
@@ -40,7 +43,7 @@ public class UserController implements UserApi {
   @Override
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserResponse> create(
-      @RequestPart("userCreateRequest") UserCreateRequest userRequest,
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest userRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     BinaryContentCreateRequest fileData = BinaryContentCreateRequest.of(profile);
@@ -53,7 +56,7 @@ public class UserController implements UserApi {
   @PatchMapping(path = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserResponse> update(
       @PathVariable("userId") UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequest request,
+      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     BinaryContentCreateRequest fileData = BinaryContentCreateRequest.of(profile);
