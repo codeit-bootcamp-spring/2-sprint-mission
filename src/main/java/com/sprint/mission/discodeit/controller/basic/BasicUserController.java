@@ -80,9 +80,9 @@ public class BasicUserController {
       @Parameter(description = "수정할 User ID")
       @PathVariable("userId") UUID userId,
       @Parameter(description = "User 수정 요청 정보", required = true)
-      @RequestPart("user") UserUpdateRequest request,
+      @RequestPart("userUpdateRequest") UserUpdateRequest request,
       @Parameter(description = "수정할 User 프로필 이미지(선택 사항)")
-      @RequestPart(value = "binaryContent", required = false) MultipartFile binaryContent) {
+      @RequestPart(value = "profile", required = false) MultipartFile binaryContent) {
 
     Optional<BinaryContentCreateRequest> optionalBinaryContent = binaryContentRequestResolver.resolve(
         binaryContent);
