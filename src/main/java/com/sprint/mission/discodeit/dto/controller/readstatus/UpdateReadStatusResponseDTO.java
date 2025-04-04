@@ -5,8 +5,6 @@ import java.util.UUID;
 
 public record UpdateReadStatusResponseDTO(
     UUID id,
-    UUID userId,
-    UUID channelId,
     Instant lastReadAt
 ) {
 

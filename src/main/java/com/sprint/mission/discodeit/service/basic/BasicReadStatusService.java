@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +37,14 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatusDTO create(CreateReadStatusParam createReadStatusParam) {
     checkUserExists(createReadStatusParam);
     checkChannelExists(createReadStatusParam);
-    checkDuplicateReadStatus(createReadStatusParam);
-
+    // 중복체크 - 원래 있던 ReadStatus면 원래 있던 값 반환
+    // 프론트측에서 메시지가 없는 경우엔 계속 Post 요청을 보내서 중복이 있는경우 예외를 던지지 않고 원래 값을 반환
+    Optional<ReadStatus> exist = readStatusRepository.findByUserIdAndChannelId(
+        createReadStatusParam.userId(),
+        createReadStatusParam.channelId());
+    if (exist.isPresent()) {
+      return readStatusMapper.toReadStatusDTO(exist.get());
+    }
     ReadStatus readStatus = readStatusMapper.toEntity(createReadStatusParam);
     readStatusRepository.save(readStatus);
     return readStatusMapper.toReadStatusDTO(readStatus);
@@ -101,14 +108,6 @@ public class BasicReadStatusService implements ReadStatusService {
         });
   }
 
-  private void checkDuplicateReadStatus(CreateReadStatusParam createReadStatusParam) {
-    if (readStatusRepository.existsByUserIdAndChannelId(createReadStatusParam.userId(),
-        createReadStatusParam.channelId())) {
-      logger.error("읽음상태 중복 발생 - userId: {}, channelId: {}", createReadStatusParam.userId(),
-          createReadStatusParam.channelId());
-      throw RestExceptions.DUPLICATE_READ_STATUS;
-    }
-  }
 
   private ReadStatus findReadStatusById(UUID id) {
     return readStatusRepository.findById(id)

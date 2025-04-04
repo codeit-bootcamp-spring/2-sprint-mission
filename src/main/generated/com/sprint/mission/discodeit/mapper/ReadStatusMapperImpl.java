@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-03T21:09:18+0900",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
+    date = "2025-04-04T10:27:12+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
 )
 @Component
 public class ReadStatusMapperImpl implements ReadStatusMapper {
@@ -25,6 +25,7 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         if ( createReadStatusRequestDTO == null ) {
             return null;
         }
+
         UUID userId = null;
         UUID channelId = null;
         Instant lastReadAt = null;
@@ -71,10 +72,7 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         id = updateReadStatusDTO.id();
         lastReadAt = updateReadStatusDTO.lastReadAt();
 
-        UUID userId = null;
-        UUID channelId = null;
-
-        UpdateReadStatusResponseDTO updateReadStatusResponseDTO = new UpdateReadStatusResponseDTO( id, userId, channelId, lastReadAt );
+        UpdateReadStatusResponseDTO updateReadStatusResponseDTO = new UpdateReadStatusResponseDTO( id, lastReadAt );
 
         return updateReadStatusResponseDTO;
     }
