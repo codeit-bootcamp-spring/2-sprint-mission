@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
@@ -40,42 +41,48 @@ public class UserController implements UserApi {
 
 
   @Override
-  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @PostMapping
   public ResponseEntity<User> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
-      @RequestPart(value = "profile", required = false) Optional<MultipartFile> profileFile) {
+      @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
 
-    Optional<BinaryContentCreateRequest> profileCreateRequest = profileFile.map(file -> {
-      try {
-        return new BinaryContentCreateRequest(file.getOriginalFilename(), file.getContentType(),
-            file.getBytes());
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    });
+    Optional<BinaryContentCreateRequest> profileCreateRequest = Optional.ofNullable(profileFile)
+        .map(file -> {
+          try {
+            return new BinaryContentCreateRequest(
+                file.getOriginalFilename(),
+                file.getContentType(),
+                file.getBytes()
+            );
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        });
 
     User createdUser = userService.create(userCreateRequest, profileCreateRequest);
 
     return ResponseEntity
-        .status(HttpStatus.CREATED)
+        .status(HttpStatus.OK)
         .body(createdUser);
   }
+
 
   @Override
   @PatchMapping(path = "{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<User> update(
       @PathVariable("userId") UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "profile", required = false) Optional<MultipartFile> profileFile) {
+      @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
 
-    Optional<BinaryContentCreateRequest> profileCreateRequest = profileFile.map(file -> {
-      try {
-        return new BinaryContentCreateRequest(file.getOriginalFilename(), file.getContentType(),
-            file.getBytes());
-      } catch (IOException e) {
-        throw new RuntimeException("File processing error", e);
-      }
-    });
+    Optional<BinaryContentCreateRequest> profileCreateRequest = Optional.ofNullable(profileFile)
+        .map(file -> {
+          try {
+            return new BinaryContentCreateRequest(file.getOriginalFilename(), file.getContentType(),
+                file.getBytes());
+          } catch (IOException e) {
+            throw new RuntimeException("File processing error", e);
+          }
+        });
 
     User updatedUser = userService.update(userId, userUpdateRequest, profileCreateRequest);
 
