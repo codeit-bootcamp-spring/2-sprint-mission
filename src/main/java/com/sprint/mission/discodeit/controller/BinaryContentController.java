@@ -60,12 +60,12 @@ public class BinaryContentController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<FindBinaryContentRequestDto>> find(
+  public ResponseEntity<FindBinaryContentRequestDto> find(
       @PathVariable("binaryContentId") UUID binaryContentId
   ) {
     binaryContentService.findById(binaryContentId);
     return ResponseEntity.status(HttpStatus.OK).body(
-        ApiDataResponse.success(binaryContentService.findById(binaryContentId)));
+        binaryContentService.findById(binaryContentId));
   }
 
   @GetMapping("")
@@ -89,10 +89,10 @@ public class BinaryContentController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<List<FindBinaryContentRequestDto>>> findByIdIn(
+  public ResponseEntity<List<FindBinaryContentRequestDto>> findByIdIn(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIdList
   ) {
     List<FindBinaryContentRequestDto> result = binaryContentService.findByIdIn(binaryContentIdList);
-    return ResponseEntity.ok(ApiDataResponse.success(result));
+    return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 }
