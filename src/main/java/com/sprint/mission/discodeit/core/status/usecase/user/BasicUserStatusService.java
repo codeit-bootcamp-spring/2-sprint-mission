@@ -84,11 +84,12 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   @CustomLogging
-  public void delete(UUID userStatusId) {
-    if (!userStatusRepository.existsById(userStatusId)) {
-      userStatusIdNotFoundError(userStatusId);
-    }
-    userStatusRepository.delete(userStatusId);
+  public void delete(UUID userId) {
+    UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(
+        () -> userStatusIdNotFoundError(userId)
+    );
+
+    userStatusRepository.delete(userStatus.getUserStatusId());
   }
 
 }
