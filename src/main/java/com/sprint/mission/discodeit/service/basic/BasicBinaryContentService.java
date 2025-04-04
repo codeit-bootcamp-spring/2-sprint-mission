@@ -13,43 +13,44 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent create(BinaryContentCreateRequest request) {
-        BinaryContent binaryContent = new BinaryContent(request.fileName(), request.bytes());
-        binaryContentRepository.save(binaryContent);
+  private final BinaryContentRepository binaryContentRepository;
 
-        return binaryContent;
+  @Override
+  public BinaryContent create(BinaryContentCreateRequest request) {
+    BinaryContent binaryContent = new BinaryContent(request.fileName(), request.bytes());
+    binaryContentRepository.save(binaryContent);
+
+    return binaryContent;
+  }
+
+  @Override
+  public BinaryContent find(UUID binaryContentKey) {
+    BinaryContent binaryContent = binaryContentRepository.findByKey(binaryContentKey);
+    if (binaryContent == null) {
+      throw new IllegalArgumentException("[Error] binaryContent is null");
     }
 
-    @Override
-    public BinaryContent find(UUID binaryContentKey) {
-        BinaryContent binaryContent = binaryContentRepository.findByKey(binaryContentKey);
-        if (binaryContent == null) {
-            throw new IllegalArgumentException("[Error] binaryContent is null");
-        }
+    return binaryContent;
+  }
 
-        return binaryContent;
+  @Override
+  public List<BinaryContent> findAllByKeys(List<UUID> binaryContentKeys) {
+    List<BinaryContent> binaryContents = binaryContentRepository.findAllByKeys(binaryContentKeys);
+    if (binaryContents == null || binaryContents.isEmpty()) {
+      throw new IllegalArgumentException("[Error] binaryContent is null");
     }
 
-    @Override
-    public List<BinaryContent> findAllByKey(List<UUID> binaryContentKeys) {
-        List<BinaryContent> binaryContents = binaryContentRepository.findAllByKeys(binaryContentKeys);
-        if (binaryContents == null || binaryContents.isEmpty()) {
-            throw new IllegalArgumentException("[Error] binaryContent is null");
-        }
+    return binaryContents;
+  }
 
-        return binaryContents;
+  @Override
+  public void delete(UUID binaryContentKey) {
+    BinaryContent binaryContent = binaryContentRepository.findByKey(binaryContentKey);
+    if (binaryContent == null) {
+      throw new IllegalArgumentException("[Error] binaryContent is null");
     }
 
-    @Override
-    public void delete(UUID binaryContentKey) {
-        BinaryContent binaryContent = binaryContentRepository.findByKey(binaryContentKey);
-        if (binaryContent == null) {
-            throw new IllegalArgumentException("[Error] binaryContent is null");
-        }
-
-        binaryContentRepository.delete(binaryContentKey);
-    }
+    binaryContentRepository.delete(binaryContentKey);
+  }
 }

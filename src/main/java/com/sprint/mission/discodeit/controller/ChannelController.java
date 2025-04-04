@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
-import com.sprint.mission.discodeit.dto.request.ChannelDeleteRequest;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.util.LogMapUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,53 +19,58 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/channels")
+@RequestMapping("/api/channels")
+@Tag(name = "Channel", description = "Channel Api")
 public class ChannelController {
-    private final ChannelService channelService;
-    private static final Logger log = LoggerFactory.getLogger(ChannelController.class);
 
-    @RequestMapping(value = "/createPublic", method = RequestMethod.POST)
-    public ResponseEntity<Channel> createPublicChannel(@RequestBody PublicChannelCreateRequest request) {
-        Channel publicChannel = channelService.create(request);
-        log.info("{}", LogMapUtil.of("action", "createPublic")
-                .add("publicChannel", publicChannel));
+  private final ChannelService channelService;
+  private static final Logger log = LoggerFactory.getLogger(ChannelController.class);
 
-        return ResponseEntity.ok(publicChannel);
-    }
+  @PostMapping("/public")
+  public ResponseEntity<Channel> create(
+      @RequestBody PublicChannelCreateRequest request) {
+    Channel publicChannel = channelService.create(request);
+    log.info("{}", LogMapUtil.of("action", "createPublic")
+        .add("publicChannel", publicChannel));
 
-    @RequestMapping(value = "/createPrivate", method = RequestMethod.POST)
-    public ResponseEntity<Channel> createPrivateChannel(@RequestBody PrivateChannelCreateRequest request) {
-        Channel privateChannel = channelService.create(request);
-        log.info("{}", LogMapUtil.of("action", "createPrivate")
-                .add("privateChannel", privateChannel));
+    return ResponseEntity.ok(publicChannel);
+  }
 
-        return ResponseEntity.ok(privateChannel);
-    }
+  @PostMapping("/private")
+  public ResponseEntity<Channel> create(
+      @RequestBody PrivateChannelCreateRequest request) {
+    Channel privateChannel = channelService.create(request);
+    log.info("{}", LogMapUtil.of("action", "createPrivate")
+        .add("privateChannel", privateChannel));
 
-    @RequestMapping(value = "/updatePublic", method = RequestMethod.PUT)
-    public ResponseEntity<Channel> updatePublicChannel(@RequestBody PublicChannelUpdateRequest request) {
-        Channel updated = channelService.update(request);
-        log.info("{}", LogMapUtil.of("action", "updatePublic")
-                .add("updated", updated));
+    return ResponseEntity.ok(privateChannel);
+  }
 
-        return ResponseEntity.ok(updated);
-    }
+  @PutMapping("/{channelKey}")
+  public ResponseEntity<Channel> update(@PathVariable UUID channelKey,
+      @RequestBody PublicChannelUpdateRequest request) {
+    Channel updated = channelService.update(channelKey, request);
+    log.info("{}", LogMapUtil.of("action", "updatePublic")
+        .add("updated", updated));
 
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public ResponseEntity<Channel> deleteChannel(@RequestBody ChannelDeleteRequest request) {
-        channelService.delete(request);
-        log.info("{}", LogMapUtil.of("action", "delete")
-                .add("request", request));
+    return ResponseEntity.ok(updated);
+  }
 
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("/{channelKey}")
+  public ResponseEntity<Channel> delete(@PathVariable UUID channelKey) {
+    channelService.delete(channelKey);
+    log.info("{}", LogMapUtil.of("action", "delete")
+        .add("request", channelKey));
 
-    @RequestMapping(value = "/listAccessibleChannels", method = RequestMethod.GET)
-    public ResponseEntity<List<ChannelDto>> listAccessibleChannels(@RequestParam UUID userKey) {
-        List<ChannelDto> listAccessibleChannels = channelService.readAllByUserKey(userKey);
-        log.info("{}", LogMapUtil.of("action", "listAccessibleChannels")
-                .add("listAccessibleChannels", listAccessibleChannels));
+    return ResponseEntity.noContent().build();
+  }
 
-        return ResponseEntity.ok(listAccessibleChannels);
-    }
+  @GetMapping
+  public ResponseEntity<List<ChannelDto>> readAll(@RequestParam UUID userKey) {
+    List<ChannelDto> channelDtoList = channelService.readAllByUserKey(userKey);
+    log.info("{}", LogMapUtil.of("action", "readAll")
+        .add("channelDtoList", channelDtoList));
+
+    return ResponseEntity.ok(channelDtoList);
+  }
 }

@@ -90,20 +90,21 @@ public class BasicUserService implements UserService {
 
     String newUsername = request.newUsername();
     String newEmail = request.newEmail();
-    if (userRepository.existsByEmail(newEmail)) {
-      throw new IllegalArgumentException("User with email " + newEmail + " already exists");
-    }
-    if (userRepository.existsByName(newUsername)) {
-      throw new IllegalArgumentException("User with username " + newUsername + " already exists");
-    }
-    if (request.newUsername() != null && !request.newUsername().isEmpty()) {
+
+    if (request.newUsername() != null) {
+      if (userRepository.existsByName(newUsername)) {
+        throw new IllegalArgumentException("User with username " + newUsername + " already exists");
+      }
       user.updateName(request.newUsername());
+    }
+    if (newEmail != null && !newEmail.isEmpty()) {
+      if (userRepository.existsByEmail(newEmail)) {
+        throw new IllegalArgumentException("User with email " + newEmail + " already exists");
+      }
+      user.updateEmail(request.newEmail());
     }
     if (request.newPassword() != null && !request.newPassword().isEmpty()) {
       user.updatePwd(request.newPassword());
-    }
-    if (request.newEmail() != null && !request.newEmail().isEmpty()) {
-      user.updateEmail(request.newEmail());
     }
 
     if (isValidBinaryContent(profileRequest)) {
