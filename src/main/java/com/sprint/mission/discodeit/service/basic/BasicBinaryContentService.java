@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.FindBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.binaryContent.SaveBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryData;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.BinaryDataRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,20 +18,19 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
-  private final BinaryDataRepository binaryDataRepository;
 
   @Override
-  public BinaryContent save(SaveBinaryContentRequestDto saveBinaryContentRequestDto) {
-    String fileName = saveBinaryContentRequestDto.fileName();
-    String contentType = saveBinaryContentRequestDto.contentType();
-    byte[] data = saveBinaryContentRequestDto.fileData();
+  public BinaryContent save(BinaryContentCreateRequest binaryContentCreateRequest) {
+    String fileName = binaryContentCreateRequest.fileName();
+    String contentType = binaryContentCreateRequest.contentType();
+    byte[] bytes = binaryContentCreateRequest.bytes();
 
-    BinaryData binaryData = binaryDataRepository.save(new BinaryData(data));
-    BinaryContent binaryContent = new BinaryContent(
-        binaryData.getId(),
-        fileName,
-        contentType
-    );
+    BinaryContent binaryContent = BinaryContent.builder()
+        .fileName(fileName)
+        .contentType(contentType)
+        .bytes(bytes)
+        .size((long) bytes.length)
+        .build();
     binaryContentRepository.save(binaryContent);
     return binaryContent;
   }
@@ -43,13 +41,10 @@ public class BasicBinaryContentService implements BinaryContentService {
         .orElseThrow(
             () -> new NoSuchElementException(binaryContentUUID + "에 해당하는 파일을 찾는데 실패하였습니다."));
 
-    BinaryData binaryData = binaryDataRepository.findById(binaryContent.getId())
-        .orElseThrow(() -> new NoSuchElementException("원본 데이터 파일을 찾는데 실패하였습니다."));
-
     return new FindBinaryContentRequestDto(
         binaryContent.getFileName(),
         binaryContent.getContentType(),
-        binaryData.getData(),
+        binaryContent.getBytes(),
         binaryContent.getCreatedAt()
     );
   }

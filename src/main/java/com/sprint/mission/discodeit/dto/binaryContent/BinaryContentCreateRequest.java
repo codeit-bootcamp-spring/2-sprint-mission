@@ -6,19 +6,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-public record SaveBinaryContentRequestDto(
+public record BinaryContentCreateRequest(
     String fileName,
     String contentType,
-    byte[] fileData
+    byte[] bytes
 ) {
 
-  public static Optional<SaveBinaryContentRequestDto> nullableFrom(MultipartFile file)
+  public static Optional<BinaryContentCreateRequest> nullableFrom(MultipartFile file)
       throws IOException {
     return Optional.ofNullable(file)
         .filter(f -> !f.isEmpty())
         .map(f -> {
           try {
-            return new SaveBinaryContentRequestDto(
+            return new BinaryContentCreateRequest(
                 f.getOriginalFilename(),
                 f.getContentType(),
                 f.getBytes()
@@ -29,7 +29,7 @@ public record SaveBinaryContentRequestDto(
         });
   }
 
-  public static List<SaveBinaryContentRequestDto> nullableFromList(List<MultipartFile> files)
+  public static List<BinaryContentCreateRequest> nullableFromList(List<MultipartFile> files)
       throws IOException {
     if (files == null || files.isEmpty()) {
       return List.of();
@@ -39,7 +39,7 @@ public record SaveBinaryContentRequestDto(
         .filter(f -> !f.isEmpty())  // 빈 파일 제외
         .map(f -> {
           try {
-            return new SaveBinaryContentRequestDto(
+            return new BinaryContentCreateRequest(
                 f.getOriginalFilename(),
                 f.getContentType(),
                 f.getBytes()

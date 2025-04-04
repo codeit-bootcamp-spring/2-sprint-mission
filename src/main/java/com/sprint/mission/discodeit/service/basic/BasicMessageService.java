@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.message.FindMessageByChannelIdResponseDto;
-import com.sprint.mission.discodeit.dto.binaryContent.SaveBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.BinaryDataRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -30,11 +29,10 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final BinaryContentRepository binaryContentRepository;
-  private final BinaryDataRepository binaryDataRepository;
 
   @Override
   public void sendMessage(MessageCreateRequest messageCreateRequest,
-      List<SaveBinaryContentRequestDto> saveBinaryContentRequestDtoList) {
+      List<BinaryContentCreateRequest> binaryContentCreateRequestList) {
     User user = userRepository.findUserById(messageCreateRequest.userId())
         .orElseThrow(() -> new NoSuchElementException(
             messageCreateRequest.userId() + "에 해당하는 사용자를 찾을 수 없습니다."));
@@ -43,14 +41,20 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new NoSuchElementException(
             messageCreateRequest.channelId() + "에 해당하는 채널을 찾을 수 없습니다."));
 
-    List<UUID> attachmentList = saveBinaryContentRequestDtoList.stream()
+    List<UUID> attachmentList = binaryContentCreateRequestList.stream()
         .map(data -> {
           String filename = data.fileName();
           String contentType = data.contentType();
-          BinaryData binaryData = binaryDataRepository.save(new BinaryData(data.fileData()));
-          binaryContentRepository.save(
-              new BinaryContent(binaryData.getId(), filename, contentType));
-          return binaryData.getId();
+          byte[] bytes = data.bytes();
+          BinaryContent binaryContent = BinaryContent.builder()
+              .fileName(filename)
+              .contentType(contentType)
+              .bytes(bytes)
+              .size((long) bytes.length)
+              .build();
+
+          binaryContentRepository.save(binaryContent);
+          return binaryContent.getId();
         })
         .toList();
 

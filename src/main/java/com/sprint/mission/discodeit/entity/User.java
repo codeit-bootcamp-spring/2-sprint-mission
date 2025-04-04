@@ -14,7 +14,7 @@ public class User extends BaseEntity implements Serializable {
   private String username;
   private String password;
   private String email;
-  private UUID profile;
+  private UUID profileId;
 
   public void updateUsername(String username) {
     super.updateTime();
@@ -33,6 +33,6 @@ public class User extends BaseEntity implements Serializable {
 
   public void updateProfile(UUID profile) {
     super.updateTime();
-    this.profile = profile;
+    this.profileId = profile;
   }
 }

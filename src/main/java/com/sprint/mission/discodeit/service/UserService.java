@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.binaryContent.SaveBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.FindUserDto;
 import com.sprint.mission.discodeit.dto.user.SaveUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
@@ -12,14 +12,14 @@ import java.util.UUID;
 public interface UserService {
 
   User save(SaveUserRequestDto saveUserParamDto,
-      Optional<SaveBinaryContentRequestDto> saveBinaryContentRequestDto);
+      Optional<BinaryContentCreateRequest> saveBinaryContentRequestDto);
 
   FindUserDto findByUser(UUID userId);
 
   List<FindUserDto> findAllUser();
 
   void update(UUID userId, UpdateUserRequestDto updateUserDto,
-      Optional<SaveBinaryContentRequestDto> saveBinaryContentRequestDto);
+      Optional<BinaryContentCreateRequest> saveBinaryContentRequestDto);
 
   void delete(UUID userId);
 }

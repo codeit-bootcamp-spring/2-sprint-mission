@@ -74,7 +74,7 @@ public class ReadStatusController {
     return ResponseEntity.status(HttpStatus.CREATED).body(ApiDataResponse.success());
   }
 
-  @PutMapping("/{readStatusId}")
+  @PatchMapping("/{readStatusId}")
   @Operation(summary = "Message 읽음 상태 수정", operationId = "update_1")
   @Parameters(value = {
       @Parameter(

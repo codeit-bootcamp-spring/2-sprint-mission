@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -89,7 +90,7 @@ public class ChannelController {
         .body(ApiDataResponse.success(saveChannelResponseDto));
   }
 
-  @PutMapping("/{channelId}")
+  @PatchMapping("/{channelId}")
   @Operation(summary = "Channel 정보 수정", operationId = "update_3")
   @Parameters(
       @Parameter(
@@ -189,7 +190,7 @@ public class ChannelController {
           description = "Channel 목록 조회 성공",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = ChannelDto.class)
+              array = @ArraySchema(schema = @Schema(implementation = ChannelDto.class))
           )
       )
   })

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.SaveBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.FindUserDto;
 import com.sprint.mission.discodeit.dto.user.SaveUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.entity.BinaryData;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.BinaryDataRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -30,11 +29,10 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
   private final BinaryContentRepository binaryContentRepository;
-  private final BinaryDataRepository binaryDataRepository;
 
   @Override
   public User save(SaveUserRequestDto saveUserParamDto,
-      Optional<SaveBinaryContentRequestDto> saveBinaryContentRequestDto) {
+      Optional<BinaryContentCreateRequest> saveBinaryContentRequestDto) {
     if (userRepository.findUserByUsername(saveUserParamDto.username()).isPresent()) {
       throw new IllegalArgumentException(
           String.format("User with username %s already exists", saveUserParamDto.username()));
@@ -49,10 +47,13 @@ public class BasicUserService implements UserService {
         .map(profile -> {
           String fileName = profile.fileName();
           String contentType = profile.contentType();
-          byte[] fileData = profile.fileData();
-          BinaryData binaryData = binaryDataRepository.save(new BinaryData(fileData));
-          BinaryContent binaryContent = new BinaryContent(binaryData.getId(), fileName,
-              contentType);
+          byte[] bytes = profile.bytes();
+          BinaryContent binaryContent = BinaryContent.builder()
+              .fileName(fileName)
+              .contentType(contentType)
+              .bytes(bytes)
+              .size((long) bytes.length)
+              .build();
           binaryContentRepository.save(binaryContent);
           return binaryContent.getId();
         })
@@ -80,7 +81,7 @@ public class BasicUserService implements UserService {
 
     FindUserDto findUserDto = new FindUserDto(
         user.getId(), user.getUsername(), user.getEmail(),
-        user.getProfile(), user.getCreatedAt(),
+        user.getProfileId(), user.getCreatedAt(),
         user.getUpdatedAt(), userStatus.getLastLoginTime(),
         userStatus.isLastStatus());
 
@@ -98,7 +99,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public void update(UUID userId, UpdateUserRequestDto updateUserDto,
-      Optional<SaveBinaryContentRequestDto> saveBinaryContentRequestDto) {
+      Optional<BinaryContentCreateRequest> saveBinaryContentRequestDto) {
     User user = userRepository.findUserById(userId).
         orElseThrow(
             () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
@@ -116,10 +117,13 @@ public class BasicUserService implements UserService {
         .map(profile -> {
           String fileName = profile.fileName();
           String contentType = profile.contentType();
-          byte[] fileData = profile.fileData();
-          BinaryData binaryData = binaryDataRepository.save(new BinaryData(fileData));
-          BinaryContent binaryContent = new BinaryContent(binaryData.getId(), fileName,
-              contentType);
+          byte[] fileData = profile.bytes();
+          BinaryContent binaryContent = BinaryContent.builder()
+              .fileName(fileName)
+              .contentType(contentType)
+              .bytes(fileData)
+              .size((long) fileData.length)
+              .build();
           binaryContentRepository.save(binaryContent);
           return binaryContent.getId();
         })
@@ -133,8 +137,8 @@ public class BasicUserService implements UserService {
     User user = userRepository.findUserById(userId)
         .orElseThrow(
             () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
-    if (Objects.nonNull(user.getProfile())) {
-      binaryContentRepository.delete(user.getProfile());
+    if (Objects.nonNull(user.getProfileId())) {
+      binaryContentRepository.delete(user.getProfileId());
     }
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
         .orElseThrow(

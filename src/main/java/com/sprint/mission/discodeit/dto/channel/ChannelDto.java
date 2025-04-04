@@ -1,21 +1,21 @@
 package com.sprint.mission.discodeit.dto.channel;
 
 import com.sprint.mission.discodeit.constant.ChannelType;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 public record ChannelDto(
-    UUID channelUUID,
-    String channelName,
+    UUID id,
     ChannelType channelType,
-    List<UUID> joinUserId,
-    Instant lastMessageTime
+    String name,
+    String description,
+    List<UUID> participantIds,
+    Instant lastMessageAt
 ) {
 
-  public ChannelDto(UUID channelUUID, String channelName, ChannelType channelType,
-      Instant lastMessageTime) {
-    this(channelUUID, channelName, channelType, List.of(), lastMessageTime);
+  public ChannelDto(UUID id, ChannelType channelType, String name, String description,
+      Instant lastMessageAt) {
+    this(id, channelType, name, description, List.of(), lastMessageAt);
   }
 }

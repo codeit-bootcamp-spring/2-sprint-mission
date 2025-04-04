@@ -34,24 +34,25 @@ public class BasicChannelService implements ChannelService {
   @Override
   public SaveChannelResponseDto createPublicChannel(
       PublicChannelCreateRequest publicChannelCreateRequest) {
-    Channel channel = new Channel(publicChannelCreateRequest.channelName(), ChannelType.PUBLIC);
+    Channel channel = new Channel(publicChannelCreateRequest.name(),
+        publicChannelCreateRequest.description(), ChannelType.PUBLIC);
     channelRepository.save(channel);
-    return new SaveChannelResponseDto(channel.getId(), channel.getChannelName(),
+    return new SaveChannelResponseDto(channel.getId(), channel.getName(),
         channel.getChannelType(), channel.getCreatedAt());
   }
 
   @Override
   public SaveChannelResponseDto createPrivateChannel(
       PrivateChannelCreateRequest privateChannelCreateRequest) {
-    Channel channel = new Channel(privateChannelCreateRequest.channelName(), ChannelType.PRIVATE);
+    Channel channel = new Channel(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
-    privateChannelCreateRequest.userList().forEach(userId -> {
+    privateChannelCreateRequest.participantIds().forEach(userId -> {
       User user = userRepository.findUserById(userId)
           .orElseThrow(() -> new NoSuchElementException(userId + "에 해당하는 사용자를 찾을 수 없습니다."));
       ReadStatus readStatus = new ReadStatus(user.getId(), channel.getId(), Instant.now());
       readStatusRepository.save(readStatus);
     });
-    return new SaveChannelResponseDto(channel.getId(), privateChannelCreateRequest.channelName(),
+    return new SaveChannelResponseDto(null, null,
         channel.getChannelType(), channel.getCreatedAt());
   }
 
@@ -72,16 +73,18 @@ public class BasicChannelService implements ChannelService {
           .toList();
       return new ChannelDto(
           channel.getId(),
-          channel.getChannelName(),
           channel.getChannelType(),
+          channel.getName(),
+          channel.getDescription(),
           joinUserId,
           lastMessage != null ? lastMessage.getCreatedAt() : null
       );
     }
     return new ChannelDto(
         channel.getId(),
-        channel.getChannelName(),
         channel.getChannelType(),
+        channel.getName(),
+        channel.getDescription(),
         lastMessage != null ? lastMessage.getCreatedAt() : null
     );
   }

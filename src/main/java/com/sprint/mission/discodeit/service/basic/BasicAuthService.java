@@ -26,6 +26,7 @@ public class BasicAuthService implements AuthService {
     if (!user.getPassword().equals(loginRequest.password())) {
       throw new IllegalArgumentException("Wrong password");
     }
-    return new LoginResponse(user.getId(), user.getUsername(), user.getEmail(), user.getProfile());
+    return new LoginResponse(user.getId(), user.getUsername(), user.getEmail(),
+        user.getCreatedAt(), user.getUpdatedAt(), user.getProfileId());
   }
 }

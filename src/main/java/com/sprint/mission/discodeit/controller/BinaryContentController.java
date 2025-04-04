@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,7 +64,7 @@ public class BinaryContentController {
       @PathVariable("binaryContentId") UUID binaryContentId
   ) {
     binaryContentService.findById(binaryContentId);
-    return ResponseEntity.ok(
+    return ResponseEntity.status(HttpStatus.OK).body(
         ApiDataResponse.success(binaryContentService.findById(binaryContentId)));
   }
 
