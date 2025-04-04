@@ -67,11 +67,11 @@ public class ReadStatusController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<Void>> save(
+  public ResponseEntity<ReadStatus> save(
       @RequestBody ReadStatusRequest readStatusRequest
   ) {
-    readStatusService.save(readStatusRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body(ApiDataResponse.success());
+    ReadStatus readStatus = readStatusService.save(readStatusRequest);
+    return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
   }
 
   @PatchMapping("/{readStatusId}")
@@ -110,11 +110,11 @@ public class ReadStatusController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<Void>> update(
+  public ResponseEntity<ReadStatus> update(
       @PathVariable("readStatusId") UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
-    readStatusService.update(readStatusId, readStatusUpdateRequest);
-    return ResponseEntity.status(HttpStatus.OK).body(ApiDataResponse.success());
+    ReadStatus readStatus = readStatusService.update(readStatusId, readStatusUpdateRequest);
+    return ResponseEntity.status(HttpStatus.OK).body(readStatus);
   }
 
   @GetMapping("")
@@ -138,12 +138,11 @@ public class ReadStatusController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<List<ReadStatus>>> findByUserId(
+  public ResponseEntity<List<ReadStatus>> findByUserId(
       @RequestParam("userId") UUID readStatusId
   ) {
     List<ReadStatus> readStatusList = readStatusService.findAllByUserId(
         readStatusId);
-    return ResponseEntity.status(HttpStatus.OK).body(
-        ApiDataResponse.success(readStatusList));
+    return ResponseEntity.status(HttpStatus.OK).body(readStatusList);
   }
 }

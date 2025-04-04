@@ -21,7 +21,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ChannelRepository channelRepository;
 
   @Override
-  public void save(ReadStatusRequest readStatusRequest) {
+  public ReadStatus save(ReadStatusRequest readStatusRequest) {
     userRepository.findUserById(readStatusRequest.userId())
         .orElseThrow(
             () -> new NoSuchElementException(
@@ -41,6 +41,7 @@ public class BasicReadStatusService implements ReadStatusService {
         readStatusRequest.channelId(), readStatusRequest.lastReadAt());
 
     readStatusRepository.save(readStatus);
+    return readStatus;
   }
 
   @Override
@@ -56,11 +57,12 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public void update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
+  public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
     ReadStatus readStatus = readStatusRepository.find(readStatusId)
         .orElseThrow(() -> new NoSuchElementException(readStatusId + "에 대한 읽은 상태를 찾을 수 없습니다."));
     readStatus.updateLastReadAt(readStatusUpdateRequest.newLastReadAt());
     readStatusRepository.save(readStatus);
+    return readStatus;
   }
 
   @Override
