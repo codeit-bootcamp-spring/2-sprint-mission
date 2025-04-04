@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record FindUserDto(
-    UUID userUUID,
+    UUID id,
     String username,
     String email,
     UUID profileId,

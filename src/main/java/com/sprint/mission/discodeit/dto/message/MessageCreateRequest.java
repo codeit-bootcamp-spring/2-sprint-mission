@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public record MessageCreateRequest(
     UUID channelId,
-    UUID userId,
+    UUID authorId,
     String content
 ) {
 

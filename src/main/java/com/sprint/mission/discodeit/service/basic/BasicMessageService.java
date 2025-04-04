@@ -32,9 +32,9 @@ public class BasicMessageService implements MessageService {
   @Override
   public Message sendMessage(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequestList) {
-    User user = userRepository.findUserById(messageCreateRequest.userId())
+    User user = userRepository.findUserById(messageCreateRequest.authorId())
         .orElseThrow(() -> new NoSuchElementException(
-            messageCreateRequest.userId() + "에 해당하는 사용자를 찾을 수 없습니다."));
+            messageCreateRequest.authorId() + "에 해당하는 사용자를 찾을 수 없습니다."));
 
     Channel channel = channelRepository.findChannelById(messageCreateRequest.channelId())
         .orElseThrow(() -> new NoSuchElementException(
@@ -82,13 +82,13 @@ public class BasicMessageService implements MessageService {
     return channelMessageList.stream()
         .sorted(Comparator.comparing(Message::getCreatedAt))
         .map((message) -> {
-          String nickname = userRepository.findUserById(message.getUserUUID())
+          String nickname = userRepository.findUserById(message.getAuthorId())
               .map(User::getUsername)
               .orElse("알 수 없음");
 
           return new FindMessageByChannelIdResponseDto(
               message.getId(), nickname,
-              message.getAttachmentList(), message.getContent(),
+              message.getAttachmentIds(), message.getContent(),
               message.getCreatedAt()
           );
         })
@@ -99,7 +99,7 @@ public class BasicMessageService implements MessageService {
   public Message updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
     Message message = messageRepository.findMessageById(messageId)
         .orElseThrow(() -> new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다."));
-    message.updateContent(messageUpdateRequest.content());
+    message.updateContent(messageUpdateRequest.newContent());
     messageRepository.save(message);
     return message;
   }
@@ -108,7 +108,7 @@ public class BasicMessageService implements MessageService {
   public void deleteMessageById(UUID messageId) {
     Message message = messageRepository.findMessageById(messageId)
         .orElseThrow(() -> new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다."));
-    message.getAttachmentList().forEach(binaryContentRepository::delete);
+    message.getAttachmentIds().forEach(binaryContentRepository::delete);
     messageRepository.delete(message.getId());
   }
 }
