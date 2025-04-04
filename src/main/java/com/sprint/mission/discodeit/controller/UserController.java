@@ -46,7 +46,8 @@ public class UserController {
   }
 
   @RequestMapping(method = RequestMethod.POST, consumes = "multipart/form-data")
-  public ResponseEntity<UserDto> register(@RequestPart("user") UserCreateRequest userCreateRequest,
+  public ResponseEntity<UserDto> register(
+      @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
     Optional<BinaryContentCreateRequest> optionalProfileCreateRequest = toBinaryContentCreateRequest(
         profileFile);
@@ -56,30 +57,30 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = "multipart/form-data")
-  public ResponseEntity<UserDto> update(@PathVariable UUID id,
-      @RequestPart("user") UserUpdateRequest userUpdateRequest,
+  @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = "multipart/form-data")
+  public ResponseEntity<UserDto> update(@PathVariable UUID userId,
+      @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
     Optional<BinaryContentCreateRequest> optionalProfileCreateRequest = toBinaryContentCreateRequest(
         profileFile);
-    User user = userService.update(id, userUpdateRequest, optionalProfileCreateRequest);
+    User user = userService.update(userId, userUpdateRequest, optionalProfileCreateRequest);
     UserDto userDto = userService.find(user.getId());
 
     return ResponseEntity.status(HttpStatus.OK).body(userDto);
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<UserDto> delete(@PathVariable UUID id) {
-    userService.delete(id);
+  @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+  public ResponseEntity<UserDto> delete(@PathVariable UUID userId) {
+    userService.delete(userId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-  public ResponseEntity<UserDto> findById(@PathVariable UUID id) {
-    UserDto userDto = userService.find(id);
-
-    return ResponseEntity.status(HttpStatus.OK).body(userDto);
-  }
+//  @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+//  public ResponseEntity<UserDto> findById(@PathVariable UUID userId) {
+//    UserDto userDto = userService.find(userId);
+//
+//    return ResponseEntity.status(HttpStatus.OK).body(userDto);
+//  }
 
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity<List<UserDto>> findAll() {

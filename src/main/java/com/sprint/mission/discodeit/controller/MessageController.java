@@ -30,7 +30,7 @@ public class MessageController {
 
   @RequestMapping(method = RequestMethod.POST, consumes = "multipart/form-data")
   public ResponseEntity<UUID> create(
-      @RequestPart("message") MessageCreateRequest messageCreateRequest,
+      @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachmentFiles) {
     List<BinaryContentCreateRequest> binaryContentCreateRequests = Optional.ofNullable(
             attachmentFiles)
@@ -53,24 +53,24 @@ public class MessageController {
     return ResponseEntity.status(HttpStatus.CREATED).body(message.getId());
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-  public ResponseEntity<Message> update(@PathVariable UUID id,
+  @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
+  public ResponseEntity<Message> update(@PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest) {
-    Message message = messageService.update(id, messageUpdateRequest);
+    Message message = messageService.update(messageId, messageUpdateRequest);
     return ResponseEntity.ok(message);
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<Void> delete(@PathVariable UUID id) {
-    messageService.delete(id);
+  @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
+  public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
+    messageService.delete(messageId);
     return ResponseEntity.noContent().build();
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-  public ResponseEntity<Message> get(@PathVariable UUID id) {
-    Message message = messageService.find(id);
-    return ResponseEntity.ok(message);
-  }
+//  @RequestMapping(value = "/{messageId}", method = RequestMethod.GET)
+//  public ResponseEntity<Message> get(@PathVariable UUID messageId) {
+//    Message message = messageService.find(messageId);
+//    return ResponseEntity.ok(message);
+//  }
 
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity<List<Message>> getAll(@RequestParam UUID channelId) {

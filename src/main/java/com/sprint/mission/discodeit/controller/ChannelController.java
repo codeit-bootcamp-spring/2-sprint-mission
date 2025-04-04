@@ -39,25 +39,25 @@ public class ChannelController {
     return ResponseEntity.status(HttpStatus.CREATED).body(dto);
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-  public ResponseEntity<ChannelDto> delete(@PathVariable UUID id) {
-    channelService.delete(id);
+  @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
+  public ResponseEntity<ChannelDto> delete(@PathVariable UUID channelId) {
+    channelService.delete(channelId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-  public ResponseEntity<ChannelDto> update(@PathVariable UUID id,
+  @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
+  public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
       @RequestBody PublicChannelUpdateRequest request) {
-    Channel channel = channelService.update(id, request);
+    Channel channel = channelService.update(channelId, request);
     ChannelDto channelDto = channelService.find(channel.getId());
     return ResponseEntity.status(HttpStatus.OK).body(channelDto);
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-  public ResponseEntity<ChannelDto> get(@PathVariable UUID id) {
-    ChannelDto channelDto = channelService.find(id);
-    return ResponseEntity.status(HttpStatus.OK).body(channelDto);
-  }
+//  @RequestMapping(value = "/{channelId}", method = RequestMethod.GET)
+//  public ResponseEntity<ChannelDto> get(@PathVariable UUID channelId) {
+//    ChannelDto channelDto = channelService.find(channelId);
+//    return ResponseEntity.status(HttpStatus.OK).body(channelDto);
+//  }
 
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity<List<ChannelDto>> getAll(@RequestParam UUID userId) {

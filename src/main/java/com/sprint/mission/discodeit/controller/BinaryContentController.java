@@ -26,8 +26,9 @@ public class BinaryContentController {
   }
 
   @GetMapping
-  public ResponseEntity<List<BinaryContent>> getMultiple(@RequestParam List<UUID> binaryContentId) {
-    List<BinaryContent> contents = binaryContentService.findAllByIdIn(binaryContentId);
+  public ResponseEntity<List<BinaryContent>> getMultiple(
+      @RequestParam List<UUID> binaryContentIds) {
+    List<BinaryContent> contents = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity.status(HttpStatus.OK).body(contents);
   }
 }
