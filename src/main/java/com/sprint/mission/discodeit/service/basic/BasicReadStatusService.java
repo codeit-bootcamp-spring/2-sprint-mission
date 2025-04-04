@@ -60,9 +60,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus find(ReadStatusFindDto readStatusFindDto) {
-        return readStatusRepository.load().stream()
-                .filter(r -> r.getId().equals(readStatusFindDto.Id()))
-                .findAny()
+        return readStatusRepository.loadToId(readStatusFindDto.Id())
                 .orElseThrow(() -> new NotFoundException("readStatus not found"));
     }
 
@@ -77,10 +75,9 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus update(UUID readStatusId, ReadStatusUpdateDto readStatusUpdateDto) {
-        ReadStatus matchingReadStatus = readStatusRepository.load().stream()
-                .filter(m -> m.getId().equals(readStatusId))
-                .findAny()
+        ReadStatus matchingReadStatus = readStatusRepository.loadToId(readStatusId)
                 .orElseThrow(() -> new NotFoundException("readStatus not found"));
+
         Instant newLastReadTime = readStatusUpdateDto.newLastReadAt();
         matchingReadStatus.readStatusUpdate(newLastReadTime);
         return readStatusRepository.save(matchingReadStatus);
@@ -89,9 +86,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void delete(ReadStatusDeleteDto readStatusDeleteDto) {
-        ReadStatus matchingReadStatus = readStatusRepository.load().stream()
-                .filter(m -> m.getId().equals(readStatusDeleteDto.Id()))
-                .findAny()
+        ReadStatus matchingReadStatus = readStatusRepository.loadToId(readStatusDeleteDto.Id())
                 .orElseThrow(() -> new NotFoundException("readStatus not found"));
         readStatusRepository.remove(matchingReadStatus);
     }

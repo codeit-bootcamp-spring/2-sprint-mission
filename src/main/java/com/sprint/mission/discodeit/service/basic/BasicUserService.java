@@ -11,13 +11,11 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
 import com.sprint.mission.discodeit.service.dto.userdto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,15 +72,11 @@ public class BasicUserService implements UserService {
     @Override
     public UserFindResponseDto find(UserFindRequestDto userFindRequestDto) {
         // userRepository 에서 User Id로 조회
-        User matchingUser = userRepository.load().stream()
-                .filter(u -> u.getId().equals(userFindRequestDto.userId()))
-                .findAny()
+        User matchingUser = userRepository.loadToId(userFindRequestDto.userId())
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
 
         // userStatusRepository 에서 User Id로 조회
-        UserStatus matchingUserStatus = userStatusRepository.load().stream()
-                .filter(u -> u.getUserId().equals(userFindRequestDto.userId()))
-                .findAny()
+        UserStatus matchingUserStatus = userStatusRepository.loadToId(userFindRequestDto.userId())
                 .orElseThrow(() -> new NotFoundException("User Status does not exist."));
 
         return UserFindResponseDto.UserFindResponse(matchingUser, matchingUserStatus);
@@ -105,9 +99,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public User update(UUID userId, UserUpdateDto userUpdateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
-        User matchingUser = userRepository.load().stream()
-                .filter(u -> u.getId().equals(userId))
-                .findAny()
+        User matchingUser = userRepository.loadToId(userId)
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
 
         UUID nullableProfileId = optionalBinaryContentCreateDto
@@ -120,8 +112,7 @@ public class BasicUserService implements UserService {
                 })
                 .orElse(null);
 
-        BinaryContentDeleteDto binaryContentDeleteDto = new BinaryContentDeleteDto(matchingUser.getProfileId());
-        binaryContentService.delete(binaryContentDeleteDto);
+        binaryContentService.delete(matchingUser.getProfileId());
 
         if (userUpdateDto.newPassword() == null) {
             matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), matchingUser.getPassword(), nullableProfileId);
@@ -136,9 +127,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        User matchingUser = userRepository.load().stream()
-                .filter(u -> u.getId().equals(userId))
-                .findAny()
+        User matchingUser = userRepository.loadToId(userId)
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
 
         UserStatus matchingUserStatus = userStatusRepository.load().stream()
@@ -146,11 +135,8 @@ public class BasicUserService implements UserService {
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("User Status does not exist."));
 
-        BinaryContentDeleteDto binaryContentDeleteDto = new BinaryContentDeleteDto(matchingUser.getProfileId());
-        binaryContentService.delete(binaryContentDeleteDto);
-
+        binaryContentService.delete(matchingUser.getProfileId());
         userStatusRepository.remove(matchingUserStatus);
-
         userRepository.remove(matchingUser);
     }
 }

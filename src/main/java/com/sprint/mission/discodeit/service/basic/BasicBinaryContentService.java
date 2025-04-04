@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,9 +37,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent find(UUID binaryContentId) {
-        return binaryContentRepository.load().stream()
-                .filter(m -> m.getId().equals(binaryContentId))
-                .findAny()
+        return binaryContentRepository.loadToId(binaryContentId)
                 .orElseThrow(() -> new NotFoundException("Profile not found"));
     }
 
@@ -59,20 +56,12 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent updateByUserId(BinaryContentUpdateDto binaryContentUpdateDto) {
-        BinaryContent matchingBinaryContent = binaryContentRepository.load().stream()
-                .filter(m -> m.getId().equals(binaryContentUpdateDto.Id()))
-                .findAny()
+        BinaryContent matchingBinaryContent = binaryContentRepository.loadToId(binaryContentUpdateDto.Id())
                 .orElseThrow(() -> new NotFoundException("Profile not found."));
 
         String fileName = binaryContentUpdateDto.newFileName();
         String contentType = binaryContentUpdateDto.newContentType();
         byte[] bytes = binaryContentUpdateDto.newBytes();
-        BinaryContent binaryContent = new BinaryContent(
-                fileName,
-                (long) bytes.length,
-                contentType,
-                bytes
-        );
 
         matchingBinaryContent.updateBinaryContent(fileName, (long) bytes.length, contentType, bytes);
         return binaryContentRepository.save(matchingBinaryContent);
@@ -81,11 +70,10 @@ public class BasicBinaryContentService implements BinaryContentService {
 
 
     @Override
-    public void delete(BinaryContentDeleteDto binaryContentDeleteDto) {
-        BinaryContent matchingBinaryContent = binaryContentRepository.load().stream()
-                .filter(m -> m.getId().equals(binaryContentDeleteDto.Id()))
-                .findAny()
+    public void delete(UUID binaryContentId) {
+        BinaryContent matchingBinaryContent = binaryContentRepository.loadToId(binaryContentId)
                 .orElse(null);
+
         binaryContentRepository.remove(matchingBinaryContent);
     }
 }

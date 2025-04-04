@@ -114,10 +114,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel update(UUID channelId, ChannelUpdateDto channelUpdateDto) {
-        Channel matchingChannel = channelRepository.load().stream()
-                .filter(c -> c.getId().equals(channelId))
-                .findAny()
+        Channel matchingChannel = channelRepository.loadToId(channelId)
                 .orElseThrow(() -> new NotFoundException("A channel does not exist"));
+
         if (matchingChannel.getType().equals(ChannelType.PRIVATE)) {
             throw new InvalidInputException("Private channels cannot be changed.");
         }

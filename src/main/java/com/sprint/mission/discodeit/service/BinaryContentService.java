@@ -13,6 +13,6 @@ public interface BinaryContentService {
     BinaryContent find(UUID binaryContentId);
     List<BinaryContent> findAll(List<UUID> binaryContentIds);
     BinaryContent updateByUserId(BinaryContentUpdateDto binaryContentUpdateDto);
-    void delete(BinaryContentDeleteDto binaryContentDeleteDto);
+    void delete(UUID binaryContentId);
 
 }

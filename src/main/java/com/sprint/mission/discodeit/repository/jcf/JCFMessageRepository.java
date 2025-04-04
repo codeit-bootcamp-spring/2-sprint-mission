@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
 
@@ -29,5 +31,10 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void remove(Message message) {
         messageData.remove(message);
+    }
+
+    @Override
+    public Optional<Message> loadToId(UUID id) {
+        return messageData.stream().filter(m -> m.getId().equals(id)).findFirst();
     }
 }

@@ -72,11 +72,9 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageFindResponseDto find(MessageFindRequestDto messageFindRequestDto) {
-        Message message = messageRepository.load().stream()
-                .filter(m -> m.getId().equals(messageFindRequestDto.messageId()))
-                .findAny()
+        Message matchingMessage = messageRepository.loadToId(messageFindRequestDto.messageId())
                 .orElseThrow(() -> new NotFoundException("Message does not exist."));
-        return MessageFindResponseDto.fromMessage(message);
+        return MessageFindResponseDto.fromMessage(matchingMessage);
     }
 
 
@@ -91,28 +89,21 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message update(UUID messageId, MessageUpdateDto messageUpdateDto) {
-        Message message = messageRepository.load().stream()
-                .filter(m -> m.getId().equals(messageId))
-                .findAny()
+        Message matchingMessage = messageRepository.loadToId(messageId)
                 .orElseThrow(() -> new NotFoundException("Message does not exist."));
-        
-        message.updateMessage(messageUpdateDto.newContent());
-        return messageRepository.save(message);
+
+        matchingMessage.updateMessage(messageUpdateDto.newContent());
+        return messageRepository.save(matchingMessage);
     }
 
 
     @Override
     public void delete(UUID messageId) {
-        Message message = messageRepository.load().stream()
-                .filter(m -> m.getId().equals(messageId))
-                .findAny()
+        Message matchingMessage = messageRepository.loadToId(messageId)
                 .orElseThrow(() -> new NotFoundException("Message does not exist."));
 
-        for (UUID oldProfiles : message.getAttachmentIds()) {
-            BinaryContentDeleteDto binaryContentDeleteDto = new BinaryContentDeleteDto(oldProfiles);
-            binaryContentService.delete(binaryContentDeleteDto);
-        }
-        messageRepository.remove(message);
+        matchingMessage.getAttachmentIds().forEach(binaryContentService::delete);
+        messageRepository.remove(matchingMessage);
 
     }
 }

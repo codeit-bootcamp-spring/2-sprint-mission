@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Repository
@@ -47,6 +50,27 @@ public class FileChannelRepository implements ChannelRepository {
             throw new RuntimeException(e);
         }
 
+    }
+
+
+    @Override
+    public Optional<Channel> loadToId(UUID id) {
+        Path path = DIRECTORY.resolve(id + ".ser");
+        if (!Files.exists(path)) {
+            return Optional.empty();
+        }
+        try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+        ) {
+            Object obj = ois.readObject();
+            if (obj instanceof Channel) {
+                return Optional.of((Channel) obj);
+            }
+            return Optional.empty();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

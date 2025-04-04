@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentUpdateDto;
 import com.sprint.mission.discodeit.service.dto.userdto.*;
 
 import java.util.List;

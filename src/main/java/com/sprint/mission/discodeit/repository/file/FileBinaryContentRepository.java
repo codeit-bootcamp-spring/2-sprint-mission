@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Repository
@@ -44,6 +46,27 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         ) {
             oos.writeObject(binaryContent);
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Override
+    public Optional<BinaryContent> loadToId(UUID id) {
+        Path path = DIRECTORY.resolve(id + ".ser");
+        if (!Files.exists(path)) {
+            return Optional.empty();
+        }
+        try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+        ) {
+            Object obj = ois.readObject();
+            if (obj instanceof BinaryContent) {
+                return Optional.of((BinaryContent) obj);
+            }
+            return Optional.empty();
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
