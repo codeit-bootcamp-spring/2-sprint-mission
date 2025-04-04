@@ -22,13 +22,13 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatus create(UserStatusCreateRequest request) {
-    if (userRepository.findByKey(request.userKey()) == null) {
+    if (userRepository.findByKey(request.userId()) == null) {
       throw new IllegalArgumentException("[Error] user is null");
     }
-    if (userStatusRepository.findByUserKey(request.userKey()) != null) {
+    if (userStatusRepository.findByUserKey(request.userId()) != null) {
       throw new IllegalArgumentException("[Error] userStatus is already exists");
     }
-    UserStatus userStatus = new UserStatus(request.userKey(), Instant.now());
+    UserStatus userStatus = new UserStatus(request.userId(), Instant.now());
     return userStatusRepository.save(userStatus);
   }
 
@@ -86,6 +86,6 @@ public class BasicUserStatusService implements UserStatusService {
       throw new IllegalArgumentException("[Error] userStatus is null");
     }
 
-    userStatusRepository.delete(userStatus.getUuid());
+    userStatusRepository.delete(userStatus.getId());
   }
 }

@@ -31,7 +31,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel create(PublicChannelCreateRequest request) {
-    Channel channel = new Channel(ChannelType.PUBLIC, request.name(), request.introduction());
+    Channel channel = new Channel(ChannelType.PUBLIC, request.name(), request.description());
     return channelRepository.save(channel);
   }
 
@@ -40,9 +40,9 @@ public class BasicChannelService implements ChannelService {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     Channel createdChannel = channelRepository.save(channel);
 
-    request.memberKeys().stream()
+    request.participantIds().stream()
         .filter(userRepository::existsByKey)
-        .map(userKey -> new ReadStatus(userKey, createdChannel.getUuid(), Instant.EPOCH))
+        .map(userKey -> new ReadStatus(userKey, createdChannel.getId(), Instant.EPOCH))
         .forEach(readStatusRepository::save);
 
     return createdChannel;
@@ -61,12 +61,12 @@ public class BasicChannelService implements ChannelService {
   @Override
   public List<ChannelDto> readAllByUserKey(UUID userKey) {
     List<UUID> privateChannelKeys = readStatusRepository.findAllByUserKey(userKey).stream()
-        .map(ReadStatus::getChannelKey)
+        .map(ReadStatus::getChannelId)
         .toList();
     return channelRepository.findAll().stream()
         .filter(
             channel -> channel.getType().equals(ChannelType.PUBLIC) || privateChannelKeys.contains(
-                channel.getUuid()))
+                channel.getId()))
         .map(this::createReadChannelResponse)
         .toList();
   }
@@ -83,8 +83,8 @@ public class BasicChannelService implements ChannelService {
     if (!request.newName().isEmpty()) {
       channel.updateName(request.newName());
     }
-    if (!request.newIntroduction().isEmpty()) {
-      channel.updateIntroduction(request.newIntroduction());
+    if (!request.newDescription().isEmpty()) {
+      channel.updateIntroduction(request.newDescription());
     }
     channelRepository.save(channel);
     return channel;
@@ -99,32 +99,32 @@ public class BasicChannelService implements ChannelService {
 
     List<Message> messages = messageRepository.findAllByChannelKey(channelKey);
     for (Message message : messages) {
-      messageRepository.delete(message.getUuid());
+      messageRepository.delete(message.getId());
     }
 
     List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelKey(channelKey);
     for (ReadStatus readStatus : readStatuses) {
-      readStatusRepository.delete(readStatus.getUuid());
+      readStatusRepository.delete(readStatus.getId());
     }
 
-    channelRepository.delete(channel.getUuid());
+    channelRepository.delete(channel.getId());
   }
 
   private ChannelDto createReadChannelResponse(Channel channel) {
-    Instant lastMessageAt = messageRepository.findAllByChannelKey(channel.getUuid()).stream()
+    Instant lastMessageAt = messageRepository.findAllByChannelKey(channel.getId()).stream()
         .map(Message::getCreatedAt)
         .max(Instant::compareTo)
         .orElse(null);
     List<UUID> memberKeys = null;
 
     if (channel.getType() == ChannelType.PRIVATE) {
-      memberKeys = readStatusRepository.findAllByChannelKey(channel.getUuid()).stream()
-          .map(ReadStatus::getUserKey)
+      memberKeys = readStatusRepository.findAllByChannelKey(channel.getId()).stream()
+          .map(ReadStatus::getUserId)
           .toList();
     }
 
-    return new ChannelDto(channel.getUuid(), channel.getType(), channel.getName(),
-        channel.getIntroduction(), memberKeys, lastMessageAt);
+    return new ChannelDto(channel.getId(), channel.getType(), channel.getName(),
+        channel.getDescription(), memberKeys, lastMessageAt);
   }
 
 }

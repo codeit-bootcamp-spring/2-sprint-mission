@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.dto.request;
 
 public record PublicChannelCreateRequest(
-        String name,
-        String introduction
+    String name,
+    String description
 ) {
+
 }

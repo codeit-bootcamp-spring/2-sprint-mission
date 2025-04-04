@@ -56,29 +56,29 @@ public class MessageController {
   }
 
   @GetMapping
-  public ResponseEntity<List<Message>> readAllByChannel(@RequestParam UUID channelKey) {
-    List<Message> messages = messageService.readAllByChannelKey(channelKey);
+  public ResponseEntity<List<Message>> readAllByChannel(@RequestParam UUID channelId) {
+    List<Message> messages = messageService.readAllByChannelKey(channelId);
     log.info("{}", LogMapUtil.of("action", "readAllByChannel")
         .add("messages", messages));
 
     return ResponseEntity.ok(messages);
   }
 
-  @PutMapping("/{messageKey}")
-  public ResponseEntity<Message> update(@PathVariable UUID messageKey,
+  @PutMapping("/{messageId}")
+  public ResponseEntity<Message> update(@PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest request) {
-    Message updated = messageService.update(messageKey, request);
+    Message updated = messageService.update(messageId, request);
     log.info("{}", LogMapUtil.of("action", "update")
         .add("updated", updated));
 
     return ResponseEntity.ok(updated);
   }
 
-  @DeleteMapping("/{messageKey}")
-  public ResponseEntity<Void> delete(@PathVariable UUID messageKey) {
-    messageService.delete(messageKey);
+  @DeleteMapping("/{messageId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
+    messageService.delete(messageId);
     log.info("{}", LogMapUtil.of("action", "delete")
-        .add("messageKey", messageKey));
+        .add("messageId", messageId));
     return ResponseEntity.noContent().build();
   }
 }

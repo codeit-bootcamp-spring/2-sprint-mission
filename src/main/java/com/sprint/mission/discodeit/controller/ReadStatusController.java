@@ -18,7 +18,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/readStatuses")
-@Tag(name = "UserStatuses", description = "Message 읽음 상태 API")
+@Tag(name = "ReadStatus", description = "Message 읽음 상태 API")
 public class ReadStatusController {
 
   private final ReadStatusService readStatusService;
@@ -33,10 +33,10 @@ public class ReadStatusController {
     return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
   }
 
-  @PatchMapping({"/{readStatusKey}"})
-  public ResponseEntity<ReadStatus> update(@PathVariable UUID readStatusKey,
+  @PatchMapping({"/{readStatusId}"})
+  public ResponseEntity<ReadStatus> update(@PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest request) {
-    ReadStatus updated = readStatusService.update(readStatusKey, request);
+    ReadStatus updated = readStatusService.update(readStatusId, request);
     log.info("{}", LogMapUtil.of("action", "update")
         .add("updated", updated));
 
@@ -44,8 +44,8 @@ public class ReadStatusController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ReadStatus>> readAllByUserKey(@RequestParam UUID userKey) {
-    List<ReadStatus> list = readStatusService.findAllByUserKey(userKey);
+  public ResponseEntity<List<ReadStatus>> readAllByUserKey(@RequestParam UUID userId) {
+    List<ReadStatus> list = readStatusService.findAllByUserKey(userId);
     log.info("{}", LogMapUtil.of("action", "readAllByUser")
         .add("list", list));
 

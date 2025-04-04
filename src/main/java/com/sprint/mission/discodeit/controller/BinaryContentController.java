@@ -22,17 +22,17 @@ public class BinaryContentController {
   private final BinaryContentService binaryContentService;
   private static final Logger log = LoggerFactory.getLogger(BinaryContentController.class);
 
-  @GetMapping("/{binaryContentKey}")
-  public ResponseEntity<BinaryContent> read(@PathVariable UUID binaryContentKey) {
-    BinaryContent content = binaryContentService.find(binaryContentKey);
+  @GetMapping("/{binaryContentId}")
+  public ResponseEntity<BinaryContent> read(@PathVariable UUID binaryContentId) {
+    BinaryContent content = binaryContentService.find(binaryContentId);
     log.info("{}", LogMapUtil.of("action", "read")
         .add("content", content));
     return ResponseEntity.ok(content);
   }
 
   @GetMapping
-  public ResponseEntity<List<BinaryContent>> readAll(@RequestParam List<UUID> binaryContentKeys) {
-    List<BinaryContent> contents = binaryContentService.findAllByKeys(binaryContentKeys);
+  public ResponseEntity<List<BinaryContent>> readAll(@RequestParam List<UUID> binaryContentIds) {
+    List<BinaryContent> contents = binaryContentService.findAllByKeys(binaryContentIds);
     log.info("{}", LogMapUtil.of("action", "readAll")
         .add("contents", contents));
     return ResponseEntity.ok(contents);

@@ -31,37 +31,37 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto create(UserCreateRequest userRequest, BinaryContentCreateRequest profileRequest) {
     UUID profileImageKey = null;
-    if (userRepository.existsByName(userRequest.name())) {
+    if (userRepository.existsByName(userRequest.username())) {
       throw new IllegalStateException("[Error] 동일한 name");
     }
     if (userRepository.existsByEmail(userRequest.email())) {
       throw new IllegalStateException("[Error] 동일한 email");
     }
     if (isValidBinaryContent(profileRequest)) {
-      profileImageKey = binaryContentService.create(profileRequest).getUuid();
+      profileImageKey = binaryContentService.create(profileRequest).getId();
     }
 
-    User user = new User(userRequest.name(), userRequest.password(), userRequest.email(),
+    User user = new User(userRequest.username(), userRequest.password(), userRequest.email(),
         profileImageKey);
     userRepository.save(user);
 
-    UserStatus userStatus = new UserStatus(user.getUuid(), Instant.EPOCH);
+    UserStatus userStatus = new UserStatus(user.getId(), Instant.EPOCH);
     userStatusRepository.save(userStatus);
 
-    return new UserDto(user.getUuid(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(),
+    return new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
         user.getEmail(), user.getProfileId(), userStatus.isOnline());
   }
 
   @Override
   public UserDto read(UUID userKey) {
     User user = userRepository.findByKey(userKey);
-    UserStatus userStatus = userStatusRepository.findByUserKey(user.getUuid());
+    UserStatus userStatus = userStatusRepository.findByUserKey(user.getId());
 
-    if (user.getUuid() == null) {
+    if (user.getId() == null) {
       throw new IllegalArgumentException("[Error] 조회할 사용자가 존재하지 않습니다.");
     }
 
-    return new UserDto(user.getUuid(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(),
+    return new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
         user.getEmail(), user.getProfileId(), userStatus.isOnline());
   }
 
@@ -72,8 +72,8 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("[Error] 조회할 사용자가 존재하지 않습니다.");
     }
     return users.stream().map(user -> {
-          UserStatus userStatus = userStatusRepository.findByUserKey(user.getUuid());
-          return new UserDto(user.getUuid(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(),
+          UserStatus userStatus = userStatusRepository.findByUserKey(user.getId());
+          return new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
               user.getEmail(), user.getProfileId(), userStatus.isOnline());
         })
         .toList();
@@ -112,7 +112,7 @@ public class BasicUserService implements UserService {
       if (currentProfileId != null) {
         binaryContentRepository.delete(currentProfileId);
       }
-      updateProfileKey = binaryContentService.create(profileRequest).getUuid();
+      updateProfileKey = binaryContentService.create(profileRequest).getId();
       user.updateProfileId(updateProfileKey);
     }
 

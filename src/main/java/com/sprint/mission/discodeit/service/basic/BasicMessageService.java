@@ -32,22 +32,22 @@ public class BasicMessageService implements MessageService {
   public Message create(MessageCreateRequest messageRequest,
       List<BinaryContentCreateRequest> attachmentRequests) {
     List<UUID> attachmentKeys = null;
-    if (!channelRepository.existsByKey(messageRequest.channelKey())) {
-      throw new NoSuchElementException("[Error] 채널이 존재하지 않습니다. " + messageRequest.channelKey());
+    if (!channelRepository.existsByKey(messageRequest.channelId())) {
+      throw new NoSuchElementException("[Error] 채널이 존재하지 않습니다. " + messageRequest.channelId());
     }
-    if (!userRepository.existsByKey(messageRequest.authorKey())) {
-      throw new NoSuchElementException("[Error] 유저가 존재하지 않습니다. " + messageRequest.authorKey());
+    if (!userRepository.existsByKey(messageRequest.authorId())) {
+      throw new NoSuchElementException("[Error] 유저가 존재하지 않습니다. " + messageRequest.authorId());
     }
     if (attachmentRequests != null) {
       attachmentKeys = attachmentRequests.stream()
           .filter(this::isValidBinaryContent)
           .map(binaryContentService::create)
-          .map(BinaryContent::getUuid)
+          .map(BinaryContent::getId)
           .toList();
     }
 
-    Message message = new Message(messageRequest.content(), messageRequest.authorKey(),
-        messageRequest.channelKey(), attachmentKeys);
+    Message message = new Message(messageRequest.content(), messageRequest.authorId(),
+        messageRequest.channelId(), attachmentKeys);
 
     return messageRepository.save(message);
   }
@@ -89,7 +89,7 @@ public class BasicMessageService implements MessageService {
       throw new IllegalArgumentException("[Error] 해당 메시지가 존재하지 않습니다");
     }
 
-    message.getAttachmentKeys().forEach(binaryContentRepository::delete);
+    message.getAttachmentIds().forEach(binaryContentRepository::delete);
 
     messageRepository.delete(messageKey);
   }

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +34,7 @@ public class ChannelController {
     log.info("{}", LogMapUtil.of("action", "createPublic")
         .add("publicChannel", publicChannel));
 
-    return ResponseEntity.ok(publicChannel);
+    return ResponseEntity.status(HttpStatus.CREATED).body(publicChannel);
   }
 
   @PostMapping("/private")
@@ -43,31 +44,31 @@ public class ChannelController {
     log.info("{}", LogMapUtil.of("action", "createPrivate")
         .add("privateChannel", privateChannel));
 
-    return ResponseEntity.ok(privateChannel);
+    return ResponseEntity.status(HttpStatus.CREATED).body(privateChannel);
   }
 
-  @PutMapping("/{channelKey}")
-  public ResponseEntity<Channel> update(@PathVariable UUID channelKey,
+  @PutMapping("/{channelId}")
+  public ResponseEntity<Channel> update(@PathVariable UUID channelId,
       @RequestBody PublicChannelUpdateRequest request) {
-    Channel updated = channelService.update(channelKey, request);
+    Channel updated = channelService.update(channelId, request);
     log.info("{}", LogMapUtil.of("action", "updatePublic")
         .add("updated", updated));
 
     return ResponseEntity.ok(updated);
   }
 
-  @DeleteMapping("/{channelKey}")
-  public ResponseEntity<Channel> delete(@PathVariable UUID channelKey) {
-    channelService.delete(channelKey);
+  @DeleteMapping("/{channelId}")
+  public ResponseEntity<Channel> delete(@PathVariable UUID channelId) {
+    channelService.delete(channelId);
     log.info("{}", LogMapUtil.of("action", "delete")
-        .add("request", channelKey));
+        .add("request", channelId));
 
     return ResponseEntity.noContent().build();
   }
 
   @GetMapping
-  public ResponseEntity<List<ChannelDto>> readAll(@RequestParam UUID userKey) {
-    List<ChannelDto> channelDtoList = channelService.readAllByUserKey(userKey);
+  public ResponseEntity<List<ChannelDto>> readAll(@RequestParam UUID userId) {
+    List<ChannelDto> channelDtoList = channelService.readAllByUserKey(userId);
     log.info("{}", LogMapUtil.of("action", "readAll")
         .add("channelDtoList", channelDtoList));
 

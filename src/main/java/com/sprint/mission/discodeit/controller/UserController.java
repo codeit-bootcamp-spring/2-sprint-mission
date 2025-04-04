@@ -43,14 +43,14 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
-  @PutMapping(path = "/{userKey}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @PutMapping(path = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<User> update(
-      @PathVariable UUID userKey,
+      @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     BinaryContentCreateRequest profileRequest = resolveProfileRequest(profile);
-    User updatedUser = userService.update(userKey, userRequest, profileRequest);
+    User updatedUser = userService.update(userId, userRequest, profileRequest);
     log.info("{}", LogMapUtil.of("action", "updateUser")
         .add("updatedUser", updatedUser));
     return ResponseEntity.ok(updatedUser);
@@ -65,19 +65,19 @@ public class UserController {
     return ResponseEntity.ok(userDtos);
   }
 
-  @DeleteMapping("/{userKey}")
-  public ResponseEntity<Void> deleteUser(@PathVariable UUID userKey) {
-    userService.delete(userKey);
+  @DeleteMapping("/{userId}")
+  public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+    userService.delete(userId);
     log.info("{}", LogMapUtil.of("action", "deleteUser")
-        .add("userKey", userKey));
+        .add("userKey", userId));
 
     return ResponseEntity.noContent().build();
   }
 
-  @PatchMapping("/{userKey}/status")
-  public ResponseEntity<UserStatus> updateUserStatusByUserKey(@PathVariable UUID userKey,
+  @PatchMapping("/{userId}/userStatus")
+  public ResponseEntity<UserStatus> updateUserStatusByUserKey(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateRequest request) {
-    UserStatus updatedUserStatus = userStatusService.updateByUserKey(userKey, request);
+    UserStatus updatedUserStatus = userStatusService.updateByUserKey(userId, request);
     log.info("{}", LogMapUtil.of("action", "updateStatus")
         .add("updatedUserStatus", updatedUserStatus));
 

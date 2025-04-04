@@ -10,22 +10,23 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
-    private final UserRepository userRepository;
 
-    @Override
-    public User login(LoginRequest request) {
-        User matchedUser = userRepository.findAll().stream()
-                .filter(user -> user.getName().equals(request.username()))
-                .filter((user -> user.getPwd().equals(request.password())))
-                .findFirst()
-                .orElse(null);
+  private final UserRepository userRepository;
 
-        if (matchedUser == null) {
-            throw new IllegalArgumentException("[Error] matchedUser is null");
-        }
+  @Override
+  public User login(LoginRequest request) {
+    User matchedUser = userRepository.findAll().stream()
+        .filter(user -> user.getUsername().equals(request.username()))
+        .filter((user -> user.getPassword().equals(request.password())))
+        .findFirst()
+        .orElse(null);
 
-        return matchedUser;
+    if (matchedUser == null) {
+      throw new IllegalArgumentException("[Error] matchedUser is null");
     }
+
+    return matchedUser;
+  }
 
 
 }

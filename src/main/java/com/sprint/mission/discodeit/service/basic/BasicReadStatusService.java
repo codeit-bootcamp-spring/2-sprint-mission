@@ -23,19 +23,19 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public ReadStatus create(ReadStatusCreateRequest request) {
-    if (!userRepository.existsByKey(request.userKey())) {
+    if (!userRepository.existsByKey(request.userId())) {
       throw new IllegalArgumentException("[Error] user is null");
     }
-    if (!channelRepository.existsByKey(request.channelKey())) {
+    if (!channelRepository.existsByKey(request.channelId())) {
       throw new IllegalArgumentException("[Error] channel is null");
     }
-    if (readStatusRepository.findAllByUserKey(request.userKey()).stream()
-        .anyMatch(readStatus -> readStatus.getChannelKey().equals(request.channelKey()))) {
+    if (readStatusRepository.findAllByUserKey(request.userId()).stream()
+        .anyMatch(readStatus -> readStatus.getChannelId().equals(request.channelId()))) {
       throw new IllegalArgumentException(
-          "ReadStatus with userId " + request.userKey() + " and channelId " + request.channelKey()
+          "ReadStatus with userId " + request.userId() + " and channelId " + request.channelId()
               + " already exists");
     }
-    ReadStatus readStatus = new ReadStatus(request.userKey(), request.channelKey(),
+    ReadStatus readStatus = new ReadStatus(request.userId(), request.channelId(),
         request.lastReadAt());
     readStatusRepository.save(readStatus);
 
@@ -68,7 +68,7 @@ public class BasicReadStatusService implements ReadStatusService {
     if (readStatus == null) {
       throw new IllegalArgumentException("[Error] readStatus is null");
     }
-    readStatus.updateLastReadAt(request.lastReadAt());
+    readStatus.updateLastReadAt(request.newLastReadAt());
     readStatusRepository.save(readStatus);
 
     return readStatus;
