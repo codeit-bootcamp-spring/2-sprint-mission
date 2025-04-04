@@ -18,4 +18,9 @@ public class Channel extends BaseEntity implements Serializable {
     super.updateTime();
     this.name = name;
   }
+
+  public void updateChannelDescription(String description) {
+    super.updateTime();
+    this.description = description;
+  }
 }

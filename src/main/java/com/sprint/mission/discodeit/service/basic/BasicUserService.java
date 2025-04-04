@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.FindUserDto;
-import com.sprint.mission.discodeit.dto.user.SaveUserRequestDto;
-import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateResponse;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.UserUpdateResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -11,15 +13,14 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import java.util.NoSuchElementException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -30,16 +31,16 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public User save(SaveUserRequestDto saveUserParamDto,
+  public UserCreateResponse save(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> saveBinaryContentRequestDto) {
-    if (userRepository.findUserByUsername(saveUserParamDto.username()).isPresent()) {
+    if (userRepository.findUserByUsername(userCreateRequest.username()).isPresent()) {
       throw new IllegalArgumentException(
-          String.format("User with username %s already exists", saveUserParamDto.username()));
+          String.format("User with username %s already exists", userCreateRequest.username()));
     }
 
-    if (userRepository.findUserByEmail(saveUserParamDto.email()).isPresent()) {
+    if (userRepository.findUserByEmail(userCreateRequest.email()).isPresent()) {
       throw new IllegalArgumentException(
-          String.format("User with email %s already exists", saveUserParamDto.email()));
+          String.format("User with email %s already exists", userCreateRequest.email()));
     }
 
     UUID profileId = saveBinaryContentRequestDto
@@ -59,14 +60,15 @@ public class BasicUserService implements UserService {
         .orElse(null);
 
     User user = new User(
-        saveUserParamDto.username(), saveUserParamDto.password(),
-        saveUserParamDto.email(), profileId);
+        userCreateRequest.username(), userCreateRequest.password(),
+        userCreateRequest.email(), profileId);
     userRepository.save(user);
     UserStatus userStatus = UserStatus.builder()
         .userId(user.getId())
         .build();
     userStatusRepository.save(userStatus);
-    return user;
+    return new UserCreateResponse(user.getId(), user.getUsername(), user.getEmail(),
+        user.getProfileId(), user.getCreatedAt());
   }
 
   @Override
@@ -97,20 +99,20 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public void update(UUID userId, UpdateUserRequestDto updateUserDto,
+  public UserUpdateResponse update(UUID userId, UserUpdateRequest updateUserDto,
       Optional<BinaryContentCreateRequest> saveBinaryContentRequestDto) {
     User user = userRepository.findUserById(userId).
         orElseThrow(
             () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
 
-    if (userRepository.findUserByEmail(updateUserDto.email()).isPresent()) {
+    if (userRepository.findUserByEmail(updateUserDto.newEmail()).isPresent()) {
       throw new IllegalArgumentException(
-          String.format("User with email %s already exists", updateUserDto.email()));
+          String.format("User with email %s already exists", updateUserDto.newEmail()));
     }
 
-    user.updateUsername(updateUserDto.username());
-    user.updatePassword(updateUserDto.password());
-    user.updateEmail(updateUserDto.email());
+    user.updateUsername(updateUserDto.newUsername());
+    user.updatePassword(updateUserDto.newPassword());
+    user.updateEmail(updateUserDto.newEmail());
 
     UUID profileId = saveBinaryContentRequestDto
         .map(profile -> {
@@ -129,6 +131,8 @@ public class BasicUserService implements UserService {
         .orElse(null);
     user.updateProfile(profileId);
     userRepository.save(user);
+    return new UserUpdateResponse(user.getId(), user.getUsername(), user.getEmail(),
+        user.getProfileId(), user.getCreatedAt(), user.getUpdatedAt());
   }
 
   @Override

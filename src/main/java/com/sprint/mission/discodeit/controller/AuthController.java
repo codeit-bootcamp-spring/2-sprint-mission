@@ -62,10 +62,10 @@ public class AuthController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<LoginResponse>> login(
+  public ResponseEntity<LoginResponse> login(
       @RequestBody() LoginRequest loginRequest
   ) {
     LoginResponse loginResponse = authService.login(loginRequest);
-    return ResponseEntity.status(HttpStatus.OK).body(ApiDataResponse.success(loginResponse));
+    return ResponseEntity.status(HttpStatus.OK).body(loginResponse);
   }
 }

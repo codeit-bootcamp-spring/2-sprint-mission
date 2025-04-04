@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -20,7 +19,6 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
-  private final MessageRepository messageRepository;
 
   @Override
   public void save(ReadStatusRequest readStatusRequest) {
@@ -61,7 +59,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public void update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
     ReadStatus readStatus = readStatusRepository.find(readStatusId)
         .orElseThrow(() -> new NoSuchElementException(readStatusId + "에 대한 읽은 상태를 찾을 수 없습니다."));
-    readStatus.updateLastReadAt(readStatusUpdateRequest.readTime());
+    readStatus.updateLastReadAt(readStatusUpdateRequest.newLastReadAt());
     readStatusRepository.save(readStatus);
   }
 

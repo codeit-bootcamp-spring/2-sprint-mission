@@ -49,7 +49,7 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
         .orElseThrow(() -> new NoSuchElementException(
             String.format("UserStatus with userId %s not found", userId)));
-    userStatus.updateLastLoginTime(userStatusUpdateRequest.loginTime());
+    userStatus.updateLastLoginTime(userStatusUpdateRequest.newLastActiveAt());
     userStatusRepository.save(userStatus);
     return new UpdateUserStatusResponse(userStatus.getId(), userStatus.getUserId(),
         userStatus.getLastActiveAt(), userStatus.isLastStatus(), userStatus.getCreatedAt(),

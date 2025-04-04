@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ApiDataResponse;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.FindUserDto;
-import com.sprint.mission.discodeit.dto.user.SaveUserRequestDto;
-import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateResponse;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.UserUpdateResponse;
 import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusResponse;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,14 +72,13 @@ public class UserController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<Void>> create(
-      @RequestPart("userCreateRequest") SaveUserRequestDto saveUserRequestDto,
+  public ResponseEntity<UserCreateResponse> create(
+      @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile file
   ) throws IOException {
-    System.out.println(saveUserRequestDto);
-    userService.save(saveUserRequestDto, BinaryContentCreateRequest.nullableFrom(file));
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(ApiDataResponse.success());
+    UserCreateResponse userCreateResponse = userService.save(userCreateRequest,
+        BinaryContentCreateRequest.nullableFrom(file));
+    return ResponseEntity.status(HttpStatus.CREATED).body(userCreateResponse);
   }
 
   @PatchMapping(
@@ -118,14 +117,14 @@ public class UserController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<Void>> update(
+  public ResponseEntity<UserUpdateResponse> update(
       @PathVariable("userId") UUID userId,
-      @RequestPart("userUpdateRequest") UpdateUserRequestDto updateUserRequestDto,
+      @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile file
   ) throws IOException {
-    userService.update(userId, updateUserRequestDto,
+    UserUpdateResponse userUpdateResponse = userService.update(userId, userUpdateRequest,
         BinaryContentCreateRequest.nullableFrom(file));
-    return ResponseEntity.ok(ApiDataResponse.success());
+    return ResponseEntity.status(HttpStatus.OK).body(userUpdateResponse);
   }
 
 
@@ -151,11 +150,11 @@ public class UserController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<Void>> delete(
+  public ResponseEntity<Void> delete(
       @PathVariable("userId") UUID userId
   ) {
     userService.delete(userId);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiDataResponse.success());
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @GetMapping("")
@@ -172,9 +171,9 @@ public class UserController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<List<FindUserDto>>> findAll() {
+  public ResponseEntity<List<FindUserDto>> findAll() {
     List<FindUserDto> findUserDtoList = userService.findAllUser();
-    return ResponseEntity.ok(ApiDataResponse.success(findUserDtoList));
+    return ResponseEntity.status(HttpStatus.OK).body(findUserDtoList);
   }
 
   @PatchMapping("/{userId}/userStatus")
@@ -199,7 +198,7 @@ public class UserController {
           description = "User 온라인 상태가 성공적으로 업데이트됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = UserStatus.class)
+              schema = @Schema(implementation = UpdateUserStatusResponse.class)
           )
       ),
       @ApiResponse(
@@ -211,14 +210,14 @@ public class UserController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<UpdateUserStatusResponse>> updateUserStatusByUserId(
+  public ResponseEntity<UpdateUserStatusResponse> updateUserStatusByUserId(
       @PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest dto
   ) {
-    System.out.println(dto.loginTime());
+    System.out.println(dto.newLastActiveAt());
     UpdateUserStatusResponse updateUserStatusResponse = userStatusService.updateByUserId(userId,
         dto);
     return ResponseEntity.status(HttpStatus.OK)
-        .body(ApiDataResponse.success(updateUserStatusResponse));
+        .body(updateUserStatusResponse);
   }
 }
