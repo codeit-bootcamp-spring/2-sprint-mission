@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import static com.sprint.mission.discodeit.util.FileUtils.getBinaryContent;
+import static com.sprint.mission.discodeit.util.FileUtils.getBytesFromMultiPartFile;
 
 import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -18,17 +18,19 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
 
-  public UUID createProfileImage(MultipartFile multipartFile) {
+  @Override
+  public BinaryContentResult createProfileImage(MultipartFile multipartFile) {
     if (multipartFile == null) {
       return null;
     }
 
     BinaryContent binaryContent = new BinaryContent(multipartFile.getName(),
         multipartFile.getContentType(),
-        multipartFile.getSize(), getBinaryContent(multipartFile));
+        multipartFile.getSize(), getBytesFromMultiPartFile(multipartFile));
+
     BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
-    return savedBinaryContent.getId();
+    return BinaryContentResult.fromEntity(savedBinaryContent);
   }
 
   @Override

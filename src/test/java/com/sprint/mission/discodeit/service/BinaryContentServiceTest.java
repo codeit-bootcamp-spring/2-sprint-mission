@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
+import static com.sprint.mission.discodeit.util.FileUtils.getBytesFromMultiPartFile;
+import static com.sprint.mission.discodeit.util.mock.file.FileInfo.IMAGE_NAME_DOG;
+import static com.sprint.mission.discodeit.util.mock.file.FileInfo.IMAGE_NAME_KIRBY;
 import static com.sprint.mission.discodeit.util.mock.file.MockFile.createMockImageFile;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -8,8 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
-import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,40 +28,39 @@ class BinaryContentServiceTest {
   @DisplayName("이미지 파일을 저장하면 올바른 경로가 반환된다.")
   @Test
   void createProfileImage() {
-    MultipartFile file = createMockImageFile("dog.jpg");
-    UUID profileId = binaryContentService.createProfileImage(file);
-    BinaryContentResult binaryContent = binaryContentService.getById(profileId);
+    MultipartFile file = createMockImageFile(IMAGE_NAME_DOG);
+    BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(file);
 
-    assertThat(profileId).isEqualTo(binaryContent.id());
+    assertThat(binaryContentResult.bytes()).isEqualTo(getBytesFromMultiPartFile(file));
   }
 
   @DisplayName("여러 ID로 조회하면 해당하는 모든 바이너리 콘텐츠가 반환된다.")
   @Test
   void findAllByIdIn() {
-    UUID profileId1 = binaryContentService.createProfileImage(
-        createMockImageFile("Kirby.jpg"));
-    UUID profileId2 = binaryContentService.createProfileImage(createMockImageFile("dog.jpg"));
-    List<BinaryContentResult> binaryContentsResults = binaryContentService.getByIdIn(
-        List.of(profileId1, profileId2));
+    MultipartFile imageFile = createMockImageFile(IMAGE_NAME_DOG);
+    BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(imageFile);
 
-    BinaryContentResult binaryContentResult1 = binaryContentsResults.get(0);
-    BinaryContentResult binaryContentResult2 = binaryContentsResults.get(1);
+    MultipartFile otherImageFile = createMockImageFile(IMAGE_NAME_KIRBY);
+    BinaryContentResult otherBinaryContentResult = binaryContentService.createProfileImage(
+        otherImageFile);
 
     assertAll(
-        () -> assertThat(binaryContentResult1.id()).isEqualTo(profileId1),
-        () -> assertThat(binaryContentResult2.id()).isEqualTo(profileId2)
+        () -> assertThat(binaryContentResult.bytes()).isEqualTo(
+            getBytesFromMultiPartFile(imageFile)),
+        () -> assertThat(otherBinaryContentResult.bytes()).isEqualTo(
+            getBytesFromMultiPartFile(otherImageFile))
     );
   }
 
   @DisplayName("이미지를 삭제하면 로컬 저장소에서도 삭제된다.")
   @Test
   void deleteProfileImage() {
-    MultipartFile file = createMockImageFile("dog.jpg");
-    UUID profileId = binaryContentService.createProfileImage(file);
+    MultipartFile file = createMockImageFile(IMAGE_NAME_DOG);
+    BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(file);
 
-    binaryContentService.delete(profileId);
+    binaryContentService.delete(binaryContentResult.id());
 
-    assertThatThrownBy(() -> binaryContentService.getById(profileId))
+    assertThatThrownBy(() -> binaryContentService.getById(binaryContentResult.id()))
         .isInstanceOf(IllegalArgumentException.class);
   }
 }

@@ -42,7 +42,7 @@ public final class FileUtils {
     creatDirectory(parentDir);
   }
 
-  public static byte[] getBinaryContent(MultipartFile multipartFile) {
+  public static byte[] getBytesFromMultiPartFile(MultipartFile multipartFile) {
     byte[] bytes;
     try {
       bytes = multipartFile.getBytes();

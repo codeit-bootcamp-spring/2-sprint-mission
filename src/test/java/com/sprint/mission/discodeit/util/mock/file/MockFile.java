@@ -7,10 +7,17 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-public class MockFile {
+public final class MockFile {
+
+  private MockFile() {
+  }
 
   public static MultipartFile createMockImageFile(String fileName) {
-    return new MockMultipartFile(MediaType.IMAGE_JPEG_VALUE, loadImageFileFromResource(fileName));
+    return new MockMultipartFile(
+        fileName,
+        null,
+        MediaType.IMAGE_JPEG_VALUE,
+        loadImageFileFromResource(fileName));
   }
 
   private static byte[] loadImageFileFromResource(String fileName) {

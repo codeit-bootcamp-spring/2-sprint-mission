@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.discodeit.util.FileUtils.getBinaryContent;
+import static com.sprint.mission.discodeit.util.FileUtils.getBytesFromMultiPartFile;
 import static com.sprint.mission.discodeit.util.mock.file.MockFile.createMockImageFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,7 +31,7 @@ class FileBinaryContentRepositoryTest {
     MultipartFile imageFile = createMockImageFile("dog.jpg");
     setUpBinaryContent = new BinaryContent(imageFile.getName(),
         imageFile.getContentType(),
-        imageFile.getSize(), getBinaryContent(imageFile));
+        imageFile.getSize(), getBytesFromMultiPartFile(imageFile));
 
     savedSetUpBinaryContent = binaryContentRepository.save(setUpBinaryContent);
   }

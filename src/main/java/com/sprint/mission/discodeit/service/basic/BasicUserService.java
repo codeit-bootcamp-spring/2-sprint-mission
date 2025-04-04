@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
-import static com.sprint.mission.discodeit.util.FileUtils.getBinaryContent;
+import static com.sprint.mission.discodeit.util.FileUtils.getBytesFromMultiPartFile;
 
 import com.sprint.mission.discodeit.application.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
@@ -41,7 +41,7 @@ public class BasicUserService implements UserService {
           profileImage.getName(),
           profileImage.getContentType(),
           profileImage.getSize(),
-          getBinaryContent(profileImage));
+          getBytesFromMultiPartFile(profileImage));
       BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
       binaryContentId = savedBinaryContent.getId();
@@ -137,7 +137,7 @@ public class BasicUserService implements UserService {
     if (profileImage != null) {
       BinaryContent binaryContent = new BinaryContent(profileImage.getName(),
           profileImage.getContentType(),
-          profileImage.getSize(), getBinaryContent(profileImage));
+          profileImage.getSize(), getBytesFromMultiPartFile(profileImage));
 
       BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
       binaryContentId = savedBinaryContent.getId();

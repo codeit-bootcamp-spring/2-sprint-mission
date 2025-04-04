@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
-import static com.sprint.mission.discodeit.util.FileUtils.getBinaryContent;
+import static com.sprint.mission.discodeit.util.FileUtils.getBytesFromMultiPartFile;
 
 import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
@@ -38,7 +38,7 @@ public class BasicMessageService implements MessageService {
         .map(multipartFile -> {
           BinaryContent binaryContent = new BinaryContent(multipartFile.getName(),
               multipartFile.getContentType(),
-              multipartFile.getSize(), getBinaryContent(multipartFile));
+              multipartFile.getSize(), getBytesFromMultiPartFile(multipartFile));
           return binaryContentRepository.save(binaryContent);
         })
         .map(BinaryContent::getId)
