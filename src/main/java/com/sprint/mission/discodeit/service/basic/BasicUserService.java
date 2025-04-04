@@ -83,7 +83,7 @@ public class BasicUserService implements UserService {
   public User update(UUID userKey, UserUpdateRequest request,
       BinaryContentCreateRequest profileRequest) {
     User user = userRepository.findByKey(userKey);
-    UUID updateProfileKey = null;
+    UUID updateProfileKey;
     if (user == null) {
       throw new IllegalStateException("[Error] user not found");
     }
