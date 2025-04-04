@@ -19,7 +19,6 @@ import com.sprint.mission.discodeit.exception.channel.ChannelErrors;
 import com.sprint.mission.discodeit.exception.user.UserErrors;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +38,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public CreateMessageResult create(CreateMessageCommand command,
       List<CreateBinaryContentCommand> binaryContentCommands) {
+
     if (!userRepositoryPort.existId(command.userId())) {
       UserErrors.userIdNotFoundError(command.userId());
     }
@@ -47,35 +47,31 @@ public class BasicMessageService implements MessageService {
       ChannelErrors.channelIdNotFoundError(command.channelId());
     }
 
-    List<UUID> binaryContentIdList = makeBinaryContent(binaryContentCommands);
+//    List<UUID> binaryContentIdList = makeBinaryContent(binaryContentCommands);
+
+    List<UUID> binaryContentIdList = binaryContentCommands.stream()
+        .map(createBinaryContentCommand -> {
+          String fileName = createBinaryContentCommand.fileName();
+          String contentType = createBinaryContentCommand.contentType();
+          byte[] bytes = createBinaryContentCommand.bytes();
+
+          BinaryContent binaryContent = BinaryContent.create(fileName, (long) bytes.length,
+              contentType, bytes);
+
+          BinaryContent save = binaryContentRepositoryPort.save(binaryContent);
+          return save.getId();
+        }).toList();
 
     Message message = Message.create(command.userId(), command.channelId(), command.text(),
         binaryContentIdList);
 
-    messageRepositoryPort.save(message);
-    logger.info("Message Created: Message Id {}, Channel Id {}, Author Id {}, content {}",
-        message.getId(), message.getChannelId(), message.getUserId(), message.getContent());
+    Message save = messageRepositoryPort.save(message);
+    logger.info(
+        "Message Created: Message Id {}, Channel Id {}, Author Id {}, content {}, attachment {}",
+        message.getId(), message.getChannelId(), message.getUserId(), message.getContent(),
+        message.getAttachmentIds());
 
-    return new CreateMessageResult(message);
-  }
-
-
-  private List<UUID> makeBinaryContent(
-      List<CreateBinaryContentCommand> commands) {
-    return commands.stream()
-        .map(this::saveBinaryContent)
-        .collect(Collectors.toList());
-  }
-
-  private UUID saveBinaryContent(CreateBinaryContentCommand command) {
-    BinaryContent content = BinaryContent.create(
-        command.fileName(),
-        command.bytes().length,
-        command.contentType(),
-        command.bytes()
-    );
-    binaryContentRepositoryPort.save(content);
-    return content.getId();
+    return new CreateMessageResult(save);
   }
 
   @Override

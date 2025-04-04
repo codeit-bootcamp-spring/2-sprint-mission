@@ -17,7 +17,7 @@ public record BinaryContentResponse(
     @Schema(description = "Binary Content File name", example = "string")
     String fileName,
     @Schema(description = "Binary Content size", example = "9007199254740991")
-    long size,
+    Long size,
     @Schema(description = "Binary Content contentType", example = "string")
     String contentType,
     @Schema(description = "Binary Content bytes", example = "string")
@@ -32,6 +32,7 @@ public record BinaryContentResponse(
         .size(content.getSize())
         .contentType(content.getContentType())
         .bytes(Base64.getEncoder().encodeToString(content.getBytes()))
+//        .bytes(content.getBytes())
         .build();
   }
 

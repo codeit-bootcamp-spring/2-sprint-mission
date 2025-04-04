@@ -13,7 +13,7 @@ public interface BinaryContentRepositoryPort {
 
   BinaryContent findById(UUID binaryId);
 
-  List<BinaryContent> findAllByIdIn();
+  List<BinaryContent> findAllByIdIn(List<UUID> ids);
 
   void delete(UUID binaryId);
 }

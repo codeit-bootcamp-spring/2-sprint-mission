@@ -38,6 +38,7 @@ public record MessageResult(
         .content(message.getContent())
         .channelId(message.getChannelId())
         .authorId(message.getUserId())
+        .attachmentIds(message.getAttachmentIds())
         .build();
   }
 }

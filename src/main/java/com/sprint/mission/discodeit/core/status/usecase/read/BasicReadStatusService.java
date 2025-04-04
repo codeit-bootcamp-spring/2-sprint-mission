@@ -38,17 +38,15 @@ public class BasicReadStatusService implements ReadStatusService {
     ReadStatus status = ReadStatus.create(command.userId(), command.channelId(),
         command.lastReadAt());
 
-    readStatusRepository.save(status);
-
-    return status;
+    return readStatusRepository.save(status);
   }
 
   private void validateUserAndChannel(UUID userId, UUID channelId) {
-    if (userRepositoryPort.findById(userId).isEmpty()) {
+    if (!userRepositoryPort.existId(userId)) {
       userIdNotFoundError(userId);
     }
 
-    if (channelRepository.findByChannelId(channelId).isEmpty()) {
+    if (!channelRepository.existId(channelId)) {
       channelIdNotFoundError(channelId);
     }
   }
@@ -62,7 +60,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public ReadStatus findReadStatusById(UUID readStatusId) {
+  public ReadStatus find(UUID readStatusId) {
     return readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> readStatusNotFoundError(readStatusId));
   }

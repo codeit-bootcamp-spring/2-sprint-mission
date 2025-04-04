@@ -20,7 +20,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   public BinaryContent create(CreateBinaryContentCommand command) {
     BinaryContent binaryContent = BinaryContent.create(command.fileName(),
-        command.bytes().length, command.contentType(),
+        (long) command.bytes().length, command.contentType(),
         command.bytes());
     return binaryContentRepositoryPort.save(binaryContent);
   }
@@ -31,8 +31,8 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
-  public List<BinaryContent> findAllByIdIn() {
-    return binaryContentRepositoryPort.findAllByIdIn();
+  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+    return binaryContentRepositoryPort.findAllByIdIn(binaryContentIds);
   }
 
   @CustomLogging

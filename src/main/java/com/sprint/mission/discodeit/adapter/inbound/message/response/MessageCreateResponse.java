@@ -37,6 +37,8 @@ public record MessageCreateResponse(
         .content(message.getContent())
         .channelId(message.getChannelId())
         .authorId(message.getUserId())
+        .attachmentIds(message.getAttachmentIds())
         .build();
   }
+
 }

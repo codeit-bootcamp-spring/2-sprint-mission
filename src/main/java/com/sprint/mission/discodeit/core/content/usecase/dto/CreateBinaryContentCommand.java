@@ -13,7 +13,7 @@ public record CreateBinaryContentCommand(
 
   public static CreateBinaryContentCommand create(MultipartFile file) throws IOException {
     return CreateBinaryContentCommand.builder()
-        .fileName(file.getName())
+        .fileName(file.getOriginalFilename())
         .contentType(file.getContentType())
         .bytes(file.getBytes())
         .build();

@@ -12,6 +12,8 @@ import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatu
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.usecase.read.ReadStatusService;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/readStatus")
+@RequestMapping("/api/readStatuses")
 public class ReadStatusController {
 
   private final ReadStatusService readStatusService;
@@ -44,9 +46,16 @@ public class ReadStatusController {
   }
 
   @GetMapping
-  public ResponseEntity<ReadStatusFindResponse> findByUserId(@RequestParam UUID userId) {
-    ReadStatus status = readStatusService.findReadStatusByUserId(userId);
-    return ResponseEntity.ok(ReadStatusFindResponse.create(status));
+  public ResponseEntity<List<ReadStatusFindResponse>> findByUserId(
+      @RequestParam("userId") UUID userId) {
+    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+    List<ReadStatusFindResponse> list = new ArrayList<>();
+
+    for (ReadStatus readStatus : readStatuses) {
+      list.add(ReadStatusFindResponse.create(readStatus));
+    }
+
+    return ResponseEntity.ok(list);
   }
 
 }

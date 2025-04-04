@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface FindReadStatusUseCase {
 
-  ReadStatus findReadStatusById(UUID readStatusId);
+  ReadStatus find(UUID readStatusId);
 
   ReadStatus findReadStatusByUserId(UUID userId);
 

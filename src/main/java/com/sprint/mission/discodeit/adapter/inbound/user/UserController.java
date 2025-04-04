@@ -113,12 +113,4 @@ public class UserController {
 
     return ResponseEntity.ok(UserStatusResponse.create(status, online));
   }
-//
-//  @PutMapping("/offline/{userId}")
-//  public ResponseEntity<UUID> offline(@PathVariable UUID userId) {
-//    UserStatus userStatus = userStatusService.findByUserId(userId);
-//    userStatus.setOffline();
-//
-//    return ResponseEntity.ok(userStatus.getUserStatusId());
-//  }
 }

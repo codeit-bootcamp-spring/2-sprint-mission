@@ -81,7 +81,7 @@ public class BasicUserService implements UserService {
       String fileName = contentDTO.fileName();
       String contentType = contentDTO.contentType();
       byte[] bytes = contentDTO.bytes();
-      long size = bytes.length;
+      Long size = (long) bytes.length;
 
       BinaryContent content = BinaryContent.create(fileName, size, contentType, bytes);
       binaryContentRepositoryPort.save(content);

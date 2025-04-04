@@ -8,7 +8,7 @@ public interface FindBinaryContentUseCase {
 
   BinaryContent findById(UUID binaryId);
 
-  List<BinaryContent> findAllByIdIn();
+  List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds);
 
 
 }
