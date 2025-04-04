@@ -27,14 +27,14 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/channels")
 @RequiredArgsConstructor
 @Tag(name = "Channel", description = "Channel API")
 public class ChannelController {
 
   private final ChannelService channelService;
 
-  @PostMapping("/channels/public")
+  @PostMapping("/public")
   @Operation(summary = "Public Channel 생성", operationId = "create_3")
   @io.swagger.v3.oas.annotations.parameters.RequestBody(
       content = @Content(
@@ -62,7 +62,7 @@ public class ChannelController {
         .body(ApiDataResponse.success(saveChannelResponseDto));
   }
 
-  @PostMapping("/channels/private")
+  @PostMapping("/private")
   @Operation(summary = "Private Channel 생성", operationId = "create_4")
   @io.swagger.v3.oas.annotations.parameters.RequestBody(
       content = @Content(
@@ -89,7 +89,7 @@ public class ChannelController {
         .body(ApiDataResponse.success(saveChannelResponseDto));
   }
 
-  @PutMapping("/channels/{channelId}")
+  @PutMapping("/{channelId}")
   @Operation(summary = "Channel 정보 수정", operationId = "update_3")
   @Parameters(
       @Parameter(
@@ -140,7 +140,7 @@ public class ChannelController {
     return ResponseEntity.status(HttpStatus.OK).body(ApiDataResponse.success());
   }
 
-  @DeleteMapping("/channels/{channelId}")
+  @DeleteMapping("/{channelId}")
   @Operation(summary = "Channel 삭제", operationId = "delete_2")
   @Parameters(value = {
       @Parameter(
@@ -172,8 +172,8 @@ public class ChannelController {
     return ResponseEntity.status(HttpStatus.OK).body(ApiDataResponse.success());
   }
 
-  @GetMapping("/channels/find")
-  @Operation(summary = "User가 참여중인 Channel 목록 조회", operationId = "findAll_1")
+  @GetMapping("")
+  @Operation(summary = "User가 참여 중인 Channel 목록 조회", operationId = "findAll_1")
   @Parameters(value = {
       @Parameter(
           name = "userId",
