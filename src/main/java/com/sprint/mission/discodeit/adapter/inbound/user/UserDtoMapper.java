@@ -24,7 +24,8 @@ public final class UserDtoMapper {
   }
 
   static UpdateUserCommand toUpdateUserCommand(UUID userId, UserUpdateRequest requestBody) {
-    return new UpdateUserCommand(userId, requestBody.newName(), requestBody.newEmail());
+    return new UpdateUserCommand(userId, requestBody.newName(), requestBody.newEmail(),
+        requestBody.newPassword());
   }
 
 }

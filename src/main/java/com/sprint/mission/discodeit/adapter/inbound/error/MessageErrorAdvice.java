@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.adapter.inbound.error;
 
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundError;
+import com.sprint.mission.discodeit.exception.message.NullPointMessageIdError;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +17,16 @@ public class MessageErrorAdvice {
 
   @ExceptionHandler(MessageNotFoundError.class)
   public ResponseEntity<ErrorResponse> handleMessageNotFoundError(MessageNotFoundError error) {
-    logger.error("MessageNotFound handled: ", error);
+    logger.error("Message Not Found handled: ", error);
     return ResponseEntity.notFound().build();
   }
 
+  @ExceptionHandler(NullPointMessageIdError.class)
+  public ResponseEntity<ErrorResponse> handleNullPointMessageIdError(
+      NullPointMessageIdError error) {
+    logger.error("Null Point Message ID error handled: ", error);
+    return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));
+  }
 //  @ExceptionHandler(MessageError.class)
 //  public ResponseEntity<ErrorResponse> handleMessageError(MessageError error) {
 //    return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));

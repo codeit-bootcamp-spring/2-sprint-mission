@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.adapter.outbound.message;
 
+import static com.sprint.mission.discodeit.exception.message.MessageErrors.nullPointMessageIdError;
+
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import java.util.List;
@@ -15,7 +17,6 @@ import org.springframework.stereotype.Repository;
 public class JCFMessageRepository implements MessageRepositoryPort {
 
   private final Map<UUID, Message> messageList = new ConcurrentHashMap<>();
-//    private Map<UUID, List<Message>> messageList = new ConcurrentHashMap<>();
 
   @Override
   public Message save(Message message) {
@@ -25,74 +26,29 @@ public class JCFMessageRepository implements MessageRepositoryPort {
 
   @Override
   public Optional<Message> findById(UUID id) {
-    return Optional.ofNullable(this.messageList.get(id));
+    return Optional.ofNullable(messageList.get(id));
   }
 
   @Override
   public List<Message> findAllByChannelId(UUID channelId) {
-    return this.messageList.values().stream()
+    return messageList.values().stream()
         .filter(message -> message.getChannelId().equals(channelId)).toList();
   }
 
   @Override
   public boolean existsById(UUID id) {
-    return this.messageList.containsKey(id);
+    if (id == null) {
+      nullPointMessageIdError();
+    }
+    return messageList.containsKey(id);
   }
 
   @Override
-  public void deleteByMessageId(UUID id) {
-    this.messageList.remove(id);
+  public void delete(UUID id) {
+    if (id == null) {
+      nullPointMessageIdError();
+    }
+    messageList.remove(id);
   }
 
-  @Override
-  public void deleteAllByChannelId(UUID channelId) {
-    this.findAllByChannelId(channelId)
-        .forEach(message -> this.deleteByMessageId(message.getId()));
-  }
-
-//    @Override
-//    public Message save(Channel channel, Message message) {
-//        List<Message> messages = messageList.getOrDefault(channel.getChannelId(), new ArrayList<>());
-//        messages.add(message);
-//        messageList.put(channel.getChannelId(), messages);
-//        return message;
-//    }
-//
-//    @Override
-//    public Message find(UUID messageId) {
-//        List<Message> list = messageList.values().stream().flatMap(List::stream).toList();
-//        return CommonUtils.findById(list, messageId, Message::getMessageId)
-//                .orElseThrow(() -> new MessageNotFoundException("메시지를 찾을 수 없습니다."));
-//    }
-//
-//    @Override
-//    public List<Message> findAllByChannelId(UUID id) {
-//        return messageList.get(id);
-//    }
-//
-//    @Override
-//    public List<Message> findAllByMessageId(UUID messageId) {
-//        if (messageList.isEmpty()) {
-//            throw new EmptyMessageListException("Repository 에 저장된 메시지 리스트가 없습니다.");
-//        }
-//        List<Message> messages = messageList.values().stream().flatMap(List::stream)
-//                .filter(message -> message.getMessageId().equals(messageId))
-//                .toList();
-//
-//        if (messages.isEmpty()) {
-//            throw new EmptyMessageListException("해당 채널에 저장된 메시지 리스트가 없습니다.");
-//        }
-//        return messages;
-//    }
-//
-
-//
-//    @Override
-//    public void remove(UUID messageId) {
-//        List<Message> messages = findAllByMessageId(messageId);
-//        Message message = find(messageId);
-//        messages.remove(message);
-//
-//        messages.remove(message);
-//    }
 }

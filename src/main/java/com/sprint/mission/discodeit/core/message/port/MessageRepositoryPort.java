@@ -17,11 +17,6 @@ public interface MessageRepositoryPort {
 
   boolean existsById(UUID id);
 
-  void deleteByMessageId(UUID id);
+  void delete(UUID id);
 
-  void deleteAllByChannelId(UUID channelId);
-
-  //    List<Message> findAllByMessageId(UUID messageId);
-//
-//    void remove(UUID messageId);
 }

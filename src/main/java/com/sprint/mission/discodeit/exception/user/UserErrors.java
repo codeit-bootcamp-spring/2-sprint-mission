@@ -11,6 +11,7 @@ public final class UserErrors {
   public static final String USER_EMAIL_ALREADY_EXISTS_MESSAGE = "User with email %s already exists";
   public static final String USER_NOT_FOUND_MESSAGE = "User not found: %s";
   public static final String USER_LOGIN_FAILED_MESSAGE = "User with id %s login failed: %s";
+  public static final String NULL_POINT_USER_ID = "User ID is null";
 
   public static UserAlreadyExistsError userNameAlreadyExistsError(String name) {
     throw new UserAlreadyExistsError(String.format(USER_NAME_ALREADY_EXISTS_MESSAGE, name));
@@ -30,6 +31,10 @@ public final class UserErrors {
 
   public static UserLoginFailedError userLoginFailedError(UUID id, String details) {
     throw new UserLoginFailedError(String.format(USER_LOGIN_FAILED_MESSAGE, id, details));
+  }
+
+  public static NullPointUserIdError nullPointUserIdError() {
+    throw new NullPointUserIdError(NULL_POINT_USER_ID);
   }
 
 

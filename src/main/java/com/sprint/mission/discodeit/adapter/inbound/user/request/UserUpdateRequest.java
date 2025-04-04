@@ -8,7 +8,11 @@ public record UserUpdateRequest(
     String newName,
 
     @Schema(description = "User new Email", example = "string")
-    String newEmail
+    String newEmail,
+
+    @Schema(description = "User new Password", example = "string")
+    String newPassword
+
 ) {
 
 }

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.adapter.outbound.user;
 
+import static com.sprint.mission.discodeit.exception.user.UserErrors.nullPointUserIdError;
+
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import java.util.List;
@@ -43,13 +45,19 @@ public class JCFUserRepository implements UserRepositoryPort {
   }
 
   @Override
-  public void delete(UUID id) {
-    userList.remove(id);
+  public boolean existId(UUID id) {
+    if (id == null) {
+      nullPointUserIdError();
+    }
+    return userList.containsKey(id);
   }
 
   @Override
-  public boolean existId(UUID id) {
-    return userList.containsKey(id);
+  public void delete(UUID id) {
+    if (id == null) {
+      nullPointUserIdError();
+    }
+    userList.remove(id);
   }
 
 }

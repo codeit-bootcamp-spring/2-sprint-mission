@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.adapter.inbound.error;
 
+import com.sprint.mission.discodeit.exception.status.read.NullPointReadStatusIdError;
 import com.sprint.mission.discodeit.exception.status.read.ReadStatusAlreadyExistsError;
 import com.sprint.mission.discodeit.exception.status.read.ReadStatusNotFoundError;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -17,14 +18,21 @@ public class ReadStatusErrorAdvice {
 
   @ExceptionHandler(ReadStatusNotFoundError.class)
   public ResponseEntity<ErrorResponse> handleUserNotFoundError(ReadStatusNotFoundError error) {
-    logger.error("ReadStatusNotFound handled: ", error);
+    logger.error("ReadStatus Not Found handled: ", error);
     return ResponseEntity.notFound().build();
   }
 
   @ExceptionHandler(ReadStatusAlreadyExistsError.class)
   public ResponseEntity<ErrorResponse> handleUserAlreadyExistsError(
       ReadStatusAlreadyExistsError error) {
-    logger.error("ReadStatusAlreadyExists handled: ", error);
+    logger.error("Read Status Already Exists handled: ", error);
+    return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));
+  }
+
+  @ExceptionHandler(NullPointReadStatusIdError.class)
+  public ResponseEntity<ErrorResponse> handleNullReadStatusIdError(
+      NullPointReadStatusIdError error) {
+    logger.error("Null Point Read Status ID error handled: ", error);
     return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));
   }
 

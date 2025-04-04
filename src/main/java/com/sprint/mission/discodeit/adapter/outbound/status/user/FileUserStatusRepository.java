@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.adapter.outbound.status.user;
 
+import static com.sprint.mission.discodeit.exception.status.user.UserStatusErrors.nullPointUserStatusIdError;
+
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.port.UserStatusRepository;
 import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
+import com.sprint.mission.discodeit.exception.status.user.UserStatusErrors;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -57,9 +60,20 @@ public class FileUserStatusRepository implements UserStatusRepository {
   }
 
   @Override
-  public void deleteById(UUID userStatusId) {
+  public void delete(UUID userStatusId) {
+    if (userStatusId == null) {
+      nullPointUserStatusIdError();
+    }
     userStatusList.remove(userStatusId);
     fileRepository.save(userStatusList);
+  }
+
+  @Override
+  public boolean existsById(UUID userStatusId) {
+    if (userStatusId == null) {
+      nullPointUserStatusIdError();
+    }
+    return userStatusList.containsKey(userStatusId);
   }
 
 //  @Override

@@ -34,6 +34,7 @@ public class BasicUserStatusService implements UserStatusService {
     if (userStatusRepository.findByUserId(command.userId()).isPresent()) {
       userStatusAlreadyExistsError(command.userId());
     }
+
     //없으면 진행
     UserStatus userStatus = UserStatus.create(command.userId(), command.lastActiveAt());
     userStatusRepository.save(userStatus);
@@ -54,7 +55,6 @@ public class BasicUserStatusService implements UserStatusService {
         .orElseThrow(() -> userStatusIdNotFoundError(userStatusId));
 
   }
-
 
   @Override
   public List<UserStatus> findAll() {
@@ -85,7 +85,10 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   @CustomLogging
   public void delete(UUID userStatusId) {
-    userStatusRepository.deleteById(userStatusId);
+    if (!userStatusRepository.existsById(userStatusId)) {
+      userStatusIdNotFoundError(userStatusId);
+    }
+    userStatusRepository.delete(userStatusId);
   }
 
 }

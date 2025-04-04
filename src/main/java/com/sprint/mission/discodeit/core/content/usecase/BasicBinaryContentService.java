@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.core.content.usecase;
 
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.content.BinaryContentErrors;
 import com.sprint.mission.discodeit.logging.CustomLogging;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,9 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public BinaryContent findById(UUID binaryId) {
-    return binaryContentRepositoryPort.findById(binaryId);
+    return binaryContentRepositoryPort.findById(binaryId).orElseThrow(
+        () -> BinaryContentErrors.binaryContentNotFoundError(binaryId)
+    );
   }
 
   @Override
@@ -38,6 +41,10 @@ public class BasicBinaryContentService implements BinaryContentService {
   @CustomLogging
   @Override
   public void delete(UUID binaryId) {
+    if (!binaryContentRepositoryPort.existsId(binaryId)) {
+      BinaryContentErrors.binaryContentNotFoundError(binaryId);
+    }
+
     binaryContentRepositoryPort.delete(binaryId);
   }
 }

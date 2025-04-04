@@ -102,7 +102,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepositoryPort.findById(messageId)
         .orElseThrow(() -> messageIdNotFoundError(messageId));
 
-    messageRepositoryPort.deleteByMessageId(messageId);
+    messageRepositoryPort.delete(messageId);
     message.getAttachmentIds().forEach(binaryContentRepositoryPort::delete);
   }
 }

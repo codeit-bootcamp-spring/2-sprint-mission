@@ -21,6 +21,8 @@ import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserListResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Tag(name = "User", description = "사용자 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -49,7 +52,7 @@ public class UserController {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserCreateResponse> register(
-      @RequestPart("userCreateRequest") UserCreateRequest requestBody,
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest requestBody,
       @RequestPart(value = "profile", required = false) MultipartFile file
   ) {
 

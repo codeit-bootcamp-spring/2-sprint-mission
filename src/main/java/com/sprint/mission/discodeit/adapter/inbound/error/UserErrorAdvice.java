@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.adapter.inbound.error;
 
+import com.sprint.mission.discodeit.exception.user.NullPointUserIdError;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsError;
 import com.sprint.mission.discodeit.exception.user.UserLoginFailedError;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundError;
@@ -26,13 +27,19 @@ public class UserErrorAdvice {
 
   @ExceptionHandler(UserAlreadyExistsError.class)
   public ResponseEntity<ErrorResponse> handleUserAlreadyExistsError(UserAlreadyExistsError error) {
-    logger.error("UserAlreadyExists handled: ", error);
+    logger.error("User Already Exists handled: ", error);
     return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));
   }
 
   @ExceptionHandler(UserLoginFailedError.class)
   public ResponseEntity<ErrorResponse> handleUserLoginFailedError(UserLoginFailedError error) {
-    logger.error("UserLoginFailedError handled: ", error);
+    logger.error("User Login Failed Error handled: ", error);
+    return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));
+  }
+
+  @ExceptionHandler(NullPointUserIdError.class)
+  public ResponseEntity<ErrorResponse> handleNullPointUserIdError(NullPointUserIdError error) {
+    logger.error("Null Point User ID error handled: ", error);
     return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));
   }
 

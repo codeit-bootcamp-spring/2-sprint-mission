@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.adapter.outbound.status.read;
 
-import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
-import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
-import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
+import static com.sprint.mission.discodeit.exception.status.read.ReadStatusErrors.nullPointReadStatusIdError;
 
+import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
+import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
+import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
+import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -14,6 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
@@ -81,7 +82,18 @@ public class FileReadStatusRepository implements ReadStatusRepository {
   }
 
   @Override
+  public boolean existsId(UUID readStatusId) {
+    if (readStatusId == null) {
+      nullPointReadStatusIdError();
+    }
+    return readStatusList.containsKey(readStatusId);
+  }
+
+  @Override
   public void delete(UUID readStatusId) {
+    if (readStatusId == null) {
+      nullPointReadStatusIdError();
+    }
     readStatusList.remove(readStatusId);
     fileRepository.save(readStatusList);
   }

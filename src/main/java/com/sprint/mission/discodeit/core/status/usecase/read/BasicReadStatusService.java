@@ -28,12 +28,8 @@ public class BasicReadStatusService implements ReadStatusService {
   @CustomLogging
   @Override
   public ReadStatus create(CreateReadStatusCommand command) {
-    //채널, 유저가 있는지 체크
-    validateUserAndChannel(command.userId(), command.channelId());
-
-    //이미 생성된 읽기 상태가 있는지 체크
-    //없으면 생성하기
-    validateReadStatus(command);
+    //채널, 유저가 있는지, 이미 생성된 읽기 상태가 있는지 체크
+    validateCommand(command);
 
     ReadStatus status = ReadStatus.create(command.userId(), command.channelId(),
         command.lastReadAt());
@@ -41,23 +37,21 @@ public class BasicReadStatusService implements ReadStatusService {
     return readStatusRepository.save(status);
   }
 
-  private void validateUserAndChannel(UUID userId, UUID channelId) {
-    if (!userRepositoryPort.existId(userId)) {
-      userIdNotFoundError(userId);
+  private void validateCommand(CreateReadStatusCommand command) {
+    if (!userRepositoryPort.existId(command.userId())) {
+      userIdNotFoundError(command.userId());
     }
 
-    if (!channelRepository.existId(channelId)) {
-      channelIdNotFoundError(channelId);
+    if (!channelRepository.existId(command.channelId())) {
+      channelIdNotFoundError(command.channelId());
     }
-  }
 
-  private void validateReadStatus(CreateReadStatusCommand command) {
-    List<ReadStatus> list = readStatusRepository.findAllByUserId(command.userId());
-    if (list.stream()
+    if (readStatusRepository.findAllByUserId(command.userId()).stream()
         .anyMatch(readStatus -> readStatus.getChannelId().equals(command.channelId()))) {
       readStatusAlreadyExistsError(command.channelId());
     }
   }
+
 
   @Override
   public ReadStatus find(UUID readStatusId) {
@@ -87,6 +81,10 @@ public class BasicReadStatusService implements ReadStatusService {
   @CustomLogging
   @Override
   public void deleteReadStatus(UUID readStatusId) {
+    if (!readStatusRepository.existsId(readStatusId)) {
+      readStatusNotFoundError(readStatusId);
+    }
+
     readStatusRepository.delete(readStatusId);
   }
 

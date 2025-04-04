@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.adapter.outbound.user;
 
+import static com.sprint.mission.discodeit.exception.user.UserErrors.nullPointUserIdError;
+
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
@@ -63,12 +65,18 @@ public class FileUserRepository implements UserRepositoryPort {
 
   @Override
   public void delete(UUID id) {
+    if (id == null) {
+      nullPointUserIdError();
+    }
     userList.remove(id);
     fileRepository.save(userList);
   }
 
   @Override
   public boolean existId(UUID id) {
+    if (id == null) {
+      nullPointUserIdError();
+    }
     return userList.containsKey(id);
   }
 }

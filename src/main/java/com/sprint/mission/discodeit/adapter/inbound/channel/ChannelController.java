@@ -20,6 +20,8 @@ import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannel
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelResult;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Channel", description = "채널 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/channels")
@@ -43,7 +46,7 @@ public class ChannelController {
 
   @PostMapping("/public")
   public ResponseEntity<ChannelCreateResponse> create(
-      @RequestBody PublicChannelCreateRequest requestBody) {
+      @RequestBody @Valid PublicChannelCreateRequest requestBody) {
     CreatePublicChannelCommand command = toCreatePublicChannelCommand(
         requestBody);
     CreatePublicChannelResult result = channelService.create(command);

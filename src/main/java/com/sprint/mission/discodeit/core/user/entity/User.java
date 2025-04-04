@@ -40,7 +40,7 @@ public class User implements Serializable {
     return new User(UUID.randomUUID(), profileId, Instant.now(), name, email, password);
   }
 
-  public void update(String newUserName, String newEmail, UUID newProfileId) {
+  public void update(String newUserName, String newEmail, String newPassword, UUID newProfileId) {
     boolean anyValueUpdated = false;
     if (newUserName != null && !newUserName.equals(this.name)) {
       this.name = newUserName;
@@ -48,6 +48,10 @@ public class User implements Serializable {
     }
     if (newEmail != null && !newEmail.equals(this.email)) {
       this.email = newEmail;
+      anyValueUpdated = true;
+    }
+    if (newPassword != null && !newPassword.equals(this.password)) {
+      this.password = newPassword;
       anyValueUpdated = true;
     }
     if (newProfileId != null && !newProfileId.equals(this.profileId)) {

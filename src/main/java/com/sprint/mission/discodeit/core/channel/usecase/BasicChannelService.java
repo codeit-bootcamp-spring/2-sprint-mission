@@ -132,7 +132,7 @@ public class BasicChannelService implements ChannelService {
   private void deleteAllMessage(UUID channelId) {
     List<Message> list = messageRepositoryPort.findAllByChannelId(channelId);
     for (Message message : list) {
-      messageRepositoryPort.deleteByMessageId(message.getId());
+      messageRepositoryPort.delete(message.getId());
       logger.info("message deleted {}", message.getId());
     }
   }

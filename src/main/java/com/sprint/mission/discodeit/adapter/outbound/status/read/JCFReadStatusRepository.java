@@ -1,15 +1,16 @@
 package com.sprint.mission.discodeit.adapter.outbound.status.read;
 
+import static com.sprint.mission.discodeit.exception.status.read.ReadStatusErrors.nullPointReadStatusIdError;
+
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
@@ -62,7 +63,18 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
   }
 
   @Override
+  public boolean existsId(UUID readStatusId) {
+    if (readStatusId == null) {
+      nullPointReadStatusIdError();
+    }
+    return readStatusList.containsKey(readStatusId);
+  }
+
+  @Override
   public void delete(UUID readStatusId) {
+    if (readStatusId == null) {
+      nullPointReadStatusIdError();
+    }
     readStatusList.remove(readStatusId);
   }
 }

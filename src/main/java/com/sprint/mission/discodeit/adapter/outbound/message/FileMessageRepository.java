@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.adapter.outbound.message;
 
+import static com.sprint.mission.discodeit.exception.message.MessageErrors.nullPointMessageIdError;
+
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.exception.SaveFileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,20 +54,20 @@ public class FileMessageRepository implements MessageRepositoryPort {
 
   @Override
   public boolean existsById(UUID id) {
+    if (id == null) {
+      nullPointMessageIdError();
+    }
     return this.messageList.containsKey(id);
   }
 
 
   @Override
-  public void deleteByMessageId(UUID messageId) {
-    messageList.remove(messageId);
+  public void delete(UUID id) {
+    if (id == null) {
+      nullPointMessageIdError();
+    }
+    messageList.remove(id);
     fileRepository.save(messageList);
   }
 
-  @Override
-  public void deleteAllByChannelId(UUID channelId) {
-    this.findAllByChannelId(channelId)
-        .forEach(message -> this.deleteByMessageId(message.getId()));
-    fileRepository.save(messageList);
-  }
 }

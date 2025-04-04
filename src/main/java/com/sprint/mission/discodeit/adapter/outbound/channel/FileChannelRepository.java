@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.adapter.outbound.channel;
 
+import static com.sprint.mission.discodeit.exception.channel.ChannelErrors.nullPointChannelIdError;
+
 import com.sprint.mission.discodeit.adapter.outbound.FileRepositoryImpl;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
@@ -57,14 +59,20 @@ public class FileChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public void delete(UUID channelId) {
-    channelList.remove(channelId);
-    fileRepository.save(channelList);
+  public boolean existId(UUID channelId) {
+    if (channelId == null) {
+      nullPointChannelIdError();
+    }
+    return channelList.containsKey(channelId);
   }
 
   @Override
-  public boolean existId(UUID channelId) {
-    return channelList.containsKey(channelId);
+  public void delete(UUID channelId) {
+    if (channelId == null) {
+      nullPointChannelIdError();
+    }
+    channelList.remove(channelId);
+    fileRepository.save(channelList);
   }
 
 }

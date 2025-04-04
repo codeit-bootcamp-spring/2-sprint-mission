@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.adapter.outbound.status.user;
 
+import static com.sprint.mission.discodeit.exception.status.user.UserStatusErrors.nullPointUserStatusIdError;
+
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.port.UserStatusRepository;
 import java.util.List;
@@ -39,13 +41,19 @@ public class JCFUserStatusRepository implements UserStatusRepository {
   }
 
   @Override
-  public void deleteById(UUID userStatusId) {
+  public void delete(UUID userStatusId) {
+    if (userStatusId == null) {
+      nullPointUserStatusIdError();
+    }
+
     userStatusList.remove(userStatusId);
   }
 
-//  @Override
-//  public void deleteByUserId(UUID userId) {
-//    UserStatus userStatus = findByUserId(userId);
-//    userStatusList.remove(userStatus.getUserStatusId());
-//  }
+  @Override
+  public boolean existsById(UUID userStatusId) {
+    if (userStatusId == null) {
+      nullPointUserStatusIdError();
+    }
+    return userStatusList.containsKey(userStatusId);
+  }
 }

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.adapter.inbound.content;
 
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Binary Content", description = "바이너리 데이터 관련 API")
 @RestController
 @RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor

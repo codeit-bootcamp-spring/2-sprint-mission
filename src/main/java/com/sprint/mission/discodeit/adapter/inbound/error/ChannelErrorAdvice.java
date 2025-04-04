@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.adapter.inbound.error;
 
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundError;
+import com.sprint.mission.discodeit.exception.channel.NullPointChannelIdError;
 import com.sprint.mission.discodeit.exception.channel.UnmodifiableChannelError;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.slf4j.Logger;
@@ -17,14 +18,21 @@ public class ChannelErrorAdvice {
 
   @ExceptionHandler(ChannelNotFoundError.class)
   public ResponseEntity<ErrorResponse> handleChannelNotFoundError(ChannelNotFoundError error) {
-    logger.error("ChannelNotFound handled: ", error);
+    logger.error("Channel Not Found handled: ", error);
     return ResponseEntity.notFound().build();
   }
 
   @ExceptionHandler(UnmodifiableChannelError.class)
   public ResponseEntity<ErrorResponse> handleUnmodifiableChannelError(
       UnmodifiableChannelError error) {
-    logger.error("UnmodifiableChannel handled: ", error);
+    logger.error("Unmodifiable Channel handled: ", error);
+    return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));
+  }
+
+  @ExceptionHandler(NullPointChannelIdError.class)
+  public ResponseEntity<ErrorResponse> handleNullPointChannelIdError(
+      NullPointChannelIdError error) {
+    logger.error("Null Point Channel ID error handled: ", error);
     return ResponseEntity.badRequest().body(new ErrorResponse(error.getMessage()));
   }
 

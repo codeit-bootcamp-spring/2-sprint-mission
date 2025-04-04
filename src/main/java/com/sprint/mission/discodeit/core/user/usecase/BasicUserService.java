@@ -6,9 +6,9 @@ import static com.sprint.mission.discodeit.exception.user.UserErrors.userLoginFa
 import static com.sprint.mission.discodeit.exception.user.UserErrors.userNameAlreadyExistsError;
 import static com.sprint.mission.discodeit.exception.user.UserErrors.userNameNotFoundError;
 
-import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
+import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -49,13 +48,13 @@ public class BasicUserService implements UserService {
     UUID profileId = null;
     validateUser(command.name(), command.email());
 
-    String hashedPassword = BCrypt.hashpw(command.password(), BCrypt.gensalt());
+//    String hashedPassword = BCrypt.hashpw(command.password(), BCrypt.gensalt());
 
     if (binaryContentDTO.isPresent()) {
       profileId = makeBinaryContent(binaryContentDTO);
     }
 
-    User user = User.create(command.name(), command.email(), hashedPassword, profileId);
+    User user = User.create(command.name(), command.email(), command.password(), profileId);
     userRepositoryPort.save(user);
     logger.info("User registered: {}", user.getId());
 
@@ -97,7 +96,7 @@ public class BasicUserService implements UserService {
         () -> userNameNotFoundError(command.username())
     );
 
-    if (!BCrypt.checkpw(command.password(), user.getPassword())) {
+    if (!command.password().equals(user.getPassword())) {
       userLoginFailedError(user.getId(), "Password mismatch");
     }
 
@@ -132,13 +131,15 @@ public class BasicUserService implements UserService {
 
     User user = userRepositoryPort.findById(command.requestUserId())
         .orElseThrow(() -> userIdNotFoundError(command.requestUserId()));
+
     UUID profileId = user.getProfileId();
     if (profileId != null) {
       binaryContentRepositoryPort.delete(profileId);
     }
     UUID newProfileId = makeBinaryContent(binaryContentDTO);
-    user.update(command.newName(), command.newEmail(), newProfileId);
-    logger.info("User Updated: name {}, email {} ", user.getName(), user.getEmail());
+    user.update(command.newName(), command.newEmail(), command.newPassword(), newProfileId);
+    logger.info("User Updated: name {}, email {}, password {}", user.getName(), user.getEmail(),
+        user.getPassword());
     return new UpdateUserResult(userRepositoryPort.save(user));
   }
 

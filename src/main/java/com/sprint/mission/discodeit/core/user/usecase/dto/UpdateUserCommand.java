@@ -5,7 +5,8 @@ import java.util.UUID;
 public record UpdateUserCommand(
     UUID requestUserId,
     String newName,
-    String newEmail
+    String newEmail,
+    String newPassword
 ) {
 
 }
