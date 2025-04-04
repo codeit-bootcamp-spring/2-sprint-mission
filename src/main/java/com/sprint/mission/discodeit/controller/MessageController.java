@@ -2,9 +2,8 @@ package com.sprint.mission.discodeit.controller;
 
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
-import com.sprint.mission.discodeit.dto.ApiDataResponse;
-import com.sprint.mission.discodeit.dto.message.FindMessageByChannelIdResponseDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.message.FindMessageByChannelIdResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
@@ -65,13 +64,13 @@ public class MessageController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<Void>> send(
+  public ResponseEntity<Message> send(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> files
   ) throws IOException {
-    messageService.sendMessage(messageCreateRequest,
+    Message message = messageService.sendMessage(messageCreateRequest,
         BinaryContentCreateRequest.nullableFromList(files));
-    return ResponseEntity.status(HttpStatus.CREATED).body(ApiDataResponse.success());
+    return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 
   @PatchMapping("/{messageId}")
@@ -110,12 +109,12 @@ public class MessageController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<Void>> update(
+  public ResponseEntity<Message> update(
       @PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest
   ) {
-    messageService.updateMessage(messageId, messageUpdateRequest);
-    return ResponseEntity.status(HttpStatus.OK).body(ApiDataResponse.success());
+    Message message = messageService.updateMessage(messageId, messageUpdateRequest);
+    return ResponseEntity.status(HttpStatus.OK).body(message);
   }
 
   @DeleteMapping("/{messageId}")
@@ -143,11 +142,11 @@ public class MessageController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<Void>> delete(
+  public ResponseEntity<Void> delete(
       @PathVariable("messageId") UUID messageId
   ) {
     messageService.deleteMessageById(messageId);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiDataResponse.success());
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @GetMapping("")
@@ -171,12 +170,12 @@ public class MessageController {
           )
       )
   })
-  public ResponseEntity<ApiDataResponse<List<FindMessageByChannelIdResponseDto>>> FindChannelMessage(
+  public ResponseEntity<List<FindMessageByChannelIdResponseDto>> FindChannelMessage(
       @RequestParam("channelId") UUID channelId
   ) {
     List<FindMessageByChannelIdResponseDto> findMessageByChannelIdDtoList = messageService.findMessageByChannelId(
         channelId);
     return ResponseEntity.status(HttpStatus.OK)
-        .body(ApiDataResponse.success(findMessageByChannelIdDtoList));
+        .body(findMessageByChannelIdDtoList);
   }
 }

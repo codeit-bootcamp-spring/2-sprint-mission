@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface MessageService {
 
-  void sendMessage(MessageCreateRequest messageCreateRequest,
+  Message sendMessage(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequestList);
 
   Message findMessageById(UUID messageId);
@@ -20,7 +20,7 @@ public interface MessageService {
 
   List<FindMessageByChannelIdResponseDto> findMessageByChannelId(UUID id);
 
-  void updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest);
+  Message updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest);
 
   void deleteMessageById(UUID id);
 }

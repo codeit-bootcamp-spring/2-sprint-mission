@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.BinaryData;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -31,7 +30,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public void sendMessage(MessageCreateRequest messageCreateRequest,
+  public Message sendMessage(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequestList) {
     User user = userRepository.findUserById(messageCreateRequest.userId())
         .orElseThrow(() -> new NoSuchElementException(
@@ -62,6 +61,7 @@ public class BasicMessageService implements MessageService {
         messageCreateRequest.content(), user.getId(),
         channel.getId(), attachmentList);
     messageRepository.save(message);
+    return message;
   }
 
   @Override
@@ -96,11 +96,12 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public void updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
+  public Message updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
     Message message = messageRepository.findMessageById(messageId)
         .orElseThrow(() -> new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다."));
     message.updateContent(messageUpdateRequest.content());
     messageRepository.save(message);
+    return message;
   }
 
   @Override
