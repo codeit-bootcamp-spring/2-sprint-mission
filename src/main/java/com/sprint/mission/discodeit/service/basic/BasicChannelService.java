@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,10 +44,7 @@ public class BasicChannelService implements ChannelService {
     privateChannelCreateRequest.userList().forEach(userId -> {
       User user = userRepository.findUserById(userId)
           .orElseThrow(() -> new NoSuchElementException(userId + "에 해당하는 사용자를 찾을 수 없습니다."));
-      ReadStatus readStatus = ReadStatus.builder()
-          .channelId(channel.getId())
-          .userId(user.getId())
-          .build();
+      ReadStatus readStatus = new ReadStatus(user.getId(), channel.getId(), Instant.now());
       readStatusRepository.save(readStatus);
     });
     return new SaveChannelResponseDto(channel.getId(), privateChannelCreateRequest.channelName(),

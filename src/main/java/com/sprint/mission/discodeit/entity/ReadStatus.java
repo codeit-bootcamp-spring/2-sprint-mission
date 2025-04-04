@@ -12,24 +12,23 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-@Builder
 public class ReadStatus extends BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private UUID userId;
-    private UUID channelId;
-    @Builder.Default
-    private Instant lastReadAt = Instant.now();
 
-    public void updateLastReadAt() {
-        lastReadAt = ZonedDateTime.now(ZoneId.systemDefault()).toInstant();
-        super.updateTime();
-    }
+  private static final long serialVersionUID = 1L;
+  private UUID userId;
+  private UUID channelId;
+  private Instant lastReadAt;
 
-    public boolean isRead(Instant lastMessageTime) {
-        super.updateTime();
-        if(lastReadAt == null || lastReadAt.isBefore(lastMessageTime)) {
-            return false;
-        }
-        return true;
+  public void updateLastReadAt(Instant lastReadAt) {
+    this.lastReadAt = lastReadAt;
+    super.updateTime();
+  }
+
+  public boolean isRead(Instant lastMessageTime) {
+    super.updateTime();
+    if (lastReadAt == null || lastReadAt.isBefore(lastMessageTime)) {
+      return false;
     }
+    return true;
+  }
 }
