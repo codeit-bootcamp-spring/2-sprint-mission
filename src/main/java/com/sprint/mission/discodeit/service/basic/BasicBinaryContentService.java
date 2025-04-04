@@ -18,51 +18,52 @@ import java.util.UUID;
 @AllArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-    private final BinaryContentRepository binaryContentRepository;
-    private final BinaryDataRepository binaryDataRepository;
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryDataRepository binaryDataRepository;
 
-    @Override
-    public BinaryContent save(SaveBinaryContentRequestDto saveBinaryContentRequestDto) {
-        String fileName = saveBinaryContentRequestDto.fileName();
-        String contentType = saveBinaryContentRequestDto.contentType();
-        byte[] data = saveBinaryContentRequestDto.fileData();
+  @Override
+  public BinaryContent save(SaveBinaryContentRequestDto saveBinaryContentRequestDto) {
+    String fileName = saveBinaryContentRequestDto.fileName();
+    String contentType = saveBinaryContentRequestDto.contentType();
+    byte[] data = saveBinaryContentRequestDto.fileData();
 
-        BinaryData binaryData = binaryDataRepository.save(new BinaryData(data));
-        BinaryContent binaryContent = new BinaryContent(
-                binaryData.getId(),
-                fileName,
-                contentType
-        );
-        binaryContentRepository.save(binaryContent);
-        return binaryContent;
-    }
+    BinaryData binaryData = binaryDataRepository.save(new BinaryData(data));
+    BinaryContent binaryContent = new BinaryContent(
+        binaryData.getId(),
+        fileName,
+        contentType
+    );
+    binaryContentRepository.save(binaryContent);
+    return binaryContent;
+  }
 
-    @Override
-    public FindBinaryContentRequestDto findById(UUID binaryContentUUID) {
-        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentUUID)
-                .orElseThrow(() -> new NoSuchElementException("메타 데이터 파일을 찾는데 실패하였습니다."));
+  @Override
+  public FindBinaryContentRequestDto findById(UUID binaryContentUUID) {
+    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentUUID)
+        .orElseThrow(
+            () -> new NoSuchElementException(binaryContentUUID + "에 해당하는 파일을 찾는데 실패하였습니다."));
 
-        BinaryData binaryData = binaryDataRepository.findById(binaryContent.getId())
-                .orElseThrow(() -> new NoSuchElementException("원본 데이터 파일을 찾는데 실패하였습니다."));
+    BinaryData binaryData = binaryDataRepository.findById(binaryContent.getId())
+        .orElseThrow(() -> new NoSuchElementException("원본 데이터 파일을 찾는데 실패하였습니다."));
 
-        return new FindBinaryContentRequestDto(
-                binaryContent.getFileName(),
-                binaryContent.getContentType(),
-                binaryData.getData(),
-                binaryContent.getCreatedAt()
-        );
-    }
+    return new FindBinaryContentRequestDto(
+        binaryContent.getFileName(),
+        binaryContent.getContentType(),
+        binaryData.getData(),
+        binaryContent.getCreatedAt()
+    );
+  }
 
-    @Override
-    public List<FindBinaryContentRequestDto> findByIdIn(List<UUID> binaryContentUUIDList) {
-        return binaryContentRepository.findAll().stream()
-                .filter(binaryContent -> binaryContentUUIDList.contains(binaryContent.getId()))
-                .map(binaryContent -> findById(binaryContent.getId()))
-                .toList();
-    }
+  @Override
+  public List<FindBinaryContentRequestDto> findByIdIn(List<UUID> binaryContentUUIDList) {
+    return binaryContentRepository.findAll().stream()
+        .filter(binaryContent -> binaryContentUUIDList.contains(binaryContent.getId()))
+        .map(binaryContent -> findById(binaryContent.getId()))
+        .toList();
+  }
 
-    @Override
-    public void delete(UUID userStatusUUID) {
-        binaryContentRepository.delete(userStatusUUID);
-    }
+  @Override
+  public void delete(UUID userStatusUUID) {
+    binaryContentRepository.delete(userStatusUUID);
+  }
 }
