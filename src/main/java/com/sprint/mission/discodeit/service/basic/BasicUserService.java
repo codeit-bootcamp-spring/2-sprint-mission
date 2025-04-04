@@ -87,7 +87,7 @@ public class BasicUserService implements UserService {
     findUser.updateUserInfo(updateUserParam.newUsername(), updateUserParam.newEmail(),
         updateUserParam.newPassword());
     if (multipartFile != null && !multipartFile.isEmpty()) { // 프로필을 유지하거나 프로필 변경 요청이 있을 때 업데이트
-      // 기본 프로필 ID가 아닐 때만 기존 이미지 삭제
+      // 기존 이미지 삭제
       binaryContentService.delete(findUser.getProfileId());
       BinaryContent binaryContent = createBinaryContentEntity(multipartFile);
       BinaryContent createdBinaryContent = binaryContentService.create(binaryContent);
@@ -97,9 +97,10 @@ public class BasicUserService implements UserService {
       findUser.updateProfileDefault();
     }
     User user = userRepository.save(findUser);
+    UserStatus userStatus = userStatusService.findByUserId(user.getId());
     BinaryContentDTO binaryContentDTO =
         user.getProfileId() != null ? binaryContentService.find(user.getProfileId()) : null;
-    return userMapper.toUpdateUserDTO(user, binaryContentDTO);
+    return userMapper.toUpdateUserDTO(user, userStatus.isLoginUser(), binaryContentDTO);
   }
 
   @Override
@@ -144,7 +145,7 @@ public class BasicUserService implements UserService {
   }
 
   private BinaryContent createBinaryContentEntity(MultipartFile multipartFile) {
-    if (multipartFile == null) {
+    if (multipartFile == null || multipartFile.isEmpty()) {
       return null;  // 파일이 없으면 BinaryContent를 생성하지 않음
     }
     try {
