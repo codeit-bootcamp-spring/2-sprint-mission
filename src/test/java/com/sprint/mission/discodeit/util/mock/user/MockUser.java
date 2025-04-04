@@ -4,10 +4,10 @@ import com.sprint.mission.discodeit.application.dto.user.UserCreateRequest;
 
 public final class MockUser {
 
-  private MockUser() {
-  }
+    private MockUser() {
+    }
 
-  public static UserCreateRequest createMockUserRequest(String name, String email) {
-    return new UserCreateRequest(name, email, SetUpUserInfo.LOGIN_USER.getPassword());
-  }
+    public static UserCreateRequest createMockUserRequest(String name, String email) {
+        return new UserCreateRequest(name, email, UserInfo.LOGIN_USER.getPassword());
+    }
 }

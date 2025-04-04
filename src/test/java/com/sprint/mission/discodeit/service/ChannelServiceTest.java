@@ -24,8 +24,8 @@ import java.util.UUID;
 import static com.sprint.mission.discodeit.util.mock.channel.ChannelInfo.CHANNEL_NAME;
 import static com.sprint.mission.discodeit.util.mock.channel.ChannelInfo.UPDATED_CHANNEL_NAME;
 import static com.sprint.mission.discodeit.util.mock.message.MessageInfo.MESSAGE_CONTENT;
-import static com.sprint.mission.discodeit.util.mock.user.SetUpUserInfo.LOGIN_USER;
-import static com.sprint.mission.discodeit.util.mock.user.SetUpUserInfo.OTHER_USER;
+import static com.sprint.mission.discodeit.util.mock.user.UserInfo.LOGIN_USER;
+import static com.sprint.mission.discodeit.util.mock.user.UserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
