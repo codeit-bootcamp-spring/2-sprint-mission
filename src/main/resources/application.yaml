@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: discodeit
+
+discodeit:
+  repository:
+    type: file
+
+logging:
+  level:
+    root=info:
