@@ -1,18 +1,23 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.dto.MessageCreateDto;
-import com.sprint.mission.discodeit.service.dto.MessageResponseDto;
-import com.sprint.mission.discodeit.service.dto.MessageUpdateDto;
-
-import java.io.IOException;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
 import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-    Message createMessage(MessageCreateDto createDto);
-    MessageResponseDto findById(UUID id);
-    List<MessageResponseDto> findAllByChannelId(UUID channelId);
-    Message updateMessage(MessageUpdateDto updateDto);
-    void deleteMessage(UUID id, UUID userId, UUID channelId);
+
+  Message createMessage(MessageCreateRequest request,
+      List<BinaryContentCreateRequest> attachmentRequests);
+
+  Message findById(UUID messageId);
+
+  List<Message> findAllByChannelId(UUID channelId);
+
+  Message updateMessage(UUID messageId, MessageUpdateRequest request);
+
+  void deleteMessage(UUID messageId);
+
 }
