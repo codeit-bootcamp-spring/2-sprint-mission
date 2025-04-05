@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
 import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.application.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -109,8 +108,8 @@ class ChannelControllerTest {
         when(channelService.updatePublicChannelName(any(), any())).thenReturn(stubResult);
 
         assertThat(mockMvc.put()
-                .uri("/api/channels/public")
-                .content(JsonConvertor.asString(new PublicChannelUpdateRequest(channel.getId(), UPDATED_CHANNEL_NAME)))
+                .uri("/api/channels/public/{channelId}/name", channel.getId())
+                .content(UPDATED_CHANNEL_NAME)
                 .contentType(MediaType.APPLICATION_JSON))
                 .hasStatusOk()
                 .bodyJson()
