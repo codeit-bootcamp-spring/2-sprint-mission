@@ -10,27 +10,31 @@ import java.util.*;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> data = new HashMap<>();
 
-    public JCFChannelRepository() {}
+  private final Map<UUID, Channel> data = new HashMap<>();
 
-    @Override
-    public void save(Channel channel) {
-        data.put(channel.getId(), channel);
-    }
+  public JCFChannelRepository() {
+  }
 
-    @Override
-    public Optional<Channel> getChannelById(UUID ChannelId) {
-        return Optional.ofNullable(data.get(ChannelId));
-    }
+  @Override
+  public void save(Channel channel) {
+    data.put(channel.getId(), channel);
+  }
 
-    @Override
-    public List<Channel> getAllChannels() {
-        return new ArrayList<>(data.values());
-    }
+  @Override
+  public Optional<Channel> getChannelById(UUID ChannelId) {
+    return Optional.ofNullable(data.get(ChannelId));
+  }
 
-    @Override
-    public void deleteChannel(UUID ChannelId) {
-        data.remove(ChannelId);
-    }
+  @Override
+  public List<Channel> getAllChannels() {
+    return data.values().stream()
+        .filter(channel -> channel.getName() != null && channel.getDescription() != null)
+        .toList();
+  }
+
+  @Override
+  public void deleteChannel(UUID ChannelId) {
+    data.remove(ChannelId);
+  }
 }

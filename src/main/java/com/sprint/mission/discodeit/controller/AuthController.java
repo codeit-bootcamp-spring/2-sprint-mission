@@ -27,12 +27,10 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<UserResponse> login(@RequestBody LoginRequest request) {
     try {
-      User user = authService.login(request);
-      Optional<UserResponse> response = userService.getUserById(user.getId());
-      return response.map(ResponseEntity::ok)
-          .orElse(ResponseEntity.status(404).build());
+      UserResponse userResponse = authService.login(request);
+      return ResponseEntity.ok(userResponse);
     } catch (IllegalArgumentException e) {
-      return ResponseEntity.status(400).body(null);
+      return ResponseEntity.badRequest().build();
     }
   }
 }
