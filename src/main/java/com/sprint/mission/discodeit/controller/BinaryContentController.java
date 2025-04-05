@@ -2,42 +2,33 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.dto.BinaryContentResponseDto;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
-
-@RestController
-@RequestMapping("/api/binaryContent")
 @RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController {
 
-    private final BinaryContentService binaryContentService;
+  private final BinaryContentService binaryContentService;
 
-    @GetMapping("/find")
-    public ResponseEntity<Map<String, String>> find(@RequestParam UUID binaryContentId) {
-        byte[] file = binaryContentService.findBinaryById(binaryContentId);
+  @GetMapping("/{binaryContentId}")
+  public ResponseEntity<BinaryContent> find(@PathVariable UUID binaryContentId) {
+    BinaryContent file = binaryContentService.findById(binaryContentId);
+    return ResponseEntity.ok(file);
+  }
 
-        // 파일을 Base64로 인코딩
-        String base64Image = Base64.getEncoder().encodeToString(file);
-        String contentType = "image/jpeg";
-
-        // JSON 응답으로 반환
-        Map<String, String> response = new HashMap<>();
-        response.put("contentType", contentType);
-        response.put("bytes", base64Image);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<BinaryContentResponseDto>> getFiles(@RequestParam List<UUID> ids) {
-        List<BinaryContentResponseDto> files = binaryContentService.findAllByIdIn(ids);
-        return ResponseEntity.ok(files);
-    }
+  @GetMapping
+  public ResponseEntity<List<BinaryContent>> getFiles(@RequestParam List<UUID> ids) {
+    List<BinaryContent> files = binaryContentService.findAllByIdIn(ids);
+    return ResponseEntity.ok(files);
+  }
 
 }
