@@ -27,6 +27,7 @@ public class ChannelController {
 
   private final ChannelService channelService;
 
+  @Operation(summary = "공개 채널 생성")
   @PostMapping("/public")
   @ApiResponse(responseCode = "201", description = "공개 채널 생성 성공")
   public ResponseEntity<ChannelResponse> createPublicChannel(
@@ -37,6 +38,7 @@ public class ChannelController {
         .orElse(ResponseEntity.badRequest().build());
   }
 
+  @Operation(summary = "비공개 채널 생성")
   @PostMapping("/private")
   @ApiResponse(responseCode = "201", description = "비공개 채널 생성 성공")
   public ResponseEntity<ChannelResponse> createPrivateChannel(
@@ -69,6 +71,7 @@ public class ChannelController {
         .orElse(ResponseEntity.noContent().build());
   }
 
+  @Operation(summary = "채널 삭제")
   @DeleteMapping("/{channelId}")
   @ApiResponse(responseCode = "204", description = "채널 삭제 성공")
   public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId) {
@@ -76,6 +79,7 @@ public class ChannelController {
     return ResponseEntity.noContent().build();
   }
 
+  @Operation(summary = "참여 중인 채널 목록 조회", description = "사용자의 ID를 기반으로 자신이 참여 중인 채널 조회")
   @GetMapping
   public ResponseEntity<List<ChannelResponse>> findAllByUser(@RequestParam UUID userId) {
     return ResponseEntity.ok(channelService.findAllByUserId(userId));

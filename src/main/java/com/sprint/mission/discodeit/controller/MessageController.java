@@ -57,6 +57,7 @@ public class MessageController {
     return ResponseEntity.ok().build();
   }
 
+  @Operation(summary = "메시지 삭제")
   @DeleteMapping("/{messageId}")
   @ApiResponse(responseCode = "204", description = "메시지 삭제 성공")
   public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
@@ -64,6 +65,7 @@ public class MessageController {
     return ResponseEntity.noContent().build();
   }
 
+  @Operation(summary = "채널 메시지 목록 조회")
   @GetMapping
   public ResponseEntity<List<MessageResponse>> getMessagesByChannel(@RequestParam UUID channelId) {
     return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
