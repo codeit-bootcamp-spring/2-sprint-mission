@@ -12,3 +12,7 @@ discodeit:
       readStatus: ./data/readStatus
       user: ./data/user
       userStatus: ./data/userStatus
+
+logging:
+  level:
+    com.sprint.mission.discodeit: DEBUG
