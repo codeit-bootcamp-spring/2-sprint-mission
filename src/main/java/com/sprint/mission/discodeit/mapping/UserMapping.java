@@ -12,11 +12,10 @@ import org.mapstruct.factory.Mappers;
 @Mapper(config = CentralMapperConfig.class)
 public interface UserMapping {
 
-  UserMapping INSTANCE = Mappers.getMapper(UserMapping.class);
-  // 엔티티 → 응답 DTO 변환
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   @Mapping(source = "user.id", target = "id")
+  @Mapping(source = "user.createdAt", target = "createdAt")
     // 필요한 다른 필드 매핑 추가
   Summary userToSummary(User user, UserStatus userStatus);
 

@@ -39,15 +39,11 @@ public class BinaryContentController {
   @RequiresAuth
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<BinaryContentDto.Summary> uploadBinaryContent(
-      @RequestParam("ownerId") UUID ownerId,
-      @RequestParam("ownerType") String ownerType,
+      @RequestParam("ownerId") UUID ownerId, @RequestParam("ownerType") String ownerType,
       @RequestPart("file") MultipartFile file) throws IOException {
 
-    BinaryContentDto.Upload uploadDto = BinaryContentDto.Upload.builder()
-        .ownerId(ownerId)
-        .ownerType(ownerType)
-        .file(file)
-        .build();
+    BinaryContentDto.Upload uploadDto = BinaryContentDto.Upload.builder().ownerId(ownerId)
+        .ownerType(ownerType).file(file).build();
 
     BinaryContentDto.Summary summary = binaryContentService.createBinaryContent(uploadDto);
 
@@ -64,18 +60,15 @@ public class BinaryContentController {
     InputStreamResource resource = new InputStreamResource(streamOpt.get());
     String encodedFileName = UriUtils.encode(metadata.getFileName(), StandardCharsets.UTF_8);
     String contentDisposition = "attachment; filename*=UTF-8''" + encodedFileName;
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(metadata.getContentType()))
+    return ResponseEntity.ok().contentType(MediaType.parseMediaType(metadata.getContentType()))
         .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
-        .contentLength(metadata.getSize())
-        .body(resource);
+        .contentLength(metadata.getSize()).body(resource);
   }
 
   @RequiresAuth
   @GetMapping("/download-archive")
-  public void downloadFilesAsZip(
-      @RequestParam List<UUID> ids,
-      HttpServletResponse response) throws IOException {
+  public void downloadFilesAsZip(@RequestParam List<UUID> ids, HttpServletResponse response)
+      throws IOException {
 
     String zipFileName = "download_" + System.currentTimeMillis() + ".zip";
     String encodedZipFileName = UriUtils.encode(zipFileName, StandardCharsets.UTF_8);

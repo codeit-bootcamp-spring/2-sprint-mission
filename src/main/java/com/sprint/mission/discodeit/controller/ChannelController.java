@@ -45,8 +45,7 @@ public class ChannelController {
 
   @RequiresAuth
   @PutMapping("/{channelId}")
-  public ResponseEntity<ChannelDto.Response> updateChannel(
-      @Valid @PathVariable UUID channelId,
+  public ResponseEntity<ChannelDto.Response> updateChannel(@Valid @PathVariable UUID channelId,
       @Valid @RequestBody ChannelDto.Update channelDto) {
 
     return ResponseEntity.ok(channelService.updateChannel(channelDto, channelId));
@@ -54,10 +53,10 @@ public class ChannelController {
 
   @RequiresAuth
   @DeleteMapping("/{channelId}")
-  public ResponseEntity<Void> deleteChannel(
-      @Valid @PathVariable UUID channelId, HttpServletRequest httpRequest) {
-    String ownerId = (String) httpRequest.getAttribute("userId");
-    channelService.deleteChannel(channelId, UUID.fromString(ownerId));
+  public ResponseEntity<Void> deleteChannel(@Valid @PathVariable("channelId") UUID channelId,
+      HttpServletRequest httpRequest) {
+    UUID ownerId = (UUID) httpRequest.getAttribute("userId");
+    channelService.deleteChannel(channelId, ownerId);
 
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
@@ -67,7 +66,7 @@ public class ChannelController {
   public ResponseEntity<List<ChannelDto.Response>> getChannelsForUser(
       @Valid @RequestParam("userId") UUID userId) {
 
-    List<ChannelDto.Response> channels = channelService.getAccessibleChannels(userId);
+    List<ChannelDto.Response> channels = channelService.findAllByUserId(userId);
     return ResponseEntity.ok(channels);
   }
 

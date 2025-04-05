@@ -81,8 +81,6 @@ public class UserDto {
   @Builder(toBuilder = true)
   public static class Update {
 
-    @NotNull
-    private final UUID id;
     @NotBlank
     private final String password;
     private final UUID profileImage;  // 변경(프로필)

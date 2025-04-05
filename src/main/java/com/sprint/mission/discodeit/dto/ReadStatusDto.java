@@ -32,8 +32,6 @@ public class ReadStatusDto {
   public static class Update {
 
     @NotNull
-    private UUID id;
-    @NotNull
     private UUID lastReadMessageId;
   }
 

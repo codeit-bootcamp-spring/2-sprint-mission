@@ -12,15 +12,11 @@ import lombok.*;
 import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
-
+import java.util.*;
 
 //채널 DTO
 public class ChannelDto {
 
-  private CompositeIdentifier compositeIdentifier;
-  private TimeStamps timeStamps;
-  private UserChannels userChannels;
-  private ChannelInfo channelInfo;
 
   @Getter
   @Builder(toBuilder = true)
@@ -32,6 +28,7 @@ public class ChannelDto {
     private String channelName;
     private String description;
   }
+
 
   @Getter
   @Builder(toBuilder = true)
@@ -64,24 +61,28 @@ public class ChannelDto {
   public static class Response {
 
     @NotNull
-    private UUID channelId;
+    private CompositeIdentifier compositeIdentifier;
     @NotNull
-    private UUID ownerId;
-    @NotBlank
-    private String channelName;
+    private TimeStamps timeStamps;
     @NotNull
-    private String channelType;
-    private String description;
+    private ChannelInfo channelInfo;
     @NotBlank
     private ZonedDateTime lastMessageTime;
-    @NotNull
-    private Set<UUID> userList;
+    @NotBlank
+    private List<UUID> userList;
+
   }
 
 
   @Getter
   @Builder(toBuilder = true)
   public static class Summary {
+
+    private CompositeIdentifier compositeIdentifier;
+    private TimeStamps timeStamps;
+    private UserChannels userChannels;
+    private ChannelInfo channelInfo;
+
 
     @NotNull
     private final UUID channelId;
@@ -97,7 +98,9 @@ public class ChannelDto {
     private final Set<UUID> userList;
     @NotNull
     private final int participantCount;
+    @NotBlank
     private final ZonedDateTime createdAt;
+    @NotBlank
     private final ZonedDateTime updatedAt;
 
     public static Summary from(Channel channel, ReadStatus readStatus) {

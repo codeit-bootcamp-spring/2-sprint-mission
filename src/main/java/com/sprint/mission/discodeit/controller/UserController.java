@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.StatusDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UserDto.Summary;
+import com.sprint.mission.discodeit.dto.common.ListSummary;
 import com.sprint.mission.discodeit.jwt.RequiresAuth;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,9 +34,9 @@ public class UserController {
     return ResponseEntity.ok(userService.findByUserId(userId));
   }
 
-  @GetMapping
-  public ResponseEntity<List<Summary>> findAllUsers() {
-    return ResponseEntity.ok((List<Summary>) userService.findByAllUsersId());
+  @GetMapping("/all")
+  public ResponseEntity<ListSummary<Summary>> findAllUsers() {
+    return ResponseEntity.ok(userService.findByAllUsersId());
   }
 
   @RequiresAuth
@@ -43,12 +45,12 @@ public class UserController {
       @Valid @PathVariable UUID userId) {
 
     userService.deleteUser(userId);
-    return ResponseEntity.ok(new UserDto.DeleteResponse(userId.toString(), "true"));
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @RequiresAuth
   @PutMapping("/{userId}")
-  public ResponseEntity<UserDto.Update> updateUser(
+  public ResponseEntity<UserDto.Response> updateUser(
       @PathVariable UUID userId,
       @Valid @RequestBody UserDto.Update updateDto) {
 

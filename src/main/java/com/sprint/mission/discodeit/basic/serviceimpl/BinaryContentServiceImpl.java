@@ -22,11 +22,12 @@ import java.util.*;
 @RequiredArgsConstructor // final 필드 생성자 자동 주입
 public class BinaryContentServiceImpl implements BinaryContentService {
 
-  private final UserRepository userRepository;
+  private final FileMapping fileMapping;
+    private final UserRepository userRepository;
   private final FileBinaryContentRepository binaryContentRepository;
-  private final MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
 
-  @Override
+    @Override
   public BinaryContentDto.Summary createBinaryContent(BinaryContentDto.Upload uploadDto)
       throws IOException {
     UUID ownerId = uploadDto.getOwnerId();
@@ -47,7 +48,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
           ownerId,                    // 소유자 ID
           ownerType                   // 소유자 타입/용도
       );
-      return FileMapping.INSTANCE.binaryContentToSummary(persistedMetadata);
+      return fileMapping.binaryContentToSummary(persistedMetadata);
 
     } catch (IOException e) {
       throw new RuntimeException("파일 저장 처리 중 오류가 발생했습니다.", e);
@@ -85,32 +86,31 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   public BinaryContentDto.Summary findBinaryContentSummary(UUID id) {
     BinaryContent binaryContent = binaryContentRepository.findMetadataById(id)
         .orElseThrow(() -> new ResourceNotFoundException("BinaryContent", "id", id));
-    return FileMapping.INSTANCE.binaryContentToSummary(binaryContent);
-  }
+    return fileMapping.binaryContentToSummary(binaryContent);
+    }
 
-  @Override
+    @Override
   public List<BinaryContentDto.Summary> findBinaryContentSummariesByIds(List<UUID> ids) {
     if (ids == null || ids.isEmpty()) {
       return Collections.emptyList();
     }
-    List<BinaryContentDto.Summary> summaries = new ArrayList<>();
-    for (UUID id : ids) {
+        List<BinaryContentDto.Summary> summaries = new ArrayList<>();
+        for (UUID id : ids) {
       try {
         binaryContentRepository.findMetadataById(id)
             .ifPresent(
-                content -> summaries.add(FileMapping.INSTANCE.binaryContentToSummary(content)));
+                content -> summaries.add(fileMapping.binaryContentToSummary(content)));
       } catch (Exception e) {
         System.err.printf(
             "Warning: Error fetching BinaryContent summary for ID %s: %s. Skipping.%n", id,
             e.getMessage());
       }
+        }
+        return summaries;
     }
-    return summaries;
-  }
 
-  @Override
+    @Override
   public BinaryContent getBinaryContentEntity(UUID id) {
-    // 리포지토리의 findMetadataById 사용
     return binaryContentRepository.findMetadataById(id)
         .orElseThrow(() -> new ResourceNotFoundException("BinaryContent", "id", id));
   }
@@ -196,14 +196,14 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
   private void validateOwnerExists(UUID ownerId, String ownerType) {
     boolean exists;
-    switch (ownerType) {
-      case "MESSAGE":
+        switch (ownerType) {
+            case "MESSAGE":
         exists = !messageRepository.findAllByAuthorId(ownerId).isEmpty();
         if (!exists) {
           throw new ResourceNotFoundException("Message (owner)", "id", ownerId);
         }
-        break;
-      case "PROFILE":
+                break;
+            case "PROFILE":
         exists = userRepository.findByUser(ownerId).isPresent();
         if (!exists) {
           throw new ResourceNotFoundException("User (owner)", "id", ownerId);

@@ -16,7 +16,6 @@ public class User implements Serializable {
   private final UUID id;
   private final ZonedDateTime createdAt; // 객체 생성 시간
   private ZonedDateTime updateAt;
-  //가입 채널 리스트
   private final Set<UUID> belongChannels = new HashSet<>();
   private String email;
   private String password;
@@ -48,13 +47,13 @@ public class User implements Serializable {
 
   public void setEmail(String email) {
     this.email = email;
-    setUpdateAt(); // 이메일 변경 시 업데이트 시간 갱신
+    setUpdateAt();
   }
 
   // 비밀번호 변경 시
   public void setPassword(String password) {
     this.password = password;
-    setUpdateAt(); // 비밀번호 변경 시 업데이트 시간 갱신
+    setUpdateAt();
   }
 
   //로그인

@@ -33,9 +33,9 @@ public class MessageController {
   public ResponseEntity<MessageDto.Response> sendMessage(
       @RequestBody MessageDto.Create createMessage, HttpServletRequest httpRequest)
       throws IOException {
-    String authorId = (String) httpRequest.getAttribute("userId");
+    UUID authorId = (UUID) httpRequest.getAttribute("userId");
     return ResponseEntity.status(HttpStatus.CREATED).body(
-        messageService.create(createMessage, UUID.fromString(authorId)));
+        messageService.create(createMessage, authorId));
   }
 
   @RequiresAuth
@@ -44,21 +44,16 @@ public class MessageController {
       @Valid @PathVariable UUID messageId,
       @Valid @RequestBody MessageDto.Update updateMessage,
       HttpServletRequest httpRequest) throws IOException {
-    String authorId = (String) httpRequest.getAttribute("userId");
+    UUID authorId = (UUID) httpRequest.getAttribute("userId");
     MessageDto.Response updatedMessage = messageService.updateMessage(messageId, updateMessage,
-        UUID.fromString(authorId));
+        authorId);
     return ResponseEntity.ok(updatedMessage);
   }
 
   @RequiresAuth
   @DeleteMapping("/{messageId}")
-  public ResponseEntity<Void> deleteMessage(@Valid @PathVariable UUID messageId) {
-    boolean deleted = messageService.deleteMessage(messageId);
-    if (deleted) {
-      return ResponseEntity.noContent().build();
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+  public void deleteMessage(@Valid @PathVariable UUID messageId) {
+    ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @GetMapping

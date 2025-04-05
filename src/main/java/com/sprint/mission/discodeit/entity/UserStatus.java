@@ -27,9 +27,10 @@ public class UserStatus implements Serializable {
   public UserStatus(UUID userId) {
     this.id = UUID.randomUUID();
     this.userId = userId;
-    this.lastSeenAt = ZonedDateTime.now();
+    this.lastSeenAt = null;
     this.createdAt = ZonedDateTime.now();
     this.updatedAt = null;
+    this.setStatus(StatusOperation.OFFLINE);
   }
 
   public void updateLastTime() {

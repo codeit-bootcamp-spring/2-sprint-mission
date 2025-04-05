@@ -10,17 +10,14 @@ import org.mapstruct.factory.Mappers;
 @Mapper(config = CentralMapperConfig.class)
 public interface FileMapping {
 
-  @Mapping(target = "CompositeIdentifier.id", source = "id")
-  @Mapping(target = "CompositeIdentifier.ownerId", source = "ownerId")
-  @Mapping(target = "metadata.ownerType", source = "ownerType")
-  @Mapping(target = "metadata.size", source = "size")
-  @Mapping(target = "metadata.fileName", source = "fileName")
-  @Mapping(target = "metadata.contentType", source = "contentType")
+  @Mapping(target = "compositeIdentifier.id", source = "id")
+  @Mapping(target = "compositeIdentifier.ownerId", source = "ownerId")
+  @Mapping(target = "fileMetadata.ownerType", source = "ownerType")
+  @Mapping(target = "fileMetadata.size", source = "size")
+  @Mapping(target = "fileMetadata.fileName", source = "fileName")
+  @Mapping(target = "fileMetadata.contentType", source = "contentType")
+  @Mapping(target = "createdAt", source = "createdAt")
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   BinaryContentDto.Summary binaryContentToSummary(BinaryContent binaryContent);
 
-  @Mapping(target = "fileName", source = "binaryContent.fileName")
-  @Mapping(target = "message", expression = "java(message)")
-  BinaryContentDto.DeleteResponse binaryContentToDeleteResponse(BinaryContent binaryContent,
-      @Context String message);
 }

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.service.ChannelType;
+import java.util.Objects;
 import lombok.Getter;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -18,7 +18,7 @@ public class Channel implements Serializable {
   private static final long serialVersionUID = 102L;
   private final UUID channelId; // 채널 ID
   private final ZonedDateTime createdAt; // 생성시간
-  private ZonedDateTime updateAt; // 업데이트 된 시간
+  private ZonedDateTime updatedAt; // 업데이트 된 시간
   private final UUID ownerId; // 채널 생성자의 아이디
   private final Set<UUID> userList = new HashSet<>(); // 가입한 유저 리스트
   private String channelName; //채널이름
@@ -74,20 +74,20 @@ public class Channel implements Serializable {
   // 채널명 변경
   public void setChannelName(String newChannelName) {
     this.channelName = newChannelName;
-    setUpdateAt();
+    setUpdatedAt();
   }
 
   // 설명 변경 (PUBLIC)
   public void setDescription(String description) {
     if (isPublic()) {
       this.description = description;
-      setUpdateAt();
+      setUpdatedAt();
     }
   }
 
   // 업데이트 시간 설정
-  public void setUpdateAt() {
-    updateAt = ZonedDateTime.now();
+  public void setUpdatedAt() {
+    updatedAt = ZonedDateTime.now();
   }
 
   //    // 채널 타입 확인 메서드
@@ -107,4 +107,19 @@ public class Channel implements Serializable {
   public String getName() {
     return this.channelName;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Channel channel = (Channel) o;
+    return Objects.equals(ownerId, channel.ownerId);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(ownerId);
+  }
 }
+

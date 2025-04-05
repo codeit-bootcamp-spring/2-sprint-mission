@@ -34,8 +34,6 @@ public class MessageDto {
   @AllArgsConstructor
   public static class Update {
 
-    @NotNull
-    private UUID id;
     private String message;
     private List<UUID> binaryContents;
     private UpdateOperation operation;

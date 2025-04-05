@@ -21,8 +21,8 @@ public class BinaryContent implements Serializable {
   private final long size;
   private final UUID ownerId;
   private final String ownerType;
-  private String filePath;
-  private ZonedDateTime createdAt; // 생성 시간
+  private final String filePath;
+  private final ZonedDateTime createdAt; // 생성 시간
 
 
   public BinaryContent(String contentType, String fileName, long size, UUID ownerId,

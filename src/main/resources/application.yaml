@@ -6,8 +6,7 @@ spring:
 
 discodeit:
   storage:
-
-    data-dir: data
+    data-dir: C:/Users/ych61/IdeaProjects/codeit_sprint/2-sprint-mission/data
     # 이미지 파일
     image-dir: C:/Users/ych61/IdeaProjects/codeit_sprint/2-sprint-mission/images
 # 로깅 설정

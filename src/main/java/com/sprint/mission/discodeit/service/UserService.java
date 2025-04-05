@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.UserDto.Response;
+import com.sprint.mission.discodeit.dto.UserDto.Update;
 import com.sprint.mission.discodeit.dto.common.ListSummary;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UserDto.Summary;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -19,9 +22,10 @@ public interface UserService {
   UserDto.Response createdUser(UserDto.Create createUserDto);
 
   //업데이트 권한에 대한 것은?
-  UserDto.Update updateUser(UUID userId, UserDto.Update updateUserDto);
+  Response updateUser(UUID userId, Update updateUserDto);
 
-  boolean existsById(String userId);
+  boolean existsById(UUID userId);
 
-  void leaveChannel(UUID userId, UUID channelId);
+  void leaveChannel(List<UUID> ChannelInUsers, UUID channelId);
+
 }

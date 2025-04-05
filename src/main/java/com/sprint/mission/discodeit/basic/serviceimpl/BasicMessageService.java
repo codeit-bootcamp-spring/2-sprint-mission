@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.basic.serviceimpl; // 서비스 구현체 패키지
 
-import com.sprint.mission.discodeit.util.UpdateOperation;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -10,15 +9,20 @@ import com.sprint.mission.discodeit.exception.ForbiddenException;
 import com.sprint.mission.discodeit.exception.InvalidRequestException;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.mapping.MessageMapping;
-
-import com.sprint.mission.discodeit.service.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.ChannelRepository;
+import com.sprint.mission.discodeit.service.MessageRepository;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserRepository;
+import com.sprint.mission.discodeit.util.UpdateOperation;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
@@ -28,16 +32,14 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentService binaryContentService;
+  private final MessageMapping messageMapping;
 
   @Override
   public MessageDto.Response create(MessageDto.Create messageCreateDTO, UUID authorId) {
     validateUserInChannel(messageCreateDTO.getChannelId(), authorId);
 
-    Message message = new Message(
-        messageCreateDTO.getChannelId(),
-        authorId,
-        messageCreateDTO.getMessage()
-    );
+    Message message = new Message(messageCreateDTO.getChannelId(), authorId,
+        messageCreateDTO.getMessage());
     if (messageCreateDTO.getBinaryContents() != null && !messageCreateDTO.getBinaryContents()
         .isEmpty()) {
       validateAttachmentIdsExist(messageCreateDTO.getBinaryContents());
@@ -46,10 +48,8 @@ public class BasicMessageService implements MessageService {
       }
     }
 
-    if (!messageRepository.register(message)) {
-      throw new RuntimeException("메시지 저장에 실패했습니다.");
-    }
-    return MessageMapping.INSTANCE.messageToResponse(message);
+    messageRepository.register(message);
+    return messageMapping.messageToResponse(message);
 
 
   }
@@ -78,7 +78,7 @@ public class BasicMessageService implements MessageService {
 
     if (existingSummaries.size() != attachmentIds.size()) {
       List<UUID> existingIds = existingSummaries.stream()
-          .map(summary -> UUID.fromString(String.valueOf(summary.getId())))
+          .map(summary -> UUID.fromString(String.valueOf(summary.getCompositeIdentifier().getId())))
           .toList();
       List<UUID> nonExistentIds = new ArrayList<>(attachmentIds);
       nonExistentIds.removeAll(existingIds);
@@ -88,17 +88,21 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  public Optional<ZonedDateTime> findMessageByChannelId(UUID channelId) {
+    return messageRepository.findLatestTimestampByChannelId(channelId);
+  }
+
+  @Override
   public MessageDto.Response findByMessage(UUID messageId) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new ResourceNotFoundException("Message", "id", messageId)); // 404
 
-    return MessageMapping.INSTANCE.messageToResponse(message);
+    return messageMapping.messageToResponse(message);
   }
 
   @Override
   public List<MessageDto.Response> findAllMessage() {
-    return messageRepository.findAll().stream()
-        .map(MessageMapping.INSTANCE::messageToResponse)
+    return messageRepository.findAll().stream().map(messageMapping::messageToResponse)
         .collect(Collectors.toList());
   }
 
@@ -108,9 +112,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new ResourceNotFoundException("Channel", "id", channelId)); // 404
 
     List<Message> messages = messageRepository.findAllByChannelId(channelId);
-    return messages.stream()
-        .map(MessageMapping.INSTANCE::messageToResponse)
-        .collect(Collectors.toList());
+    return messages.stream().map(messageMapping::messageToResponse).collect(Collectors.toList());
   }
 
   @Override
@@ -122,6 +124,7 @@ public class BasicMessageService implements MessageService {
     if (messageUpdateDTO.getMessage() != null && !messageUpdateDTO.getMessage()
         .equals(message.getMessage())) {
       message.updateMessage(messageUpdateDTO.getMessage());
+      messageRepository.saveData();
     }
     List<UUID> binaryContentIds = messageUpdateDTO.getBinaryContents();
     UpdateOperation operation = messageUpdateDTO.getOperation();
@@ -132,6 +135,8 @@ public class BasicMessageService implements MessageService {
         case add:
           validateAttachmentIdsExist(binaryContentIds);
           message.getAttachmentIds().addAll(binaryContentIds);
+          message.setUpdateAt();
+          messageRepository.saveData();
           break;
         case remove:
           List<UUID> deleteList = new ArrayList<>(binaryContentIds);
@@ -141,14 +146,15 @@ public class BasicMessageService implements MessageService {
             binaryContentService.deleteBinaryContentsByIds(deleteList);
             deleteList.forEach(message.getAttachmentIds()::remove);
           }
+          message.setUpdateAt();
+          messageRepository.saveData();
           break;
         default:
           throw new InvalidRequestException("잘못된 요청");
       }
     }
-    message.setUpdateAt();
 
-    return MessageMapping.INSTANCE.messageToResponse(message);
+    return messageMapping.messageToResponse(message);
   }
 
   @Override

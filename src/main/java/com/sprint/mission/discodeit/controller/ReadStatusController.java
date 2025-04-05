@@ -26,25 +26,24 @@ public class ReadStatusController {
   private final ReadStatusService readStatusService;
 
   @RequiresAuth
-  @PostMapping("/create")
-  public ResponseEntity<ReadStatusDto.ResponseReadStatus> createReceptionStatus(
+  @PostMapping
+  public ResponseEntity<ReadStatusDto.ResponseReadStatus> create(
       @RequestBody ReadStatusDto.Create request) {
 
     return ResponseEntity.ok(readStatusService.create(request));
   }
 
   @RequiresAuth
-  @PutMapping("/update/{readStatusId}")
-  public ResponseEntity<ReadStatusDto.ResponseReadStatus> updateReceptionStatus(
-      @PathVariable UUID readStatusId,
+  @PutMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatusDto.ResponseReadStatus> update(
+      @Valid @PathVariable UUID readStatusId,
       @Valid @RequestBody ReadStatusDto.Update request) {
-
     ReadStatusDto.ResponseReadStatus response = readStatusService.update(readStatusId, request);
     return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{userId}")
-  public ResponseEntity<List<ReadStatusDto.ResponseReadStatus>> getUserReceptionStatuses(
+  public ResponseEntity<List<ReadStatusDto.ResponseReadStatus>> getUserReadStatuses(
       @PathVariable UUID userId) {
 
     return ResponseEntity.ok(readStatusService.findAllByUserId(userId));

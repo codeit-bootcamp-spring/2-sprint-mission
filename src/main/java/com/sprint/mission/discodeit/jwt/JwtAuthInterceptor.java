@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureException; // jwt 라이브러리에 따른 예�
 import io.jsonwebtoken.UnsupportedJwtException; // jwt 라이브러리에 따른 예외 예시
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
@@ -34,7 +35,6 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
       @NonNull HttpServletResponse response,
       @NonNull Object handler
   ) throws Exception {
-    // 핸들러가 컨트롤러 메소드가 아닌 경우 (정적 리소스 등) 통과
     if (!(handler instanceof HandlerMethod handlerMethod)) {
       return true;
     }
@@ -43,7 +43,6 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
     RequiresAuth methodAnnotation = handlerMethod.getMethodAnnotation(RequiresAuth.class);
     RequiresAuth classAnnotation = handlerMethod.getBeanType().getAnnotation(RequiresAuth.class);
 
-    // 어노테이션이 없으면 인증 불필요 (통과)
     if (methodAnnotation == null && classAnnotation == null) {
       return true;
     }
@@ -68,13 +67,23 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
       log.debug("JWT validation successful (signature, expiration)");
 
       // 3. 유효한 토큰에서 사용자 ID 추출
-      String userId = jwtUtil.extractUserId(jwt); // 유효성 검증 후 추출 시도
-      log.debug("Extracted userId: {}", userId);
+      String userIdStr = jwtUtil.extractUserId(jwt); // 유효성 검증 후 추출 시도
+      log.debug("Extracted userId: {}", userIdStr);
 
       // userId가 null이거나 비어있는 경우 처리
-      if (userId == null || userId.trim().isEmpty()) {
+      if (userIdStr == null || userIdStr.trim().isEmpty()) {
         log.warn("User ID extracted from token is null or empty");
         sendUnauthorizedResponse(response); // 통일된 응답 전송
+        return false;
+      }
+      UUID userId;
+      try {
+        userId = UUID.fromString(userIdStr);
+        log.debug("Converted userId String to UUID: {}", userId);
+      } catch (IllegalArgumentException e) {
+        // UUID 형식 오류 처리
+        log.warn("User ID string '{}' from token is not a valid UUID format", userIdStr);
+        sendUnauthorizedResponse(response); // 형식이 잘못되어도 인증 실패
         return false;
       }
 

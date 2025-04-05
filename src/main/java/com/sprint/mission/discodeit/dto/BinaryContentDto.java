@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.dto.common.CompositeIdentifier;
 import com.sprint.mission.discodeit.dto.common.FileMetadata;
+import com.sprint.mission.discodeit.dto.common.TimeStamps;
 import com.sprint.mission.discodeit.dto.common.UserData;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,8 +15,6 @@ import java.util.UUID;
 
 public class BinaryContentDto {
 
-  private FileMetadata fileMetadata;
-  private CompositeIdentifier compositeIdentifier;
 
   @Getter
   @Builder(toBuilder = true)
@@ -34,24 +34,17 @@ public class BinaryContentDto {
   @Builder(toBuilder = true)
   public static class Summary {
 
-    @NotNull
-    private UUID id;
-    @NotNull
-    private UUID ownerId;
-    @NotBlank
-    private String ownerType;
-    @NotBlank
-    private Long size;
-    @NotBlank
-    private String fileName;
-    @NotBlank
-    private String contentType;
+    private FileMetadata fileMetadata;
+    private CompositeIdentifier compositeIdentifier;
+    private ZonedDateTime createdAt;
   }
 
   @Getter
   @Builder(toBuilder = true)
   public static class DeleteResponse {
 
+    private FileMetadata fileMetadata;
+    private CompositeIdentifier compositeIdentifier;
     @NotNull
     private UUID id;
     @NotBlank
