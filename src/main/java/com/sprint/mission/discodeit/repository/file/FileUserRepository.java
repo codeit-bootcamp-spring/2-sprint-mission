@@ -17,46 +17,46 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = true)
 public class FileUserRepository implements UserRepository {
 
-    private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
 
-    public FileUserRepository(RepositoryProperties properties) {
-        this.DIRECTORY = Paths.get(properties.getUser());
-        FileUtil.init(DIRECTORY);
-    }
+  public FileUserRepository(RepositoryProperties properties) {
+    this.DIRECTORY = Paths.get(properties.getUser());
+    FileUtil.init(DIRECTORY);
+  }
 
-    @Override
-    public User save(User user) {
-        return FileUtil.saveToFile(DIRECTORY, user, user.getId());
-    }
+  @Override
+  public User save(User user) {
+    return FileUtil.saveToFile(DIRECTORY, user, user.getId());
+  }
 
-    @Override
-    public Optional<User> findById(UUID id) {
-        return FileUtil.loadFromFile(DIRECTORY, id);
-    }
+  @Override
+  public Optional<User> findById(UUID id) {
+    return FileUtil.loadFromFile(DIRECTORY, id);
+  }
 
-    @Override
-    public Optional<User> findByNickname(String nickname) {
-        return this.findAll().stream()
-                .filter(user -> user.getNickname().equals(nickname))
-                .findFirst();
-    }
+  @Override
+  public Optional<User> findByUsername(String username) {
+    return this.findAll().stream()
+        .filter(user -> user.getUsername().equals(username))
+        .findFirst();
+  }
 
-    @Override
-    public Optional<User> findByEmail(String email) {
-        return this.findAll().stream()
-                .filter(user -> user.getEmail().equals(email))
-                .findFirst();
-    }
+  @Override
+  public Optional<User> findByEmail(String email) {
+    return this.findAll().stream()
+        .filter(user -> user.getEmail().equals(email))
+        .findFirst();
+  }
 
-    @Override
-    public List<User> findAll() {
-        return FileUtil.loadAllFiles(DIRECTORY, EXTENSION);
-    }
+  @Override
+  public List<User> findAll() {
+    return FileUtil.loadAllFiles(DIRECTORY, EXTENSION);
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        FileUtil.deleteFile(DIRECTORY, id);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    FileUtil.deleteFile(DIRECTORY, id);
+  }
 
 }
