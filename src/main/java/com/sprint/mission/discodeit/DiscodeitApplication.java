@@ -16,7 +16,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import java.util.ArrayList;
 import java.util.Optional;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.sprint.mission.discodeit")
+
 public class DiscodeitApplication {
 //	static User setupUser(UserService userService) {
 //		UserCreateRequest request = new UserCreateRequest("woody", "woody@codeit.com", "woody1234");
@@ -36,8 +37,9 @@ public class DiscodeitApplication {
 //		System.out.println("메시지 생성: " + message.getId());
 //	}
 
-public static void main(String[] args) {
-ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+  public static void main(String[] args) {
+    ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class,
+        args);
 //		// 서비스 초기화
 //		UserService userService = context.getBean(UserService.class);
 //		ChannelService channelService = context.getBean(ChannelService.class);
@@ -48,8 +50,7 @@ ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplicat
 //		Channel channel = setupChannel(channelService);
 //		// 테스트
 //		messageCreateTest(messageService, channel, user);
-}
-
+  }
 
 
 }
