@@ -38,7 +38,7 @@ public class BasicChannelService implements ChannelService {
         publicChannelCreateRequest.description(), ChannelType.PUBLIC);
     channelRepository.save(channel);
     return new SaveChannelResponseDto(channel.getId(), channel.getName(),
-        channel.getChannelType(), channel.getCreatedAt());
+        channel.getType(), channel.getCreatedAt());
   }
 
   @Override
@@ -53,7 +53,7 @@ public class BasicChannelService implements ChannelService {
       readStatusRepository.save(readStatus);
     });
     return new SaveChannelResponseDto(null, null,
-        channel.getChannelType(), channel.getCreatedAt());
+        channel.getType(), channel.getCreatedAt());
   }
 
   @Override
@@ -67,13 +67,13 @@ public class BasicChannelService implements ChannelService {
         .max(Comparator.comparing(Message::getCreatedAt))
         .orElse(null);
 
-    if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
+    if (channel.getType().equals(ChannelType.PRIVATE)) {
       List<UUID> joinUserId = readStatusRepository.findByChannelId(channelId).stream()
           .map(ReadStatus::getUserId)
           .toList();
       return new ChannelDto(
           channel.getId(),
-          channel.getChannelType(),
+          channel.getType(),
           channel.getName(),
           channel.getDescription(),
           joinUserId,
@@ -82,7 +82,7 @@ public class BasicChannelService implements ChannelService {
     }
     return new ChannelDto(
         channel.getId(),
-        channel.getChannelType(),
+        channel.getType(),
         channel.getName(),
         channel.getDescription(),
         lastMessage != null ? lastMessage.getCreatedAt() : null
@@ -98,7 +98,7 @@ public class BasicChannelService implements ChannelService {
         .collect(Collectors.toSet());
 
     return channelRepository.findAllChannel().stream()
-        .filter(channel -> channel.getChannelType().equals(ChannelType.PUBLIC)
+        .filter(channel -> channel.getType().equals(ChannelType.PUBLIC)
             || privateChannelIdSet.contains(channel.getId()))
         .map(channel -> findChannel(channel.getId()))
         .toList();
@@ -110,7 +110,7 @@ public class BasicChannelService implements ChannelService {
         .orElseThrow(
             () -> new NoSuchElementException(channelId + "에 해당하는 채널을 찾을 수 없습니다."));
 
-    if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
+    if (channel.getType().equals(ChannelType.PRIVATE)) {
       throw new IllegalArgumentException("비공개 채널은 수정할 수 없습니다.");
     }
 

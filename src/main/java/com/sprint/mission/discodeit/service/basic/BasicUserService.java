@@ -105,7 +105,16 @@ public class BasicUserService implements UserService {
         orElseThrow(
             () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
 
-    if (userRepository.findUserByEmail(updateUserDto.newEmail()).isPresent()) {
+    if (userRepository.findUserByUsername(updateUserDto.newUsername())
+        .filter(otherUser -> !otherUser.getId().equals(user.getId()))
+        .isPresent()) {
+      throw new IllegalArgumentException(
+          String.format("User with username %s already exists", updateUserDto.newUsername()));
+    }
+
+    if (userRepository.findUserByEmail(updateUserDto.newEmail())
+        .filter(otherUser -> !otherUser.getId().equals(user.getId()))
+        .isPresent()) {
       throw new IllegalArgumentException(
           String.format("User with email %s already exists", updateUserDto.newEmail()));
     }

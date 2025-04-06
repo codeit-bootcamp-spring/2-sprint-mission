@@ -12,7 +12,7 @@ public class Channel extends BaseEntity implements Serializable {
   private static final long serialVersionUID = 1L;
   private String name;
   private String description;
-  private ChannelType channelType;
+  private ChannelType type;
 
   public void updateChannelName(String name) {
     super.updateTime();
