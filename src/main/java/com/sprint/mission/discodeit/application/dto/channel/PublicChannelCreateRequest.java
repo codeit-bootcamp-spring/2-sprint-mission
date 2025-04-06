@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.application.dto.channel;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
-public record PublicChannelCreateRequest(@NotBlank String name, @NotBlank String description) {
+@Schema(description = "Public 채널 생성 요청")
+public record PublicChannelCreateRequest(
+        @NotBlank String name,
+        @NotBlank String description) {
 }
