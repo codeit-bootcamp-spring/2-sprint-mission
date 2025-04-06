@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.channel.SaveChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -32,17 +31,16 @@ public class BasicChannelService implements ChannelService {
   private final UserRepository userRepository;
 
   @Override
-  public SaveChannelResponseDto createPublicChannel(
+  public Channel createPublicChannel(
       PublicChannelCreateRequest publicChannelCreateRequest) {
     Channel channel = new Channel(publicChannelCreateRequest.name(),
         publicChannelCreateRequest.description(), ChannelType.PUBLIC);
     channelRepository.save(channel);
-    return new SaveChannelResponseDto(channel.getId(), channel.getName(),
-        channel.getType(), channel.getCreatedAt());
+    return channel;
   }
 
   @Override
-  public SaveChannelResponseDto createPrivateChannel(
+  public Channel createPrivateChannel(
       PrivateChannelCreateRequest privateChannelCreateRequest) {
     Channel channel = new Channel(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
@@ -52,8 +50,7 @@ public class BasicChannelService implements ChannelService {
       ReadStatus readStatus = new ReadStatus(user.getId(), channel.getId(), Instant.now());
       readStatusRepository.save(readStatus);
     });
-    return new SaveChannelResponseDto(null, null,
-        channel.getType(), channel.getCreatedAt());
+    return channel;
   }
 
   @Override

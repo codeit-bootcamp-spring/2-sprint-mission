@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.channel.SaveChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,13 +59,13 @@ public class ChannelController {
           )
       )
   })
-  public ResponseEntity<SaveChannelResponseDto> createPublic(
+  public ResponseEntity<Channel> createPublic(
       @RequestBody PublicChannelCreateRequest publicChannelCreateRequest
   ) {
-    SaveChannelResponseDto saveChannelResponseDto = channelService.createPublicChannel(
+    Channel channel = channelService.createPublicChannel(
         publicChannelCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(saveChannelResponseDto);
+        .body(channel);
   }
 
   @PostMapping("/private")
@@ -87,13 +86,13 @@ public class ChannelController {
           )
       )
   })
-  public ResponseEntity<SaveChannelResponseDto> createPrivate(
+  public ResponseEntity<Channel> createPrivate(
       @RequestBody PrivateChannelCreateRequest privateChannelCreateRequest
   ) {
-    SaveChannelResponseDto saveChannelResponseDto = channelService.createPrivateChannel(
+    Channel channel = channelService.createPrivateChannel(
         privateChannelCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(saveChannelResponseDto);
+        .body(channel);
   }
 
   @PatchMapping("/{channelId}")
