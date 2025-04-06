@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.FindBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.BinaryData;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.AllArgsConstructor;
@@ -36,21 +34,14 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
-  public FindBinaryContentRequestDto findById(UUID binaryContentUUID) {
-    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentUUID)
+  public BinaryContent findById(UUID binaryContentUUID) {
+    return binaryContentRepository.findById(binaryContentUUID)
         .orElseThrow(
             () -> new NoSuchElementException(binaryContentUUID + "에 해당하는 파일을 찾는데 실패하였습니다."));
-
-    return new FindBinaryContentRequestDto(
-        binaryContent.getFileName(),
-        binaryContent.getContentType(),
-        binaryContent.getBytes(),
-        binaryContent.getCreatedAt()
-    );
   }
 
   @Override
-  public List<FindBinaryContentRequestDto> findByIdIn(List<UUID> binaryContentUUIDList) {
+  public List<BinaryContent> findByIdIn(List<UUID> binaryContentUUIDList) {
     return binaryContentRepository.findAll().stream()
         .filter(binaryContent -> binaryContentUUIDList.contains(binaryContent.getId()))
         .map(binaryContent -> findById(binaryContent.getId()))
