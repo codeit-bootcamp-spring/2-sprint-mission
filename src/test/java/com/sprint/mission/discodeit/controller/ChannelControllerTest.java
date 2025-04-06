@@ -103,7 +103,7 @@ class ChannelControllerTest {
     @Test
     void updatePublicChannel() {
         Channel channel = new Channel(ChannelType.PUBLIC, CHANNEL_NAME, CHANNEL_DESCRIPTION);
-        channel.updateName(UPDATED_CHANNEL_NAME);
+        channel.update(UPDATED_CHANNEL_NAME, CHANNEL_DESCRIPTION + "123");
         ChannelResult stubResult = ChannelResult.fromPublic(channel, null);
         when(channelService.updatePublic(any(), any())).thenReturn(stubResult);
 

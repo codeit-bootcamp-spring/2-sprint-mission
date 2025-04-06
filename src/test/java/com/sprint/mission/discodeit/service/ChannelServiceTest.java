@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
 import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.application.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -27,6 +28,7 @@ import static com.sprint.mission.discodeit.util.mock.user.UserInfo.LOGIN_USER;
 import static com.sprint.mission.discodeit.util.mock.user.UserInfo.OTHER_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ChannelServiceTest {
 
@@ -129,13 +131,16 @@ class ChannelServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("Public 채널의 이름을 업데이트할 경우, 변경된 정보가 반환합니다.")
+    @DisplayName("Public 채널의 이름을 업데이트할 경우, 변경된 정보를 반환합니다.")
     @Test
     void updatePublicChannelName() {
-        channelService.updatePublic(setUpPublicChannel.id(), UPDATED_CHANNEL_NAME);
+        ChannelResult updatedChannel = channelService.updatePublic(setUpPublicChannel.id(),
+                new PublicChannelUpdateRequest(UPDATED_CHANNEL_NAME, CHANNEL_DESCRIPTION + "123"));
 
-        assertThat(channelService.getById(setUpPublicChannel.id()).name()).isEqualTo(
-                UPDATED_CHANNEL_NAME);
+        assertAll(
+                () -> assertThat(updatedChannel.name()).isEqualTo(UPDATED_CHANNEL_NAME),
+                () -> assertThat(updatedChannel.description()).isEqualTo(CHANNEL_DESCRIPTION + "123")
+        );
     }
 
     @DisplayName("Private 채널의 이름을 업데이트할 경우, 예외를 반환합니다.")
@@ -145,7 +150,7 @@ class ChannelServiceTest {
         ChannelResult privateChannel = channelService.createPrivate(privateChannelDto);
 
         assertThatThrownBy(
-                () -> channelService.updatePublic(privateChannel.id(), UPDATED_CHANNEL_NAME))
+                () -> channelService.updatePublic(privateChannel.id(), new PublicChannelUpdateRequest(UPDATED_CHANNEL_NAME, CHANNEL_DESCRIPTION)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

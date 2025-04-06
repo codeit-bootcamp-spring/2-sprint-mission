@@ -109,7 +109,7 @@ public class ChannelController {
             @Parameter(description = "채널 수정 정보", required = true)
             @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
 
-        ChannelResult channelResult = channelService.updatePublic(channelId, publicChannelUpdateRequest.newName());
+        ChannelResult channelResult = channelService.updatePublic(channelId, publicChannelUpdateRequest);
 
         return ResponseEntity.ok(channelResult);
     }
