@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.controller;
 
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
@@ -66,9 +65,8 @@ public class MessageController {
   public ResponseEntity<Message> send(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
-  ) throws IOException {
-    Message message = messageService.sendMessage(messageCreateRequest,
-        BinaryContentCreateRequest.nullableFromList(attachments));
+  ) {
+    Message message = messageService.sendMessage(messageCreateRequest, attachments);
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 

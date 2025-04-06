@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.FindUserDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateResponse;
@@ -74,10 +73,9 @@ public class UserController {
   })
   public ResponseEntity<UserCreateResponse> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile file
+      @RequestPart(value = "profile", required = false) MultipartFile profile
   ) throws IOException {
-    UserCreateResponse userCreateResponse = userService.save(userCreateRequest,
-        BinaryContentCreateRequest.nullableFrom(file));
+    UserCreateResponse userCreateResponse = userService.save(userCreateRequest, profile);
     return ResponseEntity.status(HttpStatus.CREATED).body(userCreateResponse);
   }
 
@@ -120,10 +118,9 @@ public class UserController {
   public ResponseEntity<UserUpdateResponse> update(
       @PathVariable("userId") UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile file
+      @RequestPart(value = "profile", required = false) MultipartFile profile
   ) throws IOException {
-    UserUpdateResponse userUpdateResponse = userService.update(userId, userUpdateRequest,
-        BinaryContentCreateRequest.nullableFrom(file));
+    UserUpdateResponse userUpdateResponse = userService.update(userId, userUpdateRequest, profile);
     return ResponseEntity.status(HttpStatus.OK).body(userUpdateResponse);
   }
 

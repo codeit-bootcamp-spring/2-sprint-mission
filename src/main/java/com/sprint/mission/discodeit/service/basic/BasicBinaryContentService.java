@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @AllArgsConstructor
@@ -18,10 +18,14 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public BinaryContent save(BinaryContentCreateRequest binaryContentCreateRequest) {
-    String fileName = binaryContentCreateRequest.fileName();
-    String contentType = binaryContentCreateRequest.contentType();
-    byte[] bytes = binaryContentCreateRequest.bytes();
+  public BinaryContent save(MultipartFile file) throws IOException {
+    if (file.isEmpty()) {
+      throw new NoSuchElementException("File is empty");
+    }
+
+    String fileName = file.getOriginalFilename();
+    String contentType = file.getContentType();
+    byte[] bytes = file.getBytes();
 
     BinaryContent binaryContent = BinaryContent.builder()
         .fileName(fileName)

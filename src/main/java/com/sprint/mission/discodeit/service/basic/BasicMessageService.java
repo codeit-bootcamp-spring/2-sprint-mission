@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -12,12 +11,14 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import java.util.Comparator;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,9 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public Message sendMessage(MessageCreateRequest messageCreateRequest,
-      List<BinaryContentCreateRequest> binaryContentCreateRequestList) {
+      List<MultipartFile> attachments) {
+    List<UUID> attachmentList = new ArrayList<>();
+
     User user = userRepository.findUserById(messageCreateRequest.authorId())
         .orElseThrow(() -> new NoSuchElementException(
             messageCreateRequest.authorId() + "에 해당하는 사용자를 찾을 수 없습니다."));
@@ -39,22 +42,28 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new NoSuchElementException(
             messageCreateRequest.channelId() + "에 해당하는 채널을 찾을 수 없습니다."));
 
-    List<UUID> attachmentList = binaryContentCreateRequestList.stream()
-        .map(data -> {
-          String filename = data.fileName();
-          String contentType = data.contentType();
-          byte[] bytes = data.bytes();
-          BinaryContent binaryContent = BinaryContent.builder()
-              .fileName(filename)
-              .contentType(contentType)
-              .bytes(bytes)
-              .size((long) bytes.length)
-              .build();
+    if (attachments != null && !attachments.isEmpty()) {
+      attachmentList = attachments.stream()
+          .map(data -> {
+            try {
+              String fileName = data.getOriginalFilename();
+              String contentType = data.getContentType();
+              byte[] bytes = data.getBytes();
+              BinaryContent binaryContent = BinaryContent.builder()
+                  .fileName(fileName)
+                  .contentType(contentType)
+                  .bytes(bytes)
+                  .size((long) bytes.length)
+                  .build();
 
-          binaryContentRepository.save(binaryContent);
-          return binaryContent.getId();
-        })
-        .toList();
+              binaryContentRepository.save(binaryContent);
+              return binaryContent.getId();
+            } catch (IOException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .toList();
+    }
 
     Message message = new Message(
         messageCreateRequest.content(), user.getId(),

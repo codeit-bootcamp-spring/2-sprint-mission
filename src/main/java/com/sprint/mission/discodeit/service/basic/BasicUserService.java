@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.FindUserDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateResponse;
@@ -13,14 +12,15 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +31,9 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public UserCreateResponse save(UserCreateRequest userCreateRequest,
-      Optional<BinaryContentCreateRequest> saveBinaryContentRequestDto) {
+  public UserCreateResponse save(UserCreateRequest userCreateRequest, MultipartFile profile)
+      throws IOException {
+    UUID profileId = null;
     if (userRepository.findUserByUsername(userCreateRequest.username()).isPresent()) {
       throw new IllegalArgumentException(
           String.format("User with username %s already exists", userCreateRequest.username()));
@@ -43,21 +44,16 @@ public class BasicUserService implements UserService {
           String.format("User with email %s already exists", userCreateRequest.email()));
     }
 
-    UUID profileId = saveBinaryContentRequestDto
-        .map(profile -> {
-          String fileName = profile.fileName();
-          String contentType = profile.contentType();
-          byte[] bytes = profile.bytes();
-          BinaryContent binaryContent = BinaryContent.builder()
-              .fileName(fileName)
-              .contentType(contentType)
-              .bytes(bytes)
-              .size((long) bytes.length)
-              .build();
-          binaryContentRepository.save(binaryContent);
-          return binaryContent.getId();
-        })
-        .orElse(null);
+    if (profile != null) {
+      BinaryContent binaryContent = BinaryContent.builder()
+          .fileName(profile.getOriginalFilename())
+          .contentType(profile.getContentType())
+          .bytes(profile.getBytes())
+          .size((long) profile.getBytes().length)
+          .build();
+      binaryContentRepository.save(binaryContent);
+      profileId = binaryContent.getId();
+    }
 
     User user = new User(
         userCreateRequest.username(), userCreateRequest.password(),
@@ -99,45 +95,43 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserUpdateResponse update(UUID userId, UserUpdateRequest updateUserDto,
-      Optional<BinaryContentCreateRequest> saveBinaryContentRequestDto) {
+  public UserUpdateResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
+      MultipartFile profile) throws IOException {
+
+    UUID profileId = null;
+
     User user = userRepository.findUserById(userId).
         orElseThrow(
             () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
 
-    if (userRepository.findUserByUsername(updateUserDto.newUsername())
+    if (userRepository.findUserByUsername(userUpdateRequest.newUsername())
         .filter(otherUser -> !otherUser.getId().equals(user.getId()))
         .isPresent()) {
       throw new IllegalArgumentException(
-          String.format("User with username %s already exists", updateUserDto.newUsername()));
+          String.format("User with username %s already exists", userUpdateRequest.newUsername()));
     }
 
-    if (userRepository.findUserByEmail(updateUserDto.newEmail())
+    if (userRepository.findUserByEmail(userUpdateRequest.newEmail())
         .filter(otherUser -> !otherUser.getId().equals(user.getId()))
         .isPresent()) {
       throw new IllegalArgumentException(
-          String.format("User with email %s already exists", updateUserDto.newEmail()));
+          String.format("User with email %s already exists", userUpdateRequest.newEmail()));
     }
 
-    user.updateUsername(updateUserDto.newUsername());
-    user.updatePassword(updateUserDto.newPassword());
-    user.updateEmail(updateUserDto.newEmail());
+    if (profile != null) {
+      BinaryContent binaryContent = BinaryContent.builder()
+          .fileName(profile.getOriginalFilename())
+          .contentType(profile.getContentType())
+          .bytes(profile.getBytes())
+          .size((long) profile.getBytes().length)
+          .build();
+      binaryContentRepository.save(binaryContent);
+      profileId = binaryContent.getId();
+    }
 
-    UUID profileId = saveBinaryContentRequestDto
-        .map(profile -> {
-          String fileName = profile.fileName();
-          String contentType = profile.contentType();
-          byte[] fileData = profile.bytes();
-          BinaryContent binaryContent = BinaryContent.builder()
-              .fileName(fileName)
-              .contentType(contentType)
-              .bytes(fileData)
-              .size((long) fileData.length)
-              .build();
-          binaryContentRepository.save(binaryContent);
-          return binaryContent.getId();
-        })
-        .orElse(null);
+    user.updateUsername(userUpdateRequest.newUsername());
+    user.updatePassword(userUpdateRequest.newPassword());
+    user.updateEmail(userUpdateRequest.newEmail());
     user.updateProfile(profileId);
     userRepository.save(user);
     return new UserUpdateResponse(user.getId(), user.getUsername(), user.getEmail(),
