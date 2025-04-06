@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
@@ -20,10 +19,5 @@ public class Message extends BaseEntity implements Serializable {
   public void updateContent(String content) {
     super.updateTime();
     this.content = content;
-  }
-
-  public void updateAttachmentList(List<UUID> attachmentList) {
-    super.updateTime();
-    this.attachmentIds = attachmentList;
   }
 }

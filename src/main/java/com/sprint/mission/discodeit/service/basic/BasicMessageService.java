@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.message.FindMessageByChannelIdResponseDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
@@ -76,23 +75,8 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<FindMessageByChannelIdResponseDto> findMessageByChannelId(UUID channelUUID) {
-    List<Message> channelMessageList = messageRepository.findMessageByChannel(channelUUID);
-
-    return channelMessageList.stream()
-        .sorted(Comparator.comparing(Message::getCreatedAt))
-        .map((message) -> {
-          String nickname = userRepository.findUserById(message.getAuthorId())
-              .map(User::getUsername)
-              .orElse("알 수 없음");
-
-          return new FindMessageByChannelIdResponseDto(
-              message.getId(), nickname,
-              message.getAttachmentIds(), message.getContent(),
-              message.getCreatedAt()
-          );
-        })
-        .toList();
+  public List<Message> findMessageByChannelId(UUID channelUUID) {
+    return messageRepository.findMessageByChannel(channelUUID);
   }
 
   @Override

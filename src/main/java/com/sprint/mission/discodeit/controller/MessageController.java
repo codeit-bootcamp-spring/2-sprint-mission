@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.message.FindMessageByChannelIdResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
@@ -66,10 +65,10 @@ public class MessageController {
   })
   public ResponseEntity<Message> send(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> files
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) throws IOException {
     Message message = messageService.sendMessage(messageCreateRequest,
-        BinaryContentCreateRequest.nullableFromList(files));
+        BinaryContentCreateRequest.nullableFromList(attachments));
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 
@@ -170,12 +169,12 @@ public class MessageController {
           )
       )
   })
-  public ResponseEntity<List<FindMessageByChannelIdResponseDto>> FindChannelMessage(
+  public ResponseEntity<List<Message>> FindChannelMessage(
       @RequestParam("channelId") UUID channelId
   ) {
-    List<FindMessageByChannelIdResponseDto> findMessageByChannelIdDtoList = messageService.findMessageByChannelId(
+    List<Message> message = messageService.findMessageByChannelId(
         channelId);
     return ResponseEntity.status(HttpStatus.OK)
-        .body(findMessageByChannelIdDtoList);
+        .body(message);
   }
 }
