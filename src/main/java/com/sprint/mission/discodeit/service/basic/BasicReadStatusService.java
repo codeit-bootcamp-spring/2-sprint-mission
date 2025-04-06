@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -28,9 +29,10 @@ public class BasicReadStatusService implements ReadStatusService {
                 readStatusRequest.userId() + "에 해당하는 사용자를 찾을 수 없습니다."));
 
     channelRepository.findChannelById(readStatusRequest.channelId())
+        .filter(channel -> channel.getType().equals(ChannelType.PRIVATE))
         .orElseThrow(
             () -> new NoSuchElementException(
-                readStatusRequest.channelId() + "에 해당하는 채널을 찾을 수 없습니다."));
+                readStatusRequest.channelId() + "에 해당하는 비공개 채널을 찾을 수 없습니다."));
 
     if (readStatusRepository.findByUserId(readStatusRequest.userId()).stream()
         .anyMatch(readStatus -> readStatus.getChannelId().equals(readStatusRequest.channelId()))) {
