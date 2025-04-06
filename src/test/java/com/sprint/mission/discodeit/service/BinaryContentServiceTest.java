@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
@@ -28,21 +29,24 @@ class BinaryContentServiceTest {
     @DisplayName("이미지 파일을 저장하면 올바른 경로가 반환된다.")
     @Test
     void createProfileImage() {
-        MultipartFile file = createMockImageFile(IMAGE_NAME_DOG);
-        BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(file);
+        MultipartFile imageFile = createMockImageFile(IMAGE_NAME_DOG);
+        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(imageFile.getName(), imageFile.getContentType(), getBytesFromMultiPartFile(imageFile));
 
-        assertThat(binaryContentResult.bytes()).isEqualTo(getBytesFromMultiPartFile(file));
+        BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(binaryContentRequest);
+
+        assertThat(binaryContentResult.bytes()).isEqualTo(getBytesFromMultiPartFile(imageFile));
     }
 
     @DisplayName("여러 ID로 조회하면 해당하는 모든 바이너리 콘텐츠가 반환된다.")
     @Test
     void findAllByIdIn() {
         MultipartFile imageFile = createMockImageFile(IMAGE_NAME_DOG);
-        BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(imageFile);
+        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(imageFile.getName(), imageFile.getContentType(), getBytesFromMultiPartFile(imageFile));
+        BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(binaryContentRequest);
 
         MultipartFile otherImageFile = createMockImageFile(IMAGE_NAME_KIRBY);
-        BinaryContentResult otherBinaryContentResult = binaryContentService.createProfileImage(
-                otherImageFile);
+        BinaryContentRequest otherBinaryContentRequest = new BinaryContentRequest(imageFile.getName(), imageFile.getContentType(), getBytesFromMultiPartFile(otherImageFile));
+        BinaryContentResult otherBinaryContentResult = binaryContentService.createProfileImage(otherBinaryContentRequest);
 
         assertAll(
                 () -> assertThat(binaryContentResult.bytes()).isEqualTo(
@@ -55,8 +59,9 @@ class BinaryContentServiceTest {
     @DisplayName("이미지를 삭제하면 로컬 저장소에서도 삭제된다.")
     @Test
     void deleteProfileImage() {
-        MultipartFile file = createMockImageFile(IMAGE_NAME_DOG);
-        BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(file);
+        MultipartFile imageFile = createMockImageFile(IMAGE_NAME_DOG);
+        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(imageFile.getName(), imageFile.getContentType(), getBytesFromMultiPartFile(imageFile));
+        BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(binaryContentRequest);
 
         binaryContentService.delete(binaryContentResult.id());
 

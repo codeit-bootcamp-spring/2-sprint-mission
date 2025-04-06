@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
 import com.sprint.mission.discodeit.application.dto.message.MessageUpdateRequest;
@@ -25,7 +26,14 @@ public class MessageController {
             @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
-        return ResponseEntity.ok(messageService.create(messageCreateRequest, attachments));
+        List<BinaryContentRequest> binaryContentRequests = List.of();
+        if (attachments != null) {
+            binaryContentRequests = attachments.stream()
+                    .map(BinaryContentRequest::fromMultipartFile)
+                    .toList();
+        }
+
+        return ResponseEntity.ok(messageService.create(messageCreateRequest, binaryContentRequests));
     }
 
     @GetMapping

@@ -39,7 +39,10 @@ class BinaryContentControllerTest {
     @BeforeEach
     void setUp() {
         MultipartFile imageFile = createMockImageFile(IMAGE_NAME_DOG);
-        binaryContent = new BinaryContent(imageFile.getName(), imageFile.getContentType(), imageFile.getSize(), getBytesFromMultiPartFile(imageFile));
+        binaryContent = new BinaryContent(
+                imageFile.getName(),
+                imageFile.getContentType(),
+                getBytesFromMultiPartFile(imageFile));
         stubResult = BinaryContentResult.fromEntity(binaryContent);
     }
 

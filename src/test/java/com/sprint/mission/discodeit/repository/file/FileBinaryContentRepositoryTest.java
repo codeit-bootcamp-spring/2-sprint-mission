@@ -30,9 +30,10 @@ class FileBinaryContentRepositoryTest {
     void setUp() {
         binaryContentRepository = new FileBinaryContentRepository(path.resolve(BINARY_FILE));
         MultipartFile imageFile = createMockImageFile("dog.jpg");
-        setUpBinaryContent = new BinaryContent(imageFile.getName(),
+        setUpBinaryContent = new BinaryContent(
+                imageFile.getName(),
                 imageFile.getContentType(),
-                imageFile.getSize(), getBytesFromMultiPartFile(imageFile));
+                getBytesFromMultiPartFile(imageFile));
 
         savedSetUpBinaryContent = binaryContentRepository.save(setUpBinaryContent);
     }

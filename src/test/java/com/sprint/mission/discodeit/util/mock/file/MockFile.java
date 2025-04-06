@@ -13,11 +13,10 @@ public final class MockFile {
     private MockFile() {
     }
 
-    // TODO: 4/4/25 굳이 이미지 파일을 가져올 필요는 없는것 같습니다.
     public static MultipartFile createMockImageFile(String fileName) {
         return new MockMultipartFile(
                 fileName,
-                null,
+                fileName,
                 MediaType.IMAGE_JPEG_VALUE,
                 loadImageFileFromResource(fileName));
     }

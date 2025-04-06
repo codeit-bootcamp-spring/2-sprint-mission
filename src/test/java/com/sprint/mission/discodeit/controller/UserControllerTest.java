@@ -51,7 +51,8 @@ class UserControllerTest {
         assertThat(mockMvc.post()
                 .uri("/api/users")
                 .multipart()
-                .file(new MockMultipartFile("userCreateRequest", null, MediaType.APPLICATION_JSON_VALUE, JsonConvertor.asString(new UserCreateRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword())).getBytes()))
+                .file(new MockMultipartFile("userCreateRequest", null, MediaType.APPLICATION_JSON_VALUE,
+                        JsonConvertor.asString(new UserCreateRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword())).getBytes()))
                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .hasStatusOk()
                 .bodyJson()

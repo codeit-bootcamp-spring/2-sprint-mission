@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.util.FileUtils.getBytesFromMultiPartFile;
 import static com.sprint.mission.discodeit.util.mock.channel.ChannelInfo.CHANNEL_DESCRIPTION;
 import static com.sprint.mission.discodeit.util.mock.channel.ChannelInfo.CHANNEL_NAME;
 import static com.sprint.mission.discodeit.util.mock.file.MockFile.createMockImageFile;
@@ -108,11 +110,13 @@ class MessageServiceTest {
     @DisplayName("메시지를 삭제하면 바이너리 첨부 파일도 삭제됩니다.")
     @Test
     void deleteMessageDeletesAttachments() {
-        MultipartFile file = createMockImageFile("dog.jpg");
-
         MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
                 setUpPublicChannel.getId(), setUpUser.getId());
-        MessageResult message = messageService.create(messageCreateRequest, List.of(file));
+
+        MultipartFile imageFile = createMockImageFile("dog.jpg");
+        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(imageFile.getName(), imageFile.getContentType(), getBytesFromMultiPartFile(imageFile));
+
+        MessageResult message = messageService.create(messageCreateRequest, List.of(binaryContentRequest));
 
         messageService.delete(message.id());
 

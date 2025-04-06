@@ -60,5 +60,4 @@ public class BasicUserStatusService implements UserStatusService {
     public void delete(UUID userStatusId) {
         userStatusRepository.delete(userStatusId);
     }
-
 }

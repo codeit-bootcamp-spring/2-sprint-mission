@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.application.dto.user.UserUpdateRequest;
@@ -27,7 +28,12 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResult> register(@Valid @RequestPart UserCreateRequest userCreateRequest,
                                                @RequestPart(required = false) MultipartFile profileImage) {
-        UserResult user = userService.register(userCreateRequest, profileImage);
+
+        BinaryContentRequest binaryContentRequest = null;
+        if (profileImage != null) {
+            binaryContentRequest = BinaryContentRequest.fromMultipartFile(profileImage);
+        }
+        UserResult user = userService.register(userCreateRequest, binaryContentRequest);
 
         return ResponseEntity.ok(user);
     }
@@ -48,7 +54,12 @@ public class UserController {
     public ResponseEntity<UserResult> updateUser(@PathVariable UUID userId,
                                                  @RequestPart UserUpdateRequest userUpdateRequest,
                                                  @RequestPart(required = false) MultipartFile profileImage) {
-        UserResult updatedUser = userService.update(userId, userUpdateRequest, profileImage);
+
+        BinaryContentRequest binaryContentRequest = null;
+        if (profileImage != null) {
+            binaryContentRequest = BinaryContentRequest.fromMultipartFile(profileImage);
+        }
+        UserResult updatedUser = userService.update(userId, userUpdateRequest, binaryContentRequest);
 
         return ResponseEntity.ok(updatedUser);
     }

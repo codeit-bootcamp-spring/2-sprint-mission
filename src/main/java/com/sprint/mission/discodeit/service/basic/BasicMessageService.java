@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -11,14 +12,12 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
-import static com.sprint.mission.discodeit.util.FileUtils.getBytesFromMultiPartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +29,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageResult create(MessageCreateRequest messageCreateRequest,
-                                List<MultipartFile> files) {
+                                List<BinaryContentRequest> files) {
 
         Channel channel = channelRepository.findByChannelId(messageCreateRequest.channelId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 채널이 존재하지 않습니다."));
@@ -38,10 +37,12 @@ public class BasicMessageService implements MessageService {
         List<UUID> attachmentsIds;
         if (files != null) {
             attachmentsIds = files.stream()
-                    .map(multipartFile -> {
-                        BinaryContent binaryContent = new BinaryContent(multipartFile.getName(),
-                                multipartFile.getContentType(),
-                                multipartFile.getSize(), getBytesFromMultiPartFile(multipartFile));
+                    .map(binaryContentRequest -> {
+                        BinaryContent binaryContent = new BinaryContent(
+                                binaryContentRequest.fileName(),
+                                binaryContentRequest.contentType(),
+                                binaryContentRequest.bytes());
+
                         return binaryContentRepository.save(binaryContent);
                     })
                     .map(BinaryContent::getId)

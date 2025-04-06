@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.application.dto.user.UserUpdateRequest;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.util.FileUtils.getBytesFromMultiPartFile;
 import static com.sprint.mission.discodeit.util.mock.file.MockFile.createMockImageFile;
 import static com.sprint.mission.discodeit.util.mock.user.MockUser.createMockUserRequest;
 import static com.sprint.mission.discodeit.util.mock.user.UserInfo.LOGIN_USER;
@@ -78,11 +80,12 @@ class UserServiceTest {
     @DisplayName("프로필 사진을 저장할 경우, 유저 객체에 ID로 저장한 결과를 반환합니다..")
     @Test
     void register() {
-        MultipartFile imageFile = createMockImageFile("dog.jpg");
         UserCreateRequest mockUserRequest = createMockUserRequest(OTHER_USER.getName(),
                 OTHER_USER.getEmail());
+        MultipartFile imageFile = createMockImageFile("dog.jpg");
+        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(imageFile.getName(), imageFile.getContentType(), getBytesFromMultiPartFile(imageFile));
 
-        UserResult userWithImage = userService.register(mockUserRequest, imageFile);
+        UserResult userWithImage = userService.register(mockUserRequest, binaryContentRequest);
         Optional<BinaryContent> binaryContent = binaryContentRepository.findByBinaryContentId(
                 userWithImage.profileId());
 
@@ -146,7 +149,8 @@ class UserServiceTest {
     @DisplayName("다른 이름으로 업데이트할 경우, 변경된 이름을 반환합니다.")
     @Test
     void updateUserName() {
-        UserResult user = userService.update(setUpUser.id(), new UserUpdateRequest(OTHER_USER.getName(), null, null), null);
+        UserResult user = userService.update(setUpUser.id(),
+                new UserUpdateRequest(OTHER_USER.getName(), null, null), null);
 
         assertThat(user.username()).isEqualTo(OTHER_USER.getName());
     }
@@ -156,10 +160,16 @@ class UserServiceTest {
     void updateProfileImage() {
         UserCreateRequest mockUserRequest = createMockUserRequest(OTHER_USER.getName(),
                 OTHER_USER.getEmail());
-        UserResult user = userService.register(mockUserRequest, createMockImageFile("dog.jpg"));
+        MultipartFile imageFile = createMockImageFile("dog.jpg");
+        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(imageFile.getName(), imageFile.getContentType(), getBytesFromMultiPartFile(imageFile));
+
+        UserResult user = userService.register(mockUserRequest, binaryContentRequest);
 
         MultipartFile otherImageFile = createMockImageFile("Kirby.jpg");
-        UserResult updateProfileUser = userService.update(user.id(), new UserUpdateRequest(null, null, null), otherImageFile);
+        BinaryContentRequest otherBinaryContentRequest = new BinaryContentRequest(imageFile.getName(), imageFile.getContentType(), getBytesFromMultiPartFile(otherImageFile));
+
+        UserResult updateProfileUser = userService.update(user.id(),
+                new UserUpdateRequest(null, null, null), otherBinaryContentRequest);
         Optional<BinaryContent> binaryContent = binaryContentRepository.findByBinaryContentId(
                 updateProfileUser.profileId());
 

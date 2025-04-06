@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,10 @@ public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
     @PostMapping
-    public ResponseEntity<BinaryContentResult> createProfileImage(@RequestPart MultipartFile multipartFile) {
-        BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(
-                multipartFile);
+    public ResponseEntity<BinaryContentResult> create(@RequestPart MultipartFile multipartFile) {
+
+        BinaryContentRequest binaryContentRequest = BinaryContentRequest.fromMultipartFile(multipartFile);
+        BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(binaryContentRequest);
 
         return ResponseEntity.ok(binaryContentResult);
     }

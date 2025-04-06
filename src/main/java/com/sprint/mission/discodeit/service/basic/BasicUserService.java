@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.application.dto.user.UserUpdateRequest;
@@ -13,7 +14,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.List;
@@ -21,7 +21,6 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
-import static com.sprint.mission.discodeit.util.FileUtils.getBytesFromMultiPartFile;
 
 @Slf4j
 @Service
@@ -33,17 +32,16 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public UserResult register(UserCreateRequest userRequest, MultipartFile profileImage) {
+    public UserResult register(UserCreateRequest userRequest, BinaryContentRequest binaryContentRequest) {
         validateDuplicateEmail(userRequest.email());
         validateDuplicateUserName(userRequest.username());
 
         UUID binaryContentId = null;
-        if (profileImage != null) {
+        if (binaryContentRequest != null) {
             BinaryContent binaryContent = new BinaryContent(
-                    profileImage.getName(),
-                    profileImage.getContentType(),
-                    profileImage.getSize(),
-                    getBytesFromMultiPartFile(profileImage));
+                    binaryContentRequest.fileName(),
+                    binaryContentRequest.contentType(),
+                    binaryContentRequest.bytes());
             BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
             binaryContentId = savedBinaryContent.getId();
@@ -110,15 +108,16 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResult update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile profileImage) {
+    public UserResult update(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContentRequest binaryContentRequest) {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         UUID profileImageId = null;
-        if (profileImage != null) {
-            BinaryContent binaryContent = new BinaryContent(profileImage.getName(),
-                    profileImage.getContentType(),
-                    profileImage.getSize(), getBytesFromMultiPartFile(profileImage));
+        if (binaryContentRequest != null) {
+            BinaryContent binaryContent = new BinaryContent(
+                    binaryContentRequest.fileName(),
+                    binaryContentRequest.contentType(),
+                    binaryContentRequest.bytes());
 
             BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
             binaryContentRepository.delete(user.getProfileId());
