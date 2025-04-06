@@ -1,32 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Objects;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
 public class ReadStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private UUID id;
-    private UUID userId;
-    private UUID channelId;
-    private Boolean readStatus;
 
+  private static final long serialVersionUID = 1L;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private UUID userId;
+  private UUID channelId;
+  private Instant lastReadAt;
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        ReadStatus that = (ReadStatus) o;
-        return Objects.equals(id, that.id) && Objects.equals(userId, that.userId);
+  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.userId = userId;
+    this.channelId = channelId;
+    this.lastReadAt = lastReadAt;
+  }
+
+  public void update(Instant newLastReadAt) {
+    boolean anyValueUpdated = false;
+    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = newLastReadAt;
+      anyValueUpdated = true;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, userId);
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 }
