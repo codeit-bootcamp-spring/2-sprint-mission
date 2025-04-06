@@ -14,13 +14,15 @@ public class Channel implements Serializable {
     private final Instant createdAt;
     private Instant updatedAt;
     private String name;
+    private String description;
     private ChannelType type;
 
-    public Channel(ChannelType channelType, String name) {
+    public Channel(ChannelType channelType, String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = ZonedDateTime.now().toInstant();
         this.updatedAt = createdAt;
         this.name = name;
+        this.description = description;
         this.type = channelType;
     }
 

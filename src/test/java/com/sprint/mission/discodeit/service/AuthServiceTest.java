@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 import static com.sprint.mission.discodeit.util.mock.user.UserInfo.LOGIN_USER;
 import static com.sprint.mission.discodeit.util.mock.user.UserInfo.OTHER_USER;
@@ -48,7 +48,7 @@ class AuthServiceTest {
         UserResult user = authService.login(loginRequestUser);
         UserStatus userStatus = userStatusRepository.findByUserId(user.id()).get();
 
-        assertThat(userStatus.isLogin(ZonedDateTime.now().toInstant())).isTrue();
+        assertThat(userStatus.isOnline(Instant.now())).isTrue();
     }
 
     @DisplayName("등록되지 않은 유저로 로그인 시 예외가 발생한다.")

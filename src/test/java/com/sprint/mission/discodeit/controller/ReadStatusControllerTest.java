@@ -40,7 +40,7 @@ class ReadStatusControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .hasStatusOk()
                 .bodyJson()
-                .extractingPath("$.readStatusId")
+                .extractingPath("$.id")
                 .isEqualTo(readStatus.getId().toString());
     }
 
@@ -51,11 +51,11 @@ class ReadStatusControllerTest {
 
         when(readStatusService.updateLastReadTime(any())).thenReturn(stubResult);
 
-        assertThat(mockMvc.put()
-                .uri("/api/readStatuses/{readStatusId}", readStatus.getId()))
+        assertThat(mockMvc.patch()
+                .uri("/api/readStatuses/{id}", readStatus.getId()))
                 .hasStatusOk()
                 .bodyJson()
-                .extractingPath("$.lastReadTime")
+                .extractingPath("$.lastReadAt")
                 .isEqualTo(readStatus.getLastReadTime().toString());
     }
 
@@ -72,14 +72,14 @@ class ReadStatusControllerTest {
                 .queryParam("userId", userId.toString()))
                 .hasStatusOk()
                 .bodyJson()
-                .extractingPath("$[*].readStatusId")
+                .extractingPath("$[*].id")
                 .isEqualTo(List.of(readStatus.getId().toString()));
     }
 
     @Test
     void delete() {
         UUID readStatusId = UUID.randomUUID();
-        assertThat(mockMvc.delete().uri("/api/readStatuses/{readStatusId}", readStatusId))
+        assertThat(mockMvc.delete().uri("/api/readStatuses/{id}", readStatusId))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 }

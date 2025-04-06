@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.util.mock.channel.ChannelInfo.CHANNEL_DESCRIPTION;
 import static com.sprint.mission.discodeit.util.mock.channel.ChannelInfo.CHANNEL_NAME;
 import static com.sprint.mission.discodeit.util.mock.user.UserInfo.LOGIN_USER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +40,7 @@ class ReadStatusServiceTest {
         setUpUser = userRepository.save(
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
         setUpPublicChannel = channelRepository.save(
-                new Channel(ChannelType.PUBLIC, CHANNEL_NAME));
+                new Channel(ChannelType.PUBLIC, CHANNEL_NAME, CHANNEL_DESCRIPTION));
     }
 
     @DisplayName("읽기 상태를 생성하면 해당 읽기 상태 객체가 반환됩니다.")
@@ -49,7 +50,7 @@ class ReadStatusServiceTest {
                 setUpPublicChannel.getId());
         ReadStatusResult readStatus = basicReadStatusService.create(readStatusCreateRequest);
 
-        assertThat(readStatus.readStatusId()).isNotNull();
+        assertThat(readStatus.id()).isNotNull();
     }
 
     @DisplayName("존재하지 않는 유저 ID로 읽기 상태 생성 시 예외를 반환합니다.")

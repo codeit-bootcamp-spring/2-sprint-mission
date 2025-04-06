@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
 import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.application.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -47,18 +48,17 @@ public class ChannelController {
         return ResponseEntity.ok(channelService.getAllByUserId(userId));
     }
 
-    @PutMapping("/public/{channelId}/name")
-    public ResponseEntity<ChannelResult> updatePublicChannelName(@PathVariable UUID channelId, @RequestBody String name) {
-        ChannelResult channelResult = channelService.updatePublicChannelName(channelId, name);
+    @PatchMapping("/{channelId}")
+    public ResponseEntity<ChannelResult> updatePublic(@PathVariable UUID channelId, @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
+        ChannelResult channelResult = channelService.updatePublic(channelId, publicChannelUpdateRequest.newName());
 
         return ResponseEntity.ok(channelResult);
     }
 
     @PostMapping("/private/{channelId}/members")
     public ResponseEntity<ChannelResult> addPrivateChannelMember(@PathVariable UUID channelId, @RequestBody String friendEmail) {
-        log.warn(friendEmail);
         UserResult friend = userService.getByEmail(friendEmail);
-        ChannelResult channelResult = channelService.addPrivateChannelMember(channelId, friend.id());
+        ChannelResult channelResult = channelService.addPrivateMember(channelId, friend.id());
 
         return ResponseEntity.ok(channelResult);
     }

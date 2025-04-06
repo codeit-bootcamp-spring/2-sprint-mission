@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/binary-contents")
+@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
 public class BinaryContentController {
 
@@ -26,23 +26,23 @@ public class BinaryContentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BinaryContentResult>> getByIdIn(@RequestParam(value = "ids") List<UUID> ids) {
-        List<BinaryContentResult> binaryContentResults = binaryContentService.getByIdIn(ids);
+    public ResponseEntity<List<BinaryContentResult>> getByIdIn(@RequestParam(value = "binaryContentIds") List<UUID> binaryContentIds) {
+        List<BinaryContentResult> binaryContentResults = binaryContentService.getByIdIn(binaryContentIds);
 
         return ResponseEntity.ok(binaryContentResults);
     }
 
-    @GetMapping("/{fileId}")
-    public ResponseEntity<BinaryContentResult> getById(@PathVariable UUID fileId) {
-        BinaryContentResult binaryContentResult = binaryContentService.getById(fileId);
+    @GetMapping("/{binaryContentId}")
+    public ResponseEntity<BinaryContentResult> getById(@PathVariable UUID binaryContentId) {
+        BinaryContentResult binaryContentResult = binaryContentService.getById(binaryContentId);
 
         return ResponseEntity.ok()
                 .body(binaryContentResult);
     }
 
-    @DeleteMapping("/{fileId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID fileId) {
-        binaryContentService.delete(fileId);
+    @DeleteMapping("/{binaryContentId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID binaryContentId) {
+        binaryContentService.delete(binaryContentId);
 
         return ResponseEntity.noContent().build();
     }

@@ -12,13 +12,13 @@ public interface ChannelService {
 
     ChannelResult createPrivate(PrivateChannelCreateRequest privateChannelCreateRequest);
 
-    ChannelResult addPrivateChannelMember(UUID channelId, UUID friendId);
+    ChannelResult addPrivateMember(UUID channelId, UUID friendId);
 
     ChannelResult getById(UUID id);
 
     List<ChannelResult> getAllByUserId(UUID userId);
 
-    ChannelResult updatePublicChannelName(UUID id, String name);
+    ChannelResult updatePublic(UUID id, String name);
 
     void delete(UUID channelId);
 }

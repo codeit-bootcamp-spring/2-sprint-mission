@@ -31,7 +31,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResult createPublic(PublicChannelCreateRequest channelRegisterRequest) {
-        Channel channel = new Channel(ChannelType.PUBLIC, channelRegisterRequest.channelName());
+        Channel channel = new Channel(ChannelType.PUBLIC, channelRegisterRequest.name(), channelRegisterRequest.description());
         Channel savedChannel = channelRepository.save(channel);
 
         return ChannelResult.fromPublic(savedChannel, null);
@@ -39,13 +39,10 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResult createPrivate(PrivateChannelCreateRequest privateChannelCreateRequest) {
-        Channel channel = new Channel(ChannelType.PRIVATE, privateChannelCreateRequest.channelName());
+        Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         Channel savedChannel = channelRepository.save(channel);
 
-        // TODO: 4/4/25 중복된 유저 처리필요
-        readStatusRepository.save(
-                new ReadStatus(privateChannelCreateRequest.creatorId(), savedChannel.getId()));
-        for (UUID memberId : privateChannelCreateRequest.memberIds()) {
+        for (UUID memberId : privateChannelCreateRequest.participantIds()) {
             readStatusRepository.save(new ReadStatus(memberId, savedChannel.getId()));
         }
 
@@ -107,7 +104,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResult updatePublicChannelName(UUID id, String name) {
+    public ChannelResult updatePublic(UUID id, String name) {
         Channel channel = channelRepository.findByChannelId(id)
                 .orElseThrow(
                         () -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
@@ -147,14 +144,16 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public ChannelResult addPrivateChannelMember(UUID channelId, UUID friendId) {
+    public ChannelResult addPrivateMember(UUID channelId, UUID friendId) {
         Channel channel = channelRepository.findByChannelId(channelId)
-                .orElseThrow(
-                        () -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
+        readStatusRepository.findByChannelIdAndUserId(channelId, friendId)
+                .ifPresent(readStatus -> {
+                    throw new IllegalArgumentException("해당 Private 채널의 유저가 이미 존재합니다.");
+                });
         readStatusRepository.save(new ReadStatus(friendId, channel.getId()));
-        Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(
-                        channel.getId())
+        Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())
                 .orElse(null);
 
         List<UUID> userId = readStatusRepository.findByChannelId(channel.getId()).stream().toList()

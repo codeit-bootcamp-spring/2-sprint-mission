@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
+import com.sprint.mission.discodeit.application.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
+import com.sprint.mission.discodeit.application.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.util.JsonConvertor;
@@ -31,7 +32,7 @@ class MessageControllerTest {
     private MessageService messageService;
 
     @Test
-    void createMessage() {
+    void create() {
         Message message = new Message(MESSAGE_CONTENT, UUID.randomUUID(), UUID.randomUUID(), List.of());
         MessageResult stubResult = MessageResult.fromEntity(message);
         when(messageService.create(any(), any())).thenReturn(stubResult);
@@ -39,11 +40,12 @@ class MessageControllerTest {
         assertThat(mockMvc.post()
                 .uri("/api/messages")
                 .multipart()
-                .file(new MockMultipartFile("message", null, MediaType.APPLICATION_JSON_VALUE, JsonConvertor.asString(new MessageCreationRequest(MESSAGE_CONTENT, UUID.randomUUID(), UUID.randomUUID())).getBytes()))
+                .file(new MockMultipartFile("messageCreateRequest", null, MediaType.APPLICATION_JSON_VALUE,
+                        JsonConvertor.asString(new MessageCreateRequest(MESSAGE_CONTENT, UUID.randomUUID(), UUID.randomUUID())).getBytes()))
                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .hasStatusOk()
                 .bodyJson()
-                .extractingPath("$.messageId")
+                .extractingPath("$.id")
                 .isEqualTo(message.getId().toString());
     }
 
@@ -60,32 +62,32 @@ class MessageControllerTest {
                 .queryParam("channelId", channelId.toString()))
                 .hasStatusOk()
                 .bodyJson()
-                .extractingPath("$[*].messageId")
+                .extractingPath("$[*].id")
                 .isEqualTo(List.of(message.getId().toString()));
     }
 
     @Test
-    void updateContent() {
+    void updatePublic() {
         Message message = new Message(MESSAGE_CONTENT, UUID.randomUUID(), UUID.randomUUID(), List.of());
         message.updateContext(MESSAGE_CONTENT + "123");
         MessageResult stubResult = MessageResult.fromEntity(message);
 
         when(messageService.updateContext(any(), any())).thenReturn(stubResult);
 
-        assertThat(mockMvc.put()
+        assertThat(mockMvc.patch()
                 .uri("/api/messages/{messageId}", message.getId())
-                .content(JsonConvertor.asString(MESSAGE_CONTENT + "123"))
+                .content(JsonConvertor.asString(new MessageUpdateRequest(MESSAGE_CONTENT + "123")))
                 .contentType(MediaType.APPLICATION_JSON))
                 .hasStatusOk()
                 .bodyJson()
-                .extractingPath("$.context")
+                .extractingPath("$.content")
                 .isEqualTo(MESSAGE_CONTENT + "123");
     }
 
     @Test
     void delete() {
         UUID messageId = UUID.randomUUID();
-        assertThat(mockMvc.delete().uri("/api/messages/{messageId}", messageId))
+        assertThat(mockMvc.delete().uri("/api/messages/{id}", messageId))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 }

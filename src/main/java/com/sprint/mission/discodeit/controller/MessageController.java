@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
+import com.sprint.mission.discodeit.application.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
+import com.sprint.mission.discodeit.application.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +21,11 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping
-    public ResponseEntity<MessageResult> createMessage(
-            @Valid @RequestPart("message") MessageCreationRequest messageCreationRequest,
+    public ResponseEntity<MessageResult> create(
+            @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
-        return ResponseEntity.ok(messageService.create(messageCreationRequest, attachments));
+        return ResponseEntity.ok(messageService.create(messageCreateRequest, attachments));
     }
 
     @GetMapping
@@ -32,11 +33,11 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getAllByChannelId(channelId));
     }
 
-    @PutMapping("/{messageId}")
-    public ResponseEntity<MessageResult> updateContent(@PathVariable UUID messageId,
-                                                       @RequestBody String context) {
+    @PatchMapping("/{messageId}")
+    public ResponseEntity<MessageResult> update(@PathVariable UUID messageId,
+                                                @RequestBody MessageUpdateRequest messageUpdateRequest) {
         return ResponseEntity.ok(
-                messageService.updateContext(messageId, context));
+                messageService.updateContext(messageId, messageUpdateRequest.newContent()));
     }
 
     @DeleteMapping("/{messageId}")

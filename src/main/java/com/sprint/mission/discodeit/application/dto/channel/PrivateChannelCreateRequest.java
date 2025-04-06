@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.application.dto.channel;
 
-import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
 import java.util.UUID;
 
-public record PrivateChannelCreateRequest(@NotNull String channelName, @NotNull UUID creatorId,
-                                          List<UUID> memberIds) {
+public record PrivateChannelCreateRequest(List<UUID> participantIds) {
 }

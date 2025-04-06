@@ -21,8 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.util.mock.channel.ChannelInfo.CHANNEL_NAME;
-import static com.sprint.mission.discodeit.util.mock.channel.ChannelInfo.UPDATED_CHANNEL_NAME;
+import static com.sprint.mission.discodeit.util.mock.channel.ChannelInfo.*;
 import static com.sprint.mission.discodeit.util.mock.message.MessageInfo.MESSAGE_CONTENT;
 import static com.sprint.mission.discodeit.util.mock.user.UserInfo.LOGIN_USER;
 import static com.sprint.mission.discodeit.util.mock.user.UserInfo.OTHER_USER;
@@ -48,8 +47,7 @@ class ChannelServiceTest {
 
         setUpUser = userRepository.save(
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
-        setUpPublicChannel = channelService.createPublic(new PublicChannelCreateRequest(CHANNEL_NAME,
-                setUpUser.getId()));
+        setUpPublicChannel = channelService.createPublic(new PublicChannelCreateRequest(CHANNEL_NAME, CHANNEL_DESCRIPTION));
     }
 
     @DisplayName("Public 채널을 생성할 경우, 저장한 채널 정보를 반환합니다.")
@@ -61,17 +59,16 @@ class ChannelServiceTest {
     @DisplayName("Public 채널을 생성할 경우, 채널내 멤버는 null을 반환합니다.")
     @Test
     void createPublicChannel_NoMember() {
-        assertThat(setUpPublicChannel.privateMemberIds()).isNull();
+        assertThat(setUpPublicChannel.participantIds()).isNull();
     }
 
     @DisplayName("Private 채널을 생성할 경우, 채널 멤버도 반홥합니다.")
     @Test
     void createPrivateChannel() {
-        PrivateChannelCreateRequest privateChannelCreateRequest = new PrivateChannelCreateRequest(
-                CHANNEL_NAME, setUpUser.getId(), List.of());
+        PrivateChannelCreateRequest privateChannelCreateRequest = new PrivateChannelCreateRequest(List.of(setUpUser.getId()));
         ChannelResult privateChannel = channelService.createPrivate(privateChannelCreateRequest);
 
-        assertThat(privateChannel.privateMemberIds()).containsExactlyInAnyOrder(setUpUser.getId());
+        assertThat(privateChannel.participantIds()).containsExactlyInAnyOrder(setUpUser.getId());
     }
 
     @DisplayName("채널 ID로 조회할 경우, 같은 ID를 가진 채널을 반환합니다.")
@@ -91,18 +88,13 @@ class ChannelServiceTest {
 
         ChannelResult channel = channelService.getById(setUpPublicChannel.id());
 
-        assertThat(channel.lastMessageCreatedAt()).isEqualTo(message.getCreatedAt());
+        assertThat(channel.lastMessageAt()).isEqualTo(message.getCreatedAt());
     }
 
     @DisplayName("전체 채널을 조회할 경우, Public 채널과 사용자가 속한 Private 채널만 반환합니다.")
     @Test
     void getAllChannelsForUser() {
-        User otherUser = userRepository.save(
-                new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
-        channelService.createPrivate(
-                new PrivateChannelCreateRequest(CHANNEL_NAME, otherUser.getId(), List.of()));
-        ChannelResult userPrivateChannel = channelService.createPrivate(
-                new PrivateChannelCreateRequest(CHANNEL_NAME, setUpUser.getId(), List.of()));
+        ChannelResult userPrivateChannel = channelService.createPrivate(new PrivateChannelCreateRequest(List.of(setUpUser.getId())));
 
         List<ChannelResult> channels = channelService.getAllByUserId(setUpUser.getId());
 
@@ -115,21 +107,32 @@ class ChannelServiceTest {
     void getByIdPrivateChannel_MemberTogether() {
         User friend = userRepository.save(
                 new User(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword(), null));
-        PrivateChannelCreateRequest privateChannelCreateRequest = new PrivateChannelCreateRequest(
-                CHANNEL_NAME, setUpUser.getId(), List.of());
+        PrivateChannelCreateRequest privateChannelCreateRequest = new PrivateChannelCreateRequest(List.of(setUpUser.getId()));
         ChannelResult privateChannel = channelService.createPrivate(privateChannelCreateRequest);
 
-        ChannelResult addedPrivateChannel = channelService.addPrivateChannelMember(privateChannel.id(),
-                friend.getId());
+        ChannelResult addedPrivateChannel = channelService.addPrivateMember(privateChannel.id(), friend.getId());
 
-        assertThat(addedPrivateChannel.privateMemberIds())
+        assertThat(addedPrivateChannel.participantIds())
                 .containsExactlyInAnyOrder(setUpUser.getId(), friend.getId());
+    }
+
+    @DisplayName("Private 채널에 맴버를 추가할 경우, 해당 Private 채널에 중복된 멤버가 있다면, 예외를 반환합니다.")
+    @Test
+    void getByIdPrivateChannel_MemberTogether_Exception() {
+        User friend = userRepository.save(
+                new User(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword(), null));
+        PrivateChannelCreateRequest privateChannelCreateRequest = new PrivateChannelCreateRequest(List.of(setUpUser.getId(), friend.getId()));
+        ChannelResult privateChannel = channelService.createPrivate(privateChannelCreateRequest);
+
+
+        assertThatThrownBy(() -> channelService.addPrivateMember(privateChannel.id(), friend.getId()))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("Public 채널의 이름을 업데이트할 경우, 변경된 정보가 반환합니다.")
     @Test
     void updatePublicChannelName() {
-        channelService.updatePublicChannelName(setUpPublicChannel.id(), UPDATED_CHANNEL_NAME);
+        channelService.updatePublic(setUpPublicChannel.id(), UPDATED_CHANNEL_NAME);
 
         assertThat(channelService.getById(setUpPublicChannel.id()).name()).isEqualTo(
                 UPDATED_CHANNEL_NAME);
@@ -138,12 +141,11 @@ class ChannelServiceTest {
     @DisplayName("Private 채널의 이름을 업데이트할 경우, 예외를 반환합니다.")
     @Test
     void updatePrivateChannelNameThrowsException() {
-        PrivateChannelCreateRequest privateChannelDto = new PrivateChannelCreateRequest(
-                CHANNEL_NAME, setUpUser.getId(), List.of());
+        PrivateChannelCreateRequest privateChannelDto = new PrivateChannelCreateRequest(List.of());
         ChannelResult privateChannel = channelService.createPrivate(privateChannelDto);
 
         assertThatThrownBy(
-                () -> channelService.updatePublicChannelName(privateChannel.id(), UPDATED_CHANNEL_NAME))
+                () -> channelService.updatePublic(privateChannel.id(), UPDATED_CHANNEL_NAME))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -173,7 +175,7 @@ class ChannelServiceTest {
     @Test
     void deletePrivateChannelRemovesReadStatus() {
         ChannelResult privateChannel = channelService.createPrivate(
-                new PrivateChannelCreateRequest(CHANNEL_NAME, setUpUser.getId(), List.of()));
+                new PrivateChannelCreateRequest(List.of()));
 
         UUID privateChannelId = privateChannel.id();
         channelService.delete(privateChannelId);

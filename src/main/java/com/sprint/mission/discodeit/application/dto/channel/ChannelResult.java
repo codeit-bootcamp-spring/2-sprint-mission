@@ -7,14 +7,20 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record ChannelResult(UUID id, String name, ChannelType type, Instant lastMessageCreatedAt,
-                            List<UUID> privateMemberIds) {
+public record ChannelResult(UUID id, ChannelType type, String name, String description,
+                            Instant lastMessageAt,
+                            List<UUID> participantIds) {
 
     public static ChannelResult fromPrivate(Channel channel, Instant lastMessageCreatedAt, List<UUID> privateMemberIds) {
-        return new ChannelResult(channel.getId(), channel.getName(), channel.getType(), lastMessageCreatedAt, privateMemberIds);
+        return new ChannelResult(channel.getId(),
+                channel.getType(),
+                null,
+                null,
+                lastMessageCreatedAt,
+                privateMemberIds);
     }
 
     public static ChannelResult fromPublic(Channel channel, Instant lastMessageCreatedAt) {
-        return new ChannelResult(channel.getId(), channel.getName(), channel.getType(), lastMessageCreatedAt, null);
+        return new ChannelResult(channel.getId(), channel.getType(), channel.getName(), channel.getDescription(), lastMessageCreatedAt, null);
     }
 }

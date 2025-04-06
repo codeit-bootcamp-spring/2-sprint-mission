@@ -10,15 +10,15 @@
 
 2. 기본 요구사항
 
-- [ ] 스프린트 미션#4에서 구현한 API를 RESTful API로 다시 설계해보세요.
+- [x] 스프린트 미션#4에서 구현한 API를 RESTful API로 다시 설계해보세요.
     - API 스펙을 확인하고 본인이 설계한 API와 비교해보세요.
     - oasdiff를 활용하면 좀 더 수월하게 비교할 수 있어요.
     - API 설계에 정답은 없지만, 이어지는 요구사항과 미션을 원활히 수행하기 위해 제공된 API 스펙에 맞추어 구현해주세요.
     - 특히, 심화 요구사항에서 제공되는 프론트엔드 코드는 제공된 API 스펙을 준수해야 연동할 수 있습니다.
-- [ ] Postman을 활용해 컨트롤러를 테스트 하세요.
+- [x] Postman을 활용해 컨트롤러를 테스트 하세요.
     - Postman API 테스트 결과를 export하여 PR에 첨부해주세요.
-- [ ] springdoc-openapi를 활용하여 Swagger 기반의 API 문서를 생성하세요.
-- [ ] Swagger-UI를 활용해 API를 테스트해보세요.
+- [x] springdoc-openapi를 활용하여 Swagger 기반의 API 문서를 생성하세요.
+- [x] Swagger-UI를 활용해 API를 테스트해보세요.
 
 3. 심화 요구사항
 

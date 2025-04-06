@@ -9,10 +9,6 @@ import java.util.UUID;
 public interface ReadStatusService {
     ReadStatusResult create(ReadStatusCreateRequest request);
 
-    List<ReadStatusResult> getByChannelId(UUID channelId);
-
-    ReadStatusResult getByReadStatusId(UUID readStatusId);
-
     List<ReadStatusResult> getAllByUserId(UUID userId);
 
     ReadStatusResult updateLastReadTime(UUID readStatusId);

@@ -28,14 +28,28 @@ public class User implements Serializable {
         this.profileId = profileId;
     }
 
-    public void updateName(String name) {
-        this.name = name;
-        updateLastModified();
-    }
+    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.name)) {
+            this.name = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
+            anyValueUpdated = true;
+        }
 
-    public void updateProfileImage(UUID profileId) {
-        this.profileId = profileId;
-        updateLastModified();
+        if (anyValueUpdated) {
+            this.updatedAt = ZonedDateTime.now().toInstant();
+        }
     }
 
     public boolean isSameName(String name) {
@@ -48,9 +62,5 @@ public class User implements Serializable {
 
     public boolean isSamePassword(String password) {
         return this.password.equals(password);
-    }
-
-    private void updateLastModified() {
-        this.updatedAt = ZonedDateTime.now().toInstant();
     }
 }

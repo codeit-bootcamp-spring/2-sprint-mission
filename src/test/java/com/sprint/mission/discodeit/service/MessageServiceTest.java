@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.application.dto.message.MessageCreationRequest;
+import com.sprint.mission.discodeit.application.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.util.mock.channel.ChannelInfo.CHANNEL_DESCRIPTION;
 import static com.sprint.mission.discodeit.util.mock.channel.ChannelInfo.CHANNEL_NAME;
 import static com.sprint.mission.discodeit.util.mock.file.MockFile.createMockImageFile;
 import static com.sprint.mission.discodeit.util.mock.message.MessageInfo.MESSAGE_CONTENT;
@@ -46,41 +47,41 @@ class MessageServiceTest {
 
         setUpUser = userRepository.save(
                 new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null));
-        setUpPublicChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, CHANNEL_NAME));
+        setUpPublicChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, CHANNEL_NAME, CHANNEL_DESCRIPTION));
         setUpMessage = messageService.create(
-                new MessageCreationRequest(MESSAGE_CONTENT, setUpPublicChannel.getId(), setUpUser.getId()),
+                new MessageCreateRequest(MESSAGE_CONTENT, setUpPublicChannel.getId(), setUpUser.getId()),
                 List.of());
     }
 
     @DisplayName("메시지를 생성한다면 생성된 메세지를 반환합니다")
     @Test
     void createMessage() {
-        assertThat(setUpMessage.context()).isEqualTo(MESSAGE_CONTENT);
+        assertThat(setUpMessage.content()).isEqualTo(MESSAGE_CONTENT);
     }
 
     @Test
     @DisplayName("현재 존재하지 않는 채널에 메세지를 생성하려고 시도한다면 예외를 반환합니다.")
     void createMessage_Exception() {
-        MessageCreationRequest messageCreationRequest = new MessageCreationRequest(MESSAGE_CONTENT,
+        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
                 UUID.randomUUID(), setUpUser.getId());
 
-        assertThatThrownBy(() -> messageService.create(messageCreationRequest, List.of()))
+        assertThatThrownBy(() -> messageService.create(messageCreateRequest, List.of()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메시지 ID로 조회한다면 ID에 해당하는 메시지를 반환합니다.")
     @Test
     void getMessageById() {
-        MessageResult message = messageService.getById(setUpMessage.messageId());
+        MessageResult message = messageService.getById(setUpMessage.id());
 
-        assertThat(message.context()).isEqualTo(MESSAGE_CONTENT);
+        assertThat(message.content()).isEqualTo(MESSAGE_CONTENT);
     }
 
     @DisplayName("채널 ID로 메시지들을 조회하면 생성 순서대로 반환합니다.")
     @Test
     void getAllMessagesByChannelId() {
         MessageResult messageResult = messageService.create(
-                new MessageCreationRequest(MESSAGE_CONTENT, setUpPublicChannel.getId(), setUpUser.getId()),
+                new MessageCreateRequest(MESSAGE_CONTENT, setUpPublicChannel.getId(), setUpUser.getId()),
                 List.of());
         List<MessageResult> messages = messageService.getAllByChannelId(setUpPublicChannel.getId());
 
@@ -90,17 +91,17 @@ class MessageServiceTest {
     @DisplayName("메시지 내용을 수정하면 변경된 내용이 반환됩니다.")
     @Test
     void updateMessageContent() {
-        MessageResult message = messageService.updateContext(setUpMessage.messageId(),
+        MessageResult message = messageService.updateContext(setUpMessage.id(),
                 MESSAGE_CONTENT + "123");
 
-        assertThat(message.context()).isEqualTo(MESSAGE_CONTENT + "123");
+        assertThat(message.content()).isEqualTo(MESSAGE_CONTENT + "123");
     }
 
     @DisplayName("메시지를 삭제한 후 조회하면 예외가 발생한다.")
     @Test
     void deleteMessage() {
-        messageService.delete(setUpMessage.messageId());
-        assertThatThrownBy(() -> messageService.getById(setUpMessage.messageId()))
+        messageService.delete(setUpMessage.id());
+        assertThatThrownBy(() -> messageService.getById(setUpMessage.id()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -109,11 +110,11 @@ class MessageServiceTest {
     void deleteMessageDeletesAttachments() {
         MultipartFile file = createMockImageFile("dog.jpg");
 
-        MessageCreationRequest messageCreationRequest = new MessageCreationRequest(MESSAGE_CONTENT,
+        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
                 setUpPublicChannel.getId(), setUpUser.getId());
-        MessageResult message = messageService.create(messageCreationRequest, List.of(file));
+        MessageResult message = messageService.create(messageCreateRequest, List.of(file));
 
-        messageService.delete(message.messageId());
+        messageService.delete(message.id());
 
         assertThat(
                 binaryContentRepository.findByBinaryContentId(message.attachmentIds().get(0))).isEmpty();

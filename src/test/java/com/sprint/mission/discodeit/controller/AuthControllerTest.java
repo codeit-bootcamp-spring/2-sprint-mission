@@ -33,12 +33,12 @@ class AuthControllerTest {
         when(authService.login(any())).thenReturn(stubResult);
 
         assertThat(mockMvc.post()
-                .uri("/api/login")
+                .uri("/api/auth/login")
                 .content(JsonConvertor.asString(new LoginRequest(LOGIN_USER.getName(), LOGIN_USER.getPassword())))
                 .contentType(MediaType.APPLICATION_JSON))
                 .hasStatusOk()
                 .bodyJson()
-                .extractingPath("$.isLogin")
+                .extractingPath("$.online")
                 .isEqualTo(true);
     }
 }

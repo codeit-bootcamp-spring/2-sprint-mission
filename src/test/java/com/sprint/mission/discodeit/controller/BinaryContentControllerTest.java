@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +48,7 @@ class BinaryContentControllerTest {
         when(binaryContentService.createProfileImage(any())).thenReturn(stubResult);
 
         assertThat(mockMvc.post()
-                .uri("/api/binary-contents")
+                .uri("/api/binaryContents")
                 .multipart()
                 .file("multipartFile", createMockImageFile(IMAGE_NAME_DOG).getBytes()))
                 .hasStatusOk()
@@ -60,7 +61,7 @@ class BinaryContentControllerTest {
     void getById() {
         when(binaryContentService.getById(any())).thenReturn(stubResult);
 
-        assertThat(mockMvc.get().uri("/api/binary-contents/{fileId}", binaryContent.getId()))
+        assertThat(mockMvc.get().uri("/api/binaryContents/{binaryContentId}", binaryContent.getId()))
                 .hasStatusOk()
                 .bodyJson()
                 .extractingPath("$.id")
@@ -72,16 +73,17 @@ class BinaryContentControllerTest {
         MultipartFile imageFile = createMockImageFile(IMAGE_NAME_KIRBY);
         UUID otherBinaryContentId = UUID.randomUUID();
         BinaryContentResult otherStubResult = new BinaryContentResult(otherBinaryContentId,
+                Instant.now(),
                 imageFile.getName(),
-                imageFile.getContentType(), imageFile.getSize(),
+                imageFile.getContentType(),
                 getBytesFromMultiPartFile(imageFile));
 
         when(binaryContentService.getByIdIn(any())).thenReturn(List.of(otherStubResult, stubResult));
 
 
         assertThat(mockMvc.get()
-                .uri("/api/binary-contents")
-                .queryParam("ids", binaryContent.getId().toString(), otherBinaryContentId.toString()))
+                .uri("/api/binaryContents")
+                .queryParam("binaryContentIds", binaryContent.getId().toString(), otherBinaryContentId.toString()))
                 .hasStatusOk()
                 .bodyJson()
                 .extractingPath("$[*].id")
@@ -92,7 +94,7 @@ class BinaryContentControllerTest {
     @Test
     void delete() {
         UUID fileId = UUID.randomUUID();
-        assertThat(mockMvc.delete().uri("/api/binary-contents/{fileId}", fileId))
+        assertThat(mockMvc.delete().uri("/api/binaryContents/{binaryContentId}", fileId))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 }

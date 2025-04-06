@@ -1,6 +1,6 @@
 discodeit:
   repository:
-    type: file   # jcf | file
+    type: file  # jcf | file
     file-directory:
       binary-content-path: filestorage/binary-content.ser
       channel-path: filestorage/channel.ser

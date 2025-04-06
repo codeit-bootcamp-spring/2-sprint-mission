@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.application.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
+import com.sprint.mission.discodeit.application.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -105,7 +107,7 @@ class UserServiceTest {
                 OTHER_USER.getEmail());
         UserResult user = userService.register(mockUserRequest, null);
 
-        assertThat(user.isLogin()).isFalse();
+        assertThat(user.online()).isTrue();
     }
 
     @DisplayName("유저 조회 시 등록되지않은 ID로 조회한다면 예외를 반환합니다.")
@@ -130,15 +132,23 @@ class UserServiceTest {
     void getByNameReturnsUser() {
         UserResult user = userService.getByName(LOGIN_USER.getName());
 
-        assertThat(user.name()).isEqualTo(LOGIN_USER.getName());
+        assertThat(user.username()).isEqualTo(LOGIN_USER.getName());
+    }
+
+    @DisplayName("등록된 전체 유저를 가져옵니다.")
+    @Test
+    void getALL() {
+        List<UserResult> user = userService.getAll();
+        assertThat(user).extracting(UserResult::online)
+                .containsExactlyInAnyOrder(true);
     }
 
     @DisplayName("다른 이름으로 업데이트할 경우, 변경된 이름을 반환합니다.")
     @Test
     void updateUserName() {
-        UserResult user = userService.updateName(setUpUser.id(), OTHER_USER.getName());
+        UserResult user = userService.update(setUpUser.id(), new UserUpdateRequest(OTHER_USER.getName(), null, null), null);
 
-        assertThat(user.name()).isEqualTo(OTHER_USER.getName());
+        assertThat(user.username()).isEqualTo(OTHER_USER.getName());
     }
 
     @DisplayName("유저 프로필 이미지를 업데이트할 경우, 변경된 이미지를 반환하고 이전 이미지는 삭제합니다.")
@@ -149,7 +159,7 @@ class UserServiceTest {
         UserResult user = userService.register(mockUserRequest, createMockImageFile("dog.jpg"));
 
         MultipartFile otherImageFile = createMockImageFile("Kirby.jpg");
-        UserResult updateProfileUser = userService.updateProfileImage(user.id(), otherImageFile);
+        UserResult updateProfileUser = userService.update(user.id(), new UserUpdateRequest(null, null, null), otherImageFile);
         Optional<BinaryContent> binaryContent = binaryContentRepository.findByBinaryContentId(
                 updateProfileUser.profileId());
 
@@ -159,7 +169,6 @@ class UserServiceTest {
                 () -> assertThat(binaryContentRepository.findByBinaryContentId(user.profileId())).isEmpty()
         );
     }
-
 
     @DisplayName("유저가 삭제할 경우, 연관된 유저 상태와 유저 프로필 이미지도 삭제됩니다.")
     @Test

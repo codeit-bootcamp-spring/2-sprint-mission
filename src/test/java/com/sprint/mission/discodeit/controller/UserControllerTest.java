@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.application.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.application.dto.user.UserResult;
+import com.sprint.mission.discodeit.application.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusResult;
+import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
@@ -18,6 +20,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,7 +51,7 @@ class UserControllerTest {
         assertThat(mockMvc.post()
                 .uri("/api/users")
                 .multipart()
-                .file(new MockMultipartFile("userRequest", null, MediaType.APPLICATION_JSON_VALUE, JsonConvertor.asString(new UserCreateRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword())).getBytes()))
+                .file(new MockMultipartFile("userCreateRequest", null, MediaType.APPLICATION_JSON_VALUE, JsonConvertor.asString(new UserCreateRequest(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword())).getBytes()))
                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .hasStatusOk()
                 .bodyJson()
@@ -64,8 +67,8 @@ class UserControllerTest {
         when(userService.getById(any())).thenReturn(stubResult);
 
         assertThat(mockMvc.get()
-                .uri("/api/users/{userId}", user.getId())
-                .queryParam("userId", user.getId().toString()))
+                .uri("/api/users/{authorId}", user.getId())
+                .queryParam("authorId", user.getId().toString()))
                 .hasStatusOk()
                 .bodyJson()
                 .extractingPath("$.id")
@@ -91,19 +94,20 @@ class UserControllerTest {
 
     @Test
     void updateUserName() {
-        User user = new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null);
-        user.updateName(OTHER_USER.getName());
+        User user = new User(OTHER_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), null);
         UserResult stubResult = UserResult.fromEntity(user, false);
 
-        when(userService.updateName(any(), any())).thenReturn(stubResult);
+        when(userService.update(any(), any(), any())).thenReturn(stubResult);
 
-        assertThat(mockMvc.put()
+        assertThat(mockMvc.patch()
                 .uri("/api/users/{userId}", user.getId())
-                .content(JsonConvertor.asString(new UserCreateRequest(OTHER_USER.getName(), OTHER_USER.getEmail(), OTHER_USER.getPassword())))
-                .contentType(MediaType.APPLICATION_JSON))
+                .multipart()
+                .file(new MockMultipartFile("userUpdateRequest", null, MediaType.APPLICATION_JSON_VALUE,
+                        JsonConvertor.asString(new UserUpdateRequest(OTHER_USER.getName(), null, null)).getBytes()))
+                .contentType(MediaType.MULTIPART_FORM_DATA))
                 .hasStatusOk()
                 .bodyJson()
-                .extractingPath("$.name")
+                .extractingPath("$.username")
                 .isEqualTo(OTHER_USER.getName());
     }
 
@@ -111,15 +115,17 @@ class UserControllerTest {
     void updateProfileImage() throws IOException {
         UUID profileId = UUID.randomUUID();
         User user = new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), profileId);
-        user.updateName(OTHER_USER.getName());
         UserResult stubResult = UserResult.fromEntity(user, false);
 
-        when(userService.updateProfileImage(any(), any())).thenReturn(stubResult);
+        when(userService.update(any(), any(), any())).thenReturn(stubResult);
 
-        assertThat(mockMvc.put()
-                .uri("/api/users/{userId}/profile-image", user.getId())
+        assertThat(mockMvc.patch()
+                .uri("/api/users/{userId}", user.getId())
                 .multipart()
-                .file("profileImage", createMockImageFile(IMAGE_NAME_DOG).getBytes()))
+                .file(new MockMultipartFile("userUpdateRequest", null, MediaType.APPLICATION_JSON_VALUE,
+                        JsonConvertor.asString(new UserUpdateRequest(null, null, null)).getBytes()))
+                .file("profileImage", createMockImageFile(IMAGE_NAME_DOG).getBytes())
+                .contentType(MediaType.MULTIPART_FORM_DATA))
                 .hasStatusOk()
                 .bodyJson()
                 .extractingPath("$.profileId")
@@ -129,23 +135,25 @@ class UserControllerTest {
     @Test
     void updateOnlineStatus() {
         User user = new User(LOGIN_USER.getName(), LOGIN_USER.getEmail(), LOGIN_USER.getPassword(), UUID.randomUUID());
-        UserStatus userStatus = new UserStatus(user.getId());
+        UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
         UserStatusResult stubResult = UserStatusResult.fromEntity(userStatus, true);
 
-        when(userStatusService.updateByUserId(any())).thenReturn(stubResult);
+        when(userStatusService.updateByUserId(any(), any())).thenReturn(stubResult);
 
-        assertThat(mockMvc.put()
-                .uri("/api/users/{userId}/status", user.getId()))
+        assertThat(mockMvc.patch()
+                .uri("/api/users/{userId}/userStatus", user.getId())
+                .content(JsonConvertor.asString(new UserStatusUpdateRequest(Instant.now())))
+                .contentType(MediaType.APPLICATION_JSON))
                 .hasStatusOk()
                 .bodyJson()
-                .extractingPath("$.isLogin")
+                .extractingPath("$.online")
                 .isEqualTo(true);
     }
 
     @Test
     void delete() {
         UUID userId = UUID.randomUUID();
-        assertThat(mockMvc.delete().uri("/api/users/{userId}", userId))
+        assertThat(mockMvc.delete().uri("/api/users/{authorId}", userId))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 }

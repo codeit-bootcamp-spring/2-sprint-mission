@@ -15,23 +15,23 @@ class UserStatusTest {
 
     @BeforeEach
     void setUp() {
-        userStatus = new UserStatus(UUID.randomUUID());
-        userStatus.updateLastLoginAt();
+        userStatus = new UserStatus(UUID.randomUUID(), Instant.now());
+        userStatus.updateLastActiveAt(Instant.now());
     }
 
-    @DisplayName("로그인후 제한시간이내에 로그아웃 하지않으면 로그인 상태로 변경합니다.")
+    @DisplayName("로그인한 경우, 로그인 상태로 변경합니다.")
     @Test
     void isLogin() {
-        assertThat(userStatus.isLogin(Instant.now())).isTrue();
+        assertThat(userStatus.isOnline(Instant.now())).isTrue();
     }
 
-    @DisplayName("로그아웃 이후로 5분내에 로그인한 기록이 없으면 로그아웃 처리합니다.")
+    @DisplayName("로그아웃 5분이 지날 경우, 로그아웃 처리합니다.")
     @Test
     void isLogout() {
         Instant instant = ZonedDateTime.now()
                 .plusNanos(5L * 60 * 1_000_000_000 + 1_000_000)
                 .toInstant();
 
-        assertThat(userStatus.isLogin(instant)).isFalse();
+        assertThat(userStatus.isOnline(instant)).isFalse();
     }
 }
