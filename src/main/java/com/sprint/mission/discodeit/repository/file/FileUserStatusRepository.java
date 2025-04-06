@@ -38,7 +38,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     public void serialize(UserStatus userStatus) {
-        Path path = getFilePath(userStatus.getUserStatusId());
+        Path path = getFilePath(userStatus.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)

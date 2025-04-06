@@ -14,26 +14,26 @@ public class User implements Serializable {
     private Instant createdAt;
     private Instant updatedAt;
 
-    private String userName;
+    private String username;
     private String email;
     private String password;
     private UUID profileId;
 
-    public User(String userName, String email, String password, UUID profileId) {
+    public User(String username, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
-        this.userName = userName;
+        this.username = username;
         this.email = email;
         this.password = password;
         this.profileId = profileId;
 
     }
 
-    public void updateUser(String newUserName, String newEmail, String newPassword, UUID newProfileId) {
+    public void updateUser(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
         boolean anyValueUpdated = false;
-        if (newUserName != null && !newUserName.equals(this.userName)) {
-            this.userName = newUserName;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
             anyValueUpdated = true;
         }
         if (newEmail != null && !newEmail.equals(this.email)) {
@@ -55,6 +55,6 @@ public class User implements Serializable {
     }
 
     public String toString() {
-        return "[ userID: " + getId() + "userName: " + getUserName() + " ]";
+        return "[ userID: " + getId() + "userName: " + getUsername() + " ]";
     }
 }

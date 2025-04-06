@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDTO;
-import com.sprint.mission.discodeit.dto.message.CreateMessageDTO;
-import com.sprint.mission.discodeit.dto.message.UpdateMessageDTO;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -27,9 +27,9 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message createMessage(CreateMessageDTO dto, List<BinaryContentDTO> binaryContentDto) {
-        UUID channelId = dto.channelId();
-        UUID userId = dto.userId();
+    public Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+        UUID channelId = messageCreateRequest.channelId();
+        UUID userId = messageCreateRequest.authorId();
 
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("존재하지 않는 사용자 입니다. 메세지를 생성할 수 없습니다.");
@@ -38,7 +38,7 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("존재하지 않는 채널 입니다. 메세지를 생성할 수 없습니다.");
         }
 
-        List<UUID> attachmentIds = binaryContentDto.stream()
+        List<UUID> attachmentIds = binaryContentCreateRequests.stream()
                 .map(attachmentRequest -> {
                     String fileName = attachmentRequest.fileName();
                     String contentType = attachmentRequest.contentType();
@@ -50,7 +50,7 @@ public class BasicMessageService implements MessageService {
                 })
                 .toList();
 
-        String content = dto.text();
+        String content = messageCreateRequest.content();
         Message message = new Message(
                 content,
                 userId,
@@ -67,14 +67,14 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> searchAllByChannelId(UUID channelId) {
+    public List<Message> findAllByChannelId(UUID channelId) {
         return messageRepository.findAllByChannelId(channelId).stream()
                 .toList();
     }
 
     @Override
-    public Message updateMessage(UUID messageId, UpdateMessageDTO dto) {
-        String newText = dto.text();
+    public Message updateMessage(UUID messageId, MessageUpdateRequest dto) {
+        String newText = dto.newContent();
         Message message = getMessage(messageId);
         message.updateText(newText);
         return messageRepository.save(message);

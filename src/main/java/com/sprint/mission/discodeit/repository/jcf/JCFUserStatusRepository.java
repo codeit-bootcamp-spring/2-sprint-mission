@@ -19,7 +19,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public UserStatus saveUserStatus(UserStatus userStatus) {
-        this.userStatusData.put(userStatus.getUserStatusId(), userStatus);
+        this.userStatusData.put(userStatus.getId(), userStatus);
         return userStatus;
     }
 
@@ -53,6 +53,6 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public void deleteByUserId(UUID userId) {
         this.findByUserId(userId)
-                .ifPresent(userStatus -> this.deleteById(userStatus.getUserStatusId()));
+                .ifPresent(userStatus -> this.deleteById(userStatus.getId()));
     }
 }

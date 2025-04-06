@@ -3,13 +3,13 @@ package com.sprint.mission.discodeit.dto.user;
 import java.time.Instant;
 import java.util.UUID;
 
-public record UserResponseDTO(
-        UUID userId,
+public record UserDto(
+        UUID id,
         Instant createdAt,
         Instant updatedAt,
-        String userName,
+        String username,
         String email,
-        UUID profiledId,
-        Boolean isOnline
+        UUID profileId,
+        boolean online
 ) {
 }

@@ -6,12 +6,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record ChannelResponseDTO(
-        UUID channelId,
+public record ChannelDto(
+        UUID id,
         ChannelType type,
-        String channelName,
+        String name,
         String description,
-        List<UUID> participants,
+        List<UUID> participantIds,
         Instant lastMessageAt
 ) {
 }

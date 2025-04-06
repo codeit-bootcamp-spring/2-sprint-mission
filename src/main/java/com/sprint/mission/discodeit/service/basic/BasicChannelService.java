@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDTO;
-import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDTO;
-import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelDTO;
-import com.sprint.mission.discodeit.dto.channel.UpdateChannelDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -26,11 +26,11 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
 
     @Override
-    public Channel createPrivateChannel(CreatePrivateChannelDTO dto) {
+    public Channel create(PrivateChannelCreateRequest request) {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         Channel newChannel = channelRepository.save(channel);
 
-        dto.participantIds().stream()
+        request.participantIds().stream()
                 .map(userId -> new ReadStatus(userId, newChannel.getId(), Instant.MIN))
                 .forEach(readStatusRepository::save);
 
@@ -38,23 +38,23 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createPublicChannel(CreatePublicChannelDTO dto) {
-        String channelName = dto.channelName();
-        String description = dto.description();
+    public Channel create(PublicChannelCreateRequest request) {
+        String channelName = request.name();
+        String description = request.description();
         Channel newChannel = new Channel(ChannelType.PUBLIC, channelName, description);
 
         return channelRepository.save(newChannel);
     }
 
     @Override
-    public ChannelResponseDTO searchChannel(UUID channelId) {
+    public ChannelDto searchChannel(UUID channelId) {
         return channelRepository.findById(channelId)
                 .map(this::toDto)
                 .orElseThrow(() -> new RuntimeException("Channel with id" + channelId + " not found"));
     }
 
     @Override
-    public List<ChannelResponseDTO> searchAllByUserId(UUID userId) {
+    public List<ChannelDto> findAllChannelsByUserId(UUID userId) {
         List<UUID> mySubsribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
                 .map(ReadStatus::getChannelId)
                 .toList();
@@ -68,9 +68,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannel(UUID channelId, UpdateChannelDTO dto) {
-        String newName = dto.channelName();
-        String newDescription = dto.description();
+    public Channel updateChannel(UUID channelId, PublicChannelUpdateRequest dto) {
+        String newName = dto.newName();
+        String newDescription = dto.newDescription();
         Channel channel = getChannel(channelId);
 
         if (channel.getType() == ChannelType.PRIVATE) {
@@ -91,7 +91,7 @@ public class BasicChannelService implements ChannelService {
         channelRepository.deleteById(channelId);
     }
 
-    private ChannelResponseDTO toDto(Channel channel) {
+    private ChannelDto toDto(Channel channel) {
         Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId())
                 .stream()
                 .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
@@ -107,10 +107,10 @@ public class BasicChannelService implements ChannelService {
                     .map(ReadStatus::getUserId)
                     .forEach(participantIds::add);
         }
-        return new ChannelResponseDTO(
+        return new ChannelDto(
                 channel.getId(),
                 channel.getType(),
-                channel.getChannelName(),
+                channel.getName(),
                 channel.getDescription(),
                 participantIds,
                 lastMessageAt

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusDTO;
-import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusDTO;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -23,9 +23,9 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatus create(CreateReadStatusDTO dto) {
-        UUID userId = dto.userId();
-        UUID channelId = dto.channelId();
+    public ReadStatus create(ReadStatusCreateRequest request) {
+        UUID userId = request.userId();
+        UUID channelId = request.channelId();
 
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("사용자를 찾을 수 없습니다.");
@@ -38,7 +38,7 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new IllegalArgumentException("ReadStatus with userId " + userId + " and channelId " + channelId + " already exists");
         }
 
-        Instant readAt = dto.readAt();
+        Instant readAt = request.lastReadAt();
         ReadStatus readStatus = new ReadStatus(userId, channelId, readAt);
         return readStatusRepository.save(readStatus);
     }
@@ -55,8 +55,8 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(UUID readStatusId, UpdateReadStatusDTO dto) {
-        Instant newReadAt = dto.readAt();
+    public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest dto) {
+        Instant newReadAt = dto.newLastReadAt();
         ReadStatus readStatus = getReadStatus(readStatusId);
         readStatus.updateReadAt(newReadAt);
 
@@ -64,8 +64,8 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus updateByChannelIdAndUserId(UUID userId, UUID channelId, UpdateReadStatusDTO dto) {
-        Instant newReadAt = dto.readAt();
+    public ReadStatus updateByChannelIdAndUserId(UUID userId, UUID channelId, ReadStatusUpdateRequest dto) {
+        Instant newReadAt = dto.newLastReadAt();
         ReadStatus readStatus = readStatusRepository.findAllByUserId(userId).stream()
                 .filter(status -> status.getChannelId().equals(channelId))
                 .findFirst()

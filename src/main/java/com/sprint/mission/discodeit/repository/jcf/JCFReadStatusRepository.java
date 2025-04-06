@@ -18,7 +18,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        this.readStatusData.put(readStatus.getReadStatusId(), readStatus);
+        this.readStatusData.put(readStatus.getId(), readStatus);
         return readStatus;
     }
 
@@ -54,6 +54,6 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     @Override
     public void deleteAllByChannelId(UUID channelId) {
         this.findAllByChannelId(channelId)
-                .forEach(readStatus -> this.deleteById(readStatus.getReadStatusId()));
+                .forEach(readStatus -> this.deleteById(readStatus.getId()));
     }
 }
