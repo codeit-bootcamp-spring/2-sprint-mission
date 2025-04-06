@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.readStatus;
 
 import java.time.Instant;
 import lombok.Data;
@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 public class UpdateReadStatusRequest {
 
-  private Instant lastActiveAt;
+  private Instant newLastReadAt;
 }

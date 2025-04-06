@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.LoginRequest;
-import com.sprint.mission.discodeit.dto.LoginResponse;
-import com.sprint.mission.discodeit.dto.RegisterResponse;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.jwt.JwtUtil;
@@ -25,7 +23,7 @@ public class BasicAuthService implements AuthService {
   private final JwtUtil jwtUtil;
 
   @Override
-  public RegisterResponse register(CreateUserRequest request) {
+  public User register(CreateUserRequest request) {
     String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
 
     if (userRepository.existsByEmail(request.getEmail())) {
@@ -39,15 +37,17 @@ public class BasicAuthService implements AuthService {
     userRepository.addUser(user);
     userStatusRepository.addUserStatus(new UserStatus(user.getId(), Instant.now()));
 
-    return RegisterResponse.builder()
-        .userId(user.getId())
-        .success(true)
-        .message("회원 가입이 완료되었습니다.")
-        .build();
+    return user;
+
+//    return RegisterResponse.builder()
+//        .userId(user.getId())
+//        .success(true)
+//        .message("회원 가입이 완료되었습니다.")
+//        .build();
   }
 
   @Override
-  public LoginResponse login(LoginRequest request) {
+  public User login(LoginRequest request) {
     User user = userRepository.findUserByName(request.getUsername())
         .orElseThrow(NoSuchElementException::new);
     if (user == null) {
@@ -60,15 +60,15 @@ public class BasicAuthService implements AuthService {
     }
 
     userStatusRepository.findUserStatusById(user.getId())
-        .ifPresent(status -> status.updateLastActiveAt());
+        .ifPresent(UserStatus::updateLastActiveAt);
     userStatusRepository.save();
 
-    String token = jwtUtil.generateToken(user.getId().toString());
+    return user;
 
-    return LoginResponse.builder()
-        .success(true)
-        .message("성공적으로 로그인 되었습니다.")
-        .token(token)
-        .build();
+//    return LoginResponse.builder()
+//        .success(true)
+//        .message("성공적으로 로그인 되었습니다.")
+//        .token(token)
+//        .build();
   }
 }

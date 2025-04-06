@@ -5,9 +5,11 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.Setter;
 
 
 @Getter
+@Setter
 public class UserStatus extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;

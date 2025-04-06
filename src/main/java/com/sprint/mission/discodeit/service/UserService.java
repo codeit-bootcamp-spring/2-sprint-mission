@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.UserInfoDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UserInfoDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
@@ -24,9 +24,9 @@ public interface UserService {
 
   List<UserInfoDto> getAllUsers();   //모든 유저 조회
 
-  void updateProfile(UUID userId, UUID profileId);
+  User updateProfile(UUID userId, UUID profileId);
 
-  void updateUser(UUID userId, UpdateUserRequest request);
+  User updateUser(UUID userId, UpdateUserRequest request);
 
   void deleteUser(UUID userId);   //유저 삭제 (UUID 기반)
 

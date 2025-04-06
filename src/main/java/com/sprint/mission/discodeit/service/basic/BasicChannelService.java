@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ChannelInfoDto;
-import com.sprint.mission.discodeit.dto.CreatePrivateChannelRequest;
-import com.sprint.mission.discodeit.dto.CreatePublicChannelRequest;
-import com.sprint.mission.discodeit.dto.UpdateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.ChannelInfoDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -39,7 +39,7 @@ public class BasicChannelService implements ChannelService {
   public Channel createPrivateChannel(CreatePrivateChannelRequest request) {
     Channel channel = new Channel(ChannelType.PRIVATE, "", "");
     UUID channelId = channel.getId();
-    request.getUsers().forEach(userId -> {
+    request.getParticipantIds().forEach(userId -> {
       if (!userRepository.existsById(userId)) {
         throw new IllegalArgumentException("User " + userId + " 는 존재하지 않습니다.");
       }
@@ -51,7 +51,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel createPublicChannel(CreatePublicChannelRequest request) {
-    Channel channel = new Channel(ChannelType.PUBLIC, request.getChannelName(),
+    Channel channel = new Channel(ChannelType.PUBLIC, request.getName(),
         request.getDescription());
     channelRepository.addChannel(channel);
     return channel;
@@ -66,7 +66,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public String findChannelNameById(UUID channelId) {
-    return findChannelById(channelId).getChannelName();
+    return findChannelById(channelId).getName();
   }
 
   @Override
@@ -104,21 +104,23 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public void updateChannel(UUID channelId, UpdateChannelRequest request) {
+  public Channel updateChannel(UUID channelId, UpdateChannelRequest request) {
     Channel channel = findChannelById(channelId);
 
     if (channel.getType() == ChannelType.PRIVATE) {
       throw new UnsupportedOperationException("PRIVATE 채널은 수정할 수 없습니다.");
     }
 
-    if (request.getChannelName() != null) {
-      channel.updateChannelName(request.getChannelName());
+    if (request.getNewName() != null) {
+      channel.updateChannelName(request.getNewName());
     }
-    if (request.getDescription() != null) {
-      channel.updateDescription(request.getDescription());
+    if (request.getNewDescription() != null) {
+      channel.updateDescription(request.getNewDescription());
     }
 
     saveChannelData();
+
+    return channel;
   }
 
   @Override
@@ -138,18 +140,18 @@ public class BasicChannelService implements ChannelService {
   @Override
   public ChannelInfoDto mapToDto(Channel channel) {
     ChannelInfoDto dto = new ChannelInfoDto();
-    dto.setChannelId(channel.getId());
-    dto.setChannelName(channel.getChannelName());
+    dto.setId(channel.getId());
+    dto.setName(channel.getName());
     dto.setDescription(channel.getDescription());
-    dto.setChannelType(channel.getType());
+    dto.setType(channel.getType());
 
     messageRepository.findLatestMessageByChannelId(channel.getId())
         .ifPresentOrElse(
-            message -> dto.setLastMessageTime(message.getCreatedAt()),
-            () -> dto.setLastMessageTime(null)  // 메시지가 없으면 null로 설정
+            message -> dto.setLastMessageAt(message.getCreatedAt()),
+            () -> dto.setLastMessageAt(null)  // 메시지가 없으면 null로 설정
         );
 
-    dto.setParticipantsUserIds(readStatusRepository.findAllReadStatus().stream()
+    dto.setParticipantIds(readStatusRepository.findAllReadStatus().stream()
         .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
         .map(ReadStatus::getUserId)
         .toList());

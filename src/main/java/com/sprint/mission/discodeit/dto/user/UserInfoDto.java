@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.user;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class UserInfoDto {
 
-  private UUID userid;
+  private UUID id;
   private Instant createAt;
   private Instant updateAt;
   private String username;

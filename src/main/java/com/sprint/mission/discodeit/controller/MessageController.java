@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 
-import com.sprint.mission.discodeit.dto.CreateMessageRequest;
-import com.sprint.mission.discodeit.dto.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.Message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.Message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -28,27 +28,27 @@ public class MessageController {
   private final BinaryContentService binaryContentService;
 
   @RequestMapping(value = "", method = RequestMethod.POST)
-  public ResponseEntity<?> createMessage(
+  public ResponseEntity<Message> createMessage(
       @RequestPart("messageCreateRequest") CreateMessageRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    UUID messageId = messageService.createMessage(request).getId();
+    Message message = messageService.createMessage(request);
     if (!attachments.isEmpty()) {
       attachments.stream()
           .map(binaryContentService::createBinaryContent)
-          .forEach(binaryId -> messageService.addAttachment(messageId, binaryId));
+          .forEach(binaryId -> messageService.addAttachment(message.getId(), binaryId));
     }
 
-    return ResponseEntity.ok("메세지가 성공적으로 생성되었습니다.");
+    return ResponseEntity.status(201).body(message);
   }
 
   @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
-  public ResponseEntity<?> updateMessage(
+  public ResponseEntity<Message> updateMessage(
       @PathVariable("messageId") UUID messageId,
       @RequestBody UpdateMessageRequest request) {
-    messageService.updateMessage(messageId, request);
+    Message message = messageService.updateMessage(messageId, request);
 
-    return ResponseEntity.ok("메세지가 업데이트 되었습니다.");
+    return ResponseEntity.ok(message);
   }
 
   @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
@@ -56,11 +56,11 @@ public class MessageController {
       @PathVariable("messageId") UUID messageId) {
     messageService.deleteMessage(messageId);
 
-    return ResponseEntity.ok("메세지가 삭제 되었습니다.");
+    return ResponseEntity.status(204).body("Message가 성공적으로 삭제됨");
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<?> getChannelMessage(
+  public ResponseEntity<List<Message>> getChannelMessage(
       @RequestParam("channelId") UUID channelId) {
     List<Message> messages = messageService.findallByChannelId(channelId);
 

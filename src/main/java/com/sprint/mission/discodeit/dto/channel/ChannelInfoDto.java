@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.channel;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
 import java.time.Instant;
@@ -9,10 +9,10 @@ import lombok.Data;
 @Data
 public class ChannelInfoDto {
 
-  private UUID channelId;
-  private ChannelType channelType;
-  private String channelName;
+  private UUID id;
+  private ChannelType type;
+  private String name;
   private String description;
-  private Instant lastMessageTime;
-  private List<UUID> participantsUserIds;
+  private Instant lastMessageAt;
+  private List<UUID> participantIds;
 }

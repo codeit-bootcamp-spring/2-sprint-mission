@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.CreateMessageRequest;
-import com.sprint.mission.discodeit.dto.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.Message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.Message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import java.util.List;
@@ -25,7 +25,7 @@ public interface MessageService {
 
   List<Message> findallByUserId(UUID senderId); // 유저의 모든 메세지 확인
 
-  void updateMessage(UUID messageId, UpdateMessageRequest request); // 메세지 내용 수정
+  Message updateMessage(UUID messageId, UpdateMessageRequest request); // 메세지 내용 수정
 
   void deleteMessage(UUID messageId); // 메세지 삭제
 

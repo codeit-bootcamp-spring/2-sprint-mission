@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.CreateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -21,9 +22,11 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ChannelRepository channelRepository;
 
   @Override
-  public void createReadStatus(CreateReadStatusRequest request) {
+  public ReadStatus createReadStatus(CreateReadStatusRequest request) {
     UUID channelId = request.getChannelId();
     UUID userId = request.getUserId();
+
+    System.out.println(22);
 
     if (!channelRepository.existsById(channelId)) {
       throw new IllegalArgumentException("Channel " + channelId + "이 존재하지 않습니다.");
@@ -32,10 +35,12 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new IllegalArgumentException("User " + userId + "이 존재하지 않습니다.");
     }
 
-    findReadStatusByUserIdAndChannelId(channelId, userId);
+    //validReadStatus(channelId, userId);
 
     ReadStatus readStatus = new ReadStatus(channelId, userId, request.getLastReadAt());
     readStatusRepository.addReadStatus(readStatus);
+
+    return readStatus;
   }
 
   @Override
@@ -57,10 +62,12 @@ public class BasicReadStatusService implements ReadStatusService {
 
 
   @Override
-  public void updateReadStatus(UUID readStatusId) {
+  public ReadStatus updateReadStatus(UUID readStatusId, UpdateReadStatusRequest request) {
     ReadStatus readStatus = findReadStatusById(readStatusId);
-    readStatus.updateLastAccessTime();
+    readStatus.setLastReadAt(readStatus.getLastReadAt());
     readStatusRepository.addReadStatus(readStatus);
+
+    return readStatus;
   }
 
   public void updateReadStatusByIds(UUID userId, UUID channelId) {
@@ -75,5 +82,9 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new IllegalArgumentException("ReadStatus " + id + "을 찾을 수 없습니다.");
     }
     readStatusRepository.deleteReadStatusById(id);
+  }
+
+  public boolean validReadStatus(UUID userId, UUID channelId) {
+    return readStatusRepository.findByUserIdAndChannelId(userId, channelId).isEmpty();
   }
 }

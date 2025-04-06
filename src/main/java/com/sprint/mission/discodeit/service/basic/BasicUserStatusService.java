@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.UserStatusInfoDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusInfoDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -35,8 +36,8 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public void create(UUID userId) {
-    if (userRepository.findUserById(userId) == null) {
+  public UserStatus create(UUID userId) {
+    if (userRepository.findUserById(userId).isEmpty()) {
       throw new IllegalArgumentException("해당 유저가 존재하지 않습니다.");
     }
 
@@ -46,14 +47,18 @@ public class BasicUserStatusService implements UserStatusService {
 
     UserStatus status = new UserStatus(userId, Instant.now());
     userStatusRepository.addUserStatus(status);
+
+    return status;
   }
 
   @Override
-  public void update(UUID userId) {
+  public UserStatus update(UUID userId, UserStatusUpdateRequest request) {
     UserStatus status = userStatusRepository.findUserStatusById(userId)
         .orElseThrow(() -> new IllegalArgumentException("UserStatus를 찾을 수 없습니다."));
-    status.updateLastActiveAt();
+    status.setLastActiveAt(request.getNewLastActiveAt());
     userStatusRepository.addUserStatus(status);
+
+    return status;
   }
 
   @Override

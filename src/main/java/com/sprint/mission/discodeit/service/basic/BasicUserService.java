@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.UserInfoDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UserInfoDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -83,24 +83,28 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public void updateProfile(UUID userId, UUID profileId) {
+  public User updateProfile(UUID userId, UUID profileId) {
     findUserById(userId).updateProfile(profileId);
     userRepository.save();
+
+    return findUserById(userId);
   }
 
   @Override
-  public void updateUser(UUID userId, UpdateUserRequest request) {
+  public User updateUser(UUID userId, UpdateUserRequest request) {
     User user = findUserById(userId);
 
-    if (request.getUsername() != null) {
-      user.updateUsername(request.getUsername());
+    if (request.getNewUsername() != null) {
+      user.updateUsername(request.getNewUsername());
     }
-    if (request.getPassword() != null) {
-      user.updatePassword(request.getPassword());
+    if (request.getNewPassword() != null) {
+      user.updatePassword(request.getNewPassword());
     }
-    if (request.getEmail() != null) {
-      user.updateEmail(request.getEmail());
+    if (request.getNewEmail() != null) {
+      user.updateEmail(request.getNewEmail());
     }
+
+    return user;
   }
 
   @Override
@@ -124,7 +128,7 @@ public class BasicUserService implements UserService {
         .orElse(null);
 
     UserInfoDto dto = new UserInfoDto();
-    dto.setUserid(user.getId());
+    dto.setId(user.getId());
     dto.setCreateAt(user.getCreatedAt());
     dto.setUpdateAt(user.getUpdatedAt());
     dto.setUsername(user.getUsername());

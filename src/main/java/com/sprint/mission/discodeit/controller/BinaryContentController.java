@@ -29,12 +29,14 @@ public class BinaryContentController {
   }
 
   @RequestMapping(value = "{binaryContentId}", method = RequestMethod.GET)
-  public ResponseEntity<?> getBinaryContent(@PathVariable("binaryContentId") UUID binaryContentId) {
+  public ResponseEntity<BinaryContent> getBinaryContent(
+      @PathVariable("binaryContentId") UUID binaryContentId) {
     return ResponseEntity.ok(binaryContentService.findBinaryContent(binaryContentId));
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<?> getBinaryContents(@RequestParam List<UUID> binaryIds) {
+  public ResponseEntity<List<BinaryContent>> getBinaryContents(
+      @RequestParam("binaryContentIds") List<UUID> binaryIds) {
     List<BinaryContent> binaryContents = binaryIds.stream()
         .map(binaryContentService::findBinaryContent)
         .toList();
