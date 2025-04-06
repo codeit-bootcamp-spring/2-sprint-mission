@@ -149,9 +149,7 @@ public class BasicUserService implements UserService {
     User user = userRepository.findUserById(userId)
         .orElseThrow(
             () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
-    if (Objects.nonNull(user.getProfileId())) {
-      binaryContentRepository.delete(user.getProfileId());
-    }
+
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
         .orElseThrow(
             () -> new NoSuchElementException(

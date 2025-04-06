@@ -92,7 +92,6 @@ public class BasicMessageService implements MessageService {
   public void deleteMessageById(UUID messageId) {
     Message message = messageRepository.findMessageById(messageId)
         .orElseThrow(() -> new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다."));
-    message.getAttachmentIds().forEach(binaryContentRepository::delete);
     messageRepository.delete(message.getId());
   }
 }
