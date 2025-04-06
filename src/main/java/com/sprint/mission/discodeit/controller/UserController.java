@@ -65,7 +65,8 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/userStatus")
-    public ResponseEntity<UserStatusResult> updateOnlineStatus(@PathVariable UUID userId, @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
+    public ResponseEntity<UserStatusResult> updateOnlineStatus(@PathVariable UUID userId,
+                                                               @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
         UserStatusResult status = userStatusService.updateByUserId(userId, userStatusUpdateRequest);
 
         return ResponseEntity.ok(status);

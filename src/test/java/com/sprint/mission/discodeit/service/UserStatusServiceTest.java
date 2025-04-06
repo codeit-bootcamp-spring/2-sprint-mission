@@ -48,8 +48,8 @@ class UserStatusServiceTest {
     void create_NotUser() {
         UUID random = UUID.randomUUID();
 
-        assertThatThrownBy(() -> userStatusService.create(new UserStatusCreateRequest(random, Instant.now()))).isInstanceOf(
-                IllegalArgumentException.class);
+        assertThatThrownBy(() -> userStatusService.create(new UserStatusCreateRequest(random, Instant.now())))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("이미 존재하는 유저 상태로 다시 생성 시 예외를 발생시킨다.")
@@ -57,8 +57,8 @@ class UserStatusServiceTest {
     void create_AlreadyUserStatusExist() {
         userStatusService.create(new UserStatusCreateRequest(user.getId(), Instant.now()));
 
-        assertThatThrownBy(() -> userStatusService.create(new UserStatusCreateRequest(user.getId(), Instant.now()))).isInstanceOf(
-                IllegalArgumentException.class);
+        assertThatThrownBy(() -> userStatusService.create(new UserStatusCreateRequest(user.getId(), Instant.now())))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("유저 ID로 상태를 조회하면 올바른 상태를 반환한다.")
@@ -73,9 +73,20 @@ class UserStatusServiceTest {
     @DisplayName("유저 ID로 상태를 업데이트하면 로그인 시간이 갱신된다.")
     @Test
     void updateByUserId() {
-        UserStatusResult userStatusDto = userStatusService.create(new UserStatusCreateRequest(user.getId(), Instant.now()));
-        UserStatusResult updatedUserStatusDto = userStatusService.updateByUserId(user.getId(), new UserStatusUpdateRequest(Instant.now()));
+        userStatusService.create(new UserStatusCreateRequest(user.getId(), Instant.now()));
+        Instant now = Instant.now();
+        UserStatusResult updatedUserStatusDto = userStatusService.updateByUserId(user.getId(), new UserStatusUpdateRequest(now));
 
-        assertThat(updatedUserStatusDto.lastLoginAt()).isAfter(userStatusDto.lastLoginAt());
+        assertThat(updatedUserStatusDto.lastLoginAt()).isEqualTo(now);
+    }
+
+    @DisplayName("현재 시간으로 유저 ID로 상태를 업데이트할 경우, online은 true를 반환한다")
+    @Test
+    void updateByUserId_isOnline() {
+        userStatusService.create(new UserStatusCreateRequest(user.getId(), Instant.now()));
+        Instant now = Instant.now();
+        UserStatusResult updatedUserStatusDto = userStatusService.updateByUserId(user.getId(), new UserStatusUpdateRequest(now));
+
+        assertThat(updatedUserStatusDto.online()).isTrue();
     }
 }

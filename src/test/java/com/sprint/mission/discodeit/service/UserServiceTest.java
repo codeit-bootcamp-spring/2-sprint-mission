@@ -77,7 +77,7 @@ class UserServiceTest {
         assertThat(setUpUser.profileId()).isNull();
     }
 
-    @DisplayName("프로필 사진을 저장할 경우, 유저 객체에 ID로 저장한 결과를 반환합니다..")
+    @DisplayName("프로필 사진을 저장할 경우, 유저 객체에 ID로 저장한 결과를 반환합니다.")
     @Test
     void register() {
         UserCreateRequest mockUserRequest = createMockUserRequest(OTHER_USER.getName(),
@@ -93,7 +93,7 @@ class UserServiceTest {
                 .hasValue(userWithImage.profileId());
     }
 
-    @DisplayName("유저 등롟시 프로필 사진 저장을 하지 않은 경우, 프로필 아이디를 null을 반환합니다.")
+    @DisplayName("유저 등록시 프로필 사진 저장을 하지 않은 경우, 프로필 아이디를 null을 반환합니다.")
     @Test
     void registerException() {
         UserCreateRequest mockUserRequest = createMockUserRequest(OTHER_USER.getName(),
@@ -103,7 +103,7 @@ class UserServiceTest {
         assertThat(user.profileId()).isNull();
     }
 
-    @DisplayName("처음 등록된 유저의 경우, 로그인 상태는 false를 반환합니다.")
+    @DisplayName("처음 등록된 유저의 경우, 로그인 상태는 true를 반환합니다.")
     @Test
     void registerValidateUserStatus() {
         UserCreateRequest mockUserRequest = createMockUserRequest(OTHER_USER.getName(),
