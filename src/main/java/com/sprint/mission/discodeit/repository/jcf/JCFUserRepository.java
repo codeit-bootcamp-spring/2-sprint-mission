@@ -10,27 +10,36 @@ import java.util.*;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> data = new HashMap<>();
 
-    public JCFUserRepository() {}
+  private final Map<UUID, User> data = new HashMap<>();
 
-    @Override
-    public void save(User user) {
-        data.put(user.getId(), user);
-    }
+  public JCFUserRepository() {
+  }
 
-    @Override
-    public Optional<User> getUserById(UUID userId) {
-        return Optional.ofNullable(data.get(userId));
-    }
+  @Override
+  public void save(User user) {
+    data.put(user.getId(), user);
+  }
 
-    @Override
-    public List<User> getAllUsers() {
-        return new ArrayList<>(data.values());
-    }
+  @Override
+  public Optional<User> getUserById(UUID userId) {
+    return Optional.ofNullable(data.get(userId));
+  }
 
-    @Override
-    public void deleteUser(UUID userId) {
-        data.remove(userId);
-    }
+  @Override
+  public List<User> getAllUsers() {
+    return new ArrayList<>(data.values());
+  }
+
+  @Override
+  public Optional<User> findByUsername(String username) {
+    return data.values().stream()
+        .filter(user -> user.getUsername().equals(username))
+        .findFirst();
+  }
+
+  @Override
+  public void deleteUser(UUID userId) {
+    data.remove(userId);
+  }
 }

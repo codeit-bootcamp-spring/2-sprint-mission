@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.file.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
@@ -10,10 +11,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    User createUser(CreateUserRequest request);
-    Optional<UserResponse> getUserById(UUID userId);
-    List<UserResponse> getUsersByName(String name);
-    List<UserResponse> getAllUsers();
-    void updateUser(UpdateUserRequest request);
-    void deleteUser(UUID userId);
+
+  User createUser(CreateUserRequest request, Optional<CreateBinaryContentRequest> profileOpt);
+
+  Optional<UserResponse> getUserById(UUID userId);
+
+  List<UserResponse> getUsersByName(String name);
+
+  List<UserResponse> getAllUsers();
+
+  void updateUser(UpdateUserRequest request, Optional<CreateBinaryContentRequest> profileOpt);
+
+  void deleteUser(UUID userId);
 }

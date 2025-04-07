@@ -5,15 +5,16 @@ import java.util.UUID;
 
 @Getter
 public class BinaryContent extends BaseImmutableEntity {
-    private final UUID userId;
-    private final UUID messageId;
-    private final String fileName;
-    private final String filePath;
 
-    public BinaryContent(UUID userId, UUID messageId, String fileName, String filePath) {
-        this.userId = userId;
-        this.messageId = messageId;
-        this.fileName = fileName;
-        this.filePath = filePath;
-    }
+  private final String fileName;
+  private final Long size;
+  private final String contentType;
+  private final byte[] bytes;
+
+  public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
+    this.fileName = fileName;
+    this.size = size;
+    this.contentType = contentType;
+    this.bytes = bytes;
+  }
 }

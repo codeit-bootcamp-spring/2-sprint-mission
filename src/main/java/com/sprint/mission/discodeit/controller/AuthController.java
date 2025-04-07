@@ -5,8 +5,10 @@ import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,21 +18,21 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
-    private final UserService userService;
 
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest request) {
-        try {
-            User user = authService.login(request);
-            Optional<UserResponse> response = userService.getUserById(user.getId());
-            return response.map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.badRequest().build());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).build();
-        }
+  private final AuthService authService;
+  private final UserService userService;
+
+  @Operation(summary = "사용자 로그인")
+  @PostMapping("/login")
+  public ResponseEntity<UserResponse> login(@RequestBody LoginRequest request) {
+    try {
+      UserResponse userResponse = authService.login(request);
+      return ResponseEntity.ok(userResponse);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().build();
     }
+  }
 }

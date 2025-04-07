@@ -11,38 +11,41 @@ import java.util.UUID;
 @Getter
 @Setter
 public class User extends BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private String username;
-    private String password;
-    private String email;
-    private UUID profileId;
+  private static final long serialVersionUID = 1L;
+
+  private String username;
+  private String password;
+  private String email;
+  private UUID profileId;
 
 
-    public User(String username, String password, String email, UUID profileId) {
-        super();
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.profileId = profileId;
-    }
+  public User(String username, String password, String email, UUID profileId) {
+    super();
+    this.username = username;
+    this.password = password;
+    this.email = email;
+    this.profileId = profileId;
+  }
 
-    public void update(String username, String password, String email, Instant updatedAt) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.updatedAt = updatedAt;
-    }
+  public void update(String username, String password, String email, Instant updatedAt,
+      UUID profileId) {
+    this.username = username;
+    this.password = password;
+    this.email = email;
+    this.updatedAt = updatedAt;
+    this.profileId = profileId;
+  }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "username='" + username + '\'' +
-                ", password='****'" +
-                ", email='" + email + '\'' +
-                ", id=" + id +
-                ", createdAt=" + TimeFormatter.formatTimestamp(createdAt) +
-                ", updatedAt=" + TimeFormatter.formatTimestamp(updatedAt) +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "User{" +
+        "username='" + username + '\'' +
+        ", password='****'" +
+        ", email='" + email + '\'' +
+        ", id=" + id +
+        ", createdAt=" + TimeFormatter.formatTimestamp(createdAt) +
+        ", updatedAt=" + TimeFormatter.formatTimestamp(updatedAt) +
+        '}';
+  }
 }

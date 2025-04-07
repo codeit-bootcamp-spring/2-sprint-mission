@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.file.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
@@ -17,121 +18,141 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
-    private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public User createUser(CreateUserRequest request) {
-        if (userRepository.getAllUsers().stream().anyMatch(
-                user -> user.getUsername().equals(request.username()) || user.getEmail().equals(request.email())
-        )) {
-            throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
-        }
+  private final UserRepository userRepository;
+  private final UserStatusRepository userStatusRepository;
+  private final BinaryContentRepository binaryContentRepository;
 
-        User user = new User(request.username(), request.password(), request.email(), null);
-        userRepository.save(user);
-
-        if (request.profileImageFileName() != null && request.profileImageFilePath() != null) {
-            BinaryContent profileImage = new BinaryContent(
-                    user.getId(),
-                    null,
-                    request.profileImageFileName(),
-                    request.profileImageFilePath()
-            );
-            binaryContentRepository.save(profileImage);
-            user.setProfileId(profileImage.getId());  // User의 profileId 업데이트
-            userRepository.save(user);
-        }
-
-        UserStatus userStatus = new UserStatus(user.getId());
-        userStatusRepository.save(userStatus);
-
-        return user;
+  @Override
+  public User createUser(CreateUserRequest request,
+      Optional<CreateBinaryContentRequest> profileOpt) {
+    if (userRepository.getAllUsers().stream().anyMatch(
+        user -> user.getUsername().equals(request.username()) || user.getEmail()
+            .equals(request.email())
+    )) {
+      throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
     }
 
-    @Override
-    public Optional<UserResponse> getUserById(UUID userId) {
-        return userRepository.getUserById(userId)
-                .map(user -> new UserResponse(
-                        user.getId(),
-                        user.getCreatedAt(),
-                        user.getUpdatedAt(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getProfileId(),
-                        userStatusRepository.getById(userId)
-                                .map(UserStatus::isOnline)
-                                .orElse(false)
-                ));
-    }
+    UUID profileId = profileOpt.map(profile -> {
+      BinaryContent binaryContent = new BinaryContent(
+          profile.fileName(),
+          (long) profile.bytes().length,
+          profile.contentType(),
+          profile.bytes()
+      );
+      return binaryContentRepository.save(binaryContent).getId();
+    }).orElse(null);
 
-    @Override
-    public List<UserResponse> getUsersByName(String name) {
-        return userRepository.getAllUsers().stream()
-                .filter(user -> user.getUsername().equals(name))
-                .map(user -> new UserResponse(
-                        user.getId(),
-                        user.getCreatedAt(),
-                        user.getUpdatedAt(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getProfileId(),
-                        userStatusRepository.getById(user.getId())
-                                .map(UserStatus::isOnline).orElse(false)
-                ))
-                .toList();
-    }
+    User user = new User(
+        request.username(),
+        request.password(),
+        request.email(),
+        profileId
+    );
+    userRepository.save(user);
 
-    @Override
-    public List<UserResponse> getAllUsers() {
-        return userRepository.getAllUsers().stream()
-                .map(user -> new UserResponse(
-                        user.getId(),
-                        user.getCreatedAt(),
-                        user.getUpdatedAt(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getProfileId(),
-                        userStatusRepository.getById(user.getId())
-                                .map(UserStatus::isOnline).orElse(false)
-                ))
-                .toList();
-    }
+    userStatusRepository.save(new UserStatus(user.getId()));
 
-    @Override
-    public void updateUser(UpdateUserRequest request) {
-        userRepository.getUserById(request.userId()).ifPresent(user -> {
-            Instant updatedTime = Instant.now();
-            user.update(request.username(), request.password(), request.email(), updatedTime);
-            userRepository.save(user);
+    return user;
+  }
 
-            if (request.profileImageFileName() != null && request.profileImageFilePath() != null) {
-                BinaryContent profileImage = new BinaryContent(
-                        user.getId(),
-                        null,
-                        request.profileImageFileName(),
-                        request.profileImageFilePath()
-                );
-                binaryContentRepository.save(profileImage);
-                user.setProfileId(profileImage.getId());
-                userRepository.save(user);
-            }
-        });
-    }
+  @Override
+  public Optional<UserResponse> getUserById(UUID userId) {
+    return userRepository.getUserById(userId)
+        .map(user -> new UserResponse(
+            user.getId(),
+            user.getCreatedAt(),
+            user.getUpdatedAt(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getProfileId(),
+            userStatusRepository.getById(userId)
+                .map(UserStatus::online)
+                .orElse(false),
+            user.getPassword()
+        ));
+  }
 
-    @Override
-    public void deleteUser(UUID userId) {
-        userRepository.getUserById(userId).ifPresent(user -> {
-            if (user.getProfileId() != null) {
-                binaryContentRepository.deleteById(user.getProfileId());
-            }
-        });
-        userStatusRepository.deleteById(userId);
-        userRepository.deleteUser(userId);
-    }
+  @Override
+  public List<UserResponse> getUsersByName(String name) {
+    return userRepository.getAllUsers().stream()
+        .filter(user -> user.getUsername().equals(name))
+        .map(user -> new UserResponse(
+            user.getId(),
+            user.getCreatedAt(),
+            user.getUpdatedAt(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getProfileId(),
+            userStatusRepository.getById(user.getId())
+                .map(UserStatus::online).orElse(false),
+            user.getPassword()
+        ))
+        .toList();
+  }
+
+  @Override
+  public List<UserResponse> getAllUsers() {
+    return userRepository.getAllUsers().stream()
+        .map(user -> new UserResponse(
+            user.getId(),
+            user.getCreatedAt(),
+            user.getUpdatedAt(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getProfileId(),
+            userStatusRepository.getById(user.getId())
+                .map(UserStatus::online).orElse(false),
+            user.getPassword()
+        ))
+        .toList();
+  }
+
+  @Override
+  public void updateUser(UpdateUserRequest request,
+      Optional<CreateBinaryContentRequest> profileOpt) {
+    userRepository.getUserById(request.userId()).ifPresent(user -> {
+      Instant updatedTime = Instant.now();
+
+      UUID newProfileId = profileOpt.map(profile -> {
+        Optional.ofNullable(user.getProfileId())
+            .ifPresent(binaryContentRepository::deleteById);
+
+        BinaryContent binaryContent = new BinaryContent(
+            profile.fileName(),
+            (long) profile.bytes().length,
+            profile.contentType(),
+            profile.bytes()
+        );
+
+        return binaryContentRepository.save(binaryContent).getId();
+      }).orElse(user.getProfileId());
+
+      user.update(
+          request.newUsername(),
+          request.newPassword(),
+          request.newEmail(),
+          updatedTime,
+          newProfileId
+      );
+
+      userRepository.save(user);
+    });
+  }
+
+  @Override
+  public void deleteUser(UUID userId) {
+    userRepository.getUserById(userId).ifPresent(user -> {
+      if (user.getProfileId() != null) {
+        binaryContentRepository.deleteById(user.getProfileId());
+      }
+    });
+    userStatusRepository.deleteById(userId);
+    userRepository.deleteUser(userId);
+  }
 }

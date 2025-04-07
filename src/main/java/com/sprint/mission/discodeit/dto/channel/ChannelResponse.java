@@ -5,8 +5,14 @@ import java.util.List;
 import java.util.UUID;
 
 public record ChannelResponse(
-        UUID id,
-        String name,
-        Instant latestMessageTime,
-        List<UUID> participantUserIds  // PRIVATE 채널의 참여한 사용자 ID 목록
-) {}
+    UUID id,
+    String name,
+    String description,
+    Instant lastMessageAt,
+    List<UUID> participantIds,
+    String type,
+    Instant createdAt,
+    Instant updatedAt
+) {
+
+}
