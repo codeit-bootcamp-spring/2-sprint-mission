@@ -1,54 +1,110 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.model.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileChannelRepository extends AbstractFileRepository<Channel> implements ChannelRepository {
-    public FileChannelRepository(RepositoryProperties repositoryProperties) {
-        super(Channel.class, Paths.get(repositoryProperties.getFileDirectory()).resolve("ChannelData"));   // 현재 프로그램이 실행되고 있는 디렉토리로 설정
-    }
+@Repository
+public class FileChannelRepository implements ChannelRepository {
 
-    @Override
-    public void add(Channel newChannel) {
-        super.add(newChannel);
-        super.saveToFile(super.directory.resolve(newChannel.getId().toString() + ".ser"), newChannel);
-    }
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
 
-    // existsById(),findById(), getAll()  굳이 file을 탐색할 필요 없다고 생각해 storage를 통해 정보 확인, -> 상속 받은걸 사용
-    @Override
-    public List<Channel> findAllByUserId(UUID userId) {
-        return super.storage.values().stream()
-                .filter(channel -> channel.getChannelType() == ChannelType.PUBLIC || (channel.getParticipantIds().contains(userId)))
-                .collect(Collectors.toList());
+  public FileChannelRepository(
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        Channel.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
+  }
 
-    @Override
-    public void updateChannelName(UUID channelId, String newChannelName) {
-        Channel findChannel = super.findById(channelId);
-        findChannel.updateChannelName(newChannelName);
-        super.saveToFile(super.directory.resolve(channelId.toString() + ".ser"), findChannel);
-    }
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
+  }
 
-    public void addParticipant(UUID channelId, UUID newParticipantId) {
-        Channel findChannel = super.findById(channelId);
-        findChannel.addParticipant(newParticipantId);
-        super.saveToFile(super.directory.resolve(channelId.toString() + ".ser"), findChannel);
+  @Override
+  public Channel save(Channel channel) {
+    Path path = resolvePath(channel.getId());
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
+      oos.writeObject(channel);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+    return channel;
+  }
 
-    @Override
-    public void deleteById(UUID channelId) {
-        super.deleteById(channelId);
-        super.deleteFile(channelId);
+  @Override
+  public Optional<Channel> findById(UUID id) {
+    Channel channelNullable = null;
+    Path path = resolvePath(id);
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        channelNullable = (Channel) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
     }
+    return Optional.ofNullable(channelNullable);
+  }
+
+  @Override
+  public List<Channel> findAll() {
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (Channel) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
+  }
+
+  @Override
+  public void deleteById(UUID id) {
+    Path path = resolvePath(id);
+    try {
+      Files.delete(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

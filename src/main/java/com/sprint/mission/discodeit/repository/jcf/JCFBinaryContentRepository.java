@@ -1,30 +1,47 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.repository.AbstractRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
-public class JCFBinaryContentRepository extends AbstractRepository<BinaryContent> implements BinaryContentRepository {
-    public JCFBinaryContentRepository() {
-        super(BinaryContent.class, new ConcurrentHashMap<>());      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
-    }
+public class JCFBinaryContentRepository implements BinaryContentRepository {
 
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        List<BinaryContent> responses = new ArrayList<>();
-        for(UUID id : ids) {
-            BinaryContent binaryContent = findById(id);
-            responses.add(binaryContent);
-        }
-        return responses;
-    }
+  private final Map<UUID, BinaryContent> data;
+
+  public JCFBinaryContentRepository() {
+    this.data = new HashMap<>();
+  }
+
+  @Override
+  public BinaryContent save(BinaryContent binaryContent) {
+    this.data.put(binaryContent.getId(), binaryContent);
+    return binaryContent;
+  }
+
+  @Override
+  public Optional<BinaryContent> findById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
+  }
+
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    return this.data.values().stream()
+        .filter(content -> ids.contains(content.getId()))
+        .toList();
+  }
+
+  @Override
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
+  }
+
+  @Override
+  public void deleteById(UUID id) {
+    this.data.remove(id);
+  }
 }

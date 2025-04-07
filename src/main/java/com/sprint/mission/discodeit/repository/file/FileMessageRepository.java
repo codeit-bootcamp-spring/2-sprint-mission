@@ -1,78 +1,117 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
-@Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository {
-    private Map<UUID, NavigableSet<Message>> channelIdMessages;       // channelId를 Key로 가지는 TreeSet<Message> / List가 아니라 NavigatbaleSet을 사용하는 이유는 구간조회가 빠르기 때문
+@Repository
+public class FileMessageRepository implements MessageRepository {
 
-    public FileMessageRepository(RepositoryProperties repositoryProperties) {
-        super(Message.class, Paths.get(repositoryProperties.getFileDirectory()).resolve("MessageData"));
-        channelIdMessages = new HashMap<>();
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
+
+  public FileMessageRepository(
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        Message.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
+  }
 
-    @Override
-    public void addChannelIdToChannelIdMessage(UUID channelId) {
-        if (channelIdMessages.containsKey(channelId)) {         // 자체적인 무결성 확보
-            throw new IllegalArgumentException("이미 존재하는 채널입니다: " + channelId);
-        }
-        channelIdMessages.put(channelId, new TreeSet<>(Comparator.comparing(Message::getCreatedAt)
-                                                                .thenComparing(Message::getId)));
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
+  }
+
+  @Override
+  public Message save(Message message) {
+    Path path = resolvePath(message.getId());
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
+      oos.writeObject(message);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+    return message;
+  }
 
-    @Override
-    public void add(Message newMessage) {
-        super.add(newMessage);
-        super.saveToFile(super.directory.resolve(newMessage.getId().toString() + ".ser"), newMessage);
-        channelIdMessages.get(newMessage.getChannelId()).add(newMessage);
+  @Override
+  public Optional<Message> findById(UUID id) {
+    Message messageNullable = null;
+    Path path = resolvePath(id);
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        messageNullable = (Message) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
     }
+    return Optional.ofNullable(messageNullable);
+  }
 
-    // existsById(),findById(), getAll()  굳이 file을 탐색할 필요 없다고 생각해 storage를 통해 정보 확인, -> 상속 받은걸 사용
-
-    @Override
-    public List<Message> findMessageListByChannelId(UUID channelId) {   //해당 channelID를 가진 message가 없을 때, 빈 리스트 반환
-        if (channelIdMessages.get(channelId) == null) {         // channelService에서 createChannel을 할때 항상 addChannelIdToChannelIdMessage가 호출되어 확인할 필요 없지만 자체적인 검증로직 필요?
-            throw new NullPointerException("해당 channelId를 가진 채널이 아직 생성되지 않았습니다. " + channelId);
-        }
-        return new ArrayList<>(channelIdMessages.get(channelId));
+  @Override
+  public List<Message> findAllByChannelId(UUID channelId) {
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .filter(message -> message.getChannelId().equals(channelId))
+          .toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public void updateMessageContent(UUID messageId, String newContent) {
-        if (existsById(messageId)) {
-            super.storage.get(messageId).updateContent(newContent);
-            super.saveToFile(super.directory.resolve(messageId.toString() + ".ser"), super.findById(messageId));
-        }
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
+  }
 
-    @Override
-    public void updateAttachmentIds(UUID messageId, List<UUID> attachmentIds) {
-        if (existsById(messageId)) {
-            super.storage.get(messageId).updateAttachmentIds(attachmentIds);
-            super.saveToFile(super.directory.resolve(messageId.toString() + ".ser"), super.findById(messageId));
-        }
+  @Override
+  public void deleteById(UUID id) {
+    Path path = resolvePath(id);
+    try {
+      Files.delete(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public void deleteAttachment(UUID messageId, UUID attachmentId) {
-        if (existsById(messageId)) {
-            super.storage.get(messageId).deleteAttachment(attachmentId);
-            super.saveToFile(super.directory.resolve(messageId.toString() + ".ser"), super.findById(messageId));
-        }
-    }
-
-    @Override
-    public void deleteById(UUID messageId) {
-        channelIdMessages.get(super.findById(messageId).getChannelId()).remove(super.findById(messageId));
-        super.deleteById(messageId);
-        super.deleteFile(messageId);
-    }
+  @Override
+  public void deleteAllByChannelId(UUID channelId) {
+    this.findAllByChannelId(channelId)
+        .forEach(message -> this.deleteById(message.getId()));
+  }
 }

@@ -3,12 +3,20 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public interface MessageRepository extends Repository<Message> {
-    void addChannelIdToChannelIdMessage(UUID channelId);
-    List<Message> findMessageListByChannelId(UUID channelId);
-    void updateMessageContent(UUID messageId, String newContent);
-    void updateAttachmentIds(UUID messageId, List<UUID> attachmentIds);
-    void deleteAttachment(UUID messageId, UUID attachmentId);
+public interface MessageRepository {
+
+  Message save(Message message);
+
+  Optional<Message> findById(UUID id);
+
+  List<Message> findAllByChannelId(UUID channelId);
+
+  boolean existsById(UUID id);
+
+  void deleteById(UUID id);
+
+  void deleteAllByChannelId(UUID channelId);
 }

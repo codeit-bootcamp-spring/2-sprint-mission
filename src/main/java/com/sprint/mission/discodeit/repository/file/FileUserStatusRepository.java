@@ -1,76 +1,123 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.common.NoSuchIdException;
-import com.sprint.mission.discodeit.model.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
-@Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileUserStatusRepository extends AbstractFileRepository<UserStatus> implements UserStatusRepository {
-    private Map<UUID, UserStatus> userIdMap = new HashMap<>();
+@Repository
+public class FileUserStatusRepository implements UserStatusRepository {
 
-    public FileUserStatusRepository(RepositoryProperties repositoryProperties) {
-        super(UserStatus.class, Paths.get(repositoryProperties.getFileDirectory()).resolve("UserStatusData"));      // 현재 프로그램이 실행되고 있는 디렉토리로 설정);
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
+
+  public FileUserStatusRepository(
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        UserStatus.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
+  }
 
-    @Override
-    public void add(UserStatus newUserStatus) {
-        super.add(newUserStatus);
-        super.saveToFile(directory.resolve(newUserStatus.getId().toString() + ".ser"), newUserStatus);    // file에 반영
-        userIdMap.put(newUserStatus.getUserId(), newUserStatus);
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
+  }
+
+  @Override
+  public UserStatus save(UserStatus userStatus) {
+    Path path = resolvePath(userStatus.getId());
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
+      oos.writeObject(userStatus);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+    return userStatus;
+  }
 
-    @Override
-    public boolean existsByUserId(UUID userId) {
-        return userIdMap.containsKey(userId);
+  @Override
+  public Optional<UserStatus> findById(UUID id) {
+    UserStatus userStatusNullable = null;
+    Path path = resolvePath(id);
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        userStatusNullable = (UserStatus) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
     }
+    return Optional.ofNullable(userStatusNullable);
+  }
 
-    @Override
-    public UserStatus findUserStatusByUserId(UUID userId) {
-        if (!existsByUserId(userId)) {
-            throw new NoSuchIdException("해당 userId를 가진 userStatus를 찾을 수 없습니다 : " + userId, HttpStatus.NOT_FOUND);
-        }
-        return userIdMap.get(userId);
+  @Override
+  public Optional<UserStatus> findByUserId(UUID userId) {
+    return findAll().stream()
+        .filter(userStatus -> userStatus.getUserId().equals(userId))
+        .findFirst();
+  }
+
+  @Override
+  public List<UserStatus> findAll() {
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (UserStatus) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public void updateTimeById(UUID userStatusId, Instant updateTime) {
-        UserStatus findUserStatus = findUserStatusByUserId(userStatusId);
-        findUserStatus.updateUpdatedAt(updateTime);
-        super.saveToFile(directory.resolve(findUserStatus.getId().toString() + ".ser"), findUserStatus);    // file에 반영
+  @Override
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
+  }
+
+  @Override
+  public void deleteById(UUID id) {
+    Path path = resolvePath(id);
+    try {
+      Files.delete(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public void updateTimeByUserId(UUID userId, Instant updateTime) {
-        UserStatus findUserStatus = findUserStatusByUserId(userId);
-        findUserStatus.updateUpdatedAt(updateTime);
-        super.saveToFile(directory.resolve(findUserStatus.getId().toString() + ".ser"), findUserStatus);    // file에 반영
-    }
-
-    @Override
-    public void updateUserStatusByUserId(UUID id, UserStatusType type) {
-        UserStatus findUserStatus = findUserStatusByUserId(id);
-        findUserStatus.setUserStatusType(type);
-        super.saveToFile(directory.resolve(findUserStatus.getId().toString() + ".ser"), findUserStatus);
-    }
-
-
-    @Override
-    public void deleteById(UUID userStatusId) {
-        super.deleteById(userStatusId);
-        super.deleteFile(userStatusId);
-        userIdMap.remove(userStatusId);
-    }
+  @Override
+  public void deleteByUserId(UUID userId) {
+    this.findByUserId(userId)
+        .ifPresent(userStatus -> this.deleteById(userStatus.getId()));
+  }
 }
