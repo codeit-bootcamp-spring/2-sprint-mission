@@ -1,0 +1,10 @@
+discodeit:
+  repository:
+    type: file   # jcf | file
+    file-directory:
+      binary-content-path: filestorage/test/binary-content.ser
+      channel-path: filestorage/test/channel.ser
+      message-path: filestorage/test/message.ser
+      readStatus-path: filestorage/test/readStatus.ser
+      user-path: filestorage/test/user.ser
+      user-status-path: filestorage/test/userStatus.ser
