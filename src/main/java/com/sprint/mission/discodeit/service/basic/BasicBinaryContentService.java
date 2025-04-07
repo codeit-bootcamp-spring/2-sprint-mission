@@ -9,40 +9,40 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent create(BinaryContentCreateRequest requestDto) {
-        BinaryContent binaryContent = new BinaryContent(
-                requestDto.fileName(),
-                (long)requestDto.bytes().length,
-                requestDto.contentType(),
-                requestDto.bytes());
-        return binaryContentRepository.save(binaryContent);
-    }
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent find(UUID id) {
-        return binaryContentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("해당 BinaryContent 없음"));
-    }
+  @Override
+  public BinaryContent create(BinaryContentCreateRequest request) {
+    BinaryContent binaryContent = new BinaryContent(
+        request.fileName(),
+        (long) request.bytes().length,
+        request.contentType(),
+        request.bytes());
+    return binaryContentRepository.save(binaryContent);
+  }
 
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return binaryContentRepository.findAllByIdIn(ids);
-    }
+  @Override
+  public BinaryContent find(UUID binaryContentId) {
+    return binaryContentRepository.findById(binaryContentId)
+        .orElseThrow(() -> new ResourceNotFoundException("해당 BinaryContent 없음"));
+  }
 
-    @Override
-    public void delete(UUID id) {
-        if (!binaryContentRepository.existsById(id)) {
-            throw new ResourceNotFoundException("해당 BinaryContent 없음");
-        }
-        binaryContentRepository.deleteById(id);
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+    return binaryContentRepository.findAllByIdIn(binaryContentIds);
+  }
+
+  @Override
+  public void delete(UUID binaryContentId) {
+    if (!binaryContentRepository.existsById(binaryContentId)) {
+      throw new ResourceNotFoundException("해당 BinaryContent 없음");
     }
+    binaryContentRepository.deleteById(binaryContentId);
+  }
 }
