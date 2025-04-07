@@ -17,53 +17,56 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    private final MessageRepository messageRepository;
-    //
-    private final ChannelRepository channelRepository;
-    private final UserRepository userRepository;
-    private final BasicBinaryContentService basicBinaryContentService;
 
-    @Override
-    public Message create(UUID channelId, UUID authorId, MessageCreateRequest createRequest,
-                          List<BinaryContentCreateRequest> binaryContentRequestList) {
-        if (!channelRepository.existsById(channelId)) {
-            throw new NoSuchElementException(channelId + "에 해당하는 Channel을 찾을 수 없음");
-        }
-        if (!userRepository.existsById(authorId)) {
-            throw new NoSuchElementException(authorId + "에 해당하는 Author를 찾을 수 없음");
-        }
-        List<UUID> idList = binaryContentRequestList.stream()
-                .map(request ->
-                        basicBinaryContentService.create(request).getId()).toList();
-        Message message = new Message(createRequest.content(), channelId, authorId, idList);
-        return messageRepository.save(message);
-    }
+  private final MessageRepository messageRepository;
+  //
+  private final ChannelRepository channelRepository;
+  private final UserRepository userRepository;
+  private final BasicBinaryContentService basicBinaryContentService;
 
-    @Override
-    public Message find(UUID messageId) {
-        return messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException(messageId + " 에 해당하는 Message를 찾을 수 없음"));
+  @Override
+  public Message create(MessageCreateRequest createRequest,
+      List<BinaryContentCreateRequest> binaryRequestList) {
+    UUID channelId = createRequest.channelId();
+    UUID authorId = createRequest.authorId();
+    if (!channelRepository.existsById(channelId)) {
+      throw new NoSuchElementException(channelId + "에 해당하는 Channel을 찾을 수 없음");
     }
+    if (!userRepository.existsById(authorId)) {
+      throw new NoSuchElementException(authorId + "에 해당하는 Author를 찾을 수 없음");
+    }
+    List<UUID> idList = binaryRequestList.stream()
+        .map(request ->
+            basicBinaryContentService.create(request).getId()).toList();
+    Message message = new Message(createRequest.content(), channelId, authorId, idList);
+    return messageRepository.save(message);
+  }
 
-    @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannelId(channelId);
-    }
+  @Override
+  public Message find(UUID messageId) {
+    return messageRepository.findById(messageId)
+        .orElseThrow(() -> new NoSuchElementException(messageId + " 에 해당하는 Message를 찾을 수 없음"));
+  }
 
-    @Override
-    public Message update(UUID id, MessageUpdateRequest updateRequest) {
-        Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 Message를 찾을 수 없음"));
-        message.update(updateRequest.newContent());
-        return messageRepository.save(message);
-    }
+  @Override
+  public List<Message> findAllByChannelId(UUID channelId) {
+    return messageRepository.findAllByChannelId(channelId);
+  }
 
-    @Override
-    public void delete(UUID messageId) {
-        Message message = find(messageId);
-        if (message.getAttachmentIds() != null) {
-            message.getAttachmentIds().forEach(basicBinaryContentService::delete);
-        }
-        messageRepository.deleteById(messageId);
+  @Override
+  public Message update(UUID id, MessageUpdateRequest updateRequest) {
+    Message message = messageRepository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 Message를 찾을 수 없음"));
+    message.update(updateRequest.newContent());
+    return messageRepository.save(message);
+  }
+
+  @Override
+  public void delete(UUID messageId) {
+    Message message = find(messageId);
+    if (message.getAttachmentIds() != null) {
+      message.getAttachmentIds().forEach(basicBinaryContentService::delete);
     }
+    messageRepository.deleteById(messageId);
+  }
 }
