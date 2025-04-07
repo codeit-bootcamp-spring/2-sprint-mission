@@ -6,36 +6,51 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFBinaryContentRepository implements BinaryContentRepository {
-    private final Map<UUID, BinaryContent> data;
 
-    public JCFBinaryContentRepository() {
-        this.data = new HashMap<>();
-    }
+  private final Map<UUID, BinaryContent> data;
 
-    public BinaryContent save(BinaryContent binaryContent){
-        this.data.put(binaryContent.getId(), binaryContent);
+  public JCFBinaryContentRepository() {
+    this.data = new HashMap<>();
+  }
 
-        return binaryContent;
-    }
+  public BinaryContent save(BinaryContent binaryContent) {
+    this.data.put(binaryContent.getId(), binaryContent);
 
-    public BinaryContent findById(UUID binaryContentId){
-        return Optional.ofNullable(data.get(binaryContentId))
-                .orElseThrow(() -> new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found"));
-    }
+    return binaryContent;
+  }
 
-    public List<BinaryContent> findAll(){
-        return this.data.values().stream().toList();
-    }
+  public BinaryContent findById(UUID binaryContentId) {
+    return Optional.ofNullable(data.get(binaryContentId))
+        .orElseThrow(() -> new NoSuchElementException(
+            "BinaryContent with id " + binaryContentId + " not found"));
+  }
 
-    public void delete(UUID binaryContentId){
-        data.remove(binaryContentId);
-    }
+  public List<BinaryContent> findAllByIds(List<UUID> ids) {
+    return ids.stream()
+        .map(data::get)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+  }
+
+  public List<BinaryContent> findAll() {
+    return this.data.values().stream().toList();
+  }
+
+  public void delete(UUID binaryContentId) {
+    Optional.ofNullable(data.get(binaryContentId))
+        .orElseThrow(() -> new NoSuchElementException(
+            "BinaryContent with id " + binaryContentId + " not found"));
+
+    data.remove(binaryContentId);
+  }
 }
