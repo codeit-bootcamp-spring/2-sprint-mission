@@ -2,23 +2,20 @@ package com.sprint.mission.discodeit.basic.repositoryimpl;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-
+//asdasdasdsdadasd
 public class BasicChannelRepositoryImplement implements ChannelRepository {
 
   // 채널 id/채널
   private final Map<UUID, Channel> channelRepository = new HashMap<>();
 
   @Override
-  public void saveData() {
-
-  }
-
-  @Override
-  public void register(Channel channel) {
+  public boolean register(Channel channel) {
     channelRepository.put(channel.getChannelId(), channel);
+    return true;
   }
 
   @Override
@@ -56,15 +53,5 @@ public class BasicChannelRepositoryImplement implements ChannelRepository {
       return true;
     }
     return false;
-  }
-
-  @Override
-  public List<Channel> findAllPublicChannels() {
-    return List.of();
-  }
-
-  @Override
-  public List<Channel> findPrivateChannels(UUID userId) {
-    return List.of();
   }
 }
