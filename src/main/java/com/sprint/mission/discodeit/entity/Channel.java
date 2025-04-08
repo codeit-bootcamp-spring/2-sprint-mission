@@ -20,56 +20,57 @@ id, createdAt은 final로 선언해서 불변 객체 유지
 @Getter
 //@Builder
 public class Channel implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt; //Long -> Instant로 변경, 가독성이 뛰어나며, 시간대(Time Zone) 변환과 정밀한 시간 연산이 가능해 확장성이 높습니다.
-    private Instant updatedAt;
 
-    private ChannelType type;
-    private String name;
-    private String description;
+  @Serial
+  private static final long serialVersionUID = 1L;
+  private final UUID id;
+  private final Instant createdAt; //Long -> Instant로 변경, 가독성이 뛰어나며, 시간대(Time Zone) 변환과 정밀한 시간 연산이 가능해 확장성이 높습니다.
+  private Instant updatedAt;
 
-    public Channel(ChannelType type, String name, String description) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
-        this.type = type;
-        this.name = name;
-        this.description = description;
+  private ChannelType type;
+  private String name;
+  private String description;
+
+  public Channel(ChannelType type, String name, String description) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
+
+  public void update(String newName, String newDescription) {
+    boolean anyValueUpdated = false;
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
+      anyValueUpdated = true;
+    }
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
+      anyValueUpdated = true;
     }
 
-    public void update(String newName, String newDescription) {
-        boolean anyValueUpdated = false;
-        if (newName != null && !newName.equals(this.name)) {
-            this.name = newName;
-            anyValueUpdated = true;
-        }
-        if (newDescription != null && !newDescription.equals(this.description)) {
-            this.description = newDescription;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
+    if (anyValueUpdated) {
             /*
             - UTC는 세계 표준 시간, 한국(KST)은 UTC+9
             - Instant 객체는 "날짜 + 시간 (나노초 단위까지 포함)"을 가집니다.
             - .now()는 Instant 객체를 반환하며 년-월-일T시:분:초.나노초Z 형식으로 출력됨.
             ex: Instant.now(): 2025-03-18T08:30:00.123456Z
              */
-            this.updatedAt = Instant.now();
-        }
+      this.updatedAt = Instant.now();
     }
+  }
 
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", type=" + type +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "Channel{" +
+        "id=" + id +
+        ", createdAt=" + createdAt +
+        ", updatedAt=" + updatedAt +
+        ", type=" + type +
+        ", name='" + name + '\'' +
+        ", description='" + description + '\'' +
+        '}';
+  }
 }

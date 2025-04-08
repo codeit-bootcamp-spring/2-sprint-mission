@@ -15,34 +15,23 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 @Service
 public class BasicAuthServiceImp implements AuthService {
-    private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
 
-    @Override
-    public User login(LoginRequest loginRequest) {
-        String username = loginRequest.username();
-        String password = loginRequest.password();
+  private final UserRepository userRepository;
+  private final UserStatusRepository userStatusRepository;
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchElementException("User with username " + username + " not found"));
+  @Override
+  public User login(LoginRequest loginRequest) {
+    String username = loginRequest.username();
+    String password = loginRequest.password();
 
-        if (!user.getPassword().equals(password)) {
-            throw new IllegalArgumentException("Wrong password");
-        }
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(
+            () -> new NoSuchElementException("User with username " + username + " not found"));
 
-        userStatusRepository.findByUserId(user.getId())
-                .ifPresentOrElse(
-                        status -> {
-                            status.update(Instant.now());  // ✅ 마지막 활동 시간만 업데이트
-                            userStatusRepository.save(status);
-                        },
-                        () -> {
-                            UserStatus newStatus = new UserStatus(user.getId(), Instant.now());
-                            userStatusRepository.save(newStatus);
-                        }
-                );
-
-
-        return user;
+    if (!user.getPassword().equals(password)) {
+      throw new IllegalArgumentException("Wrong password");
     }
+
+    return user;
+  }
 }
