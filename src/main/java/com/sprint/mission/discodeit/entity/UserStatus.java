@@ -15,37 +15,40 @@ import java.util.UUID;
 
 @Getter
 public class UserStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
 
-    private final UUID userId;
-    private Instant lastActiveAt;  // 마지막 접속 시간
+  private static final long serialVersionUID = 1L;
+  private final UUID id;
+  private final Instant createdAt;
+  private Instant updatedAt;
 
-    public UserStatus(UUID userId, Instant lastActiveAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+  private final UUID userId;
+  private Instant lastActiveAt;
 
-        this.userId = userId;
-        this.lastActiveAt = lastActiveAt;
+  public UserStatus(UUID userId, Instant lastActiveAt) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+
+    this.userId = userId;
+    this.lastActiveAt = lastActiveAt;
+  }
+
+  // setter 여러개 대신 update 하나로 모든 필드 업데이트
+  public void update(Instant lastActiveAt) {
+    boolean anyValueUpdated = false;
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
+      anyValueUpdated = true;
     }
 
-    // setter 여러개 대신 update 하나로 모든 필드 업데이트
-    public void update(Instant lastActiveAt) {
-        boolean anyValueUpdated = false;
-        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
-            this.lastActiveAt = lastActiveAt;
-            anyValueUpdated = true;
-        }
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 
-    // 온라인 여부, lastActiveAt가 5분 이내면 온라인으로 표시
-    public Boolean isOnline() {
-        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
-        return lastActiveAt.isAfter(instantFiveMinutesAgo);
-    }
+  //API 문서상 request가 5분이 아니라 그냥 online true 요청으로 바뀜
+  // 온라인 여부, lastActiveAt가 5분 이내면 온라인으로 표시
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 }
