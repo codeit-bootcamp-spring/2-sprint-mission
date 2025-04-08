@@ -1,44 +1,34 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
+@Tag(name = "읽음 상태 API", description = "메시지 읽음 상태 관련 기능을 제공합니다.")
 @RestController
-@RequestMapping("/channels/{channelId}/read-status")
+@RequiredArgsConstructor
+@RequestMapping("/api/readStatuses")
 public class ReadStatusController {
-    private final ReadStatusService readStatusService;
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<ReadStatus> createReadStatus(
-            @PathVariable UUID channelId,
-            @RequestBody ReadStatusCreateRequest request
-    ) {
-        ReadStatus createdReadStatus = readStatusService.create(request);
-        return ResponseEntity.ok(createdReadStatus);
-    }
+  private final ReadStatusService readStatusService;
 
-    @RequestMapping(value = "/update/{readStatusId}", method = RequestMethod.PUT)
-    public ResponseEntity<ReadStatus> updateReadStatus(
-            @PathVariable UUID channelId,
-            @PathVariable UUID readStatusId,
-            @RequestBody ReadStatusUpdateRequest request
-    ) {
-        ReadStatus updatedReadStatus = readStatusService.update(readStatusId, request);
-        return ResponseEntity.ok(updatedReadStatus);
-    }
-
-    @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
-    public ResponseEntity<List<ReadStatus>> getUserReadStatuses(@PathVariable UUID userId) {
-        List<ReadStatus> userReadStatuses = readStatusService.findAllByUserId(userId);
-        return ResponseEntity.ok(userReadStatuses);
-    }
+  @Operation(
+      summary = "Message 읽음 상태 수정",
+      description = "특정 읽음 상태를 수정합니다."
+  )
+  @PatchMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatus> updateReadStatus(
+      @PathVariable UUID readStatusId,
+      @RequestBody ReadStatusUpdateRequest request
+  ) {
+    ReadStatus updated = readStatusService.update(readStatusId, request);
+    return ResponseEntity.ok(updated);
+  }
 }
