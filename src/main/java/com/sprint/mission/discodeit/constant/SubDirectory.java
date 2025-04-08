@@ -3,18 +3,12 @@ package com.sprint.mission.discodeit.constant;
 import lombok.Getter;
 
 @Getter
-public enum SubDirectory {
-    USER("user"),
-    CHANNEL("channel"),
-    MESSAGE("message"),
-    USER_STATUS("userstatus"),
-    READ_STATUS("readstatus"),
-    BINARY_CONTENT("binarycontent"),
-    BINARY_DATA("binarydata");
+public final class SubDirectory {
 
-    private final String directory;
-
-    SubDirectory(String directory) {
-        this.directory = directory;
-    }
+  public static final String USER = "user";
+  public static final String CHANNEL = "channel";
+  public static final String MESSAGE = "message";
+  public static final String USER_STATUS = "userstatus";
+  public static final String READ_STATUS = "readstatus";
+  public static final String BINARY_CONTENT = "binarycontent";
 }

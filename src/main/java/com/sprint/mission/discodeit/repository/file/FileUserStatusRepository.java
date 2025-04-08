@@ -17,33 +17,34 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileUserStatusRepository implements UserStatusRepository {
 
-    private final FileManager fileManager;
+  private final FileManager fileManager;
 
-    @Override
-    public void save(UserStatus userStatus) {
-        fileManager.writeToFile(SubDirectory.USER_STATUS, userStatus, userStatus.getId());
-    }
+  @Override
+  public void save(UserStatus userStatus) {
+    fileManager.writeToFile(SubDirectory.USER_STATUS, userStatus, userStatus.getId());
+  }
 
-    @Override
-    public Optional<UserStatus> findById(UUID userStatusUUID) {
-        return fileManager.readFromFileById(SubDirectory.USER_STATUS, userStatusUUID, UserStatus.class);
-    }
+  @Override
+  public Optional<UserStatus> findById(UUID userStatusUUID) {
+    return fileManager.readFromFileById(SubDirectory.USER_STATUS, userStatusUUID, UserStatus.class);
+  }
 
-    @Override
-    public Optional<UserStatus> findByUserId(UUID userUUID) {
-        return findAll().stream()
-                .filter(userStatus -> userStatus.getUserUUID().equals(userUUID))
-                .findAny();
-    }
+  @Override
+  public Optional<UserStatus> findByUserId(UUID userUUID) {
+    return findAll().stream()
+        .filter(userStatus -> userStatus.getUserId().equals(userUUID))
+        .findAny();
+  }
 
-    @Override
-    public List<UserStatus> findAll() {
-        List<UserStatus> userStatusList = fileManager.readFromFileAll(SubDirectory.USER_STATUS, UserStatus.class);
-        return userStatusList;
-    }
+  @Override
+  public List<UserStatus> findAll() {
+    List<UserStatus> userStatusList = fileManager.readFromFileAll(SubDirectory.USER_STATUS,
+        UserStatus.class);
+    return userStatusList;
+  }
 
-    @Override
-    public void delete(UUID userStatusUUID) {
-        fileManager.deleteFileById(SubDirectory.USER_STATUS, userStatusUUID);
-    }
+  @Override
+  public void delete(UUID userStatusUUID) {
+    fileManager.deleteFileById(SubDirectory.USER_STATUS, userStatusUUID);
+  }
 }
