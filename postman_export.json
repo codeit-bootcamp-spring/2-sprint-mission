@@ -1,0 +1,503 @@
+{
+	"info": {
+		"_postman_id": "4888aeca-ada4-4c77-b4f6-85b7509c12a9",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43515278"
+	},
+	"item": [
+		{
+			"name": "Create ro0709",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "userCreateRequest",
+							"value": "{\n  \"username\": \"ro0709\",\n  \"email\": \"ro0709@naver.com\",\n  \"password\": \"0709\"\n}",
+							"contentType": "application/json",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create yryun00",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "userCreateRequest",
+							"value": "{\n  \"username\": \"yryun00\",\n  \"email\": \"yryun00@naver.com\",\n  \"password\": \"0709\"\n}",
+							"contentType": "application/json",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					],
+					"query": [
+						{
+							"key": "userCreateRequest",
+							"value": "",
+							"description": "application/json",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create zeroad",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "userCreateRequest",
+							"value": "{\n  \"username\": \"zeroad\",\n  \"email\": \"zeroad@naver.com\",\n  \"password\": \"0709\"\n}",
+							"contentType": "application/json",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					],
+					"query": [
+						{
+							"key": "userCreateRequest",
+							"value": "{\n  \"username\": \"zeroad\",\n  \"email\": \"zeroad@naver.com\",\n  \"password\": \"0709\"\n}",
+							"description": "application/json",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Get",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Update",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "userUpdateRequest",
+							"value": "{\n  \"newUsername\": \"ro111\",\n  \"newEmail\": \"ro111@naver.com\",\n  \"newPassword\": \"0709\"\n}",
+							"contentType": "application/json",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users/66d8e446-14f6-4aff-b400-024d33207093",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"66d8e446-14f6-4aff-b400-024d33207093"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Status Update",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const currentTimeStamp = Math.floor(Date.now() / 1000);\r",
+							"pm.environment.set('currentTimeStamp', currentTimeStamp);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"newLastActiveAt\": {{currentTimeStamp}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users/da52f5fe-4a2f-4a9a-9d38-2dee0e5169fa/userStatus",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"da52f5fe-4a2f-4a9a-9d38-2dee0e5169fa",
+						"userStatus"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "public channel create",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"SB02team\", \r\n    \"description\" : \"1 team\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/channels/public",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels",
+						"public"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "private channel create",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"participantIds\": [\r\n        \"468c60df-7031-4f87-883d-9cb27ba35852\", \r\n        \"da52f5fe-4a2f-4a9a-9d38-2dee0e5169fa\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/channels/private",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels",
+						"private"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "channel Get",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/channels?userId=468c60df-7031-4f87-883d-9cb27ba35852",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "468c60df-7031-4f87-883d-9cb27ba35852"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "channel update",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"newName\": \"SB02 newTeam\", \r\n    \"newDescription\": \"2 team\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/channels/137b8150-dac7-4f4c-993d-c3c74791376d",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels",
+						"137b8150-dac7-4f4c-993d-c3c74791376d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "channel update Copy",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"newName\": \"SB02 newTeam\", \r\n    \"newDescription\": \"2 team\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/channels/d1a89cd1-3667-40b8-806d-56d3624dde75",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels",
+						"d1a89cd1-3667-40b8-806d-56d3624dde75"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "message Create",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "messageCreateRequest",
+							"value": "{\n  \"content\": \"first message\",\n  \"channelId\": \"137b8150-dac7-4f4c-993d-c3c74791376d\",\n  \"authorId\": \"1df86504-6a29-4227-ac94-aaf7c224754f\"\n}",
+							"contentType": "application/json",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/messages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"messages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "message Update",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"newContent\": \"new first message\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/messages/3c5c5a12-76db-4008-9240-cff4f19651de",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"messages",
+						"3c5c5a12-76db-4008-9240-cff4f19651de"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "message Get",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/messages?channelId=137b8150-dac7-4f4c-993d-c3c74791376d",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"messages"
+					],
+					"query": [
+						{
+							"key": "channelId",
+							"value": "137b8150-dac7-4f4c-993d-c3c74791376d"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
