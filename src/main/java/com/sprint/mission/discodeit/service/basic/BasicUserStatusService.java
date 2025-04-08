@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -61,12 +61,12 @@ public class BasicUserStatusService implements UserStatusService {
 
 
     @Override
-    public UserStatus updateByUserId(UserStatusUpdateDto userStatusUpdateDto) {
+    public UserStatus updateByUserId(UUID userId, UserStatusUpdateDto userStatusUpdateRequest) {
         UserStatus matchingUserStatus = userStatusRepository.load().stream()
-                .filter(u -> u.getUserId().equals(userStatusUpdateDto.userId()))
+                .filter(u -> u.getUserId().equals(userId))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
-        Instant currentTime = Instant.now();
+        Instant currentTime = userStatusUpdateRequest.newLastActiveAt();
         matchingUserStatus.updateLastConnectionTime(currentTime);
         userStatusRepository.save(matchingUserStatus);
         return matchingUserStatus;

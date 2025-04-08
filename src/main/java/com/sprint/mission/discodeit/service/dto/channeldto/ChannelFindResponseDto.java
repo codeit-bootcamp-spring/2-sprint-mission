@@ -9,25 +9,25 @@ import java.util.UUID;
 
 public record ChannelFindResponseDto(
         UUID id,
-        ChannelType channelType,
+        ChannelType Type,
         String name,
         String description,
         Instant createdAt,
         Instant updatedAt,
         UUID userId,
-        Instant lastReadTime
+        Instant lastReadAt
 ) {
     public static ChannelFindResponseDto fromChannel(Channel channel, ReadStatus readStatus) {
         UUID userId = (channel.getType() == ChannelType.PRIVATE && readStatus !=null) ? readStatus.getUserId() : null;
         return new ChannelFindResponseDto(
                 channel.getId(),
                 channel.getType(),
-                channel.getChannelName(),
+                channel.getName(),
                 channel.getDescription(),
                 channel.getCreatedAt(),
                 channel.getUpdatedAt(),
                 userId,
-                readStatus != null ? readStatus.getLastReadTime() : null
+                readStatus != null ? readStatus.getLastReadAt() : null
 
         );
     }

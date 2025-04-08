@@ -7,12 +7,13 @@ import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusFindDto;
 import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusUpdateDto;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UserStatusService {
 
     UserStatus create(UserStatusCreateDto userStatusCreateDto);
     UserStatus getUser(UserStatusFindDto userStatusFindDto);
     List<UserStatus> getAllUser();
-    UserStatus updateByUserId(UserStatusUpdateDto userStatusUpdateDto);
+    UserStatus updateByUserId(UUID userId, UserStatusUpdateDto userStatusUpdateRequest);
     void delete(UserStatusDeleteDto userStatusDeleteDto);
 }

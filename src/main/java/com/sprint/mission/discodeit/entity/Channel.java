@@ -9,22 +9,22 @@ public class Channel extends BaseEntity {
 
     // 필드 선언
     private final ChannelType type;
-    private String channelName;
+    private String name;
     private String description;
 
     // 생선자 선언
     public Channel(ChannelType type, String channelName, String description) {
         this.type = type;
-        this.channelName = channelName;
+        this.name = channelName;
         this.description = description;
     }
 
     // 채널 업데이트 메소드 선언
     public void updateChannel(String channelName, String description) {
-        this.channelName = channelName;
+        this.name = channelName;
         this.description = description;
         super.update();
-        System.out.printf("[ %s ], [ %s ] 로 변경되었습니다.", this.channelName, this.description);
+        System.out.printf("[ %s ], [ %s ] 로 변경되었습니다.", this.name, this.description);
     }
 
     @Override
@@ -43,9 +43,9 @@ public class Channel extends BaseEntity {
     @Override
     public String toString() {
         return "\nChannel Type: " + type +
-                "\nChannelName: " + channelName + "\nDescription: " + description +
+                "\nChannelName: " + name + "\nDescription: " + description +
                 "\nChannel ID: " + this.getId() +
-                "\nCreatedAt: " + this.getCreatedAtFormatted() +
-                "\nUpdatedAt: " + this.getUpdatedAttFormatted();
+                "\nCreatedAt: " + this.getCreatedAt() +
+                "\nUpdatedAt: " + this.getUpdatedAt();
     }
 }

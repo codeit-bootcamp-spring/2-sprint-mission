@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -40,17 +40,17 @@ public class BasicReadStatusService implements ReadStatusService {
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("User not found"));
         Channel matchingChannel = channelList.stream()
-                .filter(m->m.getId().equals(readStatusCreateDto.channelId()))
+                .filter(m -> m.getId().equals(readStatusCreateDto.channelId()))
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("Channel not found"));
         Optional<ReadStatus> matchingReadStatus = readStatusList.stream()
-                .filter(m->m.getUserId().equals(readStatusCreateDto.userId()) && m.getChannelId().equals(readStatusCreateDto.channelId()))
+                .filter(m -> m.getUserId().equals(readStatusCreateDto.userId()) && m.getChannelId().equals(readStatusCreateDto.channelId()))
                 .findAny();
-        if(matchingReadStatus.isPresent()){
+        if (matchingReadStatus.isPresent()) {
             throw new InvalidInputException("Read status already exists");
         }
 
-        Instant lastReadAt = readStatusCreateDto.lastReadTime();
+        Instant lastReadAt = readStatusCreateDto.lastReadAt();
         ReadStatus readStatus = new ReadStatus(matchingUser.getId(), matchingChannel.getId(), lastReadAt);
         readStatusRepository.save(readStatus);
         return readStatus;
@@ -60,28 +60,25 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus find(ReadStatusFindDto readStatusFindDto) {
-        return readStatusRepository.load().stream()
-                .filter(r->r.getId().equals(readStatusFindDto.Id()))
-                .findAny()
+        return readStatusRepository.loadToId(readStatusFindDto.Id())
                 .orElseThrow(() -> new NotFoundException("readStatus not found"));
     }
 
 
     @Override
-    public List<ReadStatus> findAllByUserId(ReadStatusFindDto readStatusFindDto) {
+    public List<ReadStatus> findAllByUserId(UUID userId) {
         return readStatusRepository.load().stream()
-                .filter(m->m.getUserId().equals(readStatusFindDto.userId()))
+                .filter(m -> m.getUserId().equals(userId))
                 .toList();
     }
 
 
     @Override
-    public ReadStatus update(ReadStatusUpdateDto readStatusUpdateDto) {
-        ReadStatus matchingReadStatus = readStatusRepository.load().stream()
-                .filter(m->m.getUserId().equals(readStatusUpdateDto.userId()) && m.getChannelId().equals(readStatusUpdateDto.channelId()))
-                .findAny()
+    public ReadStatus update(UUID readStatusId, ReadStatusUpdateDto readStatusUpdateDto) {
+        ReadStatus matchingReadStatus = readStatusRepository.loadToId(readStatusId)
                 .orElseThrow(() -> new NotFoundException("readStatus not found"));
-        Instant newLastReadTime = readStatusUpdateDto.newLastReadTime();
+
+        Instant newLastReadTime = readStatusUpdateDto.newLastReadAt();
         matchingReadStatus.readStatusUpdate(newLastReadTime);
         return readStatusRepository.save(matchingReadStatus);
     }
@@ -89,9 +86,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void delete(ReadStatusDeleteDto readStatusDeleteDto) {
-        ReadStatus matchingReadStatus = readStatusRepository.load().stream()
-                .filter(m->m.getId().equals(readStatusDeleteDto.Id()))
-                .findAny()
+        ReadStatus matchingReadStatus = readStatusRepository.loadToId(readStatusDeleteDto.Id())
                 .orElseThrow(() -> new NotFoundException("readStatus not found"));
         readStatusRepository.remove(matchingReadStatus);
     }

@@ -9,21 +9,21 @@ import java.util.UUID;
 
 @Getter
 public class Message extends BaseEntity {
-    private String message;
+    private String content;
     private final UUID channelId;
-    private final UUID senderId;
+    private final UUID authorId;
     private final List<UUID> attachmentIds;
 
 
-    public Message(String message, UUID channelId, UUID senderId, List<UUID> attachmentIds) {
-        this.message = message;
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+        this.content = content;
         this.channelId = channelId;
-        this.senderId = senderId;
+        this.authorId = authorId;
         this.attachmentIds = attachmentIds;
     }
 
     public void updateMessage(String newMessage) {
-        this.message = newMessage;
+        this.content = newMessage;
         super.update();
     }
 
@@ -43,10 +43,10 @@ public class Message extends BaseEntity {
     @Override
     public String toString() {
         return "\nMessage ID: " + this.getId() +
-                "\nchannelID: " + channelId + "\nSenderID: " + senderId + "\nMessage: " + message +
+                "\nchannelID: " + channelId + "\nSenderID: " + authorId + "\nMessage: " + content +
                 "\nAttachments ID: " + attachmentIds +
-                "\nCreatedAt: " + this.getCreatedAtFormatted() +
-                "\nUpdatedAt: " + this.getUpdatedAttFormatted() +
+                "\nCreatedAt: " + this.getCreatedAt() +
+                "\nUpdatedAt: " + this.getUpdatedAt() +
                 "\nUUID: " + this.getId();
     }
 }

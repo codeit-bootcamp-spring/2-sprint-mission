@@ -48,8 +48,8 @@ public class User extends BaseEntity {
         return "\nName: " + name + "\nMail: " + email + "\nPassword: " + password +
                 "\nUser ID: " + this.getId() +
                 "\nProfile ID: " + profileId +
-                "\nCreatedAt: " + this.getCreatedAtFormatted() +
-                "\nUpdatedAt: " + this.getUpdatedAttFormatted();
+                "\nCreatedAt: " + this.getCreatedAt() +
+                "\nUpdatedAt: " + this.getUpdatedAt();
 
     }
 }

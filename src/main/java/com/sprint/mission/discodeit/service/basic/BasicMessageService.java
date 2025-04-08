@@ -13,7 +13,10 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
-import com.sprint.mission.discodeit.service.dto.messagedto.*;
+import com.sprint.mission.discodeit.service.dto.messagedto.MessageCreateDto;
+import com.sprint.mission.discodeit.service.dto.messagedto.MessageFindRequestDto;
+import com.sprint.mission.discodeit.service.dto.messagedto.MessageFindResponseDto;
+import com.sprint.mission.discodeit.service.dto.messagedto.MessageUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +40,7 @@ public class BasicMessageService implements MessageService {
         List<User> userList = userRepository.load();
         List<Channel> channelList = channelRepository.load();
         Optional<User> user = userList.stream()
-                .filter(u -> u.getId().equals(messageCreateDto.senderId()))
+                .filter(u -> u.getId().equals(messageCreateDto.authorId()))
                 .findAny();
         Optional<Channel> channel = channelList.stream()
                 .filter(c -> c.getId().equals(messageCreateDto.channelId()))
@@ -60,7 +63,7 @@ public class BasicMessageService implements MessageService {
                 })
                 .toList();
 
-        Message messages = new Message(messageCreateDto.message(), messageCreateDto.channelId(), messageCreateDto.senderId(), attachmentIds);
+        Message messages = new Message(messageCreateDto.content(), messageCreateDto.channelId(), messageCreateDto.authorId(), attachmentIds);
         messageRepository.save(messages);
 
         return messages;
@@ -69,47 +72,38 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageFindResponseDto find(MessageFindRequestDto messageFindRequestDto) {
-        Message message = messageRepository.load().stream()
-                .filter(m -> m.getId().equals(messageFindRequestDto.messageId()))
-                .findAny()
+        Message matchingMessage = messageRepository.loadToId(messageFindRequestDto.messageId())
                 .orElseThrow(() -> new NotFoundException("Message does not exist."));
-        return MessageFindResponseDto.fromMessage(message);
+        return MessageFindResponseDto.fromMessage(matchingMessage);
     }
 
 
     @Override
-    public List<MessageFindAllByChannelIdResponseDto> findAllByChannelId(MessageFindAllByChannelIdRequestDto messageFindAllByChannelIdRequestDto) {
-        List<Message> messageList = messageRepository.load().stream()
-                .filter(m -> m.getChannelId().equals(messageFindAllByChannelIdRequestDto.channelId()))
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.load().stream()
+                .filter(m -> m.getChannelId().equals(channelId))
                 .toList();
-        return MessageFindAllByChannelIdResponseDto.fromChannel(messageList);
+
     }
 
 
     @Override
-    public Message update(MessageUpdateDto messageUpdateDto) {
-        Message message = messageRepository.load().stream()
-                .filter(m -> m.getId().equals(messageUpdateDto.messageId()))
-                .findAny()
+    public Message update(UUID messageId, MessageUpdateDto messageUpdateDto) {
+        Message matchingMessage = messageRepository.loadToId(messageId)
                 .orElseThrow(() -> new NotFoundException("Message does not exist."));
-        
-        message.updateMessage(messageUpdateDto.changeMessage());
-        return messageRepository.save(message);
+
+        matchingMessage.updateMessage(messageUpdateDto.newContent());
+        return messageRepository.save(matchingMessage);
     }
 
 
     @Override
-    public void delete(MessageDeleteDto messageDeleteDto) {
-        Message message = messageRepository.load().stream()
-                .filter(m -> m.getId().equals(messageDeleteDto.messageId()))
-                .findAny()
+    public void delete(UUID messageId) {
+        Message matchingMessage = messageRepository.loadToId(messageId)
                 .orElseThrow(() -> new NotFoundException("Message does not exist."));
 
-        for (UUID oldProfiles : message.getAttachmentIds()) {
-            BinaryContentDeleteDto binaryContentDeleteDto = new BinaryContentDeleteDto(oldProfiles);
-            binaryContentService.delete(binaryContentDeleteDto);
-        }
-        messageRepository.remove(message);
+        matchingMessage.getAttachmentIds().forEach(binaryContentService::delete);
+        messageRepository.remove(matchingMessage);
 
     }
 }

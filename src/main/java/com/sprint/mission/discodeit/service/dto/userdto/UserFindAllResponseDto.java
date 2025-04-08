@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record UserFindAllResponseDto(
-        UUID userId,
+        UUID id,
         Instant createdAt,
         Instant updatedAt,
         String username,
@@ -39,5 +39,6 @@ public record UserFindAllResponseDto(
             }
         }
     return FindAllResponse;
+
     }
 }

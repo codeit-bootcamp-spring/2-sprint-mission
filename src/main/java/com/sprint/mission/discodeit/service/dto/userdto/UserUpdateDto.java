@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.service.dto.userdto;
 
-import java.nio.file.Path;
-import java.util.UUID;
+import jakarta.validation.constraints.NotBlank;
 
 public record UserUpdateDto(
-        UUID userId,
-        String changeName,
-        String changeEmail,
-        String changePassword
+        @NotBlank
+        String newUsername,
+
+        @NotBlank
+        String newEmail,
+        String newPassword
 ) {
 
 }
