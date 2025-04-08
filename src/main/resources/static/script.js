@@ -1,5 +1,6 @@
 // API endpoints
 // const API_BASE_URL = '/api';
+// 배포 주소
 const API_BASE_URL = "https://2-sprint-mission-production-cc64.up.railway.app/"
 const ENDPOINTS = {
   USERS: `${API_BASE_URL}/users`,
