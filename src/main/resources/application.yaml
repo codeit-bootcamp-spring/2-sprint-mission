@@ -4,6 +4,8 @@ spring:
   jpa:
     open-in-view: false
 
+
+
 discodeit:
   storage:
     data-dir: C:/Users/ych61/IdeaProjects/codeit_sprint/2-sprint-mission/data
@@ -17,4 +19,4 @@ logging:
     org.springframework.web: INFO
 
 jwt:
-  secret: your-very-strong-and-long-secret-key-please-change-this #
+  secret: your-very-strong-and-long-secret-key-please-change-this
