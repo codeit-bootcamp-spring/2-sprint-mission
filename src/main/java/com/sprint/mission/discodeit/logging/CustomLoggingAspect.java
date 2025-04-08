@@ -12,15 +12,15 @@ import java.util.Arrays;
 @Aspect
 @Component
 public class CustomLoggingAspect {
-    private static final Logger logger = LoggerFactory.getLogger(CustomLoggingAspect.class);
 
-    @Around("@annotation(com.sprint.mission.discodeit.logging.CustomLogging)")
-    public Object logMethod(ProceedingJoinPoint joinPoint) throws Throwable {
-        String methodName = joinPoint.getSignature().toShortString();
-        String args = Arrays.stream(joinPoint.getArgs()).map(Object::toString).toList().toString();
+  private static final Logger logger = LoggerFactory.getLogger(CustomLoggingAspect.class);
 
-        logger.info("Method {} called with arguments {}", methodName, args);
-        Object result = joinPoint.proceed();
-        return result;
-    }
+  @Around("@annotation(com.sprint.mission.discodeit.logging.CustomLogging)")
+  public Object logMethod(ProceedingJoinPoint joinPoint) throws Throwable {
+    String methodName = joinPoint.getSignature().toShortString();
+    String args = Arrays.stream(joinPoint.getArgs()).map(Object::toString).toList().toString();
+
+    logger.info("Method {} called with arguments {}", methodName, args);
+    return joinPoint.proceed();
+  }
 }
