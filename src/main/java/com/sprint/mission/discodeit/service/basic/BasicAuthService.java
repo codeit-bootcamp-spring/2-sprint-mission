@@ -1,32 +1,32 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.auth.AuthLoginRequestDto;
-import com.sprint.mission.discodeit.dto.auth.AuthResponseDto;
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.auth.PasswordMismatchException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
-    private final UserRepository userRepository;
 
-    @Override
-    public AuthResponseDto login(AuthLoginRequestDto dto) {
-        Optional<User> matchingUser = userRepository.findAll()
-                .stream()
-                .filter(user -> Objects.equals(user.getUsername(), dto.getUsername())
-                        && Objects.equals(user.getPassword(), dto.getPassword()))
-                .findFirst();
+  private final UserRepository userRepository;
 
-        return matchingUser.map(user -> new AuthResponseDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(), user.getEmail(), user.getProfileId()))
-                .orElseThrow(() -> new NoSuchElementException("User with name " + dto.getUsername() + " not found"));
+  @Override
+  public User login(LoginRequest request) {
+    String username = request.username();
+    String password = request.password();
+
+    User user = userRepository.findByUserName(username)
+        .orElseThrow(() -> new UserNotFoundException("User with name " + username + " not found"));
+
+    if (!user.getPassword().equals(password)) {
+      throw new PasswordMismatchException("Password mismatch");
     }
+
+    return user;
+  }
 }
