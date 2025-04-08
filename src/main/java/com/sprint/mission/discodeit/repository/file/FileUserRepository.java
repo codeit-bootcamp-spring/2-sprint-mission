@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.util.Objects;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
