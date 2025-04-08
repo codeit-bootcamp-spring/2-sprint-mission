@@ -5,9 +5,9 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.exception.handler.custom.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.handler.custom.message.MessageNotFoundException;
-import com.sprint.mission.discodeit.exception.handler.custom.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.custom.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.custom.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.custom.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -38,16 +38,21 @@ public class BasicMessageService implements MessageService {
             throw new ChannelNotFoundException("Message 생성 실패: " + e.getMessage());
         }
 
-        List<UUID> attachmentIds = binaryContentCreateDtos.stream()
-                .map(attachmentRequest -> {
-                    String fileName = attachmentRequest.fileName();
-                    String contentType = attachmentRequest.contentType();
-                    byte[] bytes = attachmentRequest.bytesImage();
+        List<BinaryContent> binaryContents = binaryContentCreateDtos.stream()
+                .map(dto -> new BinaryContent(
+                        dto.fileName(),
+                        (long) dto.bytes().length,
+                        dto.contentType(),
+                        dto.bytes()
+                ))
+                .toList();
 
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
-                    return createdBinaryContent.getId();
-                })
+        List<BinaryContent> savedBinaryContents = binaryContents.stream()
+                .map(binaryContentRepository::save)
+                .toList();
+
+        List<UUID> attachmentIds = savedBinaryContents.stream()
+                .map(BinaryContent::getId)
                 .toList();
 
         Message newMessage = new Message(messageCreateDto.authorId(), messageCreateDto.channelId(),
@@ -78,9 +83,9 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(MessageUpdateDto messageUpdateDto) {
-        Message message = findById(messageUpdateDto.id());
-        message.update(messageUpdateDto.content());
+    public Message update(UUID messageId, MessageUpdateDto messageUpdateDto) {
+        Message message = findById(messageId);
+        message.update(messageUpdateDto.newContent());
 
         return messageRepository.save(message);
     }

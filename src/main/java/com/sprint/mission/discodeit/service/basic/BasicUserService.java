@@ -8,9 +8,9 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.handler.custom.user.UserEmailAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.handler.custom.user.UserNameAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.handler.custom.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.custom.user.UserEmailAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.custom.user.UserNameAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.custom.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -48,7 +48,7 @@ public class BasicUserService implements UserService {
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytesImage();
+                    byte[] bytes = profileRequest.bytes();
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
                     return binaryContentRepository.save(binaryContent).getId();
                 })
@@ -72,19 +72,20 @@ public class BasicUserService implements UserService {
 
         UserStatus userStatus = userStatusService.findById(user.getId());
 
-        return new UserDto(user, userStatus.isActive());
+        return new UserDto(user, userStatus.isOnline());
     }
 
     @Override
     public List<UserDto> findAll() {
         return userRepository.findAll().stream().map(user -> {
             UserStatus userStatus = userStatusService.findById(user.getId());
-            return new UserDto(user, userStatus.isActive());
+            return new UserDto(user, userStatus.isOnline());
         }).toList();
     }
 
     @Override
-    public User update(UserUpdateDto userUpdateDto) {
+    public User update(UUID userId, UserUpdateDto userUpdateDto,
+                       Optional<BinaryContentCreateDto> binaryContentCreateDto) {
         List<User> users = userRepository.findAll();
         boolean isEmailExist = users.stream().anyMatch(
                 user -> user.getEmail().equals(userUpdateDto.newEmail()));
@@ -100,9 +101,24 @@ public class BasicUserService implements UserService {
             throw new UserNameAlreadyExistsException(userUpdateDto.newUsername() + " 유저는 이미 존재하여 수정할 수 없습니다.");
         }
 
-        User user = userRepository.findById(userUpdateDto.id());
+        User user = userRepository.findById(userId);
+
+        if (user == null) {
+            throw new UserNotFoundException(userId + " 유저를 찾을 수 없습니다.");
+        }
+
+        UUID nullableProfileId = binaryContentCreateDto
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
+
         user.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(),
-                userUpdateDto.newProfileId());
+                nullableProfileId);
         userRepository.save(user);
 
         return user;
@@ -111,6 +127,11 @@ public class BasicUserService implements UserService {
     @Override
     public void delete(UUID userId) {
         User user = userRepository.findById(userId);
+
+        if (user == null) {
+            throw new UserNotFoundException(userId + " 유저를 찾을 수 없습니다.");
+        }
+
         userRepository.delete(user.getId());
 
         UserStatus userStatus = userStatusService.findById(user.getId());

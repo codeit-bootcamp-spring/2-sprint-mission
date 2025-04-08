@@ -16,7 +16,7 @@ public interface MessageService {
 
     List<Message> findAllByAuthorId(UUID authorId);
 
-    Message update(MessageUpdateDto messageUpdateDto);
+    Message update(UUID messageId, MessageUpdateDto messageUpdateDto);
 
     void delete(UUID messageId);
 }

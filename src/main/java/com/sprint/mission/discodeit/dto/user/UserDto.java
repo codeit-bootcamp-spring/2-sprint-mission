@@ -11,10 +11,10 @@ public record UserDto(
         UUID profileId,
         Instant createdAt,
         Instant updatedAt,
-        boolean isActive
+        boolean online
 ) {
-    public UserDto(User user, boolean isActive) {
+    public UserDto(User user, boolean online) {
         this(user.getId(), user.getUsername(), user.getEmail(), user.getProfileId(),
-                user.getCreatedAt(), user.getUpdatedAt(), isActive);
+                user.getCreatedAt(), user.getUpdatedAt(), online);
     }
 }

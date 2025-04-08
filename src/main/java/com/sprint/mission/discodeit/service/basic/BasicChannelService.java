@@ -9,8 +9,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.handler.custom.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.handler.custom.channel.PrivateChannelUpdateException;
+import com.sprint.mission.discodeit.exception.custom.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.custom.channel.PrivateChannelUpdateNotSupportedException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -37,8 +37,8 @@ public class BasicChannelService implements ChannelService {
         Channel newChannel = Channel.createPrivate();
         channelRepository.save(newChannel);
 
-        channelCreatePrivateDto.users().forEach(user -> {
-            ReadStatusCreateDto readStatusCreateDto = new ReadStatusCreateDto(user.getId(), newChannel.getId(), null);
+        channelCreatePrivateDto.participantIds().forEach(userId -> {
+            ReadStatusCreateDto readStatusCreateDto = new ReadStatusCreateDto(userId, newChannel.getId(), null);
             readStatusService.create(readStatusCreateDto);
         });
 
@@ -56,7 +56,7 @@ public class BasicChannelService implements ChannelService {
                 );
 
         if (isExistChannel) {
-            throw new PrivateChannelUpdateException(channelCreatePublicDto.name() + " 채널은 이미 존재합니다.");
+            throw new PrivateChannelUpdateNotSupportedException(channelCreatePublicDto.name() + " 채널은 이미 존재합니다.");
         }
 
         Channel newChannel = Channel.createPublic(channelCreatePublicDto.name(), channelCreatePublicDto.description());
@@ -79,14 +79,14 @@ public class BasicChannelService implements ChannelService {
 
         boolean isPrivate = channel.getType().equals(ChannelType.PRIVATE);
 
-        List<UUID> userIds = isPrivate ?
+        List<UUID> participantIds = isPrivate ?
                 readStatusService.findAll().stream()
                         .filter(readStatus -> readStatus.getChannelId().equals(channelId))
                         .map(ReadStatus::getUserId)
                         .toList()
                 : List.of();
 
-        return new ChannelDto(channel, lastMessageAt, userIds);
+        return new ChannelDto(channel, lastMessageAt, participantIds);
     }
 
     @Override
@@ -102,11 +102,11 @@ public class BasicChannelService implements ChannelService {
                         joinedChannelIds.contains(channel.getId()))
                 .map(channel -> {
                     Instant lastMessageAt = findLastMessageAt(channel.getId());
-                    List<UUID> userIds = readStatusService.findAll().stream()
+                    List<UUID> participantIds = readStatusService.findAll().stream()
                             .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
                             .map(ReadStatus::getUserId)
                             .toList();
-                    return new ChannelDto(channel, lastMessageAt, userIds);
+                    return new ChannelDto(channel, lastMessageAt, participantIds);
                 })
                 .toList();
 
@@ -130,15 +130,15 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(ChannelUpdateDto channelUpdateDto) {
-        Channel channel = channelRepository.findById(channelUpdateDto.id());
+    public Channel update(UUID channelId, ChannelUpdateDto channelUpdateDto) {
+        Channel channel = channelRepository.findById(channelId);
 
         if (channel == null) {
-            throw new ChannelNotFoundException(channelUpdateDto.id() + " 채널은 존재하지 않아 수정할 수 없습니다.");
+            throw new ChannelNotFoundException(channelId + " 채널은 존재하지 않아 수정할 수 없습니다.");
         }
 
         if (channel.getType().equals(ChannelType.PRIVATE)) {
-            throw new PrivateChannelUpdateException("Private 채널은 수정할 수 없습니다.");
+            throw new PrivateChannelUpdateNotSupportedException("Private 채널은 수정할 수 없습니다.");
         }
 
         channel.update(channelUpdateDto.newName(), channelUpdateDto.newDescription());

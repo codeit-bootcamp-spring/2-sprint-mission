@@ -32,7 +32,7 @@ public class UserStatus extends BaseEntity implements Serializable {
         }
     }
 
-    public boolean isActive() {
+    public boolean isOnline() {
         Instant now = Instant.now();
         Duration duration = Duration.between(this.lastActiveAt, now);
 

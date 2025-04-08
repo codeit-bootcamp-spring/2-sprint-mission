@@ -3,10 +3,10 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.handler.custom.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.handler.custom.readStatus.ReadStatusAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.handler.custom.readStatus.ReadStatusNotFoundException;
-import com.sprint.mission.discodeit.exception.handler.custom.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.custom.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.custom.readStatus.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.custom.readStatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.custom.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -76,8 +76,8 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(ReadStatusUpdateDto readStatusUpdateDto) {
-        ReadStatus readStatus = findById(readStatusUpdateDto.id());
+    public ReadStatus update(UUID readStatusId, ReadStatusUpdateDto readStatusUpdateDto) {
+        ReadStatus readStatus = findById(readStatusId);
         readStatus.update(readStatusUpdateDto.newLastReadAt());
 
         return readStatusRepository.save(readStatus);

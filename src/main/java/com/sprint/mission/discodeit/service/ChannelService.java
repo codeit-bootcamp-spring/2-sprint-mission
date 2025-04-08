@@ -17,7 +17,7 @@ public interface ChannelService {
 
     List<ChannelDto> findAllByUserId(UUID userId);
 
-    Channel update(ChannelUpdateDto channelUpdateDto);
+    Channel update(UUID channelId, ChannelUpdateDto channelUpdateDto);
 
     void delete(UUID channelId);
 }

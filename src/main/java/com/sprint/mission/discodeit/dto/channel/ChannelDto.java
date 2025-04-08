@@ -12,9 +12,10 @@ public record ChannelDto(
         String description,
         ChannelType type,
         Instant lastMessageAt,
-        List<UUID> userIds
+        List<UUID> participantIds
 ) {
-    public ChannelDto(Channel channel, Instant lastMessageAt, List<UUID> userIds) {
-        this(channel.getId(), channel.getName(), channel.getDescription(), channel.getType(), lastMessageAt, userIds);
+    public ChannelDto(Channel channel, Instant lastMessageAt, List<UUID> participantIds) {
+        this(channel.getId(), channel.getName(), channel.getDescription(), channel.getType(), lastMessageAt,
+                participantIds);
     }
 }
