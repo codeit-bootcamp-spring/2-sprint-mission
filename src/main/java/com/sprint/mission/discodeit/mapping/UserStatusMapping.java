@@ -11,12 +11,11 @@ import org.springframework.context.annotation.Bean;
 
 @Mapper(config = CentralMapperConfig.class)
 public interface UserStatusMapping {
-    UserStatusMapping INSTANCE = Mappers.getMapper(UserStatusMapping.class);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    StatusDto.Summary userStatusToSummary(UserStatus userStatus);
+  @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  StatusDto.Summary userStatusToSummary(UserStatus userStatus);
 
-    @Mapping(target = "id", source = "userStatus.id")
-    @Mapping(target = "message", expression = "java(message)")
-    StatusDto.ResponseDelete userStatusToResponse(UserStatus userStatus, @Context String message);
+  @Mapping(target = "id", source = "userStatus.id")
+  @Mapping(target = "message", expression = "java(message)")
+  StatusDto.ResponseDelete userStatusToResponse(UserStatus userStatus, @Context String message);
 }

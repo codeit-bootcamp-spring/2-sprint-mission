@@ -9,14 +9,13 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(config = CentralMapperConfig.class)
 public interface ReadStatusMapping {
-    ReadStatusMapping INSTANCE = Mappers.getMapper(ReadStatusMapping.class);
 
-    ReadStatusDto.ResponseReadStatus toResponseDto(ReadStatus readStatus);
+  ReadStatusDto.ResponseReadStatus toResponseDto(ReadStatus readStatus);
 
-    ReadStatus createDtoToEntity(ReadStatusDto.Create createDto);
+  ReadStatus createDtoToEntity(ReadStatusDto.Create createDto);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateEntityFromDto(ReadStatusDto.Update updateDto, @MappingTarget ReadStatus readStatus);
-    
+  @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  void updateEntityFromDto(ReadStatusDto.Update updateDto, @MappingTarget ReadStatus readStatus);
+
 
 } 

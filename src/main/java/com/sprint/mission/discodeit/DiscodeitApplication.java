@@ -7,12 +7,11 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 public class DiscodeitApplication {
-//컨트롤러라고 가정
-	public static void main(String[] args) {
-		ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+
+  public static void main(String[] args) {
+    ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
 
-
-	}
+  }
 
 }

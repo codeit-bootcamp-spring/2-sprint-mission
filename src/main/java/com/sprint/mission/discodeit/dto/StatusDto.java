@@ -9,48 +9,57 @@ import lombok.Getter;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 public class StatusDto {
 
-    @Getter
-    @Builder(toBuilder = true)
-    public static class Summary {
-        @NotNull
-        private final UUID id; //status 아이디
-        @NotNull
-        private UUID userid; // 유저아이디
-        private ZonedDateTime lastSeenAt; // 마지막 접속 시간
-        private ZonedDateTime updatedAt; // 업데이트 시간
-    }
+  @Getter
+  @Builder(toBuilder = true)
+  public static class Summary {
 
-    @Getter
-    @Builder(toBuilder = true)
-    public static class Create {
-        @NotNull
-        private final UUID userid; //유저 아이디
-    }
+    @NotNull
+    private final UUID id; //status 아이디
+    @NotNull
+    private UUID userid; // 유저아이디
+    private ZonedDateTime lastSeenAt; // 마지막 접속 시간
+    private ZonedDateTime updatedAt; // 업데이트 시간
+  }
+
+  @Getter
+  @Builder(toBuilder = true)
+  public static class Create {
+
+    @NotNull
+    private final UUID userid; //유저 아이디
+  }
 
 
-    @Getter
-    @Builder(toBuilder = true)
-    public static class ResponseDelete {
-        @NotNull
-        private final UUID id;
-        private String message;
-    }
-    @AllArgsConstructor
-    @Getter
-    @Builder(toBuilder = true)
-    public static class StatusRequest {
-        @NotBlank
-        private String status;
-    }
-    @AllArgsConstructor
-    @Getter
-    @Builder(toBuilder = true)
-    public static class StatusResponse {
-        private UUID id;
-        @NotBlank
-        private StatusOperation status;
-    }
+  @Getter
+  @Builder(toBuilder = true)
+  public static class ResponseDelete {
+
+    @NotNull
+    private final UUID id;
+    private String message;
+  }
+
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Getter
+  @Builder(toBuilder = true)
+  public static class StatusRequest {
+
+    @NotBlank
+    private String status;
+  }
+
+  @AllArgsConstructor
+  @Getter
+  @Builder(toBuilder = true)
+  public static class StatusResponse {
+
+    private UUID id;
+    @NotBlank
+    private StatusOperation status;
+  }
 }

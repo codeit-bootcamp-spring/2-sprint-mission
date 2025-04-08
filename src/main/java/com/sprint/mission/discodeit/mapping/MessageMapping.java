@@ -15,11 +15,10 @@ import java.util.*;
 
 @Mapper(config = CentralMapperConfig.class)
 public interface MessageMapping {
-    MessageMapping INSTANCE = Mappers.getMapper(MessageMapping.class);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    MessageDto.Response messageToResponse(Message message);
+  @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  MessageDto.Response messageToResponse(Message message);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateMessageFromDto(MessageDto.Update messageDto, @MappingTarget Message message);
+  @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  void updateMessageFromDto(MessageDto.Update messageDto, @MappingTarget Message message);
 }

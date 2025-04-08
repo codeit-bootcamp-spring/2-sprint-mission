@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.*;
 import java.util.UUID;
 
@@ -12,16 +13,20 @@ import java.util.UUID;
 public interface BinaryContentService {
 
 
-    BinaryContentDto.Summary createBinaryContent(BinaryContentDto.Upload binaryContentDto) throws IOException;
+  BinaryContentDto.Summary createBinaryContent(BinaryContentDto.Upload binaryContentDto)
+      throws IOException;
 
-    BinaryContentDto.Summary findBinaryContentSummary(UUID id);
+  void writeFilesAsZip(List<UUID> ids, OutputStream os) throws IOException;
 
-    List<BinaryContentDto.Summary> findBinaryContentSummariesByIds(List<UUID> ids);
+  BinaryContentDto.Summary findBinaryContentSummary(UUID id);
 
-    BinaryContent getBinaryContentEntity(UUID id);
+  List<BinaryContentDto.Summary> findBinaryContentSummariesByIds(List<UUID> ids);
 
-    Optional<InputStream> getContentStream(UUID id) throws IOException;
+  BinaryContent getBinaryContentEntity(UUID id);
 
-    void deleteBinaryContentByOwner(UUID ownerId);
-    List<BinaryContentDto.DeleteResponse> deleteBinaryContentsByIds(List<UUID> ids);
+  Optional<InputStream> getContentStream(UUID id) throws IOException;
+
+  void deleteBinaryContentByOwner(UUID ownerId);
+
+  List<BinaryContentDto.DeleteResponse> deleteBinaryContentsByIds(List<UUID> ids);
 }
