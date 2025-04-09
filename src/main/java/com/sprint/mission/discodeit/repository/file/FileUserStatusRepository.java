@@ -20,48 +20,48 @@ import java.util.stream.Collectors;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = true)
 public class FileUserStatusRepository implements UserStatusRepository {
 
-    private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
 
-    public FileUserStatusRepository(RepositoryProperties properties) {
-        this.DIRECTORY = Paths.get(properties.getUserStatus());
-        FileUtil.init(DIRECTORY);
-    }
+  public FileUserStatusRepository(RepositoryProperties properties) {
+    this.DIRECTORY = Paths.get(properties.getUserStatus());
+    FileUtil.init(DIRECTORY);
+  }
 
-    @Override
-    public UserStatus save(UserStatus userStatus) {
-        return FileUtil.saveToFile(DIRECTORY, userStatus, userStatus.getId());
-    }
+  @Override
+  public UserStatus save(UserStatus userStatus) {
+    return FileUtil.saveToFile(DIRECTORY, userStatus, userStatus.getId());
+  }
 
-    @Override
-    public Optional<UserStatus> findById(UUID id) {
-        return FileUtil.loadFromFile(DIRECTORY, id);
-    }
+  @Override
+  public Optional<UserStatus> findById(UUID id) {
+    return FileUtil.loadFromFile(DIRECTORY, id);
+  }
 
-    @Override
-    public Optional<UserStatus> findByUserId(UUID userId) {
-        return this.findAll().stream()
-                .filter(UserStatus -> UserStatus.getUserId().equals(userId))
-                .findFirst();
-    }
+  @Override
+  public Optional<UserStatus> findByUserId(UUID userId) {
+    return this.findAll().stream()
+        .filter(UserStatus -> UserStatus.getUserId().equals(userId))
+        .findFirst();
+  }
 
-    @Override
-    public List<UserStatus> findAll() {
-        return FileUtil.loadAllFiles(DIRECTORY,EXTENSION).stream()
-                .filter(object -> object instanceof UserStatus)
-                .map(object -> (UserStatus) object)
-                .collect(Collectors.toList());
-    }
+  @Override
+  public List<UserStatus> findAll() {
+    return FileUtil.loadAllFiles(DIRECTORY, EXTENSION).stream()
+        .filter(UserStatus.class::isInstance)
+        .map(UserStatus.class::cast)
+        .collect(Collectors.toList());
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        FileUtil.deleteFile(DIRECTORY, id);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    FileUtil.deleteFile(DIRECTORY, id);
+  }
 
-    @Override
-    public void deleteByUserId(UUID userId) {
-        this.findByUserId(userId)
-                .ifPresent(userStatus -> this.deleteById(userStatus.getId()));
-    }
+  @Override
+  public void deleteByUserId(UUID userId) {
+    this.findByUserId(userId)
+        .ifPresent(userStatus -> this.deleteById(userStatus.getId()));
+  }
 
 }
