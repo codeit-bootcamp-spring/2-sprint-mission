@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.UUID;
 
 public record UpdateMessageDTO(
-        UUID id,
-        Instant updatedAt,
-        List<UUID> attachmentIds,
-        String content,
-        UUID channelId,
-        UserDTO userDTO
+    UUID id,
+    Instant updatedAt,
+    List<UUID> attachmentIds,
+    String content,
+    UUID channelId,
+    UUID authorId
 ) {
+
 }

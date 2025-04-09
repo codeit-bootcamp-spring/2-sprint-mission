@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusParam
 import com.sprint.mission.discodeit.dto.service.readStatus.ReadStatusDTO;
 import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.ReadStatus.ReadStatusBuilder;
 import java.time.Instant;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
@@ -15,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-29T13:22:28+0900",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
+    date = "2025-04-04T10:27:12+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
 )
 @Component
 public class ReadStatusMapperImpl implements ReadStatusMapper {
@@ -29,11 +28,13 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
 
         UUID userId = null;
         UUID channelId = null;
+        Instant lastReadAt = null;
 
         userId = createReadStatusRequestDTO.userId();
         channelId = createReadStatusRequestDTO.channelId();
+        lastReadAt = createReadStatusRequestDTO.lastReadAt();
 
-        CreateReadStatusParam createReadStatusParam = new CreateReadStatusParam( userId, channelId );
+        CreateReadStatusParam createReadStatusParam = new CreateReadStatusParam( userId, channelId, lastReadAt );
 
         return createReadStatusParam;
     }
@@ -47,12 +48,14 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         UUID id = null;
         UUID userId = null;
         UUID channelId = null;
+        Instant lastReadAt = null;
 
         id = readStatusDTO.id();
         userId = readStatusDTO.userId();
         channelId = readStatusDTO.channelId();
+        lastReadAt = readStatusDTO.lastReadAt();
 
-        CreateReadStatusResponseDTO createReadStatusResponseDTO = new CreateReadStatusResponseDTO( id, userId, channelId );
+        CreateReadStatusResponseDTO createReadStatusResponseDTO = new CreateReadStatusResponseDTO( id, userId, channelId, lastReadAt );
 
         return createReadStatusResponseDTO;
     }
@@ -64,12 +67,12 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         }
 
         UUID id = null;
-        Instant updatedAt = null;
+        Instant lastReadAt = null;
 
         id = updateReadStatusDTO.id();
-        updatedAt = updateReadStatusDTO.updatedAt();
+        lastReadAt = updateReadStatusDTO.lastReadAt();
 
-        UpdateReadStatusResponseDTO updateReadStatusResponseDTO = new UpdateReadStatusResponseDTO( id, updatedAt );
+        UpdateReadStatusResponseDTO updateReadStatusResponseDTO = new UpdateReadStatusResponseDTO( id, lastReadAt );
 
         return updateReadStatusResponseDTO;
     }
@@ -80,10 +83,11 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
             return null;
         }
 
-        ReadStatusBuilder readStatus = ReadStatus.builder();
+        ReadStatus.ReadStatusBuilder readStatus = ReadStatus.builder();
 
         readStatus.userId( createReadStatusParam.userId() );
         readStatus.channelId( createReadStatusParam.channelId() );
+        readStatus.lastReadAt( createReadStatusParam.lastReadAt() );
 
         return readStatus.build();
     }
@@ -97,14 +101,14 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         UUID id = null;
         UUID userId = null;
         UUID channelId = null;
-        Instant updatedAt = null;
+        Instant lastReadAt = null;
 
         id = readStatus.getId();
         userId = readStatus.getUserId();
         channelId = readStatus.getChannelId();
-        updatedAt = readStatus.getUpdatedAt();
+        lastReadAt = readStatus.getLastReadAt();
 
-        ReadStatusDTO readStatusDTO = new ReadStatusDTO( id, userId, channelId, updatedAt );
+        ReadStatusDTO readStatusDTO = new ReadStatusDTO( id, userId, channelId, lastReadAt );
 
         return readStatusDTO;
     }

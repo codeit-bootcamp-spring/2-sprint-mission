@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record CreatePrivateChannelParam(
-        ChannelType type,
-        String name,
-        String description,
-        List<UUID> userIds
+    List<UUID> participantIds
 ) {
+
 }

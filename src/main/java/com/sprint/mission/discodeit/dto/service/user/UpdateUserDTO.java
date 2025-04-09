@@ -6,10 +6,13 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record UpdateUserDTO(
-        UUID id,
-        BinaryContentDTO binaryContentDTO,
-        Instant updatedAt,
-        String username,
-        String email
+    UUID id,
+    UUID profileId,
+    Instant createdAt,
+    Instant updatedAt,
+    String username,
+    String email,
+    Boolean online
 ) {
+
 }

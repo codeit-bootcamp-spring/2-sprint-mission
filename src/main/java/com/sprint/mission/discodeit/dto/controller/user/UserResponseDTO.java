@@ -6,11 +6,13 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record UserResponseDTO(
-        UUID id,
-        BinaryContentDTO binaryContentDTO,
-        String username,
-        String email,
-        Instant createdAt,
-        boolean isLogin
+    UUID id,
+    UUID profileId,
+    Instant createdAt,
+    Instant updatedAt,
+    String username,
+    String email,
+    Boolean online
 ) {
+
 }

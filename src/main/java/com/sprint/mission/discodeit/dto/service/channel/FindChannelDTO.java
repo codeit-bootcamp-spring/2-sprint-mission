@@ -8,11 +8,12 @@ import java.util.UUID;
 
 
 public record FindChannelDTO(
-        UUID id,
-        ChannelType type,
-        String name,
-        String description,
-        Instant lastMessageAt,
-        List<UUID> userIds
+    UUID id,
+    ChannelType type,
+    String name,
+    String description,
+    List<UUID> participantIds,
+    Instant lastMessageAt
 ) {
+
 }

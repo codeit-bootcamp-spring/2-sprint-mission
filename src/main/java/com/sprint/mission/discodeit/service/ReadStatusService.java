@@ -9,11 +9,18 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
-    ReadStatusDTO create(CreateReadStatusParam createReadStatusParam);
-    ReadStatusDTO find(UUID id);
-    List<ReadStatusDTO> findAllByUserId(UUID userId);
-    List<ReadStatusDTO> findAllByChannelId(UUID channelId);
-    UpdateReadStatusDTO update(UpdateReadStatusParam updateReadStatusParam);
-    void delete(UUID id);
-    void deleteByChannelId(UUID channelId);
+
+  ReadStatusDTO create(CreateReadStatusParam createReadStatusParam);
+
+  ReadStatusDTO find(UUID id);
+
+  List<ReadStatusDTO> findAllByUserId(UUID userId);
+
+  List<ReadStatusDTO> findAllByChannelId(UUID channelId);
+
+  UpdateReadStatusDTO update(UUID id, UpdateReadStatusParam updateReadStatusParam);
+
+  void delete(UUID id);
+
+  void deleteByChannelId(UUID channelId);
 }

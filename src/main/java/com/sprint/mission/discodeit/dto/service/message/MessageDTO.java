@@ -8,12 +8,13 @@ import java.util.UUID;
 
 
 public record MessageDTO(
-        UUID id,
-        Instant createdAt,
-        Instant updatedAt,
-        List<UUID> attachmentIds,
-        String content,
-        UUID channelId,
-        UserDTO userDTO
+    UUID id,
+    Instant createdAt,
+    Instant updatedAt,
+    List<UUID> attachmentIds,
+    String content,
+    UUID channelId,
+    UUID authorId
 ) {
+
 }

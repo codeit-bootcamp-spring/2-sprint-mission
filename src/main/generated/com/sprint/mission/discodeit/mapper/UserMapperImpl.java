@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-29T13:31:28+0900",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
+    date = "2025-04-04T10:27:12+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
 )
 @Component
 public class UserMapperImpl implements UserMapper {
@@ -51,16 +51,22 @@ public class UserMapperImpl implements UserMapper {
         }
 
         UUID id = null;
-        BinaryContentDTO binaryContentDTO = null;
+        UUID profileId = null;
+        Instant createdAt = null;
+        Instant updatedAt = null;
         String username = null;
         String email = null;
+        Boolean online = null;
 
         id = userDTO.id();
-        binaryContentDTO = userDTO.binaryContentDTO();
+        profileId = userDTO.profileId();
+        createdAt = userDTO.createdAt();
+        updatedAt = userDTO.updatedAt();
         username = userDTO.username();
         email = userDTO.email();
+        online = userDTO.online();
 
-        CreateUserResponseDTO createUserResponseDTO = new CreateUserResponseDTO( id, binaryContentDTO, username, email );
+        CreateUserResponseDTO createUserResponseDTO = new CreateUserResponseDTO( id, profileId, createdAt, updatedAt, username, email, online );
 
         return createUserResponseDTO;
     }
@@ -71,15 +77,15 @@ public class UserMapperImpl implements UserMapper {
             return null;
         }
 
-        String username = null;
-        String email = null;
-        String password = null;
+        String newUsername = null;
+        String newEmail = null;
+        String newPassword = null;
 
-        username = updateUserRequestDTO.username();
-        email = updateUserRequestDTO.email();
-        password = updateUserRequestDTO.password();
+        newUsername = updateUserRequestDTO.newUsername();
+        newEmail = updateUserRequestDTO.newEmail();
+        newPassword = updateUserRequestDTO.newPassword();
 
-        UpdateUserParam updateUserParam = new UpdateUserParam( username, email, password );
+        UpdateUserParam updateUserParam = new UpdateUserParam( newUsername, newEmail, newPassword );
 
         return updateUserParam;
     }
@@ -91,18 +97,22 @@ public class UserMapperImpl implements UserMapper {
         }
 
         UUID id = null;
-        BinaryContentDTO binaryContentDTO = null;
+        UUID profileId = null;
+        Instant createdAt = null;
         Instant updatedAt = null;
         String username = null;
         String email = null;
+        Boolean online = null;
 
         id = updateUserDTO.id();
-        binaryContentDTO = updateUserDTO.binaryContentDTO();
+        profileId = updateUserDTO.profileId();
+        createdAt = updateUserDTO.createdAt();
         updatedAt = updateUserDTO.updatedAt();
         username = updateUserDTO.username();
         email = updateUserDTO.email();
+        online = updateUserDTO.online();
 
-        UpdateUserResponseDTO updateUserResponseDTO = new UpdateUserResponseDTO( id, binaryContentDTO, updatedAt, username, email );
+        UpdateUserResponseDTO updateUserResponseDTO = new UpdateUserResponseDTO( id, profileId, createdAt, updatedAt, username, email, online );
 
         return updateUserResponseDTO;
     }
@@ -114,78 +124,78 @@ public class UserMapperImpl implements UserMapper {
         }
 
         UUID id = null;
-        BinaryContentDTO binaryContentDTO = null;
+        UUID profileId = null;
+        Instant createdAt = null;
+        Instant updatedAt = null;
         String username = null;
         String email = null;
-        Instant createdAt = null;
-        boolean isLogin = false;
+        Boolean online = null;
 
         id = userDTO.id();
-        binaryContentDTO = userDTO.binaryContentDTO();
+        profileId = userDTO.profileId();
+        createdAt = userDTO.createdAt();
+        updatedAt = userDTO.updatedAt();
         username = userDTO.username();
         email = userDTO.email();
-        createdAt = userDTO.createdAt();
-        if ( userDTO.isLogin() != null ) {
-            isLogin = userDTO.isLogin();
-        }
+        online = userDTO.online();
 
-        UserResponseDTO userResponseDTO = new UserResponseDTO( id, binaryContentDTO, username, email, createdAt, isLogin );
+        UserResponseDTO userResponseDTO = new UserResponseDTO( id, profileId, createdAt, updatedAt, username, email, online );
 
         return userResponseDTO;
     }
 
     @Override
-    public UserDTO toUserDTO(User user, UserStatus userStatus, BinaryContentDTO binaryContentDTO) {
-        if ( user == null && userStatus == null && binaryContentDTO == null ) {
+    public UserDTO toUserDTO(User user, UserStatus userStatus) {
+        if ( user == null && userStatus == null ) {
             return null;
         }
 
         UUID id = null;
         Instant createdAt = null;
         Instant updatedAt = null;
+        UUID profileId = null;
         String username = null;
         String email = null;
         if ( user != null ) {
             id = user.getId();
             createdAt = user.getCreatedAt();
             updatedAt = user.getUpdatedAt();
+            profileId = user.getProfileId();
             username = user.getUsername();
             email = user.getEmail();
         }
-        BinaryContentDTO binaryContentDTO1 = null;
-        if ( binaryContentDTO != null ) {
-            binaryContentDTO1 = binaryContentDTO;
-        }
 
-        Boolean isLogin = userStatus.isLoginUser();
+        Boolean online = userStatus.isLoginUser();
 
-        UserDTO userDTO = new UserDTO( id, binaryContentDTO1, createdAt, updatedAt, username, email, isLogin );
+        UserDTO userDTO = new UserDTO( id, profileId, createdAt, updatedAt, username, email, online );
 
         return userDTO;
     }
 
     @Override
-    public UpdateUserDTO toUpdateUserDTO(User user, BinaryContentDTO binaryContentDTO) {
+    public UpdateUserDTO toUpdateUserDTO(User user, boolean online, BinaryContentDTO binaryContentDTO) {
         if ( user == null && binaryContentDTO == null ) {
             return null;
         }
 
         UUID id = null;
+        Instant createdAt = null;
         Instant updatedAt = null;
+        UUID profileId = null;
         String username = null;
         String email = null;
         if ( user != null ) {
             id = user.getId();
+            createdAt = user.getCreatedAt();
             updatedAt = user.getUpdatedAt();
+            profileId = user.getProfileId();
             username = user.getUsername();
             email = user.getEmail();
         }
-        BinaryContentDTO binaryContentDTO1 = null;
-        if ( binaryContentDTO != null ) {
-            binaryContentDTO1 = binaryContentDTO;
-        }
+        Boolean online1 = null;
+        online1 = online;
 
-        UpdateUserDTO updateUserDTO = new UpdateUserDTO( id, binaryContentDTO1, updatedAt, username, email );
+        UpdateUserDTO updateUserDTO = new UpdateUserDTO( id, profileId, createdAt, updatedAt, username, email, online1 );
 
         return updateUserDTO;
     }
