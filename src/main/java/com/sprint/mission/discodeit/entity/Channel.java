@@ -15,24 +15,24 @@ public class Channel implements Serializable {
     private Instant updatedAt;
 
     private ChannelType type;
-    private String channelName;
+    private String name;
     private String description;
 
-    public Channel(ChannelType type, String channelName, String description) {
+    public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
 
         this.type = type;
-        this.channelName = channelName;
+        this.name = name;
         this.description = description;
 
     }
 
-    public void updateChannel(String newChannelName, String newDescription) {
+    public void updateChannel(String newName, String newDescription) {
         boolean anyValueUpdated = false;
-        if (newChannelName != null && !newChannelName.equals(this.channelName)) {
-            this.channelName = newChannelName;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
             anyValueUpdated = true;
         }
         if (newDescription != null && !newDescription.equals(this.description)) {
@@ -46,7 +46,7 @@ public class Channel implements Serializable {
     }
 
     public String toString() {
-        return "[CHANNEL " + getId() + "channelName: " + getChannelName() + " ]";
+        return "[CHANNEL " + getId() + " channelName: " + getName() + " ]";
 
     }
 }

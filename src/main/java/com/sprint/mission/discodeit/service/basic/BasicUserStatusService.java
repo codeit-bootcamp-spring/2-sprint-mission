@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDTO;
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDTO;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -21,7 +21,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public UserStatus createUserStatus(CreateUserStatusDTO dto) {
+    public UserStatus createUserStatus(UserStatusCreateRequest dto) {
         UUID userId = dto.userId();
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("존재하지 않는 사용자입니다.");
@@ -48,8 +48,8 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus updateUserStatus(UUID userStatusId, UpdateUserStatusDTO dto) {
-        Instant newLastActiveAt = dto.lastActiveAt();
+    public UserStatus updateUserStatus(UUID userStatusId, UserStatusUpdateRequest request) {
+        Instant newLastActiveAt = request.newLastActiveAt();
 
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found)"));
@@ -60,8 +60,8 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus updateByUserId(UUID userId, UpdateUserStatusDTO dto) {
-        Instant newLastActiveAt = dto.lastActiveAt();
+    public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+        Instant newLastActiveAt = request.newLastActiveAt();
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("UserStatus with userId " + userId + " not found"));

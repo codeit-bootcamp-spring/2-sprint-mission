@@ -38,7 +38,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     public void serialize(ReadStatus readStatus) {
-        Path path = getFilePath(readStatus.getReadStatusId());
+        Path path = getFilePath(readStatus.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
@@ -119,6 +119,6 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public void deleteAllByChannelId(UUID channelId) {
         this.findAllByChannelId(channelId)
-                .forEach(readStatus -> this.deleteById(readStatus.getReadStatusId()));
+                .forEach(readStatus -> this.deleteById(readStatus.getId()));
     }
 }

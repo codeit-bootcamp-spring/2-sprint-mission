@@ -15,26 +15,26 @@ public class Message implements Serializable {
     private Instant createdAt;
     private Instant updatedAt;
 
-    private String text;
+    private String content;
 
-    private UUID userId;
     private UUID channelId;
+    private UUID authorId;
     private List<UUID> attachmentIds;
 
-    public Message(String text, UUID userId, UUID channelId, List<UUID> attachmentIds) {
+    public Message(String content, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
-        this.text = text;
-        this.userId = userId;
+        this.content = content;
+        this.authorId = authorId;
         this.channelId = channelId;
         this.attachmentIds = attachmentIds;
     }
 
-    public void updateText(String newText) {
+    public void updateText(String newContent) {
         boolean anyValueUpdated = false;
-        if (newText != null && !newText.equals(this.text)) {
-            this.text = newText;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
             anyValueUpdated = true;
         }
 
@@ -44,6 +44,6 @@ public class Message implements Serializable {
     }
 
     public String toString() {
-        return "[Message : " + getText() + "]";
+        return "[Message : " + getContent() + "]";
     }
 }

@@ -9,16 +9,15 @@ import java.util.UUID;
 @Getter
 public class UserStatus implements Serializable {
     private static final long serialVersionUID = 1L;
-    private UUID userStatusId;
+    private UUID id;
     private Instant createdAt;
     private Instant updatedAt;
 
     private UUID userId;
     private Instant lastActiveAt;
 
-
     public UserStatus(UUID userId, Instant lastActiveAt) {
-        this.userStatusId = UUID.randomUUID();
+        this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
 
@@ -26,10 +25,10 @@ public class UserStatus implements Serializable {
         this.lastActiveAt = lastActiveAt;
     }
 
-    public void updateLastActiveAt(Instant lastActiveAt) {
+    public void updateLastActiveAt(Instant newLastActiveAt) {
         boolean anyValueUpdated = false;
-        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
-            this.lastActiveAt = lastActiveAt;
+        if (newLastActiveAt != null && !newLastActiveAt.equals(this.lastActiveAt)) {
+            this.lastActiveAt = newLastActiveAt;
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {
