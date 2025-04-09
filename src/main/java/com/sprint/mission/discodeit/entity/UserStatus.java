@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -13,50 +12,36 @@ import java.util.UUID;
 public class UserStatus implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-
-    private final UUID id;
-    private final Instant createdAt;
-    @Setter
+    private UUID id;
+    private Instant createdAt;
     private Instant updatedAt;
+    //
+    private UUID userId;
+    private Instant lastActiveAt;
 
-    private final UUID userId;
-    private Instant lastActivatedAt;
-    @Setter
-    private Status status;
-
-    public UserStatus(UUID userId, Instant lastActivatedAt) {
+    public UserStatus(UUID userId, Instant lastActiveAt) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
+        //
         this.userId = userId;
-        this.lastActivatedAt = lastActivatedAt;
+        this.lastActiveAt = lastActiveAt;
     }
 
-    public void updateLastActivatedAt(Instant newLastActivatedAt) {
-        if (newLastActivatedAt != null && (this.lastActivatedAt == null || newLastActivatedAt.isAfter(this.lastActivatedAt))) {
-            this.lastActivatedAt = newLastActivatedAt;
+    public void update(Instant lastActiveAt) {
+        boolean anyValueUpdated = false;
+        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+            this.lastActiveAt = lastActiveAt;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
             this.updatedAt = Instant.now();
         }
     }
 
-    public boolean isCurrentlyOnline() {
-        if (this.lastActivatedAt == null) {
-            System.out.println("User is offline");
-            return false;
-        }
-        Instant now = Instant.now();
-        Duration durationSinceLastActive = Duration.between(this.lastActivatedAt, now);
-        if (durationSinceLastActive.toMinutes() <= 5) {
-            System.out.println("User is online");
-            return true;
-        } else {
-            System.out.println("User is offline");
-            return false;
-        }
+    public Boolean isOnline() {
+        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+
+        return lastActiveAt.isAfter(instantFiveMinutesAgo);
     }
-
-    public Status getStatus() {
-        return isCurrentlyOnline() ? Status.ONLINE : Status.OFFLINE;
-    }
-
-
 }

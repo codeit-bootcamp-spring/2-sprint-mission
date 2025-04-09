@@ -1,34 +1,43 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.User.LoginRequest;
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.basic.BasicAuthService;
+import com.sprint.mission.discodeit.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
+@Tag(name = "Auth", description = "인증 관련 API")
 public class AuthController {
-    private final BasicAuthService authService;
-    private final UserStatusRepository userStatusRepository;
+    private final AuthService authService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "/login")
-    public UserStatus login(@RequestBody LoginRequest request) {
-        User user = authService.login(request);
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("User status not found for user ID: " + user.getId()));
-
-        userStatus.updateLastActivatedAt(Instant.now());
-        userStatusRepository.save(userStatus);
-
-        return userStatus;
+    @Operation(summary = "로그인", description = "사용자 로그인 처리")
+    @ApiResponse(
+            responseCode = "200",
+            description = "로그인 성공",
+            content = @Content(schema = @Schema(implementation = User.class))
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "로그인 실패 (잘못된 자격 증명)",
+            content = @Content(examples = @ExampleObject(value = "Invalid username or password"))
+    )
+    @PostMapping("/login")
+    public ResponseEntity<User> login(
+            @Parameter(description = "로그인 요청 데이터", required = true)
+            @RequestBody LoginRequest loginRequest
+    ) {
+        User user = authService.login(loginRequest);
+        return ResponseEntity.ok(user);
     }
 }
