@@ -3,35 +3,38 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@RestController
 @RequiredArgsConstructor
-@RequestMapping("/binary-contents")
+@RestController
+@RequestMapping("/api/binary-contents")
 public class BinaryContentController {
 
-    private final BinaryContentService binaryContentService;
+  private final BinaryContentService binaryContentService;
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> find(@PathVariable UUID id) {
-        BinaryContent content = binaryContentService.find(id);
-        if (content == null) {
-            throw new NoSuchElementException("BinaryContent with id" + id + "not found");
-        }
-        return ResponseEntity.ok()
-                .header("Content-Disposition", "inline; filename=" + content.getFileName())
-                .header("Content-Type", content.getContentType())
-                .body(content.getBytes());
-    }
+  @GetMapping("/{binaryContentId}")
+  public ResponseEntity<BinaryContent> find(@PathVariable UUID binaryContentId) {
+    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContent);
+  }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContent>> findAll(@RequestParam List<UUID> ids){
-        List<BinaryContent> contents = binaryContentService.findAllByIdIn(ids);
-        return ResponseEntity.ok(contents);
-    }
+  @GetMapping
+  public ResponseEntity<List<BinaryContent>> findAllByIdIn(
+      @RequestParam("binaryContentId") List<UUID> binaryContentIds) {
+    List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContents);
+  }
 }

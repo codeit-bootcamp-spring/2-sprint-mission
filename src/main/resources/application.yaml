@@ -1,8 +1,26 @@
 spring:
   application:
     name: discodeit
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 30MB
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 discodeit:
   repository:
-    type: file   # jcf | file
+    type: file
     file-directory: .discodeit
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet: DEBUG
+    org.springframework.web.multipart: DEBUG
+    org.springframework.http.converter: DEBUG
