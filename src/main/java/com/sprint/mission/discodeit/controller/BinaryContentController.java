@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,44 +15,30 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/binaryContent")
-public class BinaryContentController {
+@RequestMapping("/api/binaryContents")
+public class BinaryContentController implements BinaryContentApi {
 
-    private final BinaryContentService binaryContentService;
+  private final BinaryContentService binaryContentService;
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<BinaryContent> createBinaryContent(
-            @RequestParam("fileName") String fileName,
-            @RequestParam("contentType") String contentType,
-            @RequestParam("file") byte[] fileBytes) {
+  @GetMapping(path = "{binaryContentId}")
+  public ResponseEntity<BinaryContent> find(
+      @PathVariable("binaryContentId") UUID binaryContentId) {
 
-        BinaryContent binaryContent = binaryContentService.create(new BinaryContentCreateRequest(fileName, contentType, fileBytes));
+    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
 
-        return new ResponseEntity<>(binaryContent, HttpStatus.CREATED);
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContent);
+  }
 
-    @RequestMapping(value = "/find", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContent> findBinaryContent(
-            @RequestParam UUID binaryContentId) {
+  @GetMapping
+  public ResponseEntity<List<BinaryContent>> findAllByIdIn(
+      @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
 
-        BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+    List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
 
-        return new ResponseEntity<>(binaryContent, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContent>> findMultipleBinaryContent(
-            @RequestParam List<UUID> binaryContentIds) {
-        List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
-        return new ResponseEntity<>(binaryContents, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/delete/{binaryContentId}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteBinaryContent(
-            @PathVariable UUID binaryContentId) {
-
-        binaryContentService.delete(binaryContentId);
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContents);
+  }
 }

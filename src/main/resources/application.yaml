@@ -12,7 +12,6 @@ logging:
     org.springframework: INFO
     com.sprint.mission.discodeit: INFO
 
-
 Spring:
   web:
     mvc:
@@ -23,6 +22,7 @@ Spring:
             allowed-methods: GET, POST, PUT, DELETE
             allowed-headers:
             allow-credentials: true
+
 
 server:
   port: 8080
