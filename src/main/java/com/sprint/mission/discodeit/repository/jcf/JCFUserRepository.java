@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -31,9 +30,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User findByUserId(UUID userId) {
-        return Optional.ofNullable(userDb.get(userId))
-            .orElseThrow(
-                () -> new IllegalArgumentException("[ERROR]유효하지 않은 아이디 입니다. id : " + userId));
+        return userDb.get(userId);
     }
 
     @Override
@@ -43,7 +40,7 @@ public class JCFUserRepository implements UserRepository {
                 return user;
             }
         }
-        throw new IllegalArgumentException("[ERROR] 유효하지 않은 이름 입니다.");
+        return null;
     }
 
     @Override
@@ -53,7 +50,7 @@ public class JCFUserRepository implements UserRepository {
                 return user;
             }
         }
-        throw new IllegalArgumentException("[ERROR] 유효하지 않은 이메일 입니다.");
+        return null;
     }
 
     @Override
@@ -78,5 +75,10 @@ public class JCFUserRepository implements UserRepository {
     public boolean existByEmail(String email) {
         return findAll().stream()
             .anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public boolean existById(UUID channelId) {
+        return userDb.containsKey(channelId);
     }
 }

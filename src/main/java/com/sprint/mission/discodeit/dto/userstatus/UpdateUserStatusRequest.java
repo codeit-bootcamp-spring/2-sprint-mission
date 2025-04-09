@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.userstatus;
 
-import java.util.UUID;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,5 +8,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UpdateUserStatusRequest {
 
-    private UUID userId;
+    private Instant newLastActiveAt;
 }

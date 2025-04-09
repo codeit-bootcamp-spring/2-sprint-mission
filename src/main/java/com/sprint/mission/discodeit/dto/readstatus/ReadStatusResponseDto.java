@@ -15,10 +15,7 @@ public class ReadStatusResponseDto {
     private UUID userId;
     private Instant updatedAt;
     private Instant lastReadAt;
-
-    private ReadStatusResponseDto() {
-    }
-
+    
     public static ReadStatusResponseDto from(ReadStatus readStatus) {
         return new ReadStatusResponseDto(
             readStatus.getId(),

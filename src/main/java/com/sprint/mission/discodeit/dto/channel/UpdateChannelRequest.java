@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UpdateChannelRequest {
 
-    private String channelName;
-    private String description;
+    private String newName;
+    private String newDescription;
 }

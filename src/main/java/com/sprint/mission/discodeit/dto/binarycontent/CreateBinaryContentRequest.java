@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CreateBinaryContentRequest {
 
-    private String name;
+    private String fileName;
     private String contentType;
     private byte[] bytes;
 }

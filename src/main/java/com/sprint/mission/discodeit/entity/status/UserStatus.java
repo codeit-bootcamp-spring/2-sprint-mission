@@ -21,15 +21,11 @@ public class UserStatus implements Serializable {
     private UUID userId;
     private Instant lastSeenAt;
 
-    public UserStatus(UUID userId) {
+    public UserStatus(UUID userId, Instant lastSeenAt) {
         this.id = UUID.randomUUID();
         this.userId = userId;
         this.createdAt = Instant.now();
-        this.lastSeenAt = createdAt;
-    }
-
-    public void updateUserId(UUID userId) {
-        this.userId = userId;
+        this.lastSeenAt = lastSeenAt;
     }
 
     public boolean isOnline() {

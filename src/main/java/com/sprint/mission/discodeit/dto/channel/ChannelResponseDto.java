@@ -14,26 +14,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChannelResponseDto {
 
-    private UUID channelId;
+    private UUID id;
+    private ChannelType type;
     private String name;
-    private ChannelType channelType;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private Instant lastMessageTimestamp;
-    private List<UUID> userIds;
     private String description;
+    private List<UUID> participantIds;
+    private Instant lastMessageAt;
 
-    public static ChannelResponseDto from(Channel channel, Instant lastMessageTimestamp,
-        List<UUID> userIds) {
+    public static ChannelResponseDto from(Channel channel,
+        List<UUID> participantIds,
+        Instant lastMessageAt) {
+        
         ChannelResponseDto response = new ChannelResponseDto();
-        response.setChannelId(channel.getId());
+        response.setId(channel.getId());
         response.setName(channel.getName());
         response.setDescription(channel.getDescription());
-        response.setChannelType(channel.getType());
-        response.setCreatedAt(channel.getCreatedAt());
-        response.setUpdatedAt(channel.getUpdatedAt());
-        response.setLastMessageTimestamp(lastMessageTimestamp);
-        response.setUserIds(userIds);
+        response.setType(channel.getType());
+        response.setLastMessageAt(lastMessageAt);
+        response.setParticipantIds(participantIds);
 
         return response;
     }

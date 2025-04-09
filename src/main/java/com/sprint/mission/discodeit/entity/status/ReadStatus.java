@@ -16,16 +16,16 @@ public class ReadStatus {
     private UUID userId;
     private Instant lastReadAt;
 
-    public ReadStatus(UUID channelId, UUID userId) {
+    public ReadStatus(UUID channelId, UUID userId, Instant lastReadAt) {
         this.id = UUID.randomUUID();
         this.createAt = Instant.now();
         this.updatedAt = createAt;
-        this.lastReadAt = createAt;
+        this.lastReadAt = lastReadAt;
         this.channelId = channelId;
         this.userId = userId;
     }
 
-    public void update(Instant lastReadAt) {
+    public void updateLastReadAt(Instant lastReadAt) {
         this.lastReadAt = lastReadAt;
     }
 

@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class LoginForm {
 
-    private String name;
+    private String username;
     private String password;
 }

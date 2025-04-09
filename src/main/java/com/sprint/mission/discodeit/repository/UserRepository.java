@@ -8,7 +8,7 @@ public interface UserRepository {
 
     void save(User user);
 
-    User findByUserId(UUID userID);
+    User findByUserId(UUID userId);
 
     User findByUserName(String name);
 
@@ -21,4 +21,6 @@ public interface UserRepository {
     boolean existsByUsername(String username);
 
     boolean existByEmail(String email);
+
+    boolean existById(UUID userId);
 }

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-import com.sprint.mission.discodeit.entity.ChannelType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,7 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CreatePublicChannelRequest {
 
-    private final String channelName;
-    private ChannelType channelType;
+    private final String name;
     private String description;
 }

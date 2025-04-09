@@ -14,14 +14,14 @@ public class User implements Serializable, Comparable<User> {
 
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private final List<Message> messageList = new ArrayList<>();
+    private UUID id;
+    private Instant createdAt;
+    private List<Message> messageList = new ArrayList<>();
     private Instant updatedAt;
     private String name;
     private String email;
     private String password;
-    private UUID profileImageId = null;
+    private UUID profileImageId;
     private Instant lastLoginAt;
 
     public User(String name, String email, String password) {

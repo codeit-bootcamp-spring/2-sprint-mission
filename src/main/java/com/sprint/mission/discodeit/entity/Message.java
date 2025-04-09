@@ -14,21 +14,24 @@ public class Message implements Serializable, Comparable<Message> {
 
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private final UUID senderId;
-    private final UUID channelId;
+    private UUID id;
+    private Instant createdAt;
     private Instant updatedAt;
+
     private String content;
+
+    private UUID authorId;
+    private UUID channelId;
+
     private List<UUID> attachedImageIds;
 
-    public Message(String content, UUID senderId, UUID channelId) {
+    public Message(String content, UUID authorId, UUID channelId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
 
         this.content = content;
-        this.senderId = senderId;
+        this.authorId = authorId;
         this.channelId = channelId;
         this.attachedImageIds = new ArrayList<>();
     }

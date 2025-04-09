@@ -42,4 +42,10 @@ public class FileChannelRepository implements ChannelRepository {
         Path channelFile = channelDirectory.resolve(channelId.toString() + ".channel");
         FileUtils.delete(channelFile);
     }
+
+    @Override
+    public boolean existById(UUID channelId) {
+        return findAll().stream()
+            .anyMatch(channel -> channel.getId().equals(channelId));
+    }
 }

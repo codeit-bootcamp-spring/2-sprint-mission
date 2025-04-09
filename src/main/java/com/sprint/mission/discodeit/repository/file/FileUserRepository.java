@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
@@ -27,9 +26,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public User findByUserId(UUID userId) {
         Path userFile = userDirectory.resolve(userId.toString() + ".user");
-        return Optional.ofNullable((User) FileUtils.loadById(userFile))
-            .orElseThrow(
-                () -> new IllegalArgumentException("[ERROR]유효 하지 않은 아이디 입니다. id : " + userId));
+        return (User) FileUtils.loadById(userFile);
     }
 
     @Override
@@ -39,7 +36,7 @@ public class FileUserRepository implements UserRepository {
                 return user;
             }
         }
-        throw new IllegalArgumentException("[ERROR] 유효하지 않은 이름 입니다.");
+        return null;
     }
 
     @Override
@@ -49,7 +46,7 @@ public class FileUserRepository implements UserRepository {
                 return user;
             }
         }
-        throw new IllegalArgumentException("[ERROR] 유효하지 않은 이메일 입니다.");
+        return null;
     }
 
     @Override
@@ -73,5 +70,11 @@ public class FileUserRepository implements UserRepository {
     public boolean existByEmail(String email) {
         return findAll().stream()
             .anyMatch(u -> u.getEmail().equals(email));
+    }
+
+    @Override
+    public boolean existById(UUID userId) {
+        return findAll().stream()
+            .anyMatch(user -> user.getId().equals(userId));
     }
 }

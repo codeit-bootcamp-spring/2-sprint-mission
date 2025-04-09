@@ -1,15 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequest;
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
+import com.sprint.mission.discodeit.exception.custom.DuplicateResourceException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -26,64 +27,66 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public UUID create(CreateReadStatusRequest request) {
-        if (channelRepository.findByChannelId(request.getChannelId()) == null) {
-            throw new IllegalArgumentException("[ERROR] channel not found");
+        UUID userId = request.getUserId();
+        UUID channelId = request.getChannelId();
+
+        if (userRepository.findByUserId(userId) == null) {
+            throw new NoSuchElementException("[ERROR] user not found");
         }
-        if (userRepository.findByUserId(request.getUserId()) == null) {
-            throw new IllegalArgumentException("[ERROR] user not found");
+        if (channelRepository.findByChannelId(channelId) == null) {
+            throw new NoSuchElementException("[ERROR] channel not found");
         }
-        if (readStatusRepository.isExist(request.getChannelId(),
-            request.getUserId()) != null) {
-            throw new IllegalArgumentException("[ERROR] read status is already exist");
+        if (readStatusRepository.findAllByUserId(userId).stream()
+            .anyMatch(readStatus -> readStatus.getChannelId().equals(channelId))) {
+            throw new DuplicateResourceException("[ERROR] read status already exist");
         }
 
-        ReadStatus readStatus = new ReadStatus(request.getChannelId(), request.getUserId());
+        Instant lastReadAt = request.getLastReadAt();
+
+        ReadStatus readStatus = new ReadStatus(channelId, userId, lastReadAt);
         readStatusRepository.save(readStatus);
 
         return readStatus.getId();
     }
 
     @Override
-    public ReadStatusResponseDto find(UUID readStatusId) {
-        ReadStatus readStatus = readStatusRepository.find(readStatusId);
-        return ReadStatusResponseDto.from(readStatus);
+    public ReadStatus find(UUID readStatusId) {
+        return readStatusRepository.find(readStatusId);
     }
 
     @Override
-    public List<ReadStatusResponseDto> findAllByUserId(UUID userId) {
-        List<ReadStatus> readStatuses = readStatusRepository.
-            findAllByUserId(userId);
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return readStatusRepository.findAllByUserId(userId);
 
-        return readStatuses.stream()
-            .map(ReadStatusResponseDto::from).toList();
     }
 
     @Override
-    public List<ReadStatusResponseDto> findAllByChannelId(UUID channelId) {
-        List<ReadStatus> readStatuses = readStatusRepository.
-            findAllByChannelId(channelId);
-
-        return readStatuses.stream()
-            .map(ReadStatusResponseDto::from).toList();
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return readStatusRepository.findAllByChannelId(channelId);
     }
 
     @Override
-    public void update(UUID readStatusId, UpdateReadStatusRequest request) {
+    public UUID update(UUID readStatusId, UpdateReadStatusRequest request) {
         Instant newLastLeadAt = request.getNewLastLeadAt();
 
         ReadStatus readStatus = readStatusRepository.find(readStatusId);
-        readStatus.update(newLastLeadAt);
+        if (readStatus == null) {
+            throw new NoSuchElementException("[ERROR] read status not found");
+        }
+        readStatus.updateLastReadAt(newLastLeadAt);
+
+        readStatusRepository.save(readStatus);
+
+        return readStatus.getId();
     }
 
     @Override
     public void updateByChannelId(UUID channelId, UpdateReadStatusRequest request) {
-        // 채널 내 모든 메시지 읽기
         Instant newLastLeadAt = request.getNewLastLeadAt();
 
         List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
-
         for (ReadStatus readStatus : readStatuses) {
-            readStatus.update(newLastLeadAt);
+            readStatus.updateLastReadAt(newLastLeadAt);
         }
     }
 

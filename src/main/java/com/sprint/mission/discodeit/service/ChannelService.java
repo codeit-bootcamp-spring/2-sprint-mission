@@ -15,11 +15,12 @@ public interface ChannelService {
 
     ChannelResponseDto findByChannelId(UUID channelId);
 
+
     List<ChannelResponseDto> findAll();
 
     List<ChannelResponseDto> findAllByUserId(UUID userId);
 
-    void update(UUID channelId, UpdateChannelRequest request);
+    UUID update(UUID channelId, UpdateChannelRequest request);
 
     void remove(UUID channelId);
 

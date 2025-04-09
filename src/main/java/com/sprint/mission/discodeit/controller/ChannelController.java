@@ -13,36 +13,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/channels")
 @RequiredArgsConstructor
 public class ChannelController {
 
     private final ChannelService channelService;
 
-    @GetMapping
-    public ResponseEntity<List<ChannelResponseDto>> getAllChannels() {
-        List<ChannelResponseDto> channelList = channelService.findAll();
-
-        return ResponseEntity.ok(channelList);
-    }
-
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<List<ChannelResponseDto>> getChannelsByUserId(
-        @PathVariable UUID userId) {
-        List<ChannelResponseDto> channelList = channelService.findAllByUserId(userId);
-
-        return ResponseEntity.ok(channelList);
-    }
-    
-    @PostMapping("/public")
+    @PostMapping("/api/channels/public")
     public ResponseEntity<ChannelResponseDto> createPublicChannel(
         @RequestBody CreatePublicChannelRequest request
     ) {
@@ -53,7 +37,7 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/private")
+    @PostMapping("/api/channels/private")
     public ResponseEntity<ChannelResponseDto> createPrivateChannel(
         @RequestBody CreatePrivateChannelRequest request
     ) {
@@ -64,7 +48,16 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/{channelId}")
+    @GetMapping("/api/channels")
+    public ResponseEntity<List<ChannelResponseDto>> getChannelByUserId(
+        @RequestParam UUID userId
+    ) {
+        List<ChannelResponseDto> response = channelService.findAllByUserId(userId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/api/channels/{channelId}")
     public ResponseEntity<ChannelResponseDto> updateChannel(
         @PathVariable UUID channelId,
         @RequestBody UpdateChannelRequest request) {
@@ -75,7 +68,7 @@ public class ChannelController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{channelId}")
+    @DeleteMapping("/api/channels/{channelId}")
     public ResponseEntity<Void> deleteChannel(
         @PathVariable UUID channelId
     ) {
@@ -85,7 +78,7 @@ public class ChannelController {
     }
 
     // 채널 멤버 관리
-    @PostMapping("/{channelId}/members")
+    @PostMapping("/api/channels/{channelId}/members")
     public ResponseEntity<Void> addChannelMember(
         @PathVariable UUID channeld,
         @RequestBody AddChannelMemberRequest request) {
@@ -97,7 +90,7 @@ public class ChannelController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{channelId}/members/{userId}")
+    @DeleteMapping("/api/channels/{channelId}/members/{userId}")
     public ResponseEntity<Void> removeChannelMember(
         @PathVariable UUID channelId,
         @PathVariable UUID userId) {

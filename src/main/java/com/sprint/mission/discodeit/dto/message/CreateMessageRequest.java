@@ -10,5 +10,5 @@ public class CreateMessageRequest {
 
     private String content;
     private UUID channelId;
-    private UUID senderId;
+    private UUID authorId;
 }

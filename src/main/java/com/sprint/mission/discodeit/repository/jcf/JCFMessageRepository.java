@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -25,9 +24,7 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Message findByMessageId(UUID messageId) {
-        return Optional.ofNullable(messageDb.get(messageId))
-            .orElseThrow(
-                () -> new IllegalArgumentException("[ERROR]유효하지 않은 아이디 입니다. id : " + messageId));
+        return messageDb.get(messageId);
     }
 
     @Override
