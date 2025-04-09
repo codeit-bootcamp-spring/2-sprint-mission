@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: discodeit
+
+discodeit:
+  repository:
+    type: file   # jcf | file
+    file-directory: .discodeit
+
+springdoc:
+  swagger-ui:
+    # 각 API의 그룹 표시 순서
+    # path, query, body, response 순으로 출력
+    groups-order: DESC
+
+    # 태그 정렬 순서.
+    # alpha: 알파벳 순 정렬
+    tags-sorter: alpha
+
+    # 컨트롤러 정렬 순서.
+    # method는 delete - get - patch - post - put 순으로 정렬된다.
+    operations-sorter: method
+
+    # swagger-ui default url인 petstore html의 비활성화 설정
+    disable-swagger-default-url: true
+
+    # swagger-ui에서 try 했을 때 request duration을 알려주는 설정
+    display-request-duration: true
