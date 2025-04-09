@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public record ReadStatusCreateRequest(
-        UUID userId,
-        UUID channelId,
-        Instant lastReadAt
+    UUID userId,
+    UUID getChannelId,
+    OffsetDateTime lastReadAt
 ) {
+
 }

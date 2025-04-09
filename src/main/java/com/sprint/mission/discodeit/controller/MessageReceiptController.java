@@ -1,38 +1,38 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/readStatus")
+//@RequestMapping("/api/readStatus")
 public class MessageReceiptController {
 
-    private final ReadStatusService readStatusService;
+  private final ReadStatusService readStatusService;
 
-    public MessageReceiptController(ReadStatusService readStatusService) {
-        this.readStatusService = readStatusService;
-    }
+  public MessageReceiptController(ReadStatusService readStatusService) {
+    this.readStatusService = readStatusService;
+  }
 
-    @PostMapping
-    public ResponseEntity<ReadStatus> createReceipt(@RequestBody ReadStatusCreateRequest request) {
-        ReadStatus receipt = readStatusService.create(request);
-        return ResponseEntity.ok(receipt);
-    }
+  @PostMapping
+  public ResponseEntity<ReadStatus> createReceipt(@RequestBody ReadStatusCreateRequest request) {
+    ReadStatus receipt = readStatusService.create(request);
+    return ResponseEntity.ok(receipt);
+  }
 
-    @PatchMapping("/{readStatusId}")
-    public ResponseEntity<ReadStatus> updateReceipt(@PathVariable UUID receiptId,
-                                                @RequestParam ReadStatusUpdateRequest request) {
-        return ResponseEntity.ok(readStatusService.update(receiptId, request));
-    }
+  @PatchMapping(value = "/{readStatusId}")
+  public ResponseEntity<ReadStatus> updateReceipt(@PathVariable UUID readStatusId,
+      @RequestParam ReadStatusUpdateRequest request) {
+    return ResponseEntity.ok(readStatusService.update(readStatusId, request));
+  }
 
-    @GetMapping("/{readStatusId}")
-    public ResponseEntity<ReadStatus> getReadStatus(@PathVariable UUID readStatusId) {
-        return  ResponseEntity.ok(readStatusService.find(readStatusId));
-    }
+  @GetMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatus> getReadStatus(@PathVariable UUID readStatusId) {
+    return ResponseEntity.ok(readStatusService.find(readStatusId));
+  }
 }

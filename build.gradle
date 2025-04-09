@@ -1,39 +1,70 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.3'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.3.1'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.openapi.generator' version '7.0.0'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
+openApiGenerate {
+    generatorName = "spring" // 사용할 generator 이름
+    inputSpec = "C:/Users/dlwns/2-sprint-mission/src/main/resources/api-docs.json"
+// JSON 파일 경로
+    outputDir = "${buildDir}/generated"
+    apiPackage = "com.sprint.mission.discodeit.controller" // API 클래스 패키지 경로
+    modelPackage = "import com.sprint.mission.discodeit.dto" // 모델 클래스 패키지 경로
+    configOptions = [
+            useSpringBoot3: "true",
+            useSpringController: "true",
+            supportingFiles: "ApiUtil.java",
+            interfaceOnly    : "true", // API 인터페이스만 생성 (구현 클래스 제외)
+            generateModels   : "true",// DTO 생성 활성화
+            useBeanValidation: "true",
+            generateApis     : "true", // API 인터페이스 생성 활성화
+            dateLibrary      : "java8", // 날짜 라이브러리 설정
+            useTags          : "true"
+    ]
+    importMappings = [
+            "MultipartFile": "org.springframework.web.multipart.MultipartFile"
+    ]
+}
+
+sourceSets.main.java.srcDir("$buildDir/generated/src/main/java")
+
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
+    implementation 'org.glassfish:jakarta.el:3.0.3'  // 필요할 수도 있음
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
