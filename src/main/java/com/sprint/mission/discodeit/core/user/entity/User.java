@@ -1,43 +1,29 @@
 package com.sprint.mission.discodeit.core.user.entity;
 
+import com.sprint.mission.discodeit.core.base.BaseUpdatableEntity;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
 @ToString
 @Getter
-public class User implements Serializable {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
-
-  private UUID id;
-  private UUID profileId;
+public class User extends BaseUpdatableEntity {
 
   private String name;
   private String email;
   private String password;
+  private UUID profileId;
 
-  private final Instant createdAt;
-  private Instant updatedAt;
-
-  private User(UUID id, UUID profileId, Instant createdAt, String name, String email,
-      String password) {
-    this.id = id;
+  private User(String name, String email, String password, UUID profileId) {
+    super();
     this.profileId = profileId;
-    this.createdAt = createdAt;
-    this.updatedAt = createdAt;
     this.name = name;
     this.email = email;
     this.password = password;
   }
 
   public static User create(String name, String email, String password, UUID profileId) {
-    return new User(UUID.randomUUID(), profileId, Instant.now(), name, email, password);
+    return new User(name, email, password, profileId);
   }
 
   public void update(String newUserName, String newEmail, String newPassword, UUID newProfileId) {
@@ -59,7 +45,7 @@ public class User implements Serializable {
       anyValueUpdated = true;
     }
     if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+      super.updateTime();
     }
   }
 

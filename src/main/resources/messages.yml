@@ -1,0 +1,5 @@
+error:
+  user:
+    not-found: "User not found"
+  channel:
+    not-found: "Channel not found"

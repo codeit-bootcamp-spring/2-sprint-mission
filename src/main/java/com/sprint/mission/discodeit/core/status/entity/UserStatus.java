@@ -1,36 +1,25 @@
 package com.sprint.mission.discodeit.core.status.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
+import com.sprint.mission.discodeit.core.base.BaseUpdatableEntity;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class UserStatus implements Serializable {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
-
-  private final UUID userStatusId;
-
-  public final Instant createdAt;
-  public Instant updatedAt;
+public class UserStatus extends BaseUpdatableEntity {
 
   private final UUID userId;
   private Instant lastActiveAt;
 
-  private UserStatus(UUID userStatusId, UUID userId, Instant createdAt, Instant lastActiveAt) {
-    this.userStatusId = userStatusId;
+  private UserStatus(UUID userId, Instant lastActiveAt) {
+    super();
     this.userId = userId;
-    this.createdAt = createdAt;
-    this.updatedAt = createdAt;
     this.lastActiveAt = lastActiveAt;
   }
 
   public static UserStatus create(UUID userId, Instant lastActiveAt) {
-    return new UserStatus(UUID.randomUUID(), userId, Instant.now(), lastActiveAt);
+    return new UserStatus(userId, lastActiveAt);
   }
 
   public void update(Instant lastActiveAt) {
@@ -41,16 +30,16 @@ public class UserStatus implements Serializable {
     }
 
     if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+      super.updateTime();
     }
   }
 
   public void setOffline() {
-    this.updatedAt = Instant.now().minus(Duration.ofMinutes(6));
+    updateTime(Instant.now().minus(Duration.ofMinutes(6)));
   }
 
   public boolean isOnline() {
-    return Duration.between(updatedAt, Instant.now()).getSeconds() <= 300;
+    return Duration.between(getUpdatedAt(), Instant.now()).getSeconds() <= 300;
   }
 
 }
