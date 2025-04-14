@@ -22,5 +22,5 @@ public interface UsersService {
 
     void delete(Long usersId);
 
-    UsersLoginResponseDto login(UsersLoginRequestDto usersLoginRequestDto,Long usersId);
+    UsersLoginResponseDto login(UsersLoginRequestDto usersLoginRequestDto);
 }

@@ -2,6 +2,8 @@ package com.sprint.discodeit.sprint.service.basic.users;
 
 import com.sprint.discodeit.sprint.domain.StatusType;
 import com.sprint.discodeit.sprint.domain.dto.UsersIdAllResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersLoginRequestDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersLoginResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersNameStatusResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersProfileImgResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersRequestDto;
@@ -9,8 +11,8 @@ import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.BinaryContent;
 import com.sprint.discodeit.sprint.domain.entity.Users;
-import com.sprint.discodeit.sprint.domain.entity.UsersStatus;
 import com.sprint.discodeit.sprint.domain.mapper.UsersMapper;
+import com.sprint.discodeit.sprint.global.AuthException;
 import com.sprint.discodeit.sprint.global.ErrorCode;
 import com.sprint.discodeit.sprint.global.RequestException;
 import com.sprint.discodeit.sprint.repository.UserStatusRepository;
@@ -19,11 +21,6 @@ import com.sprint.discodeit.sprint.service.basic.util.BinaryGenerator;
 import com.sprint.discodeit.sprint.service.basic.util.UsersStatusEvaluator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -97,14 +94,13 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public usersLoginResponseDto login(usersLoginRequestDto usersLoginRequestDto) {
-            Users users = fileusersRepository.findByusersname(usersLoginRequestDto.usersname())
+    public UsersLoginResponseDto login(UsersLoginRequestDto usersLoginRequestDto) {
+            Users users = userRepository.findByUsername(usersLoginRequestDto.usersname())
                     .orElseThrow(() -> new AuthException(ErrorCode.UNAUTHORIZED));
-
             if (!users.getPassword().equals(usersLoginRequestDto.password())) {
                 throw new AuthException(ErrorCode.UNAUTHORIZED);
             }
-            return new usersLoginResponseDto(users.getId().toString(), users.getUsersname());
+            return new UsersLoginResponseDto(users.getId(), users.getUsername());
         }
 
 }
