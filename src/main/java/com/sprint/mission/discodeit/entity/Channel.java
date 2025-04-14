@@ -1,19 +1,30 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import java.io.Serializable;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-@AllArgsConstructor
+@Entity
+@Table(name = "channels")
 public class Channel extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
+  @Column(nullable = false, length = 100)
   private String name;
+
+  @Column(length = 500)
   private String description;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 10)
   private ChannelType type;
 
   public Channel(ChannelType type, String name, String description) {
@@ -21,6 +32,9 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
     this.type = type;
     this.name = name;
     this.description = description;
+  }
+
+  protected Channel() {
   }
 
   public void updateChannelType(ChannelType type) {

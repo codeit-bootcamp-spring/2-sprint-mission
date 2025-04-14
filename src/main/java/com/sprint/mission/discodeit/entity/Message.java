@@ -1,23 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 
 @Getter
 @Builder
-@AllArgsConstructor
+@Entity
+@Table(name = "messages")
 public class Message extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  private final User author;
-  private final Channel channel;
+
+  @Column(columnDefinition = "TEXT")
   private String content;
+
+  @ManyToOne
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @ManyToOne
+  @JoinColumn(name = "author_id")
+  private User author;
+
+  @ManyToMany
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id")
+  )
   private List<BinaryContent> attachments = new ArrayList<>();
 
   public Message(User author, Channel channel, String content) {
@@ -26,6 +48,9 @@ public class Message extends BaseUpdatableEntity implements Serializable {
     this.channel = channel;
     this.content = content;
     this.attachments = new ArrayList<>();
+  }
+
+  protected Message() {
   }
 
   public void updateContent(String content) {
