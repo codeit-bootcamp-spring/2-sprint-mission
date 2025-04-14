@@ -11,7 +11,6 @@ public class MessageMapper {
         return Message.builder()
                 .content(messageRequestDto.content())
                 .content(messageRequestDto.content())
-                .authorId(messageRequestDto.userId())
                 .build();
     }
 }

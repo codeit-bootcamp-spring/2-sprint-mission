@@ -24,7 +24,7 @@ public class BinaryContent extends BaseUpdatableEntity {
     private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "message_id'")
+    @JoinColumn(name = "message_id")
     private Message message;
 
     public void update(String fileType, String filePath) {
@@ -34,7 +34,6 @@ public class BinaryContent extends BaseUpdatableEntity {
         }
     }
 
-    // 양방향 연관관계 편의 메서드
     public void setUser(Users user) {
         this.user = user;
     }

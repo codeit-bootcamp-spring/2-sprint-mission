@@ -57,7 +57,6 @@ public class Message extends BaseEntity {
         }
     }
 
-
     public void addBinaryContent(BinaryContent content) {
         binaryContents.add(content);
         content.setMessage(this);
@@ -65,12 +64,14 @@ public class Message extends BaseEntity {
 
     public void addChannel(Channel channel) {
         this.channel = channel;
-        channel.addMessage(this);
+        channel.getMessage().add(this);
     }
 
-    public void setChannel(Channel channel) {
-        this.channel = channel;
+    public void addUsers(Users user) {
+        this.users = user;
+        user.getMessages().add(this);
     }
+
 
     public void update(String newContent) {
         boolean anyValueUpdated = false;
@@ -83,4 +84,6 @@ public class Message extends BaseEntity {
             this.updatedAt = Instant.ofEpochSecond(Instant.now().getEpochSecond());
         }
     }
+
+
 }
