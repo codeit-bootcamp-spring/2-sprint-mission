@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,7 +40,7 @@ public class MessageController {
           .forEach(binaryId -> messageService.addAttachment(message.getId(), binaryId));
     }
 
-    return ResponseEntity.status(201).body(message);
+    return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 
   @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
@@ -56,7 +57,7 @@ public class MessageController {
       @PathVariable("messageId") UUID messageId) {
     messageService.deleteMessage(messageId);
 
-    return ResponseEntity.status(204).body("Message가 성공적으로 삭제됨");
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Message가 성공적으로 삭제됨");
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)

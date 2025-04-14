@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,11 +27,9 @@ public class ReadStatusController {
   public ResponseEntity<ReadStatus> createReadStatus(
       @RequestBody CreateReadStatusRequest request
   ) {
-    System.out.println(11);
-
     ReadStatus readStatus = readStatusService.createReadStatus(request);
 
-    return ResponseEntity.status(201).body(readStatus);
+    return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
   }
 
   @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)

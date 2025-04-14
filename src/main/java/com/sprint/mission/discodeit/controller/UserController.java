@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,7 +44,7 @@ public class UserController {
       UUID binaryId = binaryContentService.createBinaryContent(profile);
       user = userService.updateProfile(user.getId(), binaryId);
     }
-    return ResponseEntity.status(201).body(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
 
   @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
@@ -77,7 +78,7 @@ public class UserController {
   @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteUser(@PathVariable("userId") UUID userId) {
     userService.deleteUser(userId);
-    return ResponseEntity.status(204).body("회원 탈퇴 완료");
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body("회원 탈퇴 완료");
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)

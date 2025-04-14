@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,7 +31,7 @@ public class ChannelController {
   ) {
     Channel channel = channelService.createPrivateChannel(channelDto);
 
-    return ResponseEntity.status(201).body(channel);
+    return ResponseEntity.status(HttpStatus.CREATED).body(channel);
   }
 
   @RequestMapping(value = "/public", method = RequestMethod.POST)
@@ -38,7 +39,7 @@ public class ChannelController {
       @RequestBody CreatePublicChannelRequest channelDto) {
     Channel channel = channelService.createPublicChannel(channelDto);
 
-    return ResponseEntity.status(201).body(channel);
+    return ResponseEntity.status(HttpStatus.CREATED).body(channel);
   }
 
   @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
@@ -53,7 +54,7 @@ public class ChannelController {
   public ResponseEntity<?> deleteChannel(@PathVariable("channelId") UUID channelId) {
     channelService.deleteChannel(channelId);
 
-    return ResponseEntity.status(204).body("Channel이 성공적으로 삭제됨");
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Channel이 성공적으로 삭제됨");
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
