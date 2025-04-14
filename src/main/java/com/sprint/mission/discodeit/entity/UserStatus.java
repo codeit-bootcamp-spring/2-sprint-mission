@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
@@ -14,7 +15,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class UserStatus extends BaseEntity implements Serializable {
+public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private static final int ONLINE_THRESHOLD = 300;

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class Message extends BaseEntity implements Serializable {
+public class Message extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private final UUID authorId;  // User의 UUID 저장
