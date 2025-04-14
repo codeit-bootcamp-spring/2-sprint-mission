@@ -40,9 +40,18 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("이미 존재하는 Username입니다");
     }
 
-    User user = new User(request.username(), request.email(), hashedPassword);
+    User user = User.builder()
+        .username(request.username())
+        .email(request.email())
+        .password(hashedPassword)
+        .build();
+
     userRepository.addUser(user);
-    userStatusRepository.addUserStatus(new UserStatus(user.getId(), Instant.now()));
+    UserStatus userStatus = UserStatus.builder()
+        .userid(user.getId())
+        .lastActiveAt(Instant.now())
+        .build();
+    userStatusRepository.addUserStatus(userStatus);
 
     return user;
   }

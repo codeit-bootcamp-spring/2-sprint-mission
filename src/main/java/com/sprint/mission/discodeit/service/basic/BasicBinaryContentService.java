@@ -20,12 +20,12 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   public UUID createBinaryContent(MultipartFile profile) {
     try {
-      BinaryContent binaryContent = new BinaryContent(
-          profile.getOriginalFilename(),
-          profile.getSize(),
-          profile.getContentType(),
-          profile.getBytes() // getBytes()가 IOException을 던질 수 있음
-      );
+      BinaryContent binaryContent = BinaryContent.builder()
+          .fileName(profile.getOriginalFilename())
+          .size(profile.getSize())
+          .contentType(profile.getContentType())
+          .bytes(profile.getBytes())
+          .build();
       binaryContentRepository.addBinaryContent(binaryContent);
 
       return binaryContent.getId();

@@ -37,7 +37,11 @@ public class BasicReadStatusService implements ReadStatusService {
 
     //validReadStatus(channelId, userId);
 
-    ReadStatus readStatus = new ReadStatus(channelId, userId, request.lastReadAt());
+    ReadStatus readStatus = ReadStatus.builder()
+        .channelId(channelId)
+        .userId(userId)
+        .lastReadAt(request.lastReadAt())
+        .build();
     readStatusRepository.addReadStatus(readStatus);
 
     return readStatus;

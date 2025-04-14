@@ -45,10 +45,10 @@ public class BasicUserStatusService implements UserStatusService {
       throw new IllegalStateException("이미 상태가 존재합니다.");
     }
 
-    UserStatus status = new UserStatus(userId, Instant.now());
-    userStatusRepository.addUserStatus(status);
-
-    return status;
+    return UserStatus.builder()
+        .userid(userId)
+        .lastActiveAt(Instant.now())
+        .build();
   }
 
   @Override

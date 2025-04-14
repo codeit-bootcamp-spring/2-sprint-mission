@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 
 
 @Getter
+@Builder
 public class Message extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;

@@ -38,13 +38,23 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel createPrivateChannel(CreatePrivateChannelRequest request) {
-    Channel channel = new Channel(ChannelType.PRIVATE, "", "");
+    Channel channel = Channel.builder()
+        .type(ChannelType.PRIVATE)
+        .name("")
+        .description("")
+        .build();
     UUID channelId = channel.getId();
     request.participantIds().forEach(userId -> {
       if (!userRepository.existsById(userId)) {
         throw new IllegalArgumentException("User " + userId + " 는 존재하지 않습니다.");
       }
-      readStatusRepository.addReadStatus(new ReadStatus(userId, channelId, Instant.now()));
+      ReadStatus readStatus = ReadStatus.builder()
+          .userId(userId)
+          .channelId(channelId)
+          .lastReadAt(Instant.now())
+          .build();
+
+      readStatusRepository.addReadStatus(readStatus);
     });
     channelRepository.addChannel(channel);
     return channel;
@@ -52,8 +62,11 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel createPublicChannel(CreatePublicChannelRequest request) {
-    Channel channel = new Channel(ChannelType.PUBLIC, request.name(),
-        request.description());
+    Channel channel = Channel.builder()
+        .type(ChannelType.PUBLIC)
+        .name(request.name())
+        .description(request.description())
+        .build();
     channelRepository.addChannel(channel);
     return channel;
   }

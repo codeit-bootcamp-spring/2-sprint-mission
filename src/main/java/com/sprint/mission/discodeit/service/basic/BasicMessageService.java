@@ -37,7 +37,11 @@ public class BasicMessageService implements MessageService {
     UUID authorId = request.authorId();
     userService.validateUserExists(authorId);
     channelService.validateChannelExists(channelId);
-    Message message = new Message(authorId, channelId, request.content());
+    Message message = Message.builder()
+        .authorId(authorId)
+        .channelId(channelId)
+        .content(request.content())
+        .build();
 
     messageRepository.addMessage(message);
     return message;

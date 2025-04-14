@@ -3,18 +3,19 @@ package com.sprint.mission.discodeit.entity;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class ReadStatus extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private final UUID channelId;
   private final UUID userId;
   private Instant lastReadAt;
-  //private final Map<UUID, Instant> userIds = new ConcurrentHashMap<>();
 
   public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
     super();
