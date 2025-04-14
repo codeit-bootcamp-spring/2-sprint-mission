@@ -9,7 +9,7 @@ import com.sprint.discodeit.sprint.domain.entity.Channel;
 import java.util.List;
 import java.util.UUID;
 
-public interface ChannelServiceV1 {
+public interface ChannelService {
     ChannelResponseDto createPrivateChannel(PrivateChannelCreateRequestDto requestDto);
     ChannelResponseDto createPublicChannel(PublicChannelCreateRequestDto requestDto);
     Channel update(String channelId,ChannelUpdateRequestDto channelUpdateRequestDto);

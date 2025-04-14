@@ -50,9 +50,4 @@ public class Channel extends BaseUpdatableEntity {
         }
 
     }
-
-    public void addMessage(Message message) {
-        this.message.add(message);
-        message.setChannel(this);
-    }
 }

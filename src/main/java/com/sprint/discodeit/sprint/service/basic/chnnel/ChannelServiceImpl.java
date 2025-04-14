@@ -10,6 +10,7 @@ import com.sprint.discodeit.sprint.domain.dto.channelDto.PublicChannelCreateRequ
 import com.sprint.discodeit.sprint.domain.entity.Channel;
 import com.sprint.discodeit.sprint.domain.entity.ReadStatus;
 import com.sprint.discodeit.sprint.domain.mapper.ChannelMapper;
+import com.sprint.discodeit.sprint.repository.ChannelRepository;
 import com.sprint.discodeit.sprint.repository.file.ChannelRepository;
 import com.sprint.discodeit.sprint.repository.file.FileChannelRepository;
 import com.sprint.discodeit.sprint.repository.file.FileMessageRepository;
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class BasicChannelService implements ChannelServiceV1 {
+public class ChannelServiceImpl implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final ReadStatusService readStatusService;
@@ -38,9 +39,11 @@ public class BasicChannelService implements ChannelServiceV1 {
     public ChannelResponseDto createPrivateChannel(PrivateChannelCreateRequestDto requestDto) {
         List<UUID> usersIds = requestDto.usersIds();
         Channel channel = ChannelMapper.toPrviateChannel(requestDto);
-        channelRepository.save(channel);
+
         List<ReadStatus> readStatuses = readStatusService.createReadStatusesForPrivateChannel(usersIds, channel.getId());
         readStatusRepository.saveAll(readStatuses);
+
+        channelRepository.save(channel);
         return new ChannelResponseDto(channel.getId(), channel.getName(), channel.getCreatedAt(), ChannelType.PRIVATE);
     }
 

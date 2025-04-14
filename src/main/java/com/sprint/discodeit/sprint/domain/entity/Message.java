@@ -31,8 +31,6 @@ public class Message extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Instant createdAt;
-    private Instant updatedAt;
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -78,10 +76,6 @@ public class Message extends BaseEntity {
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
             anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.ofEpochSecond(Instant.now().getEpochSecond());
         }
     }
 
