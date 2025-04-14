@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.util;
 
-import com.sprint.mission.discodeit.config.FileConfig;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -99,8 +98,6 @@ public class FileUtil {
       return false;  // 확장자가 없다면 false
     }
     String ext = originalFilename.substring(dotIndex).toLowerCase();
-    return FileConfig.ALLOWED_EXTENSIONS.contains(ext);
+    return FileExtensionUtil.ALLOWED_EXTENSIONS.contains(ext);
   }
-
-
 }

@@ -1,9 +1,9 @@
-package com.sprint.mission.discodeit.config;
+package com.sprint.mission.discodeit.util;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class FileConfig {
+public class FileExtensionUtil {
 
   public static Set<String> ALLOWED_EXTENSIONS = new HashSet<>();
 
@@ -15,4 +15,5 @@ public class FileConfig {
     ALLOWED_EXTENSIONS.add(".pdf");
     ALLOWED_EXTENSIONS.add(".txt");
   }
+
 }

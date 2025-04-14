@@ -9,37 +9,34 @@ import lombok.Getter;
 
 @Getter
 public class UserStatus implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private final UUID userId;
-    private Instant lastActiveAt;
+  private final UUID id;
+  private final Instant createdAt;
+  private Instant updatedAt;
 
-    public UserStatus(UUID userId, Instant lastActiveAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
-        this.userId = userId;
-        this.lastActiveAt = lastActiveAt;
+  private final UUID userId;
+  private Instant lastActiveAt;
+
+  public UserStatus(UUID userId, Instant lastActiveAt) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    this.updatedAt = Instant.now();
+    this.userId = userId;
+    this.lastActiveAt = lastActiveAt;
+  }
+
+  public void update(Instant lastActiveAt) {
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
+      this.updatedAt = Instant.now();
     }
+  }
 
-    public void update(Instant lastActiveAt) {
-        boolean anyValueUpdated = false;
-        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
-            this.lastActiveAt = lastActiveAt;
-            anyValueUpdated = true;
-        }
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
-    }
-
-    public Boolean isOnline() {
-        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
-        return lastActiveAt.isAfter(instantFiveMinutesAgo);
-    }
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 }
