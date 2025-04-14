@@ -30,7 +30,7 @@ public record UserStatusResponse(
 
   public static UserStatusResponse create(UserStatus status, boolean online) {
     return UserStatusResponse.builder()
-        .id(status.getUserStatusId())
+        .id(status.getId())
         .createdAt(status.getCreatedAt())
         .updatedAt(status.getUpdatedAt())
         .userId(status.getUserId())

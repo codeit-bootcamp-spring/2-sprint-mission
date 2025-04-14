@@ -89,7 +89,7 @@ public class BasicUserStatusService implements UserStatusService {
         () -> userStatusIdNotFoundError(userId)
     );
 
-    userStatusRepository.delete(userStatus.getUserStatusId());
+    userStatusRepository.delete(userStatus.getId());
   }
 
 }

@@ -20,7 +20,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
   @Override
   public ReadStatus save(ReadStatus readStatus) {
-    readStatusList.put(readStatus.getReadStatusId(), readStatus);
+    readStatusList.put(readStatus.getId(), readStatus);
     return readStatus;
   }
 

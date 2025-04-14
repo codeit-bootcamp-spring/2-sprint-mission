@@ -1,17 +1,25 @@
 package com.sprint.mission.discodeit.core.content.entity;
 
 import com.sprint.mission.discodeit.core.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.ToString;
 
 @ToString
 @Getter
+@Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {
 
+  @Column(name = "file_name", nullable = false)
   private String fileName;
+  @Column(name = "content_type", length = 100, nullable = false)
   private String contentType;
   //  private String extension;
+  @Column(name = "size", nullable = false)
   private Long size;
+  @Lob
   private byte[] bytes;
 
   private BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {

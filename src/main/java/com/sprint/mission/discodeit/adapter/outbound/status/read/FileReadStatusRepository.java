@@ -36,7 +36,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
   @Override
   public ReadStatus save(ReadStatus readStatus) {
-    readStatusList.put(readStatus.getReadStatusId(), readStatus);
+    readStatusList.put(readStatus.getId(), readStatus);
     fileRepository.save(readStatusList);
     return readStatus;
   }

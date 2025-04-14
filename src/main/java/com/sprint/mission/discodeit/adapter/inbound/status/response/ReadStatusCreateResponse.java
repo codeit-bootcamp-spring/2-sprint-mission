@@ -25,7 +25,7 @@ public record ReadStatusCreateResponse(
 
   public static ReadStatusCreateResponse create(ReadStatus readStatus) {
     return ReadStatusCreateResponse.builder()
-        .id(readStatus.getReadStatusId())
+        .id(readStatus.getId())
         .createdAt(readStatus.getCreatedAt())
         .updatedAt(readStatus.getUpdatedAt())
         .userId(readStatus.getUserId())

@@ -140,8 +140,8 @@ public class BasicChannelService implements ChannelService {
   private void deleteAllReadStatus(UUID channelId) {
     List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channelId);
     for (ReadStatus status : readStatusList) {
-      readStatusRepository.delete(status.getReadStatusId());
-      logger.info("Read Status deleted {}", status.getReadStatusId());
+      readStatusRepository.delete(status.getId());
+      logger.info("Read Status deleted {}", status.getId());
     }
   }
 }

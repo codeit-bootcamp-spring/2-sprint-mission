@@ -60,7 +60,7 @@ public class BasicUserService implements UserService {
 
     UserStatus status = userStatusService.create(
         new CreateUserStatusCommand(user.getId(), Instant.now()));
-    logger.info("User Status created: {}", status.getUserStatusId());
+    logger.info("User Status created: {}", status.getId());
 
     return new CreateUserResult(user);
   }

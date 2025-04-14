@@ -20,7 +20,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
   @Override
   public void save(UserStatus userStatus) {
-    userStatusList.put(userStatus.getUserStatusId(), userStatus);
+    userStatusList.put(userStatus.getId(), userStatus);
   }
 
   @Override

@@ -27,7 +27,7 @@ public record BinaryContentResponse(
   public static BinaryContentResponse create(BinaryContent content) {
     return BinaryContentResponse.builder()
         .id(content.getId())
-        .createdAt(content.getUploadAt())
+        .createdAt(content.getCreatedAt())
         .fileName(content.getFileName())
         .size(content.getSize())
         .contentType(content.getContentType())

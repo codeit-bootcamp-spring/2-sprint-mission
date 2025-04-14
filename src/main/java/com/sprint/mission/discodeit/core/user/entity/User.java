@@ -1,17 +1,30 @@
 package com.sprint.mission.discodeit.core.user.entity;
 
 import com.sprint.mission.discodeit.core.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.core.status.entity.UserStatus;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.ToString;
 
 @ToString
 @Getter
+@Table(name = "users")
 public class User extends BaseUpdatableEntity {
 
+  @Column(name = "username", length = 50, unique = true, nullable = false)
   private String name;
+  @Column(name = "email", length = 100, unique = true, nullable = false)
   private String email;
+  @Column(name = "password", length = 60, nullable = false)
   private String password;
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  private UserStatus userStatus;
+
+  //TODO. USER-BinaryContent 연관관계 매핑해야함 : OneToOne 관계
   private UUID profileId;
 
   private User(String name, String email, String password, UUID profileId) {
@@ -27,25 +40,17 @@ public class User extends BaseUpdatableEntity {
   }
 
   public void update(String newUserName, String newEmail, String newPassword, UUID newProfileId) {
-    boolean anyValueUpdated = false;
     if (newUserName != null && !newUserName.equals(this.name)) {
       this.name = newUserName;
-      anyValueUpdated = true;
     }
     if (newEmail != null && !newEmail.equals(this.email)) {
       this.email = newEmail;
-      anyValueUpdated = true;
     }
     if (newPassword != null && !newPassword.equals(this.password)) {
       this.password = newPassword;
-      anyValueUpdated = true;
     }
     if (newProfileId != null && !newProfileId.equals(this.profileId)) {
       this.profileId = newProfileId;
-      anyValueUpdated = true;
-    }
-    if (anyValueUpdated) {
-      super.updateTime();
     }
   }
 
