@@ -7,25 +7,23 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
 
 @Getter
 public class Message extends BaseUpdatableEntity implements Serializable, Identifiable {
 
   private static final long serialVersionUID = 1L;
 
-  private List<UUID> attachmentIds;
+  private List<BinaryContent> attachments;
   private String content;
-  private UUID channelId;
-  private UUID authorId;
+  private Channel channel;
+  private User author;
 
   @Builder
-  public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-    this.attachmentIds = attachmentIds != null ? new ArrayList<>(attachmentIds) : new ArrayList<>();
+  public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
+    this.attachments = attachments != null ? new ArrayList<>(attachments) : new ArrayList<>();
     this.content = content;
-    this.channelId = channelId;
-    this.authorId = authorId;
+    this.channel = channel;
+    this.author = author;
   }
 
   public void updateMessageInfo(String newContent) {
@@ -34,8 +32,8 @@ public class Message extends BaseUpdatableEntity implements Serializable, Identi
     }
   }
 
-  public void updateMessageAttachment(List<UUID> attachmentIds) {
-    this.attachmentIds = new ArrayList<>(attachmentIds);
+  public void updateMessageAttachment(List<BinaryContent> attachments) {
+    this.attachments = new ArrayList<>(attachments);
   }
 
 }

@@ -12,14 +12,14 @@ import java.util.UUID;
 public class ReadStatus extends BaseUpdatableEntity implements Serializable, Identifiable {
 
   private static final long serialVersionUID = 1L;
-  private UUID userId;
-  private UUID channelId;
+  private User user;
+  private Channel channel;
   private Instant lastReadAt; // 마지막으로 메시지를 읽은 시간
 
   @Builder
-  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    this.userId = userId;
-    this.channelId = channelId;
+  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+    this.user = user;
+    this.channel = channel;
     this.lastReadAt = lastReadAt;
   }
 

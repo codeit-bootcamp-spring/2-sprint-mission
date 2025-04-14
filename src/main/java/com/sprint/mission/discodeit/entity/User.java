@@ -6,14 +6,13 @@ import lombok.Getter;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 
 @Getter
 public class User extends BaseUpdatableEntity implements Serializable, Identifiable {
 
   private static final long serialVersionUID = 1L;
-  private UUID profileId;
+  private BinaryContent profile;
+  private UserStatus userStatus;
   private String username;
   private String email;
   private String password;
@@ -23,8 +22,8 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
   // 클래스에 붙이면 모든 필드에 대해 build를 해줘야함 (안하면 null)
   // id, createdAt 같은 자동 생성해야 하는 필드도 개발자가 직접 입력해야 하는 문제가 발생
   @Builder
-  public User(String username, String email, String password, UUID profileId) {
-    this.profileId = profileId;
+  public User(String username, String email, String password, BinaryContent profile) {
+    this.profile = profile;
     this.username = username;
     this.email = email;
     this.password = password;
@@ -43,12 +42,12 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
     }
   }
 
-  public void updateProfile(UUID profileId) {
-    this.profileId = profileId;
+  public void updateProfile(BinaryContent profile) {
+    this.profile = profile;
   }
 
   public void updateProfileDefault() {
-    this.profileId = null;
+    this.profile = null;
   }
 
 }

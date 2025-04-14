@@ -7,18 +7,17 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
 public class UserStatus extends BaseUpdatableEntity implements Serializable, Identifiable {
 
   private static final long serialVersionUID = 1L;
-  private UUID userId;
+  private User user;
   private Instant lastActiveAt; // 유저의 마지막 접속시간
 
   @Builder
-  public UserStatus(UUID userId, Instant lastActiveAt) {
-    this.userId = userId;
+  public UserStatus(User user, Instant lastActiveAt) {
+    this.user = user;
     this.lastActiveAt = lastActiveAt;
   }
 
