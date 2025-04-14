@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.auth.AuthLoginDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Operation(summary = "로그인")
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody AuthLoginDto authLoginDto) {
         User user = authService.login(authLoginDto);

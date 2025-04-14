@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.util.List;
@@ -38,6 +39,7 @@ public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
+    @Operation(summary = "User 등록")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<User> createUser(@RequestPart("userCreateRequest") UserCreateDto userCreateDto,
                                            @RequestPart(name = "profile", required = false) MultipartFile file) {
@@ -49,6 +51,7 @@ public class UserController {
                 .body(createdUser);
     }
 
+    @Operation(summary = "User 정보 수정")
     @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<User> updateUser(
             @PathVariable UUID userId,
@@ -63,18 +66,21 @@ public class UserController {
                 .body(updatedUser);
     }
 
+    @Operation(summary = "User 삭제")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.delete(userId);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "전체 User 목록 조회")
     @GetMapping
     public ResponseEntity<List<UserDto>> getUsers() {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @PatchMapping("{userId}/userStatus")
+    @Operation(summary = "User 온라인 상태 업데이트")
+    @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
                                                                @RequestBody UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto) {
         UserStatus userStatus = userStatusService.updateByUserId(userId, userStatusUpdateByUserIdDto);

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -21,11 +22,13 @@ public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
+    @Operation(summary = "여러 첨부 파일 조회")
     @GetMapping
     public ResponseEntity<List<BinaryContent>> getBinaryContents(@RequestParam List<UUID> binaryContentIds) {
         return ResponseEntity.ok(binaryContentService.findAllByIdIn(binaryContentIds));
     }
 
+    @Operation(summary = "첨부 파일 조회")
     @GetMapping("/{binaryContentId}")
     public ResponseEntity<BinaryContent> getBinaryContentById(@PathVariable UUID binaryContentId) {
         return ResponseEntity.ok(binaryContentService.findById(binaryContentId));
