@@ -4,20 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="# 제목은 최대 50글자까지 아래에 작성: ex) Feat: Add Key mapping  &#10;&#10;# 본문은 아래에 작성  &#10;&#10;# 꼬릿말은 아래에 작성: ex) Github issue #23  &#10;&#10;# --- COMMIT END ---  &#10;#   &lt;타입&gt; 리스트  &#10;#   feat        : 기능 (새로운 기능)  &#10;#   fix         : 버그 (버그 수정)  &#10;#   refactor    : 리팩토링  &#10;#   design      : CSS 등 사용자 UI 디자인 변경  &#10;#   comment     : 필요한 주석 추가 및 변경  &#10;#   style       : 스타일 (코드 형식, 세미콜론 추가: 비즈니스 로직에 변경 없음)  &#10;#   docs        : 문서 수정 (문서 추가, 수정, 삭제, README)  &#10;#   test        : 테스트 (테스트 코드 추가, 수정, 삭제: 비즈니스 로직에 변경 없음)  &#10;#   chore       : 기타 변경사항 (빌드 스크립트 수정, assets, 패키지 매니저 등)  &#10;#   init        : 초기 생성  &#10;#   rename      : 파일 혹은 폴더명을 수정하거나 옮기는 작업만 한 경우  &#10;#   remove      : 파일을 삭제하는 작업만 수행한 경우  &#10;# ------------------  &#10;#   제목 첫 글자를 대문자로  &#10;#   제목은 명령문으로  &#10;#   제목 끝에 마침표(.) 금지  &#10;#   제목과 본문을 한 줄 띄워 분리하기  &#10;#   본문은 &quot;어떻게&quot; 보다 &quot;무엇을&quot;, &quot;왜&quot;를 설명한다.  &#10;#   본문에 여러줄의 메시지를 작성할 땐 &quot;-&quot;로 구분  &#10;# ------------------  &#10;#   &lt;꼬리말&gt;  &#10;#   필수가 아닌 optioanl  &#10;#   Fixes        :이슈 수정중 (아직 해결되지 않은 경우)  &#10;#   Resolves     : 이슈 해결했을 때 사용  &#10;#   Ref          : 참고할 이슈가 있을 때 사용  &#10;#   Related to   : 해당 커밋에 관련된 이슈번호 (아직 해결되지 않은 경우)  &#10;#   ex) Fixes: #47 Related to: #32, #21">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/schema.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/md5-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/md5-checksums.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/sha1-checksums.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="데이터베이스, DDL 파일 구현 완료">
       <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/resources/main/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,7 +125,7 @@
       <updated>1743654898078</updated>
       <workItem from="1743654899800" duration="238000" />
       <workItem from="1743655141038" duration="8122000" />
-      <workItem from="1744589373509" duration="6150000" />
+      <workItem from="1744589373509" duration="6738000" />
     </task>
     <task id="LOCAL-00001" summary="고급 구현 과정">
       <option name="closed" value="true" />
@@ -163,7 +151,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743669824530</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="데이터베이스, DDL 파일 구현 완료">
+      <option name="closed" value="true" />
+      <created>1744596413794</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1744596413794</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -184,6 +180,7 @@
     <MESSAGE value="고급 구현 과정" />
     <MESSAGE value="Server 8080 포트 수정" />
     <MESSAGE value="MessageController API 노테이션 전체적으로 수정" />
-    <option name="LAST_COMMIT_MESSAGE" value="MessageController API 노테이션 전체적으로 수정" />
+    <MESSAGE value="데이터베이스, DDL 파일 구현 완료" />
+    <option name="LAST_COMMIT_MESSAGE" value="데이터베이스, DDL 파일 구현 완료" />
   </component>
 </project>
