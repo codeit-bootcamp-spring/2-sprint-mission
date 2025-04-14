@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +13,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @Builder
-public class UserStatus extends BaseEntity implements Serializable {
+public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private UUID userId;
@@ -21,11 +23,9 @@ public class UserStatus extends BaseEntity implements Serializable {
 
   public void updateLastLoginTime(Instant lastLoginTime) {
     this.lastActiveAt = lastLoginTime;
-    super.updateTime();
   }
 
   public boolean isLastStatus() {
-    super.updateTime();
     if (lastActiveAt == null || lastActiveAt.isBefore(Instant.now().minusSeconds(300))) {
       return false;
     }

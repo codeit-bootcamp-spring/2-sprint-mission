@@ -1,18 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class ReadStatus extends BaseEntity implements Serializable {
+public class ReadStatus extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private UUID userId;
@@ -21,11 +20,9 @@ public class ReadStatus extends BaseEntity implements Serializable {
 
   public void updateLastReadAt(Instant lastReadAt) {
     this.lastReadAt = lastReadAt;
-    super.updateTime();
   }
 
   public boolean isRead(Instant lastMessageTime) {
-    super.updateTime();
     if (lastReadAt == null || lastReadAt.isBefore(lastMessageTime)) {
       return false;
     }
