@@ -7,16 +7,20 @@ import com.sprint.discodeit.sprint.domain.dto.usersDto.usersProfileImgResponseDt
 import com.sprint.discodeit.sprint.domain.dto.usersDto.usersRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.usersResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.usersUpdateRequestDto;
-import com.sprint.discodeit.sprint.domain.entity.users;
+import com.sprint.discodeit.sprint.domain.entity.Users;
 import java.util.List;
-import java.util.UUID;
 
-public interface UsersServiceV1 {
+public interface UsersService {
 
-    usersNameStatusResponseDto create(usersRequestDto usersRequestDto, usersProfileImgResponseDto usersProfileImgResponseDto);
-    usersResponseDto find(UUID usersId);
-    List<users> findAll();
+    usersNameStatusResponseDto create(usersRequestDto usersRequestDto,usersProfileImgResponseDto usersProfileImgResponseDto);
+
+    usersResponseDto find(Long usersId);
+
+    List<Users> findAll();
+
     usersResponseDto update(usersUpdateRequestDto usersUpdateRequestDto, String usersId);
-    void delete(UUID usersId);
+
+    void delete(Long usersId);
+
     usersLoginResponseDto login(usersLoginRequestDto usersLoginRequestDto);
 }
