@@ -1,15 +1,15 @@
 package com.sprint.discodeit.sprint.controller;
 
 import com.sprint.discodeit.sprint.domain.StatusType;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersLoginRequestDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersLoginResponseDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersNameStatusResponseDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersProfileImgResponseDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersRequestDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersResponseDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersUpdateRequestDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersLoginRequestDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersLoginResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersNameStatusResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersProfileImgResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersRequestDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.Users;
-import com.sprint.discodeit.sprint.service.basic.users.UsersServiceV1;
+import com.sprint.discodeit.sprint.service.basic.users.UsersService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UsersController {
 
-    private final UsersServiceV1 basicusersService;
+    private final UsersService usersService;
 
     @Operation(summary = "회원가입", description = "회원 정보를 입력받아 회원가입을 진행합니다.")
     @ApiResponses({
@@ -42,16 +42,16 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "요청 형식 오류")
     })
     @PostMapping("/create")
-    public ResponseEntity<usersNameStatusResponseDto> signup(
-            @RequestBody usersRequestDto usersRequestDto,
-            @Parameter(description = "프로필 이미지 정보") usersProfileImgResponseDto usersProfileImgResponseDto) {
-        usersNameStatusResponseDto usersNameStatusResponseDto = basicusersService.create(usersRequestDto, usersProfileImgResponseDto);
+    public ResponseEntity<UsersNameStatusResponseDto> signup(
+            @RequestBody UsersRequestDto usersRequestDto,
+            @Parameter(description = "프로필 이미지 정보") UsersProfileImgResponseDto usersProfileImgResponseDto) {
+        UsersNameStatusResponseDto usersNameStatusResponseDto = usersService.create(usersRequestDto, usersProfileImgResponseDto);
         return ResponseEntity.ok(usersNameStatusResponseDto);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<usersLoginResponseDto> login(@RequestBody usersLoginRequestDto usersLoginRequestDto) {
-        usersLoginResponseDto login = basicusersService.login(usersLoginRequestDto);
+    public ResponseEntity<UsersLoginResponseDto> login(@RequestBody UsersLoginRequestDto usersLoginRequestDto) {
+        UsersLoginResponseDto login = usersService.login(usersLoginRequestDto);
         return ResponseEntity.ok(login);
     }
 
@@ -61,33 +61,33 @@ public class UsersController {
             @ApiResponse(responseCode = "404", description = "회원 정보를 찾을 수 없음")
     })
     @PutMapping("/update/{usersId}")
-    public ResponseEntity<usersResponseDto> update(
-            @Parameter(description = "수정할 회원의 UUID") @PathVariable String usersId,
-            @RequestBody usersUpdateRequestDto updateRequestDto) {
-        usersResponseDto usersResponseDto = basicusersService.update(updateRequestDto, usersId);
+    public ResponseEntity<UsersResponseDto> update(
+            @Parameter(description = "수정할 회원의 UUID") @PathVariable Long usersId,
+            @RequestBody UsersUpdateRequestDto updateRequestDto) {
+        UsersResponseDto usersResponseDto = usersService.update(updateRequestDto, usersId);
         return ResponseEntity.ok(usersResponseDto);
     }
 
     @Operation(summary = "회원 단건 조회", description = "UUID를 기반으로 회원 정보를 조회합니다.")
     @GetMapping("/{usersId}")
-    public ResponseEntity<usersResponseDto> get(
-            @Parameter(description = "조회할 회원의 UUID") @PathVariable String usersId) {
-        usersResponseDto usersResponseDto = basicusersService.find(UUID.fromString(usersId));
+    public ResponseEntity<UsersResponseDto> get(
+            @Parameter(description = "조회할 회원의 UUID") @PathVariable Long usersId) {
+        UsersResponseDto usersResponseDto = usersService.find(usersId);
         return ResponseEntity.ok(usersResponseDto);
     }
 
     @Operation(summary = "모든 회원 조회", description = "가입된 모든 회원을 조회합니다.")
     @GetMapping("/getAll")
-    public ResponseEntity<List<Users>> getAll() {
-        List<Users> all = basicusersService.findAll();
+    public ResponseEntity<List<Long>> getAll() {
+        List<Long> all = usersService.findAll().id();
         return ResponseEntity.ok(all);
     }
 
     @Operation(summary = "회원 비활성화", description = "UUID를 기반으로 회원 상태를 Inactive로 변경합니다.")
     @PatchMapping("/{usersId}/status")
     public ResponseEntity<String> delet(
-            @Parameter(description = "비활성화할 회원의 UUID") @PathVariable String usersId) {
-        basicusersService.delete(UUID.fromString(usersId));
+            @Parameter(description = "비활성화할 회원의 UUID") @PathVariable Long usersId) {
+        usersService.delete(usersId);
         return ResponseEntity.ok(StatusType.Inactive.getExplanation());
     }
 }
