@@ -39,6 +39,9 @@ public class Users extends BaseUpdatableEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PrivateChannelUser> privateChannelUsers = new ArrayList<>();
+
     public void update(String newUsername, String newEmail, String newPassword) {
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
@@ -65,7 +68,6 @@ public class Users extends BaseUpdatableEntity {
     }
 
 
-
     // 양방향 연관관계 편의 메서드
     public void addBinaryContent(BinaryContent content) {
         binaryContents.add(content);
@@ -75,5 +77,10 @@ public class Users extends BaseUpdatableEntity {
     public void removeBinaryContent(BinaryContent content) {
         binaryContents.remove(content);
         content.setUser(null);
+    }
+
+    public void setMessage(Message message) {
+        messages.add(message);
+        message.addUsers(this);
     }
 }
