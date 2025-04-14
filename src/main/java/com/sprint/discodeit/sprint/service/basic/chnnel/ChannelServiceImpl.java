@@ -8,9 +8,17 @@ import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelUpdateRequestDto
 import com.sprint.discodeit.sprint.domain.dto.channelDto.PrivateChannelCreateRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.PublicChannelCreateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.Channel;
+import com.sprint.discodeit.sprint.domain.entity.PrivateChannel;
+import com.sprint.discodeit.sprint.domain.entity.PrivateChannelUser;
 import com.sprint.discodeit.sprint.domain.entity.ReadStatus;
+import com.sprint.discodeit.sprint.domain.entity.Users;
 import com.sprint.discodeit.sprint.domain.mapper.ChannelMapper;
+import com.sprint.discodeit.sprint.global.ErrorCode;
+import com.sprint.discodeit.sprint.global.RequestException;
 import com.sprint.discodeit.sprint.repository.ChannelRepository;
+import com.sprint.discodeit.sprint.repository.PrivateChannelRepository;
+import com.sprint.discodeit.sprint.repository.PrivateChannelUserRepository;
+import com.sprint.discodeit.sprint.repository.UsersRepository;
 import com.sprint.discodeit.sprint.repository.file.ChannelRepository;
 import com.sprint.discodeit.sprint.repository.file.FileChannelRepository;
 import com.sprint.discodeit.sprint.repository.file.FileMessageRepository;
@@ -30,21 +38,20 @@ import org.springframework.stereotype.Service;
 public class ChannelServiceImpl implements ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final ReadStatusService readStatusService;
-    private final ReadStatusRepository readStatusRepository;
-    private final FileChannelRepository fileChannelRepository;
-    private final FileMessageRepository fileMessageRepository;
+    private final PrivateChannelRepository privateChannelRepository;
+    private final UsersRepository usersRepository;
 
     @Override
     public ChannelResponseDto createPrivateChannel(PrivateChannelCreateRequestDto requestDto) {
-        List<UUID> usersIds = requestDto.usersIds();
-        Channel channel = ChannelMapper.toPrviateChannel(requestDto);
+        PrivateChannel channel = ChannelMapper.toPrviateChannel(requestDto);
+        for(Long userId : requestDto.usersIds()) {
+            Users users = usersRepository.findById(userId)
+                    .orElseThrow(() -> new RequestException(ErrorCode.users_NOT_FOUND));
 
-        List<ReadStatus> readStatuses = readStatusService.createReadStatusesForPrivateChannel(usersIds, channel.getId());
-        readStatusRepository.saveAll(readStatuses);
-
-        channelRepository.save(channel);
-        return new ChannelResponseDto(channel.getId(), channel.getName(), channel.getCreatedAt(), ChannelType.PRIVATE);
+            channel.addPrivateChannelUser(users);
+        }
+        PrivateChannel privateChannel = privateChannelRepository.save(channel);
+        return new ChannelResponseDto(privateChannel.getId(), privateChannel.getName(),privateChannel.getCreatedAt(), ChannelType.PRIVATE);
     }
 
     @Override

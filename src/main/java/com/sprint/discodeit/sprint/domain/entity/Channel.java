@@ -1,6 +1,5 @@
 package com.sprint.discodeit.sprint.domain.entity;
 
-
 import com.sprint.discodeit.sprint.domain.ChannelType;
 import com.sprint.discodeit.sprint.domain.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
@@ -17,13 +16,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Builder
-@Entity
+
+@SuperBuilder
 @Getter
-@Inheritance(strategy = InheritanceType.JOINED)
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
+@Entity
 public abstract class Channel extends BaseUpdatableEntity {
 
     @Id
