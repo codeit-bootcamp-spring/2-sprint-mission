@@ -33,7 +33,7 @@ public record UserStatusResponse(
         .id(status.getId())
         .createdAt(status.getCreatedAt())
         .updatedAt(status.getUpdatedAt())
-        .userId(status.getUserId())
+        .userId(status.getUser().getId())
         .lastActiveAt(status.getLastActiveAt())
         .online(online).build();
   }

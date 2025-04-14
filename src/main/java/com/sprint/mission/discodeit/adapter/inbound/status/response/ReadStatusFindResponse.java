@@ -28,8 +28,8 @@ public record ReadStatusFindResponse(
         .id(readStatus.getId())
         .createdAt(readStatus.getCreatedAt())
         .updatedAt(readStatus.getUpdatedAt())
-        .userId(readStatus.getUserId())
-        .channelId(readStatus.getChannelId())
+        .userId(readStatus.getUser().getId())
+        .channelId(readStatus.getChannel().getId())
         .lastReadAt(readStatus.getLastReadAt())
         .build();
   }

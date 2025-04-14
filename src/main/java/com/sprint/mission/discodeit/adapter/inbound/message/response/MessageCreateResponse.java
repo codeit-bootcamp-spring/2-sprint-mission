@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.adapter.inbound.message.response;
 
+import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
@@ -26,7 +27,7 @@ public record MessageCreateResponse(
         description = "Binary Content ID 목록",
         example = "[\"3fa85f64-5717-4562-b3fc-2c963f66afa6\"]"
     )
-    List<UUID> attachmentIds
+    List<BinaryContent> attachmentIds
 ) {
 
   public static MessageCreateResponse create(Message message) {
@@ -35,8 +36,8 @@ public record MessageCreateResponse(
         .createdAt(message.getCreatedAt())
         .updatedAt(message.getUpdatedAt())
         .content(message.getContent())
-        .channelId(message.getChannelId())
-        .authorId(message.getUserId())
+        .channelId(message.getChannel().getId())
+        .authorId(message.getAuthor().getId())
         .attachmentIds(message.getAttachmentIds())
         .build();
   }

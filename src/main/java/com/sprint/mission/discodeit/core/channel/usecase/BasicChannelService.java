@@ -18,6 +18,9 @@ import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.port.ReadStatusRepositoryPort;
+import com.sprint.mission.discodeit.core.user.entity.User;
+import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
+import com.sprint.mission.discodeit.exception.user.UserErrors;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -34,7 +37,7 @@ public class BasicChannelService implements ChannelService {
 
   private static final Logger logger = LoggerFactory.getLogger(BasicChannelService.class);
 
-  //  private final UserRepositoryPort userRepositoryPort;
+  private final UserRepositoryPort userRepositoryPort;
   private final ChannelRepositoryPort channelRepositoryPort;
   private final MessageRepositoryPort messageRepositoryPort;
   private final ReadStatusRepositoryPort readStatusRepositoryPort;
@@ -54,7 +57,12 @@ public class BasicChannelService implements ChannelService {
     Channel createdChannel = channelRepositoryPort.save(channel);
 
     command.participantIds().stream()
-        .map(u -> ReadStatus.create(u, createdChannel.getId(), Instant.MIN))
+        .map(userId -> {
+          User user = userRepositoryPort.findById(userId).orElseThrow(
+              () -> UserErrors.userIdNotFoundError(userId)
+          );
+          return ReadStatus.create(user, createdChannel, channel.getCreatedAt());
+        })
         .forEach(readStatusRepositoryPort::save);
 
     logger.info("Private Channel created {}", channel.getId());
@@ -73,8 +81,12 @@ public class BasicChannelService implements ChannelService {
     List<UUID> userIdList = new ArrayList<>();
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       readStatusRepositoryPort.findAllByChannelId(channelId)
-          .stream().map(ReadStatus::getUserId)
+          .stream().map(readStatus -> {
+            User user = readStatus.getUser();
+            return user.getId();
+          })
           .forEach(userIdList::add);
+
     }
 
     return ChannelResult.create(channel, userIdList, lastMessageAt);
@@ -94,7 +106,10 @@ public class BasicChannelService implements ChannelService {
   @Override
   public ChannelListResult findChannelsByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusRepositoryPort.findAllByUserId(userId).stream()
-        .map(ReadStatus::getChannelId)
+        .map(readStatus -> {
+          Channel channel = readStatus.getChannel();
+          return channel.getId();
+        })
         .toList();
 
     return new ChannelListResult(channelRepositoryPort.findAll().stream()

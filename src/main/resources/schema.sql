@@ -23,7 +23,7 @@ create table if not exists users
             on delete set null
 );
 
-create table if not exists user_status
+create table if not exists user_statuses
 (
     id             uuid primary key,
     created_at     timestamp default current_timestamp,

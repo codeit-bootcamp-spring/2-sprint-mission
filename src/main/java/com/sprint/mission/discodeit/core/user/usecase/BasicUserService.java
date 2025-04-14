@@ -45,16 +45,16 @@ public class BasicUserService implements UserService {
   @Override
   public CreateUserResult create(CreateUserCommand command,
       Optional<CreateBinaryContentCommand> binaryContentDTO) {
-    UUID profileId = null;
+    BinaryContent profile = null;
     validateUser(command.name(), command.email());
 
 //    String hashedPassword = BCrypt.hashpw(command.password(), BCrypt.gensalt());
 
     if (binaryContentDTO.isPresent()) {
-      profileId = makeBinaryContent(binaryContentDTO);
+      profile = makeBinaryContent(binaryContentDTO);
     }
 
-    User user = User.create(command.name(), command.email(), command.password(), profileId);
+    User user = User.create(command.name(), command.email(), command.password(), profile);
     userRepositoryPort.save(user);
     logger.info("User registered: {}", user.getId());
 
@@ -75,7 +75,7 @@ public class BasicUserService implements UserService {
     }
   }
 
-  private UUID makeBinaryContent(Optional<CreateBinaryContentCommand> binaryContentDTO) {
+  private BinaryContent makeBinaryContent(Optional<CreateBinaryContentCommand> binaryContentDTO) {
     return binaryContentDTO.map(contentDTO -> {
       String fileName = contentDTO.fileName();
       String contentType = contentDTO.contentType();
@@ -86,7 +86,7 @@ public class BasicUserService implements UserService {
       binaryContentRepositoryPort.save(content);
       logger.info("Binary Content Created: {}", content.getId());
 
-      return content.getId();
+      return content;
     }).orElse(null);
   }
 
@@ -132,12 +132,12 @@ public class BasicUserService implements UserService {
     User user = userRepositoryPort.findById(command.requestUserId())
         .orElseThrow(() -> userIdNotFoundError(command.requestUserId()));
 
-    UUID profileId = user.getProfileId();
-    if (profileId != null) {
-      binaryContentRepositoryPort.delete(profileId);
+    BinaryContent profile = user.getProfile();
+    if (profile != null) {
+      binaryContentRepositoryPort.delete(profile.getId());
     }
-    UUID newProfileId = makeBinaryContent(binaryContentDTO);
-    user.update(command.newName(), command.newEmail(), command.newPassword(), newProfileId);
+    BinaryContent newProfile = makeBinaryContent(binaryContentDTO);
+    user.update(command.newName(), command.newEmail(), command.newPassword(), newProfile);
     logger.info("User Updated: name {}, email {}, password {}", user.getName(), user.getEmail(),
         user.getPassword());
     return new UpdateUserResult(userRepositoryPort.save(user));
@@ -149,7 +149,7 @@ public class BasicUserService implements UserService {
     User user = userRepositoryPort.findById(userId)
         .orElseThrow(() -> userIdNotFoundError(userId));
 
-    Optional.ofNullable(user.getProfileId())
+    Optional.ofNullable(user.getProfile().getId())
         .ifPresent(binaryContentRepositoryPort::delete);
 
     userStatusService.delete(user.getId());

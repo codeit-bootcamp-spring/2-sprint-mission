@@ -33,6 +33,6 @@ public record UserCreateResponse(
         .username(user.getName())
         .email(user.getEmail())
         .password(user.getPassword())
-        .profileId(user.getProfileId()).build();
+        .profileId(user.getProfile().getId()).build();
   }
 }

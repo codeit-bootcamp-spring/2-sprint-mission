@@ -35,7 +35,7 @@ public record UserResult(
   public static UserResult create(User user, boolean online) {
     return UserResult.builder()
         .id(user.getId())
-        .profileId(user.getProfileId())
+        .profileId(user.getProfile().getId())
         .username(user.getName())
         .email(user.getEmail())
         .createdAt(user.getCreatedAt())

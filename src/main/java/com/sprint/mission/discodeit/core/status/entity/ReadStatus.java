@@ -4,16 +4,20 @@ import com.sprint.mission.discodeit.core.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@Table(name = "read_status")
 @ToString
 @Getter
+@NoArgsConstructor
+@Table(name = "read_status")
+@Entity
 public class ReadStatus extends BaseUpdatableEntity {
 
   @ManyToOne(cascade = CascadeType.ALL)
@@ -44,3 +48,4 @@ public class ReadStatus extends BaseUpdatableEntity {
     }
   }
 }
+

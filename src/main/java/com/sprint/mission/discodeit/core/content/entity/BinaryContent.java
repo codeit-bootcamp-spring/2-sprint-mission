@@ -2,14 +2,18 @@ package com.sprint.mission.discodeit.core.content.entity;
 
 import com.sprint.mission.discodeit.core.base.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @ToString
 @Getter
+@NoArgsConstructor
 @Table(name = "binary_contents")
+@Entity
 public class BinaryContent extends BaseEntity {
 
   @Column(name = "file_name", nullable = false)

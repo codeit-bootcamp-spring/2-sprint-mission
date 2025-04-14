@@ -2,22 +2,26 @@ package com.sprint.mission.discodeit.core.channel.entity;
 
 import com.sprint.mission.discodeit.core.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @ToString
 @Getter
+@NoArgsConstructor
 @Table(name = "channels")
+@Entity
 public class Channel extends BaseUpdatableEntity {
 
   @Column(name = "name", length = 100)
   private String name;
   @Column(name = "description", length = 500)
   private String description;
-  
+
   @Enumerated(EnumType.STRING)
   private ChannelType type;
 

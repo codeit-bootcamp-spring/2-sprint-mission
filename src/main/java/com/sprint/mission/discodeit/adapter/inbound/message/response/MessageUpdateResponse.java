@@ -35,8 +35,8 @@ public record MessageUpdateResponse(
         .createdAt(message.getCreatedAt())
         .updatedAt(message.getUpdatedAt())
         .content(message.getContent())
-        .channelId(message.getChannelId())
-        .authorId(message.getUserId())
+        .channelId(message.getChannel().getId())
+        .authorId(message.getAuthor().getId())
         .build();
   }
 }
