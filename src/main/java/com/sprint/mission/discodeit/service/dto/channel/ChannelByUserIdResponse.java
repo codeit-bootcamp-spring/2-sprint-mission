@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.Builder;
 
+@Builder
 public record ChannelByUserIdResponse(
     UUID id,
     ChannelType type,
@@ -18,9 +20,13 @@ public record ChannelByUserIdResponse(
   public static ChannelByUserIdResponse of(Channel channel, String name, String description,
       List<UUID> participantIds,
       Instant lastMessageAt) {
-    return new ChannelByUserIdResponse(
-        channel.getId(), channel.getType(), name, description,
-        participantIds, lastMessageAt
-    );
+    return ChannelByUserIdResponse.builder()
+        .id(channel.getId())
+        .type(channel.getType())
+        .name(name)
+        .description(description)
+        .participantIds(participantIds)
+        .lastMessageAt(lastMessageAt)
+        .build();
   }
 }

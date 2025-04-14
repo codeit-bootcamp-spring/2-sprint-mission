@@ -8,8 +8,6 @@ import lombok.Builder;
 @Builder
 public record UserReadStatusResponse(
     UUID id,
-    Instant createdAt,
-    Instant updatedAt,
     UUID userId,
     UUID channelId,
     Instant lastReadAt
@@ -18,8 +16,6 @@ public record UserReadStatusResponse(
   public static UserReadStatusResponse of(ReadStatus readStatus) {
     return UserReadStatusResponse.builder()
         .id(readStatus.getId())
-        .createdAt(readStatus.getCreatedAt())
-        .updatedAt(readStatus.getUpdatedAt())
         .userId(readStatus.getUserId())
         .channelId(readStatus.getChannelId())
         .lastReadAt(readStatus.getLastReadAt())

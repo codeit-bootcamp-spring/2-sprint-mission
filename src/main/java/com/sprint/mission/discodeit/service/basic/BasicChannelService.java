@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelByUserIdResponse;
+import com.sprint.mission.discodeit.service.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PublicChannelRequest;
@@ -30,20 +31,22 @@ public class BasicChannelService implements ChannelService {
   private final BasicBinaryContentService basicBinaryContentService;
 
   @Override
-  public Channel create(PrivateChannelRequest privateRequest) {
+  public ChannelResponse create(PrivateChannelRequest privateRequest) {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     Channel channelSave = channelRepository.save(channel);
-    privateRequest.participantIds().forEach(userId ->
+    List<UUID> participantIds = privateRequest.participantIds();
+    participantIds.forEach(userId ->
         readStatusService.create(
             new ReadStatusCreateRequest(userId, channelSave.getId(), null)));
-    return channelSave;
+    return ChannelResponse.of(channel, participantIds, Instant.now());
   }
 
   @Override
-  public Channel create(PublicChannelRequest publicRequest) {
+  public ChannelResponse create(PublicChannelRequest publicRequest) {
     Channel channel = new Channel(ChannelType.PUBLIC, publicRequest.name(),
         publicRequest.description());
-    return channelRepository.save(channel);
+    channelRepository.save(channel);
+    return ChannelResponse.of(channel, null, Instant.now());
   }
 
   @Override
@@ -100,7 +103,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public Channel update(UUID id, ChannelUpdateRequest updateRequest) {
+  public ChannelResponse update(UUID id, ChannelUpdateRequest updateRequest) {
     Channel channel = channelRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 Channel을 찾을 수 없음"));
     if (channel.getType() == ChannelType.PRIVATE) {
@@ -110,7 +113,10 @@ public class BasicChannelService implements ChannelService {
     String newDescription = updateRequest.newDescription();
 
     channel.update(newName, newDescription);
-    return channelRepository.save(channel);
+    channelRepository.save(channel);
+
+    Instant lastMessageAt = findLastMessageAt(channel.getId());
+    return ChannelResponse.of(channel, null, lastMessageAt);
   }
 
   @Override

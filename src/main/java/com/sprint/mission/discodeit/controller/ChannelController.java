@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.ChannelApi;
-import com.sprint.mission.discodeit.controller.dto.ChannelResponse;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelByUserIdResponse;
+import com.sprint.mission.discodeit.service.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PublicChannelRequest;
@@ -37,8 +36,8 @@ public class ChannelController implements ChannelApi {
   @PostMapping("/public")
   public ResponseEntity<ChannelResponse> createPublic(
       @RequestBody @Valid PublicChannelRequest request) {
-    Channel channel = channelService.create(request);
-    return ResponseEntity.ok(ChannelResponse.of(channel));
+    ChannelResponse response = channelService.create(request);
+    return ResponseEntity.ok(response);
   }
 
   // 비공개 채널 생성
@@ -46,8 +45,8 @@ public class ChannelController implements ChannelApi {
   @PostMapping("/private")
   public ResponseEntity<ChannelResponse> createPrivate(
       @RequestBody @Valid PrivateChannelRequest request) {
-    Channel channel = channelService.create(request);
-    return ResponseEntity.ok(ChannelResponse.of(channel));
+    ChannelResponse response = channelService.create(request);
+    return ResponseEntity.ok(response);
   }
 
   // 채널 삭제
@@ -63,8 +62,8 @@ public class ChannelController implements ChannelApi {
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelResponse> updatePublic(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateRequest request) {
-    Channel channel = channelService.update(channelId, request);
-    return ResponseEntity.ok(ChannelResponse.of(channel));
+    ChannelResponse response = channelService.update(channelId, request);
+    return ResponseEntity.ok(response);
   }
 
   // 특정 사용자가 볼 수 있는 모든 채널 목록을 조회

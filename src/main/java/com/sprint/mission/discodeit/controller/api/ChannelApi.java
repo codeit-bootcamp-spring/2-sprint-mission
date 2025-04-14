@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
-import com.sprint.mission.discodeit.controller.dto.ChannelResponse;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelByUserIdResponse;
+import com.sprint.mission.discodeit.service.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PublicChannelRequest;

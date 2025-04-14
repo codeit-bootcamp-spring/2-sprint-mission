@@ -6,8 +6,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserDto;
+import com.sprint.mission.discodeit.service.dto.user.UserResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusCreateRequest;
 import java.time.Instant;
@@ -27,45 +28,42 @@ public class BasicUserService implements UserService {
   private final BasicBinaryContentService basicBinaryContentService;
 
   @Override
-  public User create(UserCreateRequest createRequest,
+  public UserResponse create(UserCreateRequest createRequest,
       BinaryContentCreateRequest binaryRequest) {
     validDuplicateUsername(createRequest.username());
     validDuplicateEmail(createRequest.email());
 
-    UUID binaryContentId = (binaryRequest != null)
+    UUID binaryId = (binaryRequest != null)
         ? basicBinaryContentService.create(binaryRequest).getId() : null;
-
     User user = new User(createRequest.username(), createRequest.email(), createRequest.password(),
-        binaryContentId);
+        binaryId);
     userRepository.save(user);
     UserStatusCreateRequest statusRequest = new UserStatusCreateRequest(user.getId(),
         Instant.now());
     userStatusService.create(statusRequest);
 
-    return user;
+    return assembleUserResponse(user);
   }
 
   @Override
-  public UserDto find(UUID userId) {
+  public UserResponse find(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음"));
-    UserStatus userStatus = userStatusService.findByUserId(user.getId());
+    UserStatus status = userStatusService.findByUserId(user.getId());
+    BinaryContentResponse contentResponse = basicBinaryContentService.findById(user.getId());
 
-    return UserDto.of(user, userStatus);
+    return UserResponse.of(user, contentResponse, status.isOnline());
   }
 
   @Override
-  public List<UserDto> findAll() {
+  public List<UserResponse> findAll() {
     List<User> userList = userRepository.findAll();
     return userList.stream()
-        .map(user -> {
-          UserStatus userStatus = userStatusService.findByUserId(user.getId());
-          return UserDto.of(user, userStatus);
-        }).toList();
+        .map(this::assembleUserResponse).toList();
   }
 
   @Override
-  public User update(UUID userId, UserUpdateRequest updateRequest,
+  public UserResponse update(UUID userId, UserUpdateRequest updateRequest,
       BinaryContentCreateRequest binaryRequest) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException(
@@ -87,9 +85,12 @@ public class BasicUserService implements UserService {
         basicBinaryContentService.delete(user.getProfileId());
       }
       binaryContentId = basicBinaryContentService.create(binaryRequest).getId();
+
     }
     user.update(newUsername, newEmail, newPassword, binaryContentId);
-    return userRepository.save(user);
+    userRepository.save(user);
+
+    return assembleUserResponse(user);
   }
 
   @Override
@@ -108,6 +109,14 @@ public class BasicUserService implements UserService {
   @Override
   public Optional<User> findByUsername(String username) {
     return userRepository.findByUsername(username);
+  }
+
+  @Override
+  public UserResponse assembleUserResponse(User user) {
+    BinaryContentResponse contentResponse = basicBinaryContentService.findById(user.getId());
+    UserStatus status = userStatusService.findByUserId(user.getId());
+
+    return UserResponse.of(user, contentResponse, status.isOnline());
   }
 
   private void validDuplicateUsername(String username) {

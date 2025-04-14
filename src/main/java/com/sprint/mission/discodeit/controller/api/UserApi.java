@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.controller.api;
 
-import com.sprint.mission.discodeit.controller.dto.UserResponse;
 import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserDto;
+import com.sprint.mission.discodeit.service.dto.user.UserResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,7 +78,7 @@ public interface UserApi {
           content = @Content(mediaType = "*/*",
               array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
   })
-  ResponseEntity<List<UserDto>> findAll();
+  ResponseEntity<List<UserResponse>> findAll();
 
   // 사용자 온라인 상태 변경
   @Operation(summary = "User 온라인 상태 업데이트")

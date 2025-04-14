@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
-import com.sprint.mission.discodeit.controller.dto.BinaryContentResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import java.util.ArrayList;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentResponse;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +25,8 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping("/{binaryContentId}")
   public ResponseEntity<BinaryContentResponse> find(
       @PathVariable UUID binaryContentId) {
-    BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
-    return ResponseEntity.ok(BinaryContentResponse.of(binaryContent));
+    BinaryContentResponse response = binaryContentService.findById(binaryContentId);
+    return ResponseEntity.ok(response);
   }
 
   // 여러 파일 조회
@@ -36,11 +34,9 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping
   public ResponseEntity<List<BinaryContentResponse>> findAll(
       @RequestParam List<UUID> binaryContentIds) {
-    List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
-    List<BinaryContentResponse> response = new ArrayList<>();
-    for (BinaryContent binaryContent : binaryContents) {
-      response.add(BinaryContentResponse.of(binaryContent));
-    }
+    List<BinaryContentResponse> response = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity.ok(response);
   }
+
+  // 파일 다운로드 추가하기
 }

@@ -1,15 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.UserApi;
-import com.sprint.mission.discodeit.controller.dto.UserResponse;
 import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateResponse;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserDto;
+import com.sprint.mission.discodeit.service.dto.user.UserResponse;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
 import jakarta.validation.Valid;
@@ -47,8 +45,8 @@ public class UserController implements UserApi {
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     BinaryContentCreateRequest fileData = BinaryContentCreateRequest.of(profile);
-    User user = userService.create(userRequest, fileData);
-    return ResponseEntity.ok(UserResponse.of(user));
+    UserResponse response = userService.create(userRequest, fileData);
+    return ResponseEntity.ok(response);
   }
 
   // 사용자 정보 수정
@@ -60,8 +58,8 @@ public class UserController implements UserApi {
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     BinaryContentCreateRequest fileData = BinaryContentCreateRequest.of(profile);
-    User user = userService.update(userId, request, fileData);
-    return ResponseEntity.ok(UserResponse.of(user));
+    UserResponse response = userService.update(userId, request, fileData);
+    return ResponseEntity.ok(response);
   }
 
   // 사용자 삭제
@@ -75,8 +73,8 @@ public class UserController implements UserApi {
   // 모든 사용자 조회
   @Override
   @GetMapping
-  public ResponseEntity<List<UserDto>> findAll() {
-    List<UserDto> response = userService.findAll();
+  public ResponseEntity<List<UserResponse>> findAll() {
+    List<UserResponse> response = userService.findAll();
     return ResponseEntity.ok(response);
   }
 
