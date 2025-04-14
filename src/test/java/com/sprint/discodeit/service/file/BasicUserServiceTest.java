@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import com.sprint.discodeit.sprint5.domain.dto.usersDto.usersNameStatusResponseDto;
 import com.sprint.discodeit.sprint5.domain.dto.usersDto.usersProfileImgResponseDto;
 import com.sprint.discodeit.sprint5.domain.dto.usersDto.usersRequestDto;
+import com.sprint.discodeit.sprint5.service.basic.users.BasicUsersService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class BasicUsersServiceTest {
 
     @Mock
-    private com.sprint.discodeit.sprint5.service.basic.userss.BasicUsersService basicusersService;
+    private BasicUsersService basicusersService;
 
     private UUID usersId;
     private usersRequestDto usersRequestDto;
