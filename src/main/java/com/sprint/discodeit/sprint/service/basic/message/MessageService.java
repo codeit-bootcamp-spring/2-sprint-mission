@@ -10,8 +10,8 @@ public interface MessageService {
 
 
     Message create(Long channelId, MessageRequestDto messageRequestDto);
-    Message find(UUID messageId);
-    List<Message> findAllByChannelId(UUID channelId);
-    Message update(UUID messageId, MessageUpdateRequestDto messageUpdateRequestDto);
-    void delete(UUID messageId);
+    Message find(Long messageId);
+    List<Message> findAllByChannelId(Long channelId);
+    Message update(Long messageId, MessageUpdateRequestDto messageUpdateRequestDto);
+    void delete(Long messageId);
 }
