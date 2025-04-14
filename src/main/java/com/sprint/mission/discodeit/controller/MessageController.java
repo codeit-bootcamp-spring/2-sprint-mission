@@ -5,10 +5,9 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.util.MultipartToBinaryConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -40,21 +39,7 @@ public class MessageController {
     public ResponseEntity<Message> createMessage(
             @RequestPart("messageCreateRequest") MessageCreateDto messageCreateDto,
             @RequestPart(name = "attachments", required = false) List<MultipartFile> files) {
-        List<BinaryContentCreateDto> binaryDtos = new ArrayList<>();
-        if (files != null && !files.isEmpty()) {
-            for (MultipartFile file : files) {
-                try {
-                    BinaryContentCreateDto dto = new BinaryContentCreateDto(
-                            file.getOriginalFilename(),
-                            file.getContentType(),
-                            file.getBytes()
-                    );
-                    binaryDtos.add(dto);
-                } catch (IOException e) {
-                    return ResponseEntity.internalServerError().build();
-                }
-            }
-        }
+        List<BinaryContentCreateDto> binaryDtos = MultipartToBinaryConverter.toBinaryContentCreateDtos(files);
         Message message = messageService.create(messageCreateDto, binaryDtos);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(message);

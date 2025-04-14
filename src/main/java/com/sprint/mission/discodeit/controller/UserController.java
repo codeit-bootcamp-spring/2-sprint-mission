@@ -9,9 +9,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.util.MultipartToBinaryConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class UserController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<User> createUser(@RequestPart("userCreateRequest") UserCreateDto userCreateDto,
                                            @RequestPart(name = "profile", required = false) MultipartFile file) {
-        BinaryContentCreateDto profileRequest = resolveProfileRequest(file);
+        BinaryContentCreateDto profileRequest = MultipartToBinaryConverter.toBinaryContentCreateDto(file);
         User createdUser = userService.create(userCreateDto, profileRequest);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -56,7 +56,7 @@ public class UserController {
             @RequestPart("userUpdateRequest") UserUpdateDto userUpdateDto,
             @RequestPart(name = "profile", required = false) MultipartFile file
     ) {
-        BinaryContentCreateDto profileRequest = resolveProfileRequest(file);
+        BinaryContentCreateDto profileRequest = MultipartToBinaryConverter.toBinaryContentCreateDto(file);
         User updatedUser = userService.update(userId, userUpdateDto, profileRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -82,21 +82,5 @@ public class UserController {
                                                                @RequestBody UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto) {
         UserStatus userStatus = userStatusService.updateByUserId(userId, userStatusUpdateByUserIdDto);
         return ResponseEntity.ok(userStatus);
-    }
-
-    private BinaryContentCreateDto resolveProfileRequest(MultipartFile profileFile) {
-        if (profileFile == null || profileFile.isEmpty()) {
-            return null;
-        } else {
-            try {
-                return new BinaryContentCreateDto(
-                        profileFile.getOriginalFilename(),
-                        profileFile.getContentType(),
-                        profileFile.getBytes()
-                );
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 }
