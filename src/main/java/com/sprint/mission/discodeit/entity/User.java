@@ -2,11 +2,13 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
+@AllArgsConstructor
 public class User extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
