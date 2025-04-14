@@ -15,7 +15,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -98,13 +98,13 @@ public class BasicChannelService implements ChannelService {
   }
 
   private ChannelDto toDto(Channel channel) {
-    OffsetDateTime lastMessageAt = messageRepository.findAllBygetChannelId(channel.getId())
+    Instant lastMessageAt = messageRepository.findAllBygetChannelId(channel.getId())
         .stream()
         .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
         .map(Message::getCreatedAt)
         .limit(1)
         .findFirst()
-        .orElse(OffsetDateTime.MIN);
+        .orElse(Instant.MIN);
 
     List<UUID> participantIds = new ArrayList<>();
     if (channel.getType().equals(ChannelType.PRIVATE)) {

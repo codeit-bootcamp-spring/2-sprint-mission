@@ -1,11 +1,21 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.Api.MessageApi;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.dto.data.PageResponse;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.Api.MessageApi;
+import com.sprint.mission.discodeit.dto.request.Pageable;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -24,11 +34,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController implements MessageApi {
 
   private final MessageService messageService;
+  private final ChannelService channelService;
+  private final UserService userService;
+  private final BinaryContentService binaryContentService;
 
   @Override
-  public ResponseEntity<Message> create2(
+  public ResponseEntity<MessageDto> create2(
       MessageCreateRequest messageCreateRequest
-      ,@RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
+      , List<MultipartFile> attachments) {
     if (messageCreateRequest == null) {
       return ResponseEntity.badRequest().build();
     }
@@ -50,7 +63,25 @@ public class MessageController implements MessageApi {
 
     Message message = messageService.create(messageCreateRequest, attachmentRequests);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(message);
+    UserDto author = userService.find(message.getAuthorId());
+
+    List<BinaryContentDto> binaryContentDtos = Optional.ofNullable(attachments)
+        .map(files -> files.stream()
+            .map(file -> {
+              return new BinaryContentDto(
+                  UUID.randomUUID(),
+                  file.getName(),
+                  file.getSize(),
+                  file.getContentType()
+              );
+            })
+            .toList())
+        .orElse(new ArrayList<>());
+
+    MessageDto dto = new MessageDto(message.getId(), message.getCreatedAt(), message.getUpdatedAt(),
+        message.getContent(), message.getGetChannelId(), author, binaryContentDtos);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(dto);
   }
 
   @Override
@@ -61,23 +92,65 @@ public class MessageController implements MessageApi {
   }
 
   @Override
-  public ResponseEntity<Object> findAllByChannelId(Object ChannelId) {
+  public ResponseEntity<PageResponse> findAllByChannelId(UUID ChannelId,
+      Pageable pageable) {
     UUID uuid = UUID.fromString(String.valueOf(ChannelId));
     List<Message> messages = messageService.findAllBygetChannelId(uuid);
 
-    return ResponseEntity.ok(messages);
+    PageResponse<Message> pageResponse = new PageResponse<Message>(
+        messages,        // 실제 데이터 리스트
+        pageable.page(),            // 현재 페이지 번호
+        pageable.size(),               // 페이지 당 항목 수
+        hashNext(pageable),        // 다음 페이지 존재 여부
+        messages.size()
+    );
+
+    return ResponseEntity.ok(pageResponse);
   }
 
   @Override
-  public ResponseEntity<Message> update2(Object messageId,
+  public ResponseEntity<MessageDto> update2(Object messageId,
       MessageUpdateRequest messageUpdateRequest) {
     UUID uuid = UUID.fromString(String.valueOf(messageId));
-    Message updatedMessage = messageService.update(uuid,
+    Message updated = messageService.update(uuid,
         messageUpdateRequest);
 
-    return ResponseEntity.ok(updatedMessage);
+    UserDto author = userService.find(updated.getAuthorId());
+
+    List<BinaryContent> attachments =
+        binaryContentService.findAllByIdIn(updated.getAttachmentIds());
+
+    List<BinaryContentDto> binaryContentDtos = Optional.ofNullable(attachments)
+        .map(files -> files.stream()
+            .map(file -> {
+              return new BinaryContentDto(
+                  file.getId(),
+                  file.getFileName(),
+                  file.getSize(),
+                  file.getContentType()
+              );
+            })
+            .toList())
+        .orElse(new ArrayList<>());
+
+    MessageDto dto = new MessageDto(
+        updated.getAuthorId(), updated.getCreatedAt(), updated.getUpdatedAt(),
+        updated.getContent(), updated.getGetChannelId(), author, binaryContentDtos
+    );
+
+    return ResponseEntity.ok(dto);
   }
+
+  private Boolean hashNext(Pageable pageable) {
+    if (pageable.size() == pageable.page()) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
 }
+
 
 /*
   @RequestMapping(

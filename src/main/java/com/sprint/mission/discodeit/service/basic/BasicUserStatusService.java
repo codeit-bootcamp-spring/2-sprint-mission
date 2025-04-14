@@ -7,13 +7,13 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -36,7 +36,7 @@ public class BasicUserStatusService implements UserStatusService {
       throw new IllegalArgumentException("UserStatus with id " + userId + " already exists");
     }
 
-    OffsetDateTime lastActiveAt = request.lastActiveAt();
+    Instant lastActiveAt = request.lastActiveAt();
     UserStatus userStatus = new UserStatus(userId, lastActiveAt);
     return userStatusRepository.save(userStatus);
   }

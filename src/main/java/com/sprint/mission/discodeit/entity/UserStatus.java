@@ -1,32 +1,34 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Duration;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class UserStatus implements Serializable {
+public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private UUID id;
-  private OffsetDateTime createdAt;
-  private OffsetDateTime updatedAt;
+  private Instant createdAt;
+  private Instant updatedAt;
   //
   private UUID userId;
-  private OffsetDateTime lastActiveAt;
+  private Instant lastActiveAt;
 
-  public UserStatus(UUID userId, OffsetDateTime lastActiveAt) {
+  public UserStatus(UUID userId, Instant lastActiveAt) {
     this.id = UUID.randomUUID();
-    this.createdAt = OffsetDateTime.now();
+    this.createdAt = Instant.now();
     //
     this.userId = userId;
     this.lastActiveAt = lastActiveAt;
   }
 
-  public void update(OffsetDateTime lastActiveAt) {
+  public void update(Instant lastActiveAt) {
     boolean anyValueUpdated = false;
     if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
       this.lastActiveAt = lastActiveAt;
@@ -34,13 +36,13 @@ public class UserStatus implements Serializable {
     }
 
     if (anyValueUpdated) {
-      this.updatedAt = OffsetDateTime.now();
+      this.updatedAt = Instant.now();
     }
   }
 
   public Boolean isOnline() {
-    OffsetDateTime OffsetDateTimeFiveMinutesAgo = OffsetDateTime.now().minus(Duration.ofMinutes(5));
+    Instant InstantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
-    return lastActiveAt.isAfter(OffsetDateTimeFiveMinutesAgo);
+    return lastActiveAt.isAfter(InstantFiveMinutesAgo);
   }
 }

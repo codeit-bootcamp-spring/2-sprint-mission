@@ -314,7 +314,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChannelDto"
+                  "$ref": "#/components/schemas/Channel"
                 }
               }
             }

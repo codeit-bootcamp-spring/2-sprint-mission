@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.Api.BinaryContentApi;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.Api.BinaryContentApi;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,24 +23,30 @@ public class BinaryContentController implements BinaryContentApi {
   private final BinaryContentService binaryContentService;
 
   @Override
-  public ResponseEntity<BinaryContent> find(Object binaryContentId) {
+  public ResponseEntity<BinaryContentDto> find(UUID binaryContentId) {
     UUID uuid = UUID.fromString(binaryContentId.toString());
-    BinaryContent binaryContent =  binaryContentService.find(uuid);
+    BinaryContent binaryContent = binaryContentService.find(uuid);
+
+    BinaryContentDto dto = new BinaryContentDto(
+        binaryContentId, binaryContent.getFileName(),
+        binaryContent.getSize(), binaryContent.getContentType()
+    );
+
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(binaryContent);
+        .body(dto);
   }
 
   @Override
   public ResponseEntity<Object> findAllByIdIn(Object binaryContentIds) {
     List<UUID> uuids = new ArrayList<>();
     List<BinaryContent> binaryContents = new ArrayList<>();
-    try{
-      if(binaryContentIds instanceof ArrayList) {
+    try {
+      if (binaryContentIds instanceof ArrayList) {
         uuids = (ArrayList<UUID>) binaryContentIds;
-        binaryContents =  binaryContentService.findAllByIdIn(uuids);
+        binaryContents = binaryContentService.findAllByIdIn(uuids);
       }
-    }catch (Exception e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
     return ResponseEntity

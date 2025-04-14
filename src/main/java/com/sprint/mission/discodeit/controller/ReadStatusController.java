@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.Api.ReadStatusApi;
+import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -23,30 +24,34 @@ public class ReadStatusController implements ReadStatusApi {
   private final ReadStatusService readStatusService;
 
   @Override
-  public ResponseEntity<ReadStatus> create1(ReadStatusCreateRequest readStatusCreateRequest) {
-    ReadStatus createdReadStatus =  readStatusService.create(readStatusCreateRequest);
+  public ResponseEntity<ReadStatusDto> create1(ReadStatusCreateRequest readStatusCreateRequest) {
+    ReadStatus created = readStatusService.create(readStatusCreateRequest);
+    ReadStatusDto dto = new ReadStatusDto(created.getId(), created.getUserId(),
+        created.getGetChannelId(), created.getLastReadAt());
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(createdReadStatus);
+        .body(dto);
   }
 
   @Override
   public ResponseEntity<Object> findAllByUserId(Object userId) {
     UUID uuid = UUID.fromString(userId.toString());
-    List<ReadStatus> readStatuses =  readStatusService.findAllByUserId(uuid);
+    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(uuid);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(readStatuses);
   }
 
   @Override
-  public ResponseEntity<ReadStatus> update1(Object readStatusId,
+  public ResponseEntity<ReadStatusDto> update1(Object readStatusId,
       ReadStatusUpdateRequest readStatusUpdateRequest) {
     UUID uuid = UUID.fromString(readStatusId.toString());
-    ReadStatus updatedReadStatus = readStatusService.update(uuid, readStatusUpdateRequest);
+    ReadStatus updated = readStatusService.update(uuid, readStatusUpdateRequest);
+    ReadStatusDto dto = new ReadStatusDto(updated.getId(), updated.getUserId(),
+        updated.getGetChannelId(), updated.getLastReadAt());
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(updatedReadStatus);
+        .body(dto);
   }
 
   /*

@@ -8,8 +8,8 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class BasicReadStatusService implements ReadStatusService {
               + " already exists");
     }
 
-    OffsetDateTime lastReadAt = parse(request.lastReadAt().toString());
+    Instant lastReadAt = parse(request.lastReadAt().toString());
 
     ReadStatus readStatus = new ReadStatus(userId, getChannelId, lastReadAt);
     return readStatusRepository.save(readStatus);
@@ -66,7 +66,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
-    OffsetDateTime newLastReadAt = parse(request.newLastReadAt().toString());
+    Instant newLastReadAt = parse(request.newLastReadAt().toString());
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
@@ -82,10 +82,10 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatusRepository.deleteById(readStatusId);
   }
 
-  private OffsetDateTime parse(String date) {
-    LocalDateTime parse = LocalDateTime.parse(date,
+  private Instant parse(String date) {
+    Instant parse = Instant.parse(date,
         DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));  // Stirng to Instant
     Instant instant = parse.atZone(ZoneId.systemDefault()).toInstant();
-    return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
+    return Instant.ofInstant(instant, ZoneId.systemDefault());
   }
 }

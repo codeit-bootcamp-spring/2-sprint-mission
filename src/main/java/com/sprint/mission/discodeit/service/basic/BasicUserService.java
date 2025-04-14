@@ -14,7 +14,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -57,7 +57,7 @@ public class BasicUserService implements UserService {
     User user = new User(username, email, password, nullableProfileId);
     User createdUser = userRepository.save(user);
 
-    OffsetDateTime now = OffsetDateTime.now();
+    Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(createdUser.getId(), now);
     userStatusRepository.save(userStatus);
 

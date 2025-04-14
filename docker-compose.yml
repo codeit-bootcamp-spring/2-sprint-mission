@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:14
+    container_name: discodeit-db
+    restart: always
+    environment:
+      POSTGRES_DB: discodeit
+      POSTGRES_USER: discodeit_user
+      POSTGRES_PASSWORD: discodeit1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - discodeit_data:/var/lib/postgresql/data
+
+volumes:
+  discodeit_data:
