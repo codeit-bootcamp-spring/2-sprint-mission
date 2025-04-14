@@ -14,7 +14,7 @@ import com.sprint.discodeit.sprint5.repository.file.ChannelRepository;
 import com.sprint.discodeit.sprint5.repository.file.FileChannelRepository;
 import com.sprint.discodeit.sprint5.repository.file.FileMessageRepository;
 import com.sprint.discodeit.sprint5.repository.file.ReadStatusRepository;
-import com.sprint.discodeit.sprint5.service.basic.users.ReadStatusService;
+import com.sprint.discodeit.sprint5.service.basic.userss.ReadStatusService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +36,10 @@ public class BasicChannelService implements ChannelServiceV1 {
 
     @Override
     public ChannelResponseDto createPrivateChannel(PrivateChannelCreateRequestDto requestDto) {
-        List<UUID> userIds = requestDto.userIds();
+        List<UUID> usersIds = requestDto.usersIds();
         Channel channel = ChannelMapper.toPrviateChannel(requestDto);
         channelRepository.save(channel);
-        List<ReadStatus> readStatuses = readStatusService.createReadStatusesForPrivateChannel(userIds, channel.getId());
+        List<ReadStatus> readStatuses = readStatusService.createReadStatusesForPrivateChannel(usersIds, channel.getId());
         readStatusRepository.saveAll(readStatuses);
         return new ChannelResponseDto(channel.getId(), channel.getName(), channel.getCreatedAt(), ChannelType.PRIVATE);
     }
@@ -74,19 +74,19 @@ public class BasicChannelService implements ChannelServiceV1 {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
         Instant latestMessageTime = fileMessageRepository.findLatestMessageTimeByChannelId(channel.getId());
-        List<UUID> participantUserIds = null;
+        List<UUID> participantusersIds = null;
         if (channel.getType() == ChannelType.PRIVATE) {
-            participantUserIds = readStatusRepository.findByUserIdAndChannelId(channelId);
+            participantusersIds = readStatusRepository.findByusersIdAndChannelId(channelId);
         }
-        return new ChannelFindResponseDto(channel.getId(), channel.getName(), latestMessageTime, channel.getType(), participantUserIds);
+        return new ChannelFindResponseDto(channel.getId(), channel.getName(), latestMessageTime, channel.getType(), participantusersIds);
     }
 
 
 
-    public List<ChannelSummaryResponseDto> findAllByUserId(UUID userId) {
+    public List<ChannelSummaryResponseDto> findAllByusersId(UUID usersId) {
         List<Channel> publicChannels = fileChannelRepository.findByChannelType(ChannelType.PRIVATE);
 
-        List<UUID> privateChannelIds = readStatusRepository.findChannelIdsByUserIdAll(userId);
+        List<UUID> privateChannelIds = readStatusRepository.findChannelIdsByusersIdAll(usersId);
         List<Channel> privateChannels = fileChannelRepository.findByIdAll(privateChannelIds);
 
         List<Channel> allChannels = new ArrayList<>();
@@ -112,9 +112,9 @@ public class BasicChannelService implements ChannelServiceV1 {
             latestMessageAt = channel.getCreatedAt();
         }
 
-        List<UUID> participantUserIds = null;
+        List<UUID> participantusersIds = null;
         if (channel.getType() == ChannelType.PRIVATE) {
-            participantUserIds = readStatusRepository.findByUserIdAndChannelId(channel.getId());
+            participantusersIds = readStatusRepository.findByusersIdAndChannelId(channel.getId());
         }
 
         return new ChannelSummaryResponseDto(
@@ -123,7 +123,7 @@ public class BasicChannelService implements ChannelServiceV1 {
                 channel.getDescription(),
                 channel.getType(),
                 latestMessageAt,
-                participantUserIds
+                participantusersIds
         );
     }
 

@@ -1,7 +1,7 @@
 package com.sprint.discodeit.sprint5.service.basic.util;
 
-import com.sprint.discodeit.sprint5.domain.dto.userDto.UserLoginRequestDto;
-import com.sprint.discodeit.sprint5.repository.file.FileUserRepository;
+import com.sprint.discodeit.sprint5.domain.dto.usersDto.usersLoginRequestDto;
+import com.sprint.discodeit.sprint5.repository.file.FileUsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final FileUserRepository fileUserRepository;
+    private final FileUsersRepository fileusersRepository;
 
-    public void authenticateUser(UserLoginRequestDto loginRequestDto) {
-        if(fileUserRepository.findByUsername(loginRequestDto.username()).isPresent()){
+    public void authenticateusers(usersLoginRequestDto loginRequestDto) {
+        if(fileusersRepository.findByusersname(loginRequestDto.usersname()).isPresent()){
             throw new IllegalArgumentException("이미 있는 닉네임 입니다.");
         }
     }

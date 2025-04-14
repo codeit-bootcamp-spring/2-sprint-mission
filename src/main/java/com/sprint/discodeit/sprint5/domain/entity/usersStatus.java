@@ -6,7 +6,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class UserStatus implements Serializable {
+public class usersStatus implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -14,7 +14,7 @@ public class UserStatus implements Serializable {
     private Instant lastLoginTime;
     private String statusType;
 
-    public UserStatus(Instant lastLoginTime, String statusType) {
+    public usersStatus(Instant lastLoginTime, String statusType) {
         this.id = UUID.randomUUID();
         this.lastLoginTime = lastLoginTime;
         this.statusType = statusType;

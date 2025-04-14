@@ -66,26 +66,26 @@ public class ReadStatusRepository extends AbstractFileRepository<ReadStatus> imp
         return Optional.ofNullable(readStatusMap.get(uuid));
     }
 
-    public Optional<ReadStatus> findAllByUserId(UUID userId) {
+    public Optional<ReadStatus> findAllByusersId(UUID usersId) {
         Map<UUID, ReadStatus> readStatusMap = loadAll();
         return readStatusMap.values().stream()
-                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .filter(readStatus -> readStatus.getUsersId().equals(usersId))
                 .findFirst();
     }
 
 
-    public List<UUID> findByUserIdAndChannelId(UUID channelId) {
+    public List<UUID> findByusersIdAndChannelId(UUID channelId) {
         Map<UUID, ReadStatus> readStatusMap = loadAll();
         return readStatusMap.values().stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-                .map(ReadStatus::getUserId)
+                .map(ReadStatus::getUsersId)
                 .collect(Collectors.toList());
     }
 
-    public List<UUID> findChannelIdsByUserIdAll(UUID userId) {
+    public List<UUID> findChannelIdsByusersIdAll(UUID usersId) {
         Map<UUID, ReadStatus> readStatusMap = loadAll();
         return readStatusMap.values().stream()
-                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .filter(readStatus -> readStatus.getUsersId().equals(usersId))
                 .map(ReadStatus::getChannelId)
                 .collect(Collectors.toList());
     }

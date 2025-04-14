@@ -10,5 +10,5 @@ public record ChannelSummaryResponseDto(UUID  channelId,
                                         String channelDescription,
                                         ChannelType channelType,
                                         Instant latestMessageAt,
-                                        List<UUID> participantUserIds) {
+                                        List<UUID> participantusersIds) {
 }

@@ -3,7 +3,7 @@ package com.sprint.discodeit.sprint5.repository.util;
 public enum FilePathUtil {
 
     CHANNELS("channels.dat"),
-    USERS("users.dat"),
+    usersS("userss.dat"),
     MESSAGE("message.dat"),
     STATUS("status.dat"),
     BINARY("binary.dat"),

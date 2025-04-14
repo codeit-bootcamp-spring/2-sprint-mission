@@ -70,10 +70,10 @@ public class ChannelController {
     }
 
     @Operation(summary = "내 채널 목록 조회", description = "사용자 UUID를 기반으로 본인이 참여 중인 채널 목록을 조회합니다.")
-    @GetMapping("/{userId}/profile")
-    public ResponseEntity<List<ChannelSummaryResponseDto>> getChannelsForUser(
-            @Parameter(description = "사용자의 UUID") @PathVariable UUID userId) {
-        return ResponseEntity.ok(channelService.findAllByUserId(userId));
+    @GetMapping("/{usersId}/profile")
+    public ResponseEntity<List<ChannelSummaryResponseDto>> getChannelsForusers(
+            @Parameter(description = "사용자의 UUID") @PathVariable UUID usersId) {
+        return ResponseEntity.ok(channelService.findAllByusersId(usersId));
     }
 
     @Operation(summary = "공개 채널 목록 조회", description = "모든 공개 채널을 조회합니다.")

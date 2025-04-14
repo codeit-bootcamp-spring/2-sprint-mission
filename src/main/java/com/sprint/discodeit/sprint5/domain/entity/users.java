@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class User implements Serializable {
+public class users implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -18,34 +18,34 @@ public class User implements Serializable {
     private UUID profileId;
     private Instant createdAt;
     private Instant updatedAt;
-    private String username;
+    private String usersname;
     private String email;
     private String password;
-    private UUID userStatusId;
+    private UUID usersStatusId;
     private boolean deleted; // 삭제 여부 필드 추가
 
     @Builder
-    public User(String username, String email, String password) {
+    public users(String usersname, String email, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = null;
-        this.username = username;
+        this.usersname = usersname;
         this.email = email;
         this.password = password;
     }
 
-    public void associateStatus(UserStatus userStatus) {
-        this.userStatusId = userStatus.getId();
+    public void associateStatus(usersStatus usersStatus) {
+        this.usersStatusId = usersStatus.getId();
     }
 
     public void associateProfileId(BinaryContent binaryContent) {
         this.profileId = binaryContent.getId();
     }
 
-    public void update(String newUsername, String newEmail, String newPassword) {
+    public void update(String newusersname, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
-        if (newUsername != null && !newUsername.equals(this.username)) {
-            this.username = newUsername;
+        if (newusersname != null && !newusersname.equals(this.usersname)) {
+            this.usersname = newusersname;
             anyValueUpdated = true;
         }
         if (newEmail != null && !newEmail.equals(this.email)) {

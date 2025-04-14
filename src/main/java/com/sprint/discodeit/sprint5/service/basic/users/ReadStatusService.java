@@ -1,11 +1,11 @@
-package com.sprint.discodeit.sprint5.service.basic.users;
+package com.sprint.discodeit.sprint5.service.basic.userss;
 
 import com.sprint.discodeit.sprint5.domain.dto.readStatusDto.ReadStatusRequestDto;
 import com.sprint.discodeit.sprint5.domain.entity.ReadStatus;
-import com.sprint.discodeit.sprint5.domain.entity.User;
-import com.sprint.discodeit.sprint5.domain.entity.UserStatus;
-import com.sprint.discodeit.sprint5.repository.file.BaseUserStatusRepository;
-import com.sprint.discodeit.sprint5.repository.file.FileUserRepository;
+import com.sprint.discodeit.sprint5.domain.entity.users;
+import com.sprint.discodeit.sprint5.domain.entity.usersStatus;
+import com.sprint.discodeit.sprint5.repository.file.BaseUsersStatusRepository;
+import com.sprint.discodeit.sprint5.repository.file.FileUsersRepository;
 import com.sprint.discodeit.sprint5.repository.file.ReadStatusRepository;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,12 +19,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ReadStatusService {
 
-    private final FileUserRepository fileUserRepository;
-    private final BaseUserStatusRepository baseUserStatusRepository;
+    private final FileUsersRepository fileusersRepository;
+    private final BaseUsersStatusRepository baseusersStatusRepository;
     private final ReadStatusRepository readStatusRepository;
 
     public ReadStatus create(ReadStatusRequestDto readStatusRequestDto){
-        ReadStatus readStatus = new ReadStatus(readStatusRequestDto.userId(),Instant.now(), readStatusRequestDto.check(), readStatusRequestDto.userId());
+        ReadStatus readStatus = new ReadStatus(readStatusRequestDto.usersId(),Instant.now(), readStatusRequestDto.check(), readStatusRequestDto.usersId());
         return readStatus;
     }
 
@@ -35,8 +35,8 @@ public class ReadStatusService {
         return readStatus;
     }
 
-    public ReadStatus findAll(UUID userId){
-        ReadStatus readStatus = readStatusRepository.findAllByUserId(userId)
+    public ReadStatus findAll(UUID usersId){
+        ReadStatus readStatus = readStatusRepository.findAllByusersId(usersId)
                 .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다"));
         return readStatus;
 
@@ -44,9 +44,9 @@ public class ReadStatusService {
     }
 
     public ReadStatus update(ReadStatusRequestDto readStatusRequestDto){
-        ReadStatus readStatus = readStatusRepository.findAllByUserId(readStatusRequestDto.userId())
+        ReadStatus readStatus = readStatusRepository.findAllByusersId(readStatusRequestDto.usersId())
                 .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다"));
-        readStatus.readUpdate(readStatusRequestDto.channelId(), readStatusRequestDto.check(), readStatusRequestDto.userId());
+        readStatus.readUpdate(readStatusRequestDto.channelId(), readStatusRequestDto.check(), readStatusRequestDto.usersId());
         return readStatus;
     }
 
@@ -57,29 +57,29 @@ public class ReadStatusService {
 
 
 
-    public List<ReadStatus> createReadStatusesForPrivateChannel(List<UUID> userIds, UUID channelId) {
+    public List<ReadStatus> createReadStatusesForPrivateChannel(List<UUID> usersIds, UUID channelId) {
         List<ReadStatus> readStatuses = new ArrayList<>();
 
-        for (UUID userId : userIds) {
-            readStatuses.add(createPrivateChannel(userId, channelId));
+        for (UUID usersId : usersIds) {
+            readStatuses.add(createPrivateChannel(usersId, channelId));
         }
 
         return readStatuses;
     }
 
-    public ReadStatus createPrivateChannel(UUID userUUid, UUID channelId) {
-        User user = fileUserRepository.findById(userUUid)
+    public ReadStatus createPrivateChannel(UUID usersUUid, UUID channelId) {
+        users users = fileusersRepository.findById(usersUUid)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원 입니다."));
-        Optional<UserStatus> userStatusOpt = baseUserStatusRepository.findById(user.getId());
-        boolean isActive = userStatusOpt
+        Optional<usersStatus> usersStatusOpt = baseusersStatusRepository.findById(users.getId());
+        boolean isActive = usersStatusOpt
                 .map(status -> "Active".equalsIgnoreCase(status.getStatusType()))
-                .orElse(false);  // UserStatus가 없으면 기본값 false
+                .orElse(false);  // usersStatus가 없으면 기본값 false
 
         // ReadStatus 객체 생성
-        return new ReadStatus(user.getId(), Instant.now(), isActive, channelId);
+        return new ReadStatus(users.getId(), Instant.now(), isActive, channelId);
     }
 
-    public List<UUID> getUserIdsByChannel(UUID channelId) {
-        return readStatusRepository.findByUserIdAndChannelId(channelId);
+    public List<UUID> getusersIdsByChannel(UUID channelId) {
+        return readStatusRepository.findByusersIdAndChannelId(channelId);
     }
 }

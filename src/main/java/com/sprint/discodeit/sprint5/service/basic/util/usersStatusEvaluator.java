@@ -6,9 +6,9 @@ import java.time.Instant;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserStatusEvaluator {
+public class usersStatusEvaluator {
 
-    public String determineUserStatus(Instant lastLoginTime) {
+    public String determineusersStatus(Instant lastLoginTime) {
         Instant now = Instant.now();
         Duration duration = Duration.between(lastLoginTime, now);
         if (duration.toMinutes() <= 5) {

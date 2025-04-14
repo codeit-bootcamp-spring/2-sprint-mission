@@ -4,10 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import com.sprint.discodeit.sprint5.domain.dto.userDto.UserNameStatusResponseDto;
-import com.sprint.discodeit.sprint5.domain.dto.userDto.UserProfileImgResponseDto;
-import com.sprint.discodeit.sprint5.domain.dto.userDto.UserRequestDto;
-import com.sprint.discodeit.sprint5.service.basic.users.BasicUserService;
+import com.sprint.discodeit.sprint5.domain.dto.usersDto.usersNameStatusResponseDto;
+import com.sprint.discodeit.sprint5.domain.dto.usersDto.usersProfileImgResponseDto;
+import com.sprint.discodeit.sprint5.domain.dto.usersDto.usersRequestDto;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,54 +16,54 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class BasicUserServiceTest {
+class BasicUsersServiceTest {
 
     @Mock
-    private BasicUserService basicUserService;
+    private com.sprint.discodeit.sprint5.service.basic.userss.BasicUsersService basicusersService;
 
-    private UUID userId;
-    private UserRequestDto userRequestDto;
-    private UserProfileImgResponseDto userProfileImgResponseDto;
-    private UserNameStatusResponseDto userNameStatusResponseDto;
+    private UUID usersId;
+    private usersRequestDto usersRequestDto;
+    private usersProfileImgResponseDto usersProfileImgResponseDto;
+    private usersNameStatusResponseDto usersNameStatusResponseDto;
 
     @BeforeEach
     void setUp() {
-//       userRequestDto = new UserRequestDto("testUser", "test@example.com", "password123");
-//       userProfileImgResponseDto = new UserProfileImgResponseDto("https://your-storage.com/default-profile.png");
-       userId = UUID.randomUUID();
+//       usersRequestDto = new usersRequestDto("testusers", "test@example.com", "password123");
+//       usersProfileImgResponseDto = new usersProfileImgResponseDto("https://your-storage.com/default-profile.png");
+       usersId = UUID.randomUUID();
 
-       userNameStatusResponseDto = new UserNameStatusResponseDto("testUser", "ACTIVE", userId);
+       usersNameStatusResponseDto = new usersNameStatusResponseDto("testusers", "ACTIVE", usersId);
 
-       when(basicUserService.create(userRequestDto, userProfileImgResponseDto)).thenReturn(userNameStatusResponseDto);
+       when(basicusersService.create(usersRequestDto, usersProfileImgResponseDto)).thenReturn(usersNameStatusResponseDto);
     }
 
 
     @Test
     @DisplayName("사용자 생성: 유효한 정보를 입력하면 새로운 사용자가 생성되고 상태는 ACTIVE여야 한다.")
-    void createUserTest() {
-        // ✅ When: fileUserService.create() 호출
-        UserNameStatusResponseDto response = basicUserService.create(userRequestDto, userProfileImgResponseDto);
+    void createusersTest() {
+        // ✅ When: fileusersService.create() 호출
+        usersNameStatusResponseDto response = basicusersService.create(usersRequestDto, usersProfileImgResponseDto);
 
         // ✅ Then: 결과 검증
         assertNotNull(response, "응답이 null이면 안 된다.");
-        assertEquals(userId, response.id(), "반환된 ID가 예상과 일치해야 한다.");
-        assertEquals("testUser", response.name(), "사용자 이름이 'testUser'여야 한다.");
+        assertEquals(usersId, response.id(), "반환된 ID가 예상과 일치해야 한다.");
+        assertEquals("testusers", response.name(), "사용자 이름이 'testusers'여야 한다.");
         assertEquals("ACTIVE", response.status(), "사용자 상태는 'ACTIVE'여야 한다.");
 
-        // ✅ fileUserService.create()가 한 번 호출되었는지 검증
-        verify(basicUserService, times(1)).create(userRequestDto, userProfileImgResponseDto);
+        // ✅ fileusersService.create()가 한 번 호출되었는지 검증
+        verify(basicusersService, times(1)).create(usersRequestDto, usersProfileImgResponseDto);
     }
 
     @Test
     @DisplayName("사용자 생서 시 응답이 null이 아니어야 한다.")
-    void createUserNullTest() {
+    void createusersNullTest() {
         //given
 
-        UserNameStatusResponseDto response = basicUserService.create(userRequestDto,userProfileImgResponseDto);
+        usersNameStatusResponseDto response = basicusersService.create(usersRequestDto,usersProfileImgResponseDto);
 
         //when
 
-        when(basicUserService.create(userRequestDto, userProfileImgResponseDto)).thenReturn(userNameStatusResponseDto);
+        when(basicusersService.create(usersRequestDto, usersProfileImgResponseDto)).thenReturn(usersNameStatusResponseDto);
 
         //then
         assertNotNull(response, "응답이 null이면 안 된다.");
@@ -73,35 +72,35 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("사용자 생성 실패: 필수 값이 없을 때 예외가 발생해야 한다.")
-    void createUserThrowsExceptionTest() {
+    void createusersThrowsExceptionTest() {
         // Given
-        UserRequestDto requestDto = null; // 잘못된 입력값 (null)
-        UserProfileImgResponseDto profileImgDto = null; // 잘못된 입력값 (null)
+        usersRequestDto requestDto = null; // 잘못된 입력값 (null)
+        usersProfileImgResponseDto profileImgDto = null; // 잘못된 입력값 (null)
 
         // `create()` 호출 시 예외 발생하도록 설정
-        when(basicUserService.create(requestDto, profileImgDto))
+        when(basicusersService.create(requestDto, profileImgDto))
                 .thenThrow(new IllegalArgumentException("사용자 정보가 올바르지 않습니다."));
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () -> {
-            basicUserService.create(requestDto, profileImgDto);
+            basicusersService.create(requestDto, profileImgDto);
         }, "사용자 정보가 올바르지 않을 때 예외가 발생해야 한다.");
     }
 
     @Test
     @DisplayName("사용자 생성 실패: 필수 값이 없을 때 실제 서비스에서 예외가 발생해야 한다.")
-    void createUserThrowsExceptionRealServiceTest() {
+    void createusersThrowsExceptionRealServiceTest() {
 
         // Given
 
-        UserRequestDto requestDto = null;
-        UserProfileImgResponseDto profileImgDto = null;
+        usersRequestDto requestDto = null;
+        usersProfileImgResponseDto profileImgDto = null;
 
-//        fileUserService.create(requestDto, profileImgDto); // ✅ 실제 서비스 객체 사용
+//        fileusersService.create(requestDto, profileImgDto); // ✅ 실제 서비스 객체 사용
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () -> {
-            basicUserService.create(requestDto, profileImgDto); // ✅ 실제 서비스 호출
+            basicusersService.create(requestDto, profileImgDto); // ✅ 실제 서비스 호출
         }, "사용자 정보가 없으면 실제 서비스에서도 예외가 발생해야 한다.");
     }
 

@@ -6,14 +6,14 @@ public enum ErrorCode {
     // 요청 오류
     INVALID_REQUEST("REQ001", "유효하지 않은 요청입니다.", HttpStatus.BAD_REQUEST),
     MISSING_PARAMETER("REQ002", "필수 파라미터가 누락되었습니다.", HttpStatus.BAD_REQUEST),
-    DUPLICATE_USERNAME("REQ003", "이미 존재하는 사용자 이름입니다.", HttpStatus.BAD_REQUEST),
+    DUPLICATE_usersNAME("REQ003", "이미 존재하는 사용자 이름입니다.", HttpStatus.BAD_REQUEST),
     DUPLICATE_EMAIL("REQ004", "이미 존재하는 이메일입니다.", HttpStatus.BAD_REQUEST),
-    USER_REQUEST_NULL("REQ005", "사용자 요청 정보가 없습니다.", HttpStatus.BAD_REQUEST),
+    users_REQUEST_NULL("REQ005", "사용자 요청 정보가 없습니다.", HttpStatus.BAD_REQUEST),
     PROFILE_IMAGE_NULL("REQ006", "사용자 프로필 이미지 정보가 없습니다.", HttpStatus.BAD_REQUEST),
 
-    USER_NOT_FOUND("REQ007", "존재하지 않는 사용자입니다.", HttpStatus.NOT_FOUND),
-    USER_STATUS_NOT_FOUND("REQ008", "사용자의 상태 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    ALREADY_DELETED_USER("REQ009", "이미 삭제된 사용자입니다.", HttpStatus.BAD_REQUEST),
+    users_NOT_FOUND("REQ007", "존재하지 않는 사용자입니다.", HttpStatus.NOT_FOUND),
+    users_STATUS_NOT_FOUND("REQ008", "사용자의 상태 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    ALREADY_DELETED_users("REQ009", "이미 삭제된 사용자입니다.", HttpStatus.BAD_REQUEST),
 
     // 인증/인가 오류
     UNAUTHORIZED("AUTH001", "인증 정보가 없습니다.", HttpStatus.UNAUTHORIZED),
