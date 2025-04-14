@@ -1,21 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
 public class ReadStatus extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  private UUID userId;
-  private UUID channelId;
+  private User user;
+  private Channel channel;
   private Instant lastReadAt;
 
   public void updateLastReadAt(Instant lastReadAt) {
