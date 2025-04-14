@@ -1,6 +1,7 @@
 package com.sprint.discodeit.sprint.service.basic.users;
 
 
+import com.sprint.discodeit.sprint.domain.dto.UsersIdAllResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersLoginRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersLoginResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersNameStatusResponseDto;
@@ -17,7 +18,7 @@ public interface UsersService {
 
     UsersResponseDto find(Long usersId);
 
-    List<Users> findAll();
+    UsersIdAllResponseDto findAll();
 
     UsersResponseDto update(UsersUpdateRequestDto usersUpdateRequestDto, String usersId);
 
