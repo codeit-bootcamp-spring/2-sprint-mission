@@ -1,9 +1,9 @@
 package com.sprint.discodeit.sprint.controller;
 
+import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelMessageResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.Message;
-import com.sprint.discodeit.sprint.service.basic.message.BasicMessageService;
 import com.sprint.discodeit.sprint.service.basic.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,8 +62,8 @@ public class MessageController {
 
     @Operation(summary = "채널 메시지 조회", description = "지정된 채널의 메시지를 조회합니다.")
     @GetMapping("/channels/{channelId}")
-    public ResponseEntity<List<Message>> getMessagesByChannel(
-            @Parameter(description = "메시지를 조회할 채널의 UUID") @PathVariable String channelId) {
-        return ResponseEntity.ok(messageService.findChannel(UUID.fromString(channelId)));
+    public ResponseEntity<List<ChannelMessageResponseDto>> getMessagesByChannel(
+            @Parameter(description = "메시지를 조회할 채널의 UUID") @PathVariable Long channelId) {
+        return ResponseEntity.ok(messageService.findChannel(channelId));
     }
 }
