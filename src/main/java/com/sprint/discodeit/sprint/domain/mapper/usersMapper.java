@@ -9,7 +9,7 @@ public class usersMapper {
         return Users.builder()
                 .email(usersRequestDto.email())
                 .password(usersRequestDto.password())
-                .usersname(usersRequestDto.usersname())
+                .username(usersRequestDto.usersname())
                 .build();
     }
 }

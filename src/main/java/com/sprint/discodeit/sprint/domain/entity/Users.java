@@ -54,11 +54,8 @@ public class Users extends BaseUpdatableEntity {
         this.deleted = true;
     }
 
-    public boolean isDeleted() {
-        return deleted;
-    }
 
-    // 양방향 연관관계 편의 메서드 (필요하면 사용)
+    // 양방향 연관관계 편의 메서드
     public void addBinaryContent(BinaryContent content) {
         binaryContents.add(content);
         content.setUser(this);

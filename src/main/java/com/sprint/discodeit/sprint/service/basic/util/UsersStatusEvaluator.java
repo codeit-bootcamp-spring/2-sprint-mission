@@ -6,7 +6,7 @@ import java.time.Instant;
 import org.springframework.stereotype.Component;
 
 @Component
-public class usersStatusEvaluator {
+public class UsersStatusEvaluator {
 
     public String determineusersStatus(Instant lastLoginTime) {
         Instant now = Instant.now();
