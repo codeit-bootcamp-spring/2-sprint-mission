@@ -31,7 +31,7 @@ public class Channel extends BaseUpdatableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = 'channel', cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> message = new ArrayList<>();
 
     private ChannelType type;
