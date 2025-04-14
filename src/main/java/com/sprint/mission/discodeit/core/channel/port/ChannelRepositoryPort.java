@@ -4,10 +4,8 @@ import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface ChannelRepository {
+public interface ChannelRepositoryPort {
 
   Channel save(Channel channel);
 
@@ -15,9 +13,7 @@ public interface ChannelRepository {
 
   List<Channel> findAll();
 
-  List<Channel> findAllByChannelId(UUID channelId);
-
   void delete(UUID channelId);
 
-  boolean existId(UUID channelId);
+  boolean existsById(UUID channelId);
 }

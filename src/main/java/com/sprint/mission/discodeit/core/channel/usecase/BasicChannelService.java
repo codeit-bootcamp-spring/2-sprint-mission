@@ -5,7 +5,7 @@ import static com.sprint.mission.discodeit.exception.channel.ChannelErrors.unmod
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
+import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelListResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
@@ -17,7 +17,7 @@ import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelResult
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
-import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
+import com.sprint.mission.discodeit.core.status.port.ReadStatusRepositoryPort;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,9 +35,9 @@ public class BasicChannelService implements ChannelService {
   private static final Logger logger = LoggerFactory.getLogger(BasicChannelService.class);
 
   //  private final UserRepositoryPort userRepositoryPort;
-  private final ChannelRepository channelRepository;
+  private final ChannelRepositoryPort channelRepositoryPort;
   private final MessageRepositoryPort messageRepositoryPort;
-  private final ReadStatusRepository readStatusRepository;
+  private final ReadStatusRepositoryPort readStatusRepositoryPort;
 
   @Override
   public CreatePublicChannelResult create(CreatePublicChannelCommand command) {
@@ -45,26 +45,26 @@ public class BasicChannelService implements ChannelService {
         ChannelType.PUBLIC);
     logger.info("Public Channel created {}", channel.getId());
 
-    return new CreatePublicChannelResult(channelRepository.save(channel));
+    return new CreatePublicChannelResult(channelRepositoryPort.save(channel));
   }
 
   @Override
   public CreatePrivateChannelResult create(CreatePrivateChannelCommand command) {
     Channel channel = Channel.create(null, null, ChannelType.PRIVATE);
-    Channel createdChannel = channelRepository.save(channel);
+    Channel createdChannel = channelRepositoryPort.save(channel);
 
     command.participantIds().stream()
         .map(u -> ReadStatus.create(u, createdChannel.getId(), Instant.MIN))
-        .forEach(readStatusRepository::save);
+        .forEach(readStatusRepositoryPort::save);
 
     logger.info("Private Channel created {}", channel.getId());
 
-    return new CreatePrivateChannelResult(channelRepository.save(channel));
+    return new CreatePrivateChannelResult(channelRepositoryPort.save(channel));
   }
 
   @Override
   public ChannelResult findChannelByChannelId(UUID channelId) {
-    Channel channel = channelRepository.findByChannelId(channelId).orElseThrow(
+    Channel channel = channelRepositoryPort.findByChannelId(channelId).orElseThrow(
         () -> channelIdNotFoundError(channelId)
     );
 
@@ -72,7 +72,7 @@ public class BasicChannelService implements ChannelService {
 
     List<UUID> userIdList = new ArrayList<>();
     if (channel.getType().equals(ChannelType.PRIVATE)) {
-      readStatusRepository.findAllByChannelId(channelId)
+      readStatusRepositoryPort.findAllByChannelId(channelId)
           .stream().map(ReadStatus::getUserId)
           .forEach(userIdList::add);
     }
@@ -93,11 +93,11 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public ChannelListResult findChannelsByUserId(UUID userId) {
-    List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+    List<UUID> mySubscribedChannelIds = readStatusRepositoryPort.findAllByUserId(userId).stream()
         .map(ReadStatus::getChannelId)
         .toList();
 
-    return new ChannelListResult(channelRepository.findAll().stream()
+    return new ChannelListResult(channelRepositoryPort.findAll().stream()
         .filter(channel -> channel.getType().equals(ChannelType.PUBLIC)
             || mySubscribedChannelIds.contains(channel.getId()))
         .map(channel -> findChannelByChannelId(channel.getId()))
@@ -106,7 +106,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public UpdateChannelResult update(UpdateChannelCommand command) {
-    Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
+    Channel channel = channelRepositoryPort.findByChannelId(command.channelId()).orElseThrow(
         () -> channelIdNotFoundError(command.channelId())
     );
 
@@ -118,12 +118,12 @@ public class BasicChannelService implements ChannelService {
 
     logger.info("Channel Updated: name {}, description {}", channel.getName(),
         channel.getDescription());
-    return new UpdateChannelResult(channelRepository.save(channel));
+    return new UpdateChannelResult(channelRepositoryPort.save(channel));
   }
 
   @Override
   public void delete(UUID channelId) {
-    channelRepository.delete(channelId);
+    channelRepositoryPort.delete(channelId);
     deleteAllMessage(channelId);
     deleteAllReadStatus(channelId);
     logger.info("Channel deleted {}", channelId);
@@ -138,9 +138,9 @@ public class BasicChannelService implements ChannelService {
   }
 
   private void deleteAllReadStatus(UUID channelId) {
-    List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channelId);
+    List<ReadStatus> readStatusList = readStatusRepositoryPort.findAllByChannelId(channelId);
     for (ReadStatus status : readStatusList) {
-      readStatusRepository.delete(status.getId());
+      readStatusRepositoryPort.delete(status.getId());
       logger.info("Read Status deleted {}", status.getId());
     }
   }

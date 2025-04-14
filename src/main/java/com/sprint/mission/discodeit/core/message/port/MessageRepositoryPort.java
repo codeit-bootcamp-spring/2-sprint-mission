@@ -4,9 +4,7 @@ import com.sprint.mission.discodeit.core.message.entity.Message;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface MessageRepositoryPort {
 
   Message save(Message message);

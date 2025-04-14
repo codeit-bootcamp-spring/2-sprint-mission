@@ -5,9 +5,9 @@ import static com.sprint.mission.discodeit.exception.status.read.ReadStatusError
 import static com.sprint.mission.discodeit.exception.status.read.ReadStatusErrors.readStatusNotFoundError;
 import static com.sprint.mission.discodeit.exception.user.UserErrors.userIdNotFoundError;
 
-import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
+import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
-import com.sprint.mission.discodeit.core.status.port.ReadStatusRepository;
+import com.sprint.mission.discodeit.core.status.port.ReadStatusRepositoryPort;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 public class BasicReadStatusService implements ReadStatusService {
 
   private final UserRepositoryPort userRepositoryPort;
-  private final ReadStatusRepository readStatusRepository;
-  private final ChannelRepository channelRepository;
+  private final ReadStatusRepositoryPort readStatusRepositoryPort;
+  private final ChannelRepositoryPort channelRepositoryPort;
 
   @CustomLogging
   @Override
@@ -34,7 +34,7 @@ public class BasicReadStatusService implements ReadStatusService {
     ReadStatus status = ReadStatus.create(command.userId(), command.channelId(),
         command.lastReadAt());
 
-    return readStatusRepository.save(status);
+    return readStatusRepositoryPort.save(status);
   }
 
   private void validateCommand(CreateReadStatusCommand command) {
@@ -42,11 +42,11 @@ public class BasicReadStatusService implements ReadStatusService {
       userIdNotFoundError(command.userId());
     }
 
-    if (!channelRepository.existId(command.channelId())) {
+    if (!channelRepositoryPort.existsById(command.channelId())) {
       channelIdNotFoundError(command.channelId());
     }
 
-    if (readStatusRepository.findAllByUserId(command.userId()).stream()
+    if (readStatusRepositoryPort.findAllByUserId(command.userId()).stream()
         .anyMatch(readStatus -> readStatus.getChannelId().equals(command.channelId()))) {
       readStatusAlreadyExistsError(command.channelId());
     }
@@ -55,23 +55,23 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public ReadStatus find(UUID readStatusId) {
-    return readStatusRepository.findById(readStatusId)
+    return readStatusRepositoryPort.findById(readStatusId)
         .orElseThrow(() -> readStatusNotFoundError(readStatusId));
   }
 
   @Override
   public ReadStatus findReadStatusByUserId(UUID userId) {
-    return readStatusRepository.findByUserId(userId);
+    return readStatusRepositoryPort.findByUserId(userId);
   }
 
   @Override
   public List<ReadStatus> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId);
+    return readStatusRepositoryPort.findAllByUserId(userId);
   }
 
   @Override
   public ReadStatus updateReadStatus(UpdateReadStatusCommand command) {
-    ReadStatus readStatus = readStatusRepository.findById(command.readStatusId()).orElseThrow(
+    ReadStatus readStatus = readStatusRepositoryPort.findById(command.readStatusId()).orElseThrow(
         () -> readStatusNotFoundError(command.readStatusId())
     );
     readStatus.update(command.newLastReadAt());
@@ -81,11 +81,11 @@ public class BasicReadStatusService implements ReadStatusService {
   @CustomLogging
   @Override
   public void deleteReadStatus(UUID readStatusId) {
-    if (!readStatusRepository.existsId(readStatusId)) {
+    if (!readStatusRepositoryPort.existsId(readStatusId)) {
       readStatusNotFoundError(readStatusId);
     }
 
-    readStatusRepository.delete(readStatusId);
+    readStatusRepositoryPort.delete(readStatusId);
   }
 
 }

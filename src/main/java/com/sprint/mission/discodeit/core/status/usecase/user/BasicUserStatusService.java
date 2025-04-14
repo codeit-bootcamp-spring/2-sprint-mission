@@ -4,7 +4,7 @@ import static com.sprint.mission.discodeit.exception.status.user.UserStatusError
 import static com.sprint.mission.discodeit.exception.status.user.UserStatusErrors.userStatusIdNotFoundError;
 
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
-import com.sprint.mission.discodeit.core.status.port.UserStatusRepository;
+import com.sprint.mission.discodeit.core.status.port.UserStatusRepositoryPort;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.UpdateUserStatusCommand;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 public class BasicUserStatusService implements UserStatusService {
 
   private final UserRepositoryPort userRepositoryPort;
-  private final UserStatusRepository userStatusRepository;
+  private final UserStatusRepositoryPort userStatusRepositoryPort;
 
   @Override
   @CustomLogging
@@ -31,34 +31,34 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     //있으면 진행 X
-    if (userStatusRepository.findByUserId(command.userId()).isPresent()) {
+    if (userStatusRepositoryPort.findByUserId(command.userId()).isPresent()) {
       userStatusAlreadyExistsError(command.userId());
     }
 
     //없으면 진행
     UserStatus userStatus = UserStatus.create(command.userId(), command.lastActiveAt());
-    userStatusRepository.save(userStatus);
+    userStatusRepositoryPort.save(userStatus);
     return userStatus;
   }
 
 
   @Override
   public UserStatus findByUserId(UUID userId) {
-    return userStatusRepository.findByUserId(userId)
+    return userStatusRepositoryPort.findByUserId(userId)
         .orElseThrow(() -> userStatusIdNotFoundError(userId));
 
   }
 
   @Override
   public UserStatus findByStatusId(UUID userStatusId) {
-    return userStatusRepository.findByStatusId(userStatusId)
+    return userStatusRepositoryPort.findByStatusId(userStatusId)
         .orElseThrow(() -> userStatusIdNotFoundError(userStatusId));
 
   }
 
   @Override
   public List<UserStatus> findAll() {
-    return userStatusRepository.findAll();
+    return userStatusRepositoryPort.findAll();
   }
 
   @Override
@@ -66,12 +66,12 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatus update(UpdateUserStatusCommand command) {
     UserStatus userStatus;
     if (command.userId() != null) {
-      userStatus = userStatusRepository.findByUserId(command.userId()).orElseThrow(
+      userStatus = userStatusRepositoryPort.findByUserId(command.userId()).orElseThrow(
           () -> userStatusIdNotFoundError(command.userId())
       );
 
     } else if (command.userStatusId() != null) {
-      userStatus = userStatusRepository.findByStatusId(command.userStatusId()).orElseThrow(
+      userStatus = userStatusRepositoryPort.findByStatusId(command.userStatusId()).orElseThrow(
           () -> userStatusIdNotFoundError(command.userStatusId())
       );
     } else {
@@ -85,11 +85,11 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   @CustomLogging
   public void delete(UUID userId) {
-    UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(
+    UserStatus userStatus = userStatusRepositoryPort.findByUserId(userId).orElseThrow(
         () -> userStatusIdNotFoundError(userId)
     );
 
-    userStatusRepository.delete(userStatus.getId());
+    userStatusRepositoryPort.delete(userStatus.getId());
   }
 
 }

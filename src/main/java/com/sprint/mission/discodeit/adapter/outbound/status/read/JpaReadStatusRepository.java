@@ -1,0 +1,18 @@
+package com.sprint.mission.discodeit.adapter.outbound.status.read;
+
+import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface JpaReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
+
+
+  ReadStatus findByUser_Id(UUID userId);
+
+  ReadStatus findByChannel_Id(UUID channelId);
+
+  List<ReadStatus> findAllByUser_Id(UUID userId);
+
+  List<ReadStatus> findAllByChannel_Id(UUID channelId);
+}

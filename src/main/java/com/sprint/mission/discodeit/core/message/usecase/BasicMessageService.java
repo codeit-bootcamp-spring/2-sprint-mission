@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.core.message.usecase;
 
 import static com.sprint.mission.discodeit.exception.message.MessageErrors.messageIdNotFoundError;
 
-import com.sprint.mission.discodeit.core.channel.port.ChannelRepository;
+import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
@@ -31,7 +31,7 @@ public class BasicMessageService implements MessageService {
   private static final Logger logger = LoggerFactory.getLogger(BasicMessageService.class);
 
   private final UserRepositoryPort userRepositoryPort;
-  private final ChannelRepository channelRepository;
+  private final ChannelRepositoryPort channelRepositoryPort;
   private final MessageRepositoryPort messageRepositoryPort;
   private final BinaryContentRepositoryPort binaryContentRepositoryPort;
 
@@ -43,7 +43,7 @@ public class BasicMessageService implements MessageService {
       UserErrors.userIdNotFoundError(command.userId());
     }
 
-    if (!channelRepository.existId(command.channelId())) {
+    if (!channelRepositoryPort.existsById(command.channelId())) {
       ChannelErrors.channelIdNotFoundError(command.channelId());
     }
 

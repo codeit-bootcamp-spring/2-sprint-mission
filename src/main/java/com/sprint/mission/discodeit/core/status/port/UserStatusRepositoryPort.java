@@ -4,12 +4,10 @@ import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface UserStatusRepository {
+public interface UserStatusRepositoryPort {
 
-  void save(UserStatus userStatus);
+  UserStatus save(UserStatus userStatus);
 
   Optional<UserStatus> findByUserId(UUID userId);
 
