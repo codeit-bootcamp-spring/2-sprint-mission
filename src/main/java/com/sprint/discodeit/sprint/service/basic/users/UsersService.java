@@ -9,8 +9,6 @@ import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersProfileImgResponseDt
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersUpdateRequestDto;
-import com.sprint.discodeit.sprint.domain.entity.Users;
-import java.util.List;
 
 public interface UsersService {
 
@@ -20,9 +18,9 @@ public interface UsersService {
 
     UsersIdAllResponseDto findAll();
 
-    UsersResponseDto update(UsersUpdateRequestDto usersUpdateRequestDto, String usersId);
+    UsersResponseDto update(UsersUpdateRequestDto usersUpdateRequestDto, Long usersId);
 
     void delete(Long usersId);
 
-    UsersLoginResponseDto login(UsersLoginRequestDto usersLoginRequestDto);
+    UsersLoginResponseDto login(UsersLoginRequestDto usersLoginRequestDto,Long usersId);
 }

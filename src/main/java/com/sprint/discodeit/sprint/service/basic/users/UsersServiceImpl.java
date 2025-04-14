@@ -6,6 +6,7 @@ import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersNameStatusResponseDt
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersProfileImgResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.BinaryContent;
 import com.sprint.discodeit.sprint.domain.entity.Users;
 import com.sprint.discodeit.sprint.domain.mapper.UsersMapper;
@@ -70,8 +71,8 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public usersResponseDto update(usersUpdateRequestDto usersUpdateRequestDto, Long usersId) {
-        Users users = fileusersRepository.findById(UUID.fromString(usersId))
+    public UsersResponseDto update(UsersUpdateRequestDto usersUpdateRequestDto, Long usersId) {
+        Users users = userRepository.findById(usersId)
                 .orElseThrow(() -> new RequestException(ErrorCode.users_NOT_FOUND));
 
         BinaryContent profileImage = binaryGenerator.createProfileImage(usersUpdateRequestDto.profileImg());
