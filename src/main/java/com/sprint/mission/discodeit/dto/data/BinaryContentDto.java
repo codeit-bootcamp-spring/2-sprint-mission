@@ -2,11 +2,11 @@ package com.sprint.mission.discodeit.dto.data;
 
 import java.util.UUID;
 
-public record UserDto(
+public record BinaryContentDto(
     UUID id,
-    String username,
-    String email,
-    Boolean online
+    String fileName,
+    long size,
+    String contentType
 ) {
 
 }
