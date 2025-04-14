@@ -1,7 +1,7 @@
 -- DROP TABLE IF EXISTS message_attachments;
 -- DROP TABLE IF EXISTS messages;
 -- DROP TABLE IF EXISTS read_statuses;
--- DROP TABLE IF EXISTS user_status;
+-- DROP TABLE IF EXISTS user_statuses;
 -- DROP TABLE IF EXISTS users;
 -- DROP TABLE IF EXISTS channels;
 -- DROP TABLE IF EXISTS binary_contents;
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS users
     constraint fk_users_binary_contents FOREIGN KEY (profile_id) REFERENCES binary_contents (id)
 );
 
-CREATE TABLE IF NOT EXISTS user_status
+CREATE TABLE IF NOT EXISTS user_statuses
 (
     id             UUID PRIMARY KEY,
     created_at     TIMESTAMPTZ NOT NULL,

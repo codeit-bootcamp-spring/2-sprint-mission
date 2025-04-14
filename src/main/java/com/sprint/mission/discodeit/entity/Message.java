@@ -1,21 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Table(name = "messages")
+@Entity
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Message extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private String content;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id")
   private User author;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id")
   private Channel channel;
-  private List<UUID> attachmentIds;
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id")
+  )
+  private List<BinaryContent> BinaryContents;
 
   public void updateContent(String content) {
     this.content = content;
