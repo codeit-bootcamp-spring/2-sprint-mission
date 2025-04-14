@@ -51,6 +51,12 @@ public class Users extends BaseUpdatableEntity {
         }
     }
 
+    public void addUpdateStatus(StatusType statusType) {
+            if (this.usersStatus != null) {
+                this.usersStatus.updateStatus(statusType.getExplanation());
+            }
+    }
+
     public void deactivate() {
         this.deleted = true;
         if (this.usersStatus != null) {
