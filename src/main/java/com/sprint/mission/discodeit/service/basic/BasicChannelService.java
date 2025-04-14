@@ -58,7 +58,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = channelRepository.findChannelById(channelId)
         .orElseThrow(() -> new NoSuchElementException(channelId + "에 해당하는 채널을 찾을 수 없습니다."));
 
-    List<Message> messageList = messageRepository.findMessageByChannel(channelId);
+    List<Message> messageList = messageRepository.findByChannelId(channelId);
 
     Message lastMessage = messageList.stream()
         .max(Comparator.comparing(Message::getCreatedAt))
@@ -121,7 +121,7 @@ public class BasicChannelService implements ChannelService {
     channelRepository.findChannelById(channelId)
         .orElseThrow(() -> new NoSuchElementException(channelId + "에 해당하는 채널을 찾을 수 없습니다."));
 
-    messageRepository.findMessageByChannel(channelId)
+    messageRepository.findByChannelId(channelId)
         .forEach(message -> {
           messageRepository.delete(message.getId());
         });

@@ -15,7 +15,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +33,12 @@ public class BasicUserService implements UserService {
   public UserCreateResponse save(UserCreateRequest userCreateRequest, MultipartFile profile)
       throws IOException {
     UUID profileId = null;
-    if (userRepository.findUserByUsername(userCreateRequest.username()).isPresent()) {
+    if (userRepository.findByUsername(userCreateRequest.username()).isPresent()) {
       throw new IllegalArgumentException(
           String.format("User with username %s already exists", userCreateRequest.username()));
     }
 
-    if (userRepository.findUserByEmail(userCreateRequest.email()).isPresent()) {
+    if (userRepository.findByEmail(userCreateRequest.email()).isPresent()) {
       throw new IllegalArgumentException(
           String.format("User with email %s already exists", userCreateRequest.email()));
     }
@@ -104,14 +103,14 @@ public class BasicUserService implements UserService {
         orElseThrow(
             () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
 
-    if (userRepository.findUserByUsername(userUpdateRequest.newUsername())
+    if (userRepository.findByUsername(userUpdateRequest.newUsername())
         .filter(otherUser -> !otherUser.getId().equals(user.getId()))
         .isPresent()) {
       throw new IllegalArgumentException(
           String.format("User with username %s already exists", userUpdateRequest.newUsername()));
     }
 
-    if (userRepository.findUserByEmail(userUpdateRequest.newEmail())
+    if (userRepository.findByEmail(userUpdateRequest.newEmail())
         .filter(otherUser -> !otherUser.getId().equals(user.getId()))
         .isPresent()) {
       throw new IllegalArgumentException(

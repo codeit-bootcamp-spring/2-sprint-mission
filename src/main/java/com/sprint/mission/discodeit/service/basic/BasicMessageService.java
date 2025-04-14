@@ -85,7 +85,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public List<Message> findMessageByChannelId(UUID channelUUID) {
-    return messageRepository.findMessageByChannel(channelUUID);
+    return messageRepository.findByChannelId(channelUUID);
   }
 
   @Override

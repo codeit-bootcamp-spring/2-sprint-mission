@@ -19,7 +19,7 @@ public class BasicAuthService implements AuthService {
 
   @Override
   public LoginResponse login(LoginRequest loginRequest) {
-    User user = userRepository.findUserByUsername(loginRequest.username())
+    User user = userRepository.findByUsername(loginRequest.username())
         .orElseThrow(() -> new NoSuchElementException(
             String.format("User with username %s not found", loginRequest.username())));
 

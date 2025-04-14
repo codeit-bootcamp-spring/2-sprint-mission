@@ -6,11 +6,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ReadStatusRepository {
-    void save(ReadStatus readStatus);
-    Optional<ReadStatus> find(UUID readStatusUUID);
-    List<ReadStatus> findByUserId(UUID userUUID);
-    List<ReadStatus> findByChannelId(UUID channelUUID);
-    void delete(UUID readStatusUUID);
+public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
+
+  List<ReadStatus> findByUserId(UUID userUUID);
+
+  List<ReadStatus> findByChannelId(UUID channelUUID);
 }
