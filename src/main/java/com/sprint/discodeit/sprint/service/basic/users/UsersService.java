@@ -1,26 +1,27 @@
 package com.sprint.discodeit.sprint.service.basic.users;
 
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersLoginRequestDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersLoginResponseDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersNameStatusResponseDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersProfileImgResponseDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersRequestDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersResponseDto;
-import com.sprint.discodeit.sprint.domain.dto.usersDto.usersUpdateRequestDto;
+
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersLoginRequestDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersLoginResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersNameStatusResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersProfileImgResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersRequestDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.Users;
 import java.util.List;
 
 public interface UsersService {
 
-    usersNameStatusResponseDto create(usersRequestDto usersRequestDto,usersProfileImgResponseDto usersProfileImgResponseDto);
+    UsersNameStatusResponseDto create(UsersRequestDto usersRequestDto, UsersProfileImgResponseDto usersProfileImgResponseDto);
 
-    usersResponseDto find(Long usersId);
+    UsersResponseDto find(Long usersId);
 
     List<Users> findAll();
 
-    usersResponseDto update(usersUpdateRequestDto usersUpdateRequestDto, String usersId);
+    UsersResponseDto update(UsersUpdateRequestDto usersUpdateRequestDto, String usersId);
 
     void delete(Long usersId);
 
-    usersLoginResponseDto login(usersLoginRequestDto usersLoginRequestDto);
+    UsersLoginResponseDto login(UsersLoginRequestDto usersLoginRequestDto);
 }
