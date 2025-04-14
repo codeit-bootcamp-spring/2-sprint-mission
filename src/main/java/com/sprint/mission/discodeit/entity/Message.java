@@ -13,25 +13,22 @@ import java.util.UUID;
 public class Message extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
-
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
   //
   private String content;
   //
-  private UUID getChannelId;
-  private UUID authorId;
-  private List<UUID> attachmentIds;
+  private Channel channel;
+  private User author;
+  private List<BinaryContent> attachments;
 
-  public Message(String content, UUID getChannelId, UUID authorId, List<UUID> attachmentIds) {
+  public Message(String content, Channel channel, User author,
+      List<BinaryContent> attachments) {
     this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
     //
     this.content = content;
-    this.getChannelId = getChannelId;
-    this.authorId = authorId;
-    this.attachmentIds = attachmentIds;
+    this.channel = channel;
+    this.author = author;
+    this.attachments = attachments;
   }
 
   public void update(String newContent) {

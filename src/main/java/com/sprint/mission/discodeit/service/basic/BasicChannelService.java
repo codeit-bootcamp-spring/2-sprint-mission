@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class BasicChannelService implements ChannelService {
   //
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
+  private final UserRepository userRepository;
 
   @Override
   public Channel create(PublicChannelCreateRequest request) {
@@ -42,7 +44,8 @@ public class BasicChannelService implements ChannelService {
     Channel createdChannel = channelRepository.save(channel);
 
     request.participantIds().stream()
-        .map(userId -> new ReadStatus(userId, createdChannel.getId(), channel.getCreatedAt()))
+        .map(userId -> new ReadStatus(userRepository.findById(userId).orElseThrow(), createdChannel,
+            channel.getCreatedAt()))
         .forEach(readStatusRepository::save);
 
     return createdChannel;
@@ -59,7 +62,8 @@ public class BasicChannelService implements ChannelService {
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
     List<UUID> mySubscribedgetChannelIds = readStatusRepository.findAllByUserId(userId).stream()
-        .map(ReadStatus::getGetChannelId)
+        .map(ReadStatus::getChannel)
+        .map(channel -> channel.getId())
         .toList();
 
     return channelRepository.findAll().stream()
@@ -110,7 +114,8 @@ public class BasicChannelService implements ChannelService {
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       readStatusRepository.findAllBygetChannelId(channel.getId())
           .stream()
-          .map(ReadStatus::getUserId)
+          .map(ReadStatus::getUser)
+          .map(user -> user.getId())
           .forEach(participantIds::add);
     }
 

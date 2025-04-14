@@ -50,7 +50,7 @@ public class UserController implements UserApi {
     );
     userStatusService.create(userStatusCreateRequest);
     UserDto dto = new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(),
-        user.getUsername(), user.getEmail(), user.getProfileId(), true);
+        user.getUsername(), user.getEmail(), user.getProfile().getId(), true);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(dto);
   }
@@ -88,7 +88,7 @@ public class UserController implements UserApi {
 
     UserDto dto = new UserDto(updatedUser.getId(), updatedUser.getCreatedAt(),
         updatedUser.getUpdatedAt(), updatedUser.getUsername(),
-        updatedUser.getEmail(), updatedUser.getProfileId(), true);
+        updatedUser.getEmail(), updatedUser.getProfile().getId(), true);
 
     return ResponseEntity
         .status(HttpStatus.OK)

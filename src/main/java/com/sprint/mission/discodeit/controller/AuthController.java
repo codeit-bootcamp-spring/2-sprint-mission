@@ -31,7 +31,7 @@ public class AuthController implements AuthApi {
     User user = authService.login(loginRequest);
 
     UserDto dto = new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(),
-        user.getUsername(), user.getEmail(), user.getProfileId(), true);
+        user.getUsername(), user.getEmail(), user.getProfile().getId(), true);
 
     return ResponseEntity
         .status(HttpStatus.OK)

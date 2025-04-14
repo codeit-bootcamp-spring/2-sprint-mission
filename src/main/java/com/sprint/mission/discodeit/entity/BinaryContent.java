@@ -7,13 +7,13 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Setter;
 
 @Getter
-public class BinaryContent extends BaseUpdatableEntity implements Serializable {
+public class BinaryContent extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  private UUID id;
-  private Instant createdAt;
+
   //
   private String fileName;
   private Long size;
@@ -28,5 +28,9 @@ public class BinaryContent extends BaseUpdatableEntity implements Serializable {
     this.size = size;
     this.contentType = contentType;
     this.bytes = bytes;
+  }
+
+  public void setId(UUID id) {
+    this.id = id;
   }
 }

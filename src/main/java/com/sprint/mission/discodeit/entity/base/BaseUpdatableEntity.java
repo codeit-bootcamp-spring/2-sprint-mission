@@ -13,5 +13,5 @@ public abstract class BaseUpdatableEntity extends BaseEntity {
 
   @UpdateTimestamp
   @Column(nullable = false)
-  private Instant updatedAt;
+  protected Instant updatedAt;
 }

@@ -2,6 +2,10 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -12,20 +16,19 @@ import java.util.UUID;
 public class ReadStatus extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
+
   //
-  private UUID userId;
-  private UUID getChannelId;
+
+  private User user;
+
+  private Channel channel;
   private Instant lastReadAt;
 
-  public ReadStatus(UUID userId, UUID getChannelId, Instant lastReadAt) {
+  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
     this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
-    //
-    this.userId = userId;
-    this.getChannelId = getChannelId;
+    this.user = user;
+    this.channel = channel;
     this.lastReadAt = lastReadAt;
   }
 

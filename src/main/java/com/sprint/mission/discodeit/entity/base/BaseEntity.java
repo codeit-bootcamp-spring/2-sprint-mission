@@ -13,9 +13,9 @@ public abstract class BaseEntity {
 
   @Id
   @GeneratedValue
-  private UUID id;
+  protected UUID id;
 
   @CreationTimestamp
   @Column(updatable = false, nullable = false)
-  private Instant createdAt;
+  protected Instant createdAt;
 }

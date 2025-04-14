@@ -56,9 +56,9 @@ public class BasicMessageService implements MessageService {
     String content = messageCreateRequest.content();
     Message message = new Message(
         content,
-        getChannelId,
-        authorId,
-        attachmentIds
+        channelRepository.findById(getChannelId).orElseThrow(),
+        userRepository.findById(authorId).orElseThrow(),
+        binaryContentRepository.findAllByIdIn(attachmentIds)
     );
     return messageRepository.save(message);
   }
@@ -92,7 +92,8 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
 
-    message.getAttachmentIds()
+    message.getAttachments().stream()
+        .map(binaryContent -> binaryContent.getId())
         .forEach(binaryContentRepository::deleteById);
 
     messageRepository.deleteById(messageId);

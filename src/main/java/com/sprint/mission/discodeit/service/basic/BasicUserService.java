@@ -54,11 +54,12 @@ public class BasicUserService implements UserService {
         .orElse(null);
     String password = userCreateRequest.password();
 
-    User user = new User(username, email, password, nullableProfileId);
+    User user = new User(username, email, password,
+        binaryContentRepository.findById(nullableProfileId).orElseThrow());
     User createdUser = userRepository.save(user);
 
     Instant now = Instant.now();
-    UserStatus userStatus = new UserStatus(createdUser.getId(), now);
+    UserStatus userStatus = new UserStatus(createdUser, now);
     userStatusRepository.save(userStatus);
 
     return createdUser;
@@ -96,7 +97,7 @@ public class BasicUserService implements UserService {
 
     UUID nullableProfileId = optionalProfileCreateRequest
         .map(profileRequest -> {
-          Optional.ofNullable(user.getProfileId())
+          Optional.ofNullable(user.getProfile().getId())
               .ifPresent(binaryContentRepository::deleteById);
 
           String fileName = profileRequest.fileName();
@@ -119,7 +120,7 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-    Optional.ofNullable(user.getProfileId())
+    Optional.ofNullable(user.getProfile().getId())
         .ifPresent(binaryContentRepository::deleteById);
     userStatusRepository.deleteByUserId(userId);
 
@@ -137,7 +138,7 @@ public class BasicUserService implements UserService {
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfileId(),
+        user.getProfile().getId(),
         online
     );
   }
