@@ -1,57 +1,53 @@
 package com.sprint.discodeit.sprint.domain.entity;
 
 import com.sprint.discodeit.sprint.domain.base.BaseUpdatableEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.*;
 
-
-@Builder
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Users extends BaseUpdatableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private UUID profileId;
-    private String usersname;
+    private String username;
     private String email;
     private String password;
-    private UUID usersStatusId;
-    private boolean deleted; // 삭제 여부 필드 추가
 
+    private boolean deleted;
 
-    public void associateProfileId(BinaryContent binaryContent) {
-        this.profileId = binaryContent.getId();
-    }
+    // 상태 메시지: 1:1 단방향
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_status_id")
+    private UsersStatus usersStatus;
 
-    public void update(String newusersname, String newEmail, String newPassword) {
-        boolean anyValueUpdated = false;
-        if (newusersname != null && !newusersname.equals(this.usersname)) {
-            this.usersname = newusersname;
-            anyValueUpdated = true;
+    // BinaryContent 연관관계 양방향
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BinaryContent> binaryContents = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReadStatus> readStatuses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages = new ArrayList<>();
+
+    public void update(String newUsername, String newEmail, String newPassword) {
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
         }
         if (newEmail != null && !newEmail.equals(this.email)) {
             this.email = newEmail;
-            anyValueUpdated = true;
         }
         if (newPassword != null && !newPassword.equals(this.password)) {
             this.password = newPassword;
-            anyValueUpdated = true;
         }
-
     }
 
     public void softDelete() {
@@ -62,5 +58,14 @@ public class Users extends BaseUpdatableEntity {
         return deleted;
     }
 
+    // 양방향 연관관계 편의 메서드 (필요하면 사용)
+    public void addBinaryContent(BinaryContent content) {
+        binaryContents.add(content);
+        content.setUser(this);
+    }
 
+    public void removeBinaryContent(BinaryContent content) {
+        binaryContents.remove(content);
+        content.setUser(null);
+    }
 }

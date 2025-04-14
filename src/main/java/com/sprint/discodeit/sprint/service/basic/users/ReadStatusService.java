@@ -2,7 +2,7 @@ package com.sprint.discodeit.sprint.service.basic.userss;
 
 import com.sprint.discodeit.sprint.domain.dto.readStatusDto.ReadStatusRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.ReadStatus;
-import com.sprint.discodeit.sprint.domain.entity.users;
+import com.sprint.discodeit.sprint.domain.entity.Users;
 import com.sprint.discodeit.sprint.domain.entity.usersStatus;
 import com.sprint.discodeit.sprint.repository.file.BaseUsersStatusRepository;
 import com.sprint.discodeit.sprint.repository.file.FileUsersRepository;
@@ -68,7 +68,7 @@ public class ReadStatusService {
     }
 
     public ReadStatus createPrivateChannel(UUID usersUUid, UUID channelId) {
-        users users = fileusersRepository.findById(usersUUid)
+        Users users = fileusersRepository.findById(usersUUid)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원 입니다."));
         Optional<usersStatus> usersStatusOpt = baseusersStatusRepository.findById(users.getId());
         boolean isActive = usersStatusOpt

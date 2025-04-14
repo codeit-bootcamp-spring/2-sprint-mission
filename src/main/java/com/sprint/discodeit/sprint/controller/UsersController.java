@@ -8,7 +8,7 @@ import com.sprint.discodeit.sprint.domain.dto.usersDto.usersProfileImgResponseDt
 import com.sprint.discodeit.sprint.domain.dto.usersDto.usersRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.usersResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.usersUpdateRequestDto;
-import com.sprint.discodeit.sprint.domain.entity.users;
+import com.sprint.discodeit.sprint.domain.entity.Users;
 import com.sprint.discodeit.sprint.service.basic.users.UsersServiceV1;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "users API", description = "유저 관련 API입니다.")
+@Tag(name = "Users API", description = "유저 관련 API입니다.")
 @RestController
 @RequestMapping("/api/userss")
 @RequiredArgsConstructor
@@ -78,8 +78,8 @@ public class UsersController {
 
     @Operation(summary = "모든 회원 조회", description = "가입된 모든 회원을 조회합니다.")
     @GetMapping("/getAll")
-    public ResponseEntity<List<users>> getAll() {
-        List<users> all = basicusersService.findAll();
+    public ResponseEntity<List<Users>> getAll() {
+        List<Users> all = basicusersService.findAll();
         return ResponseEntity.ok(all);
     }
 
