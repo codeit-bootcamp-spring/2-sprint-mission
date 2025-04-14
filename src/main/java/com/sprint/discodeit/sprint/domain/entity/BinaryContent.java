@@ -38,4 +38,8 @@ public class BinaryContent extends BaseUpdatableEntity {
     public void setUser(Users user) {
         this.user = user;
     }
+
+    public void setMessage(Message message) {
+        this.message = message;
+    }
 }

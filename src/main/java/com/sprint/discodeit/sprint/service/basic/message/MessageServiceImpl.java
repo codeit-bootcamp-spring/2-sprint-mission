@@ -3,8 +3,12 @@ package com.sprint.discodeit.sprint.service.basic.message;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.BinaryContent;
+import com.sprint.discodeit.sprint.domain.entity.Channel;
 import com.sprint.discodeit.sprint.domain.entity.Message;
 import com.sprint.discodeit.sprint.domain.mapper.MessageMapper;
+import com.sprint.discodeit.sprint.repository.BinaryContentRepository;
+import com.sprint.discodeit.sprint.repository.ChannelRepository;
+import com.sprint.discodeit.sprint.repository.MessageRepository;
 import com.sprint.discodeit.sprint.repository.file.BaseBinaryContentRepository;
 import com.sprint.discodeit.sprint.repository.file.FileMessageRepository;
 import com.sprint.discodeit.sprint.service.basic.util.BinaryContentService;
@@ -17,20 +21,23 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class BasicMessageService implements MessageServiceV1 {
+public class MessageServiceImpl implements MessageService {
 
-    private final FileMessageRepository fileMessageRepository;
+    private final MessageRepository messageRepository;
     private final BinaryContentService binaryContentService;
-    private final BaseBinaryContentRepository baseBinaryContentRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final ChannelRepository channelRepository;
 
 
     @Override
-    public Message create(UUID channelId, MessageRequestDto messageRequestDto) {
+    public Message create(Long channelId, MessageRequestDto messageRequestDto) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("없는 채널 입니다."));
+        Message message = MessageMapper.toMessage(messageRequestDto);
+        message.addChannel(channel);
         List<BinaryContent> binaryContents = binaryContentService.convertToBinaryContents(messageRequestDto.file());
-        binaryContentService.saveBinaryContents(binaryContents);
-        List<UUID> uuids = binaryContentService.convertToUUIDs(binaryContents);
-        Message message = MessageMapper.toMessage(messageRequestDto, uuids, channelId);
-        fileMessageRepository.save(message);
+        message.addAllBinaryContents(binaryContents);
+        messageRepository.save(message);
         return message;
     }
 

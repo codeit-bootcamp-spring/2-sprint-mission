@@ -40,30 +40,27 @@ public class BinaryContentService {
     }
 
 
-    public List<BinaryContent> convertToBinaryContents(List<BinaryContent> binaryContent) {
-        List<BinaryContent> binaryContentList = new ArrayList<>();
+    public List<BinaryContent> convertToBinaryContents(List<String> originals) {
+        List<BinaryContent> result = new ArrayList<>();
 
-        // null 또는 빈 리스트일 경우 그대로 비어있는 결과 반환
-        if (binaryContent == null || binaryContent.isEmpty()) {
-            return binaryContentList;
-        }
-        for (BinaryContent file : binaryContent) {
-            binaryContentList.add(new BinaryContent(file.getFileType(), file.getFilePath()));
+        if (originals == null || originals.isEmpty()) {
+            return result;
         }
 
-        return binaryContentList;
+        for (String file : originals) {
+            result.add(BinaryContent.builder()
+                    .fileType("이미지")
+                    .filePath(file)
+                    .build());
+        }
+        return result;
     }
+
 
     public void saveBinaryContents(List<BinaryContent> binaryContent) {
         for(BinaryContent file : binaryContent){
             baseBinaryContentRepository.save(file);
         }
     }
-    public List<UUID> convertToUUIDs(List<BinaryContent> binaryContent) {
-        List<UUID> uuidList = new ArrayList<>();
-        for (BinaryContent file : binaryContent) {
-            uuidList.add(file.getId());
-        }
-        return uuidList;
-    }
+
 }

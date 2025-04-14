@@ -6,10 +6,10 @@ import com.sprint.discodeit.sprint.domain.entity.Message;
 import java.util.List;
 import java.util.UUID;
 
-public interface MessageServiceV1 {
+public interface MessageService {
 
 
-    Message create(UUID channelId, MessageRequestDto messageRequestDto);
+    Message create(Long channelId, MessageRequestDto messageRequestDto);
     Message find(UUID messageId);
     List<Message> findAllByChannelId(UUID channelId);
     Message update(UUID messageId, MessageUpdateRequestDto messageUpdateRequestDto);
