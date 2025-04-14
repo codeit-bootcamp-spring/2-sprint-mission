@@ -108,4 +108,11 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
       throw new RuntimeException(e);
     }
   }
+
+  @Override
+  public void delete(BinaryContent binaryContent) {
+    if (binaryContent != null) {
+      deleteById(binaryContent.getId());
+    }
+  }
 }

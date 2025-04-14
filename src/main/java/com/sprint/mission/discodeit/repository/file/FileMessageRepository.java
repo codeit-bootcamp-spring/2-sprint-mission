@@ -86,7 +86,7 @@ public class FileMessageRepository implements MessageRepository {
               throw new RuntimeException(e);
             }
           })
-          .filter(message -> message.getChannelId().equals(channelId))
+          .filter(message -> message.getChannel().equals(channelId))
           .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);

@@ -1,30 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
-import java.io.Serializable;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import java.time.Instant;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 
+@Entity
 @Getter
-public class Channel implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
+  @Enumerated(EnumType.STRING) // 이거 없으면 PUBLIC -> 0, PRIVATE -> 1로 저장
+  @Column(nullable = false)
   private ChannelType type;
+
+  @Column(nullable = false)
   private String name;
+
   private String description;
 
   public Channel(ChannelType type, String name, String description) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
     this.type = type;
     this.name = name;
     this.description = description;
+  }
+
+  @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Message> messages = new ArrayList<>();
+
+  @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ReadStatus> readStatuses = new ArrayList<>();
+
+  public void addReadStatus(ReadStatus readStatus) {
+    readStatuses.add(readStatus);
+  }
+
+  public void removeReadStatus(ReadStatus readStatus) {
+    readStatuses.remove(readStatus);
   }
 
   public void update(String newName, String newDescription) {
@@ -39,7 +55,7 @@ public class Channel implements Serializable {
     }
 
     if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+      this.updatedAt = Instant.now(); // BaseUpdatableEntity에 있는 updatedAt setter
     }
   }
 }

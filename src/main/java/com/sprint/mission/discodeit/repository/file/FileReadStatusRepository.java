@@ -86,7 +86,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
               throw new RuntimeException(e);
             }
           })
-          .filter(readStatus -> readStatus.getUserId().equals(userId))
+          .filter(readStatus -> readStatus.getUser().getId().equals(userId))
           .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -108,7 +108,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
               throw new RuntimeException(e);
             }
           })
-          .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+          .filter(readStatus -> readStatus.getChannel().getId().equals(channelId))
           .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);

@@ -126,4 +126,11 @@ public class FileUserRepository implements UserRepository {
     return this.findAll().stream()
         .anyMatch(user -> user.getUsername().equals(username));
   }
+
+  @Override
+  public void delete(User user) {
+    if (user != null && user.getId() != null) {
+      deleteById(user.getId());
+    }
+  }
 }

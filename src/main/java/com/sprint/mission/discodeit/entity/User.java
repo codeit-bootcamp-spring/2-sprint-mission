@@ -1,58 +1,61 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Locked.Read;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
 @Getter
-public class User implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
+  @Column(nullable = false, unique = true)
   private String username;
-  private String email;
-  private String password;
-  private UUID profileId;     // BinaryContent
-  private boolean online;
 
-  public User(String username, String email, String password, UUID profileId) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
+  @Column(nullable = false, unique = true)
+  private String email;
+
+  @Column(nullable = false)
+  private String password;
+
+  @OneToOne
+  @JoinColumn(name = "profile_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_users_profile"))
+  private BinaryContent profile;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private UserStatus status;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ReadStatus> readStatuses = new ArrayList<>();
+
+  public void addReadStatus(ReadStatus readStatus) {
+    readStatuses.add(readStatus);
+  }
+
+  public void removeReadStatus(ReadStatus readStatus) {
+    readStatuses.remove(readStatus);
+  }
+
+  public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;
     this.email = email;
     this.password = password;
-    this.profileId = profileId;
-    this.online = false;
+    this.profile = profile;
   }
 
-  public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
-    boolean anyValueUpdated = false;
-    if (newUsername != null && !newUsername.equals(this.username)) {
-      this.username = newUsername;
-      anyValueUpdated = true;
-    }
-    if (newEmail != null && !newEmail.equals(this.email)) {
-      this.email = newEmail;
-      anyValueUpdated = true;
-    }
-    if (newPassword != null && !newPassword.equals(this.password)) {
-      this.password = newPassword;
-      anyValueUpdated = true;
-    }
-    if (newProfileId != null && !newProfileId.equals(this.profileId)) {
-      this.profileId = newProfileId;
-      anyValueUpdated = true;
-    }
+  public void update(String newUsername, String newEmail, String newPassword, BinaryContent newProfile) {
+    if (newUsername != null) this.username = newUsername;
+    if (newEmail != null) this.email = newEmail;
+    if (newPassword != null) this.password = newPassword;
+    if (newProfile != null) this.profile = newProfile;
+  }
 
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
-    }
+  public boolean isOnline() {
+    return this.status != null && this.status.isOnline();
   }
 }

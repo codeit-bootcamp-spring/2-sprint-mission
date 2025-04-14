@@ -44,4 +44,11 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
   public void deleteById(UUID id) {
     this.data.remove(id);
   }
+
+  @Override
+  public void delete(BinaryContent binaryContent) {
+    if (binaryContent != null) {
+      deleteById(binaryContent.getId());
+    }
+  }
 }

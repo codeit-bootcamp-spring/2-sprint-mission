@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.data;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.time.Instant;
@@ -19,9 +20,11 @@ public record MessageDto(
         return new MessageDto(
                 message.getId(),
                 message.getContent(),
-                message.getChannelId(),
-                message.getAuthorId(),
-                message.getAttachmentIds(),
+                message.getChannel() != null ? message.getChannel().getId() : null,
+                message.getAuthor() != null ? message.getAuthor().getId() : null,
+                message.getAttachmentIds().stream()
+                    .map(BinaryContent::getId)
+                    .toList(),
                 message.getCreatedAt(),
                 message.getUpdatedAt()
         );

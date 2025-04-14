@@ -21,4 +21,6 @@ public interface UserStatusRepository {
   void deleteById(UUID id);
 
   void deleteByUserId(UUID userId);
+
+  void delete(UserStatus status);
 }

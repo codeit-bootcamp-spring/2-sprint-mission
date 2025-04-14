@@ -74,7 +74,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
   @Override
   public Optional<UserStatus> findByUserId(UUID userId) {
     return findAll().stream()
-        .filter(userStatus -> userStatus.getUserId().equals(userId))
+        .filter(userStatus -> userStatus.getUser().getId().equals(userId))
         .findFirst();
   }
 
@@ -119,5 +119,12 @@ public class FileUserStatusRepository implements UserStatusRepository {
   public void deleteByUserId(UUID userId) {
     this.findByUserId(userId)
         .ifPresent(userStatus -> this.deleteById(userStatus.getId()));
+  }
+
+  @Override
+  public void delete(UserStatus userStatus) {
+    if (userStatus != null && userStatus.getUser() != null) {
+      deleteByUserId(userStatus.getUser().getId());
+    }
   }
 }
