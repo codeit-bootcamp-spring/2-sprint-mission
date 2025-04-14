@@ -1,7 +1,7 @@
 package com.sprint.discodeit.sprint.service.basic.users;
 
 import com.sprint.discodeit.sprint.domain.StatusType;
-import com.sprint.discodeit.sprint.domain.entity.users;
+import com.sprint.discodeit.sprint.domain.entity.Users;
 import com.sprint.discodeit.sprint.domain.entity.usersStatus;
 import com.sprint.discodeit.sprint.repository.file.BaseUsersStatusRepository;
 import com.sprint.discodeit.sprint.repository.file.FileUsersRepository;
@@ -19,9 +19,9 @@ public class UsersStatusService {
     private final BaseUsersStatusRepository baseusersStatusRepository;
     private final FileUsersRepository fileusersRepository;
 
-    public users creat(UUID usersId, StatusType statusType){
-        users users = fileusersRepository.findById(usersId)
-                .orElseThrow(() -> new IllegalArgumentException("users not found"));
+    public Users creat(UUID usersId, StatusType statusType){
+        Users users = fileusersRepository.findById(usersId)
+                .orElseThrow(() -> new IllegalArgumentException("Users not found"));
         Optional.ofNullable(users.getUsersStatusId())
                 .ifPresent(status -> {
                     throw new IllegalArgumentException("이미 상태값이 존재하는 사용자입니다.");
