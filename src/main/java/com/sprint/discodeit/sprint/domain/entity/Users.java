@@ -1,5 +1,6 @@
 package com.sprint.discodeit.sprint.domain.entity;
 
+import com.sprint.discodeit.sprint.domain.StatusType;
 import com.sprint.discodeit.sprint.domain.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class Users extends BaseUpdatableEntity {
     private String email;
     private String password;
 
-    private boolean deleted;
+    private Boolean deleted;
 
     // 상태 메시지: 1:1 단방향
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -50,9 +51,13 @@ public class Users extends BaseUpdatableEntity {
         }
     }
 
-    public void softDelete() {
+    public void deactivate() {
         this.deleted = true;
+        if (this.usersStatus != null) {
+            this.usersStatus.deactivate();
+        }
     }
+
 
 
     // 양방향 연관관계 편의 메서드

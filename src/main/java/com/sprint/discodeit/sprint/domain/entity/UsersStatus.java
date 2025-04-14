@@ -1,5 +1,6 @@
 package com.sprint.discodeit.sprint.domain.entity;
 
+import com.sprint.discodeit.sprint.domain.StatusType;
 import com.sprint.discodeit.sprint.domain.base.BaseUpdatableEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,9 +27,13 @@ public class UsersStatus extends BaseUpdatableEntity {
 
     private String statusType;
 
-    public void updateStatus(String statusType) {
-        if (statusType != null) {
-            this.statusType = statusType;
-        }
+//    public void updateStatus(String statusType) {
+//        if (statusType != null) {
+//            this.statusType = statusType;
+//        }
+//    }
+
+    public void deactivate() {
+        this.statusType = StatusType.Inactive.getExplanation();
     }
 }

@@ -9,9 +9,11 @@ import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.BinaryContent;
 import com.sprint.discodeit.sprint.domain.entity.Users;
+import com.sprint.discodeit.sprint.domain.entity.UsersStatus;
 import com.sprint.discodeit.sprint.domain.mapper.UsersMapper;
 import com.sprint.discodeit.sprint.global.ErrorCode;
 import com.sprint.discodeit.sprint.global.RequestException;
+import com.sprint.discodeit.sprint.repository.UserStatusRepository;
 import com.sprint.discodeit.sprint.repository.UsersRepository;
 import com.sprint.discodeit.sprint.service.basic.util.BinaryGenerator;
 import com.sprint.discodeit.sprint.service.basic.util.UsersStatusEvaluator;
@@ -30,6 +32,7 @@ public class UsersServiceImpl implements UsersService {
     private final UsersRepository userRepository;
     private final BinaryGenerator binaryGenerator;
     private final UsersStatusEvaluator usersStatusEvaluator;
+    private final UserStatusRepository userStatusRepository;
 
     @Override
     public UsersNameStatusResponseDto create(UsersRequestDto usersRequestDto, UsersProfileImgResponseDto usersProfileImgResponseDto) {
@@ -77,26 +80,20 @@ public class UsersServiceImpl implements UsersService {
 
         BinaryContent profileImage = binaryGenerator.createProfileImage(usersUpdateRequestDto.profileImg());
 
-        users.associateProfileId(profileImage);
-        baseBinaryContentRepository.save(profileImage);
+        users.addBinaryContent(profileImage);
 
         users.update(usersUpdateRequestDto.newusersname(), usersUpdateRequestDto.newEmail(), usersUpdateRequestDto.newPassword());
-        fileusersRepository.save(users);
+        userRepository.save(users);
 
-        return new usersResponseDto(users.getProfileId(), users.getUsersname(), users.getEmail(), StatusType.Active.toString());
+        return new UsersResponseDto(users.getId(), users.getUsername(), users.getEmail(), StatusType.Active.toString());
     }
 
     @Override
     public void delete(Long usersId) {
-        Optional<Users> users = fileusersRepository.findById(usersId);
-        if (users.isPresent()) {
-            users.get().softDelete();
-            usersStatus usersStatus = new usersStatus(Instant.now(), StatusType.Inactive.getExplanation());
-            baseusersStatusRepository.save(usersStatus);
-            fileusersRepository.save(users.get());
-        } else {
-            throw new RequestException(ErrorCode.ALREADY_DELETED_users);
-        }
+        Users user = userRepository.findById(usersId)
+                .orElseThrow(() -> new RequestException(ErrorCode.ALREADY_DELETED_users));
+        user.deactivate();
+        userRepository.save(user);
     }
 
     @Override
