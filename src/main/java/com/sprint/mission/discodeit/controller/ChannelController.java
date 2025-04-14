@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -42,11 +41,11 @@ public class ChannelController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Public Channel이 성공적으로 생성됨")
   })
-  public ResponseEntity<Channel> create(@Valid @RequestBody PublicChannelCreateRequest request) {
-    Channel createdChannel = channelService.create(request);
+  public ResponseEntity<ChannelDto> create(@Valid @RequestBody PublicChannelCreateRequest request) {
+    ChannelDto createdChannelDto = channelService.create(request);
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(createdChannel);
+        .body(createdChannelDto);
   }
 
   @PostMapping(path = "private")
@@ -54,11 +53,12 @@ public class ChannelController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Private Channel이 성공적으로 생성됨")
   })
-  public ResponseEntity<Channel> create(@Valid @RequestBody PrivateChannelCreateRequest request) {
-    Channel createdChannel = channelService.create(request);
+  public ResponseEntity<ChannelDto> create(
+      @Valid @RequestBody PrivateChannelCreateRequest request) {
+    ChannelDto createdChannelDto = channelService.create(request);
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(createdChannel);
+        .body(createdChannelDto);
   }
 
   @PatchMapping(path = "{channelId}")
@@ -68,12 +68,12 @@ public class ChannelController {
       @ApiResponse(responseCode = "400", description = "Private Channel은 수정할 수 없음", content = @Content(examples = @ExampleObject("Private channel cannot be updated"))),
       @ApiResponse(responseCode = "200", description = "Channel 정보가 성공적으로 수정됨")
   })
-  public ResponseEntity<Channel> update(@PathVariable UUID channelId,
+  public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
       @Valid @RequestBody PublicChannelUpdateRequest request) {
-    Channel udpatedChannel = channelService.update(channelId, request);
+    ChannelDto udpatedChannelDto = channelService.update(channelId, request);
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(udpatedChannel);
+        .body(udpatedChannelDto);
   }
 
   @DeleteMapping(path = "{channelId}")
@@ -95,9 +95,9 @@ public class ChannelController {
       @ApiResponse(responseCode = "200", description = "Channel 목록 조회 성공")
   })
   public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
-    List<ChannelDto> channels = channelService.findAllByUserId(userId);
+    List<ChannelDto> channelDtos = channelService.findAllByUserId(userId);
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(channels);
+        .body(channelDtos);
   }
 }

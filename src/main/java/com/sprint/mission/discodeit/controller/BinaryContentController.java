@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,11 +34,11 @@ public class BinaryContentController {
       @ApiResponse(responseCode = "200", description = "첨부 파일 조회 성공"),
       @ApiResponse(responseCode = "404", description = "첨부 파일을 찾을 수 없음", content = @Content(examples = @ExampleObject("BinaryContent with id {binaryContentId} not found")))
   })
-  public ResponseEntity<BinaryContent> find(@PathVariable UUID binaryContentId) {
-    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+  public ResponseEntity<BinaryContentDto> find(@PathVariable UUID binaryContentId) {
+    BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(binaryContent);
+        .body(binaryContentDto);
   }
 
   @GetMapping
@@ -46,11 +46,11 @@ public class BinaryContentController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "첨부 파일 목록 조회 성공")
   })
-  public ResponseEntity<List<BinaryContent>> findAllByIdIn(
+  public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
-    List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+    List<BinaryContentDto> binaryContentDtos = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(binaryContents);
+        .body(binaryContentDtos);
   }
 }
