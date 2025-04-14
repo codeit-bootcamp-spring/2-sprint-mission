@@ -17,7 +17,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(UserCreateDto userCreateDto, Optional<BinaryContentCreateDto> binaryContentCreateDto) {
+    public User create(UserCreateDto userCreateDto, BinaryContentCreateDto binaryContentCreateDto) {
         List<User> users = userRepository.findAll();
 
         boolean isEmailExist = users.stream().anyMatch(user -> user.getEmail().equals(userCreateDto.email()));
@@ -44,15 +43,15 @@ public class BasicUserService implements UserService {
             throw new UserNameAlreadyExistsException(userCreateDto.username() + " 이름은 이미 가입되었습니다.");
         }
 
-        UUID nullableProfileId = binaryContentCreateDto
-                .map(profileRequest -> {
-                    String fileName = profileRequest.fileName();
-                    String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
-                })
-                .orElse(null);
+        UUID nullableProfileId = null;
+
+        if (binaryContentCreateDto != null) {
+            String fileName = binaryContentCreateDto.fileName();
+            String contentType = binaryContentCreateDto.contentType();
+            byte[] bytes = binaryContentCreateDto.bytes();
+            BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+            nullableProfileId = binaryContentRepository.save(binaryContent).getId();
+        }
 
         User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(),
                 nullableProfileId);
@@ -85,7 +84,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public User update(UUID userId, UserUpdateDto userUpdateDto,
-                       Optional<BinaryContentCreateDto> binaryContentCreateDto) {
+                       BinaryContentCreateDto binaryContentCreateDto) {
         List<User> users = userRepository.findAll();
         boolean isEmailExist = users.stream().anyMatch(
                 user -> user.getEmail().equals(userUpdateDto.newEmail()));
@@ -107,15 +106,15 @@ public class BasicUserService implements UserService {
             throw new UserNotFoundException(userId + " 유저를 찾을 수 없습니다.");
         }
 
-        UUID nullableProfileId = binaryContentCreateDto
-                .map(profileRequest -> {
-                    String fileName = profileRequest.fileName();
-                    String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
-                })
-                .orElse(null);
+        UUID nullableProfileId = null;
+
+        if (binaryContentCreateDto != null) {
+            String fileName = binaryContentCreateDto.fileName();
+            String contentType = binaryContentCreateDto.contentType();
+            byte[] bytes = binaryContentCreateDto.bytes();
+            BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+            nullableProfileId = binaryContentRepository.save(binaryContent).getId();
+        }
 
         user.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(),
                 nullableProfileId);

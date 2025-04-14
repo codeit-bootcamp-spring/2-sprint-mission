@@ -6,17 +6,16 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    User create(UserCreateDto userCreateDto, Optional<BinaryContentCreateDto> binaryContentCreateDto);
+    User create(UserCreateDto userCreateDto, BinaryContentCreateDto binaryContentCreateDto);
 
     UserDto findById(UUID userId);
 
     List<UserDto> findAll();
 
-    User update(UUID userId, UserUpdateDto userUpdateDto, Optional<BinaryContentCreateDto> binaryContentCreateDto);
+    User update(UUID userId, UserUpdateDto userUpdateDto, BinaryContentCreateDto binaryContentCreateDto);
 
     void delete(UUID userId);
 }

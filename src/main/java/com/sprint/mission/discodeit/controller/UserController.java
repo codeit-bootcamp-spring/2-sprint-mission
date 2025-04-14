@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -43,8 +42,7 @@ public class UserController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<User> createUser(@RequestPart("userCreateRequest") UserCreateDto userCreateDto,
                                            @RequestPart(name = "profile", required = false) MultipartFile file) {
-        Optional<BinaryContentCreateDto> profileRequest = Optional.ofNullable(file)
-                .flatMap(this::resolveProfileRequest);
+        BinaryContentCreateDto profileRequest = resolveProfileRequest(file);
         User createdUser = userService.create(userCreateDto, profileRequest);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -58,8 +56,7 @@ public class UserController {
             @RequestPart("userUpdateRequest") UserUpdateDto userUpdateDto,
             @RequestPart(name = "profile", required = false) MultipartFile file
     ) {
-        Optional<BinaryContentCreateDto> profileRequest = Optional.ofNullable(file)
-                .flatMap(this::resolveProfileRequest);
+        BinaryContentCreateDto profileRequest = resolveProfileRequest(file);
         User updatedUser = userService.update(userId, userUpdateDto, profileRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -87,17 +84,16 @@ public class UserController {
         return ResponseEntity.ok(userStatus);
     }
 
-    private Optional<BinaryContentCreateDto> resolveProfileRequest(MultipartFile profileFile) {
-        if (profileFile.isEmpty()) {
-            return Optional.empty();
+    private BinaryContentCreateDto resolveProfileRequest(MultipartFile profileFile) {
+        if (profileFile == null || profileFile.isEmpty()) {
+            return null;
         } else {
             try {
-                BinaryContentCreateDto binaryContentCreateDto = new BinaryContentCreateDto(
+                return new BinaryContentCreateDto(
                         profileFile.getOriginalFilename(),
                         profileFile.getContentType(),
                         profileFile.getBytes()
                 );
-                return Optional.of(binaryContentCreateDto);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
