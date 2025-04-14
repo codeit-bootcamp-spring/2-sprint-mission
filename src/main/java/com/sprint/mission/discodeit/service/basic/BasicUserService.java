@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -24,7 +25,6 @@ import java.util.UUID;
 @Service
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    //
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
 
@@ -40,22 +40,36 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("User with username " + username + " already exists");
         }
 
-        UUID nullableProfileId = optionalProfileCreateRequest
+        BinaryContent profileContent = optionalProfileCreateRequest
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
+                    return BinaryContent.builder()
+                            .fileName(fileName)
+                            .contentType(contentType)
+                            .bytes(bytes)
+                            .build();
                 })
+                .map(binaryContentRepository::save)
                 .orElse(null);
+
         String password = userCreateRequest.password();
 
-        User user = new User(username, email, password, nullableProfileId);
+        User user = User.builder()
+                .username(username)
+                .email(email)
+                .password(password)
+                .profile(profileContent)
+                .build();
+
         User createdUser = userRepository.save(user);
 
         Instant now = Instant.now();
-        UserStatus userStatus = new UserStatus(createdUser.getId(), now);
+        UserStatus userStatus = UserStatus.builder()
+                .user(createdUser)
+                .lastActiveAt(now)
+                .build();
         userStatusRepository.save(userStatus);
 
         return createdUser;
@@ -83,56 +97,79 @@ public class BasicUserService implements UserService {
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
-        if (userRepository.existsByEmail(newEmail)) {
+        if (newEmail != null && !newEmail.equals(user.getEmail()) && userRepository.existsByEmail(newEmail)) {
             throw new IllegalArgumentException("User with email " + newEmail + " already exists");
         }
-        if (userRepository.existsByUsername(newUsername)) {
+        if (newUsername != null && !newUsername.equals(user.getUsername()) && userRepository.existsByUsername(newUsername)) {
             throw new IllegalArgumentException("User with username " + newUsername + " already exists");
         }
 
-        UUID nullableProfileId = optionalProfileCreateRequest
-                .map(profileRequest -> {
-                    Optional.ofNullable(user.getProfileId())
-                                    .ifPresent(binaryContentRepository::deleteById);
+        optionalProfileCreateRequest.ifPresent(profileRequest -> {
 
-                    String fileName = profileRequest.fileName();
-                    String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
-                })
-                .orElse(null);
+            if (user.getProfile() != null) {
+                binaryContentRepository.deleteById(user.getProfile().getUuid());
+            }
 
-        String newPassword = userUpdateRequest.newPassword();
-        user.update(newUsername, newEmail, newPassword, nullableProfileId);
+            String fileName = profileRequest.fileName();
+            String contentType = profileRequest.contentType();
+            byte[] bytes = profileRequest.bytes();
+
+            BinaryContent newProfile = BinaryContent.builder()
+                    .fileName(fileName)
+                    .size((long) bytes.length)
+                    .contentType(contentType)
+                    .bytes(bytes)
+                    .build();
+
+            BinaryContent savedProfile = binaryContentRepository.save(newProfile);
+            user.updateProfile(savedProfile);
+        });
+
+        if (newUsername != null) {
+            user.setUsername(newUsername);
+        }
+        if (newEmail != null) {
+            user.setEmail(newEmail);
+        }
+        if (userUpdateRequest.newPassword() != null) {
+            user.setPassword(userUpdateRequest.newPassword());
+        }
 
         return userRepository.save(user);
     }
+
 
     @Override
     public void delete(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-        Optional.ofNullable(user.getProfileId())
-                        .ifPresent(binaryContentRepository::deleteById);
-        userStatusRepository.deleteByUserId(userId);
+        if (user.getProfile() != null) {
+            binaryContentRepository.deleteById(user.getProfile().getUuid());
+        }
 
         userRepository.deleteById(userId);
     }
 
     private UserDto toDto(User user) {
-        Boolean online = userStatusRepository.findByUserId(user.getId())
-                .map(UserStatus::isOnline)
+        Boolean online = Optional.ofNullable(user.getStatus())
+                .map(status -> {
+                    Instant fiveMinutesAgo = Instant.now().minus(5, ChronoUnit.MINUTES);
+                    return status.getLastActiveAt().isAfter(fiveMinutesAgo);
+                })
+                .orElse(false);
+
+        UUID profileId = Optional.ofNullable(user.getProfile())
+                .map(BinaryContent::getUuid)
                 .orElse(null);
 
         return new UserDto(
-                user.getId(),
+                user.getUuid(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getProfileId(),
+                profileId,
                 online
         );
     }

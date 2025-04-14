@@ -9,7 +9,7 @@ import java.time.Instant;
 
 @Getter
 @MappedSuperclass
-public abstract class BaseUpdatableEntity {
+public abstract class BaseUpdatableEntity extends BaseEntity {
 
     @LastModifiedDate
     @Column(name = "updated_at")
