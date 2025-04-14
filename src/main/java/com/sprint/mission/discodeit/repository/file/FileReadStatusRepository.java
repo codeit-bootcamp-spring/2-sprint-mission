@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,8 +47,8 @@ public class FileReadStatusRepository implements ReadStatusRepository {
   @Override
   public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
     return readStatusMap.values().stream()
-        .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-        .filter(readStatus -> readStatus.getUserId().equals(userId))
+        .filter(readStatus -> Objects.equals(readStatus.getChannelId(), channelId))
+        .filter(readStatus -> Objects.equals(readStatus.getUserId(), userId))
         .findFirst();
   }
 
