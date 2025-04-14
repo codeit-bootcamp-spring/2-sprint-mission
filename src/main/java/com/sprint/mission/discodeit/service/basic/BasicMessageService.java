@@ -5,9 +5,8 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.exception.custom.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.custom.message.MessageNotFoundException;
-import com.sprint.mission.discodeit.exception.custom.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.LogicException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -29,14 +28,8 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message create(MessageCreateDto messageCreateDto, List<BinaryContentCreateDto> binaryContentCreateDtos) {
-        try {
-            userService.findById(messageCreateDto.authorId());
-            channelService.findById(messageCreateDto.channelId());
-        } catch (UserNotFoundException e) {
-            throw new UserNotFoundException("Message 생성 실패: " + e.getMessage());
-        } catch (ChannelNotFoundException e) {
-            throw new ChannelNotFoundException("Message 생성 실패: " + e.getMessage());
-        }
+        userService.findById(messageCreateDto.authorId());
+        channelService.findById(messageCreateDto.channelId());
 
         List<BinaryContent> binaryContents = binaryContentCreateDtos.stream()
                 .map(dto -> new BinaryContent(
@@ -66,7 +59,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId);
 
         if (message == null) {
-            throw new MessageNotFoundException(messageId + " 메시지를 찾을 수 없습니다.");
+            throw new LogicException(ErrorCode.MESSAGE_NOT_FOUND);
         }
 
         return message;

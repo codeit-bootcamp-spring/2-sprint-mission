@@ -9,8 +9,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.custom.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.custom.channel.PrivateChannelUpdateNotSupportedException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.LogicException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -56,7 +56,7 @@ public class BasicChannelService implements ChannelService {
                 );
 
         if (isExistChannel) {
-            throw new PrivateChannelUpdateNotSupportedException(channelCreatePublicDto.name() + " 채널은 이미 존재합니다.");
+            throw new LogicException(ErrorCode.CHANNEL_ALREADY_EXISTS);
         }
 
         Channel newChannel = Channel.createPublic(channelCreatePublicDto.name(), channelCreatePublicDto.description());
@@ -70,7 +70,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId);
 
         if (channel == null) {
-            throw new ChannelNotFoundException(channelId + " 채널을 찾을 수 없습니다.");
+            throw new LogicException(ErrorCode.CHANNEL_NOT_FOUND);
         }
 
         Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId())
@@ -134,11 +134,11 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId);
 
         if (channel == null) {
-            throw new ChannelNotFoundException(channelId + " 채널은 존재하지 않아 수정할 수 없습니다.");
+            throw new LogicException(ErrorCode.CHANNEL_NOT_FOUND);
         }
 
         if (channel.getType().equals(ChannelType.PRIVATE)) {
-            throw new PrivateChannelUpdateNotSupportedException("Private 채널은 수정할 수 없습니다.");
+            throw new LogicException(ErrorCode.PRIVATE_CHANNEL_UPDATE_NOT_SUPPORTED);
         }
 
         channel.update(channelUpdateDto.newName(), channelUpdateDto.newDescription());

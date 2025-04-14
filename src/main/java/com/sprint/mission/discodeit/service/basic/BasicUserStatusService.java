@@ -4,9 +4,8 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.custom.user.UserNotFoundException;
-import com.sprint.mission.discodeit.exception.custom.userStatus.UserStatusAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.custom.userStatus.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.LogicException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -26,12 +25,12 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatus create(UserStatusCreateDto userStatusCreateDto) {
         boolean isExitUser = userRepository.findById(userStatusCreateDto.userId()) != null;
         if (!isExitUser) {
-            throw new UserNotFoundException(userStatusCreateDto.userId() + " 유저를 찾을 수 없습니다.");
+            throw new LogicException(ErrorCode.USER_NOT_FOUND);
         }
 
         boolean isExistUserStatus = userStatusRepository.findByUserId(userStatusCreateDto.userId()) != null;
         if (isExistUserStatus) {
-            throw new UserStatusAlreadyExistsException(userStatusCreateDto.userId() + " 유저의 상태가 이미 존재합니다.");
+            throw new LogicException(ErrorCode.USER_STATUS_ALREADY_EXISTS);
         }
 
         UserStatus newUserStatus = new UserStatus(userStatusCreateDto.userId(), userStatusCreateDto.lastActiveAt());
@@ -43,7 +42,7 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus userStatus = userStatusRepository.findByUserId(id);
 
         if (userStatus == null) {
-            throw new UserStatusNotFoundException(id + " 유저 상태를 찾을 수 없습니다.");
+            throw new LogicException(ErrorCode.USER_STATUS_NOT_FOUND);
         }
 
         return userStatus;
@@ -67,7 +66,7 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus userStatus = userStatusRepository.findByUserId(userId);
 
         if (userStatus == null) {
-            throw new UserStatusNotFoundException(userId + " 유저 상태를 찾을 수 없습니다.");
+            throw new LogicException(ErrorCode.USER_STATUS_NOT_FOUND);
         }
         userStatus.update(userStatusUpdateByUserIdDto.newLastActiveAt());
 

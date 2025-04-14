@@ -3,10 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.custom.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.custom.readStatus.ReadStatusAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.custom.readStatus.ReadStatusNotFoundException;
-import com.sprint.mission.discodeit.exception.custom.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.LogicException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -28,19 +26,18 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatus create(ReadStatusCreateDto readStatusCreateDto) {
         boolean isExistUser = userRepository.findById(readStatusCreateDto.userId()) != null;
         if (!isExistUser) {
-            throw new UserNotFoundException(readStatusCreateDto.userId() + " 유저를 찾을 수 없습니다.");
+            throw new LogicException(ErrorCode.USER_NOT_FOUND);
         }
 
         boolean isExistChannel = channelRepository.findById(readStatusCreateDto.channelId()) != null;
         if (!isExistChannel) {
-            throw new ChannelNotFoundException(readStatusCreateDto.channelId() + " 채널을 찾을 수 없습니다.");
+            throw new LogicException(ErrorCode.CHANNEL_NOT_FOUND);
         }
 
         boolean isExistReadStatus = readStatusRepository.findAllByChannelId(readStatusCreateDto.channelId()).stream()
                 .anyMatch(readStatus -> readStatus.getUserId().equals(readStatusCreateDto.userId()));
         if (isExistReadStatus) {
-            throw new ReadStatusAlreadyExistsException(
-                    readStatusCreateDto.userId() + " 유저는 이미 " + readStatusCreateDto.channelId() + " 채널을 읽었습니다.");
+            throw new LogicException(ErrorCode.READ_STATUS_ALREADY_EXISTS);
         }
 
         ReadStatus newReadStatus = new ReadStatus(readStatusCreateDto.userId(), readStatusCreateDto.channelId(),
@@ -54,7 +51,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = readStatusRepository.findById(id);
 
         if (readStatus == null) {
-            throw new ReadStatusNotFoundException(id + " 읽은 상태를 찾을 수 없습니다.");
+            throw new LogicException(ErrorCode.READ_STATUS_NOT_FOUND);
         }
 
         return readStatus;

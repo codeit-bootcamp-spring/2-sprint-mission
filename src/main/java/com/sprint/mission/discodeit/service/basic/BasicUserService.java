@@ -8,9 +8,8 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.custom.user.UserEmailAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.custom.user.UserNameAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.custom.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.LogicException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -35,12 +34,12 @@ public class BasicUserService implements UserService {
 
         boolean isEmailExist = users.stream().anyMatch(user -> user.getEmail().equals(userCreateDto.email()));
         if (isEmailExist) {
-            throw new UserEmailAlreadyExistsException(userCreateDto.email() + " 이메일은 이미 가입되었습니다.");
+            throw new LogicException(ErrorCode.USER_EMAIL_EXISTS);
         }
 
         boolean isNameExist = users.stream().anyMatch(user -> user.getUsername().equals(userCreateDto.username()));
         if (isNameExist) {
-            throw new UserNameAlreadyExistsException(userCreateDto.username() + " 이름은 이미 가입되었습니다.");
+            throw new LogicException(ErrorCode.USER_NAME_EXISTS);
         }
 
         UUID nullableProfileId = null;
@@ -66,7 +65,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId);
 
         if (user == null) {
-            throw new UserNotFoundException(userId + " 유저를 찾을 수 없습니다.");
+            throw new LogicException(ErrorCode.USER_NOT_FOUND);
         }
 
         UserStatus userStatus = userStatusService.findById(user.getId());
@@ -90,20 +89,20 @@ public class BasicUserService implements UserService {
                 user -> user.getEmail().equals(userUpdateDto.newEmail()));
 
         if (isEmailExist) {
-            throw new UserEmailAlreadyExistsException(userUpdateDto.newEmail() + " 이메일은 이미 존재하여 수정할 수 없습니다.");
+            throw new LogicException(ErrorCode.USER_EMAIL_EXISTS);
         }
 
         boolean isNameExist = users.stream().anyMatch(
                 user -> user.getUsername().equals(userUpdateDto.newUsername()));
 
         if (isNameExist) {
-            throw new UserNameAlreadyExistsException(userUpdateDto.newUsername() + " 유저는 이미 존재하여 수정할 수 없습니다.");
+            throw new LogicException(ErrorCode.USER_NAME_EXISTS);
         }
 
         User user = userRepository.findById(userId);
 
         if (user == null) {
-            throw new UserNotFoundException(userId + " 유저를 찾을 수 없습니다.");
+            throw new LogicException(ErrorCode.USER_NOT_FOUND);
         }
 
         UUID nullableProfileId = null;
@@ -128,7 +127,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId);
 
         if (user == null) {
-            throw new UserNotFoundException(userId + " 유저를 찾을 수 없습니다.");
+            throw new LogicException(ErrorCode.USER_NOT_FOUND);
         }
 
         userRepository.delete(user.getId());
