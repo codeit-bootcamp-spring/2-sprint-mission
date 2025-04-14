@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,17 +15,17 @@ import lombok.Getter;
 public class Message extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  private final UUID authorId;  // User의 UUID 저장
-  private final UUID channelId; // Channel의 UUID 저장
+  private final User author;
+  private final Channel channel;
   private String content;
-  private List<UUID> attachmentIds = new ArrayList<>();
+  private List<BinaryContent> attachments = new ArrayList<>();
 
-  public Message(UUID authorId, UUID channelId, String content) {
+  public Message(User author, Channel channel, String content) {
     super();
-    this.authorId = authorId;
-    this.channelId = channelId;
+    this.author = author;
+    this.channel = channel;
     this.content = content;
-    this.attachmentIds = new ArrayList<>();
+    this.attachments = new ArrayList<>();
   }
 
   public void updateContent(String content) {
@@ -34,16 +33,16 @@ public class Message extends BaseUpdatableEntity implements Serializable {
     updateTimestamp();
   }
 
-  public void addAttachment(UUID attachmentId) {
-    this.attachmentIds.add(attachmentId);
+  public void addAttachment(BinaryContent attachment) {
+    this.attachments.add(attachment);
   }
 
   @Override
   public String toString() {
     return "Message{" +
-        "senderId= " + authorId + '\'' +
+        "author= " + author + '\'' +
         ", sendTime= " + getCreatedAt() + '\'' +
-        ", channelId= " + channelId + '\'' +
+        ", channel= " + channel + '\'' +
         ", content= '" + content + '\'' +
         '}';
   }

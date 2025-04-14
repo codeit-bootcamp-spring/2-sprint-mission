@@ -3,9 +3,13 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.Message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.Message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -26,6 +30,8 @@ public class BasicMessageService implements MessageService {
   private final ChannelService channelService;
   private final UserService userService;
   private final BinaryContentRepository binaryContentRepository;
+  private final UserRepository userRepository;
+  private final ChannelRepository channelRepository;
 
   private void saveMessageData() {
     messageRepository.save();
@@ -35,11 +41,14 @@ public class BasicMessageService implements MessageService {
   public Message createMessage(CreateMessageRequest request) {
     UUID channelId = request.channelId();
     UUID authorId = request.authorId();
-    userService.validateUserExists(authorId);
-    channelService.validateChannelExists(channelId);
+
+    User author = userRepository.findUserById(authorId).orElseThrow(NoSuchElementException::new);
+    Channel channel = channelRepository.findChannelById(channelId)
+        .orElseThrow(NoSuchElementException::new);
+
     Message message = Message.builder()
-        .authorId(authorId)
-        .channelId(channelId)
+        .author(author)
+        .channel(channel)
         .content(request.content())
         .build();
 
@@ -48,8 +57,8 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public void addAttachment(UUID messageId, UUID attachmentId) {
-    findMessageById(messageId).addAttachment(attachmentId);
+  public void addAttachment(UUID messageId, BinaryContent attachment) {
+    findMessageById(messageId).addAttachment(attachment);
     messageRepository.save();
   }
 
@@ -63,8 +72,9 @@ public class BasicMessageService implements MessageService {
   @Override
   public List<BinaryContent> findAttachmentsById(UUID messageId) {
     List<BinaryContent> binaryContents = new ArrayList<>();
-    findMessageById(messageId).getAttachmentIds().forEach(attachmentId -> {
-      binaryContents.add(binaryContentRepository.findBinaryContentById(attachmentId).orElse(null));
+    findMessageById(messageId).getAttachments().forEach(attachment -> {
+      binaryContents.add(
+          binaryContentRepository.findBinaryContentById(attachment.getId()).orElse(null));
     });
 
     return binaryContents;
@@ -75,8 +85,8 @@ public class BasicMessageService implements MessageService {
     userService.validateUserExists(senderId);
     channelService.validateChannelExists(channelId);
     return messageRepository.findMessageAll().stream()
-        .filter(message -> message.getChannelId().equals(channelId))
-        .filter(message -> message.getAuthorId().equals(senderId))
+        .filter(message -> message.getChannel().getId().equals(channelId))
+        .filter(message -> message.getAuthor().getId().equals(senderId))
         .collect(Collectors.toList());
   }
 
@@ -84,7 +94,7 @@ public class BasicMessageService implements MessageService {
   public List<Message> findallByChannelId(UUID channelId) {
     channelService.validateChannelExists(channelId);
     return messageRepository.findMessageAll().stream()
-        .filter(message -> message.getChannelId().equals(channelId))
+        .filter(message -> message.getChannel().getId().equals(channelId))
         .collect(Collectors.toList());
   }
 
@@ -92,7 +102,7 @@ public class BasicMessageService implements MessageService {
   public List<Message> findallByUserId(UUID senderId) {
     userService.validateUserExists(senderId);
     return messageRepository.findMessageAll().stream()
-        .filter(message -> message.getAuthorId().equals(senderId))
+        .filter(message -> message.getAuthor().getId().equals(senderId))
         .collect(Collectors.toList());
   }
 

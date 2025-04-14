@@ -36,8 +36,8 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
   @Override
   public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
     return readStatusMap.values().stream()
-        .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-        .filter(readStatus -> readStatus.getUserId().equals(userId))
+        .filter(readStatus -> readStatus.getChannel().getId().equals(channelId))
+        .filter(readStatus -> readStatus.getUser().getId().equals(userId))
         .findFirst();
   }
 

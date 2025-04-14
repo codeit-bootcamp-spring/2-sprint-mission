@@ -1,22 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-@AllArgsConstructor
+@Entity
+@Table(name = "users")
 public class User extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
+
+  @Column(nullable = false, unique = true, length = 50)
   private String username;
+
+  @Column(nullable = false, unique = true, length = 100)
   private String email;
+
+  @Column(nullable = false, length = 60)
   private String password;
-  private UUID profileId;
+
+  @OneToOne
+  @JoinColumn(
+      name = "profile_id",
+      referencedColumnName = "id"
+  )
+  private BinaryContent profile;
 
 
   public User(String username, String email, String password) {
@@ -24,6 +40,17 @@ public class User extends BaseUpdatableEntity implements Serializable {
     this.username = username;
     this.email = email;
     this.password = password;
+  }
+
+  protected User() {
+  }
+
+  public User(String username, String email, String password, BinaryContent profile) {
+    super();
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.profile = profile;
   }
 
   public void updateEmail(String email) {
@@ -41,8 +68,8 @@ public class User extends BaseUpdatableEntity implements Serializable {
     updateTimestamp();
   }
 
-  public void updateProfile(UUID profileId) {
-    this.profileId = profileId;
+  public void updateProfile(BinaryContent profile) {
+    this.profile = profile;
   }
 
 

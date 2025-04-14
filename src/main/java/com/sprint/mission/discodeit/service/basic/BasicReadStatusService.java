@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusRequest;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -26,20 +28,13 @@ public class BasicReadStatusService implements ReadStatusService {
     UUID channelId = request.channelId();
     UUID userId = request.userId();
 
-    System.out.println(22);
-
-    if (!channelRepository.existsById(channelId)) {
-      throw new IllegalArgumentException("Channel " + channelId + "이 존재하지 않습니다.");
-    }
-    if (!userRepository.existsById(userId)) {
-      throw new IllegalArgumentException("User " + userId + "이 존재하지 않습니다.");
-    }
-
-    //validReadStatus(channelId, userId);
+    Channel channel = channelRepository.findChannelById(channelId)
+        .orElseThrow(NoSuchElementException::new);
+    User user = userRepository.findUserById(userId).orElseThrow(NoSuchElementException::new);
 
     ReadStatus readStatus = ReadStatus.builder()
-        .channelId(channelId)
-        .userId(userId)
+        .channel(channel)
+        .user(user)
         .lastReadAt(request.lastReadAt())
         .build();
     readStatusRepository.addReadStatus(readStatus);

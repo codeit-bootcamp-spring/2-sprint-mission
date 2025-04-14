@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusInfoDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -21,14 +21,14 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserRepository userRepository;
 
   @Override
-  public UserStatusInfoDto findById(UUID id) {
+  public UserStatusDto findById(UUID id) {
     UserStatus status = userStatusRepository.findUserStatusById(id)
         .orElseThrow(() -> new IllegalArgumentException("UserStatus를 찾을 수 없습니다."));
     return convert(status);
   }
 
   @Override
-  public List<UserStatusInfoDto> findAll() {
+  public List<UserStatusDto> findAll() {
     return userStatusRepository.findAllUserStatus()
         .stream()
         .map(this::convert)
@@ -66,8 +66,7 @@ public class BasicUserStatusService implements UserStatusService {
     userStatusRepository.deleteUserStatusById(id);
   }
 
-  private UserStatusInfoDto convert(UserStatus status) {
-    return new UserStatusInfoDto(status.getUserid(), status.getUserid(), status.isUserOnline(),
-        status.getUpdatedAt());
+  private UserStatusDto convert(UserStatus status) {
+    return new UserStatusDto(status.getUserid(), status.getUserid(), status.getLastActiveAt());
   }
 }

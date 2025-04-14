@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,7 +38,7 @@ public class JCFMessageRepository implements MessageRepository {
   @Override
   public Optional<Message> findLatestMessageByChannelId(UUID channelId) {
     return messages.values().stream()
-        .filter(message -> message.getChannelId().equals(channelId))
+        .filter(message -> Objects.equals(message.getChannel().getId(), channelId))
         .max(Comparator.comparing(Message::getCreatedAt));
   }
 
@@ -58,6 +59,6 @@ public class JCFMessageRepository implements MessageRepository {
 
   @Override
   public void deleteMessageByChannelId(UUID channelId) {
-    messages.values().removeIf(message -> message.getChannelId().equals(channelId));
+    messages.values().removeIf(message -> Objects.equals(message.getChannel().getId(), channelId));
   }
 }

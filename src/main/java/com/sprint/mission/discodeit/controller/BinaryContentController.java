@@ -23,8 +23,8 @@ public class BinaryContentController {
   private final BinaryContentService binaryContentService;
 
   @RequestMapping(value = "/upload", method = RequestMethod.PUT)
-  public ResponseEntity<?> upload(@RequestParam("file") MultipartFile multipartFile) {
-    UUID binaryId = binaryContentService.createBinaryContent(multipartFile);
+  public ResponseEntity<BinaryContent> upload(@RequestParam("file") MultipartFile multipartFile) {
+    BinaryContent binaryId = binaryContentService.createBinaryContent(multipartFile);
 
     return ResponseEntity.ok(binaryId);
   }

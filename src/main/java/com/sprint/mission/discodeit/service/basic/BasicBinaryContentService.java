@@ -18,7 +18,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public UUID createBinaryContent(MultipartFile profile) {
+  public BinaryContent createBinaryContent(MultipartFile profile) {
     try {
       BinaryContent binaryContent = BinaryContent.builder()
           .fileName(profile.getOriginalFilename())
@@ -28,7 +28,7 @@ public class BasicBinaryContentService implements BinaryContentService {
           .build();
       binaryContentRepository.addBinaryContent(binaryContent);
 
-      return binaryContent.getId();
+      return binaryContent;
     } catch (IOException e) {
       throw new RuntimeException("프로필 이미지 업로드 실패", e);
     }

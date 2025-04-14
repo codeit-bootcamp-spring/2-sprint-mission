@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelInfoDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
@@ -58,9 +58,9 @@ public class ChannelController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<List<ChannelInfoDto>> getAllChannels(
+  public ResponseEntity<List<ChannelDto>> getAllChannels(
       @RequestParam(name = "userId") UUID userId) {
-    List<ChannelInfoDto> channels = channelService.findAllByUserId(userId);
+    List<ChannelDto> channels = channelService.findAllByUserId(userId);
 
     return ResponseEntity.ok(channels);
   }

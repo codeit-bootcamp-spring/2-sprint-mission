@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface BinaryContentService {
 
-  UUID createBinaryContent(MultipartFile profile);
+  BinaryContent createBinaryContent(MultipartFile profile);
 
   BinaryContent findBinaryContent(UUID binaryContentId);
 

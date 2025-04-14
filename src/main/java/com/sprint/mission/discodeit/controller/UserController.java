@@ -2,11 +2,11 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserInfoDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.jwt.JwtUtil;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -32,7 +32,6 @@ public class UserController {
   private final UserService userService;
   private final AuthService authService;
   private final UserStatusService userStatusService;
-  private final JwtUtil jwtUtil;
   private final BinaryContentService binaryContentService;
 
   @RequestMapping(value = "", method = RequestMethod.POST)
@@ -41,8 +40,8 @@ public class UserController {
 
     User user = authService.register(request);
     if (!profile.isEmpty()) {
-      UUID binaryId = binaryContentService.createBinaryContent(profile);
-      user = userService.updateProfile(user.getId(), binaryId);
+      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
+      user = userService.updateProfile(user.getId(), binaryContent);
     }
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
@@ -56,8 +55,8 @@ public class UserController {
     User user = userService.updateUser(userId, request);
 
     if (!profile.isEmpty()) {
-      UUID binaryId = binaryContentService.createBinaryContent(profile);
-      userService.updateProfile(userId, binaryId);
+      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
+      userService.updateProfile(userId, binaryContent);
     }
     return ResponseEntity.ok(user);
   }
@@ -82,7 +81,7 @@ public class UserController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<List<UserInfoDto>> findAll() {
+  public ResponseEntity<List<UserDto>> findAll() {
     return ResponseEntity.ok(userService.getAllUsers());
   }
 

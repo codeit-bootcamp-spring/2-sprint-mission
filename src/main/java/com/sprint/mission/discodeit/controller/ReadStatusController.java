@@ -58,7 +58,7 @@ public class ReadStatusController {
   ) {
 
     List<ReadStatus> readStatuses = readStatusService.findAll().stream()
-        .filter(readStatus -> readStatus.getUserId().equals(userId))
+        .filter(readStatus -> readStatus.getUser().getId().equals(userId))
         .toList();
 
     return ResponseEntity.ok(readStatuses);

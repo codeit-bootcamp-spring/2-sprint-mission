@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserInfoDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -68,14 +68,14 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public List<UserInfoDto> findUsersByIds(Set<UUID> userIds) {
+  public List<UserDto> findUsersByIds(Set<UUID> userIds) {
     return userRepository.findUsersByIds(userIds).stream()
         .map(this::mapToDto)
         .collect(Collectors.toList());
   }
 
   @Override
-  public List<UserInfoDto> getAllUsers() {
+  public List<UserDto> getAllUsers() {
     return userRepository.findUserAll().stream()
         .map(this::mapToDto)
         .collect(Collectors.toList());
@@ -83,13 +83,13 @@ public class BasicUserService implements UserService {
 
   @Override
   public BinaryContent findProfileById(UUID userId) {
-    return binaryContentRepository.findBinaryContentById(findUserById(userId).getProfileId())
+    return binaryContentRepository.findBinaryContentById(findUserById(userId).getProfile().getId())
         .orElse(null);
   }
 
   @Override
-  public User updateProfile(UUID userId, UUID profileId) {
-    findUserById(userId).updateProfile(profileId);
+  public User updateProfile(UUID userId, BinaryContent binaryContent) {
+    findUserById(userId).updateProfile(binaryContent);
     userRepository.save();
 
     return findUserById(userId);
@@ -127,20 +127,12 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserInfoDto mapToDto(User user) {
+  public UserDto mapToDto(User user) {
     Boolean isOnline = userStatusRepository.findUserStatusById(user.getId())
         .map(UserStatus::isUserOnline)
         .orElse(null);
 
-    return new UserInfoDto(
-        user.getId(),
-        user.getCreatedAt(),
-        user.getUpdatedAt(),
-        user.getUsername(),
-        user.getEmail(),
-        user.getProfileId(),
-        isOnline
-    );
+    return UserDto.from(user, isOnline);
   }
 
 }

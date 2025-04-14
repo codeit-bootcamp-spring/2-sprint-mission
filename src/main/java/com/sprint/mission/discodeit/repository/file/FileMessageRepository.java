@@ -49,7 +49,7 @@ public class FileMessageRepository implements MessageRepository {
   @Override
   public Optional<Message> findLatestMessageByChannelId(UUID channelId) {
     return messages.values().stream()
-        .filter(message -> message.getChannelId().equals(channelId))
+        .filter(message -> message.getChannel().getId().equals(channelId))
         .max(Comparator.comparing(Message::getCreatedAt));
   }
 
@@ -66,7 +66,7 @@ public class FileMessageRepository implements MessageRepository {
 
   @Override
   public void deleteMessageByChannelId(UUID channelId) {
-    messages.values().removeIf(message -> message.getChannelId().equals(channelId));
+    messages.values().removeIf(message -> message.getChannel().getId().equals(channelId));
     save();
   }
 

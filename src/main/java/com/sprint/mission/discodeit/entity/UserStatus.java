@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +13,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -22,13 +20,10 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
   private final UUID userid;
   private Instant lastActiveAt;
 
-  @Builder.Default
-  private boolean status = true;
 
   public UserStatus(UUID userid, Instant lastActiveAt) {
     super();
     this.userid = userid;
-    this.status = true;
     this.lastActiveAt = lastActiveAt;
   }
 
@@ -38,6 +33,8 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
   }
 
   public void updateLastActiveAt() {
+    lastActiveAt = Instant.now();
+
     updateTimestamp();
   }
 

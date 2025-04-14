@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelInfoDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
@@ -19,9 +19,9 @@ public interface ChannelService {
 
   String findChannelNameById(UUID channelId); //채널 이름 조회
 
-  List<ChannelInfoDto> getAllChannels(); //모든 채널 조회
+  List<ChannelDto> getAllChannels(); //모든 채널 조회
 
-  List<ChannelInfoDto> findAllByUserId(UUID userId);
+  List<ChannelDto> findAllByUserId(UUID userId);
 
   Channel updateChannel(UUID channelId, UpdateChannelRequest request);
 
@@ -29,5 +29,5 @@ public interface ChannelService {
 
   void validateChannelExists(UUID channelId); // 채널 존재 확인
 
-  ChannelInfoDto mapToDto(Channel channel);
+  ChannelDto mapToDto(Channel channel);
 }
