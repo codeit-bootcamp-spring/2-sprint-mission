@@ -1,31 +1,35 @@
 package com.sprint.discodeit.sprint.domain.entity;
 
+import com.sprint.discodeit.sprint.domain.base.BaseUpdatableEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Builder
 @Getter
-public class ReadStatus implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReadStatus extends BaseUpdatableEntity {
 
-    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private UUID id;
     private UUID usersId;
     private UUID channelId;
     private Instant lastReadMessageTime;
     // True 읽음, False 안 읽음
     private Boolean readCheck;
 
-    @Builder
-    public ReadStatus(UUID usersId, Instant lastReadMessageTime, Boolean readCheck, UUID channelId) {
-        this.id = UUID.randomUUID();
-        this.usersId = usersId;
-        this.lastReadMessageTime = lastReadMessageTime;
-        this.readCheck = readCheck;
-        this.channelId = channelId;
-    }
 
     public void readUpdate(UUID channelId, Boolean readCheck, UUID usersId) {
         if(channelId != null || readCheck != null || usersId != null) {

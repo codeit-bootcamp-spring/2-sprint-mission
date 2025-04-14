@@ -1,42 +1,37 @@
 package com.sprint.discodeit.sprint.domain.entity;
 
+import com.sprint.discodeit.sprint.domain.base.BaseUpdatableEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
+@Builder
+@Entity
 @Getter
 @NoArgsConstructor
-public class users implements Serializable {
+@AllArgsConstructor
+public class Users extends BaseUpdatableEntity {
 
-    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private UUID id;
     private UUID profileId;
-    private Instant createdAt;
-    private Instant updatedAt;
     private String usersname;
     private String email;
     private String password;
     private UUID usersStatusId;
     private boolean deleted; // 삭제 여부 필드 추가
 
-    @Builder
-    public users(String usersname, String email, String password) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = null;
-        this.usersname = usersname;
-        this.email = email;
-        this.password = password;
-    }
-
-    public void associateStatus(usersStatus usersStatus) {
-        this.usersStatusId = usersStatus.getId();
-    }
 
     public void associateProfileId(BinaryContent binaryContent) {
         this.profileId = binaryContent.getId();
@@ -57,9 +52,6 @@ public class users implements Serializable {
             anyValueUpdated = true;
         }
 
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
     }
 
     public void softDelete() {

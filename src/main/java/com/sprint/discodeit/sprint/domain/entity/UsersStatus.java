@@ -1,6 +1,5 @@
 package com.sprint.discodeit.sprint.domain.entity;
 
-import com.sprint.discodeit.sprint.domain.ChannelType;
 import com.sprint.discodeit.sprint.domain.base.BaseUpdatableEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,32 +13,22 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
-@Builder
 @Entity
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Channel extends BaseUpdatableEntity {
+@Builder
+public class UsersStatus extends BaseUpdatableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private ChannelType type;
-    private String name;
-    private String description;
+    private String statusType;
 
-    public void update(String newName, String newDescription) {
-        boolean anyValueUpdated = false;
-        if (newName != null && !newName.equals(this.name)) {
-            this.name = newName;
-            anyValueUpdated = true;
+    public void updateStatus(String statusType) {
+        if (statusType != null) {
+            this.statusType = statusType;
         }
-        if (newDescription != null && !newDescription.equals(this.description)) {
-            this.description = newDescription;
-            anyValueUpdated = true;
-        }
-
     }
 }

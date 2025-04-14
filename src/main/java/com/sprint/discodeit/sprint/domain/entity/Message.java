@@ -1,19 +1,30 @@
 package com.sprint.discodeit.sprint.domain.entity;
 
+import com.sprint.discodeit.sprint.domain.base.BaseEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Builder
+@Entity
 @Getter
-public class Message implements Serializable {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Message extends BaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private static final long serialVersionUID = 1L;
-
-    private UUID id;
     private Instant createdAt;
     private Instant updatedAt;
     private String content;
@@ -22,16 +33,6 @@ public class Message implements Serializable {
     private UUID authorId;
     private List<UUID>  attachmentIds;
 
-    @Builder
-    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = null;
-        this.content = content;
-        this.channelId = channelId;
-        this.authorId = authorId;
-        this.attachmentIds = attachmentIds;
-    }
 
     public void update(String newContent) {
         boolean anyValueUpdated = false;
