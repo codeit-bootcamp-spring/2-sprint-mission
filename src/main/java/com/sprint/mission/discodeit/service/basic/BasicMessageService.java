@@ -33,11 +33,11 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public Message createMessage(CreateMessageRequest request) {
-    UUID channelId = request.getChannelId();
-    UUID authorId = request.getAuthorId();
+    UUID channelId = request.channelId();
+    UUID authorId = request.authorId();
     userService.validateUserExists(authorId);
     channelService.validateChannelExists(channelId);
-    Message message = new Message(authorId, channelId, request.getContent());
+    Message message = new Message(authorId, channelId, request.content());
 
     messageRepository.addMessage(message);
     return message;
@@ -95,7 +95,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public Message updateMessage(UUID messageId, UpdateMessageRequest request) {
     Message message = findMessageById(messageId);
-    message.updateContent(request.getNewContent());
+    message.updateContent(request.newContent());
     saveMessageData();
 
     return message;

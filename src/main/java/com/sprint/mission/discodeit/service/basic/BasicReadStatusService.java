@@ -23,8 +23,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public ReadStatus createReadStatus(CreateReadStatusRequest request) {
-    UUID channelId = request.getChannelId();
-    UUID userId = request.getUserId();
+    UUID channelId = request.channelId();
+    UUID userId = request.userId();
 
     System.out.println(22);
 
@@ -37,7 +37,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     //validReadStatus(channelId, userId);
 
-    ReadStatus readStatus = new ReadStatus(channelId, userId, request.getLastReadAt());
+    ReadStatus readStatus = new ReadStatus(channelId, userId, request.lastReadAt());
     readStatusRepository.addReadStatus(readStatus);
 
     return readStatus;

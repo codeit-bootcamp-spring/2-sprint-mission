@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -39,7 +40,7 @@ public class BasicChannelService implements ChannelService {
   public Channel createPrivateChannel(CreatePrivateChannelRequest request) {
     Channel channel = new Channel(ChannelType.PRIVATE, "", "");
     UUID channelId = channel.getId();
-    request.getParticipantIds().forEach(userId -> {
+    request.participantIds().forEach(userId -> {
       if (!userRepository.existsById(userId)) {
         throw new IllegalArgumentException("User " + userId + " 는 존재하지 않습니다.");
       }
@@ -51,8 +52,8 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel createPublicChannel(CreatePublicChannelRequest request) {
-    Channel channel = new Channel(ChannelType.PUBLIC, request.getName(),
-        request.getDescription());
+    Channel channel = new Channel(ChannelType.PUBLIC, request.name(),
+        request.description());
     channelRepository.addChannel(channel);
     return channel;
   }
@@ -111,11 +112,11 @@ public class BasicChannelService implements ChannelService {
       throw new UnsupportedOperationException("PRIVATE 채널은 수정할 수 없습니다.");
     }
 
-    if (request.getNewName() != null) {
-      channel.updateChannelName(request.getNewName());
+    if (request.newName() != null) {
+      channel.updateChannelName(request.newName());
     }
-    if (request.getNewDescription() != null) {
-      channel.updateDescription(request.getNewDescription());
+    if (request.newDescription() != null) {
+      channel.updateDescription(request.newDescription());
     }
 
     saveChannelData();
@@ -139,23 +140,22 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public ChannelInfoDto mapToDto(Channel channel) {
-    ChannelInfoDto dto = new ChannelInfoDto();
-    dto.setId(channel.getId());
-    dto.setName(channel.getName());
-    dto.setDescription(channel.getDescription());
-    dto.setType(channel.getType());
+    Instant lastMessageAt = messageRepository.findLatestMessageByChannelId(channel.getId())
+        .map(Message::getCreatedAt)
+        .orElse(null);
 
-    messageRepository.findLatestMessageByChannelId(channel.getId())
-        .ifPresentOrElse(
-            message -> dto.setLastMessageAt(message.getCreatedAt()),
-            () -> dto.setLastMessageAt(null)  // 메시지가 없으면 null로 설정
-        );
-
-    dto.setParticipantIds(readStatusRepository.findAllReadStatus().stream()
+    List<UUID> participantIds = readStatusRepository.findAllReadStatus().stream()
         .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
         .map(ReadStatus::getUserId)
-        .toList());
+        .toList();
 
-    return dto;
+    return new ChannelInfoDto(
+        channel.getId(),
+        channel.getType(),
+        channel.getName(),
+        channel.getDescription(),
+        lastMessageAt,
+        participantIds
+    );
   }
 }

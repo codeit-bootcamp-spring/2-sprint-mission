@@ -24,38 +24,32 @@ public class BasicAuthService implements AuthService {
 
   @Override
   public User register(CreateUserRequest request) {
-    String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
+    String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
 
-    if (userRepository.existsByEmail(request.getEmail())) {
+    if (userRepository.existsByEmail(request.email())) {
       throw new IllegalArgumentException("이미 존재하는 Email입니다");
     }
-    if (userRepository.existsByUsername(request.getUsername())) {
+    if (userRepository.existsByUsername(request.username())) {
       throw new IllegalArgumentException("이미 존재하는 Username입니다");
     }
 
-    User user = new User(request.getUsername(), request.getEmail(), hashedPassword);
+    User user = new User(request.username(), request.email(), hashedPassword);
     userRepository.addUser(user);
     userStatusRepository.addUserStatus(new UserStatus(user.getId(), Instant.now()));
 
     return user;
-
-//    return RegisterResponse.builder()
-//        .userId(user.getId())
-//        .success(true)
-//        .message("회원 가입이 완료되었습니다.")
-//        .build();
   }
 
   @Override
   public User login(LoginRequest request) {
-    User user = userRepository.findUserByName(request.getUsername())
+    User user = userRepository.findUserByName(request.username())
         .orElseThrow(NoSuchElementException::new);
     if (user == null) {
       throw new NoSuchElementException("존재하지 않는 유저입니다.");
     }
 
     // 비밀번호 검증
-    if (!BCrypt.checkpw(request.getPassword(), user.getPassword())) {
+    if (!BCrypt.checkpw(request.password(), user.getPassword())) {
       throw new RuntimeException("비밀번호가 일치하지 않습니다.");
     }
 
@@ -64,11 +58,5 @@ public class BasicAuthService implements AuthService {
     userStatusRepository.save();
 
     return user;
-
-//    return LoginResponse.builder()
-//        .success(true)
-//        .message("성공적으로 로그인 되었습니다.")
-//        .token(token)
-//        .build();
   }
 }

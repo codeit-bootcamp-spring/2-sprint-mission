@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentListResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import java.util.List;
@@ -35,12 +36,12 @@ public class BinaryContentController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<List<BinaryContent>> getBinaryContents(
+  public ResponseEntity<BinaryContentListResponse> getBinaryContents(
       @RequestParam("binaryContentIds") List<UUID> binaryIds) {
     List<BinaryContent> binaryContents = binaryIds.stream()
         .map(binaryContentService::findBinaryContent)
         .toList();
 
-    return ResponseEntity.ok(binaryContents);
+    return ResponseEntity.ok(new BinaryContentListResponse(binaryContents));
   }
 }

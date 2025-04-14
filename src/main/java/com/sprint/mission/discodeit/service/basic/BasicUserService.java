@@ -29,22 +29,18 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
 
-  private void saveUser() {
-    userRepository.save();
-  }
-
   @Override
   public User createUser(CreateUserRequest request) {
-    String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
+    String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
 
-    if (userRepository.existsByEmail(request.getEmail())) {
+    if (userRepository.existsByEmail(request.email())) {
       throw new IllegalArgumentException("이미 존재하는 Email입니다");
     }
-    if (userRepository.existsByUsername(request.getUsername())) {
+    if (userRepository.existsByUsername(request.username())) {
       throw new IllegalArgumentException("이미 존재하는 Username입니다");
     }
 
-    User user = new User(request.getUsername(), request.getEmail(), hashedPassword);
+    User user = new User(request.username(), request.email(), hashedPassword);
     userRepository.addUser(user);
     userStatusRepository.addUserStatus(new UserStatus(user.getId(), Instant.now()));
 
@@ -94,14 +90,14 @@ public class BasicUserService implements UserService {
   public User updateUser(UUID userId, UpdateUserRequest request) {
     User user = findUserById(userId);
 
-    if (request.getNewUsername() != null) {
-      user.updateUsername(request.getNewUsername());
+    if (request.newUsername() != null) {
+      user.updateUsername(request.newUsername());
     }
-    if (request.getNewPassword() != null) {
-      user.updatePassword(request.getNewPassword());
+    if (request.newPassword() != null) {
+      user.updatePassword(request.newPassword());
     }
-    if (request.getNewEmail() != null) {
-      user.updateEmail(request.getNewEmail());
+    if (request.newEmail() != null) {
+      user.updateEmail(request.newEmail());
     }
 
     return user;
@@ -127,15 +123,15 @@ public class BasicUserService implements UserService {
         .map(UserStatus::isUserOnline)
         .orElse(null);
 
-    UserInfoDto dto = new UserInfoDto();
-    dto.setId(user.getId());
-    dto.setCreateAt(user.getCreatedAt());
-    dto.setUpdateAt(user.getUpdatedAt());
-    dto.setUsername(user.getUsername());
-    dto.setEmail(user.getEmail());
-    dto.setOnline(isOnline);
-    dto.setProfileId(user.getProfileId());
-    return dto;
+    return new UserInfoDto(
+        user.getId(),
+        user.getCreatedAt(),
+        user.getUpdatedAt(),
+        user.getUsername(),
+        user.getEmail(),
+        user.getProfileId(),
+        isOnline
+    );
   }
 
 }

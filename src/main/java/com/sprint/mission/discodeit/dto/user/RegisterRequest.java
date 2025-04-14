@@ -1,13 +1,9 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import lombok.Builder;
-import lombok.Data;
+public record RegisterRequest(
+    String username,
+    String email,
+    String password
+) {
 
-@Data
-@Builder
-public class RegisterRequest {
-
-  private String username;
-  private String email;
-  private String password;
 }

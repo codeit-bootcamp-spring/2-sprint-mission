@@ -55,7 +55,7 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatus update(UUID userId, UserStatusUpdateRequest request) {
     UserStatus status = userStatusRepository.findUserStatusById(userId)
         .orElseThrow(() -> new IllegalArgumentException("UserStatus를 찾을 수 없습니다."));
-    status.setLastActiveAt(request.getNewLastActiveAt());
+    status.setLastActiveAt(request.newLastActiveAt());
     userStatusRepository.addUserStatus(status);
 
     return status;
