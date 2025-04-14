@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.core.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
@@ -21,10 +22,12 @@ public class User extends BaseUpdatableEntity {
   private String email;
   @Column(name = "password", length = 60, nullable = false)
   private String password;
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+
+  @OneToOne(mappedBy = "users", cascade = CascadeType.ALL)
   private UserStatus userStatus;
 
-  //TODO. USER-BinaryContent 연관관계 매핑해야함 : OneToOne 관계
+  @OneToOne(orphanRemoval = true)
+  @JoinColumn(name = "profile_id")
   private UUID profileId;
 
   private User(String name, String email, String password, UUID profileId) {
