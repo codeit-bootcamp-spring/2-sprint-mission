@@ -5,12 +5,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "user_statuses")
