@@ -10,17 +10,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Entity
 @Getter
 @AllArgsConstructor
@@ -78,6 +74,9 @@ public class Message extends BaseEntity {
             anyValueUpdated = true;
         }
     }
-
+    @Builder
+    public Message(String content) {
+        this.content = content;
+    }
 
 }
