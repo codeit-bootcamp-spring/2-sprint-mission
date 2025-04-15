@@ -43,19 +43,21 @@ public class MessageServiceImpl implements MessageService {
         return message;
     }
 
-//    @Override
-//    public Message find(Long messageId) {
-//        Message message = messageRepository.findById(messageId).orElseThrow(() -> new NoSuchElementException(messageId + " 없는 회원 입니다"));
-//        return message;
-//    }
 
     @Override
     public List<ChannelMessageResponseDto> findChannel(Long channelId) {
-        List<Message> message = messageRepository.findByChannelId(channelId);
-        if(message.isEmpty()){
+        List<Message> messages = messageRepository.findByChannelId(channelId);
+        if(messages.isEmpty()){
             throw new NoSuchElementException(channelId + " 없는 채널 입니다");
         }
-        return new ChannelMessageResponseDto();
+        return messages.stream()
+                .map(message -> new ChannelMessageResponseDto(
+                        message.getId(),
+                        message.getContent(),
+                        message.getUsers().getUsername(),  // 예: 발신자 이름
+                        message.getCreatedAt()
+                ))
+                .toList();
     }
 
 
