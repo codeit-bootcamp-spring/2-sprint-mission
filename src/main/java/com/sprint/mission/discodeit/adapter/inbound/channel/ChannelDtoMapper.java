@@ -3,30 +3,23 @@ package com.sprint.mission.discodeit.adapter.inbound.channel;
 import com.sprint.mission.discodeit.adapter.inbound.channel.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.channel.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.channel.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.adapter.inbound.channel.response.ChannelResponse;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
 import java.util.UUID;
+import org.mapstruct.Mapper;
 
-public final class ChannelDtoMapper {
+@Mapper(componentModel = "spring")
+public interface ChannelDtoMapper {
 
-  private ChannelDtoMapper() {
-  }
+  ChannelResponse toCreateResponse(ChannelResult channelResult);
 
-  static CreatePublicChannelCommand toCreatePublicChannelCommand(
-      PublicChannelCreateRequest requestBody) {
-    return new CreatePublicChannelCommand(requestBody.name(), requestBody.description());
-  }
+  CreatePublicChannelCommand toCreatePublicChannelCommand(PublicChannelCreateRequest requestBody);
 
-  static CreatePrivateChannelCommand toCreatePrivateChannelCommand(
-      PrivateChannelCreateRequest requestBody) {
-    return new CreatePrivateChannelCommand(requestBody.participantIds());
-  }
+  CreatePrivateChannelCommand toCreatePrivateChannelCommand(
+      PrivateChannelCreateRequest requestBody);
 
-  static UpdateChannelCommand toUpdateChannelCommand(UUID channelId,
-      ChannelUpdateRequest requestBody) {
-    return new UpdateChannelCommand(channelId, requestBody.newName(), requestBody.newDescription());
-//    return new UpdateChannelCommand(id, requestBody.newName(), requestBody.newType());
-  }
-
+  UpdateChannelCommand toUpdateChannelCommand(UUID channelId, ChannelUpdateRequest requestBody);
 }

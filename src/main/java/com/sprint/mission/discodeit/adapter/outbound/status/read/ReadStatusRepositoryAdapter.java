@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.adapter.outbound.status.read;
 
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.port.ReadStatusRepositoryPort;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,6 +43,12 @@ public class ReadStatusRepositoryAdapter implements ReadStatusRepositoryPort {
   @Override
   public List<ReadStatus> findAllByChannelId(UUID channelId) {
     return jpaReadStatusRepository.findAllByChannel_Id(channelId);
+  }
+
+  @Override
+  public Instant findLastActiveAtByChannelId(UUID channelId) {
+    ReadStatus readStatus = findByChannelId(channelId);
+    return readStatus.getLastReadAt();
   }
 
   @Override

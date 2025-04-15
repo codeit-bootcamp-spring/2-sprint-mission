@@ -1,21 +1,15 @@
 package com.sprint.mission.discodeit.adapter.inbound.message;
 
-import static com.sprint.mission.discodeit.adapter.inbound.message.MessageDtoMapper.toCreateMessageCommand;
-import static com.sprint.mission.discodeit.adapter.inbound.message.MessageDtoMapper.toUpdateMessageCommand;
-
 import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageCreateResponse;
 import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageDeleteResponse;
-import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageUpdateResponse;
+import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageResponse;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.message.usecase.MessageService;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageListResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,10 +38,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/messages")
 public class MessageController {
 
+  private final MessageDtoMapper messageDtoMapper;
   private final MessageService messageService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<MessageCreateResponse> create(
+  public ResponseEntity<MessageResponse> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest requestBody,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments)
       throws IOException {
@@ -64,12 +59,12 @@ public class MessageController {
             .toList())
         .orElse(new ArrayList<>());
 
-    CreateMessageCommand command = toCreateMessageCommand(requestBody);
+    CreateMessageCommand command = messageDtoMapper.toCreateMessageCommand(requestBody);
 
-    CreateMessageResult result = messageService.create(command, attachmentRequests);
+    MessageResult result = messageService.create(command, attachmentRequests);
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(MessageCreateResponse.create(result.message()));
+        .body(messageDtoMapper.toCreateResponse(result));
   }
 
   @GetMapping
@@ -80,12 +75,12 @@ public class MessageController {
   }
 
   @PatchMapping("/{messageId}")
-  public ResponseEntity<MessageUpdateResponse> updateMessage(
+  public ResponseEntity<MessageResponse> updateMessage(
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest requestBody) {
-    UpdateMessageCommand command = toUpdateMessageCommand(messageId, requestBody);
-    UpdateMessageResult result = messageService.update(command);
-    return ResponseEntity.ok(MessageUpdateResponse.create(result.message()));
+    UpdateMessageCommand command = messageDtoMapper.toUpdateMessageCommand(messageId, requestBody);
+    MessageResult result = messageService.update(command);
+    return ResponseEntity.ok(messageDtoMapper.toCreateResponse(result));
   }
 
   @DeleteMapping("/{messageId}")

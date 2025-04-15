@@ -1,16 +1,11 @@
 package com.sprint.mission.discodeit.adapter.inbound.status;
 
-import static com.sprint.mission.discodeit.adapter.inbound.status.ReadStatusDtoMapper.toCreateReadStatusCommand;
-import static com.sprint.mission.discodeit.adapter.inbound.status.ReadStatusDtoMapper.toUpdateReadStatusCommand;
-
 import com.sprint.mission.discodeit.adapter.inbound.status.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.status.request.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.status.response.ReadStatusCreateResponse;
-import com.sprint.mission.discodeit.adapter.inbound.status.response.ReadStatusFindResponse;
-import com.sprint.mission.discodeit.adapter.inbound.status.response.ReadStatusUpdateResponse;
-import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
+import com.sprint.mission.discodeit.adapter.inbound.status.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.core.status.usecase.read.ReadStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
@@ -32,34 +27,36 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/readStatuses")
 public class ReadStatusController {
 
+  private final ReadStatusDtoMapper readStatusDtoMapper;
   private final ReadStatusService readStatusService;
 
   @PostMapping
-  public ResponseEntity<ReadStatusCreateResponse> createReadStatus(
+  public ResponseEntity<ReadStatusResponse> createReadStatus(
       @RequestBody ReadStatusCreateRequest requestBody) {
-    CreateReadStatusCommand command = toCreateReadStatusCommand(requestBody);
-    ReadStatus status = readStatusService.create(command);
+    CreateReadStatusCommand command = readStatusDtoMapper.toCreateReadStatusCommand(requestBody);
+    ReadStatusResult result = readStatusService.create(command);
 
-    return ResponseEntity.ok(ReadStatusCreateResponse.create(status));
+    return ResponseEntity.ok(readStatusDtoMapper.toCreateResponse(result));
   }
 
   @PatchMapping
-  public ResponseEntity<ReadStatusUpdateResponse> updateReadStatus(
+  public ResponseEntity<ReadStatusResponse> updateReadStatus(
       @RequestParam UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest requestBody) {
-    UpdateReadStatusCommand command = toUpdateReadStatusCommand(readStatusId, requestBody);
-    ReadStatus status = readStatusService.updateReadStatus(command);
-    return ResponseEntity.ok(ReadStatusUpdateResponse.create(status));
+    UpdateReadStatusCommand command = readStatusDtoMapper.toUpdateReadStatusCommand(readStatusId,
+        requestBody);
+    ReadStatusResult result = readStatusService.updateReadStatus(command);
+    return ResponseEntity.ok(readStatusDtoMapper.toCreateResponse(result));
   }
 
   @GetMapping
-  public ResponseEntity<List<ReadStatusFindResponse>> findAllByUserId(
+  public ResponseEntity<List<ReadStatusResponse>> findAllByUserId(
       @RequestParam("userId") UUID userId) {
-    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
-    List<ReadStatusFindResponse> list = new ArrayList<>();
+    List<ReadStatusResult> readStatuses = readStatusService.findAllByUserId(userId);
+    List<ReadStatusResponse> list = new ArrayList<>();
 
-    for (ReadStatus readStatus : readStatuses) {
-      list.add(ReadStatusFindResponse.create(readStatus));
+    for (ReadStatusResult readStatus : readStatuses) {
+      list.add(readStatusDtoMapper.toCreateResponse(readStatus));
     }
 
     return ResponseEntity.ok(list);

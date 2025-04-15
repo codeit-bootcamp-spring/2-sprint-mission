@@ -1,3 +1,5 @@
+-- drop table if exists binary_contents, users, user_statuses, channels, messages, read_statuses,message_attachments;
+
 create table if not exists binary_contents
 (
     id           uuid primary key,
@@ -36,6 +38,8 @@ create table if not exists user_statuses
             on delete cascade
 );
 
+create type channel_type as enum ('PUBLIC','PRIVATE');
+
 create table if not exists channels
 (
     id          uuid primary key,
@@ -43,7 +47,7 @@ create table if not exists channels
     updated_at  timestamp,
     name        varchar(100),
     description varchar(500),
-    type        varchar(10)                         not null
+    type        channel_type                        not null
 );
 
 create table if not exists messages

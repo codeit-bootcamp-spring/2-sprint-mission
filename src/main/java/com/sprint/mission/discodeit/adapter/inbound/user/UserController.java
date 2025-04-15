@@ -1,24 +1,19 @@
 package com.sprint.mission.discodeit.adapter.inbound.user;
 
 
-import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.toCreateUserCommand;
-import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.toUpdateUserCommand;
-
 import com.sprint.mission.discodeit.adapter.inbound.user.request.UserCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.user.request.UserStatusRequest;
 import com.sprint.mission.discodeit.adapter.inbound.user.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.user.response.UserCreateResponse;
 import com.sprint.mission.discodeit.adapter.inbound.user.response.UserDeleteResponse;
+import com.sprint.mission.discodeit.adapter.inbound.user.response.UserResponse;
 import com.sprint.mission.discodeit.adapter.inbound.user.response.UserStatusResponse;
-import com.sprint.mission.discodeit.adapter.inbound.user.response.UserUpdateResponse;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
-import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.OnlineUserStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusResult;
 import com.sprint.mission.discodeit.core.user.usecase.UserService;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserListResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,11 +42,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/users")
 public class UserController {
 
+  private final UserStatusDtoMapper userStatusDtoMapper;
+  private final UserDtoMapper userDtoMapper;
   private final UserService userService;
   private final UserStatusService userStatusService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserCreateResponse> register(
+  public ResponseEntity<UserResponse> register(
       @RequestPart("userCreateRequest") @Valid UserCreateRequest requestBody,
       @RequestPart(value = "profile", required = false) MultipartFile file
   ) {
@@ -59,9 +56,9 @@ public class UserController {
     Optional<CreateBinaryContentCommand> binaryContentRequest = Optional.ofNullable(file)
         .flatMap(this::resolveProfileRequest);
 
-    CreateUserCommand command = toCreateUserCommand(requestBody);
-    CreateUserResult result = userService.create(command, binaryContentRequest);
-    return ResponseEntity.ok(UserCreateResponse.create(result.user()));
+    CreateUserCommand command = userDtoMapper.toCreateUserCommand(requestBody);
+    UserResult result = userService.create(command, binaryContentRequest);
+    return ResponseEntity.ok(userDtoMapper.toCreateResponse(result));
   }
 
   private Optional<CreateBinaryContentCommand> resolveProfileRequest(MultipartFile profileFile) {
@@ -86,7 +83,7 @@ public class UserController {
   }
 
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserUpdateResponse> updateUser(
+  public ResponseEntity<UserResponse> updateUser(
       @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest requestBody,
       @RequestPart(value = "profile", required = false) MultipartFile file) {
@@ -94,10 +91,10 @@ public class UserController {
     Optional<CreateBinaryContentCommand> binaryContentRequest = Optional.ofNullable(file)
         .flatMap(this::resolveProfileRequest);
 
-    UpdateUserCommand command = toUpdateUserCommand(userId, requestBody);
+    UpdateUserCommand command = userDtoMapper.toUpdateUserCommand(userId, requestBody);
 
-    UpdateUserResult result = userService.update(command, binaryContentRequest);
-    return ResponseEntity.ok(UserUpdateResponse.create(result.user()));
+    UserResult result = userService.update(command, binaryContentRequest);
+    return ResponseEntity.ok(userDtoMapper.toCreateResponse(result));
   }
 
   @DeleteMapping("/{userId}")
@@ -109,11 +106,9 @@ public class UserController {
   @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UserStatusResponse> online(@PathVariable UUID userId,
       @RequestBody UserStatusRequest requestBody) {
-    UserStatus status = userStatusService.findByUserId(userId);
+    UserStatusResult result = userService.online(
+        OnlineUserStatusCommand.create(userId, requestBody));
 
-    status.update(requestBody.newLastActiveAt());
-    boolean online = status.isOnline();
-
-    return ResponseEntity.ok(UserStatusResponse.create(status, online));
+    return ResponseEntity.ok(userStatusDtoMapper.toCreateResponse(result));
   }
 }

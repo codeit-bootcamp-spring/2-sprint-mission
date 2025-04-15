@@ -9,17 +9,16 @@ import static com.sprint.mission.discodeit.exception.user.UserErrors.userNameNot
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
-import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.OnlineUserStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UpdateUserStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusResult;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserListResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import com.sprint.mission.discodeit.logging.CustomLogging;
@@ -31,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,11 +42,12 @@ public class BasicUserService implements UserService {
   private final UserRepositoryPort userRepositoryPort;
   private final BinaryContentRepositoryPort binaryContentRepositoryPort;
 
+  @Transactional
   @Override
-  public CreateUserResult create(CreateUserCommand command,
+  public UserResult create(CreateUserCommand command,
       Optional<CreateBinaryContentCommand> binaryContentDTO) {
     BinaryContent profile = null;
-    validateUser(command.name(), command.email());
+    validateUser(command.username(), command.email());
 
 //    String hashedPassword = BCrypt.hashpw(command.password(), BCrypt.gensalt());
 
@@ -54,15 +55,15 @@ public class BasicUserService implements UserService {
       profile = makeBinaryContent(binaryContentDTO);
     }
 
-    User user = User.create(command.name(), command.email(), command.password(), profile);
+    User user = User.create(command.username(), command.email(), command.password(), profile);
     userRepositoryPort.save(user);
     logger.info("User registered: {}", user.getId());
 
-    UserStatus status = userStatusService.create(
+    UserStatusResult statusResult = userStatusService.create(
         new CreateUserStatusCommand(user.getId(), Instant.now()));
-    logger.info("User Status created: {}", status.getId());
+    logger.info("User Status created: {}", statusResult.id());
 
-    return new CreateUserResult(user);
+    return UserResult.create(user, user.getUserStatus().isOnline());
   }
 
   private void validateUser(String name, String email) {
@@ -91,7 +92,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public LoginUserResult login(LoginUserCommand command) {
+  public UserResult login(LoginUserCommand command) {
     User user = userRepositoryPort.findByName(command.username()).orElseThrow(
         () -> userNameNotFoundError(command.username())
     );
@@ -100,18 +101,17 @@ public class BasicUserService implements UserService {
       userLoginFailedError(user.getId(), "Password mismatch");
     }
 
-    logger.info("User login: id {}, name {}, password  {}", user.getId(), user.getName(),
+    logger.info("User login: id {}, username {}, password  {}", user.getId(), user.getName(),
         user.getPassword());
 
-    return new LoginUserResult(user);
+    return UserResult.create(user, user.getUserStatus().isOnline());
   }
 
   @Override
   public UserResult findById(UUID userId) {
     User user = userRepositoryPort.findById(userId)
         .orElseThrow(() -> userIdNotFoundError(userId));
-    boolean online = userStatusService.findByUserId(userId).isOnline();
-    return UserResult.create(user, online);
+    return UserResult.create(user, user.getUserStatus().isOnline());
   }
 
   @Override
@@ -120,13 +120,13 @@ public class BasicUserService implements UserService {
 
     return new UserListResult(userList.stream().map(user -> UserResult.create(
         user,
-        userStatusService.findByUserId(user.getId()).isOnline())
+        userStatusService.isOnline(user.getId()))
     ).toList());
   }
 
   @CustomLogging
   @Override
-  public UpdateUserResult update(UpdateUserCommand command,
+  public UserResult update(UpdateUserCommand command,
       Optional<CreateBinaryContentCommand> binaryContentDTO) {
 
     User user = userRepositoryPort.findById(command.requestUserId())
@@ -138,9 +138,9 @@ public class BasicUserService implements UserService {
     }
     BinaryContent newProfile = makeBinaryContent(binaryContentDTO);
     user.update(command.newName(), command.newEmail(), command.newPassword(), newProfile);
-    logger.info("User Updated: name {}, email {}, password {}", user.getName(), user.getEmail(),
+    logger.info("User Updated: username {}, email {}, password {}", user.getName(), user.getEmail(),
         user.getPassword());
-    return new UpdateUserResult(userRepositoryPort.save(user));
+    return UserResult.create(user, user.getUserStatus().isOnline());
   }
 
   @CustomLogging
@@ -163,4 +163,15 @@ public class BasicUserService implements UserService {
     return userRepositoryPort.findById(userId).isPresent();
   }
 
+  @Override
+  public UserStatusResult online(OnlineUserStatusCommand command) {
+    User user = userRepositoryPort.findById(command.userId()).orElseThrow(
+        () -> userIdNotFoundError(command.userId())
+    );
+    UserStatusResult statusResult = userStatusService.findByUserId(user.getId());
+
+    return userStatusService.update(
+        new UpdateUserStatusCommand(statusResult.userId(), statusResult.userId(),
+            command.lastActiveAt()));
+  }
 }

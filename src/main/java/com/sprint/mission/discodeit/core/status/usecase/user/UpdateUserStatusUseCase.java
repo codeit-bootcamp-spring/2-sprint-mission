@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.core.status.usecase.user;
 
-import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.UpdateUserStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusResult;
 
 public interface UpdateUserStatusUseCase {
 
-  UserStatus update(UpdateUserStatusCommand command);
+  UserStatusResult update(UpdateUserStatusCommand command);
 
 
 }

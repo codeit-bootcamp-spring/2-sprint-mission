@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface FindChannelUseCase {
 
-  ChannelResult findChannelByChannelId(UUID channelId);
+  ChannelResult find(UUID channelId);
 
   ChannelListResult findChannelsByUserId(UUID userId);
 

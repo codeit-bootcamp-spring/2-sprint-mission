@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.core.status.usecase.user;
 
-import com.sprint.mission.discodeit.core.status.entity.UserStatus;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusResult;
 import java.util.List;
 import java.util.UUID;
 
 public interface FindUserStatusUseCase {
 
-  UserStatus findByUserId(UUID userId);
+  UserStatusResult findByUserId(UUID userId);
 
-  UserStatus findByStatusId(UUID userStatusId);
+  UserStatusResult findByStatusId(UUID userStatusId);
 
-  List<UserStatus> findAll();
+  List<UserStatusResult> findAll();
 
 
 }

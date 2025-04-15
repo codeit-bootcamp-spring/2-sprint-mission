@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.adapter.inbound.content;
 
-import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
+import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -22,15 +22,15 @@ public class BinaryController {
   private final BinaryContentService binaryContentService;
 
   @GetMapping
-  public ResponseEntity<List<BinaryContent>> findAllBinaryContent(
+  public ResponseEntity<List<BinaryContentResult>> findAllBinaryContent(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
-    List<BinaryContent> allByIdIn = binaryContentService.findAllByIdIn(binaryContentIds);
+    List<BinaryContentResult> allByIdIn = binaryContentService.findAllByIdIn(binaryContentIds);
 
     return ResponseEntity.ok(allByIdIn);
   }
 
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContent> findBinaryContent(@PathVariable UUID binaryContentId) {
+  public ResponseEntity<BinaryContentResult> findBinaryContent(@PathVariable UUID binaryContentId) {
 
     return ResponseEntity.ok(binaryContentService.findById(binaryContentId));
   }

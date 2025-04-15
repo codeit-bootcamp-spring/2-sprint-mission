@@ -1,23 +1,22 @@
 package com.sprint.mission.discodeit.adapter.inbound.message;
 
+import com.sprint.mission.discodeit.adapter.inbound.content.BinaryContentDtoMapper;
 import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
+import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageResponse;
+import com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
+import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import java.util.UUID;
+import org.mapstruct.Mapper;
 
-public final class MessageDtoMapper {
+@Mapper(componentModel = "spring", uses = {UserDtoMapper.class, BinaryContentDtoMapper.class})
+public interface MessageDtoMapper {
 
-  private MessageDtoMapper() {
-  }
+  MessageResponse toCreateResponse(MessageResult message);
 
-  static CreateMessageCommand toCreateMessageCommand(MessageCreateRequest requestBody) {
-    return new CreateMessageCommand(requestBody.authorId(), requestBody.channelId(),
-        requestBody.content());
-  }
+  CreateMessageCommand toCreateMessageCommand(MessageCreateRequest requestBody);
 
-  static UpdateMessageCommand toUpdateMessageCommand(UUID messageId,
-      MessageUpdateRequest requestBody) {
-    return new UpdateMessageCommand(messageId, requestBody.newText());
-  }
+  UpdateMessageCommand toUpdateMessageCommand(UUID messageId, MessageUpdateRequest requestBody);
 }

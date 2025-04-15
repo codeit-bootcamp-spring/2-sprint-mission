@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.adapter.inbound.user;
 
-import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.toLoginUserCommand;
-
 import com.sprint.mission.discodeit.adapter.inbound.user.request.UserLoginRequest;
-import com.sprint.mission.discodeit.adapter.inbound.user.response.UserLoginResponse;
+import com.sprint.mission.discodeit.adapter.inbound.user.response.UserResponse;
 import com.sprint.mission.discodeit.core.user.usecase.UserLoginUseCase;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserResult;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+  private final UserDtoMapper userDtoMapper;
   private final UserLoginUseCase loginUseCase;
 
   @PostMapping("/login")
-  public ResponseEntity<UserLoginResponse> login(@RequestBody UserLoginRequest requestBody) {
-    LoginUserCommand command = toLoginUserCommand(requestBody);
-    LoginUserResult result = loginUseCase.login(command);
+  public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest requestBody) {
+    LoginUserCommand command = userDtoMapper.toLoginUserCommand(requestBody);
+    UserResult result = loginUseCase.login(command);
 
-    return ResponseEntity.ok(UserLoginResponse.create(result.user()));
+    return ResponseEntity.ok(userDtoMapper.toCreateResponse(result));
   }
 
 }

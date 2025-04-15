@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserStatusService extends CreateUserStatusUseCase, FindUserStatusUseCase,
     UpdateUserStatusUseCase,
-    DeleteUserStatusUseCase {
+    DeleteUserStatusUseCase, OnlineUserStatusUseCase {
 
 }

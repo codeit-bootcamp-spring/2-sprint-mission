@@ -11,11 +11,9 @@ import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContent
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageListResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageResult;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.exception.channel.ChannelErrors;
@@ -26,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,12 +37,13 @@ public class BasicMessageService implements MessageService {
   private final MessageRepositoryPort messageRepository;
   private final BinaryContentRepositoryPort binaryContentRepository;
 
+  @Transactional
   @Override
-  public CreateMessageResult create(CreateMessageCommand command,
+  public MessageResult create(CreateMessageCommand command,
       List<CreateBinaryContentCommand> binaryContentCommands) {
 
-    User user = userRepository.findById(command.userId()).orElseThrow(
-        () -> UserErrors.userIdNotFoundError(command.userId())
+    User user = userRepository.findById(command.authorId()).orElseThrow(
+        () -> UserErrors.userIdNotFoundError(command.authorId())
     );
 
     Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
@@ -62,7 +62,7 @@ public class BasicMessageService implements MessageService {
           return binaryContentRepository.save(binaryContent);
         }).toList();
 
-    Message message = Message.create(user, channel, command.text(),
+    Message message = Message.create(user, channel, command.content(),
         binaryContentIdList);
 
     Message save = messageRepository.save(message);
@@ -72,29 +72,31 @@ public class BasicMessageService implements MessageService {
         message.getId(), channel.getId(), user.getId(), message.getContent(),
         message.getAttachmentIds());
 
-    return new CreateMessageResult(save);
+    return MessageResult.create(save, user);
   }
 
   @Override
   public MessageResult findMessageByMessageId(UUID messageId) {
-    return MessageResult.create(messageRepository.findById(messageId)
-        .orElseThrow(() -> messageIdNotFoundError(messageId)));
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(() -> messageIdNotFoundError(messageId));
+    return MessageResult.create(message, message.getAuthor());
   }
 
   @Override
   public MessageListResult findMessagesByChannelId(UUID channelId) {
     return new MessageListResult(
-        messageRepository.findAllByChannelId(channelId).stream().map(MessageResult::create)
+        messageRepository.findAllByChannelId(channelId).stream()
+            .map(message -> MessageResult.create(message, message.getAuthor()))
             .toList());
   }
 
   @Override
-  public UpdateMessageResult update(UpdateMessageCommand command) {
+  public MessageResult update(UpdateMessageCommand command) {
     Message message = messageRepository.findById(command.messageId())
         .orElseThrow(() -> messageIdNotFoundError(command.messageId()));
 
     message.update(command.newText());
-    return new UpdateMessageResult(message);
+    return MessageResult.create(message, message.getAuthor());
   }
 
   @Override

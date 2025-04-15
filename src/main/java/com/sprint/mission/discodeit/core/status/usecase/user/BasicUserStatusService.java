@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.port.UserStatusRepositoryPort;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.UpdateUserStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusResult;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.exception.status.user.UserStatusError;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +26,10 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserRepositoryPort userRepository;
   private final UserStatusRepositoryPort userStatusRepository;
 
-  @Override
   @CustomLogging
-  public UserStatus create(CreateUserStatusCommand command) {
+  @Transactional
+  @Override
+  public UserStatusResult create(CreateUserStatusCommand command) {
     User user = userRepository.findById(command.userId()).orElseThrow(
         () -> userIdNotFoundError(command.userId())
     );
@@ -39,32 +42,31 @@ public class BasicUserStatusService implements UserStatusService {
     //없으면 진행
     UserStatus userStatus = UserStatus.create(user, command.lastActiveAt());
     userStatusRepository.save(userStatus);
-    return userStatus;
+    return UserStatusResult.create(userStatus);
   }
 
 
   @Override
-  public UserStatus findByUserId(UUID userId) {
-    return userStatusRepository.findByUserId(userId)
-        .orElseThrow(() -> userStatusIdNotFoundError(userId));
+  public UserStatusResult findByUserId(UUID userId) {
+    return UserStatusResult.create(userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> userStatusIdNotFoundError(userId)));
+  }
+
+  @Override
+  public UserStatusResult findByStatusId(UUID userStatusId) {
+    return UserStatusResult.create(userStatusRepository.findByStatusId(userStatusId)
+        .orElseThrow(() -> userStatusIdNotFoundError(userStatusId)));
 
   }
 
   @Override
-  public UserStatus findByStatusId(UUID userStatusId) {
-    return userStatusRepository.findByStatusId(userStatusId)
-        .orElseThrow(() -> userStatusIdNotFoundError(userStatusId));
-
-  }
-
-  @Override
-  public List<UserStatus> findAll() {
-    return userStatusRepository.findAll();
+  public List<UserStatusResult> findAll() {
+    return userStatusRepository.findAll().stream().map(UserStatusResult::create).toList();
   }
 
   @Override
   @CustomLogging
-  public UserStatus update(UpdateUserStatusCommand command) {
+  public UserStatusResult update(UpdateUserStatusCommand command) {
     UserStatus userStatus;
     if (command.userId() != null) {
       userStatus = userStatusRepository.findByUserId(command.userId()).orElseThrow(
@@ -80,7 +82,15 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     userStatus.update(command.newLastActiveAt());
-    return userStatus;
+    return UserStatusResult.create(userStatus);
+  }
+
+  @Override
+  public boolean isOnline(UUID userId) {
+    UserStatus status = userStatusRepository.findByUserId(userId).orElseThrow(
+        () -> userStatusIdNotFoundError(userId)
+    );
+    return status.isOnline();
   }
 
   @Override

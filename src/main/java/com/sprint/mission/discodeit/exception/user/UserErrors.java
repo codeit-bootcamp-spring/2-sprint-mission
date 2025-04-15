@@ -7,7 +7,7 @@ public final class UserErrors {
   private UserErrors() {
   }
 
-  public static final String USER_NAME_ALREADY_EXISTS_MESSAGE = "User with name %s already exists";
+  public static final String USER_NAME_ALREADY_EXISTS_MESSAGE = "User with username %s already exists";
   public static final String USER_EMAIL_ALREADY_EXISTS_MESSAGE = "User with email %s already exists";
   public static final String USER_NOT_FOUND_MESSAGE = "User not found: %s";
   public static final String USER_LOGIN_FAILED_MESSAGE = "User with id %s login failed: %s";
