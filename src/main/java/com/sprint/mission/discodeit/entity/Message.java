@@ -1,25 +1,57 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-@Getter
-public class Message extends BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private final UUID authorId;
-    private final UUID channelId;
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@NoArgsConstructor
+@Entity
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    private List<UUID> attachmentIds;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name = "message_attachments",
+            joinColumns = @JoinColumn(name = "message_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id"),
+            foreignKey = @ForeignKey(name = "fk_messages_message_attachments"),
+            inverseForeignKey = @ForeignKey(name = "fk_binary_contents_message_attachments")
+    )
+    private List<BinaryContent> attachments = new ArrayList<>();
 
-    public Message(UUID authorId, UUID channelId, String content, List<UUID> attachmentIds) {
+    public Message(User author, Channel channel, String content, List<BinaryContent> attachments) {
         super();
-        this.authorId = authorId;
-        this.channelId = channelId;
+        this.author = author;
+        this.channel = channel;
         this.content = content;
-        this.attachmentIds = attachmentIds;
+        this.attachments = attachments;
     }
 
     public void update(String newContent) {
@@ -32,17 +64,5 @@ public class Message extends BaseEntity implements Serializable {
         if (anyValueUpdated) {
             updateUpdatedAt();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id=" + id + '\'' +
-                ", authorId=" + authorId + '\'' +
-                ", channelId=" + channelId + '\'' +
-                ", content='" + content + '\'' +
-                ", createdAt=" + createdAt + '\'' +
-                ", updatedAt=" + updatedAt +
-                '}';
     }
 }
