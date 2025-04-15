@@ -7,8 +7,6 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class BinaryContent extends BaseUpdatableEntity {
 
     @Id
@@ -16,7 +14,8 @@ public class BinaryContent extends BaseUpdatableEntity {
     private Long id;
 
     private String fileType; // 이미지, PDF 등 파일 타입
-    private String filePath;
+    private Long fileSize;
+    private String fileName;
 
     // Users 엔티티와의 연관관계: ManyToOne
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,9 +26,16 @@ public class BinaryContent extends BaseUpdatableEntity {
     @JoinColumn(name = "message_id")
     private Message message;
 
-    public void update(String fileType, String filePath) {
-        if (fileType != null && filePath != null) {
-            this.filePath = filePath;
+    @Builder
+    public BinaryContent(Long fileSize, String fileType, String fileName) {
+        this.fileSize = fileSize;
+        this.fileType = fileType;
+        this.fileName = fileName;
+    }
+
+    public void update(String fileType, Long fileSize) {
+        if (fileType != null && fileSize != null) {
+            this.fileSize = fileSize;
             this.fileType = fileType;
         }
     }

@@ -1,66 +1,56 @@
 package com.sprint.discodeit.sprint.service.basic.util;
 
-import com.sprint.discodeit.sprint.domain.dto.binaryContentDto.BinaryContentRequestDto;
-import com.sprint.discodeit.sprint.domain.dto.binaryContentDto.BinaryContentUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.BinaryContent;
-import com.sprint.discodeit.sprint.repository.file.BaseBinaryContentRepository;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.sprint.discodeit.sprint.domain.storage.BinaryContentStorage;
+import com.sprint.discodeit.sprint.repository.BinaryContentRepository;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class BinaryContentService {
+public class BinaryContentService implements BinaryService {
 
-    private final BaseBinaryContentRepository baseBinaryContentRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
 
-    public BinaryContent creat(BinaryContentRequestDto binaryContentRequestDto){
-        BinaryContent binaryContent = new BinaryContent(binaryContentRequestDto.fileType(), binaryContentRequestDto.filePath());
-        return binaryContent;
-    }
+    @Override
+    public BinaryContent createProfileImage(String imgUrl) {
+        try {
+            // 1. 외부 URL에서 이미지 다운로드
+            byte[] fileBytes = downloadImageAsBytes(imgUrl);
 
-    public BinaryContent find(UUID binaryContentId){
-        BinaryContent binaryContent = baseBinaryContentRepository.findById(binaryContentId).orElseThrow(() -> new IllegalArgumentException("찾을 수 없는 파일 입니다. "));
-        return binaryContent;
-    }
+            // 2. 메타 정보 생성
+            BinaryContent binaryContent = BinaryContent.builder()
+                    .fileName(extractFileName(imgUrl))
+                    .fileSize((long) fileBytes.length)
+                    .fileType("image/png") // 실제 contentType 구할 수도 있음
+                    .build();
 
-    public List<BinaryContent> findAll(){
-        return baseBinaryContentRepository.findByAll();
-    }
+            // 3. 메타 정보 저장
+            binaryContentRepository.save(binaryContent);
 
-    public void update(BinaryContentUpdateRequestDto binaryContentRequestDto){
-        BinaryContent binaryContent = baseBinaryContentRepository.findById(binaryContentRequestDto.binaryContentId()).orElseThrow(() -> new IllegalArgumentException("찾을 수 없는 파일 입니다. "));
-        binaryContent.update(binaryContentRequestDto.fileType(), binaryContentRequestDto.filePath());
-    }
+            // 4. 실제 파일 저장
+            binaryContentStorage.put(binaryContent.getId(), fileBytes);
 
-    public void delete(UUID binaryContentId){
-        baseBinaryContentRepository.delete(binaryContentId);
-    }
+            return binaryContent;
 
-
-    public List<BinaryContent> convertToBinaryContents(List<String> originals) {
-        List<BinaryContent> result = new ArrayList<>();
-
-        if (originals == null || originals.isEmpty()) {
-            return result;
-        }
-
-        for (String file : originals) {
-            result.add(BinaryContent.builder()
-                    .fileType("이미지")
-                    .filePath(file)
-                    .build());
-        }
-        return result;
-    }
-
-
-    public void saveBinaryContents(List<BinaryContent> binaryContent) {
-        for(BinaryContent file : binaryContent){
-            baseBinaryContentRepository.save(file);
+        } catch (Exception e) {
+            throw new RuntimeException("프로필 이미지 저장 실패", e);
         }
     }
 
+    private byte[] downloadImageAsBytes(String imgUrl) throws IOException {
+        try (InputStream in = new URL(imgUrl).openStream()) {
+            return in.readAllBytes();
+        }
+    }
+
+    private String extractFileName(String imgUrl) {
+        return imgUrl.substring(imgUrl.lastIndexOf("/") + 1);
+    }
 }
+
+
