@@ -2,89 +2,73 @@ package com.sprint.mission.discodeit.entity;
 
 // 필요한 import 추가
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
+import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Objects; // equals/hashCode 위해 남겨둘 수 있음 (혹시 부모 클래스에 없다면)
+import java.util.Set;
 import java.util.UUID;
-import java.util.ArrayList;
-import java.util.Collection; // findPrivateChannels 타입 수정
 
 @Getter
-@Setter
 @Entity
-@NoArgsConstructor
-public class Channel extends BaseUpdatableEntity {
+@Table(name = "channels")
+public class Channel extends BaseEntity { // <<<--- 부모 클래스 상속 (클래스 이름은 실제 사용하는 것으로 변경)
 
     @Enumerated(EnumType.STRING)
     private ChannelType type;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String name;
+
     private String description;
 
-    @Column(nullable = false)
-    private User ownerId; // 우선 ID 유지
 
-//    @ElementCollection(fetch = FetchType.EAGER)
-//    @CollectionTable(name = "channel_users", joinColumns = @JoinColumn(name = "channel_id"))
-//    @Column(name = "user_id")
-//    private List<UUID> userList = new ArrayList<>(); // Null 방지
+    @OneToMany(
+        mappedBy = "channel",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    private final Set<UserChannel> participants = new HashSet<>();
 
 
-    public Channel(String name, UUID ownerId, String description) {
+    protected Channel() {
+        super(); // 부모 클래스 생성자 호출
+    }
+
+    // 공개 채널
+    public Channel(String name, String description) {
         super();
         this.type = ChannelType.PUBLIC;
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Channel name cannot be empty.");
+        }
         this.name = name;
-        this.ownerId = ownerId;
         this.description = description;
     }
 
-    public Channel(String name, UUID ownerId) {
-        super();
-        this.type = ChannelType.PUBLIC;
-        this.name = name;
-        this.ownerId = ownerId;
+    //설명 x
+    public Channel(String name) {
+        this(name, null);
     }
-
-    public Channel(UUID ownerId, List<UUID> participantIds) {
-        super();
-        this.type = ChannelType.PRIVATE;
-        this.ownerId = ownerId;
-        if (participantIds != null) {
-            this.userList = new ArrayList<>(participantIds);
-        }
-        if (!this.userList.contains(ownerId)) {
-            this.userList.add(ownerId);
-        }
-        this.name = "Private_" + UUID.randomUUID().toString().substring(0, 8);
-    }
-
-    public Channel(String channelName, UUID ownerId, List<UUID> participantIds) {
-        super();
-        this.type = ChannelType.PRIVATE;
-        this.name = channelName;
-        this.ownerId = ownerId;
-        if (participantIds != null) {
-            this.userList = new ArrayList<>(participantIds);
-        }
-
-        if (!this.userList.contains(ownerId)) {
-            this.userList.add(ownerId);
-        }
-    }
-
 
     public boolean update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
         if (newName != null && !newName.isEmpty() && !newName.equals(this.name)) {
+            if (newName.isBlank()) {
+                throw new IllegalArgumentException("Channel name cannot be empty.");
+            }
             this.name = newName;
             anyValueUpdated = true;
         }
-        // description은 null로 업데이트 될 수도 있음
         if (newDescription == null && this.description != null) {
             this.description = null;
             anyValueUpdated = true;
@@ -96,7 +80,6 @@ public class Channel extends BaseUpdatableEntity {
     }
 
 
-    // isPublic, isPrivate 메서드 유지
     public boolean isPublic() {
         return this.type == ChannelType.PUBLIC;
     }
@@ -106,19 +89,32 @@ public class Channel extends BaseUpdatableEntity {
     }
 
 
-    // leaveChannel, addParticipant 메서드 유지
-    public void leaveChannel(UUID userId) {
-        if (this.userList != null) {
-            this.userList.remove(userId);
+    public void leaveChannel(User user) {
+
+        if (user == null) {
+            return;
+        }
+        for (Iterator<UserChannel> iterator = this.channelUsers.iterator(); iterator.hasNext(); ) {
+            UserChannel userChannel = iterator.next();
+            if (userChannel.getUser() != null && userChannel.getUser().equals(user)) {
+                iterator.remove();
+                return;
+            }
         }
     }
 
-    public void addParticipant(UUID userId) {
-        if (this.userList == null) {
-            this.userList = new ArrayList<>();
+    public void addParticipant(User user) {
+
+        if (user == null) {
+            return;
         }
-        if (!this.userList.contains(userId)) {
-            this.userList.add(userId);
+        boolean alreadyExists = this.channelUsers.stream()
+            .anyMatch(uc -> uc.getUser() != null && uc.getUser().equals(user));
+        if (!alreadyExists) {
+            UserChannel userChannel = new UserChannel(user, this);
+            this.channelUsers.add(userChannel);
         }
     }
+
+
 }

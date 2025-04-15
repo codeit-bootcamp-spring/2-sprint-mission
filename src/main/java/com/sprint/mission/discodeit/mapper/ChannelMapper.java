@@ -22,7 +22,8 @@ public class ChannelMapper {
             channel.getType(),
             channel.getName(),
             channel.getDescription(),
-            channel.getParticipants()
+            channel.getParticipants(),
+
         );
 
     }

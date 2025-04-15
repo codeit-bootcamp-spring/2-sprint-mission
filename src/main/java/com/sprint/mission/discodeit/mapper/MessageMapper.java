@@ -22,7 +22,7 @@ public class MessageMapper {
             message.getContent(),
             message.getChannel().getId(),
             userMapper.toDto(message.getAuthor()),
-            binaryContentMapper.toDto(message)
+            binaryContentMapper.toDto()
         );
 
     }

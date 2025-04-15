@@ -76,3 +76,12 @@ CREATE TABLE message_attachments
     FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE,
     FOREIGN KEY (attachment_id) REFERENCES binary_contents (id) ON DELETE CASCADE
 );
+
+CREATE TABLE user_channels
+(
+    id         UUID NOT NULL,
+    user_id    UUID NOT NULL,
+    channel_id UUID NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE,
+    FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE
+);

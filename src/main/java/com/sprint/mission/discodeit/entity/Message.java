@@ -19,17 +19,17 @@ public class Message extends BaseUpdatableEntity {
     @Lob
     private String content;
 
-    // 다 대 일 단방향
+    // message-> channel 단방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id", referencedColumnName = "id", nullable = false)
     private Channel channel;
 
-    //다 대 일 단방향
+    //message-> user 단방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", referencedColumnName = "id", nullable = false)
     private User author;
-    
-    // 1대 다 조인 테이블 생성
+
+    //  message-> binary 조인 테이블
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinTable(
         name = "message_attachments",

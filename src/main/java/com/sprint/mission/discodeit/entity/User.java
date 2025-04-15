@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,6 +32,14 @@ public class User extends BaseUpdatableEntity {
     // 외래키를 가진 status를 주인으로 설정(양방향)
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private UserStatus userStatus;
+
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL, // 업데이트 시 같이 업데이트 됨
+        orphanRemoval = true,     // 삭제
+        fetch = FetchType.LAZY
+    )
+    private Set<UserChannel> userChannels = new HashSet<>(); // UserChannel 엔티티와의 일대다 관계
 
 
     public User(String email, String password) {
