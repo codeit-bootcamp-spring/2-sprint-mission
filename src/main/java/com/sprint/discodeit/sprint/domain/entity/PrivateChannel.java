@@ -1,21 +1,20 @@
 package com.sprint.discodeit.sprint.domain.entity;
 
+import static lombok.AccessLevel.PROTECTED;
+import com.sprint.discodeit.sprint.domain.ChannelType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor
-@SuperBuilder
 public class PrivateChannel extends Channel {
 
     @OneToMany(mappedBy = "privateChannel", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -24,6 +23,14 @@ public class PrivateChannel extends Channel {
     public void addPrivateChannelUser(Users user) {
         PrivateChannelUser rel = new PrivateChannelUser(user, this);
         this.privateChannelUsers.add(rel);
+    }
+
+    private PrivateChannel(String name, String description) {
+        super(ChannelType.PRIVATE, name, description);
+    }
+
+    public static PrivateChannel create(String name, String description) {
+        return new PrivateChannel(name, description);
     }
 
 

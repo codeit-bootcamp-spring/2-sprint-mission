@@ -1,5 +1,7 @@
 package com.sprint.discodeit.sprint.domain.entity;
 
+import static lombok.AccessLevel.PROTECTED;
+
 import com.sprint.discodeit.sprint.domain.ChannelType;
 import com.sprint.discodeit.sprint.domain.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
@@ -13,16 +15,12 @@ import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
-
-@SuperBuilder
-@Getter
-@NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 @Inheritance(strategy = InheritanceType.JOINED)
 @Entity
 public abstract class Channel extends BaseUpdatableEntity {
@@ -37,6 +35,12 @@ public abstract class Channel extends BaseUpdatableEntity {
     private ChannelType type;
     private String name;
     private String description;
+
+    protected Channel(ChannelType type, String name, String description) {
+        this.type = type;
+        this.name = name;
+        this.description = description;
+    }
 
     public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
