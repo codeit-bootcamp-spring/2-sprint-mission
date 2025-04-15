@@ -11,13 +11,13 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 @Entity
 @Table(name = "channels")
 public class Channel extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  @Column(nullable = false, length = 100)
+
+  @Column(length = 100)
   private String name;
 
   @Column(length = 500)
@@ -27,6 +27,8 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
   @Column(nullable = false, length = 10)
   private ChannelType type;
 
+
+  @Builder
   public Channel(ChannelType type, String name, String description) {
     super();
     this.type = type;

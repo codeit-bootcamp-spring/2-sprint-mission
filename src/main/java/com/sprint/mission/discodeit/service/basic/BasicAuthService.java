@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.dto.user.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.jwt.JwtUtil;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.repository.Interface.UserRepository;
+import com.sprint.mission.discodeit.repository.Interface.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.time.Instant;
 import java.util.NoSuchElementException;
@@ -41,10 +41,11 @@ public class BasicAuthService implements AuthService {
 
     userRepository.addUser(user);
     UserStatus userStatus = UserStatus.builder()
-        .userid(user.getId())
+        .user(user)
         .lastActiveAt(Instant.now())
         .build();
 
+    user.setStatus(userStatus);
     userStatusRepository.addUserStatus(userStatus);
 
     return user;
@@ -58,7 +59,6 @@ public class BasicAuthService implements AuthService {
       throw new NoSuchElementException("존재하지 않는 유저입니다.");
     }
 
-    // 비밀번호 검증
     if (!BCrypt.checkpw(request.password(), user.getPassword())) {
       throw new RuntimeException("비밀번호가 일치하지 않습니다.");
     }

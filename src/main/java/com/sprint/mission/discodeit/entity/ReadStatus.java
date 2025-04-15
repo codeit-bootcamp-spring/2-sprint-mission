@@ -15,7 +15,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 @Entity
 @Table(name = "read_statuses", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"user_id", "channel_id"})
@@ -31,9 +30,10 @@ public class ReadStatus extends BaseUpdatableEntity implements Serializable {
   @JoinColumn(name = "channel_id", nullable = false)
   private Channel channel;
 
-  @Column(nullable = false)
+  @Column(name = "last_read_at", nullable = false)
   private Instant lastReadAt;
 
+  @Builder
   public ReadStatus(Channel channel, User user, Instant lastReadAt) {
     super();
     this.channel = channel;

@@ -1,29 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 
 @Getter
 @Builder
+@AllArgsConstructor
 @Entity
 @Table(name = "messages")
 public class Message extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @Column(columnDefinition = "TEXT")
+  @Lob
   private String content;
 
   @ManyToOne
@@ -34,6 +36,7 @@ public class Message extends BaseUpdatableEntity implements Serializable {
   @JoinColumn(name = "author_id")
   private User author;
 
+  @Builder.Default
   @ManyToMany
   @JoinTable(
       name = "message_attachments",
@@ -47,7 +50,6 @@ public class Message extends BaseUpdatableEntity implements Serializable {
     this.author = author;
     this.channel = channel;
     this.content = content;
-    this.attachments = new ArrayList<>();
   }
 
   protected Message() {

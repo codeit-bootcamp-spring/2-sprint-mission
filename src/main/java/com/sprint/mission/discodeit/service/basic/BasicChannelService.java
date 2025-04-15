@@ -10,12 +10,11 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.repository.Interface.ChannelRepository;
+import com.sprint.mission.discodeit.repository.Interface.MessageRepository;
+import com.sprint.mission.discodeit.repository.Interface.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.Interface.UserRepository;
+import com.sprint.mission.discodeit.repository.Interface.UserStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.time.Instant;
 import java.util.List;
@@ -161,13 +160,7 @@ public class BasicChannelService implements ChannelService {
     List<UserDto> participants = readStatusRepository.findAllReadStatus().stream()
         .filter(rs -> rs.getChannel().getId().equals(channel.getId()))
         .map(ReadStatus::getUser)
-        .map(user -> {
-          boolean isOnline = userStatusRepository.findUserStatusById(user.getId())
-              .map(UserStatus::isUserOnline)
-              .orElse(false);
-
-          return UserDto.from(user, isOnline);
-        })
+        .map(UserDto::from)
         .toList();
 
     return ChannelDto.from(channel, participants, lastMessageAt);

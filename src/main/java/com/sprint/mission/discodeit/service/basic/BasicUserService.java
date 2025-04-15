@@ -6,9 +6,9 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.repository.Interface.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.Interface.UserRepository;
+import com.sprint.mission.discodeit.repository.Interface.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
 import java.util.List;
@@ -48,7 +48,7 @@ public class BasicUserService implements UserService {
 
     userRepository.addUser(user);
     UserStatus userStatus = UserStatus.builder()
-        .userid(user.getId())
+        .user(user)
         .lastActiveAt(Instant.now())
         .build();
     userStatusRepository.addUserStatus(userStatus);
@@ -70,14 +70,14 @@ public class BasicUserService implements UserService {
   @Override
   public List<UserDto> findUsersByIds(Set<UUID> userIds) {
     return userRepository.findUsersByIds(userIds).stream()
-        .map(this::mapToDto)
+        .map(UserDto::from)
         .collect(Collectors.toList());
   }
 
   @Override
   public List<UserDto> getAllUsers() {
     return userRepository.findUserAll().stream()
-        .map(this::mapToDto)
+        .map(UserDto::from)
         .collect(Collectors.toList());
   }
 
@@ -125,14 +125,4 @@ public class BasicUserService implements UserService {
       throw new RuntimeException("존재하지 않는 유저입니다.");
     }
   }
-
-  @Override
-  public UserDto mapToDto(User user) {
-    Boolean isOnline = userStatusRepository.findUserStatusById(user.getId())
-        .map(UserStatus::isUserOnline)
-        .orElse(null);
-
-    return UserDto.from(user, isOnline);
-  }
-
 }

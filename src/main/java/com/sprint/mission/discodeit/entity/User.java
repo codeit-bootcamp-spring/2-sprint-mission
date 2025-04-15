@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -34,12 +35,18 @@ public class User extends BaseUpdatableEntity implements Serializable {
   )
   private BinaryContent profile;
 
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private UserStatus status;
 
-  public User(String username, String email, String password) {
+
+  public User(String username, String email, String password, BinaryContent profile,
+      UserStatus status) {
     super();
     this.username = username;
     this.email = email;
     this.password = password;
+    this.profile = profile;
+    this.status = status;
   }
 
   protected User() {
@@ -72,6 +79,9 @@ public class User extends BaseUpdatableEntity implements Serializable {
     this.profile = profile;
   }
 
+  public void setStatus(UserStatus status) {
+    this.status = status;
+  }
 
   @Override
   public String toString() {

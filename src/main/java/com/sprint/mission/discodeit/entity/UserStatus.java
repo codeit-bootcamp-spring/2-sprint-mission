@@ -28,7 +28,7 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
   @JoinColumn(name = "user_id", nullable = false, unique = true)
   private User user;
 
-  @Column(nullable = false)
+  @Column(name = "last_active_at", nullable = false)
   private Instant lastActiveAt;
 
 
