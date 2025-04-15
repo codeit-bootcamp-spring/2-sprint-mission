@@ -17,7 +17,7 @@ public record UserStatusDto(
 
     return new UserStatusDto(
         userStatus.getId(),
-        userStatus.getUserid(),
+        userStatus.getUser().getId(),
         userStatus.getLastActiveAt()
     );
   }

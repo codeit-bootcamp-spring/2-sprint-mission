@@ -12,7 +12,7 @@ public record UserDto(
     Boolean online
 ) {
 
-  public static UserDto from(User user, Boolean online) {
+  public static UserDto from(User user) {
     if (user == null) {
       return null;
     }
@@ -22,7 +22,7 @@ public record UserDto(
         user.getUsername(),
         user.getEmail(),
         BinaryContentDto.from(user.getProfile()),
-        online
+        user.getStatus().isUserOnline()
     );
   }
 }
