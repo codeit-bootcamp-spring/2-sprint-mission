@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +24,10 @@ public class Message extends BaseUpdatableEntity {
   @ManyToOne(optional = true)
   @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "fk_message_author"))
   private User author;
+
+  // FK: message_attachments.message_id → messages(id), ON DELETE CASCADE
+  @OneToMany(mappedBy = "message")
+  private List<MessageAttachment> attachments = new ArrayList<>();
 
   public Message(String content, Channel channel, User author) {
     this.content = content;

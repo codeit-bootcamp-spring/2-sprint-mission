@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,6 +24,14 @@ public class Channel extends BaseUpdatableEntity{
 
   @Column(length = 500)
   private String description;
+
+  // FK: messages.channel_id → channels(id), ON DELETE CASCADE
+  @OneToMany(mappedBy = "channel")
+  private List<Message> messages = new ArrayList<>();
+
+  // FK: read_statuses.channel_id → channels(id), ON DELETE CASCADE
+  @OneToMany(mappedBy = "channel")
+  private List<ReadStatus> readStatuses = new ArrayList<>();
 
   public Channel(ChannelType type, String name, String description) {
     this.type = type;
