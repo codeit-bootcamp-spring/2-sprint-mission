@@ -1,20 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
 
+@Entity
+@Table(name = "users")
 @Getter
+@NoArgsConstructor
 public class User extends BaseUpdatableEntity implements Serializable, Identifiable {
 
   private static final long serialVersionUID = 1L;
+
+  @OneToOne
+  @JoinColumn(name = "profile_id")
   private BinaryContent profile;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private UserStatus userStatus;
+
+  @Column(length = 50, nullable = false, unique = true)
   private String username;
+
+  @Column(length = 100, nullable = false, unique = true)
   private String email;
+
+  @Column(length = 60, nullable = false)
   private String password;
 
 
@@ -27,6 +48,7 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
     this.username = username;
     this.email = email;
     this.password = password;
+
   }
 
 
