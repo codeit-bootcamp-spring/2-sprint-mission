@@ -18,26 +18,6 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public BinaryContent save(MultipartFile file) throws IOException {
-    if (file.isEmpty()) {
-      throw new NoSuchElementException("File is empty");
-    }
-
-    String fileName = file.getOriginalFilename();
-    String contentType = file.getContentType();
-    byte[] bytes = file.getBytes();
-
-    BinaryContent binaryContent = BinaryContent.builder()
-        .fileName(fileName)
-        .contentType(contentType)
-        .bytes(bytes)
-        .size((long) bytes.length)
-        .build();
-    binaryContentRepository.save(binaryContent);
-    return binaryContent;
-  }
-
-  @Override
   public BinaryContent findById(UUID binaryContentId) {
     return binaryContentRepository.findById(binaryContentId)
         .orElseThrow(
@@ -50,10 +30,5 @@ public class BasicBinaryContentService implements BinaryContentService {
         .filter(binaryContent -> binaryContentIdList.contains(binaryContent.getId()))
         .map(binaryContent -> findById(binaryContent.getId()))
         .toList();
-  }
-
-  @Override
-  public void delete(UUID userStatusId) {
-    binaryContentRepository.delete(findById(userStatusId));
   }
 }
