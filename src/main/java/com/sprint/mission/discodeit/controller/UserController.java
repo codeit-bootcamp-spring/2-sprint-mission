@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusResponse;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
@@ -193,7 +193,7 @@ public class UserController {
           description = "User 온라인 상태가 성공적으로 업데이트됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = UpdateUserStatusResponse.class)
+              schema = @Schema(implementation = UserStatusDto.class)
           )
       ),
       @ApiResponse(
@@ -205,14 +205,14 @@ public class UserController {
           )
       )
   })
-  public ResponseEntity<UpdateUserStatusResponse> updateUserStatusByUserId(
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
       @PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest dto
   ) {
     System.out.println(dto.newLastActiveAt());
-    UpdateUserStatusResponse updateUserStatusResponse = userStatusService.updateByUserId(userId,
+    UserStatusDto userStatusDto = userStatusService.updateByUserId(userId,
         dto);
     return ResponseEntity.status(HttpStatus.OK)
-        .body(updateUserStatusResponse);
+        .body(userStatusDto);
   }
 }

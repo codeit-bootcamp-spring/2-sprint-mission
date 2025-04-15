@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusResponse;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -19,10 +20,11 @@ public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
+  private final UserStatusMapper userStatusMapper;
 
   @Override
   @Transactional
-  public UpdateUserStatusResponse updateByUserId(UUID userId,
+  public UserStatusDto updateByUserId(UUID userId,
       UserStatusUpdateRequest userStatusUpdateRequest) {
 
     User user = userRepository.findById(userId)
@@ -35,8 +37,6 @@ public class BasicUserStatusService implements UserStatusService {
 
     userStatus.updateLastLoginTime(userStatusUpdateRequest.newLastActiveAt());
 
-    return new UpdateUserStatusResponse(userStatus.getId(), userStatus.getUser().getId(),
-        userStatus.getLastActiveAt(), userStatus.isLastStatus(), userStatus.getCreatedAt(),
-        userStatus.getUpdatedAt());
+    return userStatusMapper.toDto(userStatus);
   }
 }
