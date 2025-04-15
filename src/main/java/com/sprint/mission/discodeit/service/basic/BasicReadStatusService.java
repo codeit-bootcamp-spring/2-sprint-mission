@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.RestException;
 import com.sprint.mission.discodeit.exception.ResultCode;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -30,6 +32,11 @@ public class BasicReadStatusService implements ReadStatusService {
     UUID userId = request.userId();
     UUID channelId = request.channelId();
 
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new RestException(ResultCode.NOT_FOUND));
+    Channel channel = channelRepository.findById(channelId)
+        .orElseThrow(() -> new RestException(ResultCode.NOT_FOUND));
+
     if (!userRepository.existsById(userId)) {
       throw new RestException(ResultCode.NOT_FOUND);
     }
@@ -37,12 +44,12 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new RestException(ResultCode.NOT_FOUND);
     }
     if (readStatusRepository.findAllByUserId(userId).stream()
-        .anyMatch(readStatus -> readStatus.getChannelId().equals(channelId))) {
+        .anyMatch(readStatus -> readStatus.getChannel().getId().equals(channelId))) {
       throw new RestException(ResultCode.BAD_REQUEST);
     }
 
     Instant lastReadAt = request.lastReadAt();
-    ReadStatus readStatus = new ReadStatus(userId, channelId, lastReadAt);
+    ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt);
     return readStatusRepository.save(readStatus);
   }
 

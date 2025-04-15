@@ -9,11 +9,13 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.RestException;
 import com.sprint.mission.discodeit.exception.ResultCode;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,9 +28,9 @@ import java.util.*;
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-  //
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
+  private final UserRepository userRepository;
 
   public ChannelDto createChannel(ChannelCreateRequest request) {
     Channel channel;
@@ -40,9 +42,9 @@ public class BasicChannelService implements ChannelService {
       channel = new Channel(ChannelType.PRIVATE, null, null);
       channelRepository.save(channel);
 
-      List<UUID> participantIds = request.participantIds();
+      List<User> participantIds = userRepository.findAllById(request.participantIds());
       participantIds.stream()
-          .map(userId -> new ReadStatus(userId, channel.getId(), Instant.MIN))
+          .map(user -> new ReadStatus(user, channel, Instant.MIN))
           .forEach(readStatusRepository::save);
     } else {
       throw new RestException(ResultCode.BAD_REQUEST);
@@ -64,8 +66,13 @@ public class BasicChannelService implements ChannelService {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     Channel createdChannel = channelRepository.save(channel);
 
-    request.participantIds().stream()
-        .map(userId -> new ReadStatus(userId, createdChannel.getId(), Instant.MIN))
+    List<User> participants = userRepository.findAllById(request.participantIds());
+    if (participants.size() != request.participantIds().size()) {
+      throw new RestException(ResultCode.NOT_FOUND);
+    }
+
+    participants.stream()
+        .map(user -> new ReadStatus(user, createdChannel, Instant.MIN))
         .forEach(readStatusRepository::save);
 
     return createdChannel;
@@ -82,7 +89,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
-        .map(ReadStatus::getChannelId)
+        .map(rs -> rs.getChannel().getId())
         .toList();
 
     return channelRepository.findAll().stream()
@@ -133,7 +140,7 @@ public class BasicChannelService implements ChannelService {
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       readStatusRepository.findAllByChannelId(channel.getId())
           .stream()
-          .map(ReadStatus::getUserId)
+          .map(rs -> rs.getUser().getId())
           .forEach(participantIds::add);
     }
 

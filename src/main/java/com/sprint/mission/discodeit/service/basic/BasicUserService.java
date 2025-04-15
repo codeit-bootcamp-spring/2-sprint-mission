@@ -27,7 +27,6 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  //
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
 
@@ -44,23 +43,23 @@ public class BasicUserService implements UserService {
       throw new RestException(ResultCode.BAD_REQUEST);
     }
 
-    UUID nullableProfileId = optionalProfileCreateRequest
+    BinaryContent profile = optionalProfileCreateRequest
         .map(profileRequest -> {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType, bytes);
-          return binaryContentRepository.save(binaryContent).getId();
+          return binaryContentRepository.save(binaryContent);
         })
         .orElse(null);
-    String password = userCreateRequest.password();
 
-    User user = new User(username, email, password, nullableProfileId);
+    String password = userCreateRequest.password();
+    User user = new User(username, email, password, profile);
     User createdUser = userRepository.save(user);
 
     Instant now = Instant.now();
-    UserStatus userStatus = new UserStatus(createdUser.getId(), now);
+    UserStatus userStatus = new UserStatus(createdUser, now);
     userStatusRepository.save(userStatus);
 
     return createdUser;
@@ -89,6 +88,7 @@ public class BasicUserService implements UserService {
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
+
     if (userRepository.existsByEmail(newEmail)) {
       throw new RestException(ResultCode.BAD_REQUEST);
     }
@@ -96,22 +96,21 @@ public class BasicUserService implements UserService {
       throw new RestException(ResultCode.BAD_REQUEST);
     }
 
-    UUID nullableProfileId = optionalProfileCreateRequest
+    BinaryContent newProfile = optionalProfileCreateRequest
         .map(profileRequest -> {
-          Optional.ofNullable(user.getProfileId())
-              .ifPresent(binaryContentRepository::deleteById);
+          Optional.ofNullable(user.getProfile()).ifPresent(binaryContentRepository::delete);
 
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType, bytes);
-          return binaryContentRepository.save(binaryContent).getId();
+          return binaryContentRepository.save(binaryContent);
         })
         .orElse(null);
 
     String newPassword = userUpdateRequest.newPassword();
-    user.update(newUsername, newEmail, newPassword, nullableProfileId);
+    user.update(newUsername, newEmail, newPassword, newProfile);
 
     return userRepository.save(user);
   }
@@ -121,8 +120,8 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new RestException(ResultCode.NOT_FOUND));
 
-    Optional.ofNullable(user.getProfileId())
-        .ifPresent(binaryContentRepository::deleteById);
+    Optional.ofNullable(user.getProfile())
+        .ifPresent(binaryContentRepository::delete);
     userStatusRepository.deleteByUserId(userId);
 
     userRepository.deleteById(userId);
@@ -139,7 +138,7 @@ public class BasicUserService implements UserService {
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfileId(),
+        Optional.ofNullable(user.getProfile()).map(BinaryContent::getId).orElse(null),
         online
     );
   }
