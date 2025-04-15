@@ -11,7 +11,6 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Users extends BaseUpdatableEntity {
 
     @Id
@@ -23,6 +22,14 @@ public class Users extends BaseUpdatableEntity {
     private String password;
 
     private Boolean deleted;
+
+    @Builder
+    public Users(String username, String email, String password, Boolean deleted) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.deleted = deleted;
+    }
 
     // 상태 메시지: 1:1 단방향
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

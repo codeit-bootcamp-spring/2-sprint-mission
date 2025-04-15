@@ -7,9 +7,11 @@ import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersNameStatusResponseDt
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersProfileImgResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersStatusResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.usersDto.UsersUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.Users;
 import com.sprint.discodeit.sprint.service.basic.users.UsersService;
+import com.sprint.discodeit.sprint.service.basic.users.UsersStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UsersController {
 
     private final UsersService usersService;
+    private final UsersStatusService usersStatusService;
 
     @Operation(summary = "회원가입", description = "회원 정보를 입력받아 회원가입을 진행합니다.")
     @ApiResponses({
@@ -89,5 +92,10 @@ public class UsersController {
             @Parameter(description = "비활성화할 회원의 UUID") @PathVariable Long usersId) {
         usersService.delete(usersId);
         return ResponseEntity.ok(StatusType.Inactive.getExplanation());
+    }
+
+    @PostMapping("/{userId}/status")
+    public ResponseEntity<UsersStatusResponseDto> statusCreat(@PathVariable Long userId, StatusType statusType){
+        return ResponseEntity.ok(usersStatusService.creat(userId, statusType));
     }
 }
