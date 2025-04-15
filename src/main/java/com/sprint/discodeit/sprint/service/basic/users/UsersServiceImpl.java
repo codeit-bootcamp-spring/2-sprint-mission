@@ -15,9 +15,8 @@ import com.sprint.discodeit.sprint.domain.mapper.UsersMapper;
 import com.sprint.discodeit.sprint.global.AuthException;
 import com.sprint.discodeit.sprint.global.ErrorCode;
 import com.sprint.discodeit.sprint.global.RequestException;
-import com.sprint.discodeit.sprint.repository.UserStatusRepository;
 import com.sprint.discodeit.sprint.repository.UsersRepository;
-import com.sprint.discodeit.sprint.service.basic.util.BinaryGenerator;
+import com.sprint.discodeit.sprint.service.basic.util.BinaryService;
 import com.sprint.discodeit.sprint.service.basic.util.UsersStatusEvaluator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,9 +26,8 @@ import org.springframework.stereotype.Service;
 public class UsersServiceImpl implements UsersService {
 
     private final UsersRepository userRepository;
-    private final BinaryGenerator binaryGenerator;
+    private final BinaryService binaryService;
     private final UsersStatusEvaluator usersStatusEvaluator;
-    private final UserStatusRepository userStatusRepository;
 
     @Override
     public UsersNameStatusResponseDto create(UsersRequestDto usersRequestDto, UsersProfileImgResponseDto usersProfileImgResponseDto) {
@@ -48,7 +46,8 @@ public class UsersServiceImpl implements UsersService {
             throw new RequestException(ErrorCode.DUPLICATE_EMAIL);
         }
 
-        BinaryContent profileImage = binaryGenerator.createProfileImage(usersProfileImgResponseDto.imgUrl());
+        BinaryContent profileImage = binaryService.createProfileImage(usersProfileImgResponseDto.imgUrl());
+
         Users users = UsersMapper.tousers(usersRequestDto);
 
         users.addBinaryContent(profileImage);
@@ -75,7 +74,7 @@ public class UsersServiceImpl implements UsersService {
         Users users = userRepository.findById(usersId)
                 .orElseThrow(() -> new RequestException(ErrorCode.users_NOT_FOUND));
 
-        BinaryContent profileImage = binaryGenerator.createProfileImage(usersUpdateRequestDto.profileImg());
+        BinaryContent profileImage = binaryService.createProfileImage(usersUpdateRequestDto.profileImg());
 
         users.addBinaryContent(profileImage);
 
