@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.repository.UserJPARepository;
+import com.sprint.mission.discodeit.repository.UserStatusJPARepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusCreateDto;
 import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusDeleteDto;
@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusFindDto;
 import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -22,37 +23,32 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-    private final UserStatusRepository userStatusRepository;
-    private final UserRepository userRepository;
+    private final UserStatusJPARepository userStatusJPARepository;
+    private final UserJPARepository userJPARepository;
 
     @Override
+    @Transactional
     public UserStatus create(UserStatusCreateDto userStatusCreateDto) {
-        List<User> userList = userRepository.load();
-        Optional<User> validateName = userList.stream()
-                .filter(u -> u.getId().equals(userStatusCreateDto.userId()))
-                .findAny();
-        if (validateName.isEmpty()) {
-            throw new NotFoundException("User does not exist.");
-        }
+        User matchingUser = userJPARepository.findById(userStatusCreateDto.userId())
+                .orElseThrow(() -> new NotFoundException("User does not exist."));
+
         Instant currentTime = Instant.now();
-        UserStatus userStatus = new UserStatus(userStatusCreateDto.userId(), currentTime);
-        userStatusRepository.save(userStatus);
+        UserStatus userStatus = new UserStatus(matchingUser, currentTime);
+        userStatusJPARepository.save(userStatus);
         return userStatus;
     }
 
 
     @Override
-    public UserStatus getUser(UserStatusFindDto userStatusFindDto) {
-        Optional<UserStatus> userStatus = userStatusRepository.load().stream()
-                .filter(u -> u.getUserId().equals(userStatusFindDto.userId()))
-                .findAny();
-        return userStatus.orElseThrow(() -> new NotFoundException("User does not exist."));
+    public UserStatus find(UserStatusFindDto userStatusFindDto) {
+        return userStatusJPARepository.findById(userStatusFindDto.userId())
+                .orElseThrow(() -> new NotFoundException("User does not exist."));
     }
 
 
     @Override
-    public List<UserStatus> getAllUser() {
-        List<UserStatus> userStatusList = userStatusRepository.load();
+    public List<UserStatus> findAll() {
+        List<UserStatus> userStatusList = userStatusJPARepository.findAll();
         if (userStatusList.isEmpty()) {
             throw new NotFoundException("Profile not found.");
         }
@@ -61,24 +57,22 @@ public class BasicUserStatusService implements UserStatusService {
 
 
     @Override
+    @Transactional
     public UserStatus updateByUserId(UUID userId, UserStatusUpdateDto userStatusUpdateRequest) {
-        UserStatus matchingUserStatus = userStatusRepository.load().stream()
-                .filter(u -> u.getUserId().equals(userId))
-                .findAny()
+        UserStatus matchingUserStatus = userStatusJPARepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
+
         Instant currentTime = userStatusUpdateRequest.newLastActiveAt();
         matchingUserStatus.updateLastConnectionTime(currentTime);
-        userStatusRepository.save(matchingUserStatus);
-        return matchingUserStatus;
+        return userStatusJPARepository.save(matchingUserStatus);
     }
 
 
     @Override
+    @Transactional
     public void delete(UserStatusDeleteDto userStatusDeleteDto) {
-        UserStatus matchingUserStatus = userStatusRepository.load().stream()
-                .filter(u -> u.getUserId().equals(userStatusDeleteDto.userId()))
-                .findAny()
+        UserStatus matchingUserStatus = userStatusJPARepository.findById(userStatusDeleteDto.userId())
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
-        userStatusRepository.remove(matchingUserStatus);
+        userStatusJPARepository.delete(matchingUserStatus);
     }
 }

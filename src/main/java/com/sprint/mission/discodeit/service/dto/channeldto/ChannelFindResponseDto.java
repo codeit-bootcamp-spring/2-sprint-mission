@@ -18,7 +18,7 @@ public record ChannelFindResponseDto(
         Instant lastReadAt
 ) {
     public static ChannelFindResponseDto fromChannel(Channel channel, ReadStatus readStatus) {
-        UUID userId = (channel.getType() == ChannelType.PRIVATE && readStatus !=null) ? readStatus.getUserId() : null;
+        UUID userId = (channel.getType() == ChannelType.PRIVATE && readStatus !=null) ? readStatus.getUser().getId() : null;
         return new ChannelFindResponseDto(
                 channel.getId(),
                 channel.getType(),

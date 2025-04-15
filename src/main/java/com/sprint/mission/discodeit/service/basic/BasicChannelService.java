@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.exceptions.InvalidInputException;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -28,10 +29,10 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
         List<UUID> userIds = channelCreatePrivateDto.participantIds();
-        List<User> users = userRepository.load().stream()
+        List<User> matchingUsers = userRepository.load().stream()
                 .filter(m ->channelCreatePrivateDto.participantIds().contains(m.getId()))
                 .toList();
-        if (users.size() != userIds.size()) {
+        if (matchingUsers.size() != userIds.size()) {
             throw new InvalidInputException("User does not exist.");
         }
 
@@ -40,7 +41,12 @@ public class BasicChannelService implements ChannelService {
 
         // Read Status 생성
         channelCreatePrivateDto.participantIds().stream()
-                .map(userId -> new ReadStatus(userId, createdPirvateChannel.getId(), Instant.MIN))
+                .map(userId -> matchingUsers.stream()
+                        .filter(m -> m.getId().equals(userId))
+                        .findAny()
+                        .orElseThrow(() -> new RuntimeException("User not found: " + userId))
+                )
+                .map(user -> new ReadStatus(user, createdPirvateChannel, channel.getCreatedAt()))
                 .forEach(readStatusRepository::save);
 
         return createdPirvateChannel;
@@ -71,7 +77,7 @@ public class BasicChannelService implements ChannelService {
                 .findAny().orElse(null);
 
         ReadStatus matchingReadStatus = readStatusRepository.load().stream()
-                .filter(r -> r.getChannelId().equals(channelFindRequestDto.channelId()))
+                .filter(r -> r.getChannel().equals(channelFindRequestDto.channelId()))
                 .findAny().orElse(null);
 
         return ChannelFindResponseDto.fromChannel(matchingChannel, matchingReadStatus);
@@ -80,9 +86,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelFindAllByUserIdResponseDto> findAllByUserId(UUID userId) {
-        List<UUID> matchingChannelIdList = readStatusRepository.load().stream()
-                .filter(m -> m.getUserId().equals(userId))
-                .map(ReadStatus::getChannelId)
+        List<Channel> matchingChannelIdList = readStatusRepository.load().stream()
+                .filter(m -> m.getUser().getId().equals(userId))
+                .map(ReadStatus::getChannel)
                 .toList();
 
         List<ChannelFindAllByUserIdResponseDto> channelByUserID = channelRepository.load().stream()
@@ -93,12 +99,12 @@ public class BasicChannelService implements ChannelService {
                     List<UUID> participantIds = new ArrayList<>();
                     if (channel.getType().equals(ChannelType.PRIVATE)) {
                         readStatusRepository.load().stream()
-                                .filter(r -> r.getChannelId().equals(channel.getId()))
-                                .map(ReadStatus::getUserId)
+                                .filter(r -> r.getChannel().getId().equals(channel.getId()))
+                                .map(u -> u.getUser().getId())
                                 .forEach(participantIds::add);
                     }
                     Instant lastMessageAt = messageRepository.load().stream()
-                            .filter(f -> f.getChannelId().equals(channel.getId()))
+                            .filter(f -> f.getChannel().getId().equals(channel.getId()))
                             .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
                             .map(Message::getCreatedAt)
                             .limit(1)
@@ -135,11 +141,11 @@ public class BasicChannelService implements ChannelService {
                 .orElseThrow(() -> new NotFoundException("A channel does not exist"));
 
         List<Message> messageList = messageRepository.load().stream()
-                .filter(m -> m.getChannelId().equals(channelId))
+                .filter(m -> m.getChannel().getId().equals(channelId))
                 .toList();
 
         List<ReadStatus> readStatusList = readStatusRepository.load().stream()
-                .filter(r -> r.getChannelId().equals(channelId))
+                .filter(r -> r.getChannel().getId().equals(channelId))
                 .toList();
 
         for (Message message : messageList) {

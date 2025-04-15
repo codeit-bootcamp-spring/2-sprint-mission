@@ -1,21 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class UserStatus extends BaseEntity {
+@NoArgsConstructor
+@Entity
+@Table(name = "user_statuses")
+public class UserStatus extends BaseUpdatableEntity {
 
-    private final UUID userId;
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true)
+    private User user;
+
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Instant lastActiveAt;
-    boolean online;
 
-    public UserStatus(UUID userId, Instant lastActiveAt) {
-        super();
-        this.userId = userId;
+
+    public UserStatus(User user, Instant lastActiveAt) {
+        this.user = user;
         this.lastActiveAt = lastActiveAt;
     }
 
@@ -23,10 +33,8 @@ public class UserStatus extends BaseEntity {
     // 마지막 접속시간과 현재시간을 계산했을 때 300보다 크면 : 5분 초과 -> false
     public boolean currentUserStatus() {
         if (Duration.between(lastActiveAt, Instant.now()).getSeconds() < 300) {
-            online = true;
             return true;
         } else {
-            online = false;
             return false;
         }
     }
@@ -40,7 +48,7 @@ public class UserStatus extends BaseEntity {
     @Override
     public String toString() {
         return "\nID: " + getId() +
-                "\nUser ID: " + userId +
+                "\nUser ID: " + user +
                 "\nLastConnectionTime: " + getLastActiveAt() +
                 "\nUser Status: " + currentUserStatus();
 

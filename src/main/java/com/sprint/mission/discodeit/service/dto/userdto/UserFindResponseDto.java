@@ -20,9 +20,9 @@ public record UserFindResponseDto(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
-                user.getName(),
+                user.getUsername(),
                 user.getEmail(),
-                user.getProfileId(),
+                user.getProfile().getId(),
                 userStatus.currentUserStatus()
 
         );

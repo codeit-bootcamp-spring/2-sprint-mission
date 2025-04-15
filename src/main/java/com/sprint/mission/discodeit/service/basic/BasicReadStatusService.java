@@ -44,14 +44,14 @@ public class BasicReadStatusService implements ReadStatusService {
                 .findAny()
                 .orElseThrow(() -> new NotFoundException("Channel not found"));
         Optional<ReadStatus> matchingReadStatus = readStatusList.stream()
-                .filter(m -> m.getUserId().equals(readStatusCreateDto.userId()) && m.getChannelId().equals(readStatusCreateDto.channelId()))
+                .filter(m -> m.getUser().getId().equals(readStatusCreateDto.userId()) && m.getChannel().equals(readStatusCreateDto.channelId()))
                 .findAny();
         if (matchingReadStatus.isPresent()) {
             throw new InvalidInputException("Read status already exists");
         }
 
         Instant lastReadAt = readStatusCreateDto.lastReadAt();
-        ReadStatus readStatus = new ReadStatus(matchingUser.getId(), matchingChannel.getId(), lastReadAt);
+        ReadStatus readStatus = new ReadStatus(matchingUser, matchingChannel, lastReadAt);
         readStatusRepository.save(readStatus);
         return readStatus;
 
@@ -68,7 +68,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return readStatusRepository.load().stream()
-                .filter(m -> m.getUserId().equals(userId))
+                .filter(m -> m.getUser().getId().equals(userId))
                 .toList();
     }
 

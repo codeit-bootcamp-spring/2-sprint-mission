@@ -1,29 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
 @Getter
-public class Channel extends BaseEntity {
+@NoArgsConstructor
+@Entity
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity {
 
-    // 필드 선언
-    private final ChannelType type;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ChannelType type;
+
+    @Column(length = 100)
     private String name;
+
+    @Column(length = 500)
     private String description;
 
-    // 생선자 선언
+
     public Channel(ChannelType type, String channelName, String description) {
         this.type = type;
         this.name = channelName;
         this.description = description;
     }
 
-    // 채널 업데이트 메소드 선언
+
     public void updateChannel(String channelName, String description) {
         this.name = channelName;
         this.description = description;
-        super.update();
         System.out.printf("[ %s ], [ %s ] 로 변경되었습니다.", this.name, this.description);
     }
 

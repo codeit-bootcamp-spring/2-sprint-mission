@@ -2,14 +2,16 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -17,10 +19,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentJPARepository binaryContentJPARepository;
 
 
     @Override
+    @Transactional
     public BinaryContent create(BinaryContentCreateDto request) {
         String fileName = request.fileName();
         String contentType = request.contentType();
@@ -31,32 +34,31 @@ public class BasicBinaryContentService implements BinaryContentService {
                 contentType,
                 bytes
         );
-        return binaryContentRepository.save(binaryContent);
+        return binaryContentJPARepository.save(binaryContent);
     }
 
 
     @Override
     public BinaryContent find(UUID binaryContentId) {
-        return binaryContentRepository.loadToId(binaryContentId)
+        return binaryContentJPARepository.findById(binaryContentId)
                 .orElseThrow(() -> new NotFoundException("Profile not found"));
     }
 
 
     @Override
     public List<BinaryContent> findAll(List<UUID> binaryContentIds) {
-        List<BinaryContent> binaryContentList = binaryContentRepository.load();
+        List<BinaryContent> binaryContentList = binaryContentJPARepository.findAllById(binaryContentIds);
         if (binaryContentList.isEmpty()) {
             throw new NotFoundException("Profile not found.");
         }
-        return binaryContentList.stream()
-                .filter(m -> binaryContentIds.contains(m.getId()))
-                .toList();
+        return binaryContentList;
     }
 
 
     @Override
+    @Transactional
     public BinaryContent updateByUserId(BinaryContentUpdateDto binaryContentUpdateDto) {
-        BinaryContent matchingBinaryContent = binaryContentRepository.loadToId(binaryContentUpdateDto.Id())
+        BinaryContent matchingBinaryContent = binaryContentJPARepository.findById(binaryContentUpdateDto.Id())
                 .orElseThrow(() -> new NotFoundException("Profile not found."));
 
         String fileName = binaryContentUpdateDto.newFileName();
@@ -64,16 +66,14 @@ public class BasicBinaryContentService implements BinaryContentService {
         byte[] bytes = binaryContentUpdateDto.newBytes();
 
         matchingBinaryContent.updateBinaryContent(fileName, (long) bytes.length, contentType, bytes);
-        return binaryContentRepository.save(matchingBinaryContent);
+        return binaryContentJPARepository.save(matchingBinaryContent);
     }
 
 
 
     @Override
+    @Transactional
     public void delete(UUID binaryContentId) {
-        BinaryContent matchingBinaryContent = binaryContentRepository.loadToId(binaryContentId)
-                .orElse(null);
-
-        binaryContentRepository.remove(matchingBinaryContent);
+        binaryContentJPARepository.findById(binaryContentId).ifPresent(binaryContentJPARepository::delete);
     }
 }

@@ -12,7 +12,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentDeleteDto;
 import com.sprint.mission.discodeit.service.dto.messagedto.MessageCreateDto;
 import com.sprint.mission.discodeit.service.dto.messagedto.MessageFindRequestDto;
 import com.sprint.mission.discodeit.service.dto.messagedto.MessageFindResponseDto;
@@ -21,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -39,31 +37,26 @@ public class BasicMessageService implements MessageService {
     public Message create(MessageCreateDto messageCreateDto, List<BinaryContentCreateDto> binaryContentCreateDtoList) {
         List<User> userList = userRepository.load();
         List<Channel> channelList = channelRepository.load();
-        Optional<User> user = userList.stream()
+        User matchingUser = userList.stream()
                 .filter(u -> u.getId().equals(messageCreateDto.authorId()))
-                .findAny();
-        Optional<Channel> channel = channelList.stream()
+                .findAny()
+                .orElseThrow(() -> new NotFoundException("Channel not found."));
+        Channel matchingChannel = channelList.stream()
                 .filter(c -> c.getId().equals(messageCreateDto.channelId()))
-                .findAny();
-        if (user.isEmpty()) {
-            throw new NotFoundException("User not found.");
-        }
-        if (channel.isEmpty()) {
-            throw new NotFoundException("Channel not found.");
-        }
+                .findAny()
+                .orElseThrow(() -> new NotFoundException("Channel not found."));
 
-        List<UUID> attachmentIds = binaryContentCreateDtoList.stream()
+        List<BinaryContent> attachments = binaryContentCreateDtoList.stream()
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
-                    return createdBinaryContent.getId();
+                    return binaryContentRepository.save(binaryContent);
                 })
                 .toList();
 
-        Message messages = new Message(messageCreateDto.content(), messageCreateDto.channelId(), messageCreateDto.authorId(), attachmentIds);
+        Message messages = new Message(messageCreateDto.content(), matchingChannel, matchingUser, attachments);
         messageRepository.save(messages);
 
         return messages;
@@ -81,7 +74,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         return messageRepository.load().stream()
-                .filter(m -> m.getChannelId().equals(channelId))
+                .filter(m -> m.getChannel().equals(channelId))
                 .toList();
 
     }
@@ -102,7 +95,10 @@ public class BasicMessageService implements MessageService {
         Message matchingMessage = messageRepository.loadToId(messageId)
                 .orElseThrow(() -> new NotFoundException("Message does not exist."));
 
-        matchingMessage.getAttachmentIds().forEach(binaryContentService::delete);
+        matchingMessage.getAttachments().stream()
+                .map(BinaryContent::getId)
+                .forEach(binaryContentService::delete);
+
         messageRepository.remove(matchingMessage);
 
     }

@@ -5,15 +5,16 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exceptions.InvalidInputException;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
+import com.sprint.mission.discodeit.repository.UserJPARepository;
+import com.sprint.mission.discodeit.repository.UserStatusJPARepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.service.dto.userdto.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -24,46 +25,36 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
-    private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
-    private final BinaryContentService binaryContentService;
-    private final BinaryContentRepository binaryContentRepository;
+    private final UserJPARepository userJPARepository;
+    private final UserStatusJPARepository userStatusJPARepository;
+    private final BinaryContentJPARepository binaryContentJPARepository;
 
     @Override
+    @Transactional
     public User create(UserCreateDto userCreateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
-        List<User> userList = userRepository.load();
-        Optional<User> validateName = userList.stream()
-                .filter(u -> u.getName().equals(userCreateDto.username()))
-                .findAny();
-        Optional<User> validateEmail = userList.stream()
-                .filter(u -> u.getEmail().equals(userCreateDto.email()))
-                .findAny();
-        if (validateName.isPresent()) {
-            throw new InvalidInputException("User already exists.");
-        }
-        if (validateEmail.isPresent()) {
-            throw new InvalidInputException("Email already exists.");
+
+        if (userJPARepository.existsByUsernameOrEmail(userCreateDto.username(), userCreateDto.email())) {
+            throw new InvalidInputException("Username or email already exists");
         }
 
-        UUID nullableProfileId = optionalBinaryContentCreateDto
+        BinaryContent nullableProfile = optionalBinaryContentCreateDto
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
+                    return binaryContentJPARepository.save(binaryContent);
                 })
                 .orElse(null);
 
         // profile ID 추가 후 user 생성
-        User user = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(), nullableProfileId);
-        User createdUser = userRepository.save(user);
-        System.out.println(createdUser);
+        User user = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(), nullableProfile);
+        User createdUser = userJPARepository.save(user);
 
         // user status 생성
         Instant currentTime = Instant.now();
-        UserStatus userStatus = new UserStatus(createdUser.getId(), currentTime);
-        userStatusRepository.save(userStatus);
+        UserStatus userStatus = new UserStatus(createdUser, currentTime);
+        userStatusJPARepository.save(userStatus);
 
         return createdUser;
     }
@@ -72,11 +63,11 @@ public class BasicUserService implements UserService {
     @Override
     public UserFindResponseDto find(UserFindRequestDto userFindRequestDto) {
         // userRepository 에서 User Id로 조회
-        User matchingUser = userRepository.loadToId(userFindRequestDto.userId())
+        User matchingUser = userJPARepository.findById(userFindRequestDto.userId())
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
 
-        // userStatusRepository 에서 User Id로 조회
-        UserStatus matchingUserStatus = userStatusRepository.loadToId(userFindRequestDto.userId())
+        // userStatusJPARepository 에서 User Id로 조회
+        UserStatus matchingUserStatus = userStatusJPARepository.findById(userFindRequestDto.userId())
                 .orElseThrow(() -> new NotFoundException("User Status does not exist."));
 
         return UserFindResponseDto.UserFindResponse(matchingUser, matchingUserStatus);
@@ -85,58 +76,47 @@ public class BasicUserService implements UserService {
 
     @Override
     public List<UserFindAllResponseDto> findAllUser() {
-        List<User> userList = userRepository.load().stream().toList();
-        if (userList.isEmpty()) {
+        List<User> userAllList = userJPARepository.findAll().stream().toList();
+        if (userAllList.isEmpty()) {
             throw new NotFoundException("User list is empty.");
         }
-        List<UserStatus> userStatusList = userStatusRepository.load().stream().toList();
-        if (userStatusList.isEmpty()) {
-            throw new NotFoundException("User Status list is empty.");
-        }
-        return UserFindAllResponseDto.UserFindAllResponse(userList, userStatusList);
+
+        return UserFindAllResponseDto.UserFindAllResponse(userAllList);
     }
 
 
     @Override
+    @Transactional
     public User update(UUID userId, UserUpdateDto userUpdateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
-        User matchingUser = userRepository.loadToId(userId)
+        User matchingUser = userJPARepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
 
-        UUID nullableProfileId = optionalBinaryContentCreateDto
+        BinaryContent nullableProfile = optionalBinaryContentCreateDto
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
+                    return binaryContentJPARepository.save(binaryContent);
                 })
                 .orElse(null);
 
-        binaryContentService.delete(matchingUser.getProfileId());
-
         if (userUpdateDto.newPassword() == null) {
-            matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), matchingUser.getPassword(), nullableProfileId);
+            matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), matchingUser.getPassword(), nullableProfile);
         } else {
-            matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(), nullableProfileId);
+            matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(), nullableProfile);
         }
-        userRepository.save(matchingUser);
+        userJPARepository.save(matchingUser);
 
         return matchingUser;
     }
 
 
     @Override
+    @Transactional
     public void delete(UUID userId) {
-        User matchingUser = userRepository.loadToId(userId)
+        User matchingUser = userJPARepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
-
-        UserStatus matchingUserStatus = userStatusRepository.load().stream()
-                .filter(us -> us.getUserId().equals(matchingUser.getId()))
-                .findAny()
-                .orElseThrow(() -> new NotFoundException("User Status does not exist."));
-
-        binaryContentService.delete(matchingUser.getProfileId());
-        userStatusRepository.remove(matchingUserStatus);
-        userRepository.remove(matchingUser);
+        userJPARepository.delete(matchingUser);
     }
 }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.dto.messagedto;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,10 +18,9 @@ public record MessageFindResponseDto(
         return new MessageFindResponseDto(
                 message.getId(),
                 message.getContent(),
-                message.getChannelId(),
-                message.getAuthorId(),
-                message.getAttachmentIds()
-
+                message.getChannel().getId(),
+                message.getAuthor().getId(),
+                message.getAttachments().stream().map(BaseEntity::getId).toList()
                 );
     }
 }

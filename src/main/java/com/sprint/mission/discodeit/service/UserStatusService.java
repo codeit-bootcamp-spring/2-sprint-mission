@@ -12,8 +12,8 @@ import java.util.UUID;
 public interface UserStatusService {
 
     UserStatus create(UserStatusCreateDto userStatusCreateDto);
-    UserStatus getUser(UserStatusFindDto userStatusFindDto);
-    List<UserStatus> getAllUser();
+    UserStatus find(UserStatusFindDto userStatusFindDto);
+    List<UserStatus> findAll();
     UserStatus updateByUserId(UUID userId, UserStatusUpdateDto userStatusUpdateRequest);
     void delete(UserStatusDeleteDto userStatusDeleteDto);
 }

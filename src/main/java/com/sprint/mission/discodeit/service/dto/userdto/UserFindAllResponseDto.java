@@ -1,44 +1,27 @@
 package com.sprint.mission.discodeit.service.dto.userdto;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public record UserFindAllResponseDto(
         UUID id,
-        Instant createdAt,
-        Instant updatedAt,
         String username,
         String email,
         UUID profileId,
         Boolean online
 ) {
-    public static List<UserFindAllResponseDto> UserFindAllResponse(List<User> users, List<UserStatus> userStatuses) {
+    public static List<UserFindAllResponseDto> UserFindAllResponse(List<User> users) {
         List<UserFindAllResponseDto> FindAllResponse = new ArrayList<>();
-
-        for (User user : users) {
-            UserStatus matchingUserStatus = userStatuses.stream()
-                    .filter(m ->m.getUserId().equals(user.getId()))
-                    .findAny()
-                    .orElse(null);
-            if (matchingUserStatus != null) {
-                UserFindAllResponseDto responseDto = new UserFindAllResponseDto(
-                        user.getId(),
-                        user.getCreatedAt(),
-                        user.getUpdatedAt(),
-                        user.getName(),
-                        user.getEmail(),
-                        user.getProfileId(),
-                        matchingUserStatus.currentUserStatus()
-                );
-                FindAllResponse.add(responseDto);
-            }
-        }
-    return FindAllResponse;
-
+        users.stream().map(user-> new UserFindAllResponseDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getProfile().getId() == null ? null : user.getProfile().getId(),
+                user.getStatus().currentUserStatus()))
+                .forEach(FindAllResponse::add);
+        return FindAllResponse;
     }
 }
