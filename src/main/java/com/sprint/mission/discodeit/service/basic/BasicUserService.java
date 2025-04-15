@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.RestException;
 import com.sprint.mission.discodeit.exception.ResultCode;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -29,6 +30,7 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
+  private final UserMapper userMapper;
 
   @Override
   public User create(UserCreateRequest userCreateRequest,
@@ -68,7 +70,7 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto find(UUID userId) {
     return userRepository.findById(userId)
-        .map(this::toDto)
+        .map(userMapper::toDto)
         .orElseThrow(() -> new RestException(ResultCode.NOT_FOUND));
   }
 
@@ -76,7 +78,7 @@ public class BasicUserService implements UserService {
   public List<UserDto> findAll() {
     return userRepository.findAll()
         .stream()
-        .map(this::toDto)
+        .map(userMapper::toDto)
         .toList();
   }
 
@@ -125,21 +127,5 @@ public class BasicUserService implements UserService {
     userStatusRepository.deleteByUserId(userId);
 
     userRepository.deleteById(userId);
-  }
-
-  private UserDto toDto(User user) {
-    Boolean online = userStatusRepository.findByUserId(user.getId())
-        .map(UserStatus::isOnline)
-        .orElse(null);
-
-    return new UserDto(
-        user.getId(),
-        user.getCreatedAt(),
-        user.getUpdatedAt(),
-        user.getUsername(),
-        user.getEmail(),
-        Optional.ofNullable(user.getProfile()).map(BinaryContent::getId).orElse(null),
-        online
-    );
   }
 }

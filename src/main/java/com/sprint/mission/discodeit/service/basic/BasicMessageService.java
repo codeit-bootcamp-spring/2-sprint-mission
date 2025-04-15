@@ -26,7 +26,6 @@ import java.util.UUID;
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
-  //
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
@@ -56,8 +55,7 @@ public class BasicMessageService implements MessageService {
 
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType, bytes);
-          BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
-          return createdBinaryContent;
+          return binaryContentRepository.save(binaryContent);
         })
         .toList();
 
@@ -100,8 +98,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> new RestException(ResultCode.NOT_FOUND));
 
-    message.getAttachments()
-        .forEach(binaryContentRepository::delete);
+    binaryContentRepository.deleteAll(message.getAttachments());
 
     messageRepository.delete(message);
   }
