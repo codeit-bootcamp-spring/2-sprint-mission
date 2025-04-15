@@ -1,9 +1,13 @@
 package com.sprint.discodeit.sprint.controller;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
+import com.sprint.discodeit.sprint.domain.dto.PaginatedResponse;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelMessageResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.Message;
+import com.sprint.discodeit.sprint.domain.mapper.PaginationMapper;
 import com.sprint.discodeit.sprint.service.basic.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +16,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -60,10 +67,11 @@ public class MessageController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "채널 메시지 조회", description = "지정된 채널의 메시지를 조회합니다.")
-    @GetMapping("/channels/{channelId}")
-    public ResponseEntity<List<ChannelMessageResponseDto>> getMessagesByChannel(
-            @Parameter(description = "메시지를 조회할 채널의 UUID") @PathVariable Long channelId) {
-        return ResponseEntity.ok(messageService.findChannel(channelId));
+    @GetMapping("/channels/{channelId}/messages")
+    public ResponseEntity<PaginatedResponse<ChannelMessageResponseDto>> getMessages(
+            @PathVariable Long channelId,
+            @PageableDefault(size = 50, sort = "createdAt", direction = DESC) Pageable pageable) {
+        return ResponseEntity.ok(messageService.findChannel(channelId, pageable));
     }
+
 }
