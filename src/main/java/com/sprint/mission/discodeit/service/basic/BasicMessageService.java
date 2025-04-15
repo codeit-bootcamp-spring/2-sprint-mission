@@ -32,13 +32,13 @@ public class BasicMessageService implements MessageService {
   @Override
   public Message sendMessage(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments) {
-    List<UUID> attachmentList = new ArrayList<>();
+    List<BinaryContent> attachmentList = new ArrayList<>();
 
-    User user = userRepository.findUserById(messageCreateRequest.authorId())
+    User user = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new NoSuchElementException(
             messageCreateRequest.authorId() + "에 해당하는 사용자를 찾을 수 없습니다."));
 
-    Channel channel = channelRepository.findChannelById(messageCreateRequest.channelId())
+    Channel channel = channelRepository.findById(messageCreateRequest.channelId())
         .orElseThrow(() -> new NoSuchElementException(
             messageCreateRequest.channelId() + "에 해당하는 채널을 찾을 수 없습니다."));
 
@@ -57,7 +57,7 @@ public class BasicMessageService implements MessageService {
                   .build();
 
               binaryContentRepository.save(binaryContent);
-              return binaryContent.getId();
+              return binaryContent;
             } catch (IOException e) {
               throw new RuntimeException(e);
             }
@@ -66,21 +66,21 @@ public class BasicMessageService implements MessageService {
     }
 
     Message message = new Message(
-        messageCreateRequest.content(), user.getId(),
-        channel.getId(), attachmentList);
+        messageCreateRequest.content(), user,
+        channel, attachmentList);
     messageRepository.save(message);
     return message;
   }
 
   @Override
   public Message findMessageById(UUID messageId) {
-    return messageRepository.findMessageById(messageId)
+    return messageRepository.findById(messageId)
         .orElseThrow(() -> new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다."));
   }
 
   @Override
   public List<Message> findAllMessages() {
-    return messageRepository.findAllMessage();
+    return messageRepository.findAll();
   }
 
   @Override
@@ -90,7 +90,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public Message updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
-    Message message = messageRepository.findMessageById(messageId)
+    Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다."));
     message.updateContent(messageUpdateRequest.newContent());
     messageRepository.save(message);
@@ -99,8 +99,8 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public void deleteMessageById(UUID messageId) {
-    Message message = messageRepository.findMessageById(messageId)
+    Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다."));
-    messageRepository.delete(message.getId());
+    messageRepository.delete(message);
   }
 }

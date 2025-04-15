@@ -18,9 +18,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_statuses")
 @Entity
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -30,7 +28,6 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
   private User user;
 
   @Column(name = "last_active_at", nullable = false)
-  @Builder.Default
   private Instant lastActiveAt = Instant.now();
 
   public void updateLastLoginTime(Instant lastLoginTime) {
@@ -42,5 +39,10 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
       return false;
     }
     return true;
+  }
+
+  public UserStatus(User user) {
+    this.user = user;
+    this.lastActiveAt = Instant.now();
   }
 }

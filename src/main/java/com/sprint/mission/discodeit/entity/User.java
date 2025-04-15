@@ -55,7 +55,11 @@ public class User extends BaseUpdatableEntity implements Serializable {
     this.profile = profile;
   }
 
-  public void updateStatus(UserStatus status) {
-    this.status = status;
+  public User(String username, String password, String email, BinaryContent profile) {
+    this.username = username;
+    this.password = password;
+    this.email = email;
+    this.profile = profile;
+    this.status = new UserStatus(this);
   }
 }

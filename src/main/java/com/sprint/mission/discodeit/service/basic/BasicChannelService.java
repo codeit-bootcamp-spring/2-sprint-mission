@@ -45,9 +45,9 @@ public class BasicChannelService implements ChannelService {
     Channel channel = new Channel(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
     privateChannelCreateRequest.participantIds().forEach(userId -> {
-      User user = userRepository.findUserById(userId)
+      User user = userRepository.findById(userId)
           .orElseThrow(() -> new NoSuchElementException(userId + "에 해당하는 사용자를 찾을 수 없습니다."));
-      ReadStatus readStatus = new ReadStatus(user.getId(), channel.getId(), Instant.now());
+      ReadStatus readStatus = new ReadStatus(user, channel, Instant.now());
       readStatusRepository.save(readStatus);
     });
     return channel;
@@ -55,7 +55,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public ChannelDto findChannel(UUID channelId) {
-    Channel channel = channelRepository.findChannelById(channelId)
+    Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException(channelId + "에 해당하는 채널을 찾을 수 없습니다."));
 
     List<Message> messageList = messageRepository.findByChannelId(channelId);
@@ -66,7 +66,7 @@ public class BasicChannelService implements ChannelService {
 
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       List<UUID> joinUserId = readStatusRepository.findByChannelId(channelId).stream()
-          .map(ReadStatus::getUserId)
+          .map(readStatus -> readStatus.getUser().getId())
           .toList();
       return new ChannelDto(
           channel.getId(),
@@ -91,10 +91,10 @@ public class BasicChannelService implements ChannelService {
     List<ReadStatus> readStatusFindByUserId = readStatusRepository.findByUserId(userId);
 
     Set<UUID> privateChannelIdSet = readStatusFindByUserId.stream()
-        .map(ReadStatus::getChannelId)
+        .map(readStatus -> readStatus.getChannel().getId())
         .collect(Collectors.toSet());
 
-    return channelRepository.findAllChannel().stream()
+    return channelRepository.findAll().stream()
         .filter(channel -> channel.getType().equals(ChannelType.PUBLIC)
             || privateChannelIdSet.contains(channel.getId()))
         .map(channel -> findChannel(channel.getId()))
@@ -103,7 +103,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel updateChannel(UUID channelId, PublicChannelUpdateRequest channelUpdateParamDto) {
-    Channel channel = channelRepository.findChannelById(channelId)
+    Channel channel = channelRepository.findById(channelId)
         .orElseThrow(
             () -> new NoSuchElementException(channelId + "에 해당하는 채널을 찾을 수 없습니다."));
 
@@ -118,19 +118,13 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void deleteChannel(UUID channelId) {
-    channelRepository.findChannelById(channelId)
+    Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException(channelId + "에 해당하는 채널을 찾을 수 없습니다."));
 
-    messageRepository.findByChannelId(channelId)
-        .forEach(message -> {
-          messageRepository.delete(message.getId());
-        });
+    messageRepository.deleteAll(messageRepository.findByChannelId(channelId));
 
-    readStatusRepository.findByChannelId(channelId)
-        .forEach(readStatus -> {
-          readStatusRepository.delete(readStatus.getId());
-        });
+    readStatusRepository.deleteAll(readStatusRepository.findByChannelId(channelId));
 
-    channelRepository.delete(channelId);
+    channelRepository.delete(channel);
   }
 }

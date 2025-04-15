@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
 
   @Override
   public LoginResponse login(LoginRequest loginRequest) {
@@ -26,7 +26,10 @@ public class BasicAuthService implements AuthService {
     if (!user.getPassword().equals(loginRequest.password())) {
       throw new IllegalArgumentException("Wrong password");
     }
+
+    UUID profileId = user.getProfile() != null ? user.getProfile().getId() : null;
+
     return new LoginResponse(user.getId(), user.getUsername(), user.getEmail(),
-        user.getCreatedAt(), user.getUpdatedAt(), user.getProfileId());
+        user.getCreatedAt(), user.getUpdatedAt(), profileId);
   }
 }

@@ -38,22 +38,22 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
-  public BinaryContent findById(UUID binaryContentUUID) {
-    return binaryContentRepository.findById(binaryContentUUID)
+  public BinaryContent findById(UUID binaryContentId) {
+    return binaryContentRepository.findById(binaryContentId)
         .orElseThrow(
-            () -> new NoSuchElementException(binaryContentUUID + "에 해당하는 파일을 찾는데 실패하였습니다."));
+            () -> new NoSuchElementException(binaryContentId + "에 해당하는 파일을 찾는데 실패하였습니다."));
   }
 
   @Override
-  public List<BinaryContent> findByIdIn(List<UUID> binaryContentUUIDList) {
+  public List<BinaryContent> findByIdIn(List<UUID> binaryContentIdList) {
     return binaryContentRepository.findAll().stream()
-        .filter(binaryContent -> binaryContentUUIDList.contains(binaryContent.getId()))
+        .filter(binaryContent -> binaryContentIdList.contains(binaryContent.getId()))
         .map(binaryContent -> findById(binaryContent.getId()))
         .toList();
   }
 
   @Override
-  public void delete(UUID userStatusUUID) {
-    binaryContentRepository.delete(userStatusUUID);
+  public void delete(UUID userStatusId) {
+    binaryContentRepository.delete(findById(userStatusId));
   }
 }
