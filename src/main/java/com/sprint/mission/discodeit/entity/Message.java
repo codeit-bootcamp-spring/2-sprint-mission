@@ -34,13 +34,13 @@ public class Message extends BaseUpdatableEntity implements Serializable {
   @JoinColumn(name = "channel_id")
   private Channel channel;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   @JoinTable(
       name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id"),
       inverseJoinColumns = @JoinColumn(name = "attachment_id")
   )
-  private List<BinaryContent> BinaryContents;
+  private List<BinaryContent> attachments;
 
   public void updateContent(String content) {
     this.content = content;

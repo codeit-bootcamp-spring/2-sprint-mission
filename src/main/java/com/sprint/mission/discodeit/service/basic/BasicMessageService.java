@@ -11,8 +11,10 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -27,9 +29,9 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
-  private final BinaryContentRepository binaryContentRepository;
 
   @Override
+  @Transactional
   public Message sendMessage(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments) {
     List<BinaryContent> attachmentList = new ArrayList<>();
@@ -44,6 +46,7 @@ public class BasicMessageService implements MessageService {
 
     if (attachments != null && !attachments.isEmpty()) {
       attachmentList = attachments.stream()
+          .filter(file -> !file.isEmpty())
           .map(data -> {
             try {
               String fileName = data.getOriginalFilename();
@@ -55,8 +58,6 @@ public class BasicMessageService implements MessageService {
                   .bytes(bytes)
                   .size((long) bytes.length)
                   .build();
-
-              binaryContentRepository.save(binaryContent);
               return binaryContent;
             } catch (IOException e) {
               throw new RuntimeException(e);
@@ -73,31 +74,21 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public Message findMessageById(UUID messageId) {
-    return messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다."));
-  }
-
-  @Override
-  public List<Message> findAllMessages() {
-    return messageRepository.findAll();
-  }
-
-  @Override
   public List<Message> findMessageByChannelId(UUID channelUUID) {
     return messageRepository.findByChannelId(channelUUID);
   }
 
   @Override
+  @Transactional
   public Message updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다."));
     message.updateContent(messageUpdateRequest.newContent());
-    messageRepository.save(message);
     return message;
   }
 
   @Override
+  @Transactional
   public void deleteMessageById(UUID messageId) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다."));

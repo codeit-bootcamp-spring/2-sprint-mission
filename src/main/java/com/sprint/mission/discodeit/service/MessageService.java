@@ -13,10 +13,6 @@ public interface MessageService {
   Message sendMessage(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments);
 
-  Message findMessageById(UUID messageId);
-
-  List<Message> findAllMessages();
-
   List<Message> findMessageByChannelId(UUID id);
 
   Message updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest);
