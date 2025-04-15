@@ -5,18 +5,14 @@ import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelPrivateUpdateReq
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelPublicUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelSummaryResponseDto;
-import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelUpdateResponseDto;
-import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelUpdateResponsetDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.PrivateChannelCreateRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.PublicChannelCreateRequestDto;
-import com.sprint.discodeit.sprint.domain.entity.Channel;
 import com.sprint.discodeit.sprint.service.basic.chnnel.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,7 +47,7 @@ public class ChannelController {
     }
 
     @Operation(summary = "채널 수정", description = "채널 정보를 수정합니다.")
-    @PutMapping("publicChannel/{channelId}")
+    @PutMapping("/publicChannel/{channelId}")
     public ResponseEntity<ChannelUpdateResponseDto> updateChannel(
             @Parameter(description = "수정할 채널의 UUID") @PathVariable Long channelId,
             @RequestBody ChannelPublicUpdateRequestDto requestDto) {
@@ -59,7 +55,7 @@ public class ChannelController {
     }
 
     @Operation(summary = "채널 수정", description = "채널 정보를 수정합니다.")
-    @PutMapping("privateChannel/{channelId}")
+    @PutMapping("/privateChannel/{channelId}")
     public ResponseEntity<ChannelUpdateResponseDto> updateChannel(
             @Parameter(description = "수정할 채널의 UUID") @PathVariable Long channelId,
             @RequestBody ChannelPrivateUpdateRequestDto requestDto) {
@@ -74,23 +70,17 @@ public class ChannelController {
         return ResponseEntity.ok("채널방 삭제되었습니다");
     }
 
-    @Operation(summary = "채널 조회", description = "UUID를 기반으로 채널을 조회합니다.")
-    @GetMapping("/{channelId}")
+    @Operation(summary = "비밀방 상세 조회", description = " 비밀방 채널에 참여하는 사람들을 조회합니다.")
+    @GetMapping("/privateChannel/{channelId}")
     public ResponseEntity<ChannelFindResponseDto> findChannel(
-            @Parameter(description = "조회할 채널의 UUID") @PathVariable String channelId) {
-        return ResponseEntity.ok(channelService.findChannelById(UUID.fromString(channelId)));
+            @Parameter(description = "조회할 채널의 UUID") @PathVariable Long channelId) {
+        return ResponseEntity.ok(channelService.findChannelById(channelId));
     }
 
     @Operation(summary = "내 채널 목록 조회", description = "사용자 UUID를 기반으로 본인이 참여 중인 채널 목록을 조회합니다.")
     @GetMapping("/{usersId}/profile")
     public ResponseEntity<List<ChannelSummaryResponseDto>> getChannelsForusers(
-            @Parameter(description = "사용자의 UUID") @PathVariable UUID usersId) {
-        return ResponseEntity.ok(channelService.findAllByusersId(usersId));
-    }
-
-    @Operation(summary = "공개 채널 목록 조회", description = "모든 공개 채널을 조회합니다.")
-    @GetMapping("/public")
-    public ResponseEntity<List<ChannelSummaryResponseDto>> getAllPublicChannels() {
-        return ResponseEntity.ok(channelService.findAll());
+            @Parameter(description = "사용자의 UUID") @PathVariable Long usersId) {
+        return ResponseEntity.ok(channelService.findAllByUsersId(usersId));
     }
 }

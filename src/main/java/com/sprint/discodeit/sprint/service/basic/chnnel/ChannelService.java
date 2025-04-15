@@ -1,6 +1,5 @@
 package com.sprint.discodeit.sprint.service.basic.chnnel;
 
-
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelFindResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelPrivateUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelPublicUpdateRequestDto;
@@ -17,7 +16,6 @@ public interface ChannelService {
     ChannelUpdateResponseDto privateUpdate(ChannelPrivateUpdateRequestDto channelUpdateRequestDto, Long channelId);
     ChannelUpdateResponseDto publicUpdate(ChannelPublicUpdateRequestDto channelUpdateRequestDto, Long channelId);
     void delete(Long channelId);
+    List<ChannelSummaryResponseDto> findAllByUsersId(Long usersId);
     ChannelFindResponseDto findChannelById(Long channelId);
-    List<ChannelSummaryResponseDto> findAllByusersId(Long usersId);
-    List<ChannelSummaryResponseDto> findAll();
 }
