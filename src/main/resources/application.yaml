@@ -25,6 +25,18 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
 
+  logging:
+    level:
+      org:
+        hibernate:
+          SQL: debug
+          orm.jdbc.bind: trace
+        springframework:
+          data: debug
+      com:
+        example:
+          discodeit: debug
+
 
 discodeit:
   repository:
