@@ -1,12 +1,17 @@
 package com.sprint.mission.discodeit.adapter.inbound.content;
 
 import com.sprint.mission.discodeit.adapter.inbound.content.response.BinaryContentResponse;
-import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentResult;
-import org.mapstruct.Mapper;
+import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 
-@Mapper(componentModel = "spring")
-public interface BinaryContentDtoMapper {
+public final class BinaryContentDtoMapper {
 
-  BinaryContentResponse toCreateResponse(BinaryContentResult content);
+  private BinaryContentDtoMapper() {
+
+  }
+
+  public static BinaryContentResponse toCreateResponse(BinaryContent binaryContent) {
+    return new BinaryContentResponse(binaryContent.getId(), binaryContent.getFileName(),
+        binaryContent.getSize(), binaryContent.getContentType());
+  }
 
 }

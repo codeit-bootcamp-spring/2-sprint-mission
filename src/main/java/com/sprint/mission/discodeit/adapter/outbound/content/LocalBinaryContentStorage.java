@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.adapter.outbound.content;
 
+import com.sprint.mission.discodeit.adapter.inbound.content.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
-import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentResult;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -75,16 +75,16 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
   }
 
   @Override
-  public ResponseEntity<Resource> download(BinaryContentResult binaryContentResult) {
-    InputStream inputStream = get(binaryContentResult.id());
+  public ResponseEntity<Resource> download(BinaryContentResponse binaryContentResponse) {
+    InputStream inputStream = get(binaryContentResponse.id());
 
     InputStreamResource resource = new InputStreamResource(inputStream);
 
     HttpHeaders headers = new HttpHeaders();
     headers.add(HttpHeaders.CONTENT_DISPOSITION,
-        "attachment; filename=\"" + binaryContentResult.fileName() + "\"");
-    headers.setContentType(MediaType.parseMediaType(binaryContentResult.contentType()));
-    headers.setContentLength(binaryContentResult.size());
+        "attachment; filename=\"" + binaryContentResponse.fileName() + "\"");
+    headers.setContentType(MediaType.parseMediaType(binaryContentResponse.contentType()));
+    headers.setContentLength(binaryContentResponse.size());
 
     return ResponseEntity.ok().headers(headers).body(resource);
   }

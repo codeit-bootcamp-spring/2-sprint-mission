@@ -20,4 +20,5 @@ public record UserResponse(
     boolean online
 ) {
 
+
 }

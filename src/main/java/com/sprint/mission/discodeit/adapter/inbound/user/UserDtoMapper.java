@@ -1,28 +1,36 @@
 package com.sprint.mission.discodeit.adapter.inbound.user;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.BinaryContentDtoMapper;
 import com.sprint.mission.discodeit.adapter.inbound.user.request.UserCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.user.request.UserLoginRequest;
 import com.sprint.mission.discodeit.adapter.inbound.user.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.user.response.UserResponse;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import java.util.UUID;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {BinaryContentDtoMapper.class})
-public interface UserDtoMapper {
+public final class UserDtoMapper {
 
-  UserResponse toCreateResponse(UserResult result);
+  private UserDtoMapper() {
 
-  CreateUserCommand toCreateUserCommand(UserCreateRequest requestBody);
+  }
 
-  LoginUserCommand toLoginUserCommand(UserLoginRequest requestBody);
+//  public static UserResponse toCreateResponse(User user) {
+//    return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getProfile(),
+//        user.getUserStatus().isOnline());
+//  }
 
-  @Mapping(target = "requestUserId", source = "userId")
-  UpdateUserCommand toUpdateUserCommand(UUID userId, UserUpdateRequest requestBody);
+  public static CreateUserCommand toCreateUserCommand(UserCreateRequest requestBody) {
+    return new CreateUserCommand(requestBody.username(), requestBody.email(),
+        requestBody.password());
+  }
+
+  public static LoginUserCommand toLoginUserCommand(UserLoginRequest requestBody) {
+    return new LoginUserCommand(requestBody.username(), requestBody.password());
+  }
+
+  public static UpdateUserCommand toUpdateUserCommand(UUID userId, UserUpdateRequest requestBody) {
+    return new UpdateUserCommand(userId, requestBody.newName(), requestBody.newEmail(),
+        requestBody.newPassword());
+  }
 
 }

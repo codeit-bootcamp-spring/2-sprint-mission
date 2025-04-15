@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.adapter.inbound.user;
 
+
+import static com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper.toLoginUserCommand;
+
 import com.sprint.mission.discodeit.adapter.inbound.user.request.UserLoginRequest;
 import com.sprint.mission.discodeit.adapter.inbound.user.response.UserResponse;
 import com.sprint.mission.discodeit.core.user.usecase.UserLoginUseCase;
@@ -19,15 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-  private final UserDtoMapper userDtoMapper;
   private final UserLoginUseCase loginUseCase;
 
   @PostMapping("/login")
   public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest requestBody) {
-    LoginUserCommand command = userDtoMapper.toLoginUserCommand(requestBody);
+    LoginUserCommand command = toLoginUserCommand(requestBody);
     UserResult result = loginUseCase.login(command);
-
-    return ResponseEntity.ok(userDtoMapper.toCreateResponse(result));
+    //TODO. service 반환값 수정해야함
+    return ResponseEntity.ok((result));
   }
 
 }

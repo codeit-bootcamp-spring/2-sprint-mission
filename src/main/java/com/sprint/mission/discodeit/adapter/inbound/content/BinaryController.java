@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.adapter.inbound.content;
 
+import static com.sprint.mission.discodeit.adapter.inbound.content.BinaryContentDtoMapper.toCreateResponse;
+
+import com.sprint.mission.discodeit.adapter.inbound.content.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
-import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -24,22 +27,24 @@ public class BinaryController {
   private final BinaryContentService binaryContentService;
 
   @GetMapping
-  public ResponseEntity<List<BinaryContentResult>> findAllBinaryContent(
+  public ResponseEntity<List<BinaryContentResponse>> findAllBinaryContent(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
-    List<BinaryContentResult> allByIdIn = binaryContentService.findAllByIdIn(binaryContentIds);
-
-    return ResponseEntity.ok(allByIdIn);
+    List<BinaryContent> allByIdIn = binaryContentService.findAllByIdIn(binaryContentIds);
+    return ResponseEntity.ok(allByIdIn.stream()
+        .map(BinaryContentDtoMapper::toCreateResponse).toList());
   }
 
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContentResult> findBinaryContent(@PathVariable UUID binaryContentId) {
-
-    return ResponseEntity.ok(binaryContentService.findById(binaryContentId));
+  public ResponseEntity<BinaryContentResponse> findBinaryContent(
+      @PathVariable UUID binaryContentId) {
+    BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
+    return ResponseEntity.ok(toCreateResponse(binaryContent));
   }
 
   @GetMapping("/{binaryContentId}/download")
   public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
-    BinaryContentResult result = binaryContentService.findById(binaryContentId);
-    return binaryContentStorage.download(result);
+    BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
+    BinaryContentResponse response = toCreateResponse(binaryContent);
+    return binaryContentStorage.download(response);
   }
 }
