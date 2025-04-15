@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.adapter.inbound.user.response.UserDeleteResp
 import com.sprint.mission.discodeit.adapter.inbound.user.response.UserResponse;
 import com.sprint.mission.discodeit.adapter.inbound.user.response.UserStatusResponse;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
-import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.OnlineUserStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusResult;
 import com.sprint.mission.discodeit.core.user.usecase.UserService;
@@ -45,7 +44,6 @@ public class UserController {
   private final UserStatusDtoMapper userStatusDtoMapper;
   private final UserDtoMapper userDtoMapper;
   private final UserService userService;
-  private final UserStatusService userStatusService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserResponse> register(

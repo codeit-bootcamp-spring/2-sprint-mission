@@ -11,6 +11,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @ToString
@@ -27,6 +28,7 @@ public class User extends BaseUpdatableEntity {
   @Column(name = "password", length = 60, nullable = false)
   private String password;
 
+  @Setter
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
   private UserStatus userStatus;
 

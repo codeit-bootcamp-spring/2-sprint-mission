@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.OnlineUserStatusCommand;
@@ -60,9 +61,11 @@ public class BasicUserService implements UserService {
     userRepository.save(user);
     logger.info("User registered: {}", user.getId());
 
-    UserStatusResult statusResult = userStatusService.create(
+    UserStatus userStatus = userStatusService.create(
         new CreateUserStatusCommand(user.getId(), Instant.now()));
-    logger.info("User Status created: {}", statusResult.id());
+    logger.info("User Status created: {}", userStatus.getId());
+
+    user.setUserStatus(userStatus);
 
     return UserResult.create(user, user.getUserStatus().isOnline());
   }
@@ -170,10 +173,12 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(command.userId()).orElseThrow(
         () -> userIdNotFoundError(command.userId())
     );
-    UserStatusResult statusResult = userStatusService.findByUserId(user.getId());
+    UserStatus userStatus = userStatusService.findByUserId(user.getId());
 
-    return userStatusService.update(
-        new UpdateUserStatusCommand(statusResult.userId(), statusResult.userId(),
+    UserStatus update = userStatusService.update(
+        new UpdateUserStatusCommand(userStatus.getUser().getId(), userStatus.getId(),
             command.lastActiveAt()));
+
+    return UserStatusResult.create(update);
   }
 }
