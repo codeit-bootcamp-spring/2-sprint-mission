@@ -35,11 +35,9 @@ public class Channel extends BaseUpdatableEntity {
   public void update(String newName, String newDescription) {
     if (newName != null && !newName.equals(this.name)) {
       this.name = newName;
-      markUpdated();
     }
     if (newDescription != null && !newDescription.equals(this.description)) {
       this.description = newDescription;
-      markUpdated();
     }
   }
 

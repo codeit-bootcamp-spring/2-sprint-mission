@@ -29,26 +29,17 @@ public class User extends BaseUpdatableEntity {
   }
 
   public void update(String newUsername, String newEmail, String newPassword, UUID profileId) {
-    boolean anyValueUpdated = false;
     if (newUsername != null && !newUsername.equals(this.username)) {
       this.username = newUsername;
-      anyValueUpdated = true;
     }
     if (newEmail != null && !newEmail.equals(this.email)) {
       this.email = newEmail;
-      anyValueUpdated = true;
     }
     if (newPassword != null && !newPassword.equals(this.password)) {
       this.password = newPassword;
-      anyValueUpdated = true;
     }
     if (profileId != null && !profileId.equals(this.profileId)) {
       this.profileId = profileId;
-      anyValueUpdated = true;
-    }
-
-    if (anyValueUpdated) {
-      markUpdated();
     }
   }
 
