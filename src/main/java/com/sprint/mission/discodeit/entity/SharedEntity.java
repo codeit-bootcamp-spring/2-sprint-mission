@@ -7,20 +7,21 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public abstract class SharedEntity implements Serializable{
-    private static final long serialVersionUID = 1L;
+public abstract class SharedEntity implements Serializable {
 
-    protected final UUID uuid;
-    protected Instant createdAt;
-    protected Instant updatedAt;
+  private static final long serialVersionUID = 1L;
 
-    public SharedEntity() {
-        this.uuid = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
-    }
+  protected final UUID id;
+  protected Instant createdAt;
+  protected Instant updatedAt;
 
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = Instant.now();
-    }
+  public SharedEntity() {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    this.updatedAt = Instant.now();
+  }
+
+  public void setUpdatedAt(Instant updatedAt) {
+    this.updatedAt = Instant.now();
+  }
 }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.util.LogMapUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,25 +15,26 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/binaryContent")
+@RequestMapping("/api/binaryContents")
+@Tag(name = "BinaryContent", description = "첨부 파일 API")
 public class BinaryContentController {
 
-    private final BinaryContentService binaryContentService;
-    private static final Logger log = LoggerFactory.getLogger(BinaryContentController.class);
+  private final BinaryContentService binaryContentService;
+  private static final Logger log = LoggerFactory.getLogger(BinaryContentController.class);
 
-    @RequestMapping(value = "/read", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContent> read(@RequestParam UUID binaryContentKey) {
-        BinaryContent content = binaryContentService.find(binaryContentKey);
-        log.info("{}", LogMapUtil.of("action", "read")
-                .add("content", content));
-        return ResponseEntity.ok(content);
-    }
+  @GetMapping("/{binaryContentId}")
+  public ResponseEntity<BinaryContent> read(@PathVariable UUID binaryContentId) {
+    BinaryContent content = binaryContentService.find(binaryContentId);
+    log.info("{}", LogMapUtil.of("action", "read")
+        .add("content", content));
+    return ResponseEntity.ok(content);
+  }
 
-    @RequestMapping(value = "/readAll", method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContent>> readAll(@RequestParam List<UUID> binaryContentKeys) {
-        List<BinaryContent> contents = binaryContentService.findAllByKey(binaryContentKeys);
-        log.info("{}", LogMapUtil.of("action", "readAll")
-                .add("contents", contents));
-        return ResponseEntity.ok(contents);
-    }
+  @GetMapping
+  public ResponseEntity<List<BinaryContent>> readAll(@RequestParam List<UUID> binaryContentIds) {
+    List<BinaryContent> contents = binaryContentService.findAllByKeys(binaryContentIds);
+    log.info("{}", LogMapUtil.of("action", "readAll")
+        .add("contents", contents));
+    return ResponseEntity.ok(contents);
+  }
 }

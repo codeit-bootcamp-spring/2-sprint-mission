@@ -1,10 +1,15 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.util.LogMapUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,55 +18,67 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/messages")
+@RequestMapping("/api/messages")
+@Tag(name = "Messages", description = "Message Api")
 public class MessageController {
-    private static final Logger log = LoggerFactory.getLogger(MessageController.class);
-    private final MessageService messageService;
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<Message> create(@RequestBody MessageCreateRequest messageRequest) {
-        Message message = messageService.create(messageRequest);
-        log.info("{}", LogMapUtil.of("action", "create")
-                .add("message", message));
+  private static final Logger log = LoggerFactory.getLogger(MessageController.class);
+  private final MessageService messageService;
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(message);
-    }
+  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<Message> create(
+      @RequestPart("messageCreateRequest") MessageCreateRequest request,
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
+    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
+        .map(files -> files.stream()
+            .map(file -> {
+              try {
+                return new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+                );
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+            .toList())
+        .orElse(new ArrayList<>());
+    Message message = messageService.create(request, attachmentRequests);
+    log.info("{}", LogMapUtil.of("action", "create")
+        .add("message", message));
 
-    @RequestMapping(value = "/read", method = RequestMethod.GET)
-    public ResponseEntity<Message> read(@RequestParam UUID messageKey) {
-        Message message = messageService.read(messageKey);
-        log.info("{}", LogMapUtil.of("action", "read")
-                .add("message", message));
+    return ResponseEntity.status(HttpStatus.CREATED).body(message);
+  }
 
-        return ResponseEntity.ok(message);
-    }
+  @GetMapping
+  public ResponseEntity<List<Message>> readAllByChannel(@RequestParam UUID channelId) {
+    List<Message> messages = messageService.readAllByChannelKey(channelId);
+    log.info("{}", LogMapUtil.of("action", "readAllByChannel")
+        .add("messages", messages));
 
-    @RequestMapping(value = "/readAllByChannel", method = RequestMethod.GET)
-    public ResponseEntity<List<Message>> readAllByChannel(@RequestParam UUID channelKey) {
-        List<Message> messages = messageService.readAllByChannelKey(channelKey);
-        log.info("{}", LogMapUtil.of("action", "readAllByChannel")
-                .add("messages", messages));
+    return ResponseEntity.ok(messages);
+  }
 
-        return ResponseEntity.ok(messages);
-    }
+  @PutMapping("/{messageId}")
+  public ResponseEntity<Message> update(@PathVariable UUID messageId,
+      @RequestBody MessageUpdateRequest request) {
+    Message updated = messageService.update(messageId, request);
+    log.info("{}", LogMapUtil.of("action", "update")
+        .add("updated", updated));
 
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public ResponseEntity<Message> update(@RequestBody MessageUpdateRequest request) {
-        Message updated = messageService.update(request);
-        log.info("{}", LogMapUtil.of("action", "update")
-                .add("updated", updated));
+    return ResponseEntity.ok(updated);
+  }
 
-        return ResponseEntity.ok(updated);
-    }
-
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public ResponseEntity<?> delete(@RequestParam UUID messageKey) {
-        messageService.delete(messageKey);
-        log.info("{}", LogMapUtil.of("action", "delete")
-                .add("messageKey", messageKey));
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("/{messageId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
+    messageService.delete(messageId);
+    log.info("{}", LogMapUtil.of("action", "delete")
+        .add("messageId", messageId));
+    return ResponseEntity.noContent().build();
+  }
 }

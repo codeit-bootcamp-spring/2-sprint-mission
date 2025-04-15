@@ -11,13 +11,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class DiscodeitApplication {
 
-    public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
-        context.getBean(UserService.class);
-        context.getBean(ChannelService.class);
-        context.getBean(MessageService.class);
-        context.getBean(BinaryContentService.class);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(DiscodeitApplication.class, args);
+  }
 
 
 }

@@ -16,65 +16,76 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
-    private final UserStatusRepository userStatusRepository;
-    private final UserRepository userRepository;
 
-    @Override
-    public UserStatus create(UserStatusCreateRequest request) {
-        if (userRepository.findByKey(request.userKey()) == null) {
-            throw new IllegalArgumentException("[Error] user is null");
-        }
-        if (userStatusRepository.findByUserKey(request.userKey()) != null) {
-            throw new IllegalArgumentException("[Error] userStatus is already exists");
-        }
-        UserStatus userStatus= new UserStatus(request.userKey(), Instant.now());
-        return userStatusRepository.save(userStatus);
+  private final UserStatusRepository userStatusRepository;
+  private final UserRepository userRepository;
+
+  @Override
+  public UserStatus create(UserStatusCreateRequest request) {
+    if (userRepository.findByKey(request.userId()) == null) {
+      throw new IllegalArgumentException("[Error] user is null");
+    }
+    if (userStatusRepository.findByUserKey(request.userId()) != null) {
+      throw new IllegalArgumentException("[Error] userStatus is already exists");
+    }
+    UserStatus userStatus = new UserStatus(request.userId(), Instant.now());
+    return userStatusRepository.save(userStatus);
+  }
+
+  @Override
+  public UserStatus find(UUID userStatusKey) {
+    UserStatus userStatus = userStatusRepository.findByKey(userStatusKey);
+    if (userStatus == null) {
+      throw new IllegalArgumentException("[Error] userStatus is null");
+    }
+    return userStatus;
+  }
+
+  @Override
+  public List<UserStatus> findAll() {
+    List<UserStatus> userStatuses = userStatusRepository.findAll();
+    if (userStatuses == null) {
+      throw new IllegalArgumentException("[Error] userStatus is null");
+    }
+    return userStatuses;
+  }
+
+  @Override
+  public UserStatus update(UUID userStatusKey, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusRepository.findByKey(userStatusKey);
+    if (userStatus == null) {
+      throw new IllegalArgumentException("[Error] userStatus is null");
+    }
+    userStatus.updateLastActiveAt(request.newLastActiveAt());
+    return userStatusRepository.save(userStatus);
+  }
+
+  @Override
+  public UserStatus updateByUserKey(UUID userKey, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusRepository.findByUserKey(userKey);
+    if (userStatus == null) {
+      throw new IllegalArgumentException("[Error] userStatus is null");
+    }
+    userStatus.updateLastActiveAt(request.newLastActiveAt());
+    return userStatusRepository.save(userStatus);
+  }
+
+  @Override
+  public void delete(UUID userStatusKey) {
+    UserStatus userStatus = userStatusRepository.findByKey(userStatusKey);
+    if (userStatus == null) {
+      throw new IllegalArgumentException("[Error] userStatus is null");
+    }
+    userStatusRepository.delete(userStatusKey);
+  }
+
+  @Override
+  public void deleteByUserKey(UUID userKey) {
+    UserStatus userStatus = userStatusRepository.findByUserKey(userKey);
+    if (userStatus == null) {
+      throw new IllegalArgumentException("[Error] userStatus is null");
     }
 
-    @Override
-    public UserStatus find(UUID userStatusKey) {
-        UserStatus userStatus = userStatusRepository.findByKey(userStatusKey);
-        if (userStatus == null) {
-            throw new IllegalArgumentException("[Error] userStatus is null");
-        }
-        return userStatus;
-    }
-
-    @Override
-    public List<UserStatus> findAll() {
-        List<UserStatus> userStatuses = userStatusRepository.findAll();
-        if (userStatuses == null) {
-            throw new IllegalArgumentException("[Error] userStatus is null");
-        }
-        return userStatuses;
-    }
-
-    @Override
-    public UserStatus update(UserStatusUpdateRequest request) {
-        UserStatus userStatus = userStatusRepository.findByUserKey(request.userKey());
-        if (userStatus == null) {
-            throw new IllegalArgumentException("[Error] userStatus is null");
-        }
-        userStatus.updateLastActiveAt(Instant.now());
-        return userStatusRepository.save(userStatus);
-    }
-
-    @Override
-    public void delete(UUID userStatusKey) {
-        UserStatus userStatus = userStatusRepository.findByKey(userStatusKey);
-        if (userStatus == null) {
-            throw new IllegalArgumentException("[Error] userStatus is null");
-        }
-        userStatusRepository.delete(userStatusKey);
-    }
-
-    @Override
-    public void deleteByUserKey(UUID userKey) {
-        UserStatus userStatus = userStatusRepository.findByUserKey(userKey);
-        if (userStatus == null) {
-            throw new IllegalArgumentException("[Error] userStatus is null");
-        }
-
-        userStatusRepository.delete(userStatus.getUuid());
-    }
+    userStatusRepository.delete(userStatus.getId());
+  }
 }

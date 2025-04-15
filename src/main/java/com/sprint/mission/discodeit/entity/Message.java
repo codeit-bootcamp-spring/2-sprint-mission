@@ -10,33 +10,34 @@ import java.util.UUID;
 
 @Getter
 public class Message extends SharedEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private String content;
-    private final UUID userKey;
-    private final UUID channelKey;
-    private final List<UUID> attachmentKeys;
+  private static final long serialVersionUID = 1L;
 
-    public Message(String content, UUID userKey, UUID channelKey, List<UUID> attachmentKeys) {
-        super();
-        this.content = content;
-        this.userKey = userKey;
-        this.channelKey = channelKey;
-        this.attachmentKeys = attachmentKeys != null ? attachmentKeys : new ArrayList<>();
-    }
+  private String content;
+  private final UUID authorId;
+  private final UUID channelId;
+  private final List<UUID> attachmentIds;
 
-    public void updateContent(String content) {
-        this.content = content;
-        setUpdatedAt(Instant.now());
-    }
+  public Message(String content, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
+    super();
+    this.content = content;
+    this.authorId = authorId;
+    this.channelId = channelId;
+    this.attachmentIds = attachmentIds != null ? attachmentIds : new ArrayList<>();
+  }
 
-    public void addAttachment(UUID attachmentKey) {
-        this.attachmentKeys.add(attachmentKey);
-    }
+  public void updateContent(String content) {
+    this.content = content;
+    setUpdatedAt(Instant.now());
+  }
 
-    @Override
-    public String toString() {
-        return String.format("\n key= %s\n content= %s\n createdAt= %s\n updatedAt= %s\n",
-                uuid, content, createdAt, updatedAt);
-    }
+  public void addAttachment(UUID attachmentKey) {
+    this.attachmentIds.add(attachmentKey);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("\n key= %s\n content= %s\n createdAt= %s\n updatedAt= %s\n",
+        id, content, createdAt, updatedAt);
+  }
 }

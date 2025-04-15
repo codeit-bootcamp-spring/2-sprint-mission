@@ -5,24 +5,27 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.ToString;
 
+@ToString
 @Getter
 public class ReadStatus extends SharedEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private final UUID userKey;
-    private final UUID channelKey;
-    private Instant lastReadAt;
+  private static final long serialVersionUID = 1L;
 
-    public ReadStatus(UUID userKey, UUID channelKey, Instant lastReadAt) {
-        super();
-        this.userKey = userKey;
-        this.channelKey = channelKey;
-        this.lastReadAt = lastReadAt;
-    }
+  private final UUID userId;
+  private final UUID channelId;
+  private Instant lastReadAt;
 
-    public void updateLastReadAt(Instant lastReadAt) {
-        this.lastReadAt = lastReadAt;
-        setUpdatedAt(Instant.now());
-    }
+  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+    super();
+    this.userId = userId;
+    this.channelId = channelId;
+    this.lastReadAt = lastReadAt;
+  }
+
+  public void updateLastReadAt(Instant lastReadAt) {
+    this.lastReadAt = lastReadAt;
+    setUpdatedAt(Instant.now());
+  }
 }
