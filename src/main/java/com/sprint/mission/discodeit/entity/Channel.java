@@ -1,19 +1,33 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
+import lombok.NoArgsConstructor;
 
-
+@Entity
+@Table(name = "channels")
 @Getter
+@NoArgsConstructor
 public class Channel extends BaseUpdatableEntity implements Serializable, Identifiable {
 
   private static final long serialVersionUID = 1L;
 
+  @Enumerated(EnumType.STRING)
+  @Column(length = 10, nullable = false)
   private ChannelType type;
+
+  @Column(length = 100)
   private String name;
+
+  @Column(length = 500)
   private String description;
 
   @Builder
