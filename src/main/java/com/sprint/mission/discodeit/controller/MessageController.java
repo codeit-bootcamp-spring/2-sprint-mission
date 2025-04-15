@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
+import static java.util.stream.Collectors.toList;
+
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.data.PageResponse;
@@ -63,7 +65,7 @@ public class MessageController implements MessageApi {
 
     Message message = messageService.create(messageCreateRequest, attachmentRequests);
 
-    UserDto author = userService.find(message.getAuthorId());
+    UserDto author = userService.find(message.getAuthor().getId());
 
     List<BinaryContentDto> binaryContentDtos = Optional.ofNullable(attachments)
         .map(files -> files.stream()
@@ -79,7 +81,7 @@ public class MessageController implements MessageApi {
         .orElse(new ArrayList<>());
 
     MessageDto dto = new MessageDto(message.getId(), message.getCreatedAt(), message.getUpdatedAt(),
-        message.getContent(), message.getGetChannelId(), author, binaryContentDtos);
+        message.getContent(), message.getChannel().getId(), author, binaryContentDtos);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(dto);
   }
@@ -115,10 +117,13 @@ public class MessageController implements MessageApi {
     Message updated = messageService.update(uuid,
         messageUpdateRequest);
 
-    UserDto author = userService.find(updated.getAuthorId());
+    UserDto author = userService.find(updated.getAuthor().getId());
 
     List<BinaryContent> attachments =
-        binaryContentService.findAllByIdIn(updated.getAttachmentIds());
+        binaryContentService.findAllByIdIn(updated.getAttachments().stream()
+            .map(attactments -> {
+              return attactments.getId();
+            }).toList());
 
     List<BinaryContentDto> binaryContentDtos = Optional.ofNullable(attachments)
         .map(files -> files.stream()
@@ -134,8 +139,8 @@ public class MessageController implements MessageApi {
         .orElse(new ArrayList<>());
 
     MessageDto dto = new MessageDto(
-        updated.getAuthorId(), updated.getCreatedAt(), updated.getUpdatedAt(),
-        updated.getContent(), updated.getGetChannelId(), author, binaryContentDtos
+        updated.getAuthor().getId(), updated.getCreatedAt(), updated.getUpdatedAt(),
+        updated.getContent(), updated.getChannel().getId(), author, binaryContentDtos
     );
 
     return ResponseEntity.ok(dto);

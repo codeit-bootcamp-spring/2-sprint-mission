@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity.base;
 
 import jakarta.persistence.*;
+import java.io.Serializable;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -9,10 +10,12 @@ import java.util.UUID;
 
 @MappedSuperclass
 @Getter
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Serializable {
 
+  private static final long serialVersionUID = 1L;
   @Id
   @GeneratedValue
+  @Column(columnDefinition = "BINARY(16)")
   protected UUID id;
 
   @CreationTimestamp

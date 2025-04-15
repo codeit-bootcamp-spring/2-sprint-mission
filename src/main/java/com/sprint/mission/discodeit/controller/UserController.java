@@ -101,7 +101,7 @@ public class UserController implements UserApi {
 
     UserStatus updated = userStatusService.update(userId, userStatusUpdateRequest);
 
-    UserStatusDto dto = new UserStatusDto(updated.getId(), updated.getUserId(),
+    UserStatusDto dto = new UserStatusDto(updated.getId(), updated.getUser().getId(),
         updated.getLastActiveAt());
 
     return ResponseEntity
