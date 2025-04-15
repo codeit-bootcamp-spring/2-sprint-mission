@@ -1,5 +1,6 @@
 package com.sprint.discodeit.sprint.service.basic.util;
 
+import com.sprint.discodeit.sprint.domain.dto.binaryContentDto.BinaryContentDto;
 import com.sprint.discodeit.sprint.domain.entity.BinaryContent;
 import com.sprint.discodeit.sprint.domain.storage.BinaryContentStorage;
 import com.sprint.discodeit.sprint.repository.BinaryContentRepository;
@@ -50,6 +51,17 @@ public class BinaryContentService implements BinaryService {
 
     private String extractFileName(String imgUrl) {
         return imgUrl.substring(imgUrl.lastIndexOf("/") + 1);
+    }
+
+    public BinaryContentDto find(Long binaryContentId) {
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
+                .orElseThrow(() -> new IllegalArgumentException("없는 파일 입니다"));
+        return new BinaryContentDto(
+                binaryContent.getId(),
+                binaryContent.getFileName(),
+                binaryContent.getFileSize(),
+                binaryContent.getFileType()
+        );
     }
 }
 
