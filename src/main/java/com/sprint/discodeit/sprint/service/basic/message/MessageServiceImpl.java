@@ -2,6 +2,7 @@ package com.sprint.discodeit.sprint.service.basic.message;
 
 import com.sprint.discodeit.sprint.domain.dto.PaginatedResponse;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelMessageResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.messageDto.CursorPaginatedResponse;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.BinaryContent;
@@ -14,8 +15,11 @@ import com.sprint.discodeit.sprint.repository.ChannelRepository;
 import com.sprint.discodeit.sprint.repository.MessageRepository;
 import com.sprint.discodeit.sprint.repository.UsersRepository;
 import com.sprint.discodeit.sprint.service.basic.util.BinaryContentService;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -63,6 +67,33 @@ public class MessageServiceImpl implements MessageService {
                         message.getCreatedAt()
                 ))
         );
+    }
+
+    public CursorPaginatedResponse<ChannelMessageResponseDto> findByChannelCursor(Long channelId, Long lastMessageId, int size){
+        Pageable pageable = PageRequest.of(0, size + 1);
+        List<Message> messages = messageRepository.findByChannelIdWithCursorPaging(channelId,
+                lastMessageId, pageable);
+
+        boolean hesNext = false;
+
+        if(messages.size() > size){
+            hesNext = true;
+            messages = messages.subList(0, size);
+        }
+
+        List<ChannelMessageResponseDto> content = messages.stream()
+                .map(m -> new ChannelMessageResponseDto(
+                        m.getId(),
+                        m.getContent(),
+                        m.getUsers().getUsername(),
+                        m.getCreatedAt()
+                ))
+                .toList();
+        Long nextCursor = null;
+        if (hesNext && !content.isEmpty()){
+            nextCursor = content.get(content.size() -1).messageId();
+        }
+        return new CursorPaginatedResponse<>(content, nextCursor, hesNext);
     }
 
 

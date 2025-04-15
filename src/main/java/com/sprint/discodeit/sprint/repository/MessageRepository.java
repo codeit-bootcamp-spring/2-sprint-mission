@@ -10,8 +10,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    @Query("SELECT m FROM Message as m WHERE m.channel.id = :channelId")
-    List<Message> findByChannelsId(@Param("channelId") Long channelId);
-
     Slice<Message> findByChannelIdOrderByCreatedAtDesc(Long channelId, Pageable pageable);
+
+    @Query("select m from Message as m where m.channel.id = :channenlId and (: lastMessageId is null or m.id < :lastMessageId)"
+            + "order by  m.id DESC ")
+    List<Message> findByChannelIdWithCursorPaging( @Param("channelId") Long channelId,
+                                                   @Param("lastMessageId") Long lastMessageId,
+                                                   Pageable pageable);
 }

@@ -3,6 +3,7 @@ package com.sprint.discodeit.sprint.controller;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import com.sprint.discodeit.sprint.domain.dto.PaginatedResponse;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelMessageResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.messageDto.CursorPaginatedResponse;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.Message;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Message API", description = "메시지 관련 API입니다.")
@@ -62,6 +64,17 @@ public class MessageController {
     public ResponseEntity<PaginatedResponse<ChannelMessageResponseDto>> getMessages(@PathVariable Long channelId,
                                                                                     @PageableDefault(size = 50, sort = "createdAt", direction = DESC) Pageable pageable) {
         return ResponseEntity.ok(messageService.findChannel(channelId, pageable));
+    }
+
+    @GetMapping("/channels/{channelId}/messages/cursor")
+    public ResponseEntity<CursorPaginatedResponse<ChannelMessageResponseDto>> getMessagesWithCursor(
+            @PathVariable Long channelId,
+            @RequestParam(required = false) Long lastMessageId,
+            @RequestParam(defaultValue = "50") int size)
+
+    {
+        return ResponseEntity.ok(messageService.findByChannelCursor(channelId, lastMessageId, size)
+        );
     }
 
 }
