@@ -1,6 +1,5 @@
 package com.sprint.discodeit.sprint.domain.entity;
 
-import com.sprint.discodeit.sprint.domain.base.BaseEntity;
 import com.sprint.discodeit.sprint.domain.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

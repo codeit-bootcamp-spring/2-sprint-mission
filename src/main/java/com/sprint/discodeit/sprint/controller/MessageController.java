@@ -8,7 +8,6 @@ import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageUpdateResponseDto;
-import com.sprint.discodeit.sprint.domain.entity.Message;
 import com.sprint.discodeit.sprint.service.basic.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

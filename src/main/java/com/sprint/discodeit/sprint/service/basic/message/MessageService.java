@@ -7,7 +7,6 @@ import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageUpdateResponseDto;
-import com.sprint.discodeit.sprint.domain.entity.Message;
 import org.springframework.data.domain.Pageable;
 
 public interface MessageService {
