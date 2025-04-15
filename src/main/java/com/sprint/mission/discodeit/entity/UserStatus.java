@@ -1,37 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.Getter;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
-public class UserStatus implements Serializable {
+public class UserStatus extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @OneToOne(optional = false, fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;
 
-  private final UUID id;
-  private final Instant createdAt;
-  private Instant updatedAt;
-
-  private final UUID userId;
+  @Column(name = "last_active_at", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private Instant lastActiveAt;
 
-  public UserStatus(UUID userId, Instant lastActiveAt) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    this.updatedAt = Instant.now();
-    this.userId = userId;
+  public UserStatus() {
+  }
+
+  public UserStatus(User user, Instant lastActiveAt) {
+    this.user = user;
     this.lastActiveAt = lastActiveAt;
   }
 
   public void update(Instant lastActiveAt) {
     if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
       this.lastActiveAt = lastActiveAt;
-      this.updatedAt = Instant.now();
     }
   }
 
