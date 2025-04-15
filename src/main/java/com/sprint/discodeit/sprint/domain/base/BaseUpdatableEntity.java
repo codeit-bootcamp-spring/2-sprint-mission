@@ -11,7 +11,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 public class BaseUpdatableEntity extends BaseEntity {
 
     @LastModifiedDate
-    @Column(updatable = false)
     private Instant lastModified;
 
 }

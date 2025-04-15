@@ -5,7 +5,9 @@ import com.sprint.discodeit.sprint.domain.dto.PaginatedResponse;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelMessageResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.CursorPaginatedResponse;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageRequestDto;
+import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageUpdateRequestDto;
+import com.sprint.discodeit.sprint.domain.dto.messageDto.MessageUpdateResponseDto;
 import com.sprint.discodeit.sprint.domain.entity.Message;
 import com.sprint.discodeit.sprint.service.basic.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +42,7 @@ public class MessageController {
     @ApiResponses({@ApiResponse(responseCode = "201", description = "메시지 전송 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 형식")})
     @PostMapping("/channels/{channelId}")
-    public ResponseEntity<Message> sendMessage(
+    public ResponseEntity<MessageResponseDto> sendMessage(
             @Parameter(description = "메시지를 보낼 채널의 UUID") @PathVariable Long channelId,
             @RequestBody MessageRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageService.create(channelId, requestDto));
@@ -48,8 +50,8 @@ public class MessageController {
 
     @Operation(summary = "메시지 수정", description = "메시지 내용을 수정합니다.")
     @PutMapping("/{messageId}")
-    public ResponseEntity<Message> updateMessage(@Parameter(description = "수정할 메시지의 UUID") @PathVariable Long messageId,
-                                                 @RequestBody MessageUpdateRequestDto updateDto) {
+    public ResponseEntity<MessageUpdateResponseDto> updateMessage(@Parameter(description = "수정할 메시지의 UUID") @PathVariable Long messageId,
+                                                                  @RequestBody MessageUpdateRequestDto updateDto) {
         return ResponseEntity.ok(messageService.update(messageId, updateDto));
     }
 
