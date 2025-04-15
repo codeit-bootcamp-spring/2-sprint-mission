@@ -22,12 +22,12 @@ public class User extends BaseUpdatableEntity {
     @Column(nullable = false)
     private String password;
 
-    //1대 1
+    //1대 1 user -> profile
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
     private BinaryContent profile;
 
-    // 외래키를 가진 status를 주인으로 설정
+    // 외래키를 가진 status를 주인으로 설정(양방향)
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private UserStatus userStatus;
 
