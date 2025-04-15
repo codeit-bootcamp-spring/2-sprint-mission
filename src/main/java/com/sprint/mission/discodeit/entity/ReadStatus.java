@@ -1,29 +1,32 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Entity
+@NoArgsConstructor
 @Getter
-public class ReadStatus implements Serializable {
+public class ReadStatus extends BaseUpdatableEntity{
 
-  private static final long serialVersionUID = 1L;
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
-  private UUID userId;
-  private UUID channelId;
+  @ManyToOne
+  @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_read_status_user"))
+  private User user;
+
+  @ManyToOne
+  @JoinColumn(name = "channel_id", foreignKey = @ForeignKey(name = "fk_read_status_channel"))
+  private Channel channel;
+
+  @Column(nullable = false)
   private Instant lastReadAt;
 
-  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
-    this.userId = userId;
-    this.channelId = channelId;
+  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+    this.user = user;
+    this.channel = channel;
     this.lastReadAt = lastReadAt;
   }
 
@@ -32,10 +35,6 @@ public class ReadStatus implements Serializable {
     if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
       this.lastReadAt = newLastReadAt;
       anyValueUpdated = true;
-    }
-
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
     }
   }
 }

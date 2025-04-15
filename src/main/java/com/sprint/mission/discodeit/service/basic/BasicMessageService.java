@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -30,6 +32,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public Message create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+
     UUID channelId = messageCreateRequest.channelId();
     UUID authorId = messageCreateRequest.authorId();
 
@@ -53,13 +56,18 @@ public class BasicMessageService implements MessageService {
         })
         .toList();
 
+    Channel channel = channelRepository.findById(channelId).orElse(null);
+    User user = userRepository.findById(authorId).orElse(null);
+
     String content = messageCreateRequest.content();
     Message message = new Message(
         content,
-        channelId,
-        authorId,
-        attachmentIds
+        channel,
+        user
     );
+
+
+
     return messageRepository.save(message);
   }
 
