@@ -2,10 +2,7 @@ package com.sprint.discodeit.sprint.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.discodeit.sprint.domain.entity.Message;
-import com.sprint.discodeit.sprint.domain.entity.PrivateChannelUser;
 import com.sprint.discodeit.sprint.domain.entity.QMessage;
-import com.sprint.discodeit.sprint.domain.entity.QPrivateChannelUser;
-import com.sprint.discodeit.sprint.domain.entity.QUsers;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -17,17 +14,14 @@ public class UserPrivateChannelMessageFindRepositoryImpl implements UserPrivateC
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Message> findMessagesByChannelGroupedByUser(Long channelId) {
-        QPrivateChannelUser privateChannelUser = QPrivateChannelUser.privateChannelUser;
-        QUsers users = QUsers.users;
+    public List<Message> findMessagesByChannelGroupedByUser(Long userId, List<Long> channelIds) {
         QMessage message = QMessage.message;
 
         return queryFactory
                 .selectFrom(message)
-                .join(message.users, users)
-                .join(privateChannelUser).on(privateChannelUser.user.eq(users))
-                .where(privateChannelUser.privateChannel.id.eq(channelId))
-                .orderBy(users.id.asc(), message.createdAt.asc())
+                .where(message.channel.id.in(channelIds),
+                        message.users.id.eq(userId))
+                .orderBy(message.createdAt.asc())
                 .fetch();
     }
 }

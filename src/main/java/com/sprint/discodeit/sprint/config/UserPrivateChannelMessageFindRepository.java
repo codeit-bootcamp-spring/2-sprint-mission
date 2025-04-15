@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface UserPrivateChannelMessageFindRepository {
 
-    List<Message> findMessagesByChannelGroupedByUser(Long channelId);
+    List<Message> findMessagesByChannelGroupedByUser(Long userId, List<Long> channelIds);
 }

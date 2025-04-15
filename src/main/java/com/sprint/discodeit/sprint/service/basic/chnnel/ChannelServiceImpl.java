@@ -10,6 +10,7 @@ import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelUpdateResponseDt
 import com.sprint.discodeit.sprint.domain.dto.channelDto.PrivateChannelCreateRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.PublicChannelCreateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.Channel;
+import com.sprint.discodeit.sprint.domain.entity.Message;
 import com.sprint.discodeit.sprint.domain.entity.PrivateChannel;
 import com.sprint.discodeit.sprint.domain.entity.PrivateChannelUser;
 import com.sprint.discodeit.sprint.domain.entity.PublicChannel;
@@ -23,6 +24,7 @@ import com.sprint.discodeit.sprint.repository.PrivateChannelUserRepository;
 import com.sprint.discodeit.sprint.repository.PublicChannelRepository;
 import com.sprint.discodeit.sprint.repository.UsersRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -103,18 +105,22 @@ public class ChannelServiceImpl implements ChannelService {
             throw new RequestException(ErrorCode.users_NOT_FOUND);
         }
 
-//       List<String> content = privateChannelUsers.stream()
-//                        .map(pcUser -> pcUser.getPrivateChannel().getMessage().stream().map(m -> m.getContent()).toList();
-
-        return privateChannelUsers.stream()
-                .map(pcUser -> new ChannelSummaryResponseDto(
-                        pcUser.getPrivateChannel().getId(),
-                        pcUser.getPrivateChannel().getName(),
-                        pcUser.getPrivateChannel().getDescription()
-                ))
+        List<Long> privateChannelId = privateChannelUsers.stream()
+                .map(pcu -> pcu.getPrivateChannel().getId())
                 .toList();
-    }
 
+        List<Message> messages = privateChannelUserRepository.findMessagesByChannelGroupedByUser(usersId,
+                privateChannelId);
+
+        Map<String, List<String>> messagesByChannelName = messages.stream()
+                .collect(Collectors.groupingBy(
+                        m -> m.getChannel().getName(),
+                        Collectors.mapping(Message::getContent, Collectors.toList())
+                ));
+
+        return messagesByChannelName.entrySet().stream()
+                .map(mcn -> new ChannelSummaryResponseDto(mcn.getKey(), mcn.getValue())).toList();
+    }
 
     @Override
     public ChannelFindResponseDto findChannelById(Long channelId) {
