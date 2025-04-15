@@ -27,7 +27,7 @@ public class Channel extends BaseUpdatableEntity {
     private String description;
 
     @Column(nullable = false)
-    private UUID ownerId; // 우선 ID 유지
+    private User ownerId; // 우선 ID 유지
 
 //    @ElementCollection(fetch = FetchType.EAGER)
 //    @CollectionTable(name = "channel_users", joinColumns = @JoinColumn(name = "channel_id"))
@@ -54,10 +54,9 @@ public class Channel extends BaseUpdatableEntity {
         super();
         this.type = ChannelType.PRIVATE;
         this.ownerId = ownerId;
-        if (participantIds != null) { // null 방지
-            this.userList = new ArrayList<>(participantIds); // 복사
+        if (participantIds != null) {
+            this.userList = new ArrayList<>(participantIds);
         }
-        // 참여자 목록에 owner도 포함 (일반적으로 DM방은 생성자도 포함)
         if (!this.userList.contains(ownerId)) {
             this.userList.add(ownerId);
         }
@@ -69,16 +68,16 @@ public class Channel extends BaseUpdatableEntity {
         this.type = ChannelType.PRIVATE;
         this.name = channelName;
         this.ownerId = ownerId;
-        if (participantIds != null) { // null 방지
-            this.userList = new ArrayList<>(participantIds); // 복사
+        if (participantIds != null) {
+            this.userList = new ArrayList<>(participantIds);
         }
-        // 참여자 목록에 owner도 포함
+
         if (!this.userList.contains(ownerId)) {
             this.userList.add(ownerId);
         }
     }
 
-    // update 메서드 유지
+
     public boolean update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
         if (newName != null && !newName.isEmpty() && !newName.equals(this.name)) {

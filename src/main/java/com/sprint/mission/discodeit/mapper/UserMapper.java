@@ -5,13 +5,15 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
 @RequiredArgsConstructor
 public class UserMapper {
 
     BinaryContentMapper binaryContentMapper;
 
-    UserDto toDto(User user) {
+    public UserDto toDto(User user) {
         return null;
     }
 }

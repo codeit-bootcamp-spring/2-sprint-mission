@@ -28,26 +28,27 @@ public class Message extends BaseUpdatableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", referencedColumnName = "id", nullable = false)
     private User author;
+    
+    // 1대 다 조인 테이블 생성
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "message_attachments",
+        joinColumns = @JoinColumn(name = "message_id"),
+        inverseJoinColumns = @JoinColumn(name = "attachment_id", unique = true)
+    )
+    private List<BinaryContent> attachments = new ArrayList<>();
 
-    // 연관 테이블 생성(부모가 관리)
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "message_attachments", joinColumns = @JoinColumn(name = "message_id"))
-    @Column(name = "attachment_id")
-    @OrderBy
-    private List<UUID> attachmentIds = new ArrayList<>();
 
-    // 생성자 수정
-    public Message(String content, Channel channel, User author, List<UUID> attachmentIds) {
+    public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
         super();
         this.content = content;
         this.channel = channel;
         this.author = author;
-        if (attachmentIds != null) {
-            this.attachmentIds = attachmentIds;
+        if (attachments != null) {
+            this.attachments = attachments;
         }
     }
 
-    // update 메서드 유지
     public boolean update(String newContent) {
         boolean anyValueUpdated = false;
         if (newContent != null && !newContent.equals(this.content)) {
@@ -57,19 +58,4 @@ public class Message extends BaseUpdatableEntity {
         return anyValueUpdated;
     }
 
-    // addAttachment/removeAttachment 메서드 유지
-    public void addAttachment(UUID attachmentId) {
-        if (this.attachmentIds == null) {
-            this.attachmentIds = new ArrayList<>();
-        }
-        if (!this.attachmentIds.contains(attachmentId)) {
-            this.attachmentIds.add(attachmentId);
-        }
-    }
-
-    public void removeAttachment(UUID attachmentId) {
-        if (this.attachmentIds != null) {
-            this.attachmentIds.remove(attachmentId);
-        }
-    }
 }

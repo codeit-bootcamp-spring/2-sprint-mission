@@ -1,8 +1,7 @@
-package com.sprint.mission.discodeit.service.basic;
+package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +10,8 @@ public interface BinaryContentStorage {
 
     UUID put(UUID id, byte[] bytes);
 
-    InputStream read(UUID id);
+
+    InputStream get(UUID id) throws IOException;
 
     ResponseEntity<?> download(BinaryContentDto binaryContentDto);
 

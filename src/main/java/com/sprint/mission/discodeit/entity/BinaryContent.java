@@ -19,25 +19,13 @@ public class BinaryContent extends BaseEntity {
     private Long size;
     private String contentType;
 
-    @Column(nullable = false)
-    private UUID ownerId;
 
-    @Column(nullable = false)
-    private String ownerType;
-
-    @Column(nullable = false)
-    private String filePath;
-
-
-    public BinaryContent(String contentType, String originalFileName, long size, UUID ownerId,
-        String ownerType, String filePath) {
+    public BinaryContent(String contentType, String fileName, long size
+    ) {
         super();
         this.contentType = contentType;
-        this.fileName = originalFileName;
+        this.fileName = fileName;
         this.size = size;
-        this.ownerId = ownerId;
-        this.ownerType = ownerType;
-        this.filePath = filePath;
     }
 
 }

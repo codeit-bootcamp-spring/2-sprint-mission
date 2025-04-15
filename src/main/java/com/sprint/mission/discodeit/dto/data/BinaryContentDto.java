@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.dto.data;
 
 import java.util.*;
+import lombok.Data;
+import lombok.Getter;
+
 
 public record BinaryContentDto
     (UUID id,
-     String filename,
+     String fileName,
      Long size,
-     String contentType,
-     byte[] content) {
+     String contentType
+    ) {
 
 }
