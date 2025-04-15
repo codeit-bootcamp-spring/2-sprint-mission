@@ -142,6 +142,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(

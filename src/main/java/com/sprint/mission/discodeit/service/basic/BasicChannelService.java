@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.transaction.Transactional;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional
   public Channel createPrivateChannel(
       PrivateChannelCreateRequest privateChannelCreateRequest) {
     Channel channel = new Channel(null, null, ChannelType.PRIVATE);
@@ -102,6 +104,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional
   public Channel updateChannel(UUID channelId, PublicChannelUpdateRequest channelUpdateParamDto) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(
@@ -113,10 +116,11 @@ public class BasicChannelService implements ChannelService {
 
     channel.updateChannelName(channelUpdateParamDto.newName());
     channel.updateChannelDescription(channelUpdateParamDto.newDescription());
-    return channelRepository.save(channel);
+    return channel;
   }
 
   @Override
+  @Transactional
   public void deleteChannel(UUID channelId) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException(channelId + "에 해당하는 채널을 찾을 수 없습니다."));
