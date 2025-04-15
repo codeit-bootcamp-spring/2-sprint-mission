@@ -1,13 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.FindUserDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserCreateResponse;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.user.UserUpdateResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -16,10 +15,8 @@ import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.swing.text.html.Option;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,12 +26,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
-  private final BinaryContentRepository binaryContentRepository;
+  private final UserMapper userMapper;
 
   @Override
   @Transactional
-  public UserCreateResponse save(UserCreateRequest userCreateRequest, MultipartFile profile)
+  public UserDto save(UserCreateRequest userCreateRequest, MultipartFile profile)
       throws IOException {
     if (userRepository.findByUsername(userCreateRequest.username()).isPresent()) {
       throw new IllegalArgumentException(
@@ -64,43 +60,19 @@ public class BasicUserService implements UserService {
 
     userRepository.save(user);
 
-    UUID profileId = user.getProfile() != null ? user.getProfile().getId() : null;
-
-    return new UserCreateResponse(user.getId(), user.getUsername(), user.getEmail(),
-        profileId, user.getCreatedAt());
+    return userMapper.toDto(user);
   }
 
   @Override
-  public FindUserDto findByUser(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(
-            () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
-    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-        .orElseThrow(() -> new NoSuchElementException(
-            String.format("User with userId %s not found", userId)));
-
-    UUID profileId = user.getProfile() != null ? user.getProfile().getId() : null;
-
-    FindUserDto findUserDto = new FindUserDto(
-        user.getId(), user.getUsername(), user.getEmail(),
-        profileId, user.getCreatedAt(), user.getUpdatedAt(),
-        userStatus.getLastActiveAt(), userStatus.isLastStatus());
-
-    return findUserDto;
-  }
-
-  @Override
-  public List<FindUserDto> findAllUser() {
-    List<User> userList = userRepository.findAll();
-
-    return userList.stream()
-        .map(user -> findByUser(user.getId()))
-        .collect(Collectors.toList());
+  public List<UserDto> findAllUser() {
+    return userRepository.findAllWithProfile().stream()
+        .map(userMapper::toDto)
+        .toList();
   }
 
   @Override
   @Transactional
-  public UserUpdateResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
+  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       MultipartFile profile) throws IOException {
     User user = userRepository.findById(userId).
         orElseThrow(
@@ -135,10 +107,7 @@ public class BasicUserService implements UserService {
     user.updateEmail(userUpdateRequest.newEmail());
     user.updateProfile(binaryContent);
 
-    UUID profileId = user.getProfile() != null ? user.getProfile().getId() : null;
-
-    return new UserUpdateResponse(user.getId(), user.getUsername(), user.getEmail(),
-        profileId, user.getCreatedAt(), user.getUpdatedAt());
+    return userMapper.toDto(user);
   }
 
   @Override

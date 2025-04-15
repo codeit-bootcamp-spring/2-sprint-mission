@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.user.FindUserDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserCreateResponse;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.user.UserUpdateResponse;
 import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusResponse;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
@@ -71,12 +69,12 @@ public class UserController {
           )
       )
   })
-  public ResponseEntity<UserCreateResponse> create(
+  public ResponseEntity<UserDto> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) throws IOException {
-    UserCreateResponse userCreateResponse = userService.save(userCreateRequest, profile);
-    return ResponseEntity.status(HttpStatus.CREATED).body(userCreateResponse);
+    UserDto userDto = userService.save(userCreateRequest, profile);
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
   @PatchMapping(
@@ -115,13 +113,13 @@ public class UserController {
           )
       )
   })
-  public ResponseEntity<UserUpdateResponse> update(
+  public ResponseEntity<UserDto> update(
       @PathVariable("userId") UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) throws IOException {
-    UserUpdateResponse userUpdateResponse = userService.update(userId, userUpdateRequest, profile);
-    return ResponseEntity.status(HttpStatus.OK).body(userUpdateResponse);
+    UserDto userDto = userService.update(userId, userUpdateRequest, profile);
+    return ResponseEntity.status(HttpStatus.OK).body(userDto);
   }
 
 
@@ -163,14 +161,14 @@ public class UserController {
           content = @Content(
               mediaType = "*/*",
               array = @ArraySchema(
-                  schema = @Schema(implementation = FindUserDto.class)
+                  schema = @Schema(implementation = UserDto.class)
               )
           )
       )
   })
-  public ResponseEntity<List<FindUserDto>> findAll() {
-    List<FindUserDto> findUserDtoList = userService.findAllUser();
-    return ResponseEntity.status(HttpStatus.OK).body(findUserDtoList);
+  public ResponseEntity<List<UserDto>> findAll() {
+    List<UserDto> userDtoList = userService.findAllUser();
+    return ResponseEntity.status(HttpStatus.OK).body(userDtoList);
   }
 
   @PatchMapping("/{userId}/userStatus")

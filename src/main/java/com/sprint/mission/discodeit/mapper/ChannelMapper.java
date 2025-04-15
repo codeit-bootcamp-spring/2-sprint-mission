@@ -41,6 +41,8 @@ public class ChannelMapper {
 
   private Instant lastMessageAt(Channel channel) {
     return messageRepository.findByChannelId(channel.getId()).stream()
-        .max(Comparator.comparing(Message::getCreatedAt)).get().getCreatedAt();
+        .map(Message::getCreatedAt)
+        .max(Comparator.naturalOrder())
+        .orElse(null);
   }
 }
