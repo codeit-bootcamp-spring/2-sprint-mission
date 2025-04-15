@@ -15,7 +15,7 @@ spring:
       hibernate:
         format_sql: true
     show-sql: true
-    
+
 discodeit:
   repository:
     type: file   # jcf | file
