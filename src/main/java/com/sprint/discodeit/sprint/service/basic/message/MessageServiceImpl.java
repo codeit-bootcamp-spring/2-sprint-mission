@@ -14,7 +14,6 @@ import com.sprint.discodeit.sprint.repository.ChannelRepository;
 import com.sprint.discodeit.sprint.repository.MessageRepository;
 import com.sprint.discodeit.sprint.repository.UsersRepository;
 import com.sprint.discodeit.sprint.service.basic.util.BinaryContentService;
-import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -42,9 +41,9 @@ public class MessageServiceImpl implements MessageService {
         message.addUsers(users);
 
         for(String file : messageRequestDto.file()) {
-            List<BinaryContent> binaryContents = binaryContentService.createProfileImage(file);
+            BinaryContent binaryContent = binaryContentService.createProfileImage(file);
+            message.addBinaryContent(binaryContent);
         }
-        message.addAllBinaryContents(binaryContents);
         messageRepository.save(message);
         return message;
     }

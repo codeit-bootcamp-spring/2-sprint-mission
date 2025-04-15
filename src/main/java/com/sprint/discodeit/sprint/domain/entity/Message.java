@@ -43,14 +43,6 @@ public class Message extends BaseEntity {
     @OneToMany(mappedBy = "message", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BinaryContent> binaryContents = new ArrayList<>();
 
-    public void addAllBinaryContents(List<BinaryContent> contents) {
-        if (contents == null || contents.isEmpty()) return;
-
-        for (BinaryContent content : contents) {
-            this.addBinaryContent(content);
-        }
-    }
-
     public void addBinaryContent(BinaryContent content) {
         binaryContents.add(content);
         content.setMessage(this);
