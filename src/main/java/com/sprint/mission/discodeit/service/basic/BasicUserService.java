@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,6 +33,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
+  @Transactional
   public UserCreateResponse save(UserCreateRequest userCreateRequest, MultipartFile profile)
       throws IOException {
     if (userRepository.findByUsername(userCreateRequest.username()).isPresent()) {
@@ -52,7 +54,6 @@ public class BasicUserService implements UserService {
           .bytes(profile.getBytes())
           .size((long) profile.getBytes().length)
           .build();
-      binaryContentRepository.save(binaryContent);
     }
 
     User user = new User(
@@ -98,6 +99,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional
   public UserUpdateResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
       MultipartFile profile) throws IOException {
     User user = userRepository.findById(userId).
@@ -119,23 +121,24 @@ public class BasicUserService implements UserService {
     }
 
     BinaryContent binaryContent = null;
-    if (profile != null) {
+    if (profile != null && !profile.isEmpty()) {
       binaryContent = BinaryContent.builder()
           .fileName(profile.getOriginalFilename())
           .contentType(profile.getContentType())
           .bytes(profile.getBytes())
           .size((long) profile.getBytes().length)
           .build();
-      binaryContentRepository.save(binaryContent);
     }
 
     user.updateUsername(userUpdateRequest.newUsername());
     user.updatePassword(userUpdateRequest.newPassword());
     user.updateEmail(userUpdateRequest.newEmail());
     user.updateProfile(binaryContent);
-    userRepository.save(user);
+
+    UUID profileId = user.getProfile() != null ? user.getProfile().getId() : null;
+
     return new UserUpdateResponse(user.getId(), user.getUsername(), user.getEmail(),
-        user.getProfile().getId(), user.getCreatedAt(), user.getUpdatedAt());
+        profileId, user.getCreatedAt(), user.getUpdatedAt());
   }
 
   @Override

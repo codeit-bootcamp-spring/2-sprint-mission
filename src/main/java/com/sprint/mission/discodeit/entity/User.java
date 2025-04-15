@@ -31,7 +31,7 @@ public class User extends BaseUpdatableEntity implements Serializable {
   @Column(unique = true, nullable = false)
   private String email;
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
