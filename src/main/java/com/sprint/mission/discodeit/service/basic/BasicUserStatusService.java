@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -26,6 +27,7 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserRepository userRepository;
 
   @Override
+  @Transactional
   public UserStatus create(UserStatusCreateRequest request) {
     UUID userId = request.userId();
 
@@ -43,6 +45,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserStatus find(UUID userStatusId) {
     return userStatusRepository.findById(userStatusId)
         .orElseThrow(
@@ -50,12 +53,14 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<UserStatus> findAll() {
     return userStatusRepository.findAll().stream()
         .toList();
   }
 
   @Override
+  @Transactional
   public UserStatus update(UUID userStatusId, UserStatusUpdateRequest request) {
 
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
@@ -67,6 +72,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional
   public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
 
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
@@ -78,6 +84,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional
   public void delete(UUID userStatusId) {
     if (!userStatusRepository.existsById(userStatusId)) {
       throw new NoSuchElementException("UserStatus with id " + userStatusId + " not found");

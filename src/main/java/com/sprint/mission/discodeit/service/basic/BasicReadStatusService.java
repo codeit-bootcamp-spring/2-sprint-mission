@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -29,6 +30,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ChannelRepository channelRepository;
 
   @Override
+  @Transactional
   public ReadStatus create(ReadStatusCreateRequest request) {
     UUID userId = UUID.fromString(request.userId().toString());
     UUID getChannelId = UUID.fromString(request.getChannelId().toString());
@@ -54,6 +56,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ReadStatus find(UUID readStatusId) {
     return readStatusRepository.findById(readStatusId)
         .orElseThrow(
@@ -61,12 +64,14 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ReadStatus> findAllByUserId(UUID userId) {
     return readStatusRepository.findAllByUserId(userId).stream()
         .toList();
   }
 
   @Override
+  @Transactional
   public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
     Instant newLastReadAt = request.newLastReadAt();
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
@@ -77,6 +82,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional
   public void delete(UUID readStatusId) {
     if (!readStatusRepository.existsById(readStatusId)) {
       throw new NoSuchElementException("ReadStatus with id " + readStatusId + " not found");
@@ -84,10 +90,5 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatusRepository.deleteById(readStatusId);
   }
 
-  /*private Instant parse(String date) {
-    OffsetDateTime parse = Instant.parse(date,
-        DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));  // Stirng to Instant
-    Instant instant = parse.atZone(ZoneId.systemDefault()).toInstant();
-    return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
-  }*/
+
 }

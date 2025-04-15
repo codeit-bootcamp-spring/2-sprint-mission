@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -28,6 +29,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
+  @Transactional
   public Message create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
     UUID getChannelId = messageCreateRequest.getChannelId();
@@ -64,6 +66,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Message find(UUID messageId) {
     return messageRepository.findById(messageId)
         .orElseThrow(
@@ -71,12 +74,14 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<Message> findAllBygetChannelId(UUID getChannelId) {
-    return messageRepository.findAllBygetChannelId(getChannelId).stream()
+    return messageRepository.findAllByChannelId(getChannelId).stream()
         .toList();
   }
 
   @Override
+  @Transactional
   public Message update(UUID messageId, MessageUpdateRequest request) {
     String newContent = request.newContent().toString();
     Message message = messageRepository.findById(messageId)
@@ -87,6 +92,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional
   public void delete(UUID messageId) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(

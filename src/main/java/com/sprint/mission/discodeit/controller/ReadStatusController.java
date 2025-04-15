@@ -26,8 +26,8 @@ public class ReadStatusController implements ReadStatusApi {
   @Override
   public ResponseEntity<ReadStatusDto> create1(ReadStatusCreateRequest readStatusCreateRequest) {
     ReadStatus created = readStatusService.create(readStatusCreateRequest);
-    ReadStatusDto dto = new ReadStatusDto(created.getId(), created.getUserId(),
-        created.getGetChannelId(), created.getLastReadAt());
+    ReadStatusDto dto = new ReadStatusDto(created.getId(), created.getUser().getId(),
+        created.getChannel().getId(), created.getLastReadAt());
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(dto);
@@ -47,8 +47,8 @@ public class ReadStatusController implements ReadStatusApi {
       ReadStatusUpdateRequest readStatusUpdateRequest) {
     UUID uuid = UUID.fromString(readStatusId.toString());
     ReadStatus updated = readStatusService.update(uuid, readStatusUpdateRequest);
-    ReadStatusDto dto = new ReadStatusDto(updated.getId(), updated.getUserId(),
-        updated.getGetChannelId(), updated.getLastReadAt());
+    ReadStatusDto dto = new ReadStatusDto(updated.getId(), updated.getUser().getId(),
+        updated.getChannel().getId(), updated.getLastReadAt());
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(dto);
