@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.adapter.inbound.content;
 
+import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
 import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class BinaryController {
 
+  private final BinaryContentStoragePort binaryContentStorage;
   private final BinaryContentService binaryContentService;
 
   @GetMapping
@@ -33,5 +35,11 @@ public class BinaryController {
   public ResponseEntity<BinaryContentResult> findBinaryContent(@PathVariable UUID binaryContentId) {
 
     return ResponseEntity.ok(binaryContentService.findById(binaryContentId));
+  }
+
+  @GetMapping("/{binaryContentId}/download")
+  public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
+    BinaryContentResult result = binaryContentService.findById(binaryContentId);
+    return binaryContentStorage.download(result);
   }
 }

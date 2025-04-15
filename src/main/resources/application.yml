@@ -36,11 +36,11 @@ logging:
       example:
         myapp: DEBUG
 
----
 discodeit:
-  repository:
-    type: jcf
-    file-directory: .discodeit
+  storage:
+    type: local
+    local:
+      root-path: ./storage
   servlet:
     multipart:
       enabled: true

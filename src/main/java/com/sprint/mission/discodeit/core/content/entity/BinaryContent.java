@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.core.content.entity;
 
-import com.sprint.mission.discodeit.core.base.BaseEntity;
+import com.sprint.mission.discodeit.core.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,22 +26,21 @@ public class BinaryContent extends BaseEntity {
   @Column(name = "size", nullable = false)
   private Long size;
 
-  @Lob
-  private byte[] bytes;
+//  @Lob
+//  private byte[] bytes;
 
-  private BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
+  private BinaryContent(String fileName, Long size, String contentType) {
     super();
     this.fileName = fileName;
     this.contentType = contentType;
 //    this.extension = extractExtension(fileName);
 
     this.size = size;
-    this.bytes = bytes;
+//    this.bytes = bytes;
   }
 
-  public static BinaryContent create(String fileName, Long size, String contentType,
-      byte[] bytes) {
-    return new BinaryContent(fileName, size, contentType, bytes);
+  public static BinaryContent create(String fileName, Long size, String contentType) {
+    return new BinaryContent(fileName, size, contentType);
   }
 
 //  private static String extractExtension(String fileName) {

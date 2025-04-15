@@ -2,11 +2,12 @@ package com.sprint.mission.discodeit.core.message.usecase;
 
 import static com.sprint.mission.discodeit.exception.message.MessageErrors.messageIdNotFoundError;
 
-import com.sprint.mission.discodeit.core.base.BaseEntity;
+import com.sprint.mission.discodeit.core.BaseEntity;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
+import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
+import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
@@ -35,7 +36,9 @@ public class BasicMessageService implements MessageService {
   private final UserRepositoryPort userRepository;
   private final ChannelRepositoryPort channelRepository;
   private final MessageRepositoryPort messageRepository;
-  private final BinaryContentRepositoryPort binaryContentRepository;
+
+  private final BinaryContentStoragePort binaryContentStorage;
+  private final BinaryContentMetaRepositoryPort binaryContentRepository;
 
   @Transactional
   @Override
@@ -57,9 +60,10 @@ public class BasicMessageService implements MessageService {
           byte[] bytes = createBinaryContentCommand.bytes();
 
           BinaryContent binaryContent = BinaryContent.create(fileName, (long) bytes.length,
-              contentType, bytes);
-
-          return binaryContentRepository.save(binaryContent);
+              contentType);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
         }).toList();
 
     Message message = Message.create(user, channel, command.content(),

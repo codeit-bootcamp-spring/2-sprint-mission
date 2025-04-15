@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.base;
+package com.sprint.mission.discodeit.core;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;

@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.core.content.usecase;
 
+import com.sprint.mission.discodeit.adapter.outbound.content.LocalBinaryContentStorage;
 import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.content.BinaryContentErrors;
 import com.sprint.mission.discodeit.logging.CustomLogging;
-import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
+import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,22 +18,23 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-  private final BinaryContentRepositoryPort binaryContentRepositoryPort;
+  private final BinaryContentMetaRepositoryPort binaryContentMetaRepository;
+  private final LocalBinaryContentStorage binaryContentStorage;
 
   @CustomLogging
   @Transactional
   @Override
   public BinaryContentResult create(CreateBinaryContentCommand command) {
     BinaryContent binaryContent = BinaryContent.create(command.fileName(),
-        (long) command.bytes().length, command.contentType(),
-        command.bytes());
-    binaryContentRepositoryPort.save(binaryContent);
+        (long) command.bytes().length, command.contentType());
+    binaryContentMetaRepository.save(binaryContent);
+    binaryContentStorage.put(binaryContent.getId(), command.bytes());
     return BinaryContentResult.create(binaryContent);
   }
 
   @Override
   public BinaryContentResult findById(UUID binaryId) {
-    BinaryContent binaryContent = binaryContentRepositoryPort.findById(binaryId).orElseThrow(
+    BinaryContent binaryContent = binaryContentMetaRepository.findById(binaryId).orElseThrow(
         () -> BinaryContentErrors.binaryContentNotFoundError(binaryId)
     );
     return BinaryContentResult.create(binaryContent);
@@ -40,7 +42,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public List<BinaryContentResult> findAllByIdIn(List<UUID> binaryContentIds) {
-    return binaryContentRepositoryPort.findAllByIdIn(binaryContentIds).stream().map(
+    return binaryContentMetaRepository.findAllByIdIn(binaryContentIds).stream().map(
         BinaryContentResult::create
     ).toList();
   }
@@ -48,10 +50,9 @@ public class BasicBinaryContentService implements BinaryContentService {
   @CustomLogging
   @Override
   public void delete(UUID binaryId) {
-    if (!binaryContentRepositoryPort.existsId(binaryId)) {
+    if (!binaryContentMetaRepository.existsId(binaryId)) {
       BinaryContentErrors.binaryContentNotFoundError(binaryId);
     }
-
-    binaryContentRepositoryPort.delete(binaryId);
+    binaryContentMetaRepository.delete(binaryId);
   }
 }

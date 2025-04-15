@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.channel.entity;
 
-import com.sprint.mission.discodeit.core.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

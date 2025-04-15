@@ -7,7 +7,8 @@ import static com.sprint.mission.discodeit.exception.user.UserErrors.userNameAlr
 import static com.sprint.mission.discodeit.exception.user.UserErrors.userNameNotFoundError;
 
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
+import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
+import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
@@ -38,9 +39,11 @@ public class BasicUserService implements UserService {
 
   private static final Logger logger = LoggerFactory.getLogger(BasicUserService.class);
 
+  private final UserRepositoryPort userRepository;
   private final UserStatusService userStatusService;
-  private final UserRepositoryPort userRepositoryPort;
-  private final BinaryContentRepositoryPort binaryContentRepositoryPort;
+
+  private final BinaryContentStoragePort binaryContentStorage;
+  private final BinaryContentMetaRepositoryPort binaryContentMetaRepository;
 
   @Transactional
   @Override
@@ -49,14 +52,12 @@ public class BasicUserService implements UserService {
     BinaryContent profile = null;
     validateUser(command.username(), command.email());
 
-//    String hashedPassword = BCrypt.hashpw(command.password(), BCrypt.gensalt());
-
     if (binaryContentDTO.isPresent()) {
       profile = makeBinaryContent(binaryContentDTO);
     }
 
     User user = User.create(command.username(), command.email(), command.password(), profile);
-    userRepositoryPort.save(user);
+    userRepository.save(user);
     logger.info("User registered: {}", user.getId());
 
     UserStatusResult statusResult = userStatusService.create(
@@ -67,11 +68,11 @@ public class BasicUserService implements UserService {
   }
 
   private void validateUser(String name, String email) {
-    if (userRepositoryPort.findByName(name).isPresent()) {
+    if (userRepository.findByName(name).isPresent()) {
       userNameAlreadyExistsError(name);
     }
 
-    if (userRepositoryPort.findByEmail(email).isPresent()) {
+    if (userRepository.findByEmail(email).isPresent()) {
       userEmailAlreadyExistsError(email);
     }
   }
@@ -83,8 +84,9 @@ public class BasicUserService implements UserService {
       byte[] bytes = contentDTO.bytes();
       Long size = (long) bytes.length;
 
-      BinaryContent content = BinaryContent.create(fileName, size, contentType, bytes);
-      binaryContentRepositoryPort.save(content);
+      BinaryContent content = BinaryContent.create(fileName, size, contentType);
+      binaryContentMetaRepository.save(content);
+      binaryContentStorage.put(content.getId(), bytes);
       logger.info("Binary Content Created: {}", content.getId());
 
       return content;
@@ -93,7 +95,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public UserResult login(LoginUserCommand command) {
-    User user = userRepositoryPort.findByName(command.username()).orElseThrow(
+    User user = userRepository.findByName(command.username()).orElseThrow(
         () -> userNameNotFoundError(command.username())
     );
 
@@ -109,14 +111,14 @@ public class BasicUserService implements UserService {
 
   @Override
   public UserResult findById(UUID userId) {
-    User user = userRepositoryPort.findById(userId)
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> userIdNotFoundError(userId));
     return UserResult.create(user, user.getUserStatus().isOnline());
   }
 
   @Override
   public UserListResult findAll() {
-    List<User> userList = userRepositoryPort.findAll();
+    List<User> userList = userRepository.findAll();
 
     return new UserListResult(userList.stream().map(user -> UserResult.create(
         user,
@@ -129,12 +131,12 @@ public class BasicUserService implements UserService {
   public UserResult update(UpdateUserCommand command,
       Optional<CreateBinaryContentCommand> binaryContentDTO) {
 
-    User user = userRepositoryPort.findById(command.requestUserId())
+    User user = userRepository.findById(command.requestUserId())
         .orElseThrow(() -> userIdNotFoundError(command.requestUserId()));
 
     BinaryContent profile = user.getProfile();
     if (profile != null) {
-      binaryContentRepositoryPort.delete(profile.getId());
+      binaryContentMetaRepository.delete(profile.getId());
     }
     BinaryContent newProfile = makeBinaryContent(binaryContentDTO);
     user.update(command.newName(), command.newEmail(), command.newPassword(), newProfile);
@@ -146,26 +148,26 @@ public class BasicUserService implements UserService {
   @CustomLogging
   @Override
   public void delete(UUID userId) {
-    User user = userRepositoryPort.findById(userId)
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> userIdNotFoundError(userId));
 
     Optional.ofNullable(user.getProfile().getId())
-        .ifPresent(binaryContentRepositoryPort::delete);
+        .ifPresent(binaryContentMetaRepository::delete);
 
     userStatusService.delete(user.getId());
-    userRepositoryPort.delete(user.getId());
+    userRepository.delete(user.getId());
 
     logger.info("User deleted {}", userId);
   }
 
   @Override
   public boolean existsById(UUID userId) {
-    return userRepositoryPort.findById(userId).isPresent();
+    return userRepository.findById(userId).isPresent();
   }
 
   @Override
   public UserStatusResult online(OnlineUserStatusCommand command) {
-    User user = userRepositoryPort.findById(command.userId()).orElseThrow(
+    User user = userRepository.findById(command.userId()).orElseThrow(
         () -> userIdNotFoundError(command.userId())
     );
     UserStatusResult statusResult = userStatusService.findByUserId(user.getId());

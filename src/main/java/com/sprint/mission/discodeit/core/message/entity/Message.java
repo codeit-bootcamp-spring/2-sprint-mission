@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.message.entity;
 
-import com.sprint.mission.discodeit.core.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.user.entity.User;

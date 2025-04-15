@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.adapter.outbound.content;
 
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.port.BinaryContentRepositoryPort;
+import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class BinaryContentRepositoryAdapter implements BinaryContentRepositoryPort {
+public class BinaryContentMetaRepositoryAdapter implements BinaryContentMetaRepositoryPort {
 
   private final JpaBinaryContentRepository jpaBinaryContentRepository;
 
