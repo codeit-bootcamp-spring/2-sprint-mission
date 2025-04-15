@@ -19,10 +19,11 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
+    open-in-view: true
   sql:
     init:
       mode: always
+      continue-on-error: true
 
 logging:
   level:

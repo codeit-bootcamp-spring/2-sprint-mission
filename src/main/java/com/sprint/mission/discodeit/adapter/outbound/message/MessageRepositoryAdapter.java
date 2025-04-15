@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -25,8 +27,18 @@ public class MessageRepositoryAdapter implements MessageRepositoryPort {
   }
 
   @Override
+  public Slice<Message> findById(UUID id, Pageable pageable) {
+    return jpaMessageRepository.findById(id, pageable);
+  }
+
+  @Override
   public List<Message> findAllByChannelId(UUID channelId) {
     return jpaMessageRepository.findAllByChannel_Id(channelId);
+  }
+
+  @Override
+  public Slice<Message> findAllByChannelId(UUID channelId, Pageable pageable) {
+    return jpaMessageRepository.findAllByChannel_Id(channelId, pageable);
   }
 
   @Override

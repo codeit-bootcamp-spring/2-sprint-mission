@@ -4,10 +4,10 @@ import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageCreat
 import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageDeleteResponse;
 import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageResponse;
+import com.sprint.mission.discodeit.adapter.inbound.message.response.PageResponse;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.message.usecase.MessageService;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageListResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -68,10 +72,14 @@ public class MessageController {
   }
 
   @GetMapping
-  public ResponseEntity<List<MessageResult>> findAll(@RequestParam UUID channelId) {
-    MessageListResult result = messageService.findMessagesByChannelId(channelId);
-
-    return ResponseEntity.ok(result.messageList());
+  public ResponseEntity<PageResponse<MessageResult>> findAll(@RequestParam UUID channelId,
+      @PageableDefault(
+          size = 50, sort = "createdAt", direction = Direction.DESC
+      ) Pageable pageable) {
+    Slice<MessageResult> results = messageService.findMessagesByChannelId(channelId,
+        pageable);
+    PageResponse<MessageResult> pageResponse = PageResponseMapper.fromSlice(results);
+    return ResponseEntity.ok(pageResponse);
   }
 
   @PatchMapping("/{messageId}")

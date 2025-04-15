@@ -12,7 +12,6 @@ import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContent
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageListResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
@@ -24,6 +23,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,24 +75,22 @@ public class BasicMessageService implements MessageService {
     logger.info(
         "Message Created: Message Id {}, Channel Id {}, Author Id {}, content {}, attachment {}",
         message.getId(), channel.getId(), user.getId(), message.getContent(),
-        message.getAttachmentIds());
+        message.getAttachment());
 
     return MessageResult.create(save, user);
   }
 
-  @Override
-  public MessageResult findMessageByMessageId(UUID messageId) {
-    Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> messageIdNotFoundError(messageId));
-    return MessageResult.create(message, message.getAuthor());
-  }
+//  @Override
+//  public MessageResult find(UUID messageId, Pageable pageable) {
+//    Slice<Message> messages = messageRepository.findById(messageId, pageable);
+//    return MessageResult.create(message, message.getAuthor());
+//  }
 
   @Override
-  public MessageListResult findMessagesByChannelId(UUID channelId) {
-    return new MessageListResult(
-        messageRepository.findAllByChannelId(channelId).stream()
-            .map(message -> MessageResult.create(message, message.getAuthor()))
-            .toList());
+  public Slice<MessageResult> findMessagesByChannelId(UUID channelId, Pageable pageable) {
+    Slice<Message> messageSlice = messageRepository.findAllByChannelId(channelId, pageable);
+
+    return messageSlice.map(message -> MessageResult.create(message, message.getAuthor()));
   }
 
   @Override
@@ -110,7 +109,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> messageIdNotFoundError(messageId));
 
     messageRepository.delete(messageId);
-    message.getAttachmentIds().stream().map(BaseEntity::getId)
+    message.getAttachment().stream().map(BaseEntity::getId)
         .forEach(binaryContentRepository::delete);
 
   }

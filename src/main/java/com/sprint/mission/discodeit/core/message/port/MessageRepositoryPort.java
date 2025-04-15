@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.core.message.entity.Message;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface MessageRepositoryPort {
 
@@ -11,7 +13,11 @@ public interface MessageRepositoryPort {
 
   Optional<Message> findById(UUID id);
 
+  Slice<Message> findById(UUID id, Pageable pageable);
+
   List<Message> findAllByChannelId(UUID channelId);
+
+  Slice<Message> findAllByChannelId(UUID channelId, Pageable pageable);
 
   boolean existsById(UUID id);
 

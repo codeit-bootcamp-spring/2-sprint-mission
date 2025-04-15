@@ -41,16 +41,16 @@ public class Message extends BaseUpdatableEntity {
       joinColumns = @JoinColumn(name = "message_id"),
       inverseJoinColumns = @JoinColumn(name = "attachment_id")
   )
-  private List<BinaryContent> attachmentIds;
+  private List<BinaryContent> attachment;
 
-  private Message(User author, Channel channel, String content, List<BinaryContent> attachmentIds) {
+  private Message(User author, Channel channel, String content, List<BinaryContent> attachment) {
     super();
 
     this.author = author;
     this.channel = channel;
 
     this.content = content;
-    this.attachmentIds = attachmentIds;
+    this.attachment = attachment;
   }
 
   public static Message create(User user, Channel channel, String text,

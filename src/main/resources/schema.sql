@@ -1,5 +1,3 @@
--- drop table if exists binary_contents, users, user_statuses, channels, messages, read_statuses,message_attachments;
-
 create table if not exists binary_contents
 (
     id           uuid primary key,

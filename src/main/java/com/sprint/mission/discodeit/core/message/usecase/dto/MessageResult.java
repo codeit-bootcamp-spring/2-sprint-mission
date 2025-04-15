@@ -31,7 +31,7 @@ public record MessageResult(
         .channelId(message.getChannel().getId())
         .author(UserResult.create(user, user.getUserStatus().isOnline()))
         .attachmentIds(
-            message.getAttachmentIds().stream().map(BinaryContentResult::create).toList())
+            message.getAttachment().stream().map(BinaryContentResult::create).toList())
         .build();
   }
 }
