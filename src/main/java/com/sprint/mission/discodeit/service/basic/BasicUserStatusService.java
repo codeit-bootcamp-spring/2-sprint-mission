@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.transaction.Transactional;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserRepository userRepository;
 
   @Override
+  @Transactional
   public UpdateUserStatusResponse updateByUserId(UUID userId,
       UserStatusUpdateRequest userStatusUpdateRequest) {
 
@@ -30,9 +32,9 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
         .orElseThrow(() -> new NoSuchElementException(
             String.format("UserStatus with userId %s not found", userId)));
-    
+
     userStatus.updateLastLoginTime(userStatusUpdateRequest.newLastActiveAt());
-    userStatusRepository.save(userStatus);
+
     return new UpdateUserStatusResponse(userStatus.getId(), userStatus.getUser().getId(),
         userStatus.getLastActiveAt(), userStatus.isLastStatus(), userStatus.getCreatedAt(),
         userStatus.getUpdatedAt());
