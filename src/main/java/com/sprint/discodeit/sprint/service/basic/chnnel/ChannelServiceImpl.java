@@ -2,22 +2,24 @@ package com.sprint.discodeit.sprint.service.basic.chnnel;
 
 import com.sprint.discodeit.sprint.domain.ChannelType;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelFindResponseDto;
+import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelPrivateUpdateRequestDto;
+import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelPublicUpdateRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelSummaryResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelUpdateRequestDto;
+import com.sprint.discodeit.sprint.domain.dto.channelDto.ChannelUpdateResponseDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.PrivateChannelCreateRequestDto;
 import com.sprint.discodeit.sprint.domain.dto.channelDto.PublicChannelCreateRequestDto;
 import com.sprint.discodeit.sprint.domain.entity.Channel;
 import com.sprint.discodeit.sprint.domain.entity.PrivateChannel;
-import com.sprint.discodeit.sprint.domain.entity.PrivateChannelUser;
-import com.sprint.discodeit.sprint.domain.entity.ReadStatus;
+import com.sprint.discodeit.sprint.domain.entity.PublicChannel;
 import com.sprint.discodeit.sprint.domain.entity.Users;
 import com.sprint.discodeit.sprint.domain.mapper.ChannelMapper;
 import com.sprint.discodeit.sprint.global.ErrorCode;
 import com.sprint.discodeit.sprint.global.RequestException;
 import com.sprint.discodeit.sprint.repository.ChannelRepository;
 import com.sprint.discodeit.sprint.repository.PrivateChannelRepository;
-import com.sprint.discodeit.sprint.repository.PrivateChannelUserRepository;
+import com.sprint.discodeit.sprint.repository.PublicChannelRepository;
 import com.sprint.discodeit.sprint.repository.UsersRepository;
 import com.sprint.discodeit.sprint.repository.file.ChannelRepository;
 import com.sprint.discodeit.sprint.repository.file.FileChannelRepository;
@@ -40,6 +42,7 @@ public class ChannelServiceImpl implements ChannelService {
     private final ChannelRepository channelRepository;
     private final PrivateChannelRepository privateChannelRepository;
     private final UsersRepository usersRepository;
+    private final PublicChannelRepository publicChannelRepository;
 
     @Override
     public ChannelResponseDto createPrivateChannel(PrivateChannelCreateRequestDto requestDto) {
@@ -56,31 +59,46 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public ChannelResponseDto createPublicChannel(PublicChannelCreateRequestDto requestDto) {
-        Channel channel = ChannelMapper.toPublicChannel(requestDto);
-        channelRepository.save(channel);
+        PublicChannel channel = ChannelMapper.toPublicChannel(requestDto);
+        publicChannelRepository.save(channel);
         return new ChannelResponseDto(channel.getId(), channel.getName(), channel.getCreatedAt(), ChannelType.PUBLIC);
     }
 
     @Override
-    public Channel update(String channelId, ChannelUpdateRequestDto channelUpdateRequestDto) {
-        Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElseThrow(() -> new NoSuchElementException(channelId + " 없는 채널 입니다"));
+    public ChannelUpdateResponseDto publicUpdate(ChannelPublicUpdateRequestDto channelUpdateRequestDto,Long channelId) {
+        PublicChannel channel = publicChannelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException(channelId + " 없는 채널 입니다"));
         if (channel.getType() == ChannelType.PUBLIC) {
             channel.update(channelUpdateRequestDto.newName(), channelUpdateRequestDto.newDescription());
+            publicChannelRepository.save(channel);
         }else{
-            throw new IllegalArgumentException("private 방은 수정이 불가능 합니다.");
+            throw new IllegalArgumentException("접근이 틀렸습니다.");
         }
-        return channel;
+        return new ChannelUpdateResponseDto(channel.getName(), channel.getDescription());
+    }
+
+    @Override
+    public ChannelUpdateResponseDto privateUpdate(ChannelPrivateUpdateRequestDto channelUpdateRequestDto,
+                                                  Long channelId) {
+        PrivateChannel channel = privateChannelRepository.findById(channelId).orElseThrow(() -> new NoSuchElementException(channelId + " 없는 채널 입니다"));
+        if (channel.getType() == ChannelType.PRIVATE) {
+            channel.update(channelUpdateRequestDto.newName(), channelUpdateRequestDto.newDescription());
+            privateChannelRepository.save(channel);
+        }else{
+            throw new IllegalArgumentException("접근이 틀렸습니다.");
+        }
+        return new ChannelUpdateResponseDto(channel.getName(), channel.getDescription());
     }
 
 
     @Override
-    public void delete(UUID channelId) {
-        readStatusRepository.delete(channelId);
-        channelRepository.delete(channelId);
+    public void delete(Long channelId) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException(channelId + " 없는 채널입니다"));
+        channelRepository.delete(channel);
     }
 
     @Override
-    public ChannelFindResponseDto findChannelById(UUID channelId) {
+    public ChannelFindResponseDto findChannelById(Long channelId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다."));
         Instant latestMessageTime = fileMessageRepository.findLatestMessageTimeByChannelId(channel.getId());
@@ -93,20 +111,6 @@ public class ChannelServiceImpl implements ChannelService {
 
 
 
-    public List<ChannelSummaryResponseDto> findAllByusersId(UUID usersId) {
-        List<Channel> publicChannels = fileChannelRepository.findByChannelType(ChannelType.PRIVATE);
-
-        List<UUID> privateChannelIds = readStatusRepository.findChannelIdsByusersIdAll(usersId);
-        List<Channel> privateChannels = fileChannelRepository.findByIdAll(privateChannelIds);
-
-        List<Channel> allChannels = new ArrayList<>();
-        allChannels.addAll(publicChannels);
-        allChannels.addAll(privateChannels);
-
-        return allChannels.stream()
-                .map(this::toChannelSummaryDto)
-                .collect(Collectors.toList());
-    }
 
     @Override
     public List<ChannelSummaryResponseDto> findAll() {
