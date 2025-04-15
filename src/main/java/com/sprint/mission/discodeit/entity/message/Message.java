@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity.message;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Message extends BaseEntity {
+public class Message extends BaseUpdatableEntity {
 
   private String content;
 
@@ -38,7 +38,7 @@ public class Message extends BaseEntity {
     }
 
     if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+      markUpdated();
     }
   }
 
@@ -47,12 +47,12 @@ public class Message extends BaseEntity {
       throw new IllegalArgumentException("attachmentId가 null입니다.");
     }
     attachmentIds.add(attachmentId);
-    updatedAt = Instant.now();
+    markUpdated();
   }
 
   public void removeAttachment(UUID attachmentId) {
     if (this.attachmentIds.remove(attachmentId)) {
-      this.updatedAt = Instant.now();
+      markUpdated();
     }
   }
 

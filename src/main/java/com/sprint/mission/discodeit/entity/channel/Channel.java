@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.entity.channel;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
 
 import java.time.Instant;
 
 @Getter
-public class Channel extends BaseEntity {
+public class Channel extends BaseUpdatableEntity {
 
   private final ChannelType type;
 
@@ -35,11 +35,11 @@ public class Channel extends BaseEntity {
   public void update(String newName, String newDescription) {
     if (newName != null && !newName.equals(this.name)) {
       this.name = newName;
-      this.updatedAt = Instant.now();
+      markUpdated();
     }
     if (newDescription != null && !newDescription.equals(this.description)) {
       this.description = newDescription;
-      this.updatedAt = Instant.now();
+      markUpdated();
     }
   }
 

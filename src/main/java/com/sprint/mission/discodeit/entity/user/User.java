@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.entity.user;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import lombok.Getter;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class User extends BaseEntity {
+public class User extends BaseUpdatableEntity {
 
   private String username;
   private String email;
@@ -48,7 +48,7 @@ public class User extends BaseEntity {
     }
 
     if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+      markUpdated();
     }
   }
 
