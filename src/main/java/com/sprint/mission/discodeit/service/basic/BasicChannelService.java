@@ -1,25 +1,29 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.dto.channel.ChannelByUserIdResponse;
-import com.sprint.mission.discodeit.service.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
+import com.sprint.mission.discodeit.service.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.service.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.service.dto.channel.PublicChannelRequest;
 import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,83 +31,72 @@ public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
   private final MessageRepository messageRepository;
+  private final UserRepository userRepository;
   private final ReadStatusService readStatusService;
-  private final BasicBinaryContentService basicBinaryContentService;
 
   @Override
-  public ChannelResponse create(PrivateChannelRequest privateRequest) {
+  @Transactional
+  public ChannelDto create(PrivateChannelRequest privateRequest) {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
-    Channel channelSave = channelRepository.save(channel);
+    channelRepository.save(channel);
+    UUID channelId = channel.getId();
     List<UUID> participantIds = privateRequest.participantIds();
-    participantIds.forEach(userId ->
-        readStatusService.create(
-            new ReadStatusCreateRequest(userId, channelSave.getId(), null)));
-    return ChannelResponse.of(channel, participantIds, Instant.now());
+    List<UserDto> participants = participantIds.stream().map(userId -> {
+      User user = userRepository.findById(userId)
+          .orElseThrow(() -> new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음"));
+      readStatusService.create(
+          new ReadStatusCreateRequest(user.getId(), channelId, null));
+
+      BinaryContent profile = user.getProfile();
+      boolean online = user.getUserStatus().isOnline();
+
+      return UserDto.of(user, BinaryContentDto.of(profile), online);
+    }).toList();
+    return ChannelDto.of(channel, participants, null);
   }
 
   @Override
-  public ChannelResponse create(PublicChannelRequest publicRequest) {
+  @Transactional
+  public ChannelDto create(PublicChannelRequest publicRequest) {
     Channel channel = new Channel(ChannelType.PUBLIC, publicRequest.name(),
         publicRequest.description());
     channelRepository.save(channel);
-    return ChannelResponse.of(channel, null, Instant.now());
+    return ChannelDto.of(channel, null, null);
   }
 
   @Override
-  public ChannelByUserIdResponse find(UUID channelId) {
+  public ChannelDto find(UUID channelId) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException(channelId + " 에 해당하는 Channel이 없음"));
     Instant lastMessageAt = findLastMessageAt(channel.getId());
 
-    String name;
-    String description;
-    List<UUID> participantIds;
+    List<UserDto> userDto = (channel.getType() == ChannelType.PRIVATE)
+        ? participants(readStatusService.findAllUserByChannelId(channelId))
+        : new ArrayList<>();
 
-    if (channel.getType() == ChannelType.PRIVATE) {
-      name = null;
-      description = null;
-      participantIds = readStatusService.findAllUserByChannelId(channelId);
-    } else {
-      name = channel.getName();
-      description = channel.getDescription();
-      participantIds = null;
-    }
-
-    return ChannelByUserIdResponse.of(channel, name, description, participantIds, lastMessageAt);
+    return ChannelDto.of(channel, userDto, lastMessageAt);
   }
 
   @Override
-  public List<ChannelByUserIdResponse> findAllByUserId(UUID userId) {
-    List<UUID> joinedChannelIds = readStatusService.findAllByUserId(userId).stream()
-        .map(ReadStatus::getChannelId).toList();
+  public List<ChannelDto> findAllByUserId(UUID userId) {
+    List<UUID> joinedChannelIds = readStatusService.findAllChannelIdByUserId(userId);
     return channelRepository.findAll().stream()
         .filter(channel ->
             channel.getType().equals(ChannelType.PUBLIC) || joinedChannelIds.contains(
                 channel.getId()))
         .map(channel -> {
           Instant lastMessageAt = findLastMessageAt(channel.getId());
+          List<UserDto> userDto = (channel.getType() == ChannelType.PRIVATE)
+              ? participants(readStatusService.findAllUserByChannelId(channel.getId()))
+              : new ArrayList<>();
 
-          String name;
-          String description;
-          List<UUID> participantIds;
-
-          if (channel.getType() == ChannelType.PRIVATE) {
-            name = null;
-            description = null;
-            participantIds = readStatusService.findAllUserByChannelId(channel.getId());
-          } else {
-            name = channel.getName();
-            description = channel.getDescription();
-            participantIds = null;
-          }
-
-          return ChannelByUserIdResponse.of(channel, name, description, participantIds,
-              lastMessageAt);
+          return ChannelDto.of(channel, userDto, lastMessageAt);
         }).toList();
   }
 
   @Override
-  public ChannelResponse update(UUID id, ChannelUpdateRequest updateRequest) {
+  @Transactional
+  public ChannelDto update(UUID id, ChannelUpdateRequest updateRequest) {
     Channel channel = channelRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 Channel을 찾을 수 없음"));
     if (channel.getType() == ChannelType.PRIVATE) {
@@ -116,30 +109,28 @@ public class BasicChannelService implements ChannelService {
     channelRepository.save(channel);
 
     Instant lastMessageAt = findLastMessageAt(channel.getId());
-    return ChannelResponse.of(channel, null, lastMessageAt);
+    return ChannelDto.of(channel, null, lastMessageAt);
   }
 
   @Override
+  @Transactional
   public void delete(UUID channelId) {
     if (!channelRepository.existsById(channelId)) {
       throw new NoSuchElementException(channelId + "에 해당하는 Channel을 찾을 수 없음");
     }
-    messageRepository.findAllByChannelId(channelId)
-        .forEach(message -> {
-          message.getAttachmentIds().forEach(basicBinaryContentService::delete);
-          messageRepository.deleteById(message.getId());
-        });
-
-    readStatusService.findAllByChannelId(channelId).forEach(readStatusService::delete);
     channelRepository.deleteById(channelId);
   }
 
   private Instant findLastMessageAt(UUID channelId) {
-    List<Message> messageList = messageRepository.findAll().stream()
-        .filter(message -> message.getChannelId().equals(channelId)).toList();
-    if (messageList.isEmpty()) {
-      return null;
-    }
-    return messageList.stream().map(Message::getCreatedAt).max(Instant::compareTo).orElse(null);
+    return messageRepository.findLastMessageTimeByChannelId(channelId);
+  }
+
+  private List<UserDto> participants(List<User> users) {
+    return users.stream().map(user -> {
+      BinaryContent profile = user.getProfile();
+      boolean online = user.getUserStatus().isOnline();
+
+      return UserDto.of(user, BinaryContentDto.of(profile), online);
+    }).toList();
   }
 }

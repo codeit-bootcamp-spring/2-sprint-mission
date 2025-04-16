@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentResponse;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
 import com.sprint.mission.discodeit.util.FileUtil;
 import java.io.IOException;
 import java.util.List;
@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
+  @Transactional
   public BinaryContent create(BinaryContentCreateRequest request) {
     String originalFilename = request.file().getOriginalFilename();
     String contentType = request.file().getContentType();
@@ -39,14 +41,14 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
-  public BinaryContentResponse findById(UUID id) {
+  public BinaryContentDto findById(UUID id) {
     BinaryContent binaryContent = binaryContentRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 BinaryContent를 찾을 수 없음"));
-    return BinaryContentResponse.of(binaryContent);
+    return BinaryContentDto.of(binaryContent);
   }
 
   @Override
-  public List<BinaryContentResponse> findAllByIdIn(List<UUID> idList) {
+  public List<BinaryContentDto> findAllByIdIn(List<UUID> idList) {
     return idList.stream().map(this::findById).toList();
   }
 

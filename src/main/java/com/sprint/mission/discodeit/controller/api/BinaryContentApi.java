@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller.api;
 
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentResponse;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -22,31 +22,31 @@ public interface BinaryContentApi {
   @Operation(summary = "첨부 파일 조회")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "첨부 파일 조회 성공",
-          content = @Content(mediaType = "*/*", schema = @Schema(implementation = BinaryContentResponse.class))),
+          content = @Content(mediaType = "*/*", schema = @Schema(implementation = BinaryContentDto.class))),
       @ApiResponse(responseCode = "404", description = "첨부 파일을 찾을 수 없음",
           content = @Content(mediaType = "*/*", examples =
           @ExampleObject(value = "{binaryContentId}에 해당하는 BinaryContent를 찾을 수 없음")))
   })
-  ResponseEntity<BinaryContentResponse> find(
+  ResponseEntity<BinaryContentDto> find(
       @Parameter(description = "조회할 첨부 파일 ID") UUID binaryContentId);
 
   // 여러 파일 조회
   @Operation(summary = "여러 첨부 파일 조회")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "첨부 파일 목록 조회 성공",
-          content = @Content(mediaType = "*/*", array = @ArraySchema(schema = @Schema(implementation = BinaryContentResponse.class)))),
+          content = @Content(mediaType = "*/*", array = @ArraySchema(schema = @Schema(implementation = BinaryContentDto.class)))),
       @ApiResponse(responseCode = "404", description = "첨부 파일을 찾을 수 없음",
           content = @Content(mediaType = "*/*", examples =
           @ExampleObject(value = "{binaryContentId}에 해당하는 BinaryContent를 찾을 수 없음")))
   })
-  ResponseEntity<List<BinaryContentResponse>> findAll(
+  ResponseEntity<List<BinaryContentDto>> findAll(
       @Parameter(description = "조회할 첨부 파일 ID 목록") List<UUID> binaryContentIds);
 
   // 파일 다운로드
   @Operation(summary = "파일 다운로드")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "첨부 파일 목록 조회 성공",
-          content = @Content(mediaType = "*/*", array = @ArraySchema(schema = @Schema(implementation = BinaryContentResponse.class)))),
+          content = @Content(mediaType = "*/*", array = @ArraySchema(schema = @Schema(implementation = BinaryContentDto.class)))),
       @ApiResponse(responseCode = "404", description = "첨부 파일을 찾을 수 없음",
           content = @Content(mediaType = "*/*", examples =
           @ExampleObject(value = "{binaryContentId}에 해당하는 BinaryContent를 찾을 수 없음")))

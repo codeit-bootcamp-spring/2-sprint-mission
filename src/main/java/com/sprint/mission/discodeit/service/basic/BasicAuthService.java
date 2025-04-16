@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.user.LoginRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserResponse;
+import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,8 @@ public class BasicAuthService implements AuthService {
 
   private final UserService userService;
 
-  public UserResponse login(LoginRequest loginRequest) {
+  @Override
+  public UserDto login(LoginRequest loginRequest) {
     User user = userService.findByUsername(loginRequest.username())
         .orElseThrow(() -> new NoSuchElementException("{username}에 해당하는 User가 없음"));
     if (!user.getPassword().equals(loginRequest.password())) {

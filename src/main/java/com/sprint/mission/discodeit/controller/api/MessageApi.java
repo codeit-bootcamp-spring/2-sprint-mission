@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller.api;
 
-import com.sprint.mission.discodeit.controller.dto.MessageResponse;
+import com.sprint.mission.discodeit.controller.dto.MessageDto;
 import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,13 +24,13 @@ public interface MessageApi {
   @Operation(summary = "Message 생성")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Message가 성공적으로 생성됨",
-          content = @Content(mediaType = "*/*", schema = @Schema(implementation = MessageResponse.class))),
+          content = @Content(mediaType = "*/*", schema = @Schema(implementation = MessageDto.class))),
       @ApiResponse(responseCode = "404", description = "Channel 또는 User를 찾을 수 없음",
           content = @Content(mediaType = "*/*", examples = {
               @ExampleObject(value = "{channelId}|{authorId}에 해당하는 Channel|Author를 찾을 수 없음")
           })),
   })
-  ResponseEntity<MessageResponse> create(
+  ResponseEntity<MessageDto> create(
       @Parameter(description = "Message 생성 정보") @Valid MessageCreateRequest request,
       @Parameter(description = "Message 첨부 파일들") List<MultipartFile> files);
 
@@ -38,13 +38,13 @@ public interface MessageApi {
   @Operation(summary = "Message 내용 수정")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Message가 성공적으로 수정됨",
-          content = @Content(mediaType = "*/*", schema = @Schema(implementation = MessageResponse.class))),
+          content = @Content(mediaType = "*/*", schema = @Schema(implementation = MessageDto.class))),
       @ApiResponse(responseCode = "404", description = "Message를 찾을 수 없음",
           content = @Content(mediaType = "*/*", examples = {
               @ExampleObject(value = "{messageId}에 해당하는 Message를 찾을 수 없음")
           }))
   })
-  ResponseEntity<MessageResponse> update(UUID messageId, MessageUpdateRequest request);
+  ResponseEntity<MessageDto> update(UUID messageId, MessageUpdateRequest request);
 
   // 메시지 삭제
   @Operation(summary = "Message 삭제")

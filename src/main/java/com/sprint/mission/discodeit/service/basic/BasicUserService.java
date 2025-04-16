@@ -1,16 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentResponse;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserResponse;
+import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusCreateRequest;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,52 +17,53 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusService userStatusService;
   private final BasicBinaryContentService basicBinaryContentService;
 
   @Override
-  public UserResponse create(UserCreateRequest createRequest,
+  @Transactional
+  public UserDto create(UserCreateRequest createRequest,
       BinaryContentCreateRequest binaryRequest) {
-    validDuplicateUsername(createRequest.username());
-    validDuplicateEmail(createRequest.email());
+    String username = createRequest.username();
+    String email = createRequest.email();
 
-    UUID binaryId = (binaryRequest != null)
-        ? basicBinaryContentService.create(binaryRequest).getId() : null;
-    User user = new User(createRequest.username(), createRequest.email(), createRequest.password(),
-        binaryId);
+    validDuplicateUsername(username);
+    validDuplicateEmail(email);
+
+    BinaryContent profile = (binaryRequest != null)
+        ? basicBinaryContentService.create(binaryRequest) : null;
+    User user = new User(username, email, createRequest.password(), profile);
+
+    new UserStatus(user, Instant.now());
+
     userRepository.save(user);
-    UserStatusCreateRequest statusRequest = new UserStatusCreateRequest(user.getId(),
-        Instant.now());
-    userStatusService.create(statusRequest);
 
     return assembleUserResponse(user);
   }
 
   @Override
-  public UserResponse find(UUID userId) {
+  public UserDto find(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음"));
-    UserStatus status = userStatusService.findByUserId(user.getId());
-    BinaryContentResponse contentResponse = basicBinaryContentService.findById(user.getId());
-
-    return UserResponse.of(user, contentResponse, status.isOnline());
+    return assembleUserResponse(user);
   }
 
   @Override
-  public List<UserResponse> findAll() {
+  public List<UserDto> findAll() {
     List<User> userList = userRepository.findAll();
     return userList.stream()
         .map(this::assembleUserResponse).toList();
   }
 
   @Override
-  public UserResponse update(UUID userId, UserUpdateRequest updateRequest,
+  @Transactional
+  public UserDto update(UUID userId, UserUpdateRequest updateRequest,
       BinaryContentCreateRequest binaryRequest) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException(
@@ -79,30 +79,22 @@ public class BasicUserService implements UserService {
       validDuplicateEmail(newEmail);
     }
 
-    UUID binaryContentId = null;
+    BinaryContent newProfile = null;
     if (binaryRequest != null) {
-      if (user.getProfileId() != null) {
-        basicBinaryContentService.delete(user.getProfileId());
-      }
-      binaryContentId = basicBinaryContentService.create(binaryRequest).getId();
-
+      newProfile = basicBinaryContentService.create(binaryRequest);
     }
-    user.update(newUsername, newEmail, newPassword, binaryContentId);
+    user.update(newUsername, newEmail, newPassword, newProfile);
     userRepository.save(user);
 
     return assembleUserResponse(user);
   }
 
   @Override
+  @Transactional
   public void delete(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException(userId + " 에 해당하는 user를 찾을 수 없음"));
-    if (user.getProfileId() != null) {
-      basicBinaryContentService.delete(user.getProfileId());
+    if (!userRepository.existsById(userId)) {
+      throw new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음");
     }
-    UserStatus userStatus = userStatusService.findByUserId(userId);
-    userStatusService.delete(userStatus.getId());
-
     userRepository.deleteById(userId);
   }
 
@@ -112,11 +104,11 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserResponse assembleUserResponse(User user) {
-    BinaryContentResponse contentResponse = basicBinaryContentService.findById(user.getId());
-    UserStatus status = userStatusService.findByUserId(user.getId());
+  public UserDto assembleUserResponse(User user) {
+    BinaryContentDto contentResponse = BinaryContentDto.of(user.getProfile());
+    UserStatus status = user.getUserStatus();
 
-    return UserResponse.of(user, contentResponse, status.isOnline());
+    return UserDto.of(user, contentResponse, status.isOnline());
   }
 
   private void validDuplicateUsername(String username) {

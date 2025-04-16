@@ -6,16 +6,16 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record UserStatusUpdateResponse(
+public record UserStatusUpdateDto(
     UUID id,
     UUID userId,
     Instant lastActiveAt
 ) {
 
-  public static UserStatusUpdateResponse of(UserStatus status) {
-    return UserStatusUpdateResponse.builder()
+  public static UserStatusUpdateDto of(UserStatus status) {
+    return UserStatusUpdateDto.builder()
         .id(status.getId())
-        .userId(status.getUserId())
+        .userId(status.getUser().getId())
         .lastActiveAt(status.getLastActiveAt())
         .build();
   }

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentResponse;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -28,18 +28,18 @@ public class BinaryContentController implements BinaryContentApi {
   // 파일 조회
   @Override
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContentResponse> find(
+  public ResponseEntity<BinaryContentDto> find(
       @PathVariable UUID binaryContentId) {
-    BinaryContentResponse response = binaryContentService.findById(binaryContentId);
+    BinaryContentDto response = binaryContentService.findById(binaryContentId);
     return ResponseEntity.ok(response);
   }
 
   // 여러 파일 조회
   @Override
   @GetMapping
-  public ResponseEntity<List<BinaryContentResponse>> findAll(
+  public ResponseEntity<List<BinaryContentDto>> findAll(
       @RequestParam List<UUID> binaryContentIds) {
-    List<BinaryContentResponse> response = binaryContentService.findAllByIdIn(binaryContentIds);
+    List<BinaryContentDto> response = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity.ok(response);
   }
 

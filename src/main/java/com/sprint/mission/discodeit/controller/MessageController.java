@@ -1,16 +1,17 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.MessageApi;
-import com.sprint.mission.discodeit.controller.dto.MessageResponse;
+import com.sprint.mission.discodeit.controller.dto.MessageDto;
+import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentResponse;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
 import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserResponse;
+import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class MessageController implements MessageApi {
   // 메시지 생성
   @Override
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<MessageResponse> create(
+  public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") @Valid MessageCreateRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> files) {
     List<BinaryContentCreateRequest> binaryContentList = new ArrayList<>();
@@ -52,24 +53,28 @@ public class MessageController implements MessageApi {
       }
     }
     Message message = messageService.create(request, binaryContentList);
-    UserResponse userResponse = userService.find(message.getAuthorId());
-    List<BinaryContentResponse> contentResponses = binaryContentService.findAllByIdIn(
-        message.getAttachmentIds());
+    UserDto userDto = userService.find(request.authorId());
 
-    return ResponseEntity.ok(MessageResponse.of(message, userResponse, contentResponses));
+    List<UUID> attatchmentsIds = message.getAttachments().stream()
+        .map(BaseEntity::getId).toList();
+    List<BinaryContentDto> contentResponses = binaryContentService.findAllByIdIn(attatchmentsIds);
+
+    return ResponseEntity.ok(MessageDto.of(message, userDto, contentResponses));
   }
 
   // 메시지 수정
   @Override
   @PatchMapping("/{messageId}")
-  public ResponseEntity<MessageResponse> update(@PathVariable UUID messageId,
+  public ResponseEntity<MessageDto> update(@PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest request) {
     Message message = messageService.update(messageId, request);
-    UserResponse userResponse = userService.find(message.getAuthorId());
-    List<BinaryContentResponse> contentResponses = binaryContentService.findAllByIdIn(
-        message.getAttachmentIds());
+    UserDto userDto = userService.find(message.getUser().getId());
 
-    return ResponseEntity.ok(MessageResponse.of(message, userResponse, contentResponses));
+    List<UUID> attatchmentsIds = message.getAttachments().stream()
+        .map(BaseEntity::getId).toList();
+    List<BinaryContentDto> contentResponses = binaryContentService.findAllByIdIn(attatchmentsIds);
+
+    return ResponseEntity.ok(MessageDto.of(message, userDto, contentResponses));
   }
 
   // 메시지 삭제
@@ -80,7 +85,7 @@ public class MessageController implements MessageApi {
     return ResponseEntity.noContent().build();
   }
 
-  // 특정 채널의 메시지 목록 조회 - 고치기
+  // 특정 채널의 메시지 목록 조회 - 고치기 - 페이징, binaryContent storage 필요한 듯?
   /*@Override
   @GetMapping
   public ResponseEntity<List<MessageResponse>> findAllByChannelId(@RequestParam UUID channelId) {

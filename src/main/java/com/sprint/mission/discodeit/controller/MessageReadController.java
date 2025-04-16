@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.MessageReadApi;
-import com.sprint.mission.discodeit.controller.dto.ReadStatusResponse;
-import com.sprint.mission.discodeit.controller.dto.UserReadStatusResponse;
+import com.sprint.mission.discodeit.controller.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusCreateRequest;
@@ -31,28 +30,28 @@ public class MessageReadController implements MessageReadApi {
   // 특정 채널의 메시지 수신 정보 생성
   @Override
   @PostMapping
-  public ResponseEntity<ReadStatusResponse> createByChannelId(
+  public ResponseEntity<ReadStatusDto> createByChannelId(
       @RequestBody @Valid ReadStatusCreateRequest request) {
     ReadStatus status = readStatusService.create(request);
-    return ResponseEntity.ok(ReadStatusResponse.of(status));
+    return ResponseEntity.ok(ReadStatusDto.of(status));
   }
 
   // 특정 채널의 메시지 수신 정보를 수정
   @Override
   @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatusResponse> updateByChannelId(@PathVariable("readStatusId") UUID id,
+  public ResponseEntity<ReadStatusDto> updateByChannelId(@PathVariable("readStatusId") UUID id,
       @RequestBody @Valid ReadStatusUpdateRequest request) {
     ReadStatus status = readStatusService.update(id, request);
-    return ResponseEntity.ok(ReadStatusResponse.of(status));
+    return ResponseEntity.ok(ReadStatusDto.of(status));
   }
 
   // 특정 사용자의 메시지 수신 정보를 조회
   @Override
   @GetMapping
-  public ResponseEntity<List<UserReadStatusResponse>> findAllByUserId(@RequestParam UUID userId) {
+  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam UUID userId) {
     List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
-    List<UserReadStatusResponse> response = readStatuses.stream()
-        .map(UserReadStatusResponse::of).toList();
+    List<ReadStatusDto> response = readStatuses.stream()
+        .map(ReadStatusDto::of).toList();
     return ResponseEntity.ok(response);
   }
 }

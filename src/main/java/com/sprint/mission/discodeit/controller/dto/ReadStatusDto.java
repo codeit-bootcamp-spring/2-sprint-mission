@@ -6,18 +6,18 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record UserReadStatusResponse(
+public record ReadStatusDto(
     UUID id,
     UUID userId,
     UUID channelId,
     Instant lastReadAt
 ) {
 
-  public static UserReadStatusResponse of(ReadStatus readStatus) {
-    return UserReadStatusResponse.builder()
+  public static ReadStatusDto of(ReadStatus readStatus) {
+    return ReadStatusDto.builder()
         .id(readStatus.getId())
-        .userId(readStatus.getUserId())
-        .channelId(readStatus.getChannelId())
+        .userId(readStatus.getUser().getId())
+        .channelId(readStatus.getChannel().getId())
         .lastReadAt(readStatus.getLastReadAt())
         .build();
   }

@@ -1,22 +1,22 @@
 package com.sprint.mission.discodeit.service.dto.user;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentResponse;
+import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
 import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record UserResponse(
+public record UserDto(
     UUID id,
     String username,
     String email,
-    BinaryContentResponse profile,
+    BinaryContentDto profile,
     boolean online
 ) {
 
-  public static UserResponse of(User user, BinaryContentResponse contentResponse,
+  public static UserDto of(User user, BinaryContentDto contentResponse,
       boolean online) {
-    return UserResponse.builder()
+    return UserDto.builder()
         .id(user.getId())
         .username(user.getUsername())
         .email(user.getEmail())

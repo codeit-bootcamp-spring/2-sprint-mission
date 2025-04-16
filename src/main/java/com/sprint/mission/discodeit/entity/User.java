@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
@@ -27,6 +28,7 @@ public class User extends BaseUpdatableEntity {
   @JoinColumn(name = "profile_id", columnDefinition = "UUID")
   private BinaryContent profile;
 
+  @Setter
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private UserStatus userStatus;
 

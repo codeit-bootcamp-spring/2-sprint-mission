@@ -5,15 +5,15 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record BinaryContentResponse(
+public record BinaryContentDto(
     UUID id,
     String fileName,
     Long size,
     String contentType
 ) {
 
-  public static BinaryContentResponse of(BinaryContent binaryContent) {
-    return BinaryContentResponse.builder()
+  public static BinaryContentDto of(BinaryContent binaryContent) {
+    return BinaryContentDto.builder()
         .id(binaryContent.getId())
         .fileName(binaryContent.getFileName())
         .size(binaryContent.getSize())

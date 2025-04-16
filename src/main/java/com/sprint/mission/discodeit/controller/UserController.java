@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.UserApi;
-import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateResponse;
+import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserResponse;
+import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
 import jakarta.validation.Valid;
@@ -40,25 +40,25 @@ public class UserController implements UserApi {
   // 사용자 등록
   @Override
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserResponse> create(
+  public ResponseEntity<UserDto> create(
       @RequestPart("userCreateRequest") @Valid UserCreateRequest userRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     BinaryContentCreateRequest fileData = BinaryContentCreateRequest.of(profile);
-    UserResponse response = userService.create(userRequest, fileData);
+    UserDto response = userService.create(userRequest, fileData);
     return ResponseEntity.ok(response);
   }
 
   // 사용자 정보 수정
   @Override
   @PatchMapping(path = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<UserResponse> update(
+  public ResponseEntity<UserDto> update(
       @PathVariable("userId") UUID userId,
       @RequestPart("userUpdateRequest") @Valid UserUpdateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     BinaryContentCreateRequest fileData = BinaryContentCreateRequest.of(profile);
-    UserResponse response = userService.update(userId, request, fileData);
+    UserDto response = userService.update(userId, request, fileData);
     return ResponseEntity.ok(response);
   }
 
@@ -73,20 +73,20 @@ public class UserController implements UserApi {
   // 모든 사용자 조회
   @Override
   @GetMapping
-  public ResponseEntity<List<UserResponse>> findAll() {
-    List<UserResponse> response = userService.findAll();
+  public ResponseEntity<List<UserDto>> findAll() {
+    List<UserDto> response = userService.findAll();
     return ResponseEntity.ok(response);
   }
 
   // 사용자 온라인 상태 변경
   @Override
   @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatusUpdateResponse> updateStatus(
+  public ResponseEntity<UserStatusUpdateDto> updateStatus(
       @PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest request
   ) {
     UserStatus userStatus = userStatusService.updateByUserId(userId, request);
-    UserStatusUpdateResponse response = UserStatusUpdateResponse.of(userStatus);
+    UserStatusUpdateDto response = UserStatusUpdateDto.of(userStatus);
     return ResponseEntity.ok(response);
   }
 }

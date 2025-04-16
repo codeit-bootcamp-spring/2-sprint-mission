@@ -14,7 +14,7 @@ public interface MessageService {
 
   Message find(UUID messageId);
 
-  List<Message> findAllByChannelId(UUID channelId);
+  List<Message> findAllByChannelId(UUID channelId); // 페이징 추가
 
   Message update(UUID id, MessageUpdateRequest updateRequest);
 

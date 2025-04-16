@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -13,6 +16,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,20 +29,21 @@ public class BasicMessageService implements MessageService {
   private final BasicBinaryContentService basicBinaryContentService;
 
   @Override
+  @Transactional
   public Message create(MessageCreateRequest createRequest,
       List<BinaryContentCreateRequest> binaryRequestList) {
     UUID channelId = createRequest.channelId();
     UUID authorId = createRequest.authorId();
-    if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchElementException(channelId + "에 해당하는 Channel을 찾을 수 없음");
-    }
-    if (!userRepository.existsById(authorId)) {
-      throw new NoSuchElementException(authorId + "에 해당하는 Author를 찾을 수 없음");
-    }
-    List<UUID> idList = binaryRequestList.stream()
-        .map(request ->
-            basicBinaryContentService.create(request).getId()).toList();
-    Message message = new Message(createRequest.content(), channelId, authorId, idList);
+
+    Channel channel = channelRepository.findById(channelId)
+        .orElseThrow(() -> new NoSuchElementException(channelId + " 에 해당하는 Channel를 찾을 수 없음"));
+    User author = userRepository.findById(authorId)
+        .orElseThrow(() -> new NoSuchElementException(authorId + " 에 해당하는 Author를 찾을 수 없음"));
+
+    List<BinaryContent> idList = binaryRequestList.stream()
+        .map(basicBinaryContentService::create).toList();
+
+    Message message = new Message(createRequest.content(), channel, author, idList);
     return messageRepository.save(message);
   }
 
@@ -54,6 +59,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional
   public Message update(UUID id, MessageUpdateRequest updateRequest) {
     Message message = messageRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 Message를 찾을 수 없음"));
@@ -62,10 +68,10 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional
   public void delete(UUID messageId) {
-    Message message = find(messageId);
-    if (message.getAttachmentIds() != null) {
-      message.getAttachmentIds().forEach(basicBinaryContentService::delete);
+    if (!messageRepository.existsById(messageId)) {
+      throw new NoSuchElementException(messageId + " 에 해당하는 Message를 찾을 수 없음");
     }
     messageRepository.deleteById(messageId);
   }
