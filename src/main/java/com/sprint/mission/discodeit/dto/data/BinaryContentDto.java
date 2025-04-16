@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record BinaryContentDto(
 
         @Schema(description = "바이너리 콘텐츠 ID")
-        String id,
+        java.util.UUID id,
 
         @Schema(description = "파일명")
         String fileName,

@@ -109,7 +109,7 @@ public class BasicUserService implements UserService {
         optionalProfileCreateRequest.ifPresent(profileRequest -> {
 
             if (user.getProfile() != null) {
-                binaryContentRepository.deleteById(user.getProfile().getUuid());
+                binaryContentRepository.deleteById(user.getProfile().getId());
             }
 
             String fileName = profileRequest.fileName();
@@ -147,7 +147,7 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
         if (user.getProfile() != null) {
-            binaryContentRepository.deleteById(user.getProfile().getUuid());
+            binaryContentRepository.deleteById(user.getProfile().getId());
         }
 
         userRepository.deleteById(userId);
@@ -162,11 +162,11 @@ public class BasicUserService implements UserService {
                 .orElse(false);
 
         UUID profileId = Optional.ofNullable(user.getProfile())
-                .map(BinaryContent::getUuid)
+                .map(BinaryContent::getId)
                 .orElse(null);
 
         return new UserDto(
-                user.getUuid(),
+                user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getUsername(),

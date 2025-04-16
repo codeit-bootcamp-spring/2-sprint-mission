@@ -18,7 +18,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
   sql:
     init:
       mode: always

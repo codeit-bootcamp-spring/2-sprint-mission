@@ -92,7 +92,7 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
 
         message.getAttachments().forEach(attachment -> {
-            binaryContentRepository.deleteById(attachment.getAttachment().getUuid());
+            binaryContentRepository.deleteById(attachment.getAttachment().getId());
         });
 
         messageRepository.deleteById(messageId);

@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.entity.base;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -17,17 +15,15 @@ import java.util.UUID;
 public abstract class BaseEntity {
 
     @Id
-    private UUID uuid;
-
-    @Column(name = "id")
-    private String id;
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    protected BaseEntity() {
-        this.uuid = UUID.randomUUID();
-    }
+    protected BaseEntity() {}
 
 }

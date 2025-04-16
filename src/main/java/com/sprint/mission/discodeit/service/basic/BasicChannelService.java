@@ -129,12 +129,12 @@ public class BasicChannelService implements ChannelService {
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             participantIds = readStatusRepository.findAllByChannel(channel).stream()
                     .map(ReadStatus::getUser)
-                    .map(User::getUuid)
+                    .map(User::getId)
                     .toList();
         }
 
         return new ChannelDto(
-                channel.getUuid(),
+                channel.getId(),
                 channel.getType(),
                 channel.getName(),
                 channel.getDescription(),
