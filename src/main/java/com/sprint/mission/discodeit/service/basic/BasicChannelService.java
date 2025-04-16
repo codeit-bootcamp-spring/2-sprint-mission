@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class BasicChannelService implements ChannelService {
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
+  @Transactional
   public ChannelDTO createPublicChannel(CreateChannelParam createChannelParam) {
     Channel channel = createPublicChannelEntity(createChannelParam);
     channelRepository.save(channel);
@@ -36,6 +38,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional
   public PrivateChannelDTO createPrivateChannel(
       CreatePrivateChannelParam createPrivateChannelParam) {
     Channel channel = createPrivateChannelEntity(createPrivateChannelParam);
@@ -46,6 +49,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public FindChannelDTO find(UUID channelId) {
     Channel channel = findChannelById(channelId);
     Instant latestMessageTime = findMessageLatestTimeInChannel(channelId);
@@ -53,11 +57,9 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toFindChannelDTO(channel, latestMessageTime, userIds);
   }
 
-  // PRIVATE의 경우, 참여한 User의 id정보를 포함해야함
-  // 요구사항에선 Channel이 userId를 가지지 않고, ReadStatus에서 userId와 channelId를 가지므로
-  // channelId로 ReadStatus를 조회하고,
-  // ReadStatus에서 userId를 뽑아내어 사용
+
   @Override
+  @Transactional(readOnly = true)
   public List<FindChannelDTO> findAllByUserId(UUID userId) {
     List<Channel> channels = channelRepository.findAll();
     return channels.stream()
@@ -71,6 +73,7 @@ public class BasicChannelService implements ChannelService {
 
 
   @Override
+  @Transactional
   public UpdateChannelDTO update(UUID id, UpdateChannelParam updateChannelParam) {
     Channel channel = findChannelById(id);
     if (channel.getType() == ChannelType.PRIVATE) {
@@ -78,13 +81,14 @@ public class BasicChannelService implements ChannelService {
       throw RestExceptions.FORBIDDEN_PRIVATE_CHANNEL;
     }
     channel.update(updateChannelParam.newName(), updateChannelParam.newDescription());
-    Channel updatedChannel = channelRepository.save(channel);
-    return channelMapper.toUpdateChannelDTO(updatedChannel,
-        findMessageLatestTimeInChannel(updatedChannel.getId()));
+    return channelMapper.toUpdateChannelDTO(channel,
+        findMessageLatestTimeInChannel(channel.getId()));
   }
 
   @Override
+  @Transactional
   public void delete(UUID channelId) {
+    // 연관관계 구조상 Cascade 사용 불가하여 명시적으로 삭제
     readStatusService.deleteByChannelId(channelId);
     messageRepository.deleteByChannelId(channelId);
     channelRepository.deleteById(channelId);
