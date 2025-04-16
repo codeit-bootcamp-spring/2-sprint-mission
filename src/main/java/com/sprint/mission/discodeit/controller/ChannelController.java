@@ -28,10 +28,10 @@ public class ChannelController {
     @PostMapping("/public")
     @Operation(summary = "Public Channel 생성")
     @ApiResponse(responseCode = "201", description = "Public Channel 이 성공적으로 생성됨")
-    public ResponseEntity<Channel> createPublicChannel(
+    public ResponseEntity<ChannelResponseDto> createPublicChannel(
             @RequestBody ChannelCreatePublicDto channelCreateRequest
     ) {
-        Channel publicChannel = channelService.createPublic(channelCreateRequest);
+        ChannelResponseDto publicChannel = channelService.createPublic(channelCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(publicChannel);
     }
 
@@ -40,10 +40,10 @@ public class ChannelController {
     @Operation(summary = "Private Channel 생성")
     @ApiResponse(responseCode = "200", description = "Private Channel 이 성공적으로 생성됨")
     @ApiResponse(responseCode = "400", description = "Private Channel 이 생성되지 않음", content = @Content(examples = @ExampleObject(value = "User does not exist")))
-    public ResponseEntity<Channel> createPrivateChannel(
+    public ResponseEntity<ChannelResponseDto> createPrivateChannel(
             @RequestBody ChannelCreatePrivateDto channelCreateRequest
     ) {
-        Channel privateChannel = channelService.createPrivate(channelCreateRequest);
+        ChannelResponseDto privateChannel = channelService.createPrivate(channelCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(privateChannel);
     }
 
@@ -53,12 +53,12 @@ public class ChannelController {
     @ApiResponse(responseCode = "404", description = "Channel을 찾을 수 없음", content = @Content(examples = @ExampleObject(value = "Channel does not found")))
     @ApiResponse(responseCode = "400", description = "Private Channel은 수정 할 수 없음", content = @Content(examples = @ExampleObject(value = "Private channels cannot be changed")))
     @ApiResponse(responseCode = "200", description = "Channel 정보가 성공적으로 수정됨")
-    public ResponseEntity<Channel> updateChannel(
+    public ResponseEntity<ChannelResponseDto> updateChannel(
             @PathVariable @Parameter(description = "수정 할 Channel ID") UUID channelId,
             @RequestBody ChannelUpdateDto channelUpdateRequest
     ) {
 
-        Channel updateChannel = channelService.update(channelId, channelUpdateRequest);
+        ChannelResponseDto updateChannel = channelService.update(channelId, channelUpdateRequest);
         return ResponseEntity.ok(updateChannel);
     }
 
@@ -75,22 +75,13 @@ public class ChannelController {
     }
 
 
-    @GetMapping("/find")
-    public ResponseEntity<ChannelFindResponseDto> findChannel(
-            @RequestBody ChannelFindRequestDto channelFindRequest
-    ) {
-        ChannelFindResponseDto channelFindResponse = channelService.find(channelFindRequest);
-        return ResponseEntity.ok(channelFindResponse);
-    }
-
-
     @GetMapping
     @Operation(summary = "User가 참여 중인 Channel 목록 조회")
     @ApiResponse(responseCode = "200", description = "Channel 목록 조회 성공")
-    public ResponseEntity<List<ChannelFindAllByUserIdResponseDto>> findChannelByUserId(
+    public ResponseEntity<List<ChannelResponseDto>> findChannelByUserId(
             @RequestParam @Parameter(description = "조회 할 User ID") UUID userId
     ) {
-        List<ChannelFindAllByUserIdResponseDto> channelFindAllByUserIdResponse = channelService.findAllByUserId(userId);
+        List<ChannelResponseDto> channelFindAllByUserIdResponse = channelService.findAllByUserId(userId);
         return ResponseEntity.ok(channelFindAllByUserIdResponse);
     }
 }

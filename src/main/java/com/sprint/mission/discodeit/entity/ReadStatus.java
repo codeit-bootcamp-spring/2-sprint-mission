@@ -4,8 +4,11 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -14,11 +17,11 @@ import java.util.UUID;
 @Table(name = "read_statuses")
 public class ReadStatus extends BaseUpdatableEntity {
 
-    @JoinColumn(name = "user_id", unique = true)
+    @JoinColumn(name = "user_id")
     @ManyToOne
     private User user;
 
-    @JoinColumn(name = "channel_id", unique = true)
+    @JoinColumn(name = "channel_id")
     @ManyToOne
     private Channel channel;
 
@@ -39,6 +42,19 @@ public class ReadStatus extends BaseUpdatableEntity {
         }
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(user.getId(), channel.getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ReadStatus readStatus)) return false;
+        return user != null && channel != null &&
+                user.getId().equals(readStatus.user.getId()) &&
+                channel.getId().equals(readStatus.channel.getId());
+    }
 
     @Override
     public String toString() {

@@ -1,161 +1,108 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.exceptions.InvalidInputException;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.repository.ChannelJPARepository;
+import com.sprint.mission.discodeit.repository.MessageJPARepository;
+import com.sprint.mission.discodeit.repository.ReadStatusJPARepository;
+import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.dto.channeldto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-    private final ChannelRepository channelRepository;
-    private final ReadStatusRepository readStatusRepository;
-    private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
+    private final ChannelJPARepository channelJpaRepository;
+    private final ReadStatusJPARepository readStatusJpaRepository;
+    private final MessageJPARepository messageJpaRepository;
+    private final UserJPARepository userJpaRepository;
+    private final ChannelMapper channelMapper;
 
 
     @Override
-    public Channel createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
-        List<UUID> userIds = channelCreatePrivateDto.participantIds();
-        List<User> matchingUsers = userRepository.load().stream()
-                .filter(m ->channelCreatePrivateDto.participantIds().contains(m.getId()))
-                .toList();
-        if (matchingUsers.size() != userIds.size()) {
-            throw new InvalidInputException("User does not exist.");
-        }
-
+    @Transactional
+    public ChannelResponseDto createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
-        Channel createdPirvateChannel = channelRepository.save(channel);
+        Channel createdPirvateChannel = channelJpaRepository.save(channel);
+        
+        userJpaRepository.findByIdIn(channelCreatePrivateDto.participantIds()).stream()
+                .map(user -> new ReadStatus(user, createdPirvateChannel, createdPirvateChannel.getCreatedAt()))
+                .forEach(readStatusJpaRepository::save);
 
-        // Read Status 생성
-        channelCreatePrivateDto.participantIds().stream()
-                .map(userId -> matchingUsers.stream()
-                        .filter(m -> m.getId().equals(userId))
-                        .findAny()
-                        .orElseThrow(() -> new RuntimeException("User not found: " + userId))
-                )
-                .map(user -> new ReadStatus(user, createdPirvateChannel, channel.getCreatedAt()))
-                .forEach(readStatusRepository::save);
-
-        return createdPirvateChannel;
+        return channelMapper.toDto(createdPirvateChannel);
     }
 
 
     @Override
-    public Channel createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
-        List<Channel> channelList = channelRepository.load();
-        Optional<Channel> matchingChannel = channelList.stream()
-                .filter(c -> c.getType().equals(ChannelType.PUBLIC) && c.getName().equals(channelCreatePublicDto.name()))
-                .findAny();
-        if (matchingChannel.isPresent()) {
+    @Transactional
+    public ChannelResponseDto createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
+        if (channelJpaRepository.existsByTypeAndName(ChannelType.PUBLIC, channelCreatePublicDto.name())) {
             throw new InvalidInputException("A channel already exists.");
         }
-        Channel channel = new Channel(ChannelType.PUBLIC, channelCreatePublicDto.name(), channelCreatePublicDto.description());
-        Channel createdPublicChannel = channelRepository.save(channel);
-        System.out.println(createdPublicChannel);
-        return createdPublicChannel;
 
+        Channel createdPublicChannel = new Channel(ChannelType.PUBLIC, channelCreatePublicDto.name(), channelCreatePublicDto.description());
+        channelJpaRepository.save(createdPublicChannel);
+        return channelMapper.toDto(createdPublicChannel);
     }
 
 
     @Override
-    public ChannelFindResponseDto find(ChannelFindRequestDto channelFindRequestDto) {
-        Channel matchingChannel = channelRepository.load().stream()
-                .filter(c -> c.getId().equals(channelFindRequestDto.channelId()))
-                .findAny().orElse(null);
+    public ChannelResponseDto find(ChannelFindDto channelFindDto) {
+        Channel matchingChannel = channelJpaRepository.findById(channelFindDto.channelId())
+                .orElse(null);
 
-        ReadStatus matchingReadStatus = readStatusRepository.load().stream()
-                .filter(r -> r.getChannel().equals(channelFindRequestDto.channelId()))
-                .findAny().orElse(null);
-
-        return ChannelFindResponseDto.fromChannel(matchingChannel, matchingReadStatus);
+        return channelMapper.toDto(matchingChannel);
     }
 
 
     @Override
-    public List<ChannelFindAllByUserIdResponseDto> findAllByUserId(UUID userId) {
-        List<Channel> matchingChannelIdList = readStatusRepository.load().stream()
-                .filter(m -> m.getUser().getId().equals(userId))
+    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
+        List<UUID> matchingChannelIdList = readStatusJpaRepository.findByUser_Id(userId).stream()
                 .map(ReadStatus::getChannel)
+                .map(BaseEntity::getId)
                 .toList();
 
-        List<ChannelFindAllByUserIdResponseDto> channelByUserID = channelRepository.load().stream()
-                .filter(channel -> channel.getType().equals(ChannelType.PUBLIC)
-                                || matchingChannelIdList.contains(channel.getId())
-                )
-                .map(channel -> {
-                    List<UUID> participantIds = new ArrayList<>();
-                    if (channel.getType().equals(ChannelType.PRIVATE)) {
-                        readStatusRepository.load().stream()
-                                .filter(r -> r.getChannel().getId().equals(channel.getId()))
-                                .map(u -> u.getUser().getId())
-                                .forEach(participantIds::add);
-                    }
-                    Instant lastMessageAt = messageRepository.load().stream()
-                            .filter(f -> f.getChannel().getId().equals(channel.getId()))
-                            .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
-                            .map(Message::getCreatedAt)
-                            .limit(1)
-                            .findFirst()
-                            .orElse(Instant.MIN);
-                    return ChannelFindAllByUserIdResponseDto.fromChannel(channel, participantIds, lastMessageAt);
-                })
+        return channelJpaRepository
+                .findByTypeOrIdIn(ChannelType.PUBLIC, matchingChannelIdList).stream()
+                .map(channelMapper::toDto)
                 .toList();
-
-        return channelByUserID;
     }
 
 
     @Override
-    public Channel update(UUID channelId, ChannelUpdateDto channelUpdateDto) {
-        Channel matchingChannel = channelRepository.loadToId(channelId)
+    @Transactional
+    public ChannelResponseDto update(UUID channelId, ChannelUpdateDto channelUpdateDto) {
+        Channel matchingChannel = channelJpaRepository.findById(channelId)
                 .orElseThrow(() -> new NotFoundException("A channel does not exist"));
 
         if (matchingChannel.getType().equals(ChannelType.PRIVATE)) {
             throw new InvalidInputException("Private channels cannot be changed.");
         }
         matchingChannel.updateChannel(channelUpdateDto.newName(), channelUpdateDto.newDescription());
-        channelRepository.save(matchingChannel);
-        return matchingChannel;
+        Channel updateChannel = channelJpaRepository.save(matchingChannel);
+
+        return channelMapper.toDto(updateChannel);
 
     }
 
 
     @Override
+    @Transactional
     public void delete(UUID channelId) {
-        Channel matchingChannel = channelRepository.load().stream()
-                .filter(c -> c.getId().equals(channelId))
-                .findAny()
+        Channel matchingChannel = channelJpaRepository.findById(channelId)
                 .orElseThrow(() -> new NotFoundException("A channel does not exist"));
-
-        List<Message> messageList = messageRepository.load().stream()
-                .filter(m -> m.getChannel().getId().equals(channelId))
-                .toList();
-
-        List<ReadStatus> readStatusList = readStatusRepository.load().stream()
-                .filter(r -> r.getChannel().getId().equals(channelId))
-                .toList();
-
-        for (Message message : messageList) {
-            messageRepository.remove(message);
-        }
-
-        for (ReadStatus readStatus : readStatusList) {
-            readStatusRepository.remove(readStatus);
-        }
-
-        channelRepository.remove(matchingChannel);
+        channelJpaRepository.delete(matchingChannel);
     }
 }

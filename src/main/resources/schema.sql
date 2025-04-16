@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS users(
     profile_id uuid,
     CONSTRAINT fk_profile_id
         FOREIGN KEY (profile_id)
-        REFERENCES binary_contents (id)
-        ON DELETE SET NULL
+            REFERENCES binary_contents (id)
+            ON DELETE SET NULL
 );
 
 
@@ -29,7 +29,10 @@ CREATE TABLE IF NOT EXISTS channels(
     updated_at timestamptz ,
     name VARCHAR(100) ,
     description VARCHAR(500) ,
-    type channel_type NOT NULL
+    type VARCHAR(10) NOT NULL,
+    CONSTRAINT chk_channel_type
+        CHECK (type IN ('PUBLIC', 'PRIVATE'))
+
 );
 
 CREATE TABLE IF NOT EXISTS messages(
@@ -41,12 +44,12 @@ CREATE TABLE IF NOT EXISTS messages(
     author_id uuid,
     CONSTRAINT fk_channel_id
         FOREIGN KEY (channel_id)
-        REFERENCES channels(id)
-        ON DELETE CASCADE ,
+            REFERENCES channels(id)
+            ON DELETE CASCADE ,
     CONSTRAINT fk_author_id
         FOREIGN KEY (author_id)
-        REFERENCES users(id)
-        ON DELETE SET NULL
+            REFERENCES users(id)
+            ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_statuses(
@@ -57,25 +60,27 @@ CREATE TABLE IF NOT EXISTS user_statuses(
     last_active_at timestamptz NOT NULL ,
     CONSTRAINT fk_user_id
         FOREIGN KEY (user_id)
-        REFERENCES users (id)
-        ON DELETE CASCADE
+            REFERENCES users (id)
+            ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS read_statuses(
     id uuid PRIMARY KEY ,
     created_at timestamptz NOT NULL ,
     updated_at timestamptz ,
-    user_id uuid UNIQUE ,
-    channel_id uuid UNIQUE ,
+    user_id uuid ,
+    channel_id uuid ,
     last_read_at timestamptz NOT NULL ,
     CONSTRAINT fk_user_id
         FOREIGN KEY (user_id)
-        REFERENCES users(id)
-        ON DELETE CASCADE,
+            REFERENCES users(id)
+            ON DELETE CASCADE,
     CONSTRAINT fk_channel_id
         FOREIGN KEY (channel_id)
-        REFERENCES channels(id)
-        ON DELETE CASCADE
+            REFERENCES channels(id)
+            ON DELETE CASCADE,
+    CONSTRAINT uk_user_id_channel_id
+        UNIQUE (user_id, channel_id)
 );
 
 CREATE TABLE IF NOT EXISTS message_attachments(
@@ -83,12 +88,12 @@ CREATE TABLE IF NOT EXISTS message_attachments(
     attachment_id uuid,
     CONSTRAINT fk_message_id
         FOREIGN KEY (message_id)
-        REFERENCES messages(id)
-        ON DELETE CASCADE ,
+            REFERENCES messages(id)
+            ON DELETE CASCADE ,
     CONSTRAINT fk_attachment_id
         FOREIGN KEY (attachment_id)
-        REFERENCES binary_contents(id)
-        ON DELETE CASCADE
+            REFERENCES binary_contents(id)
+            ON DELETE CASCADE
 );
 
 

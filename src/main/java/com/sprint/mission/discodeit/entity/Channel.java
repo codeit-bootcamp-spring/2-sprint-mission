@@ -13,8 +13,8 @@ import java.util.Objects;
 @Table(name = "channels")
 public class Channel extends BaseUpdatableEntity {
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
     private ChannelType type;
 
     @Column(length = 100)

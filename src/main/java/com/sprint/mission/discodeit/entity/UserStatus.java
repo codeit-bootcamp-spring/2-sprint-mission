@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class UserStatus extends BaseUpdatableEntity {
 
     @OneToOne
     @JoinColumn(name = "user_id", unique = true)
+    @JsonBackReference
     private User user;
 
     @Column(nullable = false)
@@ -27,6 +29,7 @@ public class UserStatus extends BaseUpdatableEntity {
     public UserStatus(User user, Instant lastActiveAt) {
         this.user = user;
         this.lastActiveAt = lastActiveAt;
+        user.setStatus(this);
     }
 
     // 마지막 접속시간과 현재시간을 계산했을 때 300보다 작으면 : 5분 이내 -> true

@@ -26,9 +26,11 @@ public class Message extends BaseUpdatableEntity {
     @JoinColumn(name = "author_id")
     private User author;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany()
+    @JoinTable(name = "message_attachments",
+            joinColumns = @JoinColumn(name = "message_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id"))
     private List<BinaryContent> attachments;
-
 
 
     public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
@@ -44,15 +46,16 @@ public class Message extends BaseUpdatableEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return Objects.hash(getId(), channel.getId());
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (object instanceof Message message) {
-            return message.getId().equals(this.getId());
-        }
-        return false;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Message message)) return false;
+        return getId() != null && channel != null &&
+                getId().equals(message.getId()) &&
+                channel.getId().equals(message.channel.getId());
     }
 
     @Override
