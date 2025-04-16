@@ -11,7 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @MappedSuperclass
 @Getter
 @EntityListeners(AuditingEntityListener.class)
-public class BaseUpdatableEntity extends BaseEntity {
+public abstract class BaseUpdatableEntity extends BaseEntity {
 
   @LastModifiedDate
   @Column(name = "update_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
