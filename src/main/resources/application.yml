@@ -27,9 +27,6 @@ spring:
       mode: always
 
 discodeit:
-  repository:
-    type: file
-    file-directory: \src\main\resources\dir\
   storage:
     type: local
     local:
