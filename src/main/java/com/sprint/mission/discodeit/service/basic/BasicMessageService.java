@@ -12,11 +12,15 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,11 +34,13 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final MessageMapper messageMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
   public MessageDto sendMessage(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments) {
+    List<Map.Entry<BinaryContent, byte[]>> attachmentEntryList = new ArrayList<>();
     List<BinaryContent> attachmentList = new ArrayList<>();
 
     User user = userRepository.findById(messageCreateRequest.authorId())
@@ -45,32 +51,36 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new NoSuchElementException(
             messageCreateRequest.channelId() + "에 해당하는 채널을 찾을 수 없습니다."));
 
-    if (attachments != null && !attachments.isEmpty()) {
-      attachmentList = attachments.stream()
-          .filter(file -> !file.isEmpty())
-          .map(data -> {
-            try {
-              String fileName = data.getOriginalFilename();
-              String contentType = data.getContentType();
-              byte[] bytes = data.getBytes();
-              BinaryContent binaryContent = BinaryContent.builder()
-                  .fileName(fileName)
-                  .contentType(contentType)
-                  .bytes(bytes)
-                  .size((long) bytes.length)
-                  .build();
-              return binaryContent;
-            } catch (IOException e) {
-              throw new RuntimeException(e);
-            }
-          })
-          .toList();
-    }
+    attachmentEntryList = attachments.stream()
+        .filter(file -> !file.isEmpty())
+        .map(file -> {
+          try {
+            byte[] bytes = file.getBytes();
+            BinaryContent binaryContent = BinaryContent.builder()
+                .fileName(file.getOriginalFilename())
+                .contentType(file.getContentType())
+                .size((long) bytes.length)
+                .build();
+            return new AbstractMap.SimpleEntry<>(binaryContent, bytes);
+          } catch (IOException e) {
+            throw new RuntimeException("파일 처리 중 오류 발생", e);
+          }
+        })
+        .collect(Collectors.toList());
+
+    attachmentList = attachmentEntryList.stream()
+        .map(Map.Entry::getKey)
+        .toList();
 
     Message message = new Message(
         messageCreateRequest.content(), user,
         channel, attachmentList);
     messageRepository.save(message);
+
+    attachmentEntryList.forEach(entry -> {
+      binaryContentStorage.put(entry.getKey().getId(), entry.getValue());
+    });
+
     return messageMapper.toDto(message);
   }
 

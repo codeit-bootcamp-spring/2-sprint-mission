@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,6 +24,7 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final UserMapper userMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -43,7 +45,6 @@ public class BasicUserService implements UserService {
       binaryContent = BinaryContent.builder()
           .fileName(profile.getOriginalFilename())
           .contentType(profile.getContentType())
-          .bytes(profile.getBytes())
           .size((long) profile.getBytes().length)
           .build();
     }
@@ -56,6 +57,9 @@ public class BasicUserService implements UserService {
 
     userRepository.save(user);
 
+    if (binaryContent != null) {
+      binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
+    }
     return userMapper.toDto(user);
   }
 
@@ -93,9 +97,10 @@ public class BasicUserService implements UserService {
       binaryContent = BinaryContent.builder()
           .fileName(profile.getOriginalFilename())
           .contentType(profile.getContentType())
-          .bytes(profile.getBytes())
           .size((long) profile.getBytes().length)
           .build();
+
+      binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
     }
 
     user.updateUsername(userUpdateRequest.newUsername());

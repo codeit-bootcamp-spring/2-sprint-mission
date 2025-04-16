@@ -49,8 +49,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @Override
   public InputStream get(UUID id) {
-    try (InputStream is = Files.newInputStream(resolvePath(id))) {
-      return is;
+    try {
+      return Files.newInputStream(resolvePath(id));
     } catch (IOException e) {
       throw new RuntimeException("파일을 불러오는 중 오류 발생 : ", e);
     }

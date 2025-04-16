@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
 
   @GetMapping("/{binaryContentId}")
   @Operation(summary = "첨부 파일 조회", operationId = "find")
@@ -96,5 +98,13 @@ public class BinaryContentController {
     List<BinaryContentDto> binaryContentDtoList = binaryContentService.findByIdIn(
         binaryContentIdList);
     return ResponseEntity.status(HttpStatus.OK).body(binaryContentDtoList);
+  }
+
+  @GetMapping("/{binaryContentId}/download")
+  public ResponseEntity<?> binaryContentDownload(
+      @PathVariable("binaryContentId") UUID binaryContentId
+  ) {
+    BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+    return binaryContentStorage.download(binaryContentDto);
   }
 }

@@ -33,7 +33,7 @@ discodeit:
   storage:
     type: local
     local:
-      root-path: \src\main\resources\static\files
+      root-path: ./upload
 
 springdoc:
   api-docs:

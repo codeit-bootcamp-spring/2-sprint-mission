@@ -12,8 +12,7 @@ CREATE TABLE IF NOT EXISTS binary_contents
     created_at   TIMESTAMPTZ  NOT NULL,
     file_name    VARCHAR(255),
     size         BIGINT       NOT NULL,
-    content_type varchar(100) NOT NULL,
-    bytes        BYTEA        NOT NULL
+    content_type varchar(100) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users
