@@ -22,9 +22,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReadStatus extends BaseUpdatableEntity implements Serializable {
-
-  private static final long serialVersionUID = 1L;
+public class ReadStatus extends BaseUpdatableEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)

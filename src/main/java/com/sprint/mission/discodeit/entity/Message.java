@@ -9,9 +9,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,9 +19,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Message extends BaseUpdatableEntity implements Serializable {
+public class Message extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
   private String content;
 
   @ManyToOne(fetch = FetchType.LAZY)
