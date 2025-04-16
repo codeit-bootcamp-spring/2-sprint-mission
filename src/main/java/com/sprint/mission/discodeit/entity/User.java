@@ -1,60 +1,42 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 
 @Getter
-public class User implements Serializable {
+public class User extends BaseUpdatableEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
 
     private String username;
     private String email;
     private String password;
-    private UUID profileId;
 
-    public User(String username, String email, String password, UUID profileId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+    private BinaryContent profile;
+    private UserStatus status;
+
+    public User(String username, String email, String password, BinaryContent profile) {
 
         this.username = username;
         this.email = email;
         this.password = password;
-        this.profileId = profileId;
+        this.profile = profile;
 
     }
 
-    public void updateUser(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
-        boolean anyValueUpdated = false;
+    public void updateUser(String newUsername, String newEmail, String newPassword, BinaryContent newProfile) {
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
-            anyValueUpdated = true;
         }
         if (newEmail != null && !newEmail.equals(this.email)) {
             this.email = newEmail;
-            anyValueUpdated = true;
         }
         if (newPassword != null && !newPassword.equals(this.password)) {
             this.password = newPassword;
-            anyValueUpdated = true;
         }
-        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
-            this.profileId = newProfileId;
-            anyValueUpdated = true;
+        if (newProfile != this.profile) {
+            this.profile = newProfile;
         }
-
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
-    }
-
-    public String toString() {
-        return "[ userID: " + getId() + "userName: " + getUsername() + " ]";
     }
 }
