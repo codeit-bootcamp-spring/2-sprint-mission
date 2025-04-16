@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mepper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -21,13 +22,14 @@ public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
+  private final UserStatusMapper userStatusMapper;
 
   @Override
   public UserStatusDto findById(UUID UserStatusId) {
     UserStatus status = userStatusRepository.findById(UserStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("UserStatusId: " + UserStatusId + " not found"));
-    return UserStatusDto.from(status);
+    return userStatusMapper.toDto(status);
   }
 
   @Override
@@ -35,14 +37,14 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus status = userStatusRepository.findByUserId(UserId)
         .orElseThrow(
             () -> new NoSuchElementException("UserId: " + UserId + " UserStatus not found"));
-    return UserStatusDto.from(status);
+    return userStatusMapper.toDto(status);
   }
 
   @Override
   public List<UserStatusDto> findAll() {
     return userStatusRepository.findAll()
         .stream()
-        .map(UserStatusDto::from)
+        .map(userStatusMapper::toDto)
         .collect(Collectors.toList());
   }
 

@@ -28,6 +28,4 @@ public interface ChannelService {
   void deleteChannel(UUID channelId); //채널 삭제
 
   void validateChannelExists(UUID channelId); // 채널 존재 확인
-
-  ChannelDto mapToDto(Channel channel);
 }

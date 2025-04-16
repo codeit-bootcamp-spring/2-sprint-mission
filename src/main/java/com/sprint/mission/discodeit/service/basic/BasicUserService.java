@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mepper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -27,6 +27,7 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
+  private final UserMapper userMapper;
 
   @Override
   public User createUser(CreateUserRequest request) {
@@ -70,15 +71,15 @@ public class BasicUserService implements UserService {
   @Override
   public List<UserDto> findUsersByIds(Set<UUID> userIds) {
     return userRepository.findByIdIn(userIds).stream()
-        .map(UserDto::from)
-        .collect(Collectors.toList());
+        .map(userMapper::toDto)
+        .toList();
   }
 
   @Override
   public List<UserDto> getAllUsers() {
     return userRepository.findAll().stream()
-        .map(UserDto::from)
-        .collect(Collectors.toList());
+        .map(userMapper::toDto)
+        .toList();
   }
 
   @Override
