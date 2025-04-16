@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.MessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -47,15 +48,17 @@ public class MessageController {
             .toList())
         .orElse(new ArrayList<>());
     Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdMessage);
   }
 
   @PatchMapping("/{messageId}")
-  public ResponseEntity<Message> update(@PathVariable("messageId") UUID messageId,
+  public ResponseEntity<MessageDTO> update(@PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest request) {
-    Message updatedMessage = messageService.update(messageId, request);
+    MessageDTO updatedMessage = messageService.update(messageId, request);
+
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedMessage);
@@ -70,9 +73,10 @@ public class MessageController {
   }
 
   @GetMapping
-  public ResponseEntity<List<Message>> findAllByChannelId(
+  public ResponseEntity<List<MessageDTO>> findAllByChannelId(
       @RequestParam("channelId") UUID channelId) {
-    List<Message> messages = messageService.findAllByChannelId(channelId);
+    List<MessageDTO> messages = messageService.findAllByChannelId(channelId);
+
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(messages);

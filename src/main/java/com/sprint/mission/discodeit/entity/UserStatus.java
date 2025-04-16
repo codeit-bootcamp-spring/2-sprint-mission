@@ -12,6 +12,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Getter
+@Table(name = "user_statuses")
 public class UserStatus extends BaseUpdatableEntity {
 
   @OneToOne

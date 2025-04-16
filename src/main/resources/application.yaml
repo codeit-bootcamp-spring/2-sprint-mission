@@ -35,6 +35,6 @@ spring:
 
 discodeit:
   repository:
-    type: file   # jcf | file
+    type: jpa   # jcf | file | jpa
     file-directory: .discodeit
 

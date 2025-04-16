@@ -54,6 +54,7 @@ public class UserController {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedUser);

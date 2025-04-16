@@ -13,6 +13,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Getter
+@Table(name = "channels")
 public class Channel extends BaseUpdatableEntity{
 
   @Enumerated(EnumType.STRING)
@@ -25,13 +26,10 @@ public class Channel extends BaseUpdatableEntity{
   @Column(length = 500)
   private String description;
 
-  // FK: messages.channel_id → channels(id), ON DELETE CASCADE
-  @OneToMany(mappedBy = "channel")
-  private List<Message> messages = new ArrayList<>();
-
-  // FK: read_statuses.channel_id → channels(id), ON DELETE CASCADE
-  @OneToMany(mappedBy = "channel")
-  private List<ReadStatus> readStatuses = new ArrayList<>();
+  public Channel(ChannelType type) {
+    this.type = type;
+    this.name = "Private채널";
+  }
 
   public Channel(ChannelType type, String name, String description) {
     this.type = type;

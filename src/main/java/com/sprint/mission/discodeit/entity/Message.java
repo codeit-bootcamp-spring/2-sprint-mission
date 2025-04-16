@@ -13,8 +13,9 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Getter
+@Table(name = "messages")
 public class Message extends BaseUpdatableEntity {
-  @Lob
+
   private String content;
 
   @ManyToOne(optional = false)
@@ -25,9 +26,9 @@ public class Message extends BaseUpdatableEntity {
   @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "fk_message_author"))
   private User author;
 
-  // FK: message_attachments.message_id → messages(id), ON DELETE CASCADE
-  @OneToMany(mappedBy = "message")
+  @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
   private List<MessageAttachment> attachments = new ArrayList<>();
+
 
   public Message(String content, Channel channel, User author) {
     this.content = content;
