@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +23,12 @@ import java.util.UUID;
 public class ReadStatusController implements ReadStatusApi {
 
   private final ReadStatusService readStatusService;
+  private final ReadStatusMapper readStatusMapper;
 
   @Override
   public ResponseEntity<ReadStatusDto> create1(ReadStatusCreateRequest readStatusCreateRequest) {
     ReadStatus created = readStatusService.create(readStatusCreateRequest);
-    ReadStatusDto dto = new ReadStatusDto(created.getId(), created.getUser().getId(),
-        created.getChannel().getId(), created.getLastReadAt());
+    ReadStatusDto dto = readStatusMapper.toDto(created);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(dto);
@@ -47,8 +48,7 @@ public class ReadStatusController implements ReadStatusApi {
       ReadStatusUpdateRequest readStatusUpdateRequest) {
     UUID uuid = UUID.fromString(readStatusId.toString());
     ReadStatus updated = readStatusService.update(uuid, readStatusUpdateRequest);
-    ReadStatusDto dto = new ReadStatusDto(updated.getId(), updated.getUser().getId(),
-        updated.getChannel().getId(), updated.getLastReadAt());
+    ReadStatusDto dto = readStatusMapper.toDto(updated);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(dto);

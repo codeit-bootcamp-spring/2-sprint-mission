@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.Api.ChannelApi;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class ChannelController implements ChannelApi {
 
   private final ChannelService channelService;
+  private final ChannelMapper channelMapper;
 
   @Override
   public ResponseEntity<ChannelDto> create3(PublicChannelCreateRequest publicChannelCreateRequest) {
@@ -39,10 +41,7 @@ public class ChannelController implements ChannelApi {
   public ResponseEntity<ChannelDto> create4(
       PrivateChannelCreateRequest privateChannelCreateRequest) {
     Channel created = channelService.create(privateChannelCreateRequest);
-    ChannelDto dto = new ChannelDto(created.getId(), created.getType(),
-        created.getName()
-        , created.getDescription(), privateChannelCreateRequest.participantIds(),
-        created.getCreatedAt());
+    ChannelDto dto = channelMapper.toDto(created);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)

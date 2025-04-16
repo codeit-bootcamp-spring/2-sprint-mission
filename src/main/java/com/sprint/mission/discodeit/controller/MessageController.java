@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.dto.request.Pageable;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -39,6 +40,7 @@ public class MessageController implements MessageApi {
   private final ChannelService channelService;
   private final UserService userService;
   private final BinaryContentService binaryContentService;
+  private final MessageMapper messageMapper;
 
   @Override
   public ResponseEntity<MessageDto> create2(
@@ -80,8 +82,7 @@ public class MessageController implements MessageApi {
             .toList())
         .orElse(new ArrayList<>());
 
-    MessageDto dto = new MessageDto(message.getId(), message.getCreatedAt(), message.getUpdatedAt(),
-        message.getContent(), message.getChannel().getId(), author, binaryContentDtos);
+    MessageDto dto = messageMapper.toDto(message);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(dto);
   }
@@ -138,10 +139,7 @@ public class MessageController implements MessageApi {
             .toList())
         .orElse(new ArrayList<>());
 
-    MessageDto dto = new MessageDto(
-        updated.getAuthor().getId(), updated.getCreatedAt(), updated.getUpdatedAt(),
-        updated.getContent(), updated.getChannel().getId(), author, binaryContentDtos
-    );
+    MessageDto dto = messageMapper.toDto(updated);
 
     return ResponseEntity.ok(dto);
   }

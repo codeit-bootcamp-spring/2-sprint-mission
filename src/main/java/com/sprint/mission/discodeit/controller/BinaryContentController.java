@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.Api.BinaryContentApi;
 import java.util.ArrayList;
@@ -21,16 +22,14 @@ import java.util.UUID;
 public class BinaryContentController implements BinaryContentApi {
 
   private final BinaryContentService binaryContentService;
+  private final BinaryContentMapper binaryContentMapper;
 
   @Override
   public ResponseEntity<BinaryContentDto> find(UUID binaryContentId) {
     UUID uuid = UUID.fromString(binaryContentId.toString());
     BinaryContent binaryContent = binaryContentService.find(uuid);
 
-    BinaryContentDto dto = new BinaryContentDto(
-        binaryContentId, binaryContent.getFileName(),
-        binaryContent.getSize(), binaryContent.getContentType()
-    );
+    BinaryContentDto dto = binaryContentMapper.toDto(binaryContent);
 
     return ResponseEntity
         .status(HttpStatus.OK)

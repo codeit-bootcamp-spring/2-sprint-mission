@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.Api.UserApi;
@@ -33,6 +34,7 @@ public class UserController implements UserApi {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
+  private final UserMapper userMapper;
 
   @Override
   public ResponseEntity<UserDto> create(UserCreateRequest userCreateRequest,
@@ -49,8 +51,7 @@ public class UserController implements UserApi {
         user.getId(), user.getCreatedAt()
     );
     userStatusService.create(userStatusCreateRequest);
-    UserDto dto = new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(),
-        user.getUsername(), user.getEmail(), user.getProfile().getId(), true);
+    UserDto dto = userMapper.toDto(user);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(dto);
   }
@@ -86,9 +87,7 @@ public class UserController implements UserApi {
 
     userStatusService.update(userId, userStatusUpdateRequest);
 
-    UserDto dto = new UserDto(updatedUser.getId(), updatedUser.getCreatedAt(),
-        updatedUser.getUpdatedAt(), updatedUser.getUsername(),
-        updatedUser.getEmail(), updatedUser.getProfile().getId(), true);
+    UserDto dto = userMapper.toDto(updatedUser);
 
     return ResponseEntity
         .status(HttpStatus.OK)
