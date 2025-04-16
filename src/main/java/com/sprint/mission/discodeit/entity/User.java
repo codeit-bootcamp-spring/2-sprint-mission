@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -35,7 +34,8 @@ public class User extends BaseUpdatableEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<UserChannel> userChannels = new HashSet<>();
 
-    public User(String email, String password) {
+    public User(String username, String email, String password,
+        BinaryContent nullableProfileObject) {
         super();
         this.email = email;
         this.password = password;
