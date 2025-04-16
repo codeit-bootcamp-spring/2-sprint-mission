@@ -21,53 +21,53 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class MessageController {
 
-  private final MessageService messageService;
+    private final MessageService messageService;
 
-  @Operation(summary = "메시지 생성")
-  @ApiResponse(
-      responseCode = "201",
-      description = "메시지 생성 성공"
-  )
-  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<MessageResponse> createMessage(
-      @RequestPart("messageCreateRequest") CreateMessageRequest request,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
-  ) {
-    UUID messageId = messageService.createMessage(request, attachments).getId();
-    return messageService.getMessageById(messageId)
-        .map(response -> ResponseEntity.status(201).body(response))
-        .orElse(ResponseEntity.badRequest().build());
-  }
-
-  @Operation(summary = "메시지 수정")
-  @ApiResponse(
-      responseCode = "200",
-      description = "메시지 수정 성공",
-      content = @Content(mediaType = "*/*")
-  )
-  @PatchMapping("/{messageId}")
-  public ResponseEntity<Void> updateMessage(
-      @PathVariable UUID messageId,
-      @RequestBody UpdateMessageRequest request
-  ) {
-    if (!messageId.equals(request.messageId())) {
-      return ResponseEntity.badRequest().build();
+    @Operation(summary = "메시지 생성")
+    @ApiResponse(
+        responseCode = "201",
+        description = "메시지 생성 성공"
+    )
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MessageResponse> createMessage(
+        @RequestPart("messageCreateRequest") CreateMessageRequest request,
+        @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+    ) {
+        UUID messageId = messageService.createMessage(request, attachments).getId();
+        MessageResponse response = messageService.getMessageById(messageId);
+        return ResponseEntity.status(201).body(response);
     }
-    messageService.updateMessage(request);
-    return ResponseEntity.ok().build();
-  }
 
-  @Operation(summary = "메시지 삭제")
-  @DeleteMapping("/{messageId}")
-  @ApiResponse(responseCode = "204", description = "메시지 삭제 성공")
-  public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
-    messageService.deleteMessage(messageId);
-    return ResponseEntity.noContent().build();
-  }
+    @Operation(summary = "메시지 수정")
+    @ApiResponse(
+        responseCode = "200",
+        description = "메시지 수정 성공",
+        content = @Content(mediaType = "*/*")
+    )
+    @PatchMapping("/{messageId}")
+    public ResponseEntity<Void> updateMessage(
+        @PathVariable UUID messageId,
+        @RequestBody UpdateMessageRequest request
+    ) {
+        if (!messageId.equals(request.messageId())) {
+            return ResponseEntity.badRequest().build();
+        }
+        messageService.updateMessage(request);
+        return ResponseEntity.ok().build();
+    }
 
-  @Operation(summary = "채널 메시지 목록 조회")
-  @GetMapping
-  public ResponseEntity<List<MessageResponse>> getMessagesByChannel(@RequestParam UUID channelId) {
-    return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
-  }
+    @Operation(summary = "메시지 삭제")
+    @DeleteMapping("/{messageId}")
+    @ApiResponse(responseCode = "204", description = "메시지 삭제 성공")
+    public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
+        messageService.deleteMessage(messageId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "채널 메시지 목록 조회")
+    @GetMapping
+    public ResponseEntity<List<MessageResponse>> getMessagesByChannel(
+        @RequestParam UUID channelId) {
+        return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
+    }
 }

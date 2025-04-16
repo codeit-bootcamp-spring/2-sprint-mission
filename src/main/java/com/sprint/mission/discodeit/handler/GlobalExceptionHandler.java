@@ -16,4 +16,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAll(Exception e) {
         return ResponseEntity.internalServerError().body("서버 오류: " + e.getMessage());
     }
+
+    @ExceptionHandler(MessageNotFoundException.class)
+    public ResponseEntity<String> handleMessageNotFound(MessageNotFoundException e) {
+        return ResponseEntity.status(404).body(e.getMessage());
+    }
 }

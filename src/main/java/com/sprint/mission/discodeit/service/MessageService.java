@@ -12,13 +12,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageService {
 
-  Message createMessage(CreateMessageRequest request, List<MultipartFile> attachments);
+    Message createMessage(CreateMessageRequest request, List<MultipartFile> attachments);
 
-  Optional<MessageResponse> getMessageById(UUID messageId);
+    MessageResponse getMessageById(UUID messageId);
 
-  List<MessageResponse> findAllByChannelId(UUID channelId);
+    List<MessageResponse> findAllByChannelId(UUID channelId);
 
-  void updateMessage(UpdateMessageRequest request);
+    void updateMessage(UpdateMessageRequest request);
 
-  void deleteMessage(UUID messageId);
+    void deleteMessage(UUID messageId);
 }
