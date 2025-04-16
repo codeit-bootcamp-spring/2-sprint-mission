@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -26,16 +25,14 @@ public class Message extends BaseUpdatableEntity implements Serializable, Identi
 
   private static final long serialVersionUID = 1L;
 
-  //  @ManyToMany
-  //  @JoinTable(
-  //      name = "message_attachments",
-  //      joinColumns = @JoinColumn(name = "message_id"),
-  //      inverseJoinColumns = @JoinColumn(name = "attachment_id")
-  //  )
-  // 이것보단 연결 엔티티로 만들어 관계를 풀어내는 것이 좋다.
-  // 미션에선 연결 테이블에 추가 컬럼 확장 가능성이 없으므로 @JoinTable을 사용?? - 다음 미션에서 봐야할듯
-  @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<MessageAttachment> attachments;
+
+  @OneToMany
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id")
+  )
+  private List<BinaryContent> attachments;
 
   @Lob
   private String content;
@@ -50,7 +47,7 @@ public class Message extends BaseUpdatableEntity implements Serializable, Identi
 
   @Builder
   public Message(String content, Channel channel, User author,
-      List<MessageAttachment> attachments) {
+      List<BinaryContent> attachments) {
     this.attachments = attachments != null ? new ArrayList<>(attachments) : new ArrayList<>();
     this.content = content;
     this.channel = channel;
@@ -63,7 +60,7 @@ public class Message extends BaseUpdatableEntity implements Serializable, Identi
     }
   }
 
-  public void updateMessageAttachment(List<MessageAttachment> attachments) {
+  public void updateBinaryContent(List<BinaryContent> attachments) {
     this.attachments = new ArrayList<>(attachments);
   }
 
