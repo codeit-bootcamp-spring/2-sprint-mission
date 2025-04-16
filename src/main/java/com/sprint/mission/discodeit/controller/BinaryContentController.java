@@ -27,11 +27,7 @@ public class BinaryContentController {
   @RequestMapping(value = "", method = RequestMethod.GET)
   public ResponseEntity<List<BinaryContentDto>> getBinaryContents(
       @RequestParam("binaryContentIds") List<UUID> binaryIds) {
-    List<BinaryContentDto> binaryContents = binaryIds.stream()
-        .map(binaryContentService::findBinaryContent)
-        .toList();
-
-    return ResponseEntity.ok(binaryContents);
+    return ResponseEntity.ok(binaryContentService.findAllByIdIn(binaryIds));
   }
 
   @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
