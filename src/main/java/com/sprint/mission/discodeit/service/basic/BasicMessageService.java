@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.Message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.Message.MessageDto;
 import com.sprint.mission.discodeit.dto.Message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mepper.MessageMapper;
+import com.sprint.mission.discodeit.mepper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -19,6 +21,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 
@@ -32,6 +38,7 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final MessageMapper messageMapper;
+  private final PageResponseMapper pageResponseMapper;
 
   @Transactional
   @Override
@@ -80,6 +87,18 @@ public class BasicMessageService implements MessageService {
     return messageRepository.findAllByChannelId(channelId).stream()
         .map(messageMapper::toDto)
         .toList();
+  }
+
+  @Override
+  public PageResponse<MessageDto> findMessagesByPage(UUID channelId, int page) {
+    Pageable pageable = PageRequest.of(page, 50, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+    Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId,
+        pageable);
+    
+    Slice<MessageDto> dtoSlice = messages.map(messageMapper::toDto);
+
+    return pageResponseMapper.fromSlice(dtoSlice);
   }
 
   @Override
