@@ -74,6 +74,7 @@ public class BasicChannelService implements ChannelService {
                 .map(BaseEntity::getId)
                 .toList();
 
+
         return channelJpaRepository
                 .findByTypeOrIdIn(ChannelType.PUBLIC, matchingChannelIdList).stream()
                 .map(channelMapper::toDto)

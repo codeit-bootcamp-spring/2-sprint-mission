@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor
@@ -45,7 +45,20 @@ public class UserStatus extends BaseUpdatableEntity {
     public void updateLastConnectionTime(Instant LastConnectionTime) {
         this.lastActiveAt = LastConnectionTime;
         currentUserStatus();
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, user.getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof UserStatus userStatus)) return false;
+        return id != null && user != null &&
+                id.equals(userStatus.getId()) &&
+                user.getId().equals(userStatus.user.getId());
     }
 
     @Override

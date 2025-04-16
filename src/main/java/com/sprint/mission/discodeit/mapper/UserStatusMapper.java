@@ -18,4 +18,12 @@ public class UserStatusMapper {
         );
     }
 
+    public UserStatusResponseDto toDto1(UserStatus userStatus) {
+        return UserStatusResponseDto.builder()
+                .id(userStatus.getId())
+                .userId(userStatus.getUser().getId())
+                .lastActiveAt(userStatus.getLastActiveAt())
+                .build();
+
+    }
 }

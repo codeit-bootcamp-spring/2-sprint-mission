@@ -28,7 +28,9 @@ public class ChannelMapper {
                 .orElse(Instant.MIN);
 
         List<User> user = (channel.getType().equals(ChannelType.PRIVATE))
-                ? readStatusJpaRepository.findByChannel_Id(channel.getId()).stream().map(ReadStatus::getUser).toList() : null;
+                ? readStatusJpaRepository.findByChannel_Id(channel.getId()).stream()
+                .map(ReadStatus::getUser)
+                .toList() : null;
 
         return new ChannelResponseDto(
                 channel.getId(),
@@ -38,6 +40,28 @@ public class ChannelMapper {
                 user != null ? user.stream().map(userMapper::toDto).toList() : List.of(),
                 lastMessageAt
         );
+    }
+
+
+    public ChannelResponseDto toDto1(Channel channel){
+        Instant lastMessageAt = messageJpaRepository.findByChannel_Id(channel.getId()).stream()
+                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+                .map(Message::getCreatedAt)
+                .limit(1)
+                .findFirst()
+                .orElse(Instant.MIN);
+
+        List<User> user = (channel.getType().equals(ChannelType.PRIVATE))
+                ? readStatusJpaRepository.findByChannel_Id(channel.getId()).stream().map(ReadStatus::getUser).toList() : null;
+
+        return ChannelResponseDto.builder()
+                .id(channel.getId())
+                .type(channel.getType())
+                .name(channel.getName())
+                .description(channel.getDescription())
+                .participants(user != null ? user.stream().map(userMapper::toDto).toList() : List.of())
+                .lastMessageAt(lastMessageAt)
+                .build();
 
     }
 }

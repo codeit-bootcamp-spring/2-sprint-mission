@@ -17,4 +17,13 @@ public class ReadStatusMapper {
                 readStatus.getLastReadAt()
         );
     }
+
+    public ReadStatusResponseDto toDto1(ReadStatus readStatus) {
+        return ReadStatusResponseDto.builder()
+                .id(readStatus.getId())
+                .userId(readStatus.getUser().getId())
+                .channelId(readStatus.getChannel().getId())
+                .lastReadAt(readStatus.getLastReadAt())
+                .build();
+    }
 }

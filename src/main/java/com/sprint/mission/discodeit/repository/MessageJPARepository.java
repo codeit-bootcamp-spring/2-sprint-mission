@@ -20,5 +20,5 @@ public interface MessageJPARepository extends JpaRepository<Message, UUID> {
     @EntityGraph(attributePaths = "attachments")
     Optional<Message> findByIdEntityGraph(@Param("id") UUID id);
 
-    Optional<Message> findByChannel_Id(UUID channelId);
+    List<Message> findByChannel_Id(UUID channelId);
 }

@@ -17,4 +17,14 @@ public class BinaryContentMapper {
                 binaryContent.getContentType()
         );
     }
+
+    public BinaryContentResponseDto toDto1(BinaryContent binaryContent) {
+        return BinaryContentResponseDto.builder()
+                .id(binaryContent.getId())
+                .fileName(binaryContent.getFileName())
+                .size(binaryContent.getSize())
+                .contentType(binaryContent.getContentType())
+                .build();
+
+    }
 }

@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service.dto.binarycontentdto;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import lombok.Builder;
 
 import java.util.UUID;
 
+@Builder
 public record BinaryContentResponseDto(
         UUID id,
         String fileName,

@@ -20,4 +20,14 @@ public class UserMapper {
                 user.getStatus().currentUserStatus()
         );
     }
+
+    public UserResponseDto toDto1(User user) {
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .profileId(user.getProfile() != null ? binaryContentMapper.toDto(user.getProfile()) : null)
+                .online(user.getStatus().currentUserStatus())
+                .build();
+    }
 }

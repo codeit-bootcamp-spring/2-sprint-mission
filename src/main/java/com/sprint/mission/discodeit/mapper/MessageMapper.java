@@ -23,4 +23,17 @@ public class MessageMapper {
                 message.getAttachments().stream().map(binaryContentMapper::toDto).toList()
         );
     }
+
+    public MessageResponseDto toDto1(Message message) {
+        return MessageResponseDto.builder()
+                .id(message.getId())
+                .createdAt(message.getCreatedAt())
+                .updatedAt(message.getUpdatedAt())
+                .content(message.getContent())
+                .channelId(message.getChannel().getId())
+                .author(userMapper.toDto(message.getAuthor()))
+                .attachmentIds(message.getAttachments().stream().map(binaryContentMapper::toDto).toList())
+                .build();
+
+    }
 }
