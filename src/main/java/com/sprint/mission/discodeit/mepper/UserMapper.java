@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.mepper;
 
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class UserMapper {
 
-  private BinaryContentMapper binaryContentMapper;
+  private final BinaryContentMapper binaryContentMapper;
 
   public UserDto toDto(User user) {
     if (user == null) {
