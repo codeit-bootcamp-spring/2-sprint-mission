@@ -11,6 +11,10 @@ import java.nio.file.Path;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -62,13 +66,19 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   }
 
   @Override
-  public ResponseEntity<?> download(BinaryContentDto binaryContentDto) {
+  public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
     try {
       InputStream is = get(binaryContentDto.id());
+      InputStreamResource resource = new InputStreamResource(is);
+
       return ResponseEntity.ok()
-          .body(is);
+          .header(HttpHeaders.CONTENT_DISPOSITION,
+              "attachment; filename=\"" + binaryContentDto.fileName() + "\"")
+          .contentType(MediaType.parseMediaType(binaryContentDto.contentType()))
+          .contentLength(binaryContentDto.size())
+          .body(resource);
     } catch (Exception e) {
-      return ResponseEntity.internalServerError().body("파일 다운로드 실패 : " + e.getMessage());
+      return ResponseEntity.internalServerError().body(null);
     }
   }
 }

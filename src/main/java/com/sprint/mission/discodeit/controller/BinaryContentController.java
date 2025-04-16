@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -101,7 +102,7 @@ public class BinaryContentController {
   }
 
   @GetMapping("/{binaryContentId}/download")
-  public ResponseEntity<?> binaryContentDownload(
+  public ResponseEntity<Resource> binaryContentDownload(
       @PathVariable("binaryContentId") UUID binaryContentId
   ) {
     BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
