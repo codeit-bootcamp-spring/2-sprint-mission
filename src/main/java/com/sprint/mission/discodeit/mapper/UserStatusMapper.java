@@ -9,7 +9,12 @@ import org.springframework.stereotype.Component;
 public class UserStatusMapper {
 
     public UserStatusDto toDto(UserStatus userStatus) {
-        return null;
+
+        return new UserStatusDto(
+            userStatus.getId(),
+            userStatus.getUser().getId(),
+            userStatus.getLastActiveAt()
+        );
     }
 
 }

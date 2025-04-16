@@ -14,6 +14,11 @@ public class UserMapper {
     BinaryContentMapper binaryContentMapper;
 
     public UserDto toDto(User user) {
-        return null;
+        return new UserDto(user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            binaryContentMapper.toDto(user.getProfile()),
+            user.getUserStatus().isOnline()
+        );
     }
 }

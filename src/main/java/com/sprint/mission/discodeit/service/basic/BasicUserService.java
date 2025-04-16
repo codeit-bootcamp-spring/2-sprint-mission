@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.data.PageResponse;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -37,6 +38,7 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentStorage binaryContentStorage;// 실제 데이터 관리
     private final UserMapper userMapper;
+    private final PageResponseMapper pageResponseMapper;
 
     @Transactional // 데이터 변경 작업
     @Override
@@ -97,12 +99,13 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserDto> findAll(Pageable pageable) {
-        log.debug("사용자 목록 조회: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
+    public PageResponse<UserDto> findAll(Pageable pageable) {
+        //page로 받은 후 -> 다시 변환
         Page<User> userPage = userRepository.findAll(pageable);
-
-        return userPage.map(userMapper::toDto);
+        PageResponse<UserDto> response = pageResponseMapper.fromPage(userPage, userMapper::toDto);
+        return response;
     }
+
 
     @Transactional
     @Override

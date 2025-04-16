@@ -6,7 +6,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
@@ -24,4 +29,8 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
     void deleteById(@NonNull UUID channelId);
 
     boolean findByName(@NonNull String name);
+
+    @Transactional(readOnly = true)
+    @Query("SELECT c FROM Channel c JOIN c.participants uc WHERE uc.user.id = :userId")
+    Page<Channel> findChannelsByUserId(@Param("userId") UUID userId, Pageable pageable);
 }
