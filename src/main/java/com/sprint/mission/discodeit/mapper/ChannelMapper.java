@@ -33,7 +33,7 @@ public class ChannelMapper {
   }
 
   private List<UserDto> participants(Channel channel) {
-    return readStatusRepository.findByUserId(channel.getId()).stream()
+    return readStatusRepository.findByChannelId(channel.getId()).stream()
         .map(ReadStatus::getUser)
         .map(userMapper::toDto)
         .toList();

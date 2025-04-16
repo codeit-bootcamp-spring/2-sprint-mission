@@ -11,12 +11,8 @@ public record ChannelDto(
     ChannelType type,
     String name,
     String description,
-    List<UserDto> participantIds,
+    List<UserDto> participants,
     Instant lastMessageAt
 ) {
 
-  public ChannelDto(UUID id, ChannelType channelType, String name, String description,
-      Instant lastMessageAt) {
-    this(id, channelType, name, description, List.of(), lastMessageAt);
-  }
 }
