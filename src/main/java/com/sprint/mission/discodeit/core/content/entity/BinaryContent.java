@@ -21,11 +21,10 @@ public class BinaryContent extends BaseEntity {
   @Column(name = "content_type", length = 100, nullable = false)
   private String contentType;
 
-  //  private String extension;
-
   @Column(name = "size", nullable = false)
   private Long size;
 
+  private String extension;
 //  @Lob
 //  private byte[] bytes;
 
@@ -33,7 +32,7 @@ public class BinaryContent extends BaseEntity {
     super();
     this.fileName = fileName;
     this.contentType = contentType;
-//    this.extension = extractExtension(fileName);
+    this.extension = extractExtension(fileName);
 
     this.size = size;
 //    this.bytes = bytes;
@@ -43,14 +42,14 @@ public class BinaryContent extends BaseEntity {
     return new BinaryContent(fileName, size, contentType);
   }
 
-//  private static String extractExtension(String fileName) {
-//    String[] nameSplit = fileName.split("\\.");
-//    if (nameSplit.length > 1) {
-//      return "." + nameSplit[1].toLowerCase();
-//    } else {
-//      return "";
-//    }
-//  }
+  private static String extractExtension(String fileName) {
+    String[] nameSplit = fileName.split("\\.");
+    if (nameSplit.length > 1) {
+      return "." + nameSplit[1].toLowerCase();
+    } else {
+      return "";
+    }
+  }
 
   private static class Validator {
 

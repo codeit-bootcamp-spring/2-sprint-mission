@@ -41,8 +41,8 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentStoragePort binaryContentStorage;
   private final BinaryContentMetaRepositoryPort binaryContentRepository;
 
-  @Transactional
   @Override
+  @Transactional
   public MessageResult create(CreateMessageCommand command,
       List<CreateBinaryContentCommand> binaryContentCommands) {
 
@@ -73,7 +73,7 @@ public class BasicMessageService implements MessageService {
     Message save = messageRepository.save(message);
 
     logger.info(
-        "Message Created: Message Id {}, Channel Id {}, Author Id {}, content {}, attachment {}",
+        "Message Created: Message Id {}, Channel Id {}, Author Id {}, content {}, attachments {}",
         message.getId(), channel.getId(), user.getId(), message.getContent(),
         message.getAttachment());
 
@@ -87,6 +87,7 @@ public class BasicMessageService implements MessageService {
 //  }
 
   @Override
+  @Transactional(readOnly = true)
   public Slice<MessageResult> findMessagesByChannelId(UUID channelId, Pageable pageable) {
     Slice<Message> messageSlice = messageRepository.findAllByChannelId(channelId, pageable);
 
@@ -94,6 +95,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional
   public MessageResult update(UpdateMessageCommand command) {
     Message message = messageRepository.findById(command.messageId())
         .orElseThrow(() -> messageIdNotFoundError(command.messageId()));
@@ -103,6 +105,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional
   public void delete(UUID messageId) {
 
     Message message = messageRepository.findById(messageId)

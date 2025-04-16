@@ -55,6 +55,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ReadStatusResult find(UUID readStatusId) {
     ReadStatus status = readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> readStatusNotFoundError(readStatusId));
@@ -62,12 +63,14 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ReadStatusResult findReadStatusByUserId(UUID userId) {
     ReadStatus status = readStatusRepository.findByUserId(userId);
     return ReadStatusResult.create(status);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ReadStatusResult> findAllByUserId(UUID userId) {
     return readStatusRepository.findAllByUserId(userId).stream().map(
         ReadStatusResult::create
@@ -75,6 +78,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional
   public ReadStatusResult updateReadStatus(UpdateReadStatusCommand command) {
     ReadStatus status = readStatusRepository.findById(command.readStatusId()).orElseThrow(
         () -> readStatusNotFoundError(command.readStatusId())
@@ -85,6 +89,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @CustomLogging
   @Override
+  @Transactional
   public void deleteReadStatus(UUID readStatusId) {
     if (!readStatusRepository.existsId(readStatusId)) {
       readStatusNotFoundError(readStatusId);

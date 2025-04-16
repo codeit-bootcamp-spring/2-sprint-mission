@@ -1,19 +1,19 @@
 package com.sprint.mission.discodeit.adapter.outbound.content;
 
 import com.sprint.mission.discodeit.adapter.inbound.content.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
+import com.sprint.mission.discodeit.exception.content.BinaryContentErrors;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -27,12 +27,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocalBinaryContentStorage implements BinaryContentStoragePort {
 
-  private final Map<UUID, byte[]> storage = new ConcurrentHashMap<>();
+  private final BinaryContentMetaRepositoryPort binaryContentRepository;
   private final Path storagePath;
 
   public LocalBinaryContentStorage(
-      @Value("${discodeit.storage.local.root-path}") String storagePath) {
+      @Value("${discodeit.storage.local.root-path}") String storagePath,
+      JpaBinaryContentRepository jpaBinaryContentRepository) {
     this.storagePath = Paths.get(storagePath);
+    binaryContentRepository = new BinaryContentMetaRepositoryAdapter(jpaBinaryContentRepository);
     init();
   }
 
@@ -48,16 +50,19 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
   }
 
   private Path resolvePath(UUID id) {
-    return storagePath.resolve(id.toString());
+    BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(
+        () -> BinaryContentErrors.binaryContentNotFoundError(id)
+    );
+    String extension = binaryContent.getExtension();
+
+    return storagePath.resolve(id.toString() + extension);
   }
 
   @Override
   public UUID put(UUID id, byte[] bytes) {
     Path destination = resolvePath(id);
-    try (FileOutputStream fos = new FileOutputStream(destination.toFile());
-        ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-      storage.put(id, bytes);
-      oos.writeObject(storage);
+    try (OutputStream outputStream = Files.newOutputStream(destination)) {
+      outputStream.write(bytes);
     } catch (IOException e) {
       throw new RuntimeException();
     }
@@ -81,8 +86,9 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
     InputStreamResource resource = new InputStreamResource(inputStream);
 
     HttpHeaders headers = new HttpHeaders();
+
     headers.add(HttpHeaders.CONTENT_DISPOSITION,
-        "attachment; filename=\"" + binaryContentResponse.fileName() + "\"");
+        "attachments; filename=\"" + binaryContentResponse.fileName() + "\"");
     headers.setContentType(MediaType.parseMediaType(binaryContentResponse.contentType()));
     headers.setContentLength(binaryContentResponse.size());
 

@@ -115,6 +115,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserResult findById(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> userIdNotFoundError(userId));
@@ -122,6 +123,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserListResult findAll() {
     List<User> userList = userRepository.findAll();
 
@@ -133,6 +135,7 @@ public class BasicUserService implements UserService {
 
   @CustomLogging
   @Override
+  @Transactional
   public UserResult update(UpdateUserCommand command,
       Optional<CreateBinaryContentCommand> binaryContentDTO) {
 
@@ -144,6 +147,7 @@ public class BasicUserService implements UserService {
       binaryContentMetaRepository.delete(profile.getId());
     }
     BinaryContent newProfile = makeBinaryContent(binaryContentDTO);
+
     user.update(command.newName(), command.newEmail(), command.newPassword(), newProfile);
     logger.info("User Updated: username {}, email {}, password {}", user.getName(), user.getEmail(),
         user.getPassword());
@@ -152,6 +156,7 @@ public class BasicUserService implements UserService {
 
   @CustomLogging
   @Override
+  @Transactional
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> userIdNotFoundError(userId));

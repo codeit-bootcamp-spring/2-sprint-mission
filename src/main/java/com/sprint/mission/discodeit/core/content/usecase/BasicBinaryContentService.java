@@ -20,8 +20,8 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final LocalBinaryContentStorage binaryContentStorage;
 
   @CustomLogging
-  @Transactional
   @Override
+  @Transactional
   public BinaryContent create(CreateBinaryContentCommand command) {
     BinaryContent binaryContent = BinaryContent.create(command.fileName(),
         (long) command.bytes().length, command.contentType());
@@ -31,20 +31,22 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public BinaryContent findById(UUID binaryId) {
-    BinaryContent binaryContent = binaryContentMetaRepository.findById(binaryId).orElseThrow(
+    return binaryContentMetaRepository.findById(binaryId).orElseThrow(
         () -> BinaryContentErrors.binaryContentNotFoundError(binaryId)
     );
-    return binaryContent;
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
     return binaryContentMetaRepository.findAllByIdIn(binaryContentIds);
   }
 
   @CustomLogging
   @Override
+  @Transactional
   public void delete(UUID binaryId) {
     if (!binaryContentMetaRepository.existsId(binaryId)) {
       BinaryContentErrors.binaryContentNotFoundError(binaryId);

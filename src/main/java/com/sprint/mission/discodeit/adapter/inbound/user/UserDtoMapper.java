@@ -24,9 +24,14 @@ public final class UserDtoMapper {
   }
 
   public static UserResponse toCreateResponse(UserResult result) {
-    return new UserResponse(result.id(), result.username(), result.email(),
-        BinaryContentDtoMapper.toCreateResponse(result.profile()),
-        result.online());
+    if (result.profile() == null) {
+      return new UserResponse(result.id(), result.username(), result.email(), null,
+          result.online());
+    } else {
+      return new UserResponse(result.id(), result.username(), result.email(),
+          BinaryContentDtoMapper.toCreateResponse(result.profile()),
+          result.online());
+    }
   }
 
   public static CreateUserCommand toCreateUserCommand(UserCreateRequest requestBody) {
@@ -39,7 +44,7 @@ public final class UserDtoMapper {
   }
 
   public static UpdateUserCommand toUpdateUserCommand(UUID userId, UserUpdateRequest requestBody) {
-    return new UpdateUserCommand(userId, requestBody.newName(), requestBody.newEmail(),
+    return new UpdateUserCommand(userId, requestBody.newUsername(), requestBody.newEmail(),
         requestBody.newPassword());
   }
 

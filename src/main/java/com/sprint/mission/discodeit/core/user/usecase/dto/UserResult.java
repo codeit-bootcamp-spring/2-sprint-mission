@@ -26,11 +26,19 @@ public record UserResult(
 ) {
 
   public static UserResult create(User user, boolean online) {
-    return UserResult.builder()
-        .id(user.getId())
-        .username(user.getName())
-        .email(user.getEmail())
-        .profile(BinaryContentResult.create(user.getProfile()))
-        .online(online).build();
+    if (user.getProfile() == null) {
+      return UserResult.builder()
+          .id(user.getId())
+          .username(user.getName())
+          .email(user.getEmail())
+          .online(online).build();
+    } else {
+      return UserResult.builder()
+          .id(user.getId())
+          .username(user.getName())
+          .email(user.getEmail())
+          .profile(BinaryContentResult.create(user.getProfile()))
+          .online(online).build();
+    }
   }
 }

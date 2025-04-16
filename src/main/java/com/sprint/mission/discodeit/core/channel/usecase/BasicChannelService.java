@@ -41,8 +41,8 @@ public class BasicChannelService implements ChannelService {
   private final MessageRepositoryPort messageRepository;
   private final ReadStatusRepositoryPort readStatusRepository;
 
-  @Transactional
   @Override
+  @Transactional
   public ChannelResult create(CreatePublicChannelCommand command) {
     Channel channel = Channel.create(command.name(), command.description(),
         ChannelType.PUBLIC);
@@ -51,8 +51,8 @@ public class BasicChannelService implements ChannelService {
     return toChannelResult(channel);
   }
 
-  @Transactional
   @Override
+  @Transactional
   public ChannelResult create(CreatePrivateChannelCommand command) {
     Channel channel = Channel.create(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
@@ -72,6 +72,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ChannelResult find(UUID channelId) {
     Channel channel = channelRepository.findByChannelId(channelId).orElseThrow(
         () -> channelIdNotFoundError(channelId)
@@ -108,6 +109,7 @@ public class BasicChannelService implements ChannelService {
 
 
   @Override
+  @Transactional(readOnly = true)
   public ChannelListResult findChannelsByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
         .map(readStatus -> {
@@ -124,6 +126,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional
   public ChannelResult update(UpdateChannelCommand command) {
     Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
         () -> channelIdNotFoundError(command.channelId())
@@ -141,6 +144,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional
   public void delete(UUID channelId) {
     channelRepository.delete(channelId);
     deleteAllMessage(channelId);

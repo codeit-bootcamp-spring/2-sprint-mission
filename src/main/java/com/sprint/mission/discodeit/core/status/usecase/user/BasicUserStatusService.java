@@ -46,12 +46,14 @@ public class BasicUserStatusService implements UserStatusService {
 
 
   @Override
+  @Transactional(readOnly = true)
   public UserStatus findByUserId(UUID userId) {
     return userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> userStatusIdNotFoundError(userId));
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserStatus findByStatusId(UUID userStatusId) {
     return userStatusRepository.findByStatusId(userStatusId)
         .orElseThrow(() -> userStatusIdNotFoundError(userStatusId));
@@ -59,12 +61,14 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<UserStatus> findAll() {
     return userStatusRepository.findAll();
   }
 
   @Override
   @CustomLogging
+  @Transactional
   public UserStatus update(UpdateUserStatusCommand command) {
     UserStatus userStatus;
     if (command.userId() != null) {
@@ -94,6 +98,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   @CustomLogging
+  @Transactional
   public void delete(UUID userId) {
     UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(
         () -> userStatusIdNotFoundError(userId)

@@ -18,7 +18,7 @@ public final class MessageDtoMapper {
   public static MessageResponse toCreateResponse(MessageResult result) {
     return new MessageResponse(result.id(), result.createdAt(), result.updatedAt(),
         result.content(), result.channelId(),
-        UserDtoMapper.toCreateResponse(result.author()), result.attachment().stream()
+        UserDtoMapper.toCreateResponse(result.author()), result.attachments().stream()
         .map(BinaryContentDtoMapper::toCreateResponse)
         .toList());
   }
