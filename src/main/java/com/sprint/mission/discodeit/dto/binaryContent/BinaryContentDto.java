@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.dto.binaryContent;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import java.util.UUID;
 
 public record BinaryContentDto(
@@ -11,17 +10,4 @@ public record BinaryContentDto(
     byte[] bytes
 ) {
 
-  public static BinaryContentDto from(BinaryContent entity) {
-    if (entity == null) {
-      return null;
-    }
-
-    return new BinaryContentDto(
-        entity.getId(),
-        entity.getFileName(),
-        entity.getSize(),
-        entity.getContentType(),
-        entity.getBytes()
-    );
-  }
 }
