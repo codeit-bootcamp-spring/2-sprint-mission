@@ -59,8 +59,10 @@ public interface BinaryContentApi {
       value = "/api/binaryContents/{binaryContentId}/download",
       produces = {"*/*"}
   )
-  default ResponseEntity<Object> download(
-      @Parameter(name = "binaryContentId", description = "다운로드할 파일 ID", required = true, in = ParameterIn.PATH) @PathVariable("binaryContentId") Object binaryContentId
+  default ResponseEntity<?> download(
+      @Parameter(name = "binaryContentId", description = "다운로드할 파일 ID",
+          required = true, in = ParameterIn.PATH) @PathVariable("binaryContentId")
+      UUID binaryContentId
   ) {
     return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 

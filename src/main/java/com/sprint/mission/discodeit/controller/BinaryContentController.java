@@ -5,11 +5,14 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.Api.BinaryContentApi;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.ArrayList;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -18,11 +21,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Controller
 @ResponseBody
-//@RequestMapping("/api/binaryContent")
 public class BinaryContentController implements BinaryContentApi {
 
   private final BinaryContentService binaryContentService;
   private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   public ResponseEntity<BinaryContentDto> find(UUID binaryContentId) {
@@ -52,6 +55,14 @@ public class BinaryContentController implements BinaryContentApi {
         .status(HttpStatus.OK)
         .body(binaryContents);
   }
+
+  @Override
+  public ResponseEntity<?> download(UUID binaryContentId) {
+    BinaryContentDto dto =
+        binaryContentMapper.toDto(binaryContentService.find(binaryContentId));
+    return binaryContentStorage.download(dto);
+  }
+
   /*@RequestMapping(path = "find")
   public ResponseEntity<BinaryContent> find(@RequestParam("binaryContentId") UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentService.find(binaryContentId);

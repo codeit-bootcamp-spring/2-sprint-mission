@@ -23,5 +23,5 @@ public abstract class BaseEntity implements Serializable {
   @Column(updatable = false, nullable = false)
   protected Instant createdAt;
 
-  public abstract LoggingEventVO getType();
+  //public abstract LoggingEventVO getType();
 }
