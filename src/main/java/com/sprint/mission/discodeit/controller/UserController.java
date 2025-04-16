@@ -3,10 +3,9 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -34,62 +33,50 @@ public class UserController {
   private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
 
-  @RequestMapping(value = "", method = RequestMethod.POST)
-  public ResponseEntity<User> register(@RequestPart("userCreateRequest") CreateUserRequest request,
-      @RequestPart(value = "profile", required = false) MultipartFile profile) {
-
-    User user = authService.register(request);
-    if (!profile.isEmpty()) {
-      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
-      user = userService.updateProfile(user.getId(), binaryContent);
-    }
-    return ResponseEntity.status(HttpStatus.CREATED).body(user);
-  }
-
-  @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
-  public ResponseEntity<User> updateUser(
-      @RequestPart("userUpdateRequest") UpdateUserRequest request,
-      @RequestPart(value = "profile", required = false) MultipartFile profile,
-      @PathVariable("userId") UUID userId
-  ) {
-    User user = userService.updateUser(userId, request);
-
-    if (!profile.isEmpty()) {
-      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
-      userService.updateProfile(userId, binaryContent);
-    }
-    return ResponseEntity.ok(user);
-  }
-
-//  @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
-//  public ResponseEntity<?> updateUserProfile(
-//      @RequestParam("profile") MultipartFile profile,
-//      @PathVariable("userId") UUID userId
-//  ) {
-//    UUID binaryId = binaryContentService.createBinaryContent(profile);
-//
-//    userService.updateProfile(userId, binaryId);
-//
-//    return ResponseEntity.ok("프로필사진 변경 완료");
-//  }
-
-
-  @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteUser(@PathVariable("userId") UUID userId) {
-    userService.deleteUser(userId);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body("회원 탈퇴 완료");
-  }
-
   @RequestMapping(value = "", method = RequestMethod.GET)
   public ResponseEntity<List<UserDto>> findAll() {
     return ResponseEntity.ok(userService.getAllUsers());
   }
 
+  @RequestMapping(value = "", method = RequestMethod.POST)
+  public ResponseEntity<UserDto> createUser(
+      @RequestPart("userCreateRequest") CreateUserRequest request,
+      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+
+    UserDto user = authService.register(request);
+    if (!profile.isEmpty()) {
+      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
+      user = userService.updateProfile(user.id(), binaryContent);
+    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+  }
+
+  @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+  public ResponseEntity<?> delete(@PathVariable("userId") UUID userId) {
+    userService.deleteUser(userId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body("회원 탈퇴 완료");
+  }
+
+  @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
+  public ResponseEntity<UserDto> update(
+      @RequestPart("userUpdateRequest") UpdateUserRequest request,
+      @RequestPart(value = "profile", required = false) MultipartFile profile,
+      @PathVariable("userId") UUID userId
+  ) {
+    UserDto userDto = userService.updateUser(userId, request);
+
+    if (!profile.isEmpty()) {
+      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
+      userService.updateProfile(userId, binaryContent);
+    }
+    return ResponseEntity.ok(userDto);
+  }
+
+
   @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
-  public ResponseEntity<?> updateStatus(
+  public ResponseEntity<UserStatusDto> updateStatus(
       @PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest request) {
-    UserStatus userStatus = userStatusService.update(userId, request);
-    return ResponseEntity.ok(userStatus);
+    return ResponseEntity.ok(userStatusService.update(userId, request));
   }
 }

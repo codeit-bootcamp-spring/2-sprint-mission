@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.LoginRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mepper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -20,10 +22,11 @@ public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
+  private final UserMapper userMapper;
 
   @Transactional
   @Override
-  public User register(CreateUserRequest request) {
+  public UserDto register(CreateUserRequest request) {
     String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
 
     if (userRepository.existsByEmail(request.email())) {
@@ -48,12 +51,12 @@ public class BasicAuthService implements AuthService {
     userRepository.save(user);
     userStatusRepository.save(userStatus);
 
-    return user;
+    return userMapper.toDto(user);
   }
 
   @Transactional
   @Override
-  public User login(LoginRequest request) {
+  public UserDto login(LoginRequest request) {
     User user = userRepository.findByUsername(request.username())
         .orElseThrow(NoSuchElementException::new);
 
@@ -64,6 +67,6 @@ public class BasicAuthService implements AuthService {
     userStatusRepository.findByUserId(user.getId())
         .ifPresent(UserStatus::updateLastActiveAt);
 
-    return user;
+    return userMapper.toDto(user);
   }
 }

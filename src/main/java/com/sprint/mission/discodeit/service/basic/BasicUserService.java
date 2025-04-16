@@ -30,7 +30,7 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
 
   @Override
-  public User createUser(CreateUserRequest request) {
+  public UserDto createUser(CreateUserRequest request) {
     String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
 
     if (userRepository.existsByEmail(request.email())) {
@@ -54,18 +54,17 @@ public class BasicUserService implements UserService {
     userRepository.save(user);
     userStatusRepository.save(userStatus);
 
-    return user;
+    return userMapper.toDto(user);
   }
 
   @Override
-  public User findUserById(UUID userId) {
-    return userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("UserId: " + userId + "not found"));
+  public UserDto findUserById(UUID userId) {
+    return userMapper.toDto(findUserOrThrow(userId));
   }
 
   @Override
   public String findUserNameById(UUID userId) {
-    return findUserById(userId).getUsername();
+    return findUserById(userId).username();
   }
 
   @Override
@@ -84,22 +83,21 @@ public class BasicUserService implements UserService {
 
   @Override
   public BinaryContent findProfileById(UUID userId) {
-    return userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("UserId: " + userId + " not found"))
-        .getProfile();
+    return findUserOrThrow(userId).getProfile();
   }
 
   @Transactional
   @Override
-  public User updateProfile(UUID userId, BinaryContent binaryContent) {
-    findUserById(userId).updateProfile(binaryContent);
-    return findUserById(userId);
+  public UserDto updateProfile(UUID userId, BinaryContent binaryContent) {
+    User user = findUserOrThrow(userId);
+    user.updateProfile(binaryContent);
+    return userMapper.toDto(user);
   }
 
   @Transactional
   @Override
-  public User updateUser(UUID userId, UpdateUserRequest request) {
-    User user = findUserById(userId);
+  public UserDto updateUser(UUID userId, UpdateUserRequest request) {
+    User user = findUserOrThrow(userId);
 
     if (request.newUsername() != null) {
       user.updateUsername(request.newUsername());
@@ -111,7 +109,7 @@ public class BasicUserService implements UserService {
       user.updateEmail(request.newEmail());
     }
 
-    return user;
+    return userMapper.toDto(user);
   }
 
   @Override
@@ -125,5 +123,10 @@ public class BasicUserService implements UserService {
     if (!userRepository.existsById(userId)) {
       throw new NoSuchElementException("UserId: " + userId + " not found");
     }
+  }
+
+  private User findUserOrThrow(UUID userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("UserId: " + userId + " not found"));
   }
 }

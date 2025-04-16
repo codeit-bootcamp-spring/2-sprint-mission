@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.Message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.Message.MessageDto;
 import com.sprint.mission.discodeit.dto.Message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.mepper.MessageMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -28,13 +29,13 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final ChannelService channelService;
   private final UserService userService;
-  private final BinaryContentRepository binaryContentRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
+  private final MessageMapper messageMapper;
 
   @Transactional
   @Override
-  public Message createMessage(CreateMessageRequest request) {
+  public MessageDto createMessage(CreateMessageRequest request) {
     UUID channelId = request.channelId();
     UUID authorId = request.authorId();
 
@@ -43,53 +44,58 @@ public class BasicMessageService implements MessageService {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException("ChannelId:" + channelId + " not found"));
 
-    return messageRepository.save(
+    Message message = messageRepository.save(
         Message.builder()
             .author(author)
             .channel(channel)
             .content(request.content())
             .build()
     );
+    return messageMapper.toDto(message);
   }
 
   @Transactional
   @Override
   public void addAttachment(UUID messageId, BinaryContent attachment) {
-    findMessageById(messageId).addAttachment(attachment);
+    findMessageOrThrow(messageId).addAttachment(attachment);
   }
 
   @Override
-  public Message findMessageById(UUID messageId) {
-    return messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException(
-            "MessageId: " + messageId + "not found"));
+  public MessageDto findMessageById(UUID messageId) {
+    return messageMapper.toDto(findMessageOrThrow(messageId));
   }
 
   @Override
-  public List<Message> findMessagesByUserAndChannel(UUID authorId, UUID channelId) {
+  public List<MessageDto> findMessagesByUserAndChannel(UUID authorId, UUID channelId) {
     userService.validateUserExists(authorId);
     channelService.validateChannelExists(channelId);
-    return messageRepository.findAllByChannelIdAndAuthorId(channelId, authorId);
+    return messageRepository.findAllByChannelIdAndAuthorId(channelId, authorId).stream()
+        .map(messageMapper::toDto)
+        .toList();
   }
 
   @Override
-  public List<Message> findAllByChannelId(UUID channelId) {
+  public List<MessageDto> findAllByChannelId(UUID channelId) {
     channelService.validateChannelExists(channelId);
-    return messageRepository.findAllByChannelId(channelId);
+    return messageRepository.findAllByChannelId(channelId).stream()
+        .map(messageMapper::toDto)
+        .toList();
   }
 
   @Override
-  public List<Message> findAllByUserId(UUID authorId) {
+  public List<MessageDto> findAllByUserId(UUID authorId) {
     userService.validateUserExists(authorId);
-    return messageRepository.findAllByAuthorId(authorId);
+    return messageRepository.findAllByAuthorId(authorId).stream()
+        .map(messageMapper::toDto)
+        .toList();
   }
 
   @Transactional
   @Override
-  public Message updateMessage(UUID messageId, UpdateMessageRequest request) {
-    Message message = findMessageById(messageId);
+  public MessageDto updateMessage(UUID messageId, UpdateMessageRequest request) {
+    Message message = findMessageOrThrow(messageId);
     message.updateContent(request.newContent());
-    return message;
+    return messageMapper.toDto(message);
   }
 
   @Transactional
@@ -103,5 +109,10 @@ public class BasicMessageService implements MessageService {
     if (!messageRepository.existsById(messageId)) {
       throw new IllegalArgumentException("MessageId:" + messageId + " not found");
     }
+  }
+
+  private Message findMessageOrThrow(UUID messageId) {
+    return messageRepository.findById(messageId)
+        .orElseThrow(() -> new NoSuchElementException("MessageId:" + messageId + " not found"));
   }
 }

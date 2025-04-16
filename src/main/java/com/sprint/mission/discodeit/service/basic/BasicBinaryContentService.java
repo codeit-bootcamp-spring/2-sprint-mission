@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mepper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
@@ -17,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentMapper binaryContentMapper;
 
   @Transactional
   @Override
@@ -26,8 +31,8 @@ public class BasicBinaryContentService implements BinaryContentService {
           .fileName(profile.getOriginalFilename())
           .size(profile.getSize())
           .contentType(profile.getContentType())
-          .bytes(profile.getBytes())
           .build();
+      binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
       binaryContentRepository.save(binaryContent);
 
       return binaryContent;
@@ -37,15 +42,18 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
-  public BinaryContent findBinaryContent(UUID binaryContentId) {
-    return binaryContentRepository.findById(binaryContentId)
+  public BinaryContentDto findBinaryContent(UUID binaryContentId) {
+    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
         .orElseThrow(() -> new NoSuchElementException(
             "BinaryContentId: " + binaryContentId + " not found"));
+    return binaryContentMapper.toDto(binaryContent);
   }
 
   @Override
-  public List<BinaryContent> findAllBinaryContent() {
-    return binaryContentRepository.findAll();
+  public List<BinaryContentDto> findAllBinaryContent() {
+    return binaryContentRepository.findAll().stream()
+        .map(binaryContentMapper::toDto)
+        .toList();
   }
 
   @Override

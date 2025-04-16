@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.controller;
 
 
 import com.sprint.mission.discodeit.dto.Message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.Message.MessageDto;
 import com.sprint.mission.discodeit.dto.Message.UpdateMessageRequest;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.List;
@@ -28,28 +28,32 @@ public class MessageController {
   private final MessageService messageService;
   private final BinaryContentService binaryContentService;
 
+  @RequestMapping(value = "", method = RequestMethod.GET)
+  public ResponseEntity<List<MessageDto>> findAllByChannelId(
+      @RequestParam("channelId") UUID channelId) {
+    return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
+  }
+
   @RequestMapping(value = "", method = RequestMethod.POST)
-  public ResponseEntity<Message> createMessage(
+  public ResponseEntity<MessageDto> createMessage(
       @RequestPart("messageCreateRequest") CreateMessageRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    Message message = messageService.createMessage(request);
+    MessageDto messageDto = messageService.createMessage(request);
     if (!attachments.isEmpty()) {
       attachments.stream()
           .map(binaryContentService::createBinaryContent)
-          .forEach(binaryId -> messageService.addAttachment(message.getId(), binaryId));
+          .forEach(binaryId -> messageService.addAttachment(messageDto.id(), binaryId));
     }
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(message);
+    return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
   }
 
   @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
-  public ResponseEntity<Message> updateMessage(
+  public ResponseEntity<MessageDto> updateMessage(
       @PathVariable("messageId") UUID messageId,
       @RequestBody UpdateMessageRequest request) {
-    Message message = messageService.updateMessage(messageId, request);
-
-    return ResponseEntity.ok(message);
+    return ResponseEntity.ok(messageService.updateMessage(messageId, request));
   }
 
   @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
@@ -60,11 +64,5 @@ public class MessageController {
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Message가 성공적으로 삭제됨");
   }
 
-  @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<List<Message>> getChannelMessage(
-      @RequestParam("channelId") UUID channelId) {
-    List<Message> messages = messageService.findAllByChannelId(channelId);
 
-    return ResponseEntity.ok(messages);
-  }
 }

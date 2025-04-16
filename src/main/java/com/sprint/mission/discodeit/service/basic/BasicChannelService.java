@@ -36,7 +36,7 @@ public class BasicChannelService implements ChannelService {
 
   @Transactional
   @Override
-  public Channel createPrivateChannel(CreatePrivateChannelRequest request) {
+  public ChannelDto createPrivateChannel(CreatePrivateChannelRequest request) {
     Channel channel = channelRepository.save(
         Channel.builder()
             .type(ChannelType.PRIVATE)
@@ -54,31 +54,25 @@ public class BasicChannelService implements ChannelService {
           .build();
       readStatusRepository.save(readStatus);
     });
-    return channel;
+    return channelMapper.toDto(channel);
   }
 
   @Transactional
   @Override
-  public Channel createPublicChannel(CreatePublicChannelRequest request) {
-    return channelRepository.save(
+  public ChannelDto createPublicChannel(CreatePublicChannelRequest request) {
+    Channel channel = channelRepository.save(
         Channel.builder()
             .type(ChannelType.PUBLIC)
             .name(request.name())
             .description(request.description())
-            .build()
-    );
+            .build());
+
+    return channelMapper.toDto(channel);
   }
 
   @Override
-  public Channel findChannelById(UUID channelId) {
-    return channelRepository.findById(channelId)
-        .orElseThrow(
-            () -> new NoSuchElementException("ChannelId: " + channelId + "not found"));
-  }
-
-  @Override
-  public String findChannelNameById(UUID channelId) {
-    return findChannelById(channelId).getName();
+  public ChannelDto findChannelById(UUID channelId) {
+    return channelMapper.toDto(findChannelOrThrow(channelId));
   }
 
   @Override
@@ -113,8 +107,8 @@ public class BasicChannelService implements ChannelService {
 
   @Transactional
   @Override
-  public Channel updateChannel(UUID channelId, UpdateChannelRequest request) {
-    Channel channel = findChannelById(channelId);
+  public ChannelDto updateChannel(UUID channelId, UpdateChannelRequest request) {
+    Channel channel = findChannelOrThrow(channelId);
 
     if (channel.getType() == ChannelType.PRIVATE) {
       throw new UnsupportedOperationException("PRIVATE 채널은 수정할 수 없습니다.");
@@ -127,7 +121,7 @@ public class BasicChannelService implements ChannelService {
       channel.updateDescription(request.newDescription());
     }
 
-    return channel;
+    return channelMapper.toDto(channel);
   }
 
   @Transactional
@@ -144,5 +138,10 @@ public class BasicChannelService implements ChannelService {
     if (!channelRepository.existsById(channelId)) {
       throw new IllegalArgumentException("ChannelId: " + channelId + " not found");
     }
+  }
+
+  private Channel findChannelOrThrow(UUID channelId) {
+    return channelRepository.findById(channelId)
+        .orElseThrow(() -> new NoSuchElementException("ChannelId: " + channelId + "not found"));
   }
 }
