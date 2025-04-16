@@ -6,7 +6,8 @@ public record BinaryContentDto(
     UUID id,
     String fileName,
     long size,
-    String contentType
+    String contentType,
+    byte[] bytes
 ) {
 
 }

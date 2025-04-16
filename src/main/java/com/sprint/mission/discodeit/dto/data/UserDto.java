@@ -6,6 +6,7 @@ public record UserDto(
     UUID id,
     String username,
     String email,
+    BinaryContentDto profile,
     Boolean online
 ) {
 
