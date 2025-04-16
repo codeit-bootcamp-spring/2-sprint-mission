@@ -32,5 +32,4 @@ public interface UserService {
 
   void validateUserExists(UUID userId);   //유저 존재 확인(UUID)
 
-  UserDto mapToDto(User user);
 }

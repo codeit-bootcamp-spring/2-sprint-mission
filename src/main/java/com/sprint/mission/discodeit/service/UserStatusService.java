@@ -8,7 +8,9 @@ import java.util.UUID;
 
 public interface UserStatusService {
 
-  UserStatusDto findById(UUID id);
+  UserStatusDto findById(UUID UserStatusId);
+
+  UserStatusDto findByUserId(UUID UserId);
 
   List<UserStatusDto> findAll();
 
@@ -16,5 +18,5 @@ public interface UserStatusService {
 
   UserStatus update(UUID userId, UserStatusUpdateRequest request);
 
-  void delete(UUID id);
+  void delete(UUID UserStatusId);
 }

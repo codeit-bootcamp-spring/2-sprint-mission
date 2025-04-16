@@ -4,23 +4,19 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MessageRepository {
+public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-  void save();
+  Optional<Message> findTopByChannelIdOrderByCreatedAtDesc(UUID channelId);
 
-  void addMessage(Message message); // 메시지 저장
+  List<Message> findAllByChannelIdAndAuthorId(UUID channelId, UUID authorId);
 
-  Optional<Message> findMessageById(UUID messageId); // 메시지 조회
+  List<Message> findAllByAuthorId(UUID authorId);
 
-  Optional<Message> findLatestMessageByChannelId(UUID channelId);
+  List<Message> findAllByChannelId(UUID channelId);
 
-  List<Message> findMessageAll(); // 모든 메시지 조회
+  void deleteAllByChannelId(UUID channelId);
 
-  void deleteMessageById(UUID messageId); // 메시지 삭제
-
-  boolean existsById(UUID messageId);
-
-  void deleteMessageByChannelId(UUID channelId);
 
 }

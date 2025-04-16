@@ -5,24 +5,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-  void save();
+  Optional<User> findByUsername(String username);
 
-  void addUser(User user);
-
-  Optional<User> findUserById(UUID userId);
-
-  List<User> findUsersByIds(Set<UUID> userIds);
-
-  List<User> findUserAll();
-
-  Optional<User> findUserByName(String username);
-
-  void deleteUserById(UUID userId);
-
-  boolean existsById(UUID userId);
+  List<User> findByIdIn(Set<UUID> userIds);
 
   boolean existsByUsername(String username);
 

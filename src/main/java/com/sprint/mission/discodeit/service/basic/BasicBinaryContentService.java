@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -17,6 +18,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
 
+  @Transactional
   @Override
   public BinaryContent createBinaryContent(MultipartFile profile) {
     try {
@@ -26,7 +28,7 @@ public class BasicBinaryContentService implements BinaryContentService {
           .contentType(profile.getContentType())
           .bytes(profile.getBytes())
           .build();
-      binaryContentRepository.addBinaryContent(binaryContent);
+      binaryContentRepository.save(binaryContent);
 
       return binaryContent;
     } catch (IOException e) {
@@ -36,18 +38,18 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public BinaryContent findBinaryContent(UUID binaryContentId) {
-    return binaryContentRepository.findBinaryContentById(binaryContentId)
+    return binaryContentRepository.findById(binaryContentId)
         .orElseThrow(() -> new NoSuchElementException(
-            "BinaryContent with id: " + binaryContentId + "not found"));
+            "BinaryContentId: " + binaryContentId + " not found"));
   }
 
   @Override
   public List<BinaryContent> findAllBinaryContent() {
-    return binaryContentRepository.findAllBinaryContents();
+    return binaryContentRepository.findAll();
   }
 
   @Override
   public void deleteBinaryContent(UUID binaryContentId) {
-    binaryContentRepository.deleteBinaryContentById(binaryContentId);
+    binaryContentRepository.deleteById(binaryContentId);
   }
 }

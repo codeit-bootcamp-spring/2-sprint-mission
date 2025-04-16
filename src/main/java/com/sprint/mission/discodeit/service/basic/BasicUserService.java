@@ -6,10 +6,10 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.Interface.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.Interface.UserRepository;
-import com.sprint.mission.discodeit.repository.Interface.UserStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
 
   @Override
@@ -46,20 +45,21 @@ public class BasicUserService implements UserService {
         .password(hashedPassword)
         .build();
 
-    userRepository.addUser(user);
     UserStatus userStatus = UserStatus.builder()
         .user(user)
         .lastActiveAt(Instant.now())
         .build();
-    userStatusRepository.addUserStatus(userStatus);
+
+    userRepository.save(user);
+    userStatusRepository.save(userStatus);
 
     return user;
   }
 
   @Override
   public User findUserById(UUID userId) {
-    return userRepository.findUserById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id: " + userId + "not found"));
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("UserId: " + userId + "not found"));
   }
 
   @Override
@@ -69,32 +69,33 @@ public class BasicUserService implements UserService {
 
   @Override
   public List<UserDto> findUsersByIds(Set<UUID> userIds) {
-    return userRepository.findUsersByIds(userIds).stream()
+    return userRepository.findByIdIn(userIds).stream()
         .map(UserDto::from)
         .collect(Collectors.toList());
   }
 
   @Override
   public List<UserDto> getAllUsers() {
-    return userRepository.findUserAll().stream()
+    return userRepository.findAll().stream()
         .map(UserDto::from)
         .collect(Collectors.toList());
   }
 
   @Override
   public BinaryContent findProfileById(UUID userId) {
-    return binaryContentRepository.findBinaryContentById(findUserById(userId).getProfile().getId())
-        .orElse(null);
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("UserId: " + userId + " not found"))
+        .getProfile();
   }
 
+  @Transactional
   @Override
   public User updateProfile(UUID userId, BinaryContent binaryContent) {
     findUserById(userId).updateProfile(binaryContent);
-    userRepository.save();
-
     return findUserById(userId);
   }
 
+  @Transactional
   @Override
   public User updateUser(UUID userId, UpdateUserRequest request) {
     User user = findUserById(userId);
@@ -114,15 +115,14 @@ public class BasicUserService implements UserService {
 
   @Override
   public void deleteUser(UUID userId) {
-    userRepository.deleteUserById(userId);
-    userStatusRepository.deleteUserStatusById(userId);
-    binaryContentRepository.deleteBinaryContentById(userId);
+    validateUserExists(userId);
+    userRepository.deleteById(userId);
   }
 
   @Override
   public void validateUserExists(UUID userId) {
     if (!userRepository.existsById(userId)) {
-      throw new RuntimeException("존재하지 않는 유저입니다.");
+      throw new NoSuchElementException("UserId: " + userId + " not found");
     }
   }
 }

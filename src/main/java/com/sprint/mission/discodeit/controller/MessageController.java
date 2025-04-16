@@ -63,7 +63,7 @@ public class MessageController {
   @RequestMapping(value = "", method = RequestMethod.GET)
   public ResponseEntity<List<Message>> getChannelMessage(
       @RequestParam("channelId") UUID channelId) {
-    List<Message> messages = messageService.findallByChannelId(channelId);
+    List<Message> messages = messageService.findAllByChannelId(channelId);
 
     return ResponseEntity.ok(messages);
   }
