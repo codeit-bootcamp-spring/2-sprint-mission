@@ -21,7 +21,7 @@ public record UserCreateResponse(
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfileId()
+        user.getProfile()
     );
   }
 }

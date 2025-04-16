@@ -70,12 +70,12 @@ public class BasicMessageService implements MessageService {
   public void delete(UUID messageId) {
     Message message = getMessage(messageId);
 
-    if (message.getAttachmentIds().isEmpty()) {
+    if (message.getAttachments().isEmpty()) {
       messageRepository.deleteById(messageId);
       return;
     }
 
-    message.getAttachmentIds()
+    message.getAttachments()
         .forEach(attachmentId -> {
           if (binaryContentRepository.existsById(attachmentId)) {
             binaryContentRepository.deleteById(attachmentId);

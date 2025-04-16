@@ -41,7 +41,7 @@ public class FileUserStatusRepository extends
   @Override
   public Optional<UserStatus> findByUserId(UUID userId) {
     return data.values().stream()
-        .filter(userStatus -> userStatus.getUserId().equals(userId))
+        .filter(userStatus -> userStatus.getUser().equals(userId))
         .findFirst();
   }
 
@@ -64,7 +64,7 @@ public class FileUserStatusRepository extends
   @Override
   public void deleteByUserId(UUID userId) {
     List<UUID> keysToRemove = data.values().stream()
-        .filter(userStatus -> userStatus.getUserId().equals(userId))
+        .filter(userStatus -> userStatus.getUser().equals(userId))
         .map(UserStatus::getId)
         .toList();
     keysToRemove.forEach(data::remove);

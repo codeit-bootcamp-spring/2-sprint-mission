@@ -74,8 +74,8 @@ public class BasicUserService implements UserService {
 
     UUID newProfileId = null;
     if (profileCreateRequest != null) {
-      if (user.getProfileId() != null) {
-        binaryContentService.delete(user.getProfileId());
+      if (user.getProfile() != null) {
+        binaryContentService.delete(user.getProfile());
       }
       newProfileId = binaryContentService.create(profileCreateRequest).getId();
     }
@@ -92,7 +92,7 @@ public class BasicUserService implements UserService {
     User user = getUserBy(userId);
 
     if (user.hasProfile()) {
-      binaryContentRepository.deleteById(user.getProfileId());
+      binaryContentRepository.deleteById(user.getProfile());
     }
 
     userStatusService.deleteByUserId(userId);

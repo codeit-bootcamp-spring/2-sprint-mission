@@ -1,24 +1,35 @@
 package com.sprint.mission.discodeit.entity.user;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
 public class UserStatus extends BaseUpdatableEntity {
 
   private static final long ONLINE_THRESHOLD_MINUTES = 5;
 
-  private UUID userId;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
 
   private Instant lastActiveAt;
 
-  public UserStatus(UUID userId) {
+  protected UserStatus() {
+  }
+
+  public UserStatus(User user) {
     super();
-    this.userId = userId;
+    this.user = user;
   }
 
   public void updateLastActiveAt(Instant newLastActiveAt) {
@@ -33,13 +44,4 @@ public class UserStatus extends BaseUpdatableEntity {
     return minutesAfterLogin < ONLINE_THRESHOLD_MINUTES;
   }
 
-  @Override
-  public String toString() {
-    return "UserStatus{" +
-        "userId=" + userId +
-        ", lastLoginAt=" + lastActiveAt +
-        ", id=" + id +
-        ", createdAt=" + createdAt +
-        '}';
-  }
 }

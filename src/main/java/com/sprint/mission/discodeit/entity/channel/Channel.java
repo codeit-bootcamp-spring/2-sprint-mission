@@ -2,20 +2,27 @@ package com.sprint.mission.discodeit.entity.channel;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
 import java.time.Instant;
 
+@Entity
+@Table(name = "channels")
 @Getter
 public class Channel extends BaseUpdatableEntity {
 
-  private final ChannelType type;
+  @Enumerated(EnumType.STRING)
+  private ChannelType type;
 
-  @Nullable
   private String name; //PUBLIC 전용
-  @Nullable
   private String description; //PUBLIC 전용
 
+  protected Channel() {
+  }
 
   //Private Channel 만들때 호출
   public Channel(ChannelType type) {
@@ -39,17 +46,5 @@ public class Channel extends BaseUpdatableEntity {
     if (newDescription != null && !newDescription.equals(this.description)) {
       this.description = newDescription;
     }
-  }
-
-  @Override
-  public String toString() {
-    return "Channel{" +
-        "type=" + type +
-        ", name='" + name + '\'' +
-        ", newDescription='" + description + '\'' +
-        ", updatedAt=" + updatedAt +
-        ", id=" + id +
-        ", createdAt=" + createdAt +
-        '}';
   }
 }
