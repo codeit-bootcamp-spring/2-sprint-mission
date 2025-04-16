@@ -8,10 +8,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
 @Entity
 @Getter
 @Table(name = "channels")
@@ -21,7 +17,7 @@ public class Channel extends BaseUpdatableEntity {
   @Column(name = "type", nullable = false, length = 10)
   private ChannelType type;
 
-  @Column(name = "name", nullable = false, length = 100)
+  @Column(name = "name", length = 100)
   private String name;
 
   @Column(name = "description", length = 500)

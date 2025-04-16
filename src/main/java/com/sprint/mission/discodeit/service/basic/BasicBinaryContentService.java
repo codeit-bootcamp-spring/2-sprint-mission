@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.exception.RestException;
 import com.sprint.mission.discodeit.exception.ResultCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,24 +15,29 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   public BinaryContent create(BinaryContentCreateRequest request) {
     String fileName = request.fileName();
     byte[] bytes = request.bytes();
     String contentType = request.contentType();
-    BinaryContent binaryContent = new BinaryContent(
+    BinaryContent meta = new BinaryContent(
         fileName,
         (long) bytes.length,
-        contentType,
-        bytes
+        contentType
     );
-    return binaryContentRepository.save(binaryContent);
+
+    BinaryContent saveMeta = binaryContentRepository.save(meta);
+
+    binaryContentStorage.put(saveMeta.getId(), bytes);
+    return saveMeta;
   }
 
   @Override

@@ -14,6 +14,8 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
@@ -29,6 +32,7 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   public Message create(MessageCreateRequest messageCreateRequest,
@@ -53,9 +57,11 @@ public class BasicMessageService implements MessageService {
           String contentType = attachmentRequest.contentType();
           byte[] bytes = attachmentRequest.bytes();
 
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          return binaryContentRepository.save(binaryContent);
+          BinaryContent meta = new BinaryContent(fileName, (long) bytes.length, contentType);
+          BinaryContent saveMeta = binaryContentRepository.save(meta);
+
+          binaryContentStorage.put(saveMeta.getId(), bytes);
+          return saveMeta;
         })
         .toList();
 

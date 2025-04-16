@@ -1,20 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
+import javax.swing.Action;
 import lombok.Getter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -25,19 +23,22 @@ public class Message extends BaseUpdatableEntity {
   private String content;
 
   @ManyToOne(optional = false)
-  @JoinColumn(name = "channel_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
+  @JoinColumn(name = "channel_id", nullable = false)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Channel channel;
 
   @ManyToOne
-  @JoinColumn(name = "author_id", foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
+  @JoinColumn(name = "author_id")
+  @OnDelete(action = OnDeleteAction.SET_NULL)
   private User author;
 
-  @ManyToMany
+  @OneToMany
   @JoinTable(
       name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id"),
       inverseJoinColumns = @JoinColumn(name = "attachment_id")
   )
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private List<BinaryContent> attachments;
 
   protected Message() {

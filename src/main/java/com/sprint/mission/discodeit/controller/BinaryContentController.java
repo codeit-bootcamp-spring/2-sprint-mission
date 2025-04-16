@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentMapper binaryContentMapper;
 
   @GetMapping("/{binaryContentId}")
   public ResponseEntity<BinaryContent> get(@PathVariable UUID binaryContentId) {
@@ -40,14 +46,10 @@ public class BinaryContentController {
   }
 
   @GetMapping("/{binaryContentId}/download")
-  public ResponseEntity<Resource> download(@PathVariable UUID binaryContentId) {
+  public ResponseEntity<?> download(@PathVariable UUID binaryContentId) throws IOException {
     BinaryContent content = binaryContentService.find(binaryContentId);
+    BinaryContentDto dto = binaryContentMapper.toDto(content);
 
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(content.getContentType()))
-        .header(HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename=\"" + content.getFileName() + "\"")
-        .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(content.getSize()))
-        .body(new ByteArrayResource(content.getBytes()));
+    return binaryContentStorage.download(dto);
   }
 }
