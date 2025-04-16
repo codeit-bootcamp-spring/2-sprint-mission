@@ -30,6 +30,10 @@ discodeit:
   repository:
     type: file
     file-directory: \src\main\resources\dir\
+  storage:
+    type: local
+    local:
+      root-path: \src\main\resources\static\files
 
 springdoc:
   api-docs:
