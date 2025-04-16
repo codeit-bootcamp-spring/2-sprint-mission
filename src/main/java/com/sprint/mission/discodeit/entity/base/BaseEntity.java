@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity.base;
 
+import ch.qos.logback.classic.spi.LoggingEventVO;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import lombok.Getter;
@@ -21,4 +22,6 @@ public abstract class BaseEntity implements Serializable {
   @CreationTimestamp
   @Column(updatable = false, nullable = false)
   protected Instant createdAt;
+
+  public abstract LoggingEventVO getType();
 }
