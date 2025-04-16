@@ -46,8 +46,8 @@ public class BasicUserService implements UserService {
   private final BinaryContentStoragePort binaryContentStorage;
   private final BinaryContentMetaRepositoryPort binaryContentMetaRepository;
 
-  @Transactional
   @Override
+  @Transactional
   public UserResult create(CreateUserCommand command,
       Optional<CreateBinaryContentCommand> binaryContentDTO) {
     BinaryContent profile = null;
@@ -64,7 +64,6 @@ public class BasicUserService implements UserService {
     UserStatus userStatus = userStatusService.create(
         new CreateUserStatusCommand(user.getId(), Instant.now()));
     logger.info("User Status created: {}", userStatus.getId());
-
     user.setUserStatus(userStatus);
 
     return UserResult.create(user, user.getUserStatus().isOnline());
@@ -129,7 +128,7 @@ public class BasicUserService implements UserService {
 
     return new UserListResult(userList.stream().map(user -> UserResult.create(
         user,
-        userStatusService.isOnline(user.getId()))
+        user.getUserStatus().isOnline())
     ).toList());
   }
 

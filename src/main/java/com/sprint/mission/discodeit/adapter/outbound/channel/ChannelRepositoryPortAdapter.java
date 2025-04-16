@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.adapter.outbound.channel;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
+import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,16 @@ public class ChannelRepositoryPortAdapter implements ChannelRepositoryPort {
   @Override
   public List<Channel> findAll() {
     return jpaChannelRepository.findAll();
+  }
+
+  @Override
+  public List<Channel> findAccessibleChannels(ChannelType channelType,
+      List<UUID> subscribedChannelIds) {
+    if (subscribedChannelIds.isEmpty()) {
+      return jpaChannelRepository.findAllByType(channelType);
+    } else {
+      return jpaChannelRepository.findAccessibleChannels(channelType, subscribedChannelIds);
+    }
   }
 
   @Override

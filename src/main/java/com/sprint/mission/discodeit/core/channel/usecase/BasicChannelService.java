@@ -84,15 +84,13 @@ public class BasicChannelService implements ChannelService {
     Instant lastMessageAt = findLastMessageAt(channel);
 
     List<UserResult> userIdList = new ArrayList<>();
-//    if (channel.getType().equals(ChannelType.PRIVATE)) {
-//
-//    }
     readStatusRepository.findAllByChannelId(channel.getId())
         .stream().map(readStatus -> {
           User user = readStatus.getUser();
           return UserResult.create(user, user.getUserStatus().isOnline());
         })
         .forEach(userIdList::add);
+
     return ChannelResult.create(channel, userIdList, lastMessageAt);
 
   }
@@ -118,9 +116,10 @@ public class BasicChannelService implements ChannelService {
         })
         .toList();
 
-    return new ChannelListResult(channelRepository.findAll().stream()
-        .filter(channel -> channel.getType().equals(ChannelType.PUBLIC)
-            || mySubscribedChannelIds.contains(channel.getId()))
+    List<Channel> channels = channelRepository.findAccessibleChannels(ChannelType.PUBLIC,
+        mySubscribedChannelIds);
+
+    return new ChannelListResult(channels.stream()
         .map(channel -> find(channel.getId()))
         .toList());
   }
