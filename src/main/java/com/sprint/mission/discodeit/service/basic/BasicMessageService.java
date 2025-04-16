@@ -1,25 +1,25 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -29,10 +29,11 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
+  private final MessageMapper messageMapper;
 
   @Override
   @Transactional
-  public Message sendMessage(MessageCreateRequest messageCreateRequest,
+  public MessageDto sendMessage(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments) {
     List<BinaryContent> attachmentList = new ArrayList<>();
 
@@ -70,21 +71,24 @@ public class BasicMessageService implements MessageService {
         messageCreateRequest.content(), user,
         channel, attachmentList);
     messageRepository.save(message);
-    return message;
+    return messageMapper.toDto(message);
   }
 
   @Override
-  public List<Message> findMessageByChannelId(UUID channelUUID) {
-    return messageRepository.findByChannelId(channelUUID);
+  @Transactional(readOnly = true)
+  public List<MessageDto> findMessageByChannelId(UUID channelId) {
+    return messageRepository.findByChannelId(channelId).stream()
+        .map(messageMapper::toDto)
+        .toList();
   }
 
   @Override
   @Transactional
-  public Message updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
+  public MessageDto updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다."));
     message.updateContent(messageUpdateRequest.newContent());
-    return message;
+    return messageMapper.toDto(message);
   }
 
   @Override

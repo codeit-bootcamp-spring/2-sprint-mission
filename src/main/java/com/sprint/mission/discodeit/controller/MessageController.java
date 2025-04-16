@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -62,12 +63,12 @@ public class MessageController {
           )
       )
   })
-  public ResponseEntity<Message> send(
+  public ResponseEntity<MessageDto> send(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    Message message = messageService.sendMessage(messageCreateRequest, attachments);
-    return ResponseEntity.status(HttpStatus.CREATED).body(message);
+    MessageDto messageDto = messageService.sendMessage(messageCreateRequest, attachments);
+    return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
   }
 
   @PatchMapping("/{messageId}")
@@ -106,12 +107,12 @@ public class MessageController {
           )
       )
   })
-  public ResponseEntity<Message> update(
+  public ResponseEntity<MessageDto> update(
       @PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest
   ) {
-    Message message = messageService.updateMessage(messageId, messageUpdateRequest);
-    return ResponseEntity.status(HttpStatus.OK).body(message);
+    MessageDto messageDto = messageService.updateMessage(messageId, messageUpdateRequest);
+    return ResponseEntity.status(HttpStatus.OK).body(messageDto);
   }
 
   @DeleteMapping("/{messageId}")
@@ -167,12 +168,12 @@ public class MessageController {
           )
       )
   })
-  public ResponseEntity<List<Message>> FindChannelMessage(
+  public ResponseEntity<List<MessageDto>> FindChannelMessage(
       @RequestParam("channelId") UUID channelId
   ) {
-    List<Message> message = messageService.findMessageByChannelId(
+    List<MessageDto> messageDto = messageService.findMessageByChannelId(
         channelId);
     return ResponseEntity.status(HttpStatus.OK)
-        .body(message);
+        .body(messageDto);
   }
 }
