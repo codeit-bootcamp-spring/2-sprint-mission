@@ -26,5 +26,4 @@ public record ChannelDto(
 
         @Schema(description = "마지막 메시지 시간")
         Instant lastMessageAt
-) {
-}
+) {}

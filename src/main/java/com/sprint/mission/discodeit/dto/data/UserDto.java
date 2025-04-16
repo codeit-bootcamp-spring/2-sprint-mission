@@ -14,5 +14,4 @@ public record UserDto(
         String email,
         BinaryContentDto profileId,
         Boolean online
-) {
-}
+) {}

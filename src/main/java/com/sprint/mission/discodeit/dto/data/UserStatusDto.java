@@ -15,5 +15,4 @@ public record UserStatusDto(
 
         @Schema(description = "마지막 활동 시간")
         Instant lastActiveAt
-) {
-}
+) {}
