@@ -21,4 +21,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleMessageNotFound(MessageNotFoundException e) {
         return ResponseEntity.status(404).body(e.getMessage());
     }
+
+    @ExceptionHandler(UserStatusNotFoundException.class)
+    public ResponseEntity<String> handleUserStatusNotFound(UserStatusNotFoundException e) {
+        return ResponseEntity.status(500).body(e.getMessage());
+    }
 }

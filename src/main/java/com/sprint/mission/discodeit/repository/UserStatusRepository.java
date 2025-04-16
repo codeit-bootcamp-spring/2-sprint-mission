@@ -7,8 +7,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserStatusRepository {
+
     void save(UserStatus userStatus);
-    Optional<UserStatus> getById(UUID id);
+
+    UserStatus getById(UUID id);
+
     List<UserStatus> getAll();
+
     void deleteById(UUID id);
 }

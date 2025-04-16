@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.handler.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -12,10 +13,12 @@ import java.util.*;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserStatusRepository implements UserStatusRepository {
+
     private final String filePath;
     private final Map<UUID, UserStatus> data;
 
-    public FileUserStatusRepository(@Value("${discodeit.repository.file-directory}") String baseDir) {
+    public FileUserStatusRepository(
+        @Value("${discodeit.repository.file-directory}") String baseDir) {
         this.filePath = baseDir + "/userStatus.ser";
         this.data = loadData();
     }
@@ -50,8 +53,12 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public Optional<UserStatus> getById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+    public UserStatus getById(UUID id) {
+        UserStatus userStatus = data.get(id);
+        if (userStatus == null) {
+            throw new UserStatusNotFoundException(id);
+        }
+        return userStatus;
     }
 
     @Override

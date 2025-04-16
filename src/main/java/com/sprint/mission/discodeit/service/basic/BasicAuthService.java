@@ -14,29 +14,27 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
-  private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
+    private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
 
-  @Override
-  public UserResponse login(LoginRequest request) {
-    User user = userRepository.findByUsername(request.username())
-        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    @Override
+    public UserResponse login(LoginRequest request) {
+        User user = userRepository.findByUsername(request.username())
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-    if (!user.getPassword().equals(request.password())) {
-      throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        if (!user.getPassword().equals(request.password())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return new UserResponse(
+            user.getId(),
+            user.getCreatedAt(),
+            user.getUpdatedAt(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getProfileId(),
+            userStatusRepository.getById(user.getId()).online(),
+            user.getPassword()
+        );
     }
-
-    return new UserResponse(
-        user.getId(),
-        user.getCreatedAt(),
-        user.getUpdatedAt(),
-        user.getUsername(),
-        user.getEmail(),
-        user.getProfileId(),
-        userStatusRepository.getById(user.getId())
-            .map(UserStatus::online)
-            .orElse(false),
-        user.getPassword()
-    );
-  }
 }
