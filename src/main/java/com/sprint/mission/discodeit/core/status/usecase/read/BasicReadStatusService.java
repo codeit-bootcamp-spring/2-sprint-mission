@@ -51,34 +51,26 @@ public class BasicReadStatusService implements ReadStatusService {
         command.lastReadAt());
     readStatusRepository.save(status);
 
-    return ReadStatusResult.create(status.getId(), status.getUser().getId(),
-        status.getChannel().getId(),
-        status.getLastReadAt());
+    return ReadStatusResult.create(status);
   }
 
   @Override
   public ReadStatusResult find(UUID readStatusId) {
     ReadStatus status = readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> readStatusNotFoundError(readStatusId));
-    return ReadStatusResult.create(status.getId(), status.getUser().getId(),
-        status.getChannel().getId(),
-        status.getLastReadAt());
+    return ReadStatusResult.create(status);
   }
 
   @Override
   public ReadStatusResult findReadStatusByUserId(UUID userId) {
     ReadStatus status = readStatusRepository.findByUserId(userId);
-    return ReadStatusResult.create(status.getId(), status.getUser().getId(),
-        status.getChannel().getId(),
-        status.getLastReadAt());
+    return ReadStatusResult.create(status);
   }
 
   @Override
   public List<ReadStatusResult> findAllByUserId(UUID userId) {
     return readStatusRepository.findAllByUserId(userId).stream().map(
-        status -> ReadStatusResult.create(status.getId(), status.getUser().getId(),
-            status.getChannel().getId(),
-            status.getLastReadAt())
+        ReadStatusResult::create
     ).toList();
   }
 
@@ -88,9 +80,7 @@ public class BasicReadStatusService implements ReadStatusService {
         () -> readStatusNotFoundError(command.readStatusId())
     );
     status.update(command.newLastReadAt());
-    return ReadStatusResult.create(status.getId(), status.getUser().getId(),
-        status.getChannel().getId(),
-        status.getLastReadAt());
+    return ReadStatusResult.create(status);
   }
 
   @CustomLogging

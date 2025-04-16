@@ -7,16 +7,27 @@ import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatu
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
 import java.util.UUID;
-import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
-public interface ReadStatusDtoMapper {
+public final class ReadStatusDtoMapper {
 
-  ReadStatusResponse toCreateResponse(ReadStatusResult readStatus);
+  private ReadStatusDtoMapper() {
 
-  CreateReadStatusCommand toCreateReadStatusCommand(ReadStatusCreateRequest requestBody);
+  }
 
-  UpdateReadStatusCommand toUpdateReadStatusCommand(UUID readStatusId,
-      ReadStatusUpdateRequest requestBody);
+  public static ReadStatusResponse toCreateResponse(ReadStatusResult result) {
+    return new ReadStatusResponse(result.id(), result.userId(), result.channelId(),
+        result.lastReadAt());
+  }
+
+  public static CreateReadStatusCommand toCreateReadStatusCommand(
+      ReadStatusCreateRequest requestBody) {
+    return new CreateReadStatusCommand(requestBody.userId(), requestBody.channelId(),
+        requestBody.lastReadAt());
+  }
+
+  public static UpdateReadStatusCommand toUpdateReadStatusCommand(UUID readStatusId,
+      ReadStatusUpdateRequest requestBody) {
+    return new UpdateReadStatusCommand(readStatusId, requestBody.newLastReadAt());
+  }
 
 }

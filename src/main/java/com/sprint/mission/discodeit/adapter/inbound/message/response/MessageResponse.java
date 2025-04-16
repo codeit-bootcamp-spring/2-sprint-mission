@@ -20,7 +20,7 @@ public record MessageResponse(
     @Schema(
         description = "Binary Content ID 목록"
     )
-    List<BinaryContentResponse> attachmentIds
+    List<BinaryContentResponse> attachment
 ) {
 
 }

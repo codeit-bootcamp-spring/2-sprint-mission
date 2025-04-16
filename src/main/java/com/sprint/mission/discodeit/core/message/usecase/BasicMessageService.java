@@ -87,6 +87,7 @@ public class BasicMessageService implements MessageService {
 //  }
 
   @Override
+  @Transactional(readOnly = true)
   public Slice<MessageResult> findMessagesByChannelId(UUID channelId, Pageable pageable) {
     Slice<Message> messageSlice = messageRepository.findAllByChannelId(channelId, pageable);
 

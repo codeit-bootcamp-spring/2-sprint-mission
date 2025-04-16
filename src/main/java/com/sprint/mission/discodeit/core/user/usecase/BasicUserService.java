@@ -88,8 +88,10 @@ public class BasicUserService implements UserService {
       Long size = (long) bytes.length;
 
       BinaryContent content = BinaryContent.create(fileName, size, contentType);
+
       binaryContentMetaRepository.save(content);
       binaryContentStorage.put(content.getId(), bytes);
+
       logger.info("Binary Content Created: {}", content.getId());
 
       return content;

@@ -28,8 +28,6 @@ public class AuthController {
   public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest requestBody) {
     LoginUserCommand command = toLoginUserCommand(requestBody);
     UserResult result = loginUseCase.login(command);
-    //TODO. service 반환값 수정해야함
-    return ResponseEntity.ok((result));
+    return ResponseEntity.ok((UserDtoMapper.toCreateResponse(result)));
   }
-
 }

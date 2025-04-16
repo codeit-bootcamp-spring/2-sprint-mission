@@ -1,0 +1,35 @@
+<configuration>
+
+  <appender name="MEMORY" class="com.sprint.mission.discodeit.logging.InMemoryLogAppender"/>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%throwable
+      </pattern>
+    </encoder>
+  </appender>
+
+  <!-- ERROR 전용 로그 파일 -->
+  <appender name="ERROR_FILE" class="ch.qos.logback.core.FileAppender">
+    <file>logs/error-${DATE}.txt</file>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%throwable
+      </pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>ERROR</level>
+    </filter>
+  </appender>
+
+  <!-- 날짜 변수 정의 -->
+  <timestamp key="DATE" datePattern="yyyy-MM-dd_HH-mm-ss"/>
+
+  <root level="INFO">
+    <appender-ref ref="MEMORY"/>
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="ERROR_FILE"/>
+  </root>
+</configuration>

@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.core.channel.usecase;
 import static com.sprint.mission.discodeit.exception.channel.ChannelErrors.channelIdNotFoundError;
 import static com.sprint.mission.discodeit.exception.channel.ChannelErrors.unmodifiableChannelError;
 
-import com.sprint.mission.discodeit.adapter.inbound.user.UserDtoMapper;
-import com.sprint.mission.discodeit.adapter.inbound.user.response.UserResponse;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
@@ -38,7 +36,6 @@ public class BasicChannelService implements ChannelService {
 
   private static final Logger logger = LoggerFactory.getLogger(BasicChannelService.class);
 
-  private final UserDtoMapper userDtoMapper;
   private final UserRepositoryPort userRepository;
   private final ChannelRepositoryPort channelRepository;
   private final MessageRepositoryPort messageRepository;
@@ -85,16 +82,16 @@ public class BasicChannelService implements ChannelService {
   private ChannelResult toChannelResult(Channel channel) {
     Instant lastMessageAt = findLastMessageAt(channel);
 
-    List<UserResponse> userIdList = new ArrayList<>();
-    if (channel.getType().equals(ChannelType.PRIVATE)) {
-      readStatusRepository.findAllByChannelId(channel.getId())
-          .stream().map(readStatus -> {
-            User user = readStatus.getUser();
-            return userDtoMapper.toCreateResponse(
-                UserResult.create(user, user.getUserStatus().isOnline()));
-          })
-          .forEach(userIdList::add);
-    }
+    List<UserResult> userIdList = new ArrayList<>();
+//    if (channel.getType().equals(ChannelType.PRIVATE)) {
+//
+//    }
+    readStatusRepository.findAllByChannelId(channel.getId())
+        .stream().map(readStatus -> {
+          User user = readStatus.getUser();
+          return UserResult.create(user, user.getUserStatus().isOnline());
+        })
+        .forEach(userIdList::add);
     return ChannelResult.create(channel, userIdList, lastMessageAt);
 
   }

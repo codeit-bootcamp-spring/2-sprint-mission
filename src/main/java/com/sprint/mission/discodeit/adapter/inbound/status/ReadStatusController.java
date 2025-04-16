@@ -27,26 +27,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/readStatuses")
 public class ReadStatusController {
 
-  private final ReadStatusDtoMapper readStatusDtoMapper;
   private final ReadStatusService readStatusService;
 
   @PostMapping
   public ResponseEntity<ReadStatusResponse> createReadStatus(
       @RequestBody ReadStatusCreateRequest requestBody) {
-    CreateReadStatusCommand command = readStatusDtoMapper.toCreateReadStatusCommand(requestBody);
+    CreateReadStatusCommand command = ReadStatusDtoMapper.toCreateReadStatusCommand(requestBody);
     ReadStatusResult result = readStatusService.create(command);
 
-    return ResponseEntity.ok(readStatusDtoMapper.toCreateResponse(result));
+    return ResponseEntity.ok(ReadStatusDtoMapper.toCreateResponse(result));
   }
 
   @PatchMapping
   public ResponseEntity<ReadStatusResponse> updateReadStatus(
       @RequestParam UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest requestBody) {
-    UpdateReadStatusCommand command = readStatusDtoMapper.toUpdateReadStatusCommand(readStatusId,
+    UpdateReadStatusCommand command = ReadStatusDtoMapper.toUpdateReadStatusCommand(readStatusId,
         requestBody);
     ReadStatusResult result = readStatusService.updateReadStatus(command);
-    return ResponseEntity.ok(readStatusDtoMapper.toCreateResponse(result));
+    return ResponseEntity.ok(ReadStatusDtoMapper.toCreateResponse(result));
   }
 
   @GetMapping
@@ -56,7 +55,7 @@ public class ReadStatusController {
     List<ReadStatusResponse> list = new ArrayList<>();
 
     for (ReadStatusResult readStatus : readStatuses) {
-      list.add(readStatusDtoMapper.toCreateResponse(readStatus));
+      list.add(ReadStatusDtoMapper.toCreateResponse(readStatus));
     }
 
     return ResponseEntity.ok(list);

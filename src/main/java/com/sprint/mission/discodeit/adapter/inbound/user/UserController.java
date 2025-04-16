@@ -41,8 +41,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/users")
 public class UserController {
 
-  private final UserStatusDtoMapper userStatusDtoMapper;
-  private final UserDtoMapper userDtoMapper;
   private final UserService userService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -54,9 +52,9 @@ public class UserController {
     Optional<CreateBinaryContentCommand> binaryContentRequest = Optional.ofNullable(file)
         .flatMap(this::resolveProfileRequest);
 
-    CreateUserCommand command = userDtoMapper.toCreateUserCommand(requestBody);
+    CreateUserCommand command = UserDtoMapper.toCreateUserCommand(requestBody);
     UserResult result = userService.create(command, binaryContentRequest);
-    return ResponseEntity.ok(userDtoMapper.toCreateResponse(result));
+    return ResponseEntity.ok(UserDtoMapper.toCreateResponse(result));
   }
 
   private Optional<CreateBinaryContentCommand> resolveProfileRequest(MultipartFile profileFile) {
@@ -89,10 +87,10 @@ public class UserController {
     Optional<CreateBinaryContentCommand> binaryContentRequest = Optional.ofNullable(file)
         .flatMap(this::resolveProfileRequest);
 
-    UpdateUserCommand command = userDtoMapper.toUpdateUserCommand(userId, requestBody);
+    UpdateUserCommand command = UserDtoMapper.toUpdateUserCommand(userId, requestBody);
 
     UserResult result = userService.update(command, binaryContentRequest);
-    return ResponseEntity.ok(userDtoMapper.toCreateResponse(result));
+    return ResponseEntity.ok(UserDtoMapper.toCreateResponse(result));
   }
 
   @DeleteMapping("/{userId}")
@@ -107,6 +105,6 @@ public class UserController {
     UserStatusResult result = userService.online(
         OnlineUserStatusCommand.create(userId, requestBody));
 
-    return ResponseEntity.ok(userStatusDtoMapper.toCreateResponse(result));
+    return ResponseEntity.ok(UserStatusDtoMapper.toCreateResponse(result));
   }
 }

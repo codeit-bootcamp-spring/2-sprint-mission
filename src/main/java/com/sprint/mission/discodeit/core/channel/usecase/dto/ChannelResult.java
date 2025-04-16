@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.core.channel.usecase.dto;
 
-import com.sprint.mission.discodeit.adapter.inbound.user.response.UserResponse;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.Builder;
 
 @Builder
 @Schema(description = "Channel Item")
@@ -25,12 +24,12 @@ public record ChannelResult(
         description = "사용자 ID 목록",
         example = "[\"3fa85f64-5717-4562-b3fc-2c963f66afa6\"]"
     )
-    List<UserResponse> participants,
+    List<UserResult> participants,
     @Schema(description = "최근 메시지 시각", example = "2025-04-03T01:49:44.983Z")
     Instant lastMessageAt
 ) {
 
-  public static ChannelResult create(Channel channel, List<UserResponse> userIdList,
+  public static ChannelResult create(Channel channel, List<UserResult> userIdList,
       Instant lastMessageAt) {
     return ChannelResult.builder()
         .id(channel.getId())

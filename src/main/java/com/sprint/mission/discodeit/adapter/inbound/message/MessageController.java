@@ -42,7 +42,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/messages")
 public class MessageController {
 
-  private final MessageDtoMapper messageDtoMapper;
   private final MessageService messageService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -63,12 +62,12 @@ public class MessageController {
             .toList())
         .orElse(new ArrayList<>());
 
-    CreateMessageCommand command = messageDtoMapper.toCreateMessageCommand(requestBody);
+    CreateMessageCommand command = MessageDtoMapper.toCreateMessageCommand(requestBody);
 
     MessageResult result = messageService.create(command, attachmentRequests);
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(messageDtoMapper.toCreateResponse(result));
+        .body(MessageDtoMapper.toCreateResponse(result));
   }
 
   @GetMapping
@@ -86,9 +85,9 @@ public class MessageController {
   public ResponseEntity<MessageResponse> updateMessage(
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest requestBody) {
-    UpdateMessageCommand command = messageDtoMapper.toUpdateMessageCommand(messageId, requestBody);
+    UpdateMessageCommand command = MessageDtoMapper.toUpdateMessageCommand(messageId, requestBody);
     MessageResult result = messageService.update(command);
-    return ResponseEntity.ok(messageDtoMapper.toCreateResponse(result));
+    return ResponseEntity.ok(MessageDtoMapper.toCreateResponse(result));
   }
 
   @DeleteMapping("/{messageId}")

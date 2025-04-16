@@ -33,27 +33,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/channels")
 public class ChannelController {
 
-  private final ChannelDtoMapper channelDtoMapper;
   private final ChannelService channelService;
 
   @PostMapping("/public")
   public ResponseEntity<ChannelResponse> create(
       @RequestBody @Valid PublicChannelCreateRequest requestBody) {
-    CreatePublicChannelCommand command = channelDtoMapper.toCreatePublicChannelCommand(
+    CreatePublicChannelCommand command = ChannelDtoMapper.toCreatePublicChannelCommand(
         requestBody);
     ChannelResult result = channelService.create(command);
-    ChannelResponse response = channelDtoMapper.toCreateResponse(result);
+    ChannelResponse response = ChannelDtoMapper.toCreateResponse(result);
     return ResponseEntity.ok(response);
   }
 
   @PostMapping("/private")
   public ResponseEntity<ChannelResponse> create(
       @RequestBody PrivateChannelCreateRequest requestBody) {
-    CreatePrivateChannelCommand command = channelDtoMapper.toCreatePrivateChannelCommand(
+    CreatePrivateChannelCommand command = ChannelDtoMapper.toCreatePrivateChannelCommand(
         requestBody);
     ChannelResult result = channelService.create(command);
 
-    return ResponseEntity.ok(channelDtoMapper.toCreateResponse(result));
+    return ResponseEntity.ok(ChannelDtoMapper.toCreateResponse(result));
   }
 
   @GetMapping
@@ -66,9 +65,9 @@ public class ChannelController {
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelResponse> update(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateRequest requestBody) {
-    UpdateChannelCommand command = channelDtoMapper.toUpdateChannelCommand(channelId, requestBody);
+    UpdateChannelCommand command = ChannelDtoMapper.toUpdateChannelCommand(channelId, requestBody);
     ChannelResult result = channelService.update(command);
-    return ResponseEntity.ok(channelDtoMapper.toCreateResponse(result));
+    return ResponseEntity.ok(ChannelDtoMapper.toCreateResponse(result));
   }
 
   @DeleteMapping("/{channelId}")

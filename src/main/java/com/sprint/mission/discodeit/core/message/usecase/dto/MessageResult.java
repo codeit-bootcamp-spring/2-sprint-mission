@@ -19,7 +19,7 @@ public record MessageResult(
     String content,
     UUID channelId,
     UserResult author,
-    List<BinaryContentResult> attachmentIds
+    List<BinaryContentResult> attachment
 ) {
 
   public static MessageResult create(Message message, User user) {
@@ -30,7 +30,7 @@ public record MessageResult(
         .content(message.getContent())
         .channelId(message.getChannel().getId())
         .author(UserResult.create(user, user.getUserStatus().isOnline()))
-        .attachmentIds(
+        .attachment(
             message.getAttachment().stream().map(BinaryContentResult::create).toList())
         .build();
   }

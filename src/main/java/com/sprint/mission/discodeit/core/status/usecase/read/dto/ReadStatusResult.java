@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.core.status.usecase.read.dto;
 
+import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Builder;
@@ -12,12 +13,12 @@ public record ReadStatusResult(
     Instant lastReadAt
 ) {
 
-  public static ReadStatusResult create(UUID id, UUID userId, UUID channelId, Instant lastReadAt) {
+  public static ReadStatusResult create(ReadStatus readStatus) {
     return ReadStatusResult.builder()
-        .id(id)
-        .userId(userId)
-        .channelId(channelId)
-        .lastReadAt(lastReadAt)
+        .id(readStatus.getId())
+        .userId(readStatus.getUser().getId())
+        .channelId(readStatus.getChannel().getId())
+        .lastReadAt(readStatus.getLastReadAt())
         .build();
   }
 }
