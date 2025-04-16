@@ -22,17 +22,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthController {
 
-  private final AuthService authService;
-  private final UserService userService;
+    private final AuthService authService;
 
-  @Operation(summary = "사용자 로그인")
-  @PostMapping("/login")
-  public ResponseEntity<UserResponse> login(@RequestBody LoginRequest request) {
-    try {
-      UserResponse userResponse = authService.login(request);
-      return ResponseEntity.ok(userResponse);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().build();
+    @Operation(summary = "사용자 로그인")
+    @PostMapping("/login")
+    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest request) {
+        UserResponse userResponse = authService.login(request);
+        return ResponseEntity.ok(userResponse);
     }
-  }
 }
