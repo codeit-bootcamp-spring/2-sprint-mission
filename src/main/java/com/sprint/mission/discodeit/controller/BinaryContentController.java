@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,12 +62,11 @@ public class BinaryContentController {
           )
       )
   })
-  public ResponseEntity<BinaryContent> find(
+  public ResponseEntity<BinaryContentDto> find(
       @PathVariable("binaryContentId") UUID binaryContentId
   ) {
-    binaryContentService.findById(binaryContentId);
-    return ResponseEntity.status(HttpStatus.OK).body(
-        binaryContentService.findById(binaryContentId));
+    BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+    return ResponseEntity.status(HttpStatus.OK).body(binaryContentDto);
   }
 
   @GetMapping("")
@@ -90,10 +90,11 @@ public class BinaryContentController {
           )
       )
   })
-  public ResponseEntity<List<BinaryContent>> findByIdIn(
+  public ResponseEntity<List<BinaryContentDto>> findByIdIn(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIdList
   ) {
-    List<BinaryContent> result = binaryContentService.findByIdIn(binaryContentIdList);
-    return ResponseEntity.status(HttpStatus.OK).body(result);
+    List<BinaryContentDto> binaryContentDtoList = binaryContentService.findByIdIn(
+        binaryContentIdList);
+    return ResponseEntity.status(HttpStatus.OK).body(binaryContentDtoList);
   }
 }

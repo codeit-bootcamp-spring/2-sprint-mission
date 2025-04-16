@@ -1,31 +1,33 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @AllArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentMapper binaryContentMapper;
 
   @Override
-  public BinaryContent findById(UUID binaryContentId) {
-    return binaryContentRepository.findById(binaryContentId)
+  public BinaryContentDto findById(UUID binaryContentId) {
+    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
         .orElseThrow(
             () -> new NoSuchElementException(binaryContentId + "에 해당하는 파일을 찾는데 실패하였습니다."));
+    return binaryContentMapper.toDto(binaryContent);
   }
 
   @Override
-  public List<BinaryContent> findByIdIn(List<UUID> binaryContentIdList) {
+  public List<BinaryContentDto> findByIdIn(List<UUID> binaryContentIdList) {
     return binaryContentRepository.findAll().stream()
         .filter(binaryContent -> binaryContentIdList.contains(binaryContent.getId()))
         .map(binaryContent -> findById(binaryContent.getId()))
