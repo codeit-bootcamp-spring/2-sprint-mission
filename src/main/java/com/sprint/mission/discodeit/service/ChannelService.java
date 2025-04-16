@@ -5,22 +5,27 @@ import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface ChannelService {
 
-  Channel create(PublicChannelCreateRequest request);
+    @Transactional
+    Channel create(PublicChannelCreateRequest request);
 
-  Channel create(PrivateChannelCreateRequest request);
+    @Transactional
+    Channel create(PrivateChannelCreateRequest request);
 
-  ChannelDto find(UUID channelId);
+    @Transactional(readOnly = true)
+    ChannelDto find(UUID channelId);
 
-  List<ChannelDto> findAllByUserId(UUID userId);
+    @Transactional(readOnly = true)
+    List<ChannelDto> findAllByUserId(UUID userId);
 
-  Channel update(UUID channelId, PublicChannelUpdateRequest request);
+    @Transactional
+    Channel update(UUID channelId, PublicChannelUpdateRequest request);
 
-  void delete(UUID channelId);
+    @Transactional
+    void delete(UUID channelId);
 }

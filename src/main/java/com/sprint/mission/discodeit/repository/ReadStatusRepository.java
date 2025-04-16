@@ -5,21 +5,24 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
-    ReadStatus save(ReadStatus readStatus);
+    @NonNull
+    ReadStatus save(@NonNull ReadStatus readStatus);
 
-    Optional<ReadStatus> findById(UUID id);
+    @NonNull
+    Optional<ReadStatus> findById(@NonNull UUID id);
 
     List<ReadStatus> findAllByUserId(UUID userId);
 
     List<ReadStatus> findAllByChannelId(UUID channelId);
 
-    boolean existsById(UUID id);
+    boolean existsById(@NonNull UUID id);
 
-    void deleteById(UUID id);
+    void deleteById(@NonNull UUID id);
 
     void deleteAllByChannelId(UUID channelId);
 }

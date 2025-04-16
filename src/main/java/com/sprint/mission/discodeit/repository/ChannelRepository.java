@@ -5,17 +5,23 @@ import com.sprint.mission.discodeit.entity.Channel;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
-    Channel save(Channel channel);
+    @NonNull
+    Channel save(@NonNull Channel channel);
 
-    Optional<Channel> findById(UUID id);
+    @NonNull
+    Optional<Channel> findById(@NonNull UUID channelId);
 
+    @NonNull
     List<Channel> findAll();
 
-    boolean existsById(UUID id);
+    boolean existsById(@NonNull UUID channelId);
 
-    void deleteById(UUID id);
+    void deleteById(@NonNull UUID channelId);
+
+    boolean findByName(@NonNull String name);
 }

@@ -1,35 +1,34 @@
 package com.sprint.mission.discodeit.entity;
 
-// 필요한 import 추가
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Objects; // equals/hashCode 위해 남겨둘 수 있음 (혹시 부모 클래스에 없다면)
-import java.util.Set;
-import java.util.UUID;
 
 @Getter
-@Entity
 @Table(name = "channels")
-public class Channel extends BaseEntity { // <<<--- 부모 클래스 상속 (클래스 이름은 실제 사용하는 것으로 변경)
+@Entity
+public class Channel extends BaseEntity { // 부모 클래스 상속 가정
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false) // 타입은 필수
     private ChannelType type;
 
     @Column(unique = true, nullable = false)
     private String name;
 
+    @Column(nullable = true)
     private String description;
-
 
     @OneToMany(
         mappedBy = "channel",
@@ -39,46 +38,63 @@ public class Channel extends BaseEntity { // <<<--- 부모 클래스 상속 (클
     )
     private final Set<UserChannel> participants = new HashSet<>();
 
-
     protected Channel() {
-        super(); // 부모 클래스 생성자 호출
+        super();
     }
 
-    // 공개 채널
-    public Channel(String name, String description) {
+
+    public Channel(ChannelType type, String name, String description) {
         super();
-        this.type = ChannelType.PUBLIC;
+        if (type == null) {
+            throw new IllegalArgumentException("Channel type cannot be null.");
+        }
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Channel name cannot be empty.");
         }
-        this.name = name;
-        this.description = description;
+        this.type = type;
+        this.name = name.trim();
+        this.description =
+            (description == null || description.isBlank()) ? null : description.trim();
     }
 
-    //설명 x
-    public Channel(String name) {
-        this(name, null);
+    public static Channel createPublicChannel(String name, String description) {
+        return new Channel(ChannelType.PUBLIC, name, description);
     }
+
+    public static Channel createPublicChannel(String name) {
+        return new Channel(ChannelType.PUBLIC, name, null);
+    }
+
+
+    public static Channel createPrivateChannel(String name, String description) {
+        return new Channel(ChannelType.PRIVATE, name, description);
+    }
+
+    public static Channel createPrivateChannel(String name) {
+        return new Channel(ChannelType.PRIVATE, name, null);
+    }
+
 
     public boolean update(String newName, String newDescription) {
-        boolean anyValueUpdated = false;
-        if (newName != null && !newName.isEmpty() && !newName.equals(this.name)) {
-            if (newName.isBlank()) {
-                throw new IllegalArgumentException("Channel name cannot be empty.");
-            }
-            this.name = newName;
-            anyValueUpdated = true;
-        }
-        if (newDescription == null && this.description != null) {
-            this.description = null;
-            anyValueUpdated = true;
-        } else if (newDescription != null && !newDescription.equals(this.description)) {
-            this.description = newDescription;
-            anyValueUpdated = true;
-        }
-        return anyValueUpdated;
-    }
+        boolean updated = false;
+        String trimmedNewName = (newName == null) ? null : newName.trim();
+        String trimmedNewDescription = (newDescription == null) ? null : newDescription.trim();
 
+        if (trimmedNewName != null && trimmedNewName.isEmpty()) {
+            throw new IllegalArgumentException("Channel name cannot be empty.");
+        }
+
+        if (trimmedNewName != null && !trimmedNewName.equals(this.name)) {
+            this.name = trimmedNewName;
+            updated = true;
+        }
+
+        if (!Objects.equals(this.description, trimmedNewDescription)) {
+            this.description = trimmedNewDescription;
+            updated = true;
+        }
+        return updated;
+    }
 
     public boolean isPublic() {
         return this.type == ChannelType.PUBLIC;
@@ -88,33 +104,24 @@ public class Channel extends BaseEntity { // <<<--- 부모 클래스 상속 (클
         return this.type == ChannelType.PRIVATE;
     }
 
-
-    public void leaveChannel(User user) {
-
-        if (user == null) {
-            return;
-        }
-        for (Iterator<UserChannel> iterator = this.channelUsers.iterator(); iterator.hasNext(); ) {
-            UserChannel userChannel = iterator.next();
-            if (userChannel.getUser() != null && userChannel.getUser().equals(user)) {
-                iterator.remove();
-                return;
-            }
-        }
-    }
-
     public void addParticipant(User user) {
-
         if (user == null) {
             return;
         }
-        boolean alreadyExists = this.channelUsers.stream()
-            .anyMatch(uc -> uc.getUser() != null && uc.getUser().equals(user));
+        boolean alreadyExists = this.participants.stream()
+            .anyMatch(uc -> uc != null && uc.getUser() != null && uc.getUser().equals(user));
         if (!alreadyExists) {
             UserChannel userChannel = new UserChannel(user, this);
-            this.channelUsers.add(userChannel);
+            this.participants.add(userChannel);
         }
     }
 
+    public void leaveChannel(User user) {
+        if (user == null) {
+            return;
+        }
+        this.participants.removeIf(
+            uc -> uc != null && uc.getUser() != null && uc.getUser().equals(user));
+    }
 
 }

@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import java.util.*;
+import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,9 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ChannelMapper {
 
-    MessageRepository messageRepository;
-    ReadStatusRepository readStatusRepository;
-    UserMapper userMapper;
+    private final MessageService messageService;
 
     public ChannelDto toDto(Channel channel) {
         return new ChannelDto(
@@ -23,7 +19,7 @@ public class ChannelMapper {
             channel.getName(),
             channel.getDescription(),
             channel.getParticipants(),
-
+            messageService.lastMessageTime(channel.getId())
         );
 
     }

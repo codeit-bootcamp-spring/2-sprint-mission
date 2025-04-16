@@ -5,21 +5,25 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    User save(User user);
+    @NonNull
+    User save(@NonNull User user);
 
-    Optional<User> findById(UUID id);
+    @NonNull
+    Optional<User> findById(@NonNull UUID id);
 
     Optional<User> findByUsername(String username);
 
+    @NonNull
     List<User> findAll();
 
-    boolean existsById(UUID id);
+    boolean existsById(@NonNull UUID id);
 
-    void deleteById(UUID id);
+    void deleteById(@NonNull UUID id);
 
     boolean existsByEmail(String email);
 

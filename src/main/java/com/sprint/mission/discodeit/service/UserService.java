@@ -9,18 +9,20 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 
-  User create(UserCreateRequest userCreateRequest,
-      Optional<BinaryContentCreateRequest> profileCreateRequest);
+    User create(UserCreateRequest userCreateRequest,
+        Optional<BinaryContentCreateRequest> profileCreateRequest);
 
-  UserDto find(UUID userId);
+    UserDto find(UUID userId);
 
-  List<UserDto> findAll();
+    Page<UserDto> findAll(Pageable pageable);
 
-  User update(UUID userId, UserUpdateRequest userUpdateRequest,
-      Optional<BinaryContentCreateRequest> profileCreateRequest);
+    User update(UUID userId, UserUpdateRequest userUpdateRequest,
+        Optional<BinaryContentCreateRequest> profileCreateRequest);
 
-  void delete(UUID userId);
+    void delete(UUID userId);
 }

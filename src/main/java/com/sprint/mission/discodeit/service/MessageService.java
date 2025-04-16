@@ -1,23 +1,31 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 
+
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface MessageService {
 
-  Message create(MessageCreateRequest messageCreateRequest,
-      List<BinaryContentCreateRequest> binaryContentCreateRequests);
 
-  Message find(UUID messageId);
+    @Transactional
+    MessageDto create(MessageCreateRequest messageCreateRequest,
+        List<BinaryContentCreateRequest> binaryContentCreateRequests);
 
-  List<Message> findAllByChannelId(UUID channelId);
+    Message find(UUID messageId);
 
-  Message update(UUID messageId, MessageUpdateRequest request);
+    List<Message> findAllByChannelId(UUID channelId);
 
-  void delete(UUID messageId);
+    Instant lastMessageTime(UUID channelId);
+
+    Message update(UUID messageId, MessageUpdateRequest request);
+
+    void delete(UUID messageId);
 }

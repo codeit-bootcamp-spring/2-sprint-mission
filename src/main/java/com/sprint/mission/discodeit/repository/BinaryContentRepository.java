@@ -2,20 +2,26 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BinaryContentRepository extends JpaRepository<BinaryContent, UUID> {
 
-    BinaryContent save(BinaryContent binaryContent);
 
-    Optional<BinaryContent> findById(UUID id);
+    @NonNull
+    BinaryContent save(@NonNull BinaryContent binaryContent);
 
-    List<BinaryContent> findAllByIdIn(List<UUID> ids);
+    @NonNull
+    Optional<BinaryContent> findById(@NonNull UUID binaryContentId);
 
-    boolean existsById(UUID id);
+    @NonNull
+    List<BinaryContent> findAllByIdIn(@NonNull List<UUID> ids);
 
-    void deleteById(UUID id);
+    boolean existsById(@NonNull UUID id);
+
+    void deleteById(@NonNull UUID id);
 }

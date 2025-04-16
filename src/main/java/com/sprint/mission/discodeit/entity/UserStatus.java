@@ -40,20 +40,20 @@ public class UserStatus extends BaseUpdatableEntity {
     // update 메서드 수정
     public boolean update(Instant newLastActiveAt) {
         boolean anyValueUpdated = false;
-        // lastActiveAt이 null이 아니고, 이전 값과 다를 때만 업데이트
+
         if (newLastActiveAt != null && !newLastActiveAt.equals(this.lastActiveAt)) {
             this.lastActiveAt = newLastActiveAt;
             anyValueUpdated = true;
         }
-        // updatedAt은 자동으로 처리됨
+
         return anyValueUpdated;
     }
 
-    // isOnline 메서드는 그대로 유지 (JPA와 직접 관련 없음)
-    @Transient // DB 컬럼으로 매핑하지 않음
+    // isOnline 메서드는 그대로 유지
+    @Transient
     public Boolean isOnline() {
         if (this.lastActiveAt == null) {
-            return false; // null 체크 추가
+            return false;
         }
         Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
         return lastActiveAt.isAfter(instantFiveMinutesAgo);

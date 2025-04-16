@@ -1,8 +1,11 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 
+import com.sprint.mission.discodeit.service.BinaryContentStorage;
+import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +28,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
+
+@jakarta.annotation.Resource
 
 @Service
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
@@ -138,21 +143,5 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         }
     }
 
-    @Override
-    public boolean delete(UUID id) throws IOException {
-        Path filePath = resolvePath(id);
-        log.debug("파일 삭제 시도: {}", filePath);
-        try {
-            boolean deleted = Files.deleteIfExists(filePath);
-            if (deleted) {
-                log.info("파일 삭제 성공: {}", filePath);
-            } else {
-                log.warn("삭제할 파일을 찾지 못함: {}", filePath);
-            }
-            return deleted;
-        } catch (IOException e) {
-            log.error("파일 삭제 실패: {}", filePath, e);
-            throw new IOException("파일 삭제 실패: " + filePath, e);
-        }
-    }
+
 }

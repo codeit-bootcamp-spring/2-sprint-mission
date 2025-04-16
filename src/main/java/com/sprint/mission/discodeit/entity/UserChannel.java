@@ -25,7 +25,7 @@ public class UserChannel {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    // ID는 보통 Setter가 없음
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -38,7 +38,8 @@ public class UserChannel {
     public UserChannel(User user, Channel channel) {
         this.user = user;
         this.channel = channel;
-
+        user.getUserChannels().add(this);
+        channel.getParticipants().add(this);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class UserChannel {
             return false;
         }
         UserChannel that = (UserChannel) o;
-        // ID가 null이 아니어야 하고, 같은 UUID 값을 가져야 함
+
         return id != null && id.equals(that.id);
     }
 
