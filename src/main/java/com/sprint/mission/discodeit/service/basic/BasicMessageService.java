@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
   private final MessageMapper messageMapper;
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -49,7 +51,19 @@ public class BasicMessageService implements MessageService {
 
     List<BinaryContent> binaryContentList = createBinaryContentList(multipartFiles);
     if (!binaryContentList.isEmpty() && binaryContentList != null) {
-      binaryContentList.forEach(binaryContentService::create);
+      // multipartFiles 순서대로 binaryContentList를 만들었으므로 순서가 일치함 -> 인덱스로 뽑아서 각각 메타데이터 / 로컬로 저장
+      for (int i = 0; i < multipartFiles.size(); i++) {
+        BinaryContent binaryContent = binaryContentList.get(i);
+        MultipartFile multipartFile = multipartFiles.get(i);
+
+        binaryContentService.create(binaryContent);
+        try {
+          binaryContentStorage.put(binaryContent.getId(), multipartFile.getBytes());
+        } catch (IOException e) {
+          logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
+          throw RestExceptions.FILE_READ_ERROR;
+        }
+      }
     }
 
     Message message = createMessageEntity(user, channel, createMessageCommand, binaryContentList);
@@ -106,10 +120,25 @@ public class BasicMessageService implements MessageService {
     }
 
     message.getAttachments()
-        .forEach(attachment -> binaryContentService.delete(attachment.getId()));
+        .forEach(attachment -> {
+          binaryContentService.delete(attachment.getId());
+          binaryContentStorage.delete(attachment.getId());
+        });
 
     List<BinaryContent> binaryContentList = createBinaryContentList(multipartFiles);
-    binaryContentList.forEach(binaryContentService::create);
+
+    for (int i = 0; i < multipartFiles.size(); i++) {
+      BinaryContent binaryContent = binaryContentList.get(i);
+      MultipartFile multipartFile = multipartFiles.get(i);
+
+      binaryContentService.create(binaryContent);
+      try {
+        binaryContentStorage.put(binaryContent.getId(), multipartFile.getBytes());
+      } catch (IOException e) {
+        logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
+        throw RestExceptions.FILE_READ_ERROR;
+      }
+    }
 
     // 변경감지로 commit 시점에 message 테이블에 Update 쿼리 날아감
     // + message가 JoinTable을 관리하므로, commit 시점에 message_attachments 테이블에도 Insert 쿼리 날아감
@@ -123,17 +152,11 @@ public class BasicMessageService implements MessageService {
     }
     return multipartFiles.stream()
         .map(multipartFile -> {
-          try {
-            return BinaryContent.builder()
-                .contentType(multipartFile.getContentType())
-                .bytes(multipartFile.getBytes())
-                .size(multipartFile.getSize())
-                .filename(multipartFile.getOriginalFilename())
-                .build();
-          } catch (IOException e) {
-            logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
-            throw RestExceptions.FILE_READ_ERROR;
-          }
+          return BinaryContent.builder()
+              .contentType(multipartFile.getContentType())
+              .size(multipartFile.getSize())
+              .filename(multipartFile.getOriginalFilename())
+              .build();
         })
         .collect(Collectors.toList());
   }

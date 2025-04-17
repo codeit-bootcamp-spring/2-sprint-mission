@@ -27,14 +27,10 @@ public class BinaryContent extends BaseEntity implements Serializable, Identifia
   @Column(name = "content_type", length = 100, nullable = false)
   private String contentType;
 
-  @Column(nullable = false)
-  private byte[] bytes;
-
   @Builder
-  public BinaryContent(String filename, long size, String contentType, byte[] bytes) {
+  public BinaryContent(String filename, long size, String contentType) {
     this.filename = filename;
     this.size = size;
     this.contentType = contentType;
-    this.bytes = bytes;
   }
 }

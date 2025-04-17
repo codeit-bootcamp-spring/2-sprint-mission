@@ -68,7 +68,6 @@ public class BasicBinaryContentService implements BinaryContentService {
         .filename(createBinaryContentCommand.filename())
         .size(createBinaryContentCommand.size())
         .contentType(createBinaryContentCommand.contentType())
-        .bytes(createBinaryContentCommand.bytes())
         .build();
   }
 }

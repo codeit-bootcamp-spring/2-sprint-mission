@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.service.binarycontent.CreateBinaryContentResult;
+import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentResult;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserCommand;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserResult;
 import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
@@ -17,6 +19,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
@@ -40,7 +43,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentService binaryContentService;
   private final UserMapper userMapper;
   private final UserStatusMapper userStatusMapper;
-  private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentStorage binaryContentStorage;
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
@@ -52,7 +55,14 @@ public class BasicUserService implements UserService {
 
     BinaryContent binaryContent = createBinaryContentEntity(multipartFile);
     if (binaryContent != null) {
-      binaryContentService.create(binaryContent);
+      CreateBinaryContentResult createBinaryContentResult = binaryContentService.create(
+          binaryContent);
+      try {
+        binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
+      } catch (IOException e) {
+        logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
+        throw RestExceptions.FILE_READ_ERROR;
+      }
     }
 
     User user = createUserEntity(createUserCommand, binaryContent);
@@ -95,9 +105,17 @@ public class BasicUserService implements UserService {
       // 기존 이미지 삭제 (기존 프로필 이미지가 있는 경우에만)
       if (findUser.getProfile() != null) {
         binaryContentService.delete(findUser.getProfile().getId());
+        binaryContentStorage.delete(findUser.getProfile().getId());
       }
       BinaryContent binaryContent = createBinaryContentEntity(multipartFile);
-      binaryContentService.create(binaryContent);
+      CreateBinaryContentResult createBinaryContentResult = binaryContentService.create(
+          binaryContent);
+      try {
+        binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
+      } catch (IOException e) {
+        logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
+        throw RestExceptions.FILE_READ_ERROR;
+      }
 
       findUser.updateProfile(binaryContent);
     } else { // 기본 프로필로 변경할 때
@@ -116,6 +134,7 @@ public class BasicUserService implements UserService {
     userRepository.deleteById(userId);
     if (user.getProfile() != null) {
       binaryContentService.delete(user.getProfile().getId());
+      binaryContentStorage.delete(user.getProfile().getId());
     }
     userStatusService.deleteByUserId(userId);
   }
@@ -156,18 +175,11 @@ public class BasicUserService implements UserService {
     if (multipartFile == null || multipartFile.isEmpty() || multipartFile.getSize() == 0) {
       return null;  // 파일이 없으면 BinaryContent를 생성하지 않음
     }
-    try {
-      return BinaryContent.builder()
-          .contentType(multipartFile.getContentType())
-          .bytes(multipartFile.getBytes())
-          .size(multipartFile.getSize())
-          .filename(multipartFile.getOriginalFilename())
-          .build();
-    } catch (IOException e) {
-      logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
-      throw RestExceptions.FILE_READ_ERROR;
-    }
+    return BinaryContent.builder()
+        .contentType(multipartFile.getContentType())
+        .size(multipartFile.getSize())
+        .filename(multipartFile.getOriginalFilename())
+        .build();
+
   }
-
-
 }
