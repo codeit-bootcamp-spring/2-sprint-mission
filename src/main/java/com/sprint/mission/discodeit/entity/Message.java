@@ -18,11 +18,11 @@ public class Message extends BaseUpdatableEntity {
 
   @ManyToOne(optional = false)
   @JoinColumn(name = "channel_id", foreignKey = @ForeignKey(name = "fk_messages_channel"))
-  private Channel channel;  // ✅ 이름 수정: channelId → channel
+  private Channel channel;
 
   @ManyToOne
   @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "fk_messages_author"))
-  private User author;  // ✅ 이름 수정: authorId → author
+  private User author;
 
   @ManyToMany
   @JoinTable(
@@ -30,7 +30,7 @@ public class Message extends BaseUpdatableEntity {
       joinColumns = @JoinColumn(name = "message_id"),
       inverseJoinColumns = @JoinColumn(name = "attachment_id")
   )
-  private List<BinaryContent> attachmentIds;  // ✅ 그대로 유지 (N:M 관계)
+  private List<BinaryContent> attachmentIds;
 
   public Message(String content, Channel channel, User author, List<BinaryContent> attachmentIds) {
     this.content = content;

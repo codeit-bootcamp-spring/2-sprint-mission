@@ -15,18 +15,4 @@ public record MessageDto(
         List<UUID> attachmentIds,
         Instant createdAt,
         Instant updatedAt
-) {
-    public static MessageDto from(Message message) {
-        return new MessageDto(
-                message.getId(),
-                message.getContent(),
-                message.getChannel() != null ? message.getChannel().getId() : null,
-                message.getAuthor() != null ? message.getAuthor().getId() : null,
-                message.getAttachmentIds().stream()
-                    .map(BinaryContent::getId)
-                    .toList(),
-                message.getCreatedAt(),
-                message.getUpdatedAt()
-        );
-    }
-}
+) {}

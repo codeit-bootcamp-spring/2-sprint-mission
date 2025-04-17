@@ -55,7 +55,7 @@ public class Channel extends BaseUpdatableEntity {
     }
 
     if (anyValueUpdated) {
-      this.updatedAt = Instant.now(); // BaseUpdatableEntity에 있는 updatedAt setter
+      this.updatedAt = Instant.now();
     }
   }
 }
