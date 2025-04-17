@@ -26,7 +26,7 @@ public class BasicAuthService implements AuthService {
         String username = authLoginDto.username();
         String password = authLoginDto.password();
 
-        User foundUser = userRepository.findByUsername(username, password)
+        User foundUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new LogicException(ErrorCode.USER_NOT_FOUND));
 
         if (!foundUser.getPassword().equals(password)) {
