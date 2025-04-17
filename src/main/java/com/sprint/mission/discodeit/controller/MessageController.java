@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import static java.util.stream.Collectors.toList;
-
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
-import com.sprint.mission.discodeit.dto.data.PageResponse;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
@@ -23,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -98,14 +97,14 @@ public class MessageController implements MessageApi {
   public ResponseEntity<PageResponse> findAllByChannelId(UUID ChannelId,
       Pageable pageable) {
     UUID uuid = UUID.fromString(String.valueOf(ChannelId));
-    List<Message> messages = messageService.findAllBygetChannelId(uuid);
+    List<Message> messages = messageService.findAllByChannelId(uuid);
 
     PageResponse<Message> pageResponse = new PageResponse<Message>(
         messages,        // 실제 데이터 리스트
         pageable.page(),            // 현재 페이지 번호
         pageable.size(),               // 페이지 당 항목 수
         hashNext(pageable),        // 다음 페이지 존재 여부
-        messages.size()
+        Long.valueOf(messages.size())
     );
 
     return ResponseEntity.ok(pageResponse);

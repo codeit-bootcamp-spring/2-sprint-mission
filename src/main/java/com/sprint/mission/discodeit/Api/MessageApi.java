@@ -5,7 +5,7 @@
 package com.sprint.mission.discodeit.Api;
 
 import com.sprint.mission.discodeit.dto.data.MessageDto;
-import com.sprint.mission.discodeit.dto.data.PageResponse;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.Pageable;

@@ -59,7 +59,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional(readOnly = true)
   public ChannelDto find(UUID channelId) {
     return channelRepository.findById(channelId)
-        .map(this::toDto)
+        .map(channel -> channelMapper.toDto(channel))
         .orElseThrow(
             () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
   }
@@ -75,7 +75,7 @@ public class BasicChannelService implements ChannelService {
     return channelRepository.findAll().stream()
         .filter(channel -> channel.getType().equals(ChannelType.PUBLIC) || myChannelIds.contains(
             channel.getId()))
-        .map(this::toDto)
+        .map(channelMapper::toDto)
         .toList();
   }
 
@@ -107,20 +107,4 @@ public class BasicChannelService implements ChannelService {
     channelRepository.delete(channel);
   }
 
-  private ChannelDto toDto(Channel channel) {
-    Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
-        .map(Message::getCreatedAt)
-        .max(Comparator.naturalOrder())
-        .orElse(Instant.MIN);
-
-    List<UUID> participantIds = new ArrayList<>();
-    if (channel.getType() == ChannelType.PRIVATE) {
-      participantIds = readStatusRepository.findAllByChannelId(channel.getId()).stream()
-          .map(ReadStatus::getUser)
-          .map(user -> user.getId())
-          .toList();
-    }
-
-    return channelMapper.toDto(channel);
-  }
 }
