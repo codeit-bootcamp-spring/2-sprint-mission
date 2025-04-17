@@ -1,51 +1,63 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.service.TimeFormatter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
+@Table(name = "users")
 @Getter
 @Setter
-public class User extends BaseEntity implements Serializable {
+public class User extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
+    @Column(nullable = false, unique = true, length = 50)
+    private String username;
 
-  private String username;
-  private String password;
-  private String email;
-  private UUID profileId;
+    @Column(nullable = false, length = 60)
+    private String password;
+
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
+
+    @OneToOne
+    @JoinColumn(name = "profile_id", foreignKey = @ForeignKey(name = "fk_profile"))
+    private BinaryContent profile;
 
 
-  public User(String username, String password, String email, UUID profileId) {
-    super();
-    this.username = username;
-    this.password = password;
-    this.email = email;
-    this.profileId = profileId;
-  }
+    public User(String username, String password, String email, BinaryContent profile) {
+        super();
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.profile = profile;
+    }
 
-  public void update(String username, String password, String email, Instant updatedAt,
-      UUID profileId) {
-    this.username = username;
-    this.password = password;
-    this.email = email;
-    this.updatedAt = updatedAt;
-    this.profileId = profileId;
-  }
+    protected User() {
+    }
 
-  @Override
-  public String toString() {
-    return "User{" +
-        "username='" + username + '\'' +
-        ", password='****'" +
-        ", email='" + email + '\'' +
-        ", id=" + id +
-        ", createdAt=" + TimeFormatter.formatTimestamp(createdAt) +
-        ", updatedAt=" + TimeFormatter.formatTimestamp(updatedAt) +
-        '}';
-  }
+    public void update(String username, String password, String email, BinaryContent profile) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.profile = profile;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+            "username='" + username + '\'' +
+            ", password='****'" +
+            ", email='" + email + '\'' +
+            ", id=" + id +
+            ", createdAt=" + TimeFormatter.formatTimestamp(createdAt) +
+            ", updatedAt=" + TimeFormatter.formatTimestamp(updatedAt) +
+            '}';
+    }
 }

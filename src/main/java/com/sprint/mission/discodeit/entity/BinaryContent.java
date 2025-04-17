@@ -1,20 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
-import java.util.UUID;
 
+@Entity
+@Table(name = "binary_contents")
 @Getter
-public class BinaryContent extends BaseImmutableEntity {
+public class BinaryContent extends BaseEntity {
 
-  private final String fileName;
-  private final Long size;
-  private final String contentType;
-  private final byte[] bytes;
+    @Column(name = "file_name", nullable = false, length = 255)
+    private String fileName;
 
-  public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
-    this.fileName = fileName;
-    this.size = size;
-    this.contentType = contentType;
-    this.bytes = bytes;
-  }
+    @Column(nullable = false)
+    private Long size;
+
+    @Column(name = "content_type", nullable = false, length = 100)
+    private String contentType;
+
+    protected BinaryContent() {
+    }
+
+    public BinaryContent(String fileName, Long size, String contentType) {
+        this.fileName = fileName;
+        this.size = size;
+        this.contentType = contentType;
+    }
 }
