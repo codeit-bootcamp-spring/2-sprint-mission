@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 @Getter
 public class UserStatus extends BaseUpdatableEntity {
 
+    // 연관관계 주인 -> FK 를 가짐
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true, foreignKey = @ForeignKey(name = "fk_user_status_user"))
     private User user;
