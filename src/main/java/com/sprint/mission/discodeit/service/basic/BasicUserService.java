@@ -75,7 +75,7 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional(readOnly = true)
   public UserDto find(UUID userId) {
-    return userRepository.findById(userId)
+    return userRepository.findWithProfileById(userId)
         .map(this::toDto)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
   }

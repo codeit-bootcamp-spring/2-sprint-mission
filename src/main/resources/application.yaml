@@ -17,6 +17,7 @@ spring:
         format_sql: true
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
   servlet:
     multipart:
       maxFileSize: 10MB # 파일 하나의 최대 크기
