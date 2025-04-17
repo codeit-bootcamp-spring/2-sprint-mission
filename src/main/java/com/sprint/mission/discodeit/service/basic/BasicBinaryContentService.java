@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.service.binarycontent.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.dto.service.binarycontent.CreateBinaryContentResult;
+import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
@@ -24,24 +26,26 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   @Transactional
-  public BinaryContent create(BinaryContent binaryContent) {
-    return binaryContentRepository.save(binaryContent);
+  public CreateBinaryContentResult create(BinaryContent binaryContent) {
+    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+
+    return binaryContentMapper.toCreateBinaryContentResult(createdBinaryContent);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public BinaryContentDTO find(UUID id) {
+  public FindBinaryContentResult find(UUID id) {
     BinaryContent binaryContent = findBinaryContentById(id);
-    return binaryContentMapper.toBinaryContentDTO(binaryContent);
+    return binaryContentMapper.toFindBinaryContentResult(binaryContent);
   }
 
   @Override
   @Transactional(readOnly = true)
   // attachmentIds를 받아서 리스트를 조회
-  public List<BinaryContentDTO> findAllByIdIn(List<UUID> attachmentsId) {
+  public List<FindBinaryContentResult> findAllByIdIn(List<UUID> attachmentsId) {
     return attachmentsId.stream()
-        .map(id -> findBinaryContentById(id)) // attachmentsId로 BinaryContent 찾아서
-        .map(bc -> binaryContentMapper.toBinaryContentDTO(bc)) // DTO로 변환
+        .map(this::findBinaryContentById)
+        .map(binaryContentMapper::toFindBinaryContentResult)
         .toList();
   }
 
@@ -56,5 +60,15 @@ public class BasicBinaryContentService implements BinaryContentService {
           logger.error("binaryContent 찾기 실패: {}", id);
           return RestExceptions.BINARY_CONTENT_NOT_FOUND;
         });
+  }
+
+  private BinaryContent createBinaryContentEntity(
+      CreateBinaryContentCommand createBinaryContentCommand) {
+    return BinaryContent.builder()
+        .filename(createBinaryContentCommand.filename())
+        .size(createBinaryContentCommand.size())
+        .contentType(createBinaryContentCommand.contentType())
+        .bytes(createBinaryContentCommand.bytes())
+        .build();
   }
 }
