@@ -6,6 +6,8 @@ import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
@@ -71,9 +73,15 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       InputStream is = get(binaryContentDto.id());
       InputStreamResource resource = new InputStreamResource(is);
 
+      String fileName = binaryContentDto.fileName();
+      String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
+          .replaceAll("\\+", "%20");
+
+      String contentDisposition =
+          "attachment; filename=\"download\"; filename*=UTF-8''" + encodedFileName;
+
       return ResponseEntity.ok()
-          .header(HttpHeaders.CONTENT_DISPOSITION,
-              "attachment; filename=\"" + binaryContentDto.fileName() + "\"")
+          .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
           .contentType(MediaType.parseMediaType(binaryContentDto.contentType()))
           .contentLength(binaryContentDto.size())
           .body(resource);
