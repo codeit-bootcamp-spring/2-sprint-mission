@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.Mapper.UserMapper;
+import com.sprint.mission.discodeit.Mapper.UserStatusMapper;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
@@ -30,12 +32,12 @@ public class BasicUserService implements UserService {
   //
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
-  private final ReadStatusRepository readStatusRepository;
+  private final UserMapper userMapper;
 
   @Override
   @Transactional
-  public User create(UserCreateRequest userCreateRequest,
-      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+  public UserDto create(UserCreateRequest userCreateRequest,
+    Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
 
@@ -68,13 +70,13 @@ public class BasicUserService implements UserService {
     UserStatus userStatus = new UserStatus(createdUser, now);
     userStatusRepository.save(userStatus);
 
-    return createdUser;
+    return userMapper.toDto(createdUser);
   }
 
   @Override
   public UserDto find(UUID userId) {
     return userRepository.findById(userId)
-        .map(this::toDto)
+        .map(userMapper::toDto)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
   }
 
@@ -82,13 +84,13 @@ public class BasicUserService implements UserService {
   public List<UserDto> findAll() {
     return userRepository.findAll()
         .stream()
-        .map(this::toDto)
+        .map(userMapper::toDto)
         .toList();
   }
 
   @Override
   @Transactional
-  public User update(UUID userId, UserUpdateRequest userUpdateRequest,
+  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
@@ -118,7 +120,7 @@ public class BasicUserService implements UserService {
     String newPassword = userUpdateRequest.newPassword();
     user.update(newUsername, newEmail, newPassword, nullableProfile);
 
-    return userRepository.save(user);
+    return userMapper.toDto(userRepository.save(user));
   }
 
   @Override
@@ -131,23 +133,5 @@ public class BasicUserService implements UserService {
             .ifPresent(profile -> binaryContentRepository.deleteById(profile.getId()));
 
     userRepository.deleteById(userId);
-  }
-
-  private UserDto toDto(User user) {
-    Boolean online = userStatusRepository.findByUserId(user.getId())
-        .map(UserStatus::isOnline)
-        .orElse(null);
-
-    UUID profileId = user.getProfile() == null ? null : user.getProfile().getId();
-
-    return new UserDto(
-        user.getId(),
-        user.getCreatedAt(),
-        user.getUpdatedAt(),
-        user.getUsername(),
-        user.getEmail(),
-        profileId,
-        online
-    );
   }
 }

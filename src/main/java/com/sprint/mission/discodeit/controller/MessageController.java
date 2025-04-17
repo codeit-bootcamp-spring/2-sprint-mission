@@ -3,14 +3,13 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.MessageDTO;
+import com.sprint.mission.discodeit.dto.response.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +27,7 @@ public class MessageController {
   private final MessageService messageService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<Message> create(
+  public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
@@ -47,7 +46,7 @@ public class MessageController {
             })
             .toList())
         .orElse(new ArrayList<>());
-    Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -55,9 +54,9 @@ public class MessageController {
   }
 
   @PatchMapping("/{messageId}")
-  public ResponseEntity<MessageDTO> update(@PathVariable("messageId") UUID messageId,
-      @RequestBody MessageUpdateRequest request) {
-    MessageDTO updatedMessage = messageService.update(messageId, request);
+  public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
+                                           @RequestBody MessageUpdateRequest request) {
+    MessageDto updatedMessage = messageService.update(messageId, request);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -73,9 +72,9 @@ public class MessageController {
   }
 
   @GetMapping
-  public ResponseEntity<List<MessageDTO>> findAllByChannelId(
+  public ResponseEntity<List<MessageDto>> findAllByChannelId(
       @RequestParam("channelId") UUID channelId) {
-    List<MessageDTO> messages = messageService.findAllByChannelId(channelId);
+    List<MessageDto> messages = messageService.findAllByChannelId(channelId);
 
     return ResponseEntity
         .status(HttpStatus.OK)
