@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,4 +54,10 @@ public class BinaryContentController {
         .status(HttpStatus.OK)
         .body(binaryContentDtos);
   }
+
+  @GetMapping(path = "{binaryContentId}download")
+  public ResponseEntity<Resource> downloadBinaryContent(@PathVariable UUID binaryContentId) {
+    return binaryContentService.download(binaryContentId);
+  }
+
 }
