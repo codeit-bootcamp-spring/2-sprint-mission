@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.swagger;
 
 import com.sprint.mission.discodeit.dto.controller.binarycontent.FindBinaryContentResponseDTO;
-import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +26,7 @@ public interface BinaryContentApi {
           @ApiResponse(responseCode = "200", description = "BinaryContent 다건 조회 성공"),
           @ApiResponse(responseCode = "404", description = "binaryContentId에 해당하는 BinaryContnet가 존재하지 않음")
       })
-  ResponseEntity<List<BinaryContentDTO>> getBinaryContentAllIn(List<UUID> binaryContentIds);
+  ResponseEntity<List<FindBinaryContentResponseDTO>> getBinaryContentAllIn(
+      List<UUID> binaryContentIds);
 
 }
