@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.controller.auth.LoginRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.auth.LoginResponseDTO;
-import com.sprint.mission.discodeit.dto.service.auth.LoginDTO;
-import com.sprint.mission.discodeit.dto.service.auth.LoginParam;
+import com.sprint.mission.discodeit.dto.service.auth.LoginCommand;
+import com.sprint.mission.discodeit.dto.service.auth.LoginResult;
 import com.sprint.mission.discodeit.mapper.AuthMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.swagger.AuthApi;
@@ -27,10 +27,10 @@ public class AuthController implements AuthApi {
   @Override
   @PostMapping("/login")
   public ResponseEntity<LoginResponseDTO> login(
-      @RequestBody @Valid LoginRequestDTO loginRequestDTO) {
-    LoginParam loginParam = authMapper.toLoginParam(loginRequestDTO);
-    LoginDTO loginDTO = authService.login(loginParam);
-    LoginResponseDTO user = authMapper.toLoginResponseDTO(loginDTO);
+      @RequestBody @Valid LoginRequestDTO loginRequest) {
+    LoginCommand loginCommand = authMapper.toLoginCommand(loginRequest);
+    LoginResult loginResult = authService.login(loginCommand);
+    LoginResponseDTO user = authMapper.toLoginResponseDTO(loginResult);
 
     return ResponseEntity.ok(user);
   }

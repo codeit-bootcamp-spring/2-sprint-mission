@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.dto.controller.auth;
 
 
-import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDTO;
 import java.time.Instant;
 import java.util.UUID;
 
