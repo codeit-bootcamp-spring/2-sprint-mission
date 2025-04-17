@@ -18,10 +18,11 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.AbstractMap;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -46,8 +47,8 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public MessageDto sendMessage(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments) {
-    List<Map.Entry<BinaryContent, byte[]>> attachmentEntryList = new ArrayList<>();
-    List<BinaryContent> attachmentList = new ArrayList<>();
+    List<Map.Entry<BinaryContent, byte[]>> attachmentEntryList;
+    List<BinaryContent> attachmentList;
 
     User user = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new NoSuchElementException(
@@ -57,7 +58,9 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new NoSuchElementException(
             messageCreateRequest.channelId() + "에 해당하는 채널을 찾을 수 없습니다."));
 
-    attachmentEntryList = attachments.stream()
+    attachmentEntryList = Optional.ofNullable(attachments)
+        .orElse(Collections.emptyList())
+        .stream()
         .filter(file -> !file.isEmpty())
         .map(file -> {
           try {

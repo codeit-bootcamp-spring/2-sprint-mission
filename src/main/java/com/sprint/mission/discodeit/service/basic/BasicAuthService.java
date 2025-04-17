@@ -11,6 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class BasicAuthService implements AuthService {
   private final UserMapper userMapper;
 
   @Override
+  @Transactional(readOnly = true)
   public UserDto login(LoginRequest loginRequest) {
     User user = userRepository.findByUsername(loginRequest.username())
         .orElseThrow(() -> new NoSuchElementException(
@@ -28,7 +30,7 @@ public class BasicAuthService implements AuthService {
     if (!user.getPassword().equals(loginRequest.password())) {
       throw new IllegalArgumentException("Wrong password");
     }
-    
+
     return userMapper.toDto(user);
   }
 }
