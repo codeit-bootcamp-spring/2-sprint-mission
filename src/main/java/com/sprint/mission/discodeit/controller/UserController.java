@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdDto;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -40,33 +40,32 @@ public class UserController {
 
     @Operation(summary = "User 등록")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<User> createUser(@RequestPart("userCreateRequest") UserCreateDto userCreateDto,
-                                           @RequestPart(name = "profile", required = false) MultipartFile file) {
+    public ResponseEntity<UserDto> createUser(@RequestPart("userCreateRequest") UserCreateDto userCreateDto,
+                                              @RequestPart(name = "profile", required = false) MultipartFile file) {
         BinaryContentCreateDto profileRequest = MultipartToBinaryConverter.toBinaryContentCreateDto(file);
-        User createdUser = userService.create(userCreateDto, profileRequest);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(createdUser);
+        UserDto createdUser = userService.create(userCreateDto, profileRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @Operation(summary = "User 정보 수정")
     @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<User> updateUser(
+    public ResponseEntity<UserDto> updateUser(
             @PathVariable UUID userId,
             @RequestPart("userUpdateRequest") UserUpdateDto userUpdateDto,
             @RequestPart(name = "profile", required = false) MultipartFile file
     ) {
         BinaryContentCreateDto profileRequest = MultipartToBinaryConverter.toBinaryContentCreateDto(file);
-        User updatedUser = userService.update(userId, userUpdateDto, profileRequest);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(updatedUser);
+        UserDto updatedUser = userService.update(userId, userUpdateDto, profileRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
     @Operation(summary = "User 삭제")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.delete(userId);
+        
         return ResponseEntity.noContent().build();
     }
 
@@ -78,8 +77,8 @@ public class UserController {
 
     @Operation(summary = "User 온라인 상태 업데이트")
     @PatchMapping("/{userId}/userStatus")
-    public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
-                                                               @RequestBody UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto) {
+    public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
+                                                                  @RequestBody UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto) {
         UserStatus userStatus = userStatusService.updateByUserId(userId, userStatusUpdateByUserIdDto);
         return ResponseEntity.ok(userStatus);
     }
