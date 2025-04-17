@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDto;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,22 +30,22 @@ public class ReadStatusController {
 
     @Operation(summary = "Message 읽음 상태 생성")
     @PostMapping
-    public ResponseEntity<ReadStatus> createReadStatus(@RequestBody ReadStatusCreateDto readStatusCreateDto) {
-        ReadStatus readStatus = readStatusService.create(readStatusCreateDto);
+    public ResponseEntity<ReadStatusDto> createReadStatus(@RequestBody ReadStatusCreateDto readStatusCreateDto) {
+        ReadStatusDto readStatus = readStatusService.create(readStatusCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
     }
 
     @Operation(summary = "Message 읽음 상태 수정")
     @PatchMapping("/{readStatusId}")
-    public ResponseEntity<ReadStatus> updateReadStatus(@PathVariable UUID readStatusId,
-                                                       @RequestBody ReadStatusUpdateDto readStatusUpdateDto) {
-        ReadStatus readStatus = readStatusService.update(readStatusId, readStatusUpdateDto);
+    public ResponseEntity<ReadStatusDto> updateReadStatus(@PathVariable UUID readStatusId,
+                                                          @RequestBody ReadStatusUpdateDto readStatusUpdateDto) {
+        ReadStatusDto readStatus = readStatusService.update(readStatusId, readStatusUpdateDto);
         return ResponseEntity.ok(readStatus);
     }
 
     @Operation(summary = "User의 Message 읽음 상태 목록 조회")
     @GetMapping
-    public ResponseEntity<List<ReadStatus>> getReadStatuses(@RequestParam(name = "userId") UUID userId) {
+    public ResponseEntity<List<ReadStatusDto>> getReadStatuses(@RequestParam(name = "userId") UUID userId) {
         return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
     }
 }
