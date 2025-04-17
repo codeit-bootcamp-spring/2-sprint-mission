@@ -40,10 +40,10 @@ public class UserController implements UserApi {
   ) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-    User createdUser = userService.create(userCreateRequest, profileRequest);
+    UserDto createdUser = userService.create(userCreateRequest, profileRequest);
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(userMapper.toDto(createdUser));
+        .body(createdUser);
   }
 
   @PatchMapping(
@@ -58,10 +58,10 @@ public class UserController implements UserApi {
   ) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-    User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+    UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(userMapper.toDto(updatedUser));
+        .body(updatedUser);
   }
 
   @DeleteMapping(path = "{userId}")

@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final MessageMapper messageMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Override
     public MessageDto create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests) {
@@ -56,11 +58,11 @@ public class BasicMessageService implements MessageService {
                     .fileName(attachmentRequest.fileName())
                     .size((long) attachmentRequest.bytes().length)
                     .contentType(attachmentRequest.contentType())
-                    .bytes(attachmentRequest.bytes())
                     .build();
 
             BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
+            binaryContentStorage.put(savedBinaryContent.getId(),attachmentRequest.bytes());
             savedMessage.addAttachment(savedBinaryContent);
         });
 
@@ -97,7 +99,8 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
 
         message.getAttachments().forEach(attachment -> {
-            binaryContentRepository.deleteById(attachment.getAttachment().getId());
+            UUID attachmentId = attachment.getAttachment().getId();
+            binaryContentRepository.deleteById(attachmentId);
         });
 
         messageRepository.deleteById(messageId);

@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +30,13 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
     private final UserStatusRepository userStatusRepository;
     private final UserMapper userMapper;
     private final BinaryContentMapper binaryContentMapper;
 
     @Override
-    public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public UserDto create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
 
@@ -50,13 +52,18 @@ public class BasicUserService implements UserService {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    return BinaryContent.builder()
+
+                    BinaryContent binaryContent = BinaryContent.builder()
                             .fileName(fileName)
+                            .size((long) bytes.length)
                             .contentType(contentType)
-                            .bytes(bytes)
                             .build();
+
+                    BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+
+                    binaryContentStorage.put(savedBinaryContent.getId(), bytes);
+                    return savedBinaryContent;
                 })
-                .map(binaryContentRepository::save)
                 .orElse(null);
 
         String password = userCreateRequest.password();
@@ -77,7 +84,7 @@ public class BasicUserService implements UserService {
                 .build();
         userStatusRepository.save(userStatus);
 
-        return createdUser;
+        return userMapper.toDto(createdUser);
     }
 
     @Override
@@ -93,7 +100,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
@@ -109,7 +116,8 @@ public class BasicUserService implements UserService {
         optionalProfileCreateRequest.ifPresent(profileRequest -> {
 
             if (user.getProfile() != null) {
-                binaryContentRepository.deleteById(user.getProfile().getId());
+                UUID profileId = user.getProfile().getId();
+                binaryContentRepository.deleteById(profileId);
             }
 
             String fileName = profileRequest.fileName();
@@ -120,10 +128,10 @@ public class BasicUserService implements UserService {
                     .fileName(fileName)
                     .size((long) bytes.length)
                     .contentType(contentType)
-                    .bytes(bytes)
                     .build();
 
             BinaryContent savedProfile = binaryContentRepository.save(newProfile);
+            binaryContentStorage.put(savedProfile.getId(), bytes);
             user.updateProfile(savedProfile);
         });
 
@@ -137,7 +145,7 @@ public class BasicUserService implements UserService {
             user.setPassword(userUpdateRequest.newPassword());
         }
 
-        return userRepository.save(user);
+        return userMapper.toDto(user);
     }
 
 

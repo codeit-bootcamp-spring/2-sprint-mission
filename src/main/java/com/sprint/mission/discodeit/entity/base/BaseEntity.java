@@ -24,6 +24,9 @@ public abstract class BaseEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    protected BaseEntity() {}
-
+    protected BaseEntity() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID();
+        }
+    }
 }

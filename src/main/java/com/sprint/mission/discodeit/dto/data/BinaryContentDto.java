@@ -15,8 +15,6 @@ public record BinaryContentDto(
         Long size,
 
         @Schema(description = "콘텐츠 타입")
-        String contentType,
+        String contentType
 
-        @Schema(description = "바이너리 데이터")
-        byte[] bytes
 ) {}
