@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdDto;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.util.MultipartToBinaryConverter;
@@ -65,7 +64,7 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.delete(userId);
-        
+
         return ResponseEntity.noContent().build();
     }
 
@@ -79,7 +78,8 @@ public class UserController {
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
                                                                   @RequestBody UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto) {
-        UserStatus userStatus = userStatusService.updateByUserId(userId, userStatusUpdateByUserIdDto);
+        UserStatusDto userStatus = userStatusService.updateByUserId(userId, userStatusUpdateByUserIdDto);
+
         return ResponseEntity.ok(userStatus);
     }
 }
