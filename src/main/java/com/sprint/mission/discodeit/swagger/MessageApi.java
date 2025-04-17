@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.swagger;
 
 import com.sprint.mission.discodeit.dto.controller.message.CreateMessageRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.message.CreateMessageResponseDTO;
+import com.sprint.mission.discodeit.dto.controller.message.FindMessageResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.message.UpdateMessageRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.message.UpdateMessageResponseDTO;
-import com.sprint.mission.discodeit.dto.service.message.MessageDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,6 +49,6 @@ public interface MessageApi {
       responses = {
           @ApiResponse(responseCode = "200", description = "채널 내 메시지 조회 성공")
       })
-  ResponseEntity<List<MessageDTO>> getChannelMessages(UUID id);
+  ResponseEntity<List<FindMessageResponseDTO>> getChannelMessages(UUID id);
 
 }

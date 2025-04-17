@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.controller.message.*;
-import com.sprint.mission.discodeit.dto.service.message.MessageDTO;
-import com.sprint.mission.discodeit.dto.service.message.UpdateMessageDTO;
+import com.sprint.mission.discodeit.dto.service.message.CreateMessageResult;
+import com.sprint.mission.discodeit.dto.service.message.FindMessageResult;
+import com.sprint.mission.discodeit.dto.service.message.UpdateMessageResult;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.swagger.MessageApi;
@@ -29,9 +30,10 @@ public class MessageController implements MessageApi {
   public ResponseEntity<CreateMessageResponseDTO> createMessage(
       @RequestPart("messageCreateRequest") @Valid CreateMessageRequestDTO createMessageRequestDTO,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> multipartFileList) {
-    MessageDTO messageDTO = messageService.create(
-        messageMapper.toMessageParam(createMessageRequestDTO), multipartFileList);
-    CreateMessageResponseDTO createdMessage = messageMapper.toMessageResponseDTO(messageDTO);
+    CreateMessageResult createMessageResult = messageService.create(
+        messageMapper.toCreateMessageCommand(createMessageRequestDTO), multipartFileList);
+    CreateMessageResponseDTO createdMessage = messageMapper.toCreateMessageResponseDTO(
+        createMessageResult);
     return ResponseEntity.ok(createdMessage);
   }
 
@@ -41,10 +43,10 @@ public class MessageController implements MessageApi {
       @RequestPart("messageUpdateRequest") @Valid UpdateMessageRequestDTO updateMessageRequestDTO,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> multipartFileList) {
 
-    UpdateMessageDTO updateMessageDTO = messageService.update(id,
-        messageMapper.toUpdateMessageParam(updateMessageRequestDTO), multipartFileList);
+    UpdateMessageResult updateMessageResult = messageService.update(id,
+        messageMapper.toUpdateMessageCommand(updateMessageRequestDTO), multipartFileList);
     UpdateMessageResponseDTO updatedMessage = messageMapper.toUpdateMessageResponseDTO(
-        updateMessageDTO);
+        updateMessageResult);
     return ResponseEntity.ok(updatedMessage);
   }
 
@@ -60,8 +62,12 @@ public class MessageController implements MessageApi {
 
   @Override
   @GetMapping
-  public ResponseEntity<List<MessageDTO>> getChannelMessages(@RequestParam("channelId") UUID id) {
-    List<MessageDTO> messages = messageService.findAllByChannelId(id);
+  public ResponseEntity<List<FindMessageResponseDTO>> getChannelMessages(
+      @RequestParam("channelId") UUID id) {
+    List<FindMessageResult> messageResults = messageService.findAllByChannelId(id);
+    List<FindMessageResponseDTO> messages = messageResults.stream()
+        .map(messageMapper::toFindMessageResponseDTO)
+        .toList();
     return ResponseEntity.ok(messages);
   }
 }
