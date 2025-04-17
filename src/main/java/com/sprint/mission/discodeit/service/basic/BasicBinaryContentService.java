@@ -53,9 +53,10 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
-  public BinaryContent findContentById(UUID id) {
-    return binaryContentRepository.findById(id)
+  public BinaryContentDto findContentById(UUID id) {
+    BinaryContent content = binaryContentRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 BinaryContent를 찾을 수 없음"));
+    return BinaryContentDto.of(content);
   }
 
   @Override

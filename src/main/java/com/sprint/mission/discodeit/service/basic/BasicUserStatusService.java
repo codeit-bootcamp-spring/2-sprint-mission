@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
 import java.time.Instant;
 import java.util.List;
@@ -65,12 +66,14 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   @Transactional
-  public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+  public UserStatusUpdateDto updateByUserId(UUID userId, UserStatusUpdateRequest request) {
     UserStatus userStatus = findByUserId(userId);
     Instant newLastActiveAt = request.newLastActiveAt();
     userStatus.update(newLastActiveAt);
 
-    return userStatusRepository.save(userStatus);
+    userStatusRepository.save(userStatus);
+
+    return UserStatusUpdateDto.of(userStatus);
   }
 
   @Override

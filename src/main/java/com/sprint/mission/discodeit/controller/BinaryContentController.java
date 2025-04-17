@@ -1,16 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,11 +38,11 @@ public class BinaryContentController implements BinaryContentApi {
     return ResponseEntity.ok(response);
   }
 
-  // 파일 다운로드
-  @Override
+  // 파일 다운로드 - storage
+  /*@Override
   @GetMapping("/{binaryContentId}/download")
   public ResponseEntity<Resource> download(@PathVariable UUID binaryContentId) {
-    BinaryContent binaryContent = binaryContentService.findContentById(binaryContentId);
+    BinaryContentDto binaryContent = binaryContentService.findContentById(binaryContentId);
     ByteArrayResource resource = new ByteArrayResource(binaryContent.getBytes());
 
     return ResponseEntity.ok()
@@ -55,5 +50,5 @@ public class BinaryContentController implements BinaryContentApi {
         .header(HttpHeaders.CONTENT_DISPOSITION,
             "attachment; filename=\"" + binaryContent.getFileName() + "\"")
         .body(resource);
-  }
+  }*/
 }

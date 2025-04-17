@@ -49,14 +49,16 @@ public class BasicUserService implements UserService {
 
   @Override
   public UserDto find(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음"));
+    if (!userRepository.existsById(userId)) {
+      throw new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음");
+    }
+    User user = userRepository.findByIdWithProfile(userId);
     return assembleUserResponse(user);
   }
 
   @Override
   public List<UserDto> findAll() {
-    List<User> userList = userRepository.findAll();
+    List<User> userList = userRepository.findAllWithProfile();
     return userList.stream()
         .map(this::assembleUserResponse).toList();
   }

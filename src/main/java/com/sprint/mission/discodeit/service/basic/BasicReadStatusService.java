@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusUpdateRequest;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,7 +27,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   @Transactional
-  public ReadStatus create(ReadStatusCreateRequest request) {
+  public ReadStatusDto create(ReadStatusCreateRequest request) {
     UUID userId = request.userId();
     UUID channelId = request.channelId();
 
@@ -40,7 +41,8 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     ReadStatus status = new ReadStatus(user, channel, request.lastReadAt());
-    return readStatusRepository.save(status);
+    readStatusRepository.save(status);
+    return ReadStatusDto.of(status);
   }
 
   @Override
@@ -50,11 +52,12 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public List<ReadStatus> findAllByUserId(UUID userId) {
+  public List<ReadStatusDto> findAllByUserId(UUID userId) {
     if (!userRepository.existsById(userId)) {
       throw new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음.");
     }
-    return readStatusRepository.findAllByUserId(userId);
+    List<ReadStatus> statusList = readStatusRepository.findAllByUserId(userId);
+    return statusList.stream().map(ReadStatusDto::of).toList();
   }
 
   @Override
@@ -75,10 +78,11 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   @Transactional
-  public ReadStatus update(UUID id, ReadStatusUpdateRequest request) {
-    ReadStatus readStatus = find(id);
-    readStatus.update(request.newLastReadAt());
-    return readStatusRepository.save(readStatus);
+  public ReadStatusDto update(UUID id, ReadStatusUpdateRequest request) {
+    ReadStatus status = find(id);
+    status.update(request.newLastReadAt());
+    readStatusRepository.save(status);
+    return ReadStatusDto.of(status);
   }
 
   @Override

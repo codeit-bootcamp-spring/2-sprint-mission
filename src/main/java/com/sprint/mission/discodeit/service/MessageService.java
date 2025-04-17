@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.controller.dto.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
@@ -9,14 +10,14 @@ import java.util.UUID;
 
 public interface MessageService {
 
-  Message create(MessageCreateRequest createRequest,
+  MessageDto create(MessageCreateRequest createRequest,
       List<BinaryContentCreateRequest> binaryContentRequestList);
 
   Message find(UUID messageId);
 
-  List<Message> findAllByChannelId(UUID channelId); // 페이징 추가
+  List<MessageDto> findAllByChannelId(UUID channelId); // 페이징 추가
 
-  Message update(UUID id, MessageUpdateRequest updateRequest);
+  MessageDto update(UUID id, MessageUpdateRequest updateRequest);
 
   void delete(UUID messageId);
 }

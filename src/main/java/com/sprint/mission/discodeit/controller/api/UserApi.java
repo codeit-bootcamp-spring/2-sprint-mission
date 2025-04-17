@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller.api;
 
-import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

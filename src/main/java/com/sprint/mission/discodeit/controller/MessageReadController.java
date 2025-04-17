@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.MessageReadApi;
-import com.sprint.mission.discodeit.controller.dto.ReadStatusDto;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusUpdateRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -32,8 +31,8 @@ public class MessageReadController implements MessageReadApi {
   @PostMapping
   public ResponseEntity<ReadStatusDto> createByChannelId(
       @RequestBody @Valid ReadStatusCreateRequest request) {
-    ReadStatus status = readStatusService.create(request);
-    return ResponseEntity.ok(ReadStatusDto.of(status));
+    ReadStatusDto response = readStatusService.create(request);
+    return ResponseEntity.ok(response);
   }
 
   // 특정 채널의 메시지 수신 정보를 수정
@@ -41,17 +40,15 @@ public class MessageReadController implements MessageReadApi {
   @PatchMapping("/{readStatusId}")
   public ResponseEntity<ReadStatusDto> updateByChannelId(@PathVariable("readStatusId") UUID id,
       @RequestBody @Valid ReadStatusUpdateRequest request) {
-    ReadStatus status = readStatusService.update(id, request);
-    return ResponseEntity.ok(ReadStatusDto.of(status));
+    ReadStatusDto response = readStatusService.update(id, request);
+    return ResponseEntity.ok(response);
   }
 
   // 특정 사용자의 메시지 수신 정보를 조회
   @Override
   @GetMapping
   public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam UUID userId) {
-    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
-    List<ReadStatusDto> response = readStatuses.stream()
-        .map(ReadStatusDto::of).toList();
+    List<ReadStatusDto> response = readStatusService.findAllByUserId(userId);
     return ResponseEntity.ok(response);
   }
 }

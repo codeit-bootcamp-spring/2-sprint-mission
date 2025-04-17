@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.UserApi;
-import com.sprint.mission.discodeit.controller.dto.UserStatusUpdateDto;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -85,8 +84,7 @@ public class UserController implements UserApi {
       @PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest request
   ) {
-    UserStatus userStatus = userStatusService.updateByUserId(userId, request);
-    UserStatusUpdateDto response = UserStatusUpdateDto.of(userStatus);
+    UserStatusUpdateDto response = userStatusService.updateByUserId(userId, request);
     return ResponseEntity.ok(response);
   }
 }

@@ -2,16 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.MessageApi;
 import com.sprint.mission.discodeit.controller.dto.MessageDto;
-import com.sprint.mission.discodeit.entity.BaseEntity;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
 import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserDto;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController implements MessageApi {
 
   private final MessageService messageService;
-  private final UserService userService;
-  private final BinaryContentService binaryContentService;
 
   // 메시지 생성
   @Override
@@ -52,14 +44,8 @@ public class MessageController implements MessageApi {
         binaryContentList.add(BinaryContentCreateRequest.of(file));
       }
     }
-    Message message = messageService.create(request, binaryContentList);
-    UserDto userDto = userService.find(request.authorId());
-
-    List<UUID> attatchmentsIds = message.getAttachments().stream()
-        .map(BaseEntity::getId).toList();
-    List<BinaryContentDto> contentResponses = binaryContentService.findAllByIdIn(attatchmentsIds);
-
-    return ResponseEntity.ok(MessageDto.of(message, userDto, contentResponses));
+    MessageDto response = messageService.create(request, binaryContentList);
+    return ResponseEntity.ok(response);
   }
 
   // 메시지 수정
@@ -67,14 +53,8 @@ public class MessageController implements MessageApi {
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> update(@PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest request) {
-    Message message = messageService.update(messageId, request);
-    UserDto userDto = userService.find(message.getUser().getId());
-
-    List<UUID> attatchmentsIds = message.getAttachments().stream()
-        .map(BaseEntity::getId).toList();
-    List<BinaryContentDto> contentResponses = binaryContentService.findAllByIdIn(attatchmentsIds);
-
-    return ResponseEntity.ok(MessageDto.of(message, userDto, contentResponses));
+    MessageDto response = messageService.update(messageId, request);
+    return ResponseEntity.ok(response);
   }
 
   // 메시지 삭제
