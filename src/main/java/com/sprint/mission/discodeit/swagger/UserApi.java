@@ -2,11 +2,10 @@ package com.sprint.mission.discodeit.swagger;
 
 import com.sprint.mission.discodeit.dto.controller.user.CreateUserRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.user.CreateUserResponseDTO;
+import com.sprint.mission.discodeit.dto.controller.user.FindUserResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.user.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.user.UpdateUserResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.user.UpdateUserStatusResponseDTO;
-import com.sprint.mission.discodeit.dto.controller.user.UserResponseDTO;
-import com.sprint.mission.discodeit.dto.service.user.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,14 +39,14 @@ public interface UserApi {
           @ApiResponse(responseCode = "200", description = "유저 단건 조회 성공"),
           @ApiResponse(responseCode = "404", description = "userId에 해당하는 User를 찾지 못함")
       })
-  ResponseEntity<UserResponseDTO> getUser(UUID id);
+  ResponseEntity<FindUserResponseDTO> getUser(UUID id);
 
   @Operation(summary = "유저 다건 조회",
       description = "모든 유저를 조회합니다.",
       responses = {
           @ApiResponse(responseCode = "200", description = "유저 다건 조회 성공")
       })
-  ResponseEntity<List<UserDTO>> getUserAll();
+  ResponseEntity<List<FindUserResponseDTO>> getUserAll();
 
   @Operation(summary = "유저 수정",
       description = "userId에 해당하는 유저를 수정합니다.",

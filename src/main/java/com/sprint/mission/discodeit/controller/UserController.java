@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.controller.user.*;
-import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
-import com.sprint.mission.discodeit.dto.service.user.UpdateUserDTO;
-import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
-import com.sprint.mission.discodeit.dto.service.user.UserDTO;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.dto.service.user.CreateUserCommand;
+import com.sprint.mission.discodeit.dto.service.user.CreateUserResult;
+import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserCommand;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
+import com.sprint.mission.discodeit.dto.service.userStatus.UpdateUserStatusResult;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.service.UserService;
@@ -36,28 +37,31 @@ public class UserController implements UserApi {
   public ResponseEntity<CreateUserResponseDTO> createUser(
       @RequestPart("userCreateRequest") @Valid CreateUserRequestDTO createUserRequestDTO,
       @RequestPart(value = "profile", required = false) MultipartFile multipartFile) {
-    CreateUserParam createUserParam = userMapper.toCreateUserParam(createUserRequestDTO);
-    UserDTO userDTO = userService.create(createUserParam, multipartFile);
-    CreateUserResponseDTO createdUser = userMapper.toCreateUserResponseDTO(userDTO);
+    CreateUserCommand createUserCommand = userMapper.toCreateUserCommand(createUserRequestDTO);
+    CreateUserResult createUserResult = userService.create(createUserCommand, multipartFile);
+    CreateUserResponseDTO createdUser = userMapper.toCreateUserResponseDTO(createUserResult);
 
     return ResponseEntity.ok(createdUser);
   }
 
   @Override
   @GetMapping("/{userId}")
-  public ResponseEntity<UserResponseDTO> getUser(@PathVariable("userId") UUID id) {
-    UserDTO userDTO = userService.find(id);
-    UserResponseDTO userResponseDTO = userMapper.toUserResponseDTO(userDTO);
+  public ResponseEntity<FindUserResponseDTO> getUser(@PathVariable("userId") UUID id) {
+    FindUserResult findUserResult = userService.find(id);
+    FindUserResponseDTO userResponseDTO = userMapper.toFindUserResponseDTO(findUserResult);
 
     return ResponseEntity.ok(userResponseDTO);
   }
 
   @Override
   @GetMapping
-  public ResponseEntity<List<UserDTO>> getUserAll() {
-    List<UserDTO> users = userService.findAll();
+  public ResponseEntity<List<FindUserResponseDTO>> getUserAll() {
+    List<FindUserResult> users = userService.findAll();
+    List<FindUserResponseDTO> userResponseDTOList = users.stream()
+        .map(userMapper::toFindUserResponseDTO)
+        .toList();
 
-    return ResponseEntity.ok(users);
+    return ResponseEntity.ok(userResponseDTOList);
   }
 
   @Override
@@ -65,9 +69,9 @@ public class UserController implements UserApi {
   public ResponseEntity<UpdateUserResponseDTO> updateUser(@PathVariable("userId") UUID id,
       @RequestPart("userUpdateRequest") @Valid UpdateUserRequestDTO updateUserRequestDTO,
       @RequestPart(value = "profile", required = false) MultipartFile multipartFile) {
-    UpdateUserParam updateUserParam = userMapper.toUpdateUserParam(updateUserRequestDTO);
-    UpdateUserDTO updateUserDTO = userService.update(id, updateUserParam, multipartFile);
-    UpdateUserResponseDTO updatedUser = userMapper.toUpdateUserResponseDTO(updateUserDTO);
+    UpdateUserCommand updateUserCommand = userMapper.toUpdateUserCommand(updateUserRequestDTO);
+    UpdateUserResult updateUserResult = userService.update(id, updateUserCommand, multipartFile);
+    UpdateUserResponseDTO updatedUser = userMapper.toUpdateUserResponseDTO(updateUserResult);
 
     return ResponseEntity.ok(updatedUser);
   }
@@ -76,9 +80,9 @@ public class UserController implements UserApi {
   @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UpdateUserStatusResponseDTO> updateUserStatus(
       @PathVariable("userId") UUID id) {
-    UserStatus userStatus = userStatusService.updateByUserId(id);
+    UpdateUserStatusResult updateUserStatusResult = userStatusService.updateByUserId(id);
     UpdateUserStatusResponseDTO updatedUserStatus = userStatusMapper.toUpdateUserStatusResponseDTO(
-        userStatus);
+        updateUserStatusResult);
     return ResponseEntity.ok(updatedUserStatus);
   }
 
