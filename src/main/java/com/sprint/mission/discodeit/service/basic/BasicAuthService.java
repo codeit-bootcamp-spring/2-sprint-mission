@@ -4,12 +4,10 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exceptions.AuthException;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.dto.authdto.AuthServiceLoginDto;
+import com.sprint.mission.discodeit.service.dto.request.authdto.AuthServiceLoginDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

@@ -2,7 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.dto.channeldto.*;
+import com.sprint.mission.discodeit.service.dto.request.channeldto.ChannelCreatePrivateDto;
+import com.sprint.mission.discodeit.service.dto.request.channeldto.ChannelCreatePublicDto;
+import com.sprint.mission.discodeit.service.dto.request.channeldto.ChannelUpdateDto;
+import com.sprint.mission.discodeit.service.dto.response.ChannelResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

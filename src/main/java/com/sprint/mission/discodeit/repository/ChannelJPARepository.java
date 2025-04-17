@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelJPARepository extends JpaRepository<Channel, UUID> {
-//    @Query(value = "SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM channels c WHERE c.type = CAST(:type AS channel_type) AND c.name = :name", nativeQuery = true)
-//    Boolean existsByTypeAndName(@Param("type") String type, @Param("name") String name);
 
     Boolean existsByTypeAndName(ChannelType type, String name);
 

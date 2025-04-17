@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.service.dto.userdto.*;
-import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusResponseDto;
-import com.sprint.mission.discodeit.service.dto.userstatusdto.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.service.dto.request.userdto.UserCreateDto;
+import com.sprint.mission.discodeit.service.dto.request.userdto.UserUpdateDto;
+import com.sprint.mission.discodeit.service.dto.response.UserResponseDto;
+import com.sprint.mission.discodeit.service.dto.response.UserStatusResponseDto;
+import com.sprint.mission.discodeit.service.dto.request.userstatusdto.UserStatusUpdateDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

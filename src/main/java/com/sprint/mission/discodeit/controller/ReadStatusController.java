@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.dto.readstatusdto.ReadStatusCreateDto;
-import com.sprint.mission.discodeit.service.dto.readstatusdto.ReadStatusResponseDto;
-import com.sprint.mission.discodeit.service.dto.readstatusdto.ReadStatusUpdateDto;
+import com.sprint.mission.discodeit.service.dto.request.readstatusdto.ReadStatusCreateDto;
+import com.sprint.mission.discodeit.service.dto.response.ReadStatusResponseDto;
+import com.sprint.mission.discodeit.service.dto.request.readstatusdto.ReadStatusUpdateDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

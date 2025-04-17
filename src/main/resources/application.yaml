@@ -51,3 +51,9 @@ springdoc:
     path: /swagger-ui.html
     csrf:
       enabled: true
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit

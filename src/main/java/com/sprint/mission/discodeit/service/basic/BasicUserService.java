@@ -6,13 +6,14 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exceptions.InvalidInputException;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.service.dto.userdto.UserCreateDto;
-import com.sprint.mission.discodeit.service.dto.userdto.UserFindDto;
-import com.sprint.mission.discodeit.service.dto.userdto.UserResponseDto;
-import com.sprint.mission.discodeit.service.dto.userdto.UserUpdateDto;
+import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.service.dto.request.userdto.UserCreateDto;
+import com.sprint.mission.discodeit.service.dto.request.userdto.UserUpdateDto;
+import com.sprint.mission.discodeit.service.dto.response.UserResponseDto;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,8 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
     private final UserJPARepository userJpaRepository;
+    private final BinaryContentJPARepository binaryContentJpaRepository;
+    private final BinaryContentStorage binaryContentStorage;
     private final UserMapper userMapper;
 
     @Override
@@ -42,15 +45,16 @@ public class BasicUserService implements UserService {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    return new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType);
+                    BinaryContent createBinaryContent = binaryContentJpaRepository.save(binaryContent);
+                    binaryContentStorage.put(createBinaryContent.getId(), bytes);
+                    return binaryContent;
                 })
                 .orElse(null);
 
         User user = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(), nullableProfile);
         new UserStatus(user, Instant.now());
-
         User createdUser = userJpaRepository.save(user);
-
         return userMapper.toDto(createdUser);
     }
 
@@ -87,7 +91,11 @@ public class BasicUserService implements UserService {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    return new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType);
+                    BinaryContent updateBinaryContent = binaryContentJpaRepository.save(binaryContent);
+                    binaryContentStorage.put(updateBinaryContent.getId(), bytes);
+                    return updateBinaryContent;
+
                 })
                 .orElse(null);
 

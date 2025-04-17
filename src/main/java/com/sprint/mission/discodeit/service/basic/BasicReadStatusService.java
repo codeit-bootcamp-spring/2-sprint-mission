@@ -6,9 +6,15 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exceptions.InvalidInputException;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
-import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.repository.ChannelJPARepository;
+import com.sprint.mission.discodeit.repository.ReadStatusJPARepository;
+import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.dto.readstatusdto.*;
+import com.sprint.mission.discodeit.service.dto.request.readstatusdto.ReadStatusCreateDto;
+import com.sprint.mission.discodeit.service.dto.request.readstatusdto.ReadStatusDeleteDto;
+import com.sprint.mission.discodeit.service.dto.request.readstatusdto.ReadStatusFindDto;
+import com.sprint.mission.discodeit.service.dto.request.readstatusdto.ReadStatusUpdateDto;
+import com.sprint.mission.discodeit.service.dto.response.ReadStatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +42,7 @@ public class BasicReadStatusService implements ReadStatusService {
         Channel matchingChannel = channelJpaRepository.findById(readStatusCreateDto.channelId())
                 .orElseThrow(() -> new NotFoundException("Channel not found"));
 
-        if(readStatusJpaRepository.existsByUser_IdAndChannel_Id(matchingUser.getId(), matchingChannel.getId())) {
+        if (readStatusJpaRepository.existsByUser_IdAndChannel_Id(matchingUser.getId(), matchingChannel.getId())) {
             throw new InvalidInputException("Read status already exists");
         }
 

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.dto.userdto.UserResponseDto;
+import com.sprint.mission.discodeit.service.dto.response.UserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +26,7 @@ public class UserMapper {
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .profileId(user.getProfile() != null ? binaryContentMapper.toDto(user.getProfile()) : null)
+                .profile(user.getProfile() != null ? binaryContentMapper.toDto(user.getProfile()) : null)
                 .online(user.getStatus().currentUserStatus())
                 .build();
     }

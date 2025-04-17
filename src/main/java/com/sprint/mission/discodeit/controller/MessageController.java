@@ -3,10 +3,11 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.service.dto.messagedto.MessageCreateDto;
-import com.sprint.mission.discodeit.service.dto.messagedto.MessageResponseDto;
-import com.sprint.mission.discodeit.service.dto.messagedto.MessageUpdateDto;
+import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageCreateDto;
+import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageUpdateDto;
+import com.sprint.mission.discodeit.service.dto.response.MessageResponseDto;
+import com.sprint.mission.discodeit.service.dto.response.PageableResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,6 +15,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +62,7 @@ public class MessageController {
         }
 
         MessageResponseDto createMessage = messageService.create(messageCreateRequest, contentCreate);
+
         return ResponseEntity.ok(createMessage);
     }
 
@@ -89,10 +93,12 @@ public class MessageController {
 
 
     @GetMapping("/find/{messageId}")
-    public ResponseEntity<MessageResponseDto> findMessages(
-            @PathVariable @Parameter UUID messageId
+    public ResponseEntity<PageableResponseDto<MessageResponseDto>> findMessages(
+            @PathVariable @Parameter UUID messageId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size
     ) {
-        MessageResponseDto MessageFindResponse = messageService.find(messageId);
+        PageableResponseDto<MessageResponseDto> MessageFindResponse = messageService.find(messageId, page, size);
         return ResponseEntity.ok(MessageFindResponse);
     }
 
@@ -100,12 +106,13 @@ public class MessageController {
     @GetMapping
     @Operation(summary = "Channel의 Message 목록 조회")
     @ApiResponse(responseCode = "200", description = "Message 목록 조회 성공")
-    public ResponseEntity<List<MessageResponseDto>> findMessagesByChannelId(
-            @RequestParam @Parameter(description = "조회할 Channel ID") UUID channelId
-    ) {
-        List<MessageResponseDto> messageFindByChannelResponse =
-                messageService.findAllByChannelId(channelId);
+    public ResponseEntity<PageableResponseDto<MessageResponseDto>> findMessagesByChannelId(
+            @RequestParam @Parameter(description = "조회할 Channel ID") UUID channelId,
+            @ParameterObject Pageable pageable
 
+    ) {
+        PageableResponseDto<MessageResponseDto> messageFindByChannelResponse =
+                messageService.findAllByChannelId(channelId, pageable);
         return ResponseEntity.ok(messageFindByChannelResponse);
     }
 

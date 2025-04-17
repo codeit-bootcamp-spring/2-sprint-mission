@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.dto.authdto.AuthServiceLoginDto;
+import com.sprint.mission.discodeit.service.dto.request.authdto.AuthServiceLoginDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.MessageJPARepository;
 import com.sprint.mission.discodeit.repository.ReadStatusJPARepository;
-import com.sprint.mission.discodeit.service.dto.channeldto.ChannelResponseDto;
+import com.sprint.mission.discodeit.service.dto.response.ChannelResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class ChannelMapper {
     private final ReadStatusJPARepository readStatusJpaRepository;
     private final UserMapper userMapper;
 
-    public ChannelResponseDto toDto(Channel channel){
+    public ChannelResponseDto toDto(Channel channel) {
         Instant lastMessageAt = messageJpaRepository.findByChannel_Id(channel.getId()).stream()
                 .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
                 .map(Message::getCreatedAt)
@@ -43,7 +43,7 @@ public class ChannelMapper {
     }
 
 
-    public ChannelResponseDto toDto1(Channel channel){
+    public ChannelResponseDto toDto1(Channel channel) {
         Instant lastMessageAt = messageJpaRepository.findByChannel_Id(channel.getId()).stream()
                 .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
                 .map(Message::getCreatedAt)

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.service.dto.response.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -44,5 +44,15 @@ public class BinaryContentController {
     ) {
         List<BinaryContentResponseDto> binaryContents = binaryContentService.findAll(binaryContentIds);
         return ResponseEntity.ok(binaryContents);
+    }
+
+
+    @GetMapping("/{binaryContentId}/download")
+    @Operation(summary = "파일 다운로드")
+    @ApiResponse(responseCode = "200", description = "파일 다운로드 성공")
+    public ResponseEntity<?> download(
+            @PathVariable UUID binaryContentId
+    ) {
+        return binaryContentService.download(binaryContentId);
     }
 }

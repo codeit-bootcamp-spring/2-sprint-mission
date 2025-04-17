@@ -12,7 +12,11 @@ import com.sprint.mission.discodeit.repository.MessageJPARepository;
 import com.sprint.mission.discodeit.repository.ReadStatusJPARepository;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.dto.channeldto.*;
+import com.sprint.mission.discodeit.service.dto.request.channeldto.ChannelCreatePrivateDto;
+import com.sprint.mission.discodeit.service.dto.request.channeldto.ChannelCreatePublicDto;
+import com.sprint.mission.discodeit.service.dto.request.channeldto.ChannelFindDto;
+import com.sprint.mission.discodeit.service.dto.request.channeldto.ChannelUpdateDto;
+import com.sprint.mission.discodeit.service.dto.response.ChannelResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +40,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponseDto createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         Channel createdPirvateChannel = channelJpaRepository.save(channel);
-        
+
         userJpaRepository.findByIdIn(channelCreatePrivateDto.participantIds()).stream()
                 .map(user -> new ReadStatus(user, createdPirvateChannel, createdPirvateChannel.getCreatedAt()))
                 .forEach(readStatusJpaRepository::save);

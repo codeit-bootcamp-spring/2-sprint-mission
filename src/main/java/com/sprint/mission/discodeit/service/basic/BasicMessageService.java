@@ -6,22 +6,27 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
 import com.sprint.mission.discodeit.repository.ChannelJPARepository;
 import com.sprint.mission.discodeit.repository.MessageJPARepository;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.service.dto.messagedto.MessageCreateDto;
-import com.sprint.mission.discodeit.service.dto.messagedto.MessageResponseDto;
-import com.sprint.mission.discodeit.service.dto.messagedto.MessageUpdateDto;
-import com.sprint.mission.discodeit.service.dto.userdto.UserResponseDto;
+import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageCreateDto;
+import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageUpdateDto;
+import com.sprint.mission.discodeit.service.dto.response.MessageResponseDto;
+import com.sprint.mission.discodeit.service.dto.response.PageableResponseDto;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,8 +39,9 @@ public class BasicMessageService implements MessageService {
     private final ChannelJPARepository channelJpaRepository;
     private final BinaryContentJPARepository binaryContentJpaRepository;
     private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
     private final MessageMapper messageMapper;
-
+    private final PageMapper pageMapper;
 
     @Override
     @Transactional
@@ -51,8 +57,10 @@ public class BasicMessageService implements MessageService {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    return binaryContentJpaRepository.save(binaryContent);
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType);
+                    BinaryContent createBinaryContent = binaryContentJpaRepository.save(binaryContent);
+                    binaryContentStorage.put(createBinaryContent.getId(), bytes);
+                    return createBinaryContent;
                 })
                 .toList();
 
@@ -64,21 +72,22 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public MessageResponseDto find(UUID messageId) {
-        Message matchingMessage =  messageJpaRepository.findByIdEntityGraph(messageId)
-                .orElseThrow(() -> new NotFoundException("Message does not exist."));
-        System.out.println(matchingMessage);
-        return messageMapper.toDto(matchingMessage);
+    public PageableResponseDto<MessageResponseDto> find(UUID messageId, int page, int size) {
+        Page<MessageResponseDto> matchingMessage = messageJpaRepository
+                .findByIdEntityGraph(messageId, pageRequestSortByCreatedAt(page, size))
+                .map(messageMapper::toDto);
+        if (matchingMessage.isEmpty()) {
+            throw new NotFoundException("Message not found.");
+        }
+        return pageMapper.fromPage(matchingMessage);
     }
 
 
     @Override
-    public List<MessageResponseDto> findAllByChannelId(UUID channelId) {
-        List<MessageResponseDto> messageAll = new ArrayList<>();
-        messageJpaRepository.findByChannel_IdEntityGraph(channelId).stream()
-                .map(messageMapper::toDto)
-                .forEach(messageAll::add);
-        return messageAll;
+    public PageableResponseDto<MessageResponseDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+        Page<MessageResponseDto> matchingMessageAll = messageJpaRepository.findByChannel_IdEntityGraph(channelId, pageable)
+                .map(messageMapper::toDto);
+        return pageMapper.fromPage(matchingMessageAll);
     }
 
 
@@ -108,18 +117,8 @@ public class BasicMessageService implements MessageService {
 
     }
 
-//    MessageResponseDto toDto(Message message){
-//        UserResponseDto author = messageJpaRepository.findById(message.getAuthor().getId()).stream()
-//                .map(Message::getAuthor)
-//                .map(u -> new UserResponseDto(
-//                        u.getId(),
-//                        u.getUsername(),
-//                        u.getEmail(),
-//                        u.getProfile() != null ? u.getProfile().getId() : null,
-//                        u.getStatus().currentUserStatus()
-//                )).toList();
-//        return MessageResponseDto.fromMessage(message);
+    private PageRequest pageRequestSortByCreatedAt(int page, int size) {
+        return PageRequest.of(page, size, Sort.by("createdAt").descending());
+    }
 
-
-//    }
 }

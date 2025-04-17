@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.service.dto.readstatusdto.ReadStatusResponseDto;
+import com.sprint.mission.discodeit.service.dto.response.ReadStatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

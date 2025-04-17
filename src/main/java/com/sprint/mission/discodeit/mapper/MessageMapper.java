@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.dto.messagedto.MessageResponseDto;
+import com.sprint.mission.discodeit.service.dto.response.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +32,7 @@ public class MessageMapper {
                 .content(message.getContent())
                 .channelId(message.getChannel().getId())
                 .author(userMapper.toDto(message.getAuthor()))
-                .attachmentIds(message.getAttachments().stream().map(binaryContentMapper::toDto).toList())
+                .attachments(message.getAttachments().stream().map(binaryContentMapper::toDto).toList())
                 .build();
 
     }
