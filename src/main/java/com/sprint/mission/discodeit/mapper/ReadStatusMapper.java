@@ -8,8 +8,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ReadStatusMapper {
 
-  @Mapping(target = "createdAt", ignore = true)
-  @Mapping(target = "updatedAt", ignore = true)
   @Mapping(source = "user.id", target = "userId")
   @Mapping(source = "channel.id", target = "channelId")
   ReadStatusDto toDto(ReadStatus readStatus);

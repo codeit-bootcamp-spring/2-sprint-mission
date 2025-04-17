@@ -9,14 +9,10 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import java.time.Instant;
 import java.util.List;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ChannelMapper {
 
-  @Mapping(target = "createdAt", ignore = true)
-  @Mapping(target = "updatedAt", ignore = true)
-  @Mapping(target = "participants", ignore = true)
   ChannelDto toDto(Channel channel);
 
   default ChannelDto toDto(
