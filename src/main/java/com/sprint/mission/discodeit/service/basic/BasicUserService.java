@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  //
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   public User create(UserCreateRequest userCreateRequest,
@@ -50,7 +51,8 @@ public class BasicUserService implements UserService {
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
+              contentType);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
           return binaryContentRepository.save(binaryContent);
         })
         .orElse(null);
@@ -102,7 +104,8 @@ public class BasicUserService implements UserService {
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
+              contentType);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
           return binaryContentRepository.save(binaryContent);
         })
         .orElse(null);
@@ -123,6 +126,7 @@ public class BasicUserService implements UserService {
     userRepository.deleteById(userId);
   }
 
+  // 삭제할 듯?
   private UserDto toDto(User user) {
     Boolean online = userStatusRepository.findByUserId(user.getId())
         .map(UserStatus::isOnline)
