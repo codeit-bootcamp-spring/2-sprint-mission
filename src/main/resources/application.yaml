@@ -31,10 +31,12 @@ spring:
     multipart:
       maxFileSize: 10MB # 파일 하나의 최대 크기
       maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
-
-
 discodeit:
   repository:
     type: jpa   # jcf | file | jpa
     file-directory: .discodeit
+  storage:
+    type: local
+    local:
+      root-path: ${user.home}/Documents/discodeit-storage
 

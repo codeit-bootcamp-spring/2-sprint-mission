@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.springjpa.SpringDataMessageAttachmentRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class BasicMessageService implements MessageService {
   private final SpringDataMessageAttachmentRepository messageAttachmentRepository;
   private final UserStatusRepository userStatusRepository;
   private final MessageMapper messageMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -51,10 +53,9 @@ public class BasicMessageService implements MessageService {
               String fileName = attachmentRequest.fileName();
               String contentType = attachmentRequest.contentType();
               byte[] bytes = attachmentRequest.bytes();
-
-              BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-                      contentType, bytes);
-              return binaryContentRepository.save(binaryContent);
+              BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(fileName, (long) bytes.length, contentType));
+              UUID binaryContentUuid = binaryContentStorage.put(binaryContent.getId(), bytes);
+              return binaryContent;
             })
             .toList();
 

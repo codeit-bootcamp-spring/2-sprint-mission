@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -55,9 +57,10 @@ public class BasicUserService implements UserService {
           byte[] bytes = profileRequest.bytes();
           Long size =  (long) bytes.length;
 
+          BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(fileName, size, contentType));
+          UUID binaryContentUuid = binaryContentStorage.put(binaryContent.getId(), bytes);
 
-          BinaryContent binaryContent = new BinaryContent(fileName, size, contentType, bytes);
-          return binaryContentRepository.save(binaryContent);
+          return binaryContent;
         })
         .orElse(null);
 
@@ -112,8 +115,11 @@ public class BasicUserService implements UserService {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-          return binaryContentRepository.save(binaryContent);
+
+          BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(fileName, (long) bytes.length, contentType));
+          UUID binaryContentUuid = binaryContentStorage.put(binaryContent.getId(), bytes);
+
+          return binaryContent;
         })
         .orElse(null);
 

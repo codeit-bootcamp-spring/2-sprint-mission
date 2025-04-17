@@ -31,14 +31,12 @@ public class MessageController {
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
+
     List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
             .map(file -> {
               try {
-                return new BinaryContentCreateRequest(
-                    file.getOriginalFilename(),
-                    file.getContentType(),
-                    file.getBytes()
+                return new BinaryContentCreateRequest(file.getOriginalFilename(), file.getContentType(), file.getBytes()
                 );
               } catch (IOException e) {
                 throw new RuntimeException(e);
