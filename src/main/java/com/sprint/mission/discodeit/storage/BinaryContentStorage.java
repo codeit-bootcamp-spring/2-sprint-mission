@@ -11,7 +11,7 @@ public interface BinaryContentStorage {
 
   InputStream get(UUID binaryContentId);
 
-  Void delete(UUID binaryContentId);
+  void delete(UUID binaryContentId);
 
   ResponseEntity<?> download(FindBinaryContentResult findBinaryContentResult);
 

@@ -8,8 +8,7 @@ public record FindBinaryContentResponseDTO(
     UUID id,
     String filename,
     long size,
-    String contentType,
-    byte[] bytes
+    String contentType
 ) {
 
 }

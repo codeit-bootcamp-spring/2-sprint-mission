@@ -1,10 +1,13 @@
-spring.application.name: discodeit
-
 discodeit:
-  repository:
-    type: file    # jcf | file
-    file-directory: discodeit/data
+  storage:
+    type: "local"
+    local:
+      root-path: "${user.dir}/local-storage"
 
+
+spring:
+  application:
+    name: discodeit
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
@@ -15,26 +18,27 @@ discodeit:
       minimum-idle: 5
       idle-timeout: 60000
     # JPA 설정
-    jpa:
-      hibernate:
-        # JPA Entity 설정 참고하여 DB table 생성(업데이트)
-        ddl-auto: update
+  jpa:
+    hibernate:
+      # JPA Entity 설정 참고하여 DB table 생성(업데이트)
+      ddl-auto: none
       # src/main/resources/data.sql에 기록된 INSERT query를 DB table 초기화 이후에 실행
-      defer-datasource-initialization: true
-      # 실제 실행되는 DB query 출력
-      show-sql: true
-      properties:
-        hibernate:
-          format_sql: true
-          use_sql_comments: true
-          dialect: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
+    # 실제 실행되는 DB query 출력
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
       # JPA의 영속성 컨텍스트(Persistence Context)를 서비스 계층으로 제한
-      open-in-view: false
-    sql:
-      init:
-        # 애플리케이션이 시작될 때마다 항상(always) SQL 초기화 스크립트를 실행
-        # 데이터베이스가 이미 존재하고 데이터가 있더라도 매번 스크립트를 실행
-        mode: always
+    open-in-view: false
+
+  sql:
+    init:
+      # 애플리케이션이 시작될 때마다 항상(always) SQL 초기화 스크립트를 실행
+      # 데이터베이스가 이미 존재하고 데이터가 있더라도 매번 스크립트를 실행
+      mode: never
 
   logging:
     level:
