@@ -16,6 +16,8 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
     private final MessageMapper messageMapper;
 
     @Transactional
@@ -41,19 +44,18 @@ public class BasicMessageService implements MessageService {
         Channel channel = channelRepository.findById(messageCreateDto.channelId())
                 .orElseThrow(() -> new LogicException(ErrorCode.CHANNEL_NOT_FOUND));
 
-        List<BinaryContent> attachments = binaryContentCreateDtos.stream()
-                .map(dto -> new BinaryContent(
-                        dto.fileName(),
-                        (long) dto.bytes().length,
-                        dto.contentType(),
-                        dto.bytes()
-                ))
-                .toList();
+        List<BinaryContent> attachments = new ArrayList<>();
 
-        List<BinaryContent> savedBinaryContents = binaryContentRepository.saveAll(attachments);
+        for (BinaryContentCreateDto dto : binaryContentCreateDtos) {
+            BinaryContent binaryContent = new BinaryContent(dto.fileName(), (long) dto.bytes().length,
+                    dto.contentType());
+            binaryContentRepository.save(binaryContent);
+            binaryContentStorage.put(binaryContent.getId(), dto.bytes());
+            attachments.add(binaryContent);
+        }
 
         Message newMessage = new Message(user, channel,
-                messageCreateDto.content(), savedBinaryContents);
+                messageCreateDto.content(), attachments);
         messageRepository.save(newMessage);
 
         return messageMapper.toDto(newMessage);

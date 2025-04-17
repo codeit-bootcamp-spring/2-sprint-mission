@@ -25,7 +25,12 @@ public enum ErrorCode {
     USER_STATUS_NOT_FOUND(404, "US001", "유저 상태 정보를 찾을 수 없습니다."),
 
     // 500 Internal Error
-    INTERNAL_SERVER_ERROR(500, "S001", "내부 서버 오류입니다.");
+    INTERNAL_SERVER_ERROR(500, "S001", "내부 서버 오류입니다."),
+
+    BINARY_CONTENT_SAVE_FAILED(500, "B002", "파일 저장에 실패했습니다."),
+    BINARY_CONTENT_LOAD_FAILED(500, "B003", "파일 로드에 실패했습니다."),
+    BINARY_CONTENT_DOWNLOAD_FAILED(500, "B004", "파일 다운로드에 실패했습니다.");
+
 
     private final int httpStatus;
     private final String code;

@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusService userStatusService;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
     private final UserMapper userMapper;
 
     @Transactional
@@ -47,8 +49,9 @@ public class BasicUserService implements UserService {
             String fileName = binaryContentCreateDto.fileName();
             String contentType = binaryContentCreateDto.contentType();
             byte[] bytes = binaryContentCreateDto.bytes();
-            nullableProfile = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+            nullableProfile = new BinaryContent(fileName, (long) bytes.length, contentType);
             binaryContentRepository.save(nullableProfile);
+            binaryContentStorage.put(nullableProfile.getId(), bytes);
         }
 
         User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(),
@@ -96,7 +99,9 @@ public class BasicUserService implements UserService {
             String fileName = binaryContentCreateDto.fileName();
             String contentType = binaryContentCreateDto.contentType();
             byte[] bytes = binaryContentCreateDto.bytes();
-            newProfile = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+            newProfile = new BinaryContent(fileName, (long) bytes.length, contentType);
+            binaryContentRepository.save(newProfile);
+            binaryContentStorage.put(newProfile.getId(), bytes);
         }
 
         user.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(),

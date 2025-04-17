@@ -16,6 +16,14 @@ public class GlobalExceptionHandler {
                 .body(errorCode.getMessage());
     }
 
+    @ExceptionHandler(StorageException.class)
+    public ResponseEntity<String> handleLogicException(StorageException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(errorCode.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
         return ResponseEntity
