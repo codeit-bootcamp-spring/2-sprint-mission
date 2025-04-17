@@ -57,7 +57,7 @@ public class UserController {
           description = "User가 성공적으로 생성됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = User.class)
+              schema = @Schema(implementation = UserDto.class)
           )
       ),
       @ApiResponse(
@@ -94,7 +94,7 @@ public class UserController {
       @ApiResponse(
           responseCode = "200",
           description = "User 정보가 성공적으로 수정됨",
-          content = @Content(mediaType = "*/*", schema = @Schema(implementation = User.class))
+          content = @Content(mediaType = "*/*", schema = @Schema(implementation = UserDto.class))
       ),
       @ApiResponse(
           responseCode = "400",
