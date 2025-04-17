@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.LogicException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -30,7 +29,6 @@ public class BasicUserService implements UserService {
     private final UserStatusService userStatusService;
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapper userMapper;
-    private final UserStatusMapper userStatusMapper;
 
     @Transactional
     @Override
