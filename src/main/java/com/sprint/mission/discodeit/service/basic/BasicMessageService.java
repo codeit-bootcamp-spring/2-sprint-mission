@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -11,6 +12,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.LogicException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -21,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +38,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final MessageMapper messageMapper;
+    private final PageResponseMapper pageResponseMapper;
 
     @Transactional
     @Override
@@ -72,18 +77,20 @@ public class BasicMessageService implements MessageService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<MessageDto> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannelId(channelId).stream()
-                .map(messageMapper::toDto)
-                .toList();
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+        Slice<MessageDto> messageDtoSlice = messageRepository.findAllByChannelId(channelId, pageable)
+                .map(messageMapper::toDto);
+
+        return pageResponseMapper.fromSlice(messageDtoSlice);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<MessageDto> findAllByAuthorId(UUID authorId) {
-        return messageRepository.findAllByAuthorId(authorId).stream()
-                .map(messageMapper::toDto)
-                .toList();
+    public PageResponse<MessageDto> findAllByAuthorId(UUID authorId, Pageable pageable) {
+        Slice<MessageDto> messageDtoSlice = messageRepository.findAllByAuthorId(authorId, pageable)
+                .map(messageMapper::toDto);
+
+        return pageResponseMapper.fromSlice(messageDtoSlice);
     }
 
     @Transactional
