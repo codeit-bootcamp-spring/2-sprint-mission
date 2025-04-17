@@ -1,19 +1,28 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
-import com.sprint.mission.discodeit.dto.service.user.UpdateUserDTO;
-import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
-import com.sprint.mission.discodeit.dto.service.user.UserDTO;
+
+import com.sprint.mission.discodeit.dto.service.user.CreateUserCommand;
+import com.sprint.mission.discodeit.dto.service.user.CreateUserResult;
+import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserCommand;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserDTO create(CreateUserParam createUserParam, MultipartFile multipartFile);
-    UserDTO find(UUID id);
-    List<UserDTO> findAll();
-    UpdateUserDTO update(UUID id, UpdateUserParam updateUserParam, MultipartFile multipartFile);
-    void delete(UUID id);;
+
+  CreateUserResult create(CreateUserCommand createUserCommand, MultipartFile multipartFile);
+
+  FindUserResult find(UUID id);
+
+  List<FindUserResult> findAll();
+
+  UpdateUserResult update(UUID id, UpdateUserCommand updateUserCommand,
+      MultipartFile multipartFile);
+
+  void delete(UUID id);
+
+  ;
 }

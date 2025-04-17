@@ -72,5 +72,9 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
     this.profile = null;
   }
 
+  public void updateUserStatus(UserStatus userStatus) {
+    this.userStatus = userStatus;
+  }
+
 }
 

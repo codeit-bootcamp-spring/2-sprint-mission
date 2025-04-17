@@ -1,15 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDTO;
-import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
-import com.sprint.mission.discodeit.dto.service.user.UpdateUserDTO;
-import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
-import com.sprint.mission.discodeit.dto.service.user.UserDTO;
+import com.sprint.mission.discodeit.dto.service.user.CreateUserCommand;
+import com.sprint.mission.discodeit.dto.service.user.CreateUserResult;
+import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserCommand;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -36,67 +39,73 @@ public class BasicUserService implements UserService {
   private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
   private final UserMapper userMapper;
+  private final UserStatusMapper userStatusMapper;
+  private final BinaryContentMapper binaryContentMapper;
   private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
   @Override
   @Transactional
-  public UserDTO create(CreateUserParam createUserParam, MultipartFile multipartFile) {
-    checkDuplicateUsername(createUserParam);
-    checkDuplicateEmail(createUserParam);
+  public CreateUserResult create(CreateUserCommand createUserCommand, MultipartFile multipartFile) {
+    checkDuplicateUsername(createUserCommand);
+    checkDuplicateEmail(createUserCommand);
 
     BinaryContent binaryContent = createBinaryContentEntity(multipartFile);
     if (binaryContent != null) {
       binaryContentService.create(binaryContent);
     }
 
-    User user = createUserEntity(createUserParam, binaryContent);
+    User user = createUserEntity(createUserCommand, binaryContent);
     userRepository.save(user);
 
+    // GenerationType.UUID의 경우, save()만 해줘도 User의 id를 DB가 아닌 자바에서 직접 생성
+    // IDENTITY와 다르게 flush()를 안해줘도 user.getId()로 접근이 가능하다.
+
     UserStatus userStatus = new UserStatus(user, Instant.now());
-    userStatusService.create(userStatus);
+    userStatusService.create(userStatusMapper.toCreateUserStatusCommand(userStatus));
 
-    return userMapper.toUserDTO(user);
+    return userMapper.toCreateUserResult(user);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public UserDTO find(UUID userId) {
+  public FindUserResult find(UUID userId) {
     User findUser = findUserById(userId);
-    return userMapper.toUserDTO(findUser);
+    return userMapper.toFindUserResult(findUser);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public List<UserDTO> findAll() {
+  public List<FindUserResult> findAll() {
     List<User> users = userRepository.findAll();
 
     return users.stream()
-        .map(user -> userMapper.toUserDTO(user))
+        .map(user -> userMapper.toFindUserResult(user))
         .toList();
   }
 
   @Override
   @Transactional
-  public UpdateUserDTO update(UUID userId, UpdateUserParam updateUserParam,
+  public UpdateUserResult update(UUID userId, UpdateUserCommand updateUserCommand,
       MultipartFile multipartFile) {
     User findUser = findUserById(userId);
-    findUser.updateUserInfo(updateUserParam.newUsername(), updateUserParam.newEmail(),
-        updateUserParam.newPassword());
+    findUser.updateUserInfo(updateUserCommand.newUsername(), updateUserCommand.newEmail(),
+        updateUserCommand.newPassword());
     if (multipartFile != null && !multipartFile.isEmpty()) { // 프로필을 유지하거나 프로필 변경 요청이 있을 때 업데이트
-      // 기존 이미지 삭제
-      binaryContentService.delete(findUser.getProfile().getId());
-
+      // 기존 이미지 삭제 (기존 프로필 이미지가 있는 경우에만)
+      if (findUser.getProfile() != null) {
+        binaryContentService.delete(findUser.getProfile().getId());
+      }
       BinaryContent binaryContent = createBinaryContentEntity(multipartFile);
-      BinaryContent createdBinaryContent = binaryContentService.create(binaryContent);
+      binaryContentService.create(binaryContent);
 
-      findUser.updateProfile(createdBinaryContent);
+      findUser.updateProfile(binaryContent);
     } else { // 기본 프로필로 변경할 때
       binaryContentService.delete(findUser.getProfile().getId());
       findUser.updateProfileDefault();
     }
     // 변경감지로 User는 save() 안해줘도 commit 시점에 자동으로 save()됨
-    return userMapper.toUpdateUserDTO(findUser);
+    return userMapper.toUpdateUserResult(findUser);
   }
 
 
@@ -112,25 +121,25 @@ public class BasicUserService implements UserService {
   }
 
 
-  private void checkDuplicateUsername(CreateUserParam createUserParam) {
-    if (userRepository.existsByUsername(createUserParam.username())) {
+  private void checkDuplicateUsername(CreateUserCommand createUserCommand) {
+    if (userRepository.existsByUsername(createUserCommand.username())) {
       throw RestExceptions.DUPLICATE_USERNAME;
     }
   }
 
-  private void checkDuplicateEmail(CreateUserParam createUserParam) {
-    if (userRepository.existsByEmail(createUserParam.email())) {
+  private void checkDuplicateEmail(CreateUserCommand createUserCommand) {
+    if (userRepository.existsByEmail(createUserCommand.email())) {
       throw RestExceptions.DUPLICATE_EMAIL;
     }
   }
 
   // 비밀번호를 해싱해서 넣어주는 비즈니스 로직이 있으므로 Mapper가 아닌 Service에 위치
-  private User createUserEntity(CreateUserParam createUserParam, BinaryContent binaryContent) {
+  private User createUserEntity(CreateUserCommand createUserCommand, BinaryContent binaryContent) {
     return User.builder()
-        .email(createUserParam.email())
+        .email(createUserCommand.email())
         .profile(binaryContent)
-        .password(BCrypt.hashpw(createUserParam.password(), BCrypt.gensalt()))
-        .username(createUserParam.username())
+        .password(BCrypt.hashpw(createUserCommand.password(), BCrypt.gensalt()))
+        .username(createUserCommand.username())
         .build();
   }
 
