@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.swagger;
 
 import com.sprint.mission.discodeit.dto.controller.readstatus.CreateReadStatusRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.readstatus.CreateReadStatusResponseDTO;
+import com.sprint.mission.discodeit.dto.controller.readstatus.FindReadStatusResponseDTO;
+import com.sprint.mission.discodeit.dto.controller.readstatus.UpdateReadStatusRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.readstatus.UpdateReadStatusResponseDTO;
-import com.sprint.mission.discodeit.dto.service.readStatus.ReadStatusDTO;
-import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusParam;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,13 +32,13 @@ public interface ReadStatusApi {
           @ApiResponse(responseCode = "404", description = "readStatusId에 해당하는 ReadStatus가 존재하지 않음")
       })
   ResponseEntity<UpdateReadStatusResponseDTO> updateReadStatus(UUID id,
-      UpdateReadStatusParam request);
+      UpdateReadStatusRequestDTO request);
 
   @Operation(summary = "유저의 읽음상태 조회",
       description = "userId에 해당하는 읽음상태들을 조회합니다.",
       responses = {
           @ApiResponse(responseCode = "200", description = "유저의 읽음상태 조회 성공")
       })
-  ResponseEntity<List<ReadStatusDTO>> getUserReadStatus(UUID userId);
+  ResponseEntity<List<FindReadStatusResponseDTO>> getUserReadStatus(UUID userId);
 
 }
