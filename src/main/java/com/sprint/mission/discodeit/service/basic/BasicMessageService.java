@@ -30,7 +30,7 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BasicBinaryContentService basicBinaryContentService;
-
+  
   @Override
   @Transactional
   public MessageDto create(MessageCreateRequest createRequest,

@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BinaryContentController implements BinaryContentApi {
 
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
 
   // 파일 조회
   @Override
@@ -38,17 +41,11 @@ public class BinaryContentController implements BinaryContentApi {
     return ResponseEntity.ok(response);
   }
 
-  // 파일 다운로드 - storage
-  /*@Override
+  // 파일 다운로드
+  @Override
   @GetMapping("/{binaryContentId}/download")
-  public ResponseEntity<Resource> download(@PathVariable UUID binaryContentId) {
-    BinaryContentDto binaryContent = binaryContentService.findContentById(binaryContentId);
-    ByteArrayResource resource = new ByteArrayResource(binaryContent.getBytes());
-
-    return ResponseEntity.ok()
-        .contentType(MediaType.APPLICATION_OCTET_STREAM)
-        .header(HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename=\"" + binaryContent.getFileName() + "\"")
-        .body(resource);
-  }*/
+  public ResponseEntity<Resource> download(@PathVariable("binaryContentId") UUID binaryContentId) {
+    BinaryContentDto contentDto = binaryContentService.findById(binaryContentId);
+    return binaryContentStorage.download(contentDto);
+  }
 }

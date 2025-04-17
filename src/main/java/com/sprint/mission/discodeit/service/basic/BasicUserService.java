@@ -39,9 +39,7 @@ public class BasicUserService implements UserService {
     BinaryContent profile = (binaryRequest != null)
         ? basicBinaryContentService.create(binaryRequest) : null;
     User user = new User(username, email, createRequest.password(), profile);
-
     new UserStatus(user, Instant.now());
-
     userRepository.save(user);
 
     return assembleUserResponse(user);
@@ -81,10 +79,8 @@ public class BasicUserService implements UserService {
       validDuplicateEmail(newEmail);
     }
 
-    BinaryContent newProfile = null;
-    if (binaryRequest != null) {
-      newProfile = basicBinaryContentService.create(binaryRequest);
-    }
+    BinaryContent newProfile = (binaryRequest != null)
+        ? basicBinaryContentService.create(binaryRequest) : null;
     user.update(newUsername, newEmail, newPassword, newProfile);
     userRepository.save(user);
 

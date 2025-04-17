@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.util.FileUtil;
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -37,7 +39,9 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
     BinaryContent binaryContent = new BinaryContent(originalFilename, contentType, size, bytes);
 
-    return binaryContentRepository.save(binaryContent);
+    binaryContentRepository.save(binaryContent);
+    binaryContentStorage.put(binaryContent.getId(), binaryContent.getBytes());
+    return binaryContent;
   }
 
   @Override
