@@ -46,7 +46,7 @@ discodeit:
   storage:
     type: local
     local:
-      root-path:.discodeit.binaryContents
+      root-path: .discodeit.binaryContents
 
 springdoc:
   api-docs:
