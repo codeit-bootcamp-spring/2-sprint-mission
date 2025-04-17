@@ -33,16 +33,20 @@ public class BinaryContentController {
   private final BinaryContentMapper binaryContentMapper;
 
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContent> get(@PathVariable UUID binaryContentId) {
+  public ResponseEntity<BinaryContentDto> get(@PathVariable UUID binaryContentId) {
     BinaryContent content = binaryContentService.find(binaryContentId);
-    return ResponseEntity.ok(content);
+    BinaryContentDto binaryContentDto = binaryContentMapper.toDto(content);
+    return ResponseEntity.ok(binaryContentDto);
   }
 
   @GetMapping
-  public ResponseEntity<List<BinaryContent>> getMultiple(
+  public ResponseEntity<List<BinaryContentDto>> getMultiple(
       @RequestParam List<UUID> binaryContentIds) {
     List<BinaryContent> contents = binaryContentService.findAllByIdIn(binaryContentIds);
-    return ResponseEntity.status(HttpStatus.OK).body(contents);
+    List<BinaryContentDto> binaryContentDtos = contents.stream()
+        .map(binaryContentMapper::toDto)
+        .toList();
+    return ResponseEntity.status(HttpStatus.OK).body(binaryContentDtos);
   }
 
   @GetMapping("/{binaryContentId}/download")

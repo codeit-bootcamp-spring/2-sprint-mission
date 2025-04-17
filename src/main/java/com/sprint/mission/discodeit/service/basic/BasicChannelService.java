@@ -72,6 +72,7 @@ public class BasicChannelService implements ChannelService {
     Channel createdChannel = channelRepository.save(channel);
 
     List<User> participants = userRepository.findAllById(request.participantIds());
+
     if (participants.size() != request.participantIds().size()) {
       throw new RestException(ResultCode.NOT_FOUND);
     }

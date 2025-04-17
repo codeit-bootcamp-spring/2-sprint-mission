@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
   private final AuthService authService;
+  private final UserMapper userMapper;
 
-  @RequestMapping(value = "/login", method = RequestMethod.POST)
-  public ResponseEntity<User> login(@RequestBody LoginRequest request) {
+  @PostMapping(path = "/login")
+  public ResponseEntity<UserDto> login(@RequestBody LoginRequest request) {
     User user = authService.login(request);
-    return ResponseEntity.status(HttpStatus.OK).body(user);
+    UserDto dto = userMapper.toDto(user);
+    return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 }

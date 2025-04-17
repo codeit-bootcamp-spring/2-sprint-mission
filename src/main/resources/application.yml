@@ -46,3 +46,7 @@ springdoc:
     # swagger-ui에서 try 했을 때 request duration을 알려주는 설정
     display-request-duration: true
 
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace

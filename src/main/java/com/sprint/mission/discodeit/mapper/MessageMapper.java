@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageMapper {
 
-  private BinaryContentMapper binaryContentMapper;
-  private UserMapper userMapper;
+  private final BinaryContentMapper binaryContentMapper;
+  private final UserMapper userMapper;
 
   public MessageDto toDto(Message message) {
     return new MessageDto(

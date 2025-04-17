@@ -13,18 +13,22 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
 public class ChannelMapper {
 
-  MessageRepository messageRepository;
-  ReadStatusRepository readStatusRepository;
-  UserMapper userMapper;
+  private final MessageRepository messageRepository;
+  private final ReadStatusRepository readStatusRepository;
+  private final UserMapper userMapper;
 
   public ChannelDto toDto(Channel channel) {
-    Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId())
+    Instant lastMessageAt = messageRepository.findFirstByChannelIdOrderByCreatedAtDesc(
+            channel.getId())
         .stream()
         .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
         .map(Message::getCreatedAt)

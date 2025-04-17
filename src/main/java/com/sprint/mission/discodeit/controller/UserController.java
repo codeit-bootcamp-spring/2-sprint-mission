@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +35,7 @@ public class UserController {
 
   private final UserStatusService userStatusService;
   private final UserService userService;
+  private final UserStatusMapper userStatusMapper;
 
   private Optional<BinaryContentCreateRequest> toBinaryContentCreateRequest(MultipartFile file) {
     return Optional.ofNullable(file)
@@ -86,9 +89,10 @@ public class UserController {
   }
 
   @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
-  public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateRequest request) {
     UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
-    return ResponseEntity.status(HttpStatus.OK).body(updatedUserStatus);
+    UserStatusDto userStatusDto = userStatusMapper.toDto(updatedUserStatus);
+    return ResponseEntity.status(HttpStatus.OK).body(userStatusDto);
   }
 }

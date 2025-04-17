@@ -69,6 +69,7 @@ public class BasicUserService implements UserService {
 
     Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(createdUser, now);
+    createdUser.updateStatus(userStatus);
     userStatusRepository.save(userStatus);
 
     return createdUser;
@@ -83,7 +84,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public List<UserDto> findAll() {
-    return userRepository.findAll()
+    return userRepository.findAllWithStatus()
         .stream()
         .map(userMapper::toDto)
         .toList();

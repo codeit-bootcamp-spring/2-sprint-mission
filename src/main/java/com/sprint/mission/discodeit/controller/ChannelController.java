@@ -29,11 +29,11 @@ public class ChannelController {
 
   private final ChannelService channelService;
 
-  @PostMapping
-  public ResponseEntity<ChannelDto> createChannel(@RequestBody ChannelCreateRequest request) {
-    ChannelDto dto = channelService.createChannel(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(dto);
-  }
+//  @PostMapping
+//  public ResponseEntity<ChannelDto> createChannel(@RequestBody ChannelCreateRequest request) {
+//    ChannelDto dto = channelService.createChannel(request);
+//    return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+//  }
 
   @RequestMapping(value = "/public", method = RequestMethod.POST)
   public ResponseEntity<ChannelDto> publicChannelCreate(
