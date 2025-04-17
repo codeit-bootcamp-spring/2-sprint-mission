@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -36,6 +38,7 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final MessageMapper messageMapper;
   private final BinaryContentStorage binaryContentStorage;
+  private final PageResponseMapper pageResponseMapper;
 
   @Override
   @Transactional
@@ -87,10 +90,11 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<MessageDto> findMessageByChannelId(UUID channelId, Pageable pageable) {
-    return messageRepository.findPageByChannelId(channelId, pageable).stream()
-        .map(messageMapper::toDto)
-        .toList();
+  public PageResponse<MessageDto> findMessageByChannelId(UUID channelId, Pageable pageable) {
+    return pageResponseMapper.fromSlice(
+        messageRepository.findPageByChannelId(channelId, pageable)
+            .map(messageMapper::toDto)
+    );
   }
 
   @Override
