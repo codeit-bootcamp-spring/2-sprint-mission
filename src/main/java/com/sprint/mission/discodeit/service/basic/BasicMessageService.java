@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -86,8 +87,8 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<MessageDto> findMessageByChannelId(UUID channelId) {
-    return messageRepository.findByChannelId(channelId).stream()
+  public List<MessageDto> findMessageByChannelId(UUID channelId, Pageable pageable) {
+    return messageRepository.findPageByChannelId(channelId, pageable).stream()
         .map(messageMapper::toDto)
         .toList();
   }
