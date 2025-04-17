@@ -107,6 +107,8 @@ public class BasicUserService implements UserService {
       userLoginFailedError(user.getId(), "Password mismatch");
     }
 
+    user.getUserStatus().updateTime(Instant.now());
+
     logger.info("User login: id {}, username {}, password  {}", user.getId(), user.getName(),
         user.getPassword());
 
