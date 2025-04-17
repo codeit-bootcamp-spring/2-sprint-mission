@@ -27,7 +27,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentMapper binaryContentMapper;
 
   @Override
-  public BinaryContent create(BinaryContentCreateRequest request) {
+  public BinaryContentDto create(BinaryContentCreateRequest request) {
     String fileName = request.fileName();
     byte[] bytes = request.bytes();
     String contentType = request.contentType();
@@ -37,37 +37,38 @@ public class BasicBinaryContentService implements BinaryContentService {
         contentType
     );
     binaryContentStorage.put(binaryContent.getId(), bytes);
-    return binaryContentRepository.save(binaryContent);
+    return binaryContentMapper.toDto(binaryContentRepository.save(binaryContent));
   }
 
   @Transactional(readOnly = true)
   @Override
-  public BinaryContent find(UUID binaryContentId) {
-    return binaryContentRepository.findById(binaryContentId)
-        .orElseThrow(() -> new NoSuchElementException(
-            "BinaryContent with id " + binaryContentId + " not found")
-        );
+  public BinaryContentDto find(UUID binaryContentId) {
+    return binaryContentMapper.toDto(this.findBinaryContent(binaryContentId));
   }
 
   @Transactional(readOnly = true)
   @Override
-  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-    return binaryContentRepository.findAllByIdIn(binaryContentIds);
+  public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
+    return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
+        .map(binaryContentMapper::toDto)
+        .toList();
   }
 
   @Transactional(readOnly = true)
   @Override
   public ResponseEntity<Resource> download(UUID id) {
-    BinaryContent content = this.find(id);
-
-    BinaryContentDto dto = binaryContentMapper.toDto(content);
-
-    return binaryContentStorage.download(dto);
+    return binaryContentStorage.download(this.find(id));
   }
 
   @Override
   public void delete(UUID binaryContentId) {
-    BinaryContent binaryContent = this.find(binaryContentId);
-    binaryContentRepository.delete(binaryContent);
+    binaryContentRepository.delete(this.findBinaryContent(binaryContentId));
+  }
+
+  private BinaryContent findBinaryContent(UUID binaryContentId) {
+    return binaryContentRepository.findById(binaryContentId)
+        .orElseThrow(() -> new NoSuchElementException(
+            "BinaryContent with id " + binaryContentId + " not found")
+        );
   }
 }
