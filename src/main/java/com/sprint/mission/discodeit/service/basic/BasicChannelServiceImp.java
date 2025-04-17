@@ -41,8 +41,9 @@ public class BasicChannelServiceImp implements ChannelService {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     Channel createdChannel = channelRepository.save(channel);
 
+    // Instant.MIN() -> channel.getCreatedAt() : 참여자 각각의 읽음 상태를 MIN()시간에서, 읽음상태 생성 시간으로 변경, 생성시간이 최저 시간과 동등
     request.participantIds().stream()
-        .map(userId -> new ReadStatus(userId, createdChannel.getId(), Instant.MIN))
+        .map(userId -> new ReadStatus(userId, createdChannel.getId(), channel.getCreatedAt()))
         .forEach(readStatusRepository::save);
 
     return createdChannel;

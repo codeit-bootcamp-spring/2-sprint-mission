@@ -1,0 +1,25 @@
+version: '3'
+services:
+  postgres-db:
+    image: postgres:15
+    container_name: local_postgres
+    environment:
+      POSTGRES_USER: discodeit_user
+      POSTGRES_PASSWORD: discodeit1234
+      POSTGRES_DB: discodeit
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+
+
+# -d 백그라운드 실행 (detach mode)
+# docker-compose up -d
+# 컨테이너 실행 종료 혹은 연결된 볼륨까지 삭제
+# docker-compose down
+# docker-compose down -v
+# 상태 확인 (process status, -all)
+# docker ps -a
