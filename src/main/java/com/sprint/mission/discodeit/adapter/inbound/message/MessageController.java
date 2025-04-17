@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,12 +73,14 @@ public class MessageController {
 
   @GetMapping
   public ResponseEntity<PageResponse<MessageResult>> findAll(@RequestParam UUID channelId,
+      @RequestParam(required = false) Instant cursor,
       @PageableDefault(
           size = 50, sort = "createdAt", direction = Direction.DESC
       ) Pageable pageable) {
-    Slice<MessageResult> results = messageService.findMessagesByChannelId(channelId,
+    Slice<MessageResult> results = messageService.findMessagesByChannelId(channelId, cursor,
         pageable);
-    PageResponse<MessageResult> pageResponse = PageResponseMapper.fromSlice(results);
+    PageResponse<MessageResult> pageResponse = PageResponseMapper.fromSlice(results,
+        MessageResult::createdAt);
     return ResponseEntity.ok(pageResponse);
   }
 

@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.exception.channel.ChannelErrors;
 import com.sprint.mission.discodeit.exception.user.UserErrors;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -86,11 +87,17 @@ public class BasicMessageService implements MessageService {
 //    return MessageResult.create(message, message.getAuthor());
 //  }
 
+
   @Override
   @Transactional(readOnly = true)
-  public Slice<MessageResult> findMessagesByChannelId(UUID channelId, Pageable pageable) {
-    Slice<Message> messageSlice = messageRepository.findAllByChannelId(channelId, pageable);
-
+  public Slice<MessageResult> findMessagesByChannelId(UUID channelId, Instant cursor,
+      Pageable pageable) {
+    Slice<Message> messageSlice;
+    if (cursor == null) {
+      messageSlice = messageRepository.findAllByChannelId(channelId, pageable);
+    } else {
+      messageSlice = messageRepository.findAllByChannelId(channelId, cursor, pageable);
+    }
     return messageSlice.map(message -> MessageResult.create(message, message.getAuthor()));
   }
 

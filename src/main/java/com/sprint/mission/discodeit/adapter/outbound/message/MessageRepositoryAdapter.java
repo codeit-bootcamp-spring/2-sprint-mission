@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.adapter.outbound.message;
 
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,6 +40,12 @@ public class MessageRepositoryAdapter implements MessageRepositoryPort {
   @Override
   public Slice<Message> findAllByChannelId(UUID channelId, Pageable pageable) {
     return jpaMessageRepository.findAllByChannel_Id(channelId, pageable);
+  }
+
+  @Override
+  public Slice<Message> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
+    return jpaMessageRepository.findAllByChannel_IdAndCreatedAtLessThanOrderByCreatedAt(channelId,
+        cursor, pageable);
   }
 
   @Override

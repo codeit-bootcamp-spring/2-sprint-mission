@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.adapter.outbound.message;
 
 import com.sprint.mission.discodeit.core.message.entity.Message;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
@@ -17,4 +18,8 @@ public interface JpaMessageRepository extends JpaRepository<Message, UUID> {
 
   @EntityGraph(attributePaths = {"author", "channel", "attachment"})
   Slice<Message> findAllByChannel_Id(UUID channelId, Pageable pageable);
+
+  @EntityGraph(attributePaths = {"author", "channel", "attachment"})
+  Slice<Message> findAllByChannel_IdAndCreatedAtLessThanOrderByCreatedAt(UUID channelId,
+      Instant createdAtIsLessThan, Pageable pageable);
 }

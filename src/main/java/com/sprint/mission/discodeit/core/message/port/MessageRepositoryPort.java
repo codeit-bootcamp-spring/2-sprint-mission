@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.core.message.port;
 
 import com.sprint.mission.discodeit.core.message.entity.Message;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,6 +19,8 @@ public interface MessageRepositoryPort {
   List<Message> findAllByChannelId(UUID channelId);
 
   Slice<Message> findAllByChannelId(UUID channelId, Pageable pageable);
+
+  Slice<Message> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable);
 
   boolean existsById(UUID id);
 
