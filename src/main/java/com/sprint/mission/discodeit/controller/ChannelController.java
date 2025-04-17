@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.controller.channel.*;
-import com.sprint.mission.discodeit.dto.service.channel.ChannelDTO;
-import com.sprint.mission.discodeit.dto.service.channel.FindChannelDTO;
-import com.sprint.mission.discodeit.dto.service.channel.PrivateChannelDTO;
-import com.sprint.mission.discodeit.dto.service.channel.UpdateChannelDTO;
+import com.sprint.mission.discodeit.dto.service.channel.CreatePrivateChannelResult;
+import com.sprint.mission.discodeit.dto.service.channel.CreatePublicChannelResult;
+import com.sprint.mission.discodeit.dto.service.channel.FindChannelResult;
+import com.sprint.mission.discodeit.dto.service.channel.UpdateChannelResult;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.swagger.ChannelApi;
@@ -29,9 +29,11 @@ public class ChannelController implements ChannelApi {
   @PostMapping("/public")
   public ResponseEntity<CreatePublicChannelResponseDTO> createPublicChannel(
       @RequestBody @Valid CreatePublicChannelRequestDTO createChannelRequestDTO) {
-    ChannelDTO channelDTO =
-        channelService.createPublicChannel(channelMapper.toChannelParam(createChannelRequestDTO));
-    CreatePublicChannelResponseDTO createdChannel = channelMapper.toChannelResponseDTO(channelDTO);
+    CreatePublicChannelResult createPublicChannelResult =
+        channelService.createPublicChannel(
+            channelMapper.toCreatePublicChannelCommand(createChannelRequestDTO));
+    CreatePublicChannelResponseDTO createdChannel = channelMapper.toCreatePublicChannelResponseDTO(
+        createPublicChannelResult);
     return ResponseEntity.ok(createdChannel);
   }
 
@@ -39,11 +41,11 @@ public class ChannelController implements ChannelApi {
   @PostMapping("/private")
   public ResponseEntity<CreatePrivateChannelResponseDTO> createPrivateChannel(
       @RequestBody @Valid CreatePrivateChannelRequestDTO createPrivateChannelRequestDTO) {
-    PrivateChannelDTO privateChannelDTO =
+    CreatePrivateChannelResult createPrivateChannelResult =
         channelService.createPrivateChannel(
-            channelMapper.toPrivateChannelParam(createPrivateChannelRequestDTO));
-    CreatePrivateChannelResponseDTO createdChannel = channelMapper.toPrivateChannelResponseDTO(
-        privateChannelDTO);
+            channelMapper.toCreatePrivateChannelCommand(createPrivateChannelRequestDTO));
+    CreatePrivateChannelResponseDTO createdChannel = channelMapper.toCreatePrivateChannelResponseDTO(
+        createPrivateChannelResult);
     return ResponseEntity.ok(createdChannel);
   }
 
@@ -52,11 +54,11 @@ public class ChannelController implements ChannelApi {
   public ResponseEntity<UpdateChannelResponseDTO> updateChannel(
       @PathVariable("channelId") UUID channelId,
       @RequestBody @Valid UpdateChannelRequestDTO updateChannelRequestDTO) {
-    UpdateChannelDTO updateChannelDTO =
+    UpdateChannelResult updateChannelResult =
         channelService.update(channelId,
-            channelMapper.toUpdateChannelParam(updateChannelRequestDTO));
+            channelMapper.toUpdateChannelCommand(updateChannelRequestDTO));
     UpdateChannelResponseDTO updatedChannel = channelMapper.toUpdateChannelResponseDTO(
-        updateChannelDTO);
+        updateChannelResult);
     return ResponseEntity.ok(updatedChannel);
   }
 
@@ -72,8 +74,11 @@ public class ChannelController implements ChannelApi {
 
   @Override
   @GetMapping
-  public ResponseEntity<List<FindChannelDTO>> findAll(@RequestParam("userId") UUID userId) {
-    List<FindChannelDTO> channels = channelService.findAllByUserId(userId);
+  public ResponseEntity<List<FindChannelResponseDTO>> findAll(@RequestParam("userId") UUID userId) {
+    List<FindChannelResult> findChannelResults = channelService.findAllByUserId(userId);
+    List<FindChannelResponseDTO> channels = findChannelResults.stream()
+        .map(channelMapper::toFindChannelResponseDTO)
+        .toList();
     return ResponseEntity.ok(channels);
   }
 }

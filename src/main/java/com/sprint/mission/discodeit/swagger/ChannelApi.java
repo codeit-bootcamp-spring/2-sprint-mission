@@ -4,9 +4,9 @@ import com.sprint.mission.discodeit.dto.controller.channel.CreatePrivateChannelR
 import com.sprint.mission.discodeit.dto.controller.channel.CreatePrivateChannelResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.channel.CreatePublicChannelRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.channel.CreatePublicChannelResponseDTO;
+import com.sprint.mission.discodeit.dto.controller.channel.FindChannelResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.channel.UpdateChannelRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.channel.UpdateChannelResponseDTO;
-import com.sprint.mission.discodeit.dto.service.channel.FindChannelDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -61,6 +61,6 @@ public interface ChannelApi {
       responses = {
           @ApiResponse(responseCode = "200", description = "유저가 포함된 채널 조회 성공")
       })
-  ResponseEntity<List<FindChannelDTO>> findAll(UUID userId);
+  ResponseEntity<List<FindChannelResponseDTO>> findAll(UUID userId);
 
 }
