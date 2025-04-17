@@ -3,7 +3,7 @@ create table binary_contents
     id           uuid         not null
         primary key,
     created_at   timestamp    not null,
-    file_name    varchar(225) not null,
+    file_name    varchar(255) not null,
     size         bigint       not null,
     content_type varchar(100) not null,
     bytes        bytea        not null
@@ -31,31 +31,12 @@ create table users
 alter table users
     owner to discodeit_user;
 
-create table user_statuses
-(
-    id             uuid      not null
-        constraint user_status_pkey
-            primary key,
-    created_at     timestamp not null,
-    updated_at     timestamp,
-    user_id        uuid      not null
-        constraint user_status_user_id_key
-            unique
-        constraint user_status_user_id_fkey
-            references users
-            on delete cascade,
-    last_active_at timestamp not null
-);
-
-alter table user_statuses
-    owner to discodeit_user;
-
 create table channels
 (
     id          uuid                     not null
         primary key,
     created_at  timestamp with time zone not null,
-    updated_at  timestamp with time zone not null,
+    updated_at  timestamp with time zone,
     name        varchar(100)             not null,
     description varchar(500),
     type        varchar(10)              not null
@@ -72,7 +53,7 @@ create table messages
     id         uuid                     not null
         primary key,
     created_at timestamp with time zone not null,
-    updated_at timestamp with time zone not null,
+    updated_at timestamp with time zone,
     content    text,
     channel_id uuid                     not null
         references channels
@@ -104,7 +85,7 @@ create table read_statuses
     id           uuid                     not null
         primary key,
     created_at   timestamp with time zone not null,
-    updated_at   timestamp with time zone not null,
+    updated_at   timestamp with time zone,
     user_id      uuid                     not null
         references users
             on delete cascade,
@@ -112,10 +93,27 @@ create table read_statuses
         references channels
             on delete cascade,
     last_read_at timestamp with time zone not null,
-    unique (user_id, channel_id)
+    unique (user_id, channel_id),
+    constraint ukqttel343c4eq691kcxipoixr7
+        unique (user_id, channel_id)
 );
 
 alter table read_statuses
     owner to discodeit_user;
 
+create table user_statuses
+(
+    id             uuid                     not null
+        primary key,
+    created_at     timestamp with time zone not null,
+    updated_at     timestamp with time zone,
+    user_id        uuid                     not null
+        unique
+        references users
+            on delete cascade,
+    last_active_at timestamp with time zone not null
+);
+
+alter table user_statuses
+    owner to discodeit_user;
 

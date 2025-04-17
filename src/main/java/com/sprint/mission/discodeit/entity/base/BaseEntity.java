@@ -26,7 +26,6 @@ public abstract class BaseEntity {
   protected Instant createdAt;
 
   public BaseEntity() {
-    this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
   }
 }

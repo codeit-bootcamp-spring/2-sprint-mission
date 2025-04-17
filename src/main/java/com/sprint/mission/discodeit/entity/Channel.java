@@ -7,12 +7,14 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.io.Serializable;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Entity
 @Table(name = "channels")
+@AllArgsConstructor
 public class Channel extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;

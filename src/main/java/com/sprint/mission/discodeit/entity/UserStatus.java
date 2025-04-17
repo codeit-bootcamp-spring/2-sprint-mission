@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -19,12 +20,13 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(name = "user_statuses")
+
 public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private static final int ONLINE_THRESHOLD = 300;
 
-  @OneToOne
+  @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false, unique = true)
   private User user;
 
@@ -38,7 +40,7 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
     this.lastActiveAt = lastActiveAt;
   }
 
-  protected UserStatus() {
+  public UserStatus() {
   }
 
   public boolean isUserOnline() {
