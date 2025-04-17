@@ -1,23 +1,13 @@
 package com.sprint.mission.discodeit.dto.response;
 
 import java.util.List;
-import org.springframework.data.domain.Page;
 
 public record PageResponse<T>(
     List<T> content,
-    int number,
-    int size,
+    int number,   // 페이지 번호
+    int size,     // 페이지 크기
     boolean hasNext,
-    long totalElements
+    Long totalElements    // 데이터의 총 개수
 ) {
 
-  public static <T> PageResponse<T> of(Page<T> page) {
-    return new PageResponse<>(
-        page.getContent(),
-        page.getNumber(),
-        page.getSize(),
-        page.hasNext(),
-        page.getTotalElements()
-    );
-  }
 }
