@@ -34,7 +34,7 @@ public class ReadStatusService {
     boolean exists = readStatusRepository.findAll().stream()
         .anyMatch(rs ->
             rs.getId().equals(request.userId()) &&
-                rs.getChannelId().equals(request.channelId())
+                rs.getChannel().getId().equals(request.channelId())
         );
 
     if (exists) {
@@ -42,7 +42,7 @@ public class ReadStatusService {
           "ReadStatus related to the same Channel and User already exists");
     }
 
-    ReadStatus readStatus = new ReadStatus(user.getId(), channel.getId(), request.lastReadTime());
+    ReadStatus readStatus = new ReadStatus(user, channel, request.lastReadTime());
     return readStatusRepository.save(readStatus);
   }
 
@@ -53,7 +53,7 @@ public class ReadStatusService {
 
   public List<ReadStatus> findAllByUserId(UUID userId) {
     return readStatusRepository.findAll().stream()
-        .filter(readStatus -> readStatus.getUserId().equals(userId))
+        .filter(readStatus -> readStatus.getUser().getId().equals(userId))
         .toList();
   }
 

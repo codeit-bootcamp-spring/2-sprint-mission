@@ -33,7 +33,7 @@ public class BasicUserService implements UserService {
     // username과 email은 다른 유저와 같으면 안됩니다.
     validationUserCreateRequest(request);
 
-    UUID nullableProfileId = optionalBinaryContentCreateRequest
+    BinaryContent nullableProfile = optionalBinaryContentCreateRequest
         .map(profileRequest -> {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
@@ -41,7 +41,7 @@ public class BasicUserService implements UserService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType, bytes);
           binaryContentRepository.save(binaryContent);
-          return binaryContent.getId();
+          return binaryContent;
         })
         .orElse(null);
 
@@ -49,11 +49,12 @@ public class BasicUserService implements UserService {
         request.username(),
         request.email(),
         request.password(),
-        nullableProfileId
+        nullableProfile
     );
 
     // UserStatus 를 같이 생성합니다.
-    UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
+    UserStatus userStatus = new UserStatus(user, Instant.now());
+    user.setStatus(userStatus);
     userStatusRepository.save(userStatus);
 
     return userRepository.save(user);
@@ -100,7 +101,7 @@ public class BasicUserService implements UserService {
           binaryContentRequest.bytes()
       );
       binaryContentRepository.save(binaryContent);
-      user.setProfileId(binaryContent.getId());
+      user.setProfile(binaryContent);
     });
 
     return userRepository.save(user);
@@ -116,8 +117,8 @@ public class BasicUserService implements UserService {
     // BinaryContent(프로필), UserStatus
     userRepository.findById(userId)
         .ifPresent(user -> {
-          if (user.getProfileId() != null) {
-            binaryContentRepository.delete(user.getProfileId());
+          if (user.getProfile() != null) {
+            binaryContentRepository.delete(user.getProfile().getId());
           }
         });
     userStatusRepository.findByUserId(userId)
@@ -154,7 +155,7 @@ public class BasicUserService implements UserService {
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfileId(),
+        user.getProfile(),
         online
     );
   }

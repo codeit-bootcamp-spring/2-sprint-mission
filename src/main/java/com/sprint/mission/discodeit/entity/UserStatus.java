@@ -13,13 +13,13 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
-  private final UUID userId;
+  private final User user;
   private Instant lastActiveAt;
   private boolean online;
 
-  public UserStatus(UUID userId, Instant lastActiveAt) {
+  public UserStatus(User user, Instant lastActiveAt) {
     super();
-    this.userId = userId;
+    this.user = user;
     this.lastActiveAt = lastActiveAt;
     this.online = isOnline();
   }
