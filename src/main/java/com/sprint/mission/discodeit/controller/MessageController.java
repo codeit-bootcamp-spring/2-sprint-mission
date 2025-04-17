@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -103,13 +102,13 @@ public class MessageController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Message 목록 조회 성공")
   })
-  public ResponseEntity<PageResponse<Message>> findAllByChannelId(
+  public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
       @RequestParam("channelId") UUID channelId,
       @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC) Pageable pageable
   ) {
-    List<Message> messages = messageService.findAllByChannelId(channelId);
+    PageResponse<MessageDto> pageResponse = messageService.findAllByChannelId(channelId, pageable);
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(messages);
+        .body(pageResponse);
   }
 }
