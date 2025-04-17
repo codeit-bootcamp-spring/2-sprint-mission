@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.dto.page.PageResponse;
+import com.sprint.mission.discodeit.dto.page.Pageable;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.util.MultipartToBinaryConverter;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,27 +38,29 @@ public class MessageController {
 
     @Operation(summary = "Message 생성")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Message> createMessage(
+    public ResponseEntity<MessageDto> createMessage(
             @RequestPart("messageCreateRequest") MessageCreateDto messageCreateDto,
             @RequestPart(name = "attachments", required = false) List<MultipartFile> files) {
         List<BinaryContentCreateDto> binaryDtos = MultipartToBinaryConverter.toBinaryContentCreateDtos(files);
-        Message message = messageService.create(messageCreateDto, binaryDtos);
+        MessageDto messageDto = messageService.create(messageCreateDto, binaryDtos);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(message);
+        return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
     }
 
     @Operation(summary = "Message 내용 수정")
     @PatchMapping("/{messageId}")
-    public ResponseEntity<Message> updateMessage(@PathVariable UUID messageId,
-                                                 @RequestBody MessageUpdateDto messageUpdateDto) {
-        Message message = messageService.update(messageId, messageUpdateDto);
-        return ResponseEntity.ok(message);
+    public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
+                                                    @RequestBody MessageUpdateDto messageUpdateDto) {
+        MessageDto messageDto = messageService.update(messageId, messageUpdateDto);
+
+        return ResponseEntity.ok(messageDto);
     }
 
     @Operation(summary = "Message 삭제")
     @DeleteMapping("/{messageId}")
     public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
         messageService.delete(messageId);
+
         return ResponseEntity.noContent().build();
     }
 
