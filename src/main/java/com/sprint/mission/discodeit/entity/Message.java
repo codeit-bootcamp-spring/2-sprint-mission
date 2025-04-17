@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import java.io.Serial;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -11,22 +12,23 @@ import java.util.UUID;
 @Getter
 public class Message extends BaseUpdatableEntity implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private String content;
-  private UUID channelId;
-  private UUID authorId;
-  private List<UUID> attachmentIds;
+  private Channel channel;
+  private User author;
+  private List<BinaryContent> attachments;
 
-  public Message(String content, UUID channelId, UUID authorId) {
+  public Message(String content, Channel channel, User author) {
     super();
     this.content = content;
-    this.channelId = channelId;
-    this.authorId = authorId;
+    this.channel = channel;
+    this.author = author;
   }
 
-  public void setAttachmentIds(List<UUID> attachmentIds) {
-    this.attachmentIds = attachmentIds;
+  public void setAttachmentIds(List<BinaryContent> attachments) {
+    this.attachments = attachments;
     setUpdatedAt(Instant.now());
   }
 

@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.Getter;
 
 @Getter
@@ -16,20 +15,25 @@ public class User extends BaseUpdatableEntity implements Serializable {
   private String username;
   private String email;
   private String password;
-  private UUID profileId;
+  private BinaryContent profile;
+  private UserStatus status;
 
-  public User(String username, String email, String password, UUID profileId) {
+  public User(String username, String email, String password, BinaryContent profile) {
     super();
     this.username = username;
     this.email = email;
     this.password = password;
-    this.profileId = profileId;
+    this.profile = profile;
   }
 
-  public UUID setProfileId(UUID BinaryContentId) {
-    this.profileId = BinaryContentId;
+  public UserStatus setStatus(UserStatus status) {
+    return this.status = status;
+  }
+
+  public BinaryContent setProfile(BinaryContent binaryContent) {
+    this.profile = binaryContent;
     setUpdatedAt(Instant.now());
-    return this.profileId;
+    return this.profile;
   }
 
   public void update(String newUsername, String newEmail, String newPassword) {

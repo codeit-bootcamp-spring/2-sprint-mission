@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
+  private final UserRepository userRepository;
   private final MessageRepository messageRepository;
   private final ReadStatusRepository readStatusRepository;
 
@@ -36,7 +38,10 @@ public class BasicChannelService implements ChannelService {
 
     // 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
     request.participantIds().stream()
-        .map(userId -> new ReadStatus(userId, createdChannel.getId(), Instant.MIN))
+        .map(userId -> new ReadStatus(
+            userRepository.findById(userId).orElseThrow(),
+            createdChannel,
+            Instant.MIN))
         .forEach(readStatusRepository::save);
 
     return createdChannel;
@@ -61,7 +66,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
-        .map(ReadStatus::getChannelId)
+        .map(ReadStatus -> ReadStatus.getChannel().getId())
         .toList();
 
     return channelRepository.findAll().stream()
@@ -120,7 +125,7 @@ public class BasicChannelService implements ChannelService {
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       readStatusRepository.findAllByChannelId(channel.getId())
           .stream()
-          .map(ReadStatus::getUserId)
+          .map(ReadStatus -> ReadStatus.getUser().getId())
           .forEach(participantIds::add);
     }
 
