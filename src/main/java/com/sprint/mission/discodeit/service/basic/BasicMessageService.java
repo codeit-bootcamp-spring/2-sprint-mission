@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.service.message.CreateMessageParam;
-import com.sprint.mission.discodeit.dto.service.message.MessageDTO;
-import com.sprint.mission.discodeit.dto.service.message.UpdateMessageDTO;
-import com.sprint.mission.discodeit.dto.service.message.UpdateMessageParam;
+import com.sprint.mission.discodeit.dto.service.message.CreateMessageCommand;
+import com.sprint.mission.discodeit.dto.service.message.CreateMessageResult;
+import com.sprint.mission.discodeit.dto.service.message.FindMessageResult;
+import com.sprint.mission.discodeit.dto.service.message.UpdateMessageCommand;
+import com.sprint.mission.discodeit.dto.service.message.UpdateMessageResult;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.RestExceptions;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
@@ -40,47 +41,47 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
-  public MessageDTO create(CreateMessageParam createMessageParam,
+  public CreateMessageResult create(CreateMessageCommand createMessageCommand,
       List<MultipartFile> multipartFiles) {
     // 유저와 채널이 실제로 존재하는지 검증
-    User user = findUserById(createMessageParam.authorId());
-    Channel channel = findChannelById(createMessageParam.channelId());
+    User user = findUserById(createMessageCommand.authorId());
+    Channel channel = findChannelById(createMessageCommand.channelId());
 
     List<BinaryContent> binaryContentList = createBinaryContentList(multipartFiles);
     if (!binaryContentList.isEmpty() && binaryContentList != null) {
       binaryContentList.forEach(binaryContentService::create);
     }
 
-    Message message = messageMapper.toEntity(createMessageParam, user, channel, binaryContentList);
+    Message message = createMessageEntity(user, channel, createMessageCommand, binaryContentList);
     messageRepository.save(message);
 
-    return messageMapper.toMessageDTO(message);
+    return messageMapper.toCreateMessageResult(message);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public MessageDTO find(UUID messageId) {
+  public FindMessageResult find(UUID messageId) {
     Message message = findMessageById(messageId);
-    return messageMapper.toMessageDTO(message);
+    return messageMapper.toFindMessageResult(message);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public List<MessageDTO> findAllByChannelId(UUID channelId) {
+  public List<FindMessageResult> findAllByChannelId(UUID channelId) {
     List<Message> messages = messageRepository.findAllByChannelId(channelId);
     return messages.stream()
-        .map(message -> messageMapper.toMessageDTO(message))
+        .map(messageMapper::toFindMessageResult)
         .toList();
   }
 
   @Override
   @Transactional
-  public UpdateMessageDTO update(UUID id, UpdateMessageParam updateMessageParam,
+  public UpdateMessageResult update(UUID id, UpdateMessageCommand updateMessageCommand,
       List<MultipartFile> multipartFiles) {
     Message message = findMessageById(id);
-    message.updateMessageInfo(updateMessageParam.newContent());
+    message.updateMessageInfo(updateMessageCommand.newContent());
     replaceAttachments(message, multipartFiles);
-    return messageMapper.toUpdateMessageDTO(message);
+    return messageMapper.toUpdateMessageResult(message);
   }
 
 
@@ -135,6 +136,16 @@ public class BasicMessageService implements MessageService {
           }
         })
         .collect(Collectors.toList());
+  }
+
+  private Message createMessageEntity(User user, Channel channel,
+      CreateMessageCommand createMessageCommand, List<BinaryContent> binaryContentList) {
+    return Message.builder()
+        .author(user)
+        .channel(channel)
+        .content(createMessageCommand.content())
+        .attachments(binaryContentList)
+        .build();
   }
 
 
