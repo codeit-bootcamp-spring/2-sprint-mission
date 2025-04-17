@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -90,10 +92,19 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public PageResponse<MessageDto> findMessageByChannelId(UUID channelId, Pageable pageable) {
+  public PageResponse<MessageDto> findMessageByChannelId(UUID channelId, Pageable pageable,
+      Instant cursor) {
+    Slice<Message> slice;
+
+    if (cursor != null) {
+      slice = messageRepository.findSliceByChannelIdAndCreatedAtBefore(channelId, pageable, cursor);
+    } else {
+      slice = messageRepository.findSliceByChannelId(channelId, pageable);
+    }
+
     return pageResponseMapper.fromSlice(
-        messageRepository.findPageByChannelId(channelId, pageable)
-            .map(messageMapper::toDto)
+        slice.map(messageMapper::toDto),
+        MessageDto::createdAt
     );
   }
 

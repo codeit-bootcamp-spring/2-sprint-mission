@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -174,10 +176,13 @@ public class MessageController {
   })
   public ResponseEntity<PageResponse<MessageDto>> FindChannelMessage(
       @RequestParam("channelId") UUID channelId,
+      @RequestParam(value = "cursor", required = false)
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant cursor,
       @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC)
-      Pageable pageable
+      @Parameter(hidden = true) Pageable pageable
   ) {
-    PageResponse<MessageDto> page = messageService.findMessageByChannelId(channelId, pageable);
+    PageResponse<MessageDto> page = messageService.findMessageByChannelId(channelId, pageable,
+        cursor);
     return ResponseEntity.status(HttpStatus.OK)
         .body(page);
   }
