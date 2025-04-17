@@ -1,7 +1,7 @@
 spring:
   application:
     newName:discodeit
-  datasource:
+  datasource: #앞서 구성한 데이터베이스에 연결하기 위한 설정값을 application.yaml 파일에 작성하세요.
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
     password: discodeit1234
@@ -22,6 +22,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
 
+  #디버깅을 위해 SQL 로그와 관련된 설정값을 application.yaml 파일에 작성하세요.
   logging:
     level:
       org:
