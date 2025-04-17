@@ -45,16 +45,16 @@ public class UserController {
       @ApiResponse(responseCode = "201", description = "User가 성공적으로 생성됨"),
       @ApiResponse(responseCode = "400", description = "같은 email 또는 username를 사용하는 User가 이미 존재함", content = @Content(examples = @ExampleObject("User with email {email} already exists")))
   })
-  public ResponseEntity<User> create(
+  public ResponseEntity<UserDto> create(
       @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-    User createdUser = userService.create(userCreateRequest, profileRequest);
+    UserDto dto = userService.create(userCreateRequest, profileRequest);
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(createdUser);
+        .body(dto);
   }
 
   @PatchMapping(
@@ -67,17 +67,17 @@ public class UserController {
       @ApiResponse(responseCode = "400", description = "같은 email 또는 username를 사용하는 User가 이미 존재함", content = @Content(examples = @ExampleObject("user with email {newEmail} already exists"))),
       @ApiResponse(responseCode = "200", description = "User 정보가 성공적으로 수정됨")
   })
-  public ResponseEntity<User> update(
+  public ResponseEntity<UserDto> update(
       @PathVariable UUID userId,
       @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-    User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+    UserDto dto = userService.update(userId, userUpdateRequest, profileRequest);
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(updatedUser);
+        .body(dto);
   }
 
   @DeleteMapping(path = "{userId}")
