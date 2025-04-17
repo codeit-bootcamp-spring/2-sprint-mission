@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
-import com.sprint.mission.discodeit.service.dto.user.LoginRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.service.user.LoginRequest;
+import com.sprint.mission.discodeit.dto.service.user.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;

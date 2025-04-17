@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.dto.channel;
+package com.sprint.mission.discodeit.dto.service.channel;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.List;

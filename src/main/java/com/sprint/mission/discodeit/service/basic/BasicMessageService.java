@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.controller.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.controller.MessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -9,11 +9,11 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentDto;
-import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.service.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.service.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.service.user.UserDto;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -30,7 +30,7 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BasicBinaryContentService basicBinaryContentService;
-  
+
   @Override
   @Transactional
   public MessageDto create(MessageCreateRequest createRequest,

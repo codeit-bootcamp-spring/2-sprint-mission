@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateDto;
-import com.sprint.mission.discodeit.service.dto.user.userstatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusUpdateRequest;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;

@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.MessageReadApi;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusDto;
-import com.sprint.mission.discodeit.service.dto.readstatus.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.service.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.service.readstatus.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.service.readstatus.ReadStatusUpdateRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;

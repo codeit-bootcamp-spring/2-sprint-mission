@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.dto.ErrorResponse;
+import com.sprint.mission.discodeit.dto.controller.ErrorResponse;
 import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;

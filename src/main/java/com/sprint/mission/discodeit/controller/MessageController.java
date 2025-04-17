@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.MessageApi;
-import com.sprint.mission.discodeit.controller.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.controller.MessageDto;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.service.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.service.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.service.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.service.message.MessageUpdateRequest;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;

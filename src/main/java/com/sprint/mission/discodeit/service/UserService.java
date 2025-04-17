@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.dto.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.service.dto.user.UserDto;
-import com.sprint.mission.discodeit.service.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.service.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.service.user.UserDto;
+import com.sprint.mission.discodeit.dto.service.user.UserUpdateRequest;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

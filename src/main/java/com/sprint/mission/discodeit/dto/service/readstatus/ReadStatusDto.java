@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.dto.readstatus;
+package com.sprint.mission.discodeit.dto.service.readstatus;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import java.time.Instant;

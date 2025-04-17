@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.dto.readstatus;
+package com.sprint.mission.discodeit.dto.service.readstatus;
 
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;

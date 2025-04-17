@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller.dto;
+package com.sprint.mission.discodeit.dto.controller;
 
 import java.util.HashMap;
 import java.util.Map;
