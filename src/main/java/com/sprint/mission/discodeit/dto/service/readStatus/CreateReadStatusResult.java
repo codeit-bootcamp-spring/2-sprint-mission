@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.dto.service.readStatus;
 import java.time.Instant;
 import java.util.UUID;
 
-public record UpdateReadStatusDTO(
+public record CreateReadStatusResult(
     UUID id,
+    UUID userId,
+    UUID channelId,
     Instant lastReadAt
 ) {
 
