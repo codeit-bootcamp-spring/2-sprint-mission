@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.dto.service.readstatus;
 
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Builder;
@@ -13,12 +12,4 @@ public record ReadStatusDto(
     Instant lastReadAt
 ) {
 
-  public static ReadStatusDto of(ReadStatus readStatus) {
-    return ReadStatusDto.builder()
-        .id(readStatus.getId())
-        .userId(readStatus.getUser().getId())
-        .channelId(readStatus.getChannel().getId())
-        .lastReadAt(readStatus.getLastReadAt())
-        .build();
-  }
 }
