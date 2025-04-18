@@ -26,8 +26,6 @@ public interface ChannelService {
     ChannelDto find(UUID channelId);
 
 
-    List<ChannelDto> findAllByUserId(UUID userId);
-
     @Transactional(readOnly = true)
     PageResponse<ChannelDto> findAllByUserId(UUID userId, Pageable pageable);
 
@@ -36,4 +34,6 @@ public interface ChannelService {
 
     @Transactional
     void delete(UUID channelId);
+
+    List<ChannelDto> findAllByUserId(UUID userId);
 }

@@ -78,22 +78,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         }
     }
 
-    public UUID put(UUID id, InputStream inputStream) {
-        if (id == null || inputStream == null) {
-            throw new IllegalArgumentException("ID 또는 InputStream은 null일 수 없습니다.");
-        }
-        Path destinationPath = resolvePath(id);
-        log.debug("파일 스트림 저장 시도: {}", destinationPath);
-        try {
-            Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-            log.info("파일 스트림 저장 성공: {}", destinationPath);
-            return id;
-        } catch (IOException e) {
-            log.error("파일 스트림 저장 실패: {}", destinationPath, e);
-            throw new RuntimeException("파일 스트림 저장 실패: " + destinationPath, e);
-        }
-    }
-
     @Override
     public InputStream get(UUID id) throws IOException {
         Path filePath = resolvePath(id);
@@ -110,7 +94,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     @Override
     public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
         if (binaryContentDto == null || binaryContentDto.id() == null) {
-            log.error("다운로드 요청 실패: 유효하지 않은 BinaryContentDto");
             return ResponseEntity.badRequest().build();
         }
 
@@ -132,13 +115,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
                 .body(resource);
 
         } catch (FileNotFoundException e) {
-            log.warn("다운로드 파일 찾기 실패: ID={}", id, e);
             return ResponseEntity.notFound().build();
         } catch (IOException e) {
-            log.error("다운로드 중 파일 읽기 오류: ID={}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         } catch (Exception e) {
-            log.error("다운로드 중 예상치 못한 오류: ID={}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

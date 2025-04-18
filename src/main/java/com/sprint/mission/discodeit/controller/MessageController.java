@@ -72,6 +72,11 @@ public class MessageController implements MessageApi {
             .build();
     }
 
+    @Override
+    public ResponseEntity<List<Message>> findAllByChannelId(UUID channelId) {
+        return null;
+    }
+
     @GetMapping(path = "{channelId}")
     public ResponseEntity<PageResponse<MessageDto>> getMessages(
         @PathVariable UUID channelId,
