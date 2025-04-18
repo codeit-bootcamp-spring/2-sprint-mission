@@ -17,7 +17,7 @@ import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = "user")
 @NoArgsConstructor
 @Entity
 @Table(name = "user_statuses")
