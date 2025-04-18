@@ -29,7 +29,8 @@ public enum ErrorCode {
 
     BINARY_CONTENT_SAVE_FAILED(500, "B002", "파일 저장에 실패했습니다."),
     BINARY_CONTENT_LOAD_FAILED(500, "B003", "파일 로드에 실패했습니다."),
-    BINARY_CONTENT_DOWNLOAD_FAILED(500, "B004", "파일 다운로드에 실패했습니다.");
+    BINARY_CONTENT_DOWNLOAD_FAILED(500, "B004", "파일 다운로드에 실패했습니다."),
+    BINARY_CONTENT_DELETE_FAILED(500, "B005", "파일 삭제에 실패했습니다.");
 
 
     private final int httpStatus;
