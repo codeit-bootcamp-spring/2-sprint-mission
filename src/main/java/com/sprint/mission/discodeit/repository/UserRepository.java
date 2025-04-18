@@ -13,6 +13,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
   Optional<User> findByEmail(String email);
 
-  @Query("SELECT u FROM User u LEFT JOIN FETCH u.profile")
-  List<User> findAllWithProfile();
+  @Query("""
+        SELECT u FROM User u 
+        LEFT JOIN FETCH u.profile
+        LEFT JOIN FETCH u.status
+      """)
+  List<User> findAllWithProfileAndStatus();
 }
