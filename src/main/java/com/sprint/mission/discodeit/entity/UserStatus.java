@@ -40,4 +40,8 @@ public class UserStatus extends BaseUpdatableEntity {
     Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
     return lastActiveAt.isAfter(instantFiveMinutesAgo);
   }
+
+  public void setUser(User user) {
+    this.user = user;
+  }
 }
