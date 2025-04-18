@@ -8,8 +8,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.mepper.MessageMapper;
-import com.sprint.mission.discodeit.mepper.PageResponseMapper;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.transaction.Transactional;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -89,16 +90,34 @@ public class BasicMessageService implements MessageService {
         .toList();
   }
 
-  @Override
-  public PageResponse<MessageDto> findMessagesByPage(UUID channelId, int page) {
-    Pageable pageable = PageRequest.of(page, 50, Sort.by(Sort.Direction.DESC, "createdAt"));
+//  @Override
+//  public PageResponse<MessageDto> findMessagesByPage(UUID channelId, int page) {
+//    Pageable pageable = PageRequest.of(page, 50, Sort.by(Sort.Direction.DESC, "createdAt"));
+//
+//    Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId,
+//        pageable);
+//
+//    Slice<MessageDto> dtoSlice = messages.map(messageMapper::toDto);
+//
+//    return pageResponseMapper.fromSlice(dtoSlice);
+//  }
 
-    Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId,
-        pageable);
-    
+  @Override
+  public PageResponse<MessageDto> findMessagesByCursor(UUID channelId, Instant cursor) {
+    Pageable pageable = PageRequest.of(0, 50, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+    Slice<Message> messages;
+
+    if (cursor == null) {
+      messages = messageRepository.findTop50ByChannelIdOrderByCreatedAtDesc(channelId, pageable);
+    } else {
+      messages = messageRepository.findTop50ByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc(
+          channelId, cursor, pageable);
+    }
+
     Slice<MessageDto> dtoSlice = messages.map(messageMapper::toDto);
 
-    return pageResponseMapper.fromSlice(dtoSlice);
+    return pageResponseMapper.fromSlice(dtoSlice, MessageDto::createdAt);
   }
 
   @Override

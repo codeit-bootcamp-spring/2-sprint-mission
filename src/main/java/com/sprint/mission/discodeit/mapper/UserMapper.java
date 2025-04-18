@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.mepper;
+package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
