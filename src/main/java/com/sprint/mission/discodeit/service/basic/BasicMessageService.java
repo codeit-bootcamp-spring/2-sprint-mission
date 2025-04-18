@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.MessageRepositoryCustom;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -38,6 +39,7 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final MessageMapper messageMapper;
   private final PageResponseMapper pageResponseMapper;
+  private final MessageRepositoryCustom messageRepositoryCustom;
 
   @Transactional
   @Override
@@ -108,7 +110,7 @@ public class BasicMessageService implements MessageService {
     if (cursor == null) {
       messages = messageRepository.findByChannelId(channelId, pageable);
     } else {
-      messages = messageRepository.findByChannelIdBeforeCursor(
+      messages = messageRepositoryCustom.findByChannelIdBeforeCursor(
           channelId, cursor, pageable);
     }
 
