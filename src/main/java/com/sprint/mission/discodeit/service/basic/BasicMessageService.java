@@ -17,6 +17,8 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,11 +83,9 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<FindMessageResult> findAllByChannelId(UUID channelId) {
-    List<Message> messages = messageRepository.findAllByChannelId(channelId);
-    return messages.stream()
-        .map(messageMapper::toFindMessageResult)
-        .toList();
+  public Slice<FindMessageResult> findAllByChannelId(UUID channelId, Pageable pageable) {
+    Slice<Message> messages = messageRepository.findAllByChannelId(channelId, pageable);
+    return messages.map(messageMapper::toFindMessageResult);
   }
 
   @Override

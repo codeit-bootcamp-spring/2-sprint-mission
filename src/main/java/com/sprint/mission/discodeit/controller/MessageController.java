@@ -1,14 +1,21 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.controller.message.*;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.service.message.CreateMessageResult;
 import com.sprint.mission.discodeit.dto.service.message.FindMessageResult;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageResult;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.swagger.MessageApi;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +31,7 @@ public class MessageController implements MessageApi {
 
   private final MessageService messageService;
   private final MessageMapper messageMapper;
+  private final PageResponseMapper pageResponseMapper;
 
   @Override
   @PostMapping
@@ -62,12 +70,13 @@ public class MessageController implements MessageApi {
 
   @Override
   @GetMapping
-  public ResponseEntity<List<FindMessageResponseDTO>> getChannelMessages(
-      @RequestParam("channelId") UUID id) {
-    List<FindMessageResult> messageResults = messageService.findAllByChannelId(id);
-    List<FindMessageResponseDTO> messages = messageResults.stream()
-        .map(messageMapper::toFindMessageResponseDTO)
-        .toList();
-    return ResponseEntity.ok(messages);
+  public ResponseEntity<PageResponse<FindMessageResponseDTO>> getChannelMessages(
+      @RequestParam("channelId") UUID id,
+      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
+    Slice<FindMessageResult> messageResults = messageService.findAllByChannelId(id, pageable);
+    Slice<FindMessageResponseDTO> messageResponseDTOPage = messageResults.map(
+        messageMapper::toFindMessageResponseDTO);
+
+    return ResponseEntity.ok(pageResponseMapper.fromSlice(messageResponseDTOPage));
   }
 }

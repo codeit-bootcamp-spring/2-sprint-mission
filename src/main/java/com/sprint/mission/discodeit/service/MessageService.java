@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.service.message.CreateMessageResult;
 import com.sprint.mission.discodeit.dto.service.message.FindMessageResult;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageCommand;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageResult;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -18,7 +20,7 @@ public interface MessageService {
 
   FindMessageResult find(UUID id);
 
-  List<FindMessageResult> findAllByChannelId(UUID channelId);
+  Slice<FindMessageResult> findAllByChannelId(UUID channelId, Pageable pageable);
 
   UpdateMessageResult update(UUID id, UpdateMessageCommand updateMessageCommand,
       List<MultipartFile> multipartFiles);
