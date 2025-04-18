@@ -8,6 +8,8 @@ discodeit:
 spring:
   application:
     name: discodeit
+  cache:
+    type: simple
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
@@ -48,9 +50,13 @@ spring:
           orm.jdbc.bind: TRACE
         springframework:
           data: DEBUG
+          cache:
+            interceptor: DEBUG
       com:
         sb02:
           jpa_demo: DEBUG
+
+
 
 
 
