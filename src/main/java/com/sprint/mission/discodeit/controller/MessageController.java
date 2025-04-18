@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -96,6 +97,7 @@ public class MessageController {
         .build();
   }
 
+  // pageable 파라미터 추가, size 파라미터 삭제
   @GetMapping
   @Operation(summary = "Channel의 Message 목록 조회")
   @ApiResponses(value = {
@@ -104,10 +106,10 @@ public class MessageController {
   public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
       @RequestParam("channelId") UUID channelId,
       @RequestParam(required = false) Instant cursor,
-      @RequestParam(defaultValue = "10") int size
+      @ParameterObject Pageable pageable
   ) {
     PageResponse<MessageDto> pageResponse = messageService.findAllByChannelId(channelId, cursor,
-        size);
+        pageable);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(pageResponse);
