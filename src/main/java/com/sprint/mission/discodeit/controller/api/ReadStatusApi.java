@@ -65,7 +65,7 @@ public interface ReadStatusApi {
                     content = @Content(examples = @ExampleObject(value = "ReadStatus with id {readStatusId} not found"))
             )
     })
-    ResponseEntity<ReadStatus> updateReadStatusById(
+    ResponseEntity<ReadStatusDto> updateReadStatusById(
             @Parameter(
                     name = "readStatusId",
                     description = "수정할 읽음 상태 ID",

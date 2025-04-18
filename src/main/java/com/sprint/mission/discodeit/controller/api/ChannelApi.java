@@ -27,7 +27,7 @@ public interface ChannelApi {
             responseCode = "201", description = "Public Channel이 성공적으로 생성됨",
             content = @Content(schema = @Schema(implementation = Channel.class))
     )
-    ResponseEntity<Channel> createPublic(
+    ResponseEntity<ChannelDto> createPublic(
             @Parameter(description = "Public Channel 생성 정보") PublicChannelCreateRequest request
     );
 
@@ -36,7 +36,7 @@ public interface ChannelApi {
             responseCode = "201", description = "Private Channel이 성공적으로 생성됨",
             content = @Content(schema = @Schema(implementation = Channel.class))
     )
-    ResponseEntity<Channel> createPrivate(
+    ResponseEntity<ChannelDto> createPrivate(
             @Parameter(description = "Private Channel 생성 정보") PrivateChannelCreateRequest request
     );
 
@@ -55,7 +55,7 @@ public interface ChannelApi {
                     content = @Content(schema = @Schema(implementation = Channel.class))
             )
     })
-    ResponseEntity<Channel> updateChannel(
+    ResponseEntity<ChannelDto> updateChannel(
             @Parameter(
                     name = "channelId",
                     description = "수정할 Channel ID",

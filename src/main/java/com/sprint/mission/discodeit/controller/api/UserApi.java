@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller.api;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -69,7 +70,7 @@ public interface UserApi {
                     content = @Content(schema = @Schema(implementation = User.class))
             )
     })
-    ResponseEntity<User> update(
+    ResponseEntity<UserDto> update(
             @Parameter(
                     name = "userId",
                     description = "수정할 User ID",
@@ -108,7 +109,7 @@ public interface UserApi {
                     content = @Content(schema = @Schema(implementation = UserStatus.class))
             )
     })
-    ResponseEntity<UserStatus> updateUserStatusByUserId(
+    ResponseEntity<UserStatusDto> updateUserStatusByUserId(
             @Parameter(
                     name = "userId",
                     description = "상태를 변경할 User ID",

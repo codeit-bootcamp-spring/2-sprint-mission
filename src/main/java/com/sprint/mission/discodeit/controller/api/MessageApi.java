@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.Page.PageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +33,7 @@ public interface MessageApi {
                     responseCode = "201", description = "Message가 성공적으로 생성됨",
                     content = @Content(schema = @Schema(implementation = Message.class)))
     })
-    ResponseEntity<Message> create(
+    ResponseEntity<MessageDto> create(
             @Parameter(
                     description = "Message 생성 정보",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
@@ -54,7 +55,7 @@ public interface MessageApi {
                     content = @Content(examples = @ExampleObject(value = "Message with id {messageId} not found"))
             ),
     })
-    ResponseEntity<Message> updateMessage(
+    ResponseEntity<MessageDto> updateMessage(
             @Parameter(
                     name = "messageId",
                     description = "수정할 Message ID",
@@ -86,7 +87,7 @@ public interface MessageApi {
             responseCode = "200", description = "Message 목록 조회 성공",
             content = @Content(schema = @Schema(implementation = PageResponse.class))
     )
-    ResponseEntity<List<Message>> findAllByChannelId(
+    ResponseEntity<List<MessageDto>> findAllByChannelId(
             @Parameter(
                     name = "channelId",
                     description = "조회할 Channel ID",

@@ -2,15 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,9 +25,11 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
 
+    private final MessageMapper messageMapper;
+
     @Transactional
     @Override
-    public Message create(
+    public MessageDto create(
             MessageCreateRequest messageCreateRequest,
             List<BinaryContentCreateRequest> binaryContentCreateRequests
     ) {
@@ -61,7 +59,8 @@ public class BasicMessageService implements MessageService {
                 author,
                 attachments
         );
-        return messageRepository.save(message);
+        messageRepository.save(message);
+        return messageMapper.toDto(message);
     }
 
     @Transactional(readOnly = true)
@@ -72,17 +71,19 @@ public class BasicMessageService implements MessageService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannelId(channelId);
+    public List<MessageDto> findAllByChannelId(UUID channelId) {
+        return messageRepository.findAllByChannelId(channelId).stream()
+                .map(messageMapper::toDto)
+                .toList();
     }
 
     @Transactional
     @Override
-    public Message updateMessage(UUID messageId, MessageUpdateRequest dto) {
+    public MessageDto updateMessage(UUID messageId, MessageUpdateRequest dto) {
         String newContent = dto.newContent();
         Message message = getMessage(messageId);
         message.updateContent(newContent);
-        return message;
+        return messageMapper.toDto(message);
     }
 
     @Transactional

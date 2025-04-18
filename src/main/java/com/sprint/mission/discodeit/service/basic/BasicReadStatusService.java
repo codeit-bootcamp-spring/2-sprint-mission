@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -25,6 +26,8 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+
+    private final ReadStatusMapper readStatusMapper;
 
     @Transactional
     @Override
@@ -46,7 +49,7 @@ public class BasicReadStatusService implements ReadStatusService {
         Instant readAt = request.lastReadAt();
         ReadStatus readStatus = new ReadStatus(user, channel, readAt);
         readStatusRepository.save(readStatus);
-        return toDto(readStatus);
+        return readStatusMapper.toDto(readStatus);
     }
 
     @Transactional(readOnly = true)
@@ -59,18 +62,18 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public List<ReadStatusDto> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUser_Id(userId).stream()
-                .map(this::toDto)
+                .map(readStatusMapper::toDto)
                 .toList();
     }
 
     @Transactional
     @Override
-    public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest dto) {
+    public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest dto) {
         Instant newReadAt = dto.newLastReadAt();
         ReadStatus readStatus = getReadStatus(readStatusId);
         readStatus.updateReadAt(newReadAt);
 
-        return readStatus;
+        return readStatusMapper.toDto(readStatus);
     }
 
     @Transactional
@@ -99,14 +102,5 @@ public class BasicReadStatusService implements ReadStatusService {
     private ReadStatus getReadStatus(UUID readStatusId) {
         return readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
-    }
-
-    private ReadStatusDto toDto(ReadStatus readStatus) {
-        return new ReadStatusDto(
-                readStatus.getId(),
-                readStatus.getUser().getId(),
-                readStatus.getChannel().getId(),
-                readStatus.getLastReadAt()
-        );
     }
 }

@@ -15,7 +15,7 @@ public interface ReadStatusService {
 
     List<ReadStatusDto> findAllByUserId(UUID userId);
 
-    ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest dto);
+    ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest dto);
 
     ReadStatus updateByChannelIdAndUserId(UUID userId, UUID channelId, ReadStatusUpdateRequest dto);
 
