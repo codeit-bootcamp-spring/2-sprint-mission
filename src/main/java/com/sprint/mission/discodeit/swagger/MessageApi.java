@@ -5,11 +5,14 @@ import com.sprint.mission.discodeit.dto.controller.message.CreateMessageResponse
 import com.sprint.mission.discodeit.dto.controller.message.FindMessageResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.message.UpdateMessageRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.message.UpdateMessageResponseDTO;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,6 +52,7 @@ public interface MessageApi {
       responses = {
           @ApiResponse(responseCode = "200", description = "채널 내 메시지 조회 성공")
       })
-  ResponseEntity<List<FindMessageResponseDTO>> getChannelMessages(UUID id);
+  ResponseEntity<PageResponse<FindMessageResponseDTO>> getChannelMessages(UUID id,
+      Instant cursor, int limit);
 
 }
