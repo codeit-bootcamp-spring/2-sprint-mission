@@ -5,13 +5,16 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
 public class BasicBinaryContentService implements BinaryContentService {
 
-  BinaryContentRepository binaryContentRepository;
+  private final BinaryContentRepository binaryContentRepository;
 
   @Override
   public BinaryContent create(BinaryContentCreateRequest request) {
@@ -28,21 +31,23 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
-  public BinaryContent findById(UUID binaryContentId) {
-    return binaryContentRepository.findById(binaryContentId);
-  }
-
-  public List<BinaryContent> findAllByIds(List<UUID> binaryContentIds) {
-    return binaryContentRepository.findAllByIds(binaryContentIds);
+  public BinaryContent find(UUID binaryContentId) {
+    return binaryContentRepository.findById(binaryContentId)
+        .orElseThrow(() -> new NoSuchElementException(
+            "BinaryContent with id " + binaryContentId + " not found"));
   }
 
   @Override
-  public List<BinaryContent> findAll() {
-    return binaryContentRepository.findAll();
+  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+    return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
+        .toList();
   }
 
   @Override
   public void delete(UUID binaryContentId) {
-    binaryContentRepository.delete(binaryContentId);
+    if (!binaryContentRepository.existsById(binaryContentId)) {
+      throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
+    }
+    binaryContentRepository.deleteById(binaryContentId);
   }
 }

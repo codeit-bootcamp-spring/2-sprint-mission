@@ -16,10 +16,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+@Slf4j
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserRepository implements UserRepository {
@@ -48,6 +50,7 @@ public class FileUserRepository implements UserRepository {
   }
 
   public void dataLoad() {
+    log.info("Loading users from: {}", userFilePath.toAbsolutePath());
     if (!Files.exists(userFilePath)) {
       userData = new HashMap<>();
       dataSave();
@@ -59,6 +62,7 @@ public class FileUserRepository implements UserRepository {
     } catch (IOException | ClassNotFoundException e) {
       throw new RuntimeException("파일을 불러올 수 없습니다.", e);
     }
+    log.info("Loaded {} users.", userData.size());
   }
 
   public void dataSave() {
@@ -71,9 +75,10 @@ public class FileUserRepository implements UserRepository {
   }
 
   public User save(User user) {
+    log.info("Saving User: id={} username={}", user.getId(), user.getUsername());
     this.userData.put(user.getId(), user);
     dataSave();
-
+    log.info("After save, total users: {}", userData.size());
     return user;
   }
 
@@ -86,10 +91,12 @@ public class FileUserRepository implements UserRepository {
   }
 
   public List<User> findAll() {
+    log.info("findAll() => {} users in memory", userData.size());
     return this.userData.values().stream().toList();
   }
 
   public User findById(UUID userId) {
+    log.info("findById() lookup userId={}", userId);
     return Optional.ofNullable(userData.get(userId))
         .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
   }

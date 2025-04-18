@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequestDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -51,24 +50,30 @@ public class BasicUserStatusService implements UserStatusService {
     return userStatusRepository.findAll();
   }
 
-  public UserStatus update(UserStatusUpdateRequestDto dto) {
-    UserStatus userStatus = userStatusRepository.findById(dto.getId());
+  public UserStatus update(UUID userId, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusRepository.findByUserId(userId);
     if (userStatus == null) {
-      throw new UserStatusNotFoundException("UserStatus with id " + dto.getId() + " not found");
+      throw new UserStatusNotFoundException("UserStatus with userId " + userId + " not found");
     }
 
-    return userStatusRepository.update(dto);
+    return userStatusRepository.update(userStatus.getId(), request);
   }
 
-  public UserStatus updateByUserId(UUID userId, Instant newActivatedAt) {
+  public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+    System.out.println(">>> 요청 들어옴 - userId: " + userId);
+    System.out.println(">>> 변경할 활성화 시간: " + request.newLastActiveAt());
+
+    if (request.newLastActiveAt() == null) {
+      throw new IllegalArgumentException("newActivatedAt 값이 null입니다.");
+    }
+
     UserStatus userStatus = userStatusRepository.findAll().stream()
         .filter(status -> status.getUserId().equals(userId))
         .findFirst()
         .orElseThrow(() -> new UserStatusNotFoundException(
             "UserStatus with userid " + userId + " not found"));
 
-    return userStatusRepository.update(
-        new UserStatusUpdateRequestDto(userStatus.getId(), newActivatedAt));
+    return userStatusRepository.update(userStatus.getId(), request);
   }
 
   public void delete(UUID userStatusId) {

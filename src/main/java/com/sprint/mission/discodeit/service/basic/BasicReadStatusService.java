@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequestDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -28,14 +28,14 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ChannelRepository channelRepository;
 
   @Override
-  public ReadStatus create(ReadStatusCreateRequestDto dto) {
-    User user = Optional.ofNullable(userRepository.findById(dto.getUserID()))
+  public ReadStatus create(ReadStatusCreateRequest request) {
+    User user = Optional.ofNullable(userRepository.findById(request.userId()))
         .orElseThrow(
-            () -> new UserNotFoundException("User with id " + dto.getUserID() + " not found"));
+            () -> new UserNotFoundException("User with id " + request.userId() + " not found"));
 
-    Channel channel = Optional.ofNullable(channelRepository.findById(dto.getChannelID()))
+    Channel channel = Optional.ofNullable(channelRepository.findById(request.channelId()))
         .orElseThrow(() -> new ChannelNotFoundException(
-            "Channel with id " + dto.getChannelID() + " not found"));
+            "Channel with id " + request.channelId() + " not found"));
 
     if (readStatusRepository.findAll().stream()
         .anyMatch(readStatus ->
@@ -44,7 +44,7 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new ReadStatusAlreadyExistsException("관련된 객체가 이미 존재합니다.");
     }
 
-    return readStatusRepository.save(dto);
+    return readStatusRepository.save(request);
   }
 
   @Override
@@ -62,14 +62,14 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public ReadStatus update(ReadStatusUpdateRequestDto dto) {
-    ReadStatus readStatus = readStatusRepository.findById(dto.getReadStatusId());
+  public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
+    ReadStatus readStatus = readStatusRepository.findById(readStatusId);
     if (readStatus == null) {
       throw new ReadStatusNotFoundException(
-          "ReadStatus with id " + dto.getReadStatusId() + " not found");
+          "ReadStatus with id " + readStatusId + " not found");
     }
 
-    return readStatusRepository.update(dto);
+    return readStatusRepository.update(readStatusId, request);
   }
 
   @Override

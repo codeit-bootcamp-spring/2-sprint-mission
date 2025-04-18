@@ -14,7 +14,7 @@ public class UserStatus extends BaseEntity implements Serializable {
   //
   private UserStatusType type;
   private Instant activatedAt;
-  private UUID userId;
+  private final UUID userId;
 
   public UserStatus(UUID userId, Instant activatedAt) {
     super();
@@ -25,7 +25,7 @@ public class UserStatus extends BaseEntity implements Serializable {
 
   public void update(Instant newActivatedAt) {
     boolean anyValueUpdated = false;
-    if (activatedAt != null && !newActivatedAt.equals(activatedAt)) {
+    if (newActivatedAt != null && !newActivatedAt.equals(activatedAt)) {
       this.activatedAt = newActivatedAt;
       anyValueUpdated = true;
     }

@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -27,17 +29,34 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final BinaryContentRepository binaryContentRepository;
 
-  public Message create(MessageCreateRequestDto dto) {
-    Optional.ofNullable(userRepository.findById(dto.getAuthorId()))
+  public Message create(MessageCreateRequest messageCreateRequest,
+      List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+    UUID channelId = messageCreateRequest.channelId();
+    UUID authorId = messageCreateRequest.authorId();
+
+    Optional.ofNullable(userRepository.findById(authorId))
         .orElseThrow(
-            () -> new UserNotFoundException("User with id " + dto.getAuthorId() + " not found"));
+            () -> new UserNotFoundException("User with id " + authorId + " not found"));
 
-    Optional.ofNullable(channelRepository.findById(dto.getChannelID()))
+    Optional.ofNullable(channelRepository.findById(channelId))
         .orElseThrow(() -> new ChannelNotFoundException(
-            "Channel with id " + dto.getChannelID() + " not found"));
+            "Channel with id " + channelId + " not found"));
 
-    Message message = new Message(dto.getContent(), dto.getChannelID(), dto.getAuthorId(),
-        dto.getContents());
+    List<UUID> attachmentIds = binaryContentCreateRequests.stream()
+        .map(attachmentRequest -> {
+          String fileName = attachmentRequest.fileName();
+          String contentType = attachmentRequest.contentType();
+          byte[] bytes = attachmentRequest.bytes();
+
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType, bytes);
+          BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+          return createdBinaryContent.getId();
+        })
+        .toList();
+
+    Message message = new Message(messageCreateRequest.content(), channelId, authorId,
+        attachmentIds);
     return messageRepository.save(message);
   }
 
@@ -51,15 +70,15 @@ public class BasicMessageService implements MessageService {
         .toList();
   }
 
-  public Message update(MessageUpdateRequestDto dto) {
+  public Message update(UUID messageId, MessageUpdateRequest request) {
     Map<UUID, Message> messageData = messageRepository.getMessageData();
 
-    Message messageNullable = messageData.get(dto.getMessageId());
+    Message messageNullable = messageData.get(messageId);
     Message message = Optional.ofNullable(messageNullable)
         .orElseThrow(() -> new MessageNotFoundException(
-            "Message with id " + dto.getMessageId() + " not found"));
+            "Message with id " + messageId + " not found"));
 
-    return messageRepository.update(message, dto.getNewContent());
+    return messageRepository.update(message, request.newContent());
   }
 
   public void delete(UUID messageId) {
@@ -70,7 +89,7 @@ public class BasicMessageService implements MessageService {
 
     messageRepository.delete(messageId);
     messageData.get(messageId).getAttachmentIds().stream()
-        .filter(id -> binaryContentRepository.findById(id) != null)
-        .forEach(binaryContentRepository::delete);
+        .filter(id -> binaryContentRepository.findById(id).isPresent())
+        .forEach(binaryContentRepository::deleteById);
   }
 }

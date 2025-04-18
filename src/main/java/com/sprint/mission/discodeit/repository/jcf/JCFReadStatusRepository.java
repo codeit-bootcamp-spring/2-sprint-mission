@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequestDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import java.util.HashMap;
@@ -16,35 +16,43 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFReadStatusRepository implements ReadStatusRepository {
-    private final Map<UUID, ReadStatus> data;
 
-    public JCFReadStatusRepository() {
-        this.data = new HashMap<>();
-    }
+  private final Map<UUID, ReadStatus> data;
 
-    public ReadStatus save(ReadStatusCreateRequestDto dto){
-        ReadStatus readStatus = new ReadStatus(dto.getUserID(), dto.getChannelID(), dto.getLastRead());
-        this.data.put(readStatus.getId(), readStatus);
-        return readStatus;
-    }
+  public JCFReadStatusRepository() {
+    this.data = new HashMap<>();
+  }
 
-    public ReadStatus findById(UUID id){
-        return Optional.ofNullable(data.get(id))
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + id + " not found"));
-    }
+  public ReadStatus save(ReadStatusCreateRequest request) {
+    ReadStatus readStatus = new ReadStatus(request.userId(), request.channelId(),
+        request.lastReadAt());
+    this.data.put(readStatus.getId(), readStatus);
 
-    public List<ReadStatus> findAll(){
-        return this.data.values().stream().toList();
-    }
+    return readStatus;
+  }
 
-    public ReadStatus update(ReadStatusUpdateRequestDto dto){
-        ReadStatus readStatus = data.get(dto.getReadStatusId());
-        readStatus.update(dto.getNewLastReadAt());
+  public ReadStatus findById(UUID id) {
+    return Optional.ofNullable(data.get(id))
+        .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + id + " not found"));
+  }
 
-        return readStatus;
-    }
+  public List<ReadStatus> findAll() {
+    return this.data.values().stream().toList();
+  }
 
-    public void delete(UUID readStatusID){
-        data.remove(readStatusID);
-    }
+  public List<ReadStatus> findAllByChannelId(UUID channelId) {
+    return data.values().stream()
+        .filter(readStatus -> readStatus.getChannelId().equals(channelId)).toList();
+  }
+
+  public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
+    ReadStatus readStatus = data.get(readStatusId);
+    readStatus.update(request.newLastReadAt());
+
+    return readStatus;
+  }
+
+  public void delete(UUID readStatusID) {
+    data.remove(readStatusID);
+  }
 }

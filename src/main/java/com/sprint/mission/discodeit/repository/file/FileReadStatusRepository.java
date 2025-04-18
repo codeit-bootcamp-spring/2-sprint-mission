@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequestDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequestDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,7 +16,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,74 +25,86 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileReadStatusRepository implements ReadStatusRepository {
-    private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
-    //
-    private Map<UUID, ReadStatus> readStatusData;
-    private final Path readStatusFilePath;
 
-    public FileReadStatusRepository(@Value("${discodeit.repository.file-directory:data}") String fileDirectory) {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, ReadStatus.class.getSimpleName());
-        this.readStatusFilePath = DIRECTORY.resolve("readStatus" + EXTENSION);
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
+  //
+  private Map<UUID, ReadStatus> readStatusData;
+  private final Path readStatusFilePath;
 
-        if (Files.notExists(DIRECTORY)) {
-            try {
-                Files.createDirectories(DIRECTORY);
-            } catch (IOException e) {
-                throw new RuntimeException("디렉토리 생성 실패: " + e.getMessage(), e);
-            }
-        }
-        dataLoad();
+  public FileReadStatusRepository(
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        ReadStatus.class.getSimpleName());
+    this.readStatusFilePath = DIRECTORY.resolve("readStatus" + EXTENSION);
+
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException("디렉토리 생성 실패: " + e.getMessage(), e);
+      }
     }
+    dataLoad();
+  }
 
-    public void dataLoad() {
-        if (!Files.exists(readStatusFilePath)) {
-            readStatusData = new HashMap<>();
-            dataSave();
-            return;
-        }
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(readStatusFilePath.toFile()))) {
-            readStatusData = (Map<UUID, ReadStatus>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("파일을 불러올 수 없습니다.", e);
-        }
+  public void dataLoad() {
+    if (!Files.exists(readStatusFilePath)) {
+      readStatusData = new HashMap<>();
+      dataSave();
+      return;
     }
-
-    public void dataSave() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(readStatusFilePath.toFile()))) {
-            oos.writeObject(readStatusData);
-        } catch (IOException e) {
-            throw new RuntimeException("파일을 저장할 수 없습니다."+ e.getMessage(), e);
-        }
+    try (ObjectInputStream ois = new ObjectInputStream(
+        new FileInputStream(readStatusFilePath.toFile()))) {
+      readStatusData = (Map<UUID, ReadStatus>) ois.readObject();
+    } catch (IOException | ClassNotFoundException e) {
+      throw new RuntimeException("파일을 불러올 수 없습니다.", e);
     }
+  }
 
-    public ReadStatus save(ReadStatusCreateRequestDto dto){
-        ReadStatus readStatus = new ReadStatus(dto.getUserID(), dto.getChannelID(), dto.getLastRead());
-        this.readStatusData.put(readStatus.getId(), readStatus);
-        dataSave();
-
-        return readStatus;
+  public void dataSave() {
+    try (ObjectOutputStream oos = new ObjectOutputStream(
+        new FileOutputStream(readStatusFilePath.toFile()))) {
+      oos.writeObject(readStatusData);
+    } catch (IOException e) {
+      throw new RuntimeException("파일을 저장할 수 없습니다." + e.getMessage(), e);
     }
+  }
 
-    public ReadStatus findById(UUID id){
-        return Optional.ofNullable(readStatusData.get(id))
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + id + " not found"));
-    }
+  public ReadStatus save(ReadStatusCreateRequest request) {
+    ReadStatus readStatus = new ReadStatus(request.userId(), request.channelId(),
+        request.lastReadAt());
+    this.readStatusData.put(readStatus.getId(), readStatus);
+    dataSave();
 
-    public List<ReadStatus> findAll(){
-        return this.readStatusData.values().stream().toList();
-    }
+    return readStatus;
+  }
 
-    public ReadStatus update(ReadStatusUpdateRequestDto dto){
-        ReadStatus readStatus = readStatusData.get(dto.getReadStatusId());
-        readStatus.update(dto.getNewLastReadAt());
+  public ReadStatus findById(UUID id) {
+    return Optional.ofNullable(readStatusData.get(id))
+        .orElseThrow(
+            () -> new ReadStatusNotFoundException("ReadStatus with id " + id + " not found"));
+  }
 
-        dataSave();
-        return readStatus;
-    }
+  public List<ReadStatus> findAll() {
+    return this.readStatusData.values().stream().toList();
+  }
 
-    public void delete(UUID readStatusID){
-        readStatusData.remove(readStatusID);
-        dataSave();
-    }
+  public List<ReadStatus> findAllByChannelId(UUID channelId) {
+    return readStatusData.values().stream()
+        .filter(readStatus -> readStatus.getChannelId().equals(channelId)).toList();
+  }
+
+  public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
+    ReadStatus readStatus = readStatusData.get(readStatusId);
+    readStatus.update(request.newLastReadAt());
+
+    dataSave();
+    return readStatus;
+  }
+
+  public void delete(UUID readStatusID) {
+    readStatusData.remove(readStatusID);
+    dataSave();
+  }
 }

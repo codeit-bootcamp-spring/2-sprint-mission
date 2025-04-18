@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequestDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,88 +17,103 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+@Slf4j
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserStatusRepository implements UserStatusRepository {
-    private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
-    //
-    private Map<UUID, UserStatus> userStatusData;
-    private final Path userStatusFilePath;
 
-    public FileUserStatusRepository(@Value("${discodeit.repository.file-directory:data}") String fileDirectory) {
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
+  //
+  private Map<UUID, UserStatus> userStatusData;
+  private final Path userStatusFilePath;
 
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, UserStatus.class.getSimpleName());
-        this.userStatusFilePath = DIRECTORY.resolve("userStatus" + EXTENSION);
+  public FileUserStatusRepository(
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory) {
 
-        if (Files.notExists(DIRECTORY)) {
-            try {
-                Files.createDirectories(DIRECTORY);
-            } catch (IOException e) {
-                throw new RuntimeException("디렉토리 생성 실패: " + e.getMessage(), e);
-            }
-        }
-        dataLoad();
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        UserStatus.class.getSimpleName());
+    this.userStatusFilePath = DIRECTORY.resolve("userStatus" + EXTENSION);
+
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException("디렉토리 생성 실패: " + e.getMessage(), e);
+      }
     }
+    dataLoad();
+  }
 
-    public void dataLoad() {
-        if (!Files.exists(userStatusFilePath)) {
-            userStatusData = new HashMap<>();
-            dataSave();
-            return;
-        }
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(userStatusFilePath.toFile()))) {
-            userStatusData = (Map<UUID, UserStatus>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("파일을 불러올 수 없습니다.", e);
-        }
+  public void dataLoad() {
+    log.info("Trying to load userStatusData from: {}", userStatusFilePath.toAbsolutePath());
+    if (!Files.exists(userStatusFilePath)) {
+      log.warn("userStatus file not found, initializing empty map.");
+      userStatusData = new HashMap<>();
+      dataSave();
+      return;
     }
-
-    public void dataSave() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(userStatusFilePath.toFile()))) {
-            oos.writeObject(userStatusData);
-        } catch (IOException e) {
-            throw new RuntimeException("파일을 저장할 수 없습니다."+ e.getMessage(), e);
-        }
+    try (ObjectInputStream ois = new ObjectInputStream(
+        new FileInputStream(userStatusFilePath.toFile()))) {
+      userStatusData = (Map<UUID, UserStatus>) ois.readObject();
+      log.info("Loaded {} user statuses.", userStatusData.size());
+    } catch (IOException | ClassNotFoundException e) {
+      throw new RuntimeException("파일을 불러올 수 없습니다.", e);
     }
+  }
 
-    public UserStatus save(UserStatus userStatus){
-        this.userStatusData.put(userStatus.getId(), userStatus);
-        dataSave();
-
-        return userStatus;
+  public void dataSave() {
+    try (ObjectOutputStream oos = new ObjectOutputStream(
+        new FileOutputStream(userStatusFilePath.toFile()))) {
+      oos.writeObject(userStatusData);
+    } catch (IOException e) {
+      throw new RuntimeException("파일을 저장할 수 없습니다." + e.getMessage(), e);
     }
+  }
 
-    public UserStatus update(UserStatusUpdateRequestDto dto){
-        UserStatus userStatus = userStatusData.get(dto.getId());
-        userStatus.update(dto.getNewActivatedAt());
+  public UserStatus save(UserStatus userStatus) {
+    log.info("Saving to map. userStatusId: {}, userId: {}", userStatus.getId(),
+        userStatus.getUserId());
+    this.userStatusData.put(userStatus.getId(), userStatus);
+    dataSave();
 
-        dataSave();
-        return userStatus;
-    }
+    return userStatus;
+  }
 
-    public List<UserStatus> findAll(){
-        return this.userStatusData.values().stream().toList();
-    }
+  public UserStatus update(UUID userStatusId, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusData.get(userStatusId);
+    userStatus.update(request.newLastActiveAt());
 
-    public UserStatus findById(UUID userStatusId){
-        return Optional.ofNullable(userStatusData.get(userStatusId))
-                .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
-    }
+    dataSave();
+    return userStatus;
+  }
 
-    public UserStatus findByUserId(UUID userId){
-        return userStatusData.values().stream()
-                .filter(status -> status.getUserId().equals(userId))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("UserStatus with userid " + userId + " not found"));
-    }
+  public List<UserStatus> findAll() {
+    return this.userStatusData.values().stream().toList();
+  }
 
-    public void delete(UUID userStatusId){
-        userStatusData.remove(userStatusId);
-        dataSave();
-    }
+  public UserStatus findById(UUID userStatusId) {
+    return Optional.ofNullable(userStatusData.get(userStatusId))
+        .orElseThrow(
+            () -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
+  }
+
+  public UserStatus findByUserId(UUID userId) {
+    log.info("Searching for UserStatus with userId: {}", userId);
+    return userStatusData.values().stream()
+        .filter(status -> status.getUserId().equals(userId))
+        .findFirst()
+        .orElseThrow(
+            () -> new NoSuchElementException("UserStatus with userid " + userId + " not found"));
+  }
+
+  public void delete(UUID userStatusId) {
+    userStatusData.remove(userStatusId);
+    dataSave();
+  }
 }

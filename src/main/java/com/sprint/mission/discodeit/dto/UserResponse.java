@@ -1,9 +1,16 @@
 package com.sprint.mission.discodeit.dto;
 
+import java.time.Instant;
 import java.util.UUID;
 
-public record UserResponse(boolean success, UUID id) {
-    public static UserResponse of(boolean success, UUID id) {
-        return new UserResponse(success, id);
-    }
+public record UserResponse(
+    UUID id,
+    Instant createdAt,
+    Instant updatedAt,
+    String username,
+    String email,
+    UUID profileId,
+    Boolean online
+) {
+
 }

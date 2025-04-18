@@ -3,25 +3,27 @@ package com.sprint.mission.discodeit.service.basic;
 import static com.sprint.mission.discodeit.entity.ChannelType.PRIVATE;
 import static com.sprint.mission.discodeit.entity.ChannelType.PUBLIC;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.ChannelResponse;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.channel.ChannelNameAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.MessageNotExistsInChannelException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.time.Instant;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -37,29 +39,29 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
 
-  public Channel createPublic(PublicChannelCreateRequestDto dto) {
+  public Channel createPublic(PublicChannelCreateRequest request) {
     if (channelRepository.findAll().stream()
-        .anyMatch(channel -> channel.getName().equals(dto.getName()))) {
-      throw new IllegalArgumentException("같은 이름을 가진 채널이 있습니다.");
+        .anyMatch(channel -> channel.getName().equals(request.name()))) {
+      throw new ChannelNameAlreadyExistsException("같은 이름을 가진 채널이 있습니다.");
     }
-    Channel channel = new Channel(PUBLIC, dto.getName(), dto.getDescription());
+    Channel channel = new Channel(PUBLIC, request.name(), request.description());
 
     return channelRepository.save(channel);
   }
 
-  public Channel createPrivate(PrivateChannelCreateRequestDto dto) {
+  public Channel createPrivate(PrivateChannelCreateRequest request) {
     Channel channel = new Channel(PRIVATE, null, null);
     channelRepository.save(channel);
 
-    dto.getUsers().forEach(user -> {
+    request.participantIds().forEach(userId -> {
       readStatusRepository.save(
-          new ReadStatusCreateRequestDto(user.getId(), channel.getId(), null));
+          new ReadStatusCreateRequest(userId, channel.getId(), null));
     });
 
     return channel;
   }
 
-  public ChannelResponseDto find(UUID channelId) {
+  public ChannelResponse find(UUID channelId) {
     Channel channel = channelRepository.findById(channelId);
 
     Optional<Message> latestMessage = messageRepository.findAll().stream()
@@ -67,21 +69,13 @@ public class BasicChannelService implements ChannelService {
         .max(Comparator.comparing(Message::getCreatedAt));
 
     if (latestMessage.isEmpty()) {
-      throw new NoSuchElementException("채널에 메세지가 없습니다");
+      throw new MessageNotExistsInChannelException("채널에 메세지가 없습니다");
     }
 
-    if (channel.getType() == PRIVATE) {
-      List<UUID> userIds = readStatusRepository.findAll().stream()
-          .filter(readStatus -> readStatus.getChannelId().equals(channelId))
-          .map(ReadStatus::getUserId)
-          .toList();
-      return new ChannelResponseDto(channel, latestMessage.get().getCreatedAt(), userIds);
-    }
-
-    return new ChannelResponseDto(channel, latestMessage.get().getCreatedAt(), null);
+    return toDto(channel);
   }
 
-  public List<ChannelResponseDto> findAllByUserID(UUID userId) {
+  public List<ChannelResponse> findAllByUserID(UUID userId) {
     List<Channel> channels = channelRepository.findAll();
 
     Set<UUID> userPrivateChannelIds = readStatusRepository.findAll().stream()
@@ -93,37 +87,21 @@ public class BasicChannelService implements ChannelService {
         .filter(channel ->
             channel.getType() == PUBLIC || userPrivateChannelIds.contains(channel.getId())
         )
-        .map(channel -> {
-          Optional<Message> latestMessage = messageRepository.findAll().stream()
-              .filter(message -> message.getChannelId().equals(channel.getId()))
-              .max(Comparator.comparing(Message::getCreatedAt));
-
-          Instant latestMessageTime = latestMessage.map(Message::getCreatedAt)
-              .orElse(null);
-
-          List<UUID> userIds = Collections.emptyList();
-          if (channel.getType() == PRIVATE) {
-            userIds = readStatusRepository.findAll().stream()
-                .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
-                .map(ReadStatus::getUserId)
-                .toList();
-          }
-          return new ChannelResponseDto(channel, latestMessageTime, userIds);
-        })
+        .map(this::toDto)
         .toList();
   }
 
-  public Channel update(ChannelUpdateRequestDto dto) {
-    Channel channel = Optional.ofNullable(channelRepository.findById(dto.getChannelId()))
+  public Channel update(UUID channelId, PublicChannelUpdateRequest request) {
+    Channel channel = Optional.ofNullable(channelRepository.findById(channelId))
         .orElseThrow(() -> new ChannelNotFoundException(
-            "Channel with id " + dto.getChannelId() + " not found"));
+            "Channel with id " + channelId + " not found"));
 
     if (channel.getType() == PRIVATE) {
       throw new PrivateChannelUpdateException("PRIVATE 채널은 수정할 수 없습니다");
     }
 
-    return channelRepository.update(channel, dto.getNewChannelName(),
-        dto.getNewChannelDescription());
+    return channelRepository.update(channel, request.newName(),
+        request.newDescription());
   }
 
   public void delete(UUID channelId) {
@@ -136,5 +114,32 @@ public class BasicChannelService implements ChannelService {
     readStatusRepository.findAll().stream()
         .filter(readStatus -> readStatus.getChannelId().equals(channelId))
         .forEach(readStatus -> readStatusRepository.delete(readStatus.getId()));
+  }
+
+  private ChannelResponse toDto(Channel channel) {
+    Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId())
+        .stream()
+        .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+        .map(Message::getCreatedAt)
+        .limit(1)
+        .findFirst()
+        .orElse(Instant.MIN);
+
+    List<UUID> participantIds = new ArrayList<>();
+    if (channel.getType().equals(ChannelType.PRIVATE)) {
+      readStatusRepository.findAllByChannelId(channel.getId())
+          .stream()
+          .map(ReadStatus::getUserId)
+          .forEach(participantIds::add);
+    }
+
+    return new ChannelResponse(
+        channel.getId(),
+        channel.getType(),
+        channel.getName(),
+        channel.getDescription(),
+        participantIds,
+        lastMessageAt
+    );
   }
 }

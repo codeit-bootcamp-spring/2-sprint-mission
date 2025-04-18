@@ -14,42 +14,51 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> data;
 
-    JCFMessageRepository() {
-        data = new HashMap<>();
-    }
+  private final Map<UUID, Message> data;
 
-    @Override
-    public Message save(Message message){
-        data.put(message.getId(), message);
-        return message;
-    }
+  JCFMessageRepository() {
+    data = new HashMap<>();
+  }
 
-    @Override
-    public Map<UUID, Message> getMessageData(){
-        return data;
-    }
+  @Override
+  public Message save(Message message) {
+    data.put(message.getId(), message);
+    return message;
+  }
 
-    @Override
-    public List<Message> findAll(){
-        return this.data.values().stream().toList();
-    }
+  @Override
+  public Map<UUID, Message> getMessageData() {
+    return data;
+  }
 
-    @Override
-    public Message findById(UUID messageId){
-        return Optional.ofNullable(data.get(messageId)).orElseThrow(()->new NoSuchElementException("Message with id " + messageId + " not found"));
-    }
+  @Override
+  public List<Message> findAll() {
+    return this.data.values().stream().toList();
+  }
 
-    @Override
-    public void delete(UUID messageId){
-        this.data.remove(messageId);
-    }
+  @Override
+  public Message findById(UUID messageId) {
+    return Optional.ofNullable(data.get(messageId)).orElseThrow(
+        () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+  }
 
-    @Override
-    public Message update(Message message, String newContent){
-        message.update(newContent);
+  @Override
+  public List<Message> findAllByChannelId(UUID channelId) {
+    return this.data.values().stream()
+        .filter(message -> message.getChannelId().equals(channelId))
+        .toList();
+  }
 
-        return message;
-    }
+  @Override
+  public void delete(UUID messageId) {
+    this.data.remove(messageId);
+  }
+
+  @Override
+  public Message update(Message message, String newContent) {
+    message.update(newContent);
+
+    return message;
+  }
 }

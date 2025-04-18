@@ -9,11 +9,9 @@ public interface BinaryContentService {
 
   BinaryContent create(BinaryContentCreateRequest request);
 
-  BinaryContent findById(UUID binaryContentId);
+  BinaryContent find(UUID binaryContentId);
 
-  public List<BinaryContent> findAllByIds(List<UUID> binaryContentIds);
-
-  List<BinaryContent> findAll();
+  List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds);
 
   void delete(UUID binaryContentId);
 }
