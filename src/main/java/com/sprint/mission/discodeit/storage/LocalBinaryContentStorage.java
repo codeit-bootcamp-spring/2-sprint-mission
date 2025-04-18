@@ -5,10 +5,11 @@ import com.sprint.mission.discodeit.exception.RestExceptions;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,16 +84,19 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       // 대용량 파일을 조각조각 읽기(InputStream) → 브라우저에 실시간 전송(Resource로 감싸서 Spring이 스트리밍 처리)
       Resource resource = new InputStreamResource(inputStream);
 
+      String encodedFilename = URLEncoder.encode(findBinaryContentResult.filename(),
+              StandardCharsets.UTF_8)
+          .replaceAll("\\+", "%20"); // 공백 처리
+
       return ResponseEntity.ok()
           .header(HttpHeaders.CONTENT_DISPOSITION,
-              "inline; filename=\"" + findBinaryContentResult.filename() + "\"")
+              "inline; filename=\"" + encodedFilename + "\"")
           // 프론트단에서 BinaryContent download API를 날려 사진을 가져와 바로 렌더링하는 것으로 보임 -> 이를 위해 inline으로 지정
           .contentType(MediaType.parseMediaType(findBinaryContentResult.contentType()))
           .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(findBinaryContentResult.size()))
           .body(resource);
     } catch (InvalidMediaTypeException e) {
       throw RestExceptions.UNSUPPORTED_MEDIA_TYPE;
-
     }
   }
 
