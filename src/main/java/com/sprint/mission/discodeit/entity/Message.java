@@ -27,7 +27,7 @@ public class Message extends BaseUpdatableEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id", columnDefinition = "UUID")
-  private User user;
+  private User author;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinTable(
@@ -40,10 +40,10 @@ public class Message extends BaseUpdatableEntity {
   public Message() {
   }
 
-  public Message(String content, Channel channel, User user, List<BinaryContent> attachments) {
+  public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
     this.content = content;
     this.channel = channel;
-    this.user = user;
+    this.author = author;
     this.attachments = attachments;
   }
 

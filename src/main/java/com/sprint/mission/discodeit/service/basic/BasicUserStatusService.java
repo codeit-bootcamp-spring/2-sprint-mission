@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusDto;
+import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusUpdateDto;
-import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusUpdateRequest;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -22,10 +23,11 @@ public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
+  private final UserStatusMapper userStatusMapper;
 
   @Override
   @Transactional
-  public UserStatus create(UserStatusCreateRequest request) {
+  public UserStatusDto create(UserStatusCreateRequest request) {
     User user = userRepository.findById(request.userId())
         .orElseThrow(() -> new NoSuchElementException(request.userId() + " 에 해당하는 User를 찾을 수 없음"));
 
@@ -34,18 +36,23 @@ public class BasicUserStatusService implements UserStatusService {
     }
     Instant lastActiveAt = request.lastActiveAt();
     UserStatus userStatus = new UserStatus(user, lastActiveAt);
-    return userStatusRepository.save(userStatus);
+    userStatusRepository.save(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
-  public UserStatus find(UUID id) {
-    return userStatusRepository.findById(id)
+  @Transactional(readOnly = true)
+  public UserStatusDto find(UUID id) {
+    UserStatus userStatus = userStatusRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 UserStatus를 찾을 수 없음"));
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
-  public List<UserStatus> findAll() {
-    return userStatusRepository.findAll();
+  @Transactional(readOnly = true)
+  public List<UserStatusDto> findAll() {
+    List<UserStatus> userStatusList = userStatusRepository.findAll();
+    return userStatusMapper.toDtoList(userStatusList);
   }
 
   @Override
@@ -58,7 +65,8 @@ public class BasicUserStatusService implements UserStatusService {
   @Transactional
   public UserStatus update(UUID id, UserStatusUpdateRequest request) {
     Instant newLastActiveAt = request.newLastActiveAt();
-    UserStatus userStatus = find(id);
+    UserStatus userStatus = userStatusRepository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 UserStatus를 찾을 수 없음"));
     userStatus.update(newLastActiveAt);
 
     return userStatusRepository.save(userStatus);
@@ -66,14 +74,12 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   @Transactional
-  public UserStatusUpdateDto updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+  public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest request) {
     UserStatus userStatus = findByUserId(userId);
     Instant newLastActiveAt = request.newLastActiveAt();
     userStatus.update(newLastActiveAt);
 
-    userStatusRepository.save(userStatus);
-
-    return UserStatusUpdateDto.of(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override

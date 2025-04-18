@@ -1,23 +1,26 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.controller.MessageDto;
+import com.sprint.mission.discodeit.dto.controller.PageResponse;
+import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.service.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.service.message.MessageDto;
+import com.sprint.mission.discodeit.dto.service.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.service.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.service.message.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.service.user.UserDto;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
-  //
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BasicBinaryContentService basicBinaryContentService;
+  private final MessageMapper messageMapper;
+  private final PageResponseMapper pageResponseMapper;
 
   @Override
   @Transactional
@@ -49,12 +53,7 @@ public class BasicMessageService implements MessageService {
     Message message = new Message(createRequest.content(), channel, author, attachmentList);
     messageRepository.save(message);
 
-    List<BinaryContentDto> contentDtoList = attachmentList.stream()
-        .map(BinaryContentDto::of).toList();
-
-    BinaryContentDto profileDto = BinaryContentDto.of(author.getProfile());
-    UserDto userDto = UserDto.of(author, profileDto, author.getUserStatus().isOnline());
-    return MessageDto.of(message, userDto, contentDtoList);
+    return messageMapper.toDto(message);
   }
 
   @Override
@@ -64,16 +63,13 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<MessageDto> findAllByChannelId(UUID channelId) {
-    List<Message> messages = messageRepository.findAllByChannelId(channelId);
-    return messages.stream().map(message -> {
-      List<BinaryContentDto> contentDtoList = message.getAttachments().stream()
-          .map(BinaryContentDto::of).toList();
-      User author = message.getUser();
-      BinaryContentDto profileDto = BinaryContentDto.of(author.getProfile());
-      UserDto userDto = UserDto.of(author, profileDto, author.getUserStatus().isOnline());
-      return MessageDto.of(message, userDto, contentDtoList);
-    }).toList();
+  @Transactional(readOnly = true)
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+    Slice<MessageDto> messageDtos = messageRepository
+        .findAllByChannelId(channelId, pageable)
+        .map(messageMapper::toDto);
+
+    return pageResponseMapper.fromSlice(messageDtos);
   }
 
   @Override
@@ -82,13 +78,8 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 Message를 찾을 수 없음"));
     message.update(updateRequest.newContent());
-    messageRepository.save(message);
-    User author = message.getUser();
-    List<BinaryContentDto> contentDtoList = message.getAttachments().stream()
-        .map(BinaryContentDto::of).toList();
-    BinaryContentDto profileDto = BinaryContentDto.of(author.getProfile());
-    UserDto userDto = UserDto.of(author, profileDto, author.getUserStatus().isOnline());
-    return MessageDto.of(message, userDto, contentDtoList);
+
+    return messageMapper.toDto(message);
   }
 
   @Override

@@ -1,15 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.service.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.service.readstatus.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.service.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.dto.service.readstatus.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.service.readstatus.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.service.readstatus.ReadStatusUpdateRequest;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final ReadStatusRepository readStatusRepository;
+  private final ReadStatusMapper readStatusMapper;
 
   @Override
   @Transactional
@@ -42,7 +44,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     ReadStatus status = new ReadStatus(user, channel, request.lastReadAt());
     readStatusRepository.save(status);
-    return ReadStatusDto.of(status);
+    return readStatusMapper.toDto(status);
   }
 
   @Override
@@ -52,20 +54,13 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ReadStatusDto> findAllByUserId(UUID userId) {
     if (!userRepository.existsById(userId)) {
       throw new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음.");
     }
     List<ReadStatus> statusList = readStatusRepository.findAllByUserId(userId);
-    return statusList.stream().map(ReadStatusDto::of).toList();
-  }
-
-  @Override
-  public List<User> findAllUserByChannelId(UUID channelId) {
-    if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchElementException(channelId + " 에 해당하는 Channel를 찾을 수 없음.");
-    }
-    return readStatusRepository.findAllUserByChannelId(channelId);
+    return readStatusMapper.toDtoList(statusList);
   }
 
   @Override
@@ -81,8 +76,8 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatusDto update(UUID id, ReadStatusUpdateRequest request) {
     ReadStatus status = find(id);
     status.update(request.newLastReadAt());
-    readStatusRepository.save(status);
-    return ReadStatusDto.of(status);
+
+    return readStatusMapper.toDto(status);
   }
 
   @Override

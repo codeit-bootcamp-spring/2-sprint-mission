@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.util.FileUtil;
 import java.io.IOException;
@@ -21,6 +22,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentMapper binaryContentMapper;
 
   @Override
   @Transactional
@@ -48,19 +50,12 @@ public class BasicBinaryContentService implements BinaryContentService {
   public BinaryContentDto findById(UUID id) {
     BinaryContent binaryContent = binaryContentRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 BinaryContent를 찾을 수 없음"));
-    return BinaryContentDto.of(binaryContent);
+    return binaryContentMapper.toDto(binaryContent);
   }
 
   @Override
   public List<BinaryContentDto> findAllByIdIn(List<UUID> idList) {
     return idList.stream().map(this::findById).toList();
-  }
-
-  @Override
-  public BinaryContentDto findContentById(UUID id) {
-    BinaryContent content = binaryContentRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 BinaryContent를 찾을 수 없음"));
-    return BinaryContentDto.of(content);
   }
 
   @Override

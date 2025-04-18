@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.UserApi;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.service.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.service.user.UserDto;
 import com.sprint.mission.discodeit.dto.service.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.service.user.userstatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -80,11 +80,11 @@ public class UserController implements UserApi {
   // 사용자 온라인 상태 변경
   @Override
   @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatusUpdateDto> updateStatus(
+  public ResponseEntity<UserStatusDto> updateStatus(
       @PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest request
   ) {
-    UserStatusUpdateDto response = userStatusService.updateByUserId(userId, request);
+    UserStatusDto response = userStatusService.updateByUserId(userId, request);
     return ResponseEntity.ok(response);
   }
 }

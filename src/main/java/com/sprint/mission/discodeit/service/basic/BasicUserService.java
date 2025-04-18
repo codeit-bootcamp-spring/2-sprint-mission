@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.service.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.service.user.UserDto;
 import com.sprint.mission.discodeit.dto.service.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,6 +25,7 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final BasicBinaryContentService basicBinaryContentService;
+  private final UserMapper userMapper;
 
   @Override
   @Transactional
@@ -42,7 +43,7 @@ public class BasicUserService implements UserService {
     new UserStatus(user, Instant.now());
     userRepository.save(user);
 
-    return assembleUserResponse(user);
+    return userMapper.toDto(user);
   }
 
   @Override
@@ -51,14 +52,13 @@ public class BasicUserService implements UserService {
       throw new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음");
     }
     User user = userRepository.findByIdWithProfile(userId);
-    return assembleUserResponse(user);
+    return userMapper.toDto(user);
   }
 
   @Override
   public List<UserDto> findAll() {
     List<User> userList = userRepository.findAllWithProfile();
-    return userList.stream()
-        .map(this::assembleUserResponse).toList();
+    return userMapper.toDtoList(userList);
   }
 
   @Override
@@ -82,9 +82,8 @@ public class BasicUserService implements UserService {
     BinaryContent newProfile = (binaryRequest != null)
         ? basicBinaryContentService.create(binaryRequest) : null;
     user.update(newUsername, newEmail, newPassword, newProfile);
-    userRepository.save(user);
 
-    return assembleUserResponse(user);
+    return userMapper.toDto(user);
   }
 
   @Override
@@ -99,14 +98,6 @@ public class BasicUserService implements UserService {
   @Override
   public Optional<User> findByUsername(String username) {
     return userRepository.findByUsername(username);
-  }
-
-  @Override
-  public UserDto assembleUserResponse(User user) {
-    BinaryContentDto contentResponse = BinaryContentDto.of(user.getProfile());
-    UserStatus status = user.getUserStatus();
-
-    return UserDto.of(user, contentResponse, status.isOnline());
   }
 
   private void validDuplicateUsername(String username) {

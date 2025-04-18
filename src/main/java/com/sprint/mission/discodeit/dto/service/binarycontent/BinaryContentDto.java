@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.dto.service.binarycontent;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -12,12 +11,4 @@ public record BinaryContentDto(
     String contentType
 ) {
 
-  public static BinaryContentDto of(BinaryContent binaryContent) {
-    return BinaryContentDto.builder()
-        .id(binaryContent.getId())
-        .fileName(binaryContent.getFileName())
-        .size(binaryContent.getSize())
-        .contentType(binaryContent.getContentType())
-        .build();
-  }
 }
