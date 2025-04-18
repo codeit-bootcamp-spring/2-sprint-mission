@@ -13,9 +13,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -104,9 +103,11 @@ public class MessageController {
   })
   public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
       @RequestParam("channelId") UUID channelId,
-      @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC) Pageable pageable
+      @RequestParam(required = false) Instant cursor,
+      @RequestParam(defaultValue = "10") int size
   ) {
-    PageResponse<MessageDto> pageResponse = messageService.findAllByChannelId(channelId, pageable);
+    PageResponse<MessageDto> pageResponse = messageService.findAllByChannelId(channelId, cursor,
+        size);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(pageResponse);
