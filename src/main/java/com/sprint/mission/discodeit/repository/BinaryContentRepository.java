@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface BinaryContentRepository {
 
   BinaryContent save(BinaryContent binaryContent);
@@ -14,7 +16,5 @@ public interface BinaryContentRepository {
 
   List<BinaryContent> findAllByIdIn(List<UUID> ids);
 
-  boolean existsById(UUID id);
-
-  void deleteById(UUID id);
+  void delete(BinaryContent binaryContent);
 }

@@ -1,3 +1,14 @@
+--binary_contents 테이블
+CREATE TABLE binary_contents
+(
+    id           UUID PRIMARY KEY,
+    created_at   TIMESTAMPTZ  NOT NULL,
+    file_name    VARCHAR(255) NOT NULL,
+    size         BIGINT       NOT NULL,
+    content_type VARCHAR(100) NOT NULL,
+    bytes        BYTEA        NOT NULL
+);
+
 -- user 테이블
 CREATE TABLE users
 (
@@ -13,23 +24,13 @@ CREATE TABLE users
         ON DELETE SET NULL
 );
 
---binary_contents 테이블
-CREATE TABLE binary_contents
-(
-    id           UUID PRIMARY KEY,
-    created_at   TIMESTAMPTZ  NOT NULL,
-    file_name    VARCHAR(255) NOT NULL,
-    size         BIGINT       NOT NULL,
-    content_type VARCHAR(100) NOT NULL,
-    bytes        BYTEA        NOT NULL
-);
 
 --user_status 테이블
 CREATE TABLE user_statuses
 (
     id             UUID PRIMARY KEY,
     created_at     TIMESTAMPTZ NOT NULL,
-    updated_at     TIMESTAMPZ,
+    updated_at     TIMESTAMPTZ,
     user_id        UUID        NOT NULL UNIQUE,
     last_active_at TIMESTAMPTZ NOT NULL,
     FOREIGN KEY (user_id)
@@ -78,7 +79,7 @@ CREATE TABLE read_statuses (
         REFERENCES users(id)
         ON DELETE CASCADE,
     CONSTRAINT fk_channel FOREIGN KEY (channel_id)
-        REFERENCES channels(id)N
+        REFERENCES channels(id)
         ON DELETE CASCADE,
     CONSTRAINT uq_user_channel UNIQUE (user_id, channel_id)
 );

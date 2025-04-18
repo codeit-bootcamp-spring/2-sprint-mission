@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface UserRepository {
 
   User save(User user);
@@ -16,9 +18,7 @@ public interface UserRepository {
 
   List<User> findAll();
 
-  boolean existsById(UUID id);
-
-  void deleteById(UUID id);
+  void delete(User user);
 
   boolean existsByEmail(String email);
 
