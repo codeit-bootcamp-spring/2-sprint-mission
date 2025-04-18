@@ -1,3 +1,8 @@
+# ✅ [1] 공통 설정
+spring:
+  profiles:
+    active: dev   # 어떤 프로파일을 쓸지 지정 (global, 최상단에만 위치)
+
 discodeit:
   storage:
     type: local
@@ -26,8 +31,26 @@ springdoc:
     disabled: true
   model-and-view-allowed: true
 
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        orm.jdbc.bind: TRACE
+      springframework:
+        data: DEBUG
+    com:
+      example:
+        myapp: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/application.log
+
 ---
 
+# ✅ [2] dev 프로파일 전용 설정
 spring:
   config:
     activate:
@@ -51,20 +74,3 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
-
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: DEBUG
-        orm.jdbc.bind: TRACE
-      springframework:
-        data: DEBUG
-    com:
-      example:
-        myapp: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/application.log
