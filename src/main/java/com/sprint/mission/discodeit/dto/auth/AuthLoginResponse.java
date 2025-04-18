@@ -20,7 +20,7 @@ public record AuthLoginResponse(
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfile()
+        user.getProfile().getId()
     );
   }
 }

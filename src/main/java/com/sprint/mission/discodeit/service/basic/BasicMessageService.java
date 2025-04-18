@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.entity.message.Message;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -12,6 +14,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -31,17 +35,16 @@ public class BasicMessageService implements MessageService {
   @Override
   public Message create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> attachmentsCreateRequest) {
-    validateChannelExistence(messageCreateRequest.channelId());
-    validateUserExistence(messageCreateRequest.authorId());
+    Channel channel = channelRepository.getReferenceById(messageCreateRequest.channelId());
+    User author = userRepository.getReferenceById(messageCreateRequest.authorId());
 
-    List<UUID> attachmentIds = List.of();
+    List<BinaryContent> attachments = List.of();
     if (attachmentsCreateRequest != null) {
-      attachmentIds = attachmentsCreateRequest.stream().map(binaryContentService::create)
-          .map(BaseEntity::getId).toList();
+      attachments = attachmentsCreateRequest.stream().map(binaryContentService::create)
+          .toList();
     }
 
-    Message message = new Message(messageCreateRequest.content(), messageCreateRequest.channelId(),
-        messageCreateRequest.authorId(), attachmentIds);
+    Message message = new Message(messageCreateRequest.content(), channel, author, attachments);
 
     return messageRepository.save(message);
   }
@@ -76,12 +79,12 @@ public class BasicMessageService implements MessageService {
     }
 
     message.getAttachments()
-        .forEach(attachmentId -> {
-          if (binaryContentRepository.existsById(attachmentId)) {
-            binaryContentRepository.deleteById(attachmentId);
+        .forEach(attachment -> {
+          if (binaryContentRepository.existsById(attachment.getId())) {
+            binaryContentRepository.delete(attachment);
           }
         });
-    messageRepository.deleteById(messageId);
+    messageRepository.delete(message);
   }
 
   private Message getMessage(UUID messageId) {

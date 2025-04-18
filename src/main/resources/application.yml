@@ -25,8 +25,3 @@ logging:
       hibernate:
         SQL: DEBUG
         orm.jdbc.bind: TRACE
-
-discodeit:
-  repository:
-    type: file # jcf | file
-    file-directory: .discodeit

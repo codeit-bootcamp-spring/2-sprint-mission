@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.entity.channel;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Getter;
-
-import java.time.Instant;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "channels")
@@ -16,6 +15,7 @@ import java.time.Instant;
 public class Channel extends BaseUpdatableEntity {
 
   @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   private ChannelType type;
 
   private String name; //PUBLIC 전용

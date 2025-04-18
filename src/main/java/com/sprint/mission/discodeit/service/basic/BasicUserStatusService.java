@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.transaction.Transactional;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicUserStatusService implements UserStatusService {
 
   private final UserRepository userRepository;
@@ -30,7 +32,7 @@ public class BasicUserStatusService implements UserStatusService {
       throw new IllegalArgumentException("해당 유저의 userStatus 이미 존재");
     }
 
-    UserStatus userStatus = new UserStatus(request.userId());
+    UserStatus userStatus = new UserStatus(user);
     return userStatusRepository.save(userStatus);
   }
 

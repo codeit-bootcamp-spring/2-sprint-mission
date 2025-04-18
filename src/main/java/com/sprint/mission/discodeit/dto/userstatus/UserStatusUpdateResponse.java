@@ -18,7 +18,7 @@ public record UserStatusUpdateResponse(
         userStatus.getId(),
         userStatus.getCreatedAt(),
         userStatus.getUpdatedAt(),
-        userStatus.getUser(),
+        userStatus.getUser().getId(),
         userStatus.getLastActiveAt(),
         userStatus.isOnline()
     );

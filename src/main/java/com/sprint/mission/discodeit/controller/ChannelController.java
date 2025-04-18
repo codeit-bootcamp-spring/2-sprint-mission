@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelFindResponse;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.channel.Channel;
@@ -22,31 +22,31 @@ public class ChannelController {
   private final ChannelService channelService;
 
   @GetMapping
-  public ResponseEntity<List<ChannelFindResponse>> findAllChannelByUser(
+  public ResponseEntity<List<ChannelResponse>> findAllChannelByUser(
       @RequestParam UUID userId) {
-    List<ChannelFindResponse> response = channelService.findAllByUserId(userId);
+    List<ChannelResponse> response = channelService.findAllByUserId(userId);
     return ResponseEntity.ok(response);
   }
 
   @PostMapping("/public")
-  public ResponseEntity<Channel> createPublicChannel(
+  public ResponseEntity<ChannelResponse> createPublicChannel(
       @RequestBody PublicChannelCreateRequest request) {
-    Channel response = channelService.createPublicChannel(request);
+    ChannelResponse response = channelService.createPublicChannel(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @PostMapping("/private")
-  public ResponseEntity<Channel> createPrivateChannel(
+  public ResponseEntity<ChannelResponse> createPrivateChannel(
       @RequestBody PrivateChannelCreateRequest request) {
-    Channel response = channelService.createPrivateChannel(request);
+    ChannelResponse response = channelService.createPrivateChannel(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @PatchMapping("/{channelId}")
-  public ResponseEntity<Channel> update(
+  public ResponseEntity<ChannelResponse> update(
       @PathVariable("channelId") UUID channelId,
-      @RequestBody ChannelUpdateRequest channelUpdateRequest) {
-    Channel response = channelService.update(channelId, channelUpdateRequest);
+      @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
+    ChannelResponse response = channelService.update(channelId, publicChannelUpdateRequest);
     return ResponseEntity.ok(response);
   }
 

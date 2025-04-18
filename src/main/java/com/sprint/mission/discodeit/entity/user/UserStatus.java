@@ -30,6 +30,7 @@ public class UserStatus extends BaseUpdatableEntity {
   public UserStatus(User user) {
     super();
     this.user = user;
+    this.lastActiveAt = Instant.now();
   }
 
   public void updateLastActiveAt(Instant newLastActiveAt) {
@@ -37,9 +38,6 @@ public class UserStatus extends BaseUpdatableEntity {
   }
 
   public boolean isOnline() {
-    if (lastActiveAt == null) {
-      return false;
-    }
     long minutesAfterLogin = Duration.between(lastActiveAt, Instant.now()).toMinutes();
     return minutesAfterLogin < ONLINE_THRESHOLD_MINUTES;
   }

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -32,7 +33,7 @@ public class Message extends BaseUpdatableEntity {
   @JoinColumn(name = "author_id")
   private User author;
 
-  @OneToMany
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinTable(
       name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id"),
@@ -40,7 +41,6 @@ public class Message extends BaseUpdatableEntity {
   )
   private List<BinaryContent> attachments;
 
-  //TODO: 조인테이블 cascade, orphanRemoval로 바이너리컨텐츠가 삭제 안되므로 추후 로직 추가
   protected Message() {
   }
 

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
@@ -39,10 +41,10 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
-  public void delete(UUID binaryContentId) {
-    if (!binaryContentRepository.existsById(binaryContentId)) {
-      throw new ResourceNotFoundException("해당 BinaryContent 없음");
-    }
-    binaryContentRepository.deleteById(binaryContentId);
+  public void delete(BinaryContent binaryContent) {
+    BinaryContent found = binaryContentRepository.findById(binaryContent.getId())
+        .orElseThrow(() -> new ResourceNotFoundException("해당 BinaryContent 없음"));
+
+    binaryContentRepository.delete(found);
   }
 }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.*;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicateResourceException;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
@@ -11,6 +12,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
@@ -32,12 +35,12 @@ public class BasicUserService implements UserService {
     validateUsernameDuplicate(userCreateRequest.username());
     validateEmailDuplicate(userCreateRequest.email());
 
-    UUID profileId = (profileCreateRequest != null)
-        ? binaryContentService.create(profileCreateRequest).getId()
+    BinaryContent profile = (profileCreateRequest != null)
+        ? binaryContentService.create(profileCreateRequest)
         : null;
 
     User user = new User(userCreateRequest.username(),
-        userCreateRequest.email(), userCreateRequest.password(), profileId);
+        userCreateRequest.email(), userCreateRequest.password(), profile);
     userRepository.save(user);
 
     userStatusService.create(new UserStatusCreateRequest(user.getId()));
@@ -72,16 +75,13 @@ public class BasicUserService implements UserService {
       validateEmailDuplicate(userUpdateRequest.newEmail());
     }
 
-    UUID newProfileId = null;
+    BinaryContent newProfile = null;
     if (profileCreateRequest != null) {
-      if (user.getProfile() != null) {
-        binaryContentService.delete(user.getProfile());
-      }
-      newProfileId = binaryContentService.create(profileCreateRequest).getId();
+      newProfile = binaryContentService.create(profileCreateRequest);
     }
 
     user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(),
-        userUpdateRequest.newPassword(), newProfileId);
+        userUpdateRequest.newPassword(), newProfile);
     userRepository.save(user);
 
     return UserUpdateResponse.fromEntity(user);
@@ -89,14 +89,6 @@ public class BasicUserService implements UserService {
 
   @Override
   public void delete(UUID userId) {
-    User user = getUserBy(userId);
-
-    if (user.hasProfile()) {
-      binaryContentRepository.deleteById(user.getProfile());
-    }
-
-    userStatusService.deleteByUserId(userId);
-
     userRepository.deleteById(userId);
   }
 

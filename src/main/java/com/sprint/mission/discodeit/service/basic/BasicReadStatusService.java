@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.transaction.Transactional;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicReadStatusService implements ReadStatusService {
 
   private final UserRepository userRepository;
@@ -26,18 +28,15 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public ReadStatus create(ReadStatusCreateRequest request) {
-    User user = userRepository.findById(request.userId())
-        .orElseThrow(() -> new ResourceNotFoundException("해당 유저 없음"));
-    Channel channel = channelRepository.findById(request.channelId())
-        .orElseThrow(() -> new ResourceNotFoundException("해당 채널 없음"));
+    User user = userRepository.getReferenceById(request.userId());
+    Channel channel = channelRepository.getReferenceById(request.channelId());
 
-    if (readStatusRepository.findByUserIdAndChannelId(request.userId(), request.channelId())
+    if (readStatusRepository.findByUserAndChannel(user, channel)
         .isPresent()) {
       throw new IllegalArgumentException("해당 유저의 해당 채널 ReadStatus 이미 존재");
     }
 
-    ReadStatus readStatus = new ReadStatus(request.userId(), request.channelId(),
-        request.lastReadAt());
+    ReadStatus readStatus = new ReadStatus(user, channel, request.lastReadAt());
     return readStatusRepository.save(readStatus);
   }
 

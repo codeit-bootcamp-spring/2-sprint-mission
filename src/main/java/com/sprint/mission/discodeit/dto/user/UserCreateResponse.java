@@ -10,8 +10,7 @@ public record UserCreateResponse(
     Instant createdAt,
     Instant updatedAt,
     String username,
-    String email,
-    UUID profileId
+    String email
 ) {
 
   public static UserCreateResponse fromEntity(User user) {
@@ -20,8 +19,7 @@ public record UserCreateResponse(
         user.getCreatedAt(),
         user.getUpdatedAt(),
         user.getUsername(),
-        user.getEmail(),
-        user.getProfile()
+        user.getEmail()
     );
   }
 }
