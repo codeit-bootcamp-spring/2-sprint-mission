@@ -28,14 +28,10 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
   List<Message> findAllByChannelId(UUID channelId);
 
   @EntityGraph(attributePaths = {"author", "channel"})
-  Slice<Message> findByChannelIdOrderByCreatedAtDesc(UUID channelId, Pageable pageable);
+  Slice<Message> findByChannelId(UUID channelId, Pageable pageable);
 
   @EntityGraph(attributePaths = {"author", "channel"})
-  Slice<Message> findTop50ByChannelIdOrderByCreatedAtDesc(UUID channelId, Pageable pageable);
-
-  @EntityGraph(attributePaths = {"author", "channel"})
-  Slice<Message> findTop50ByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc(UUID channelId,
-      Instant cursor, Pageable pageable);
+  Slice<Message> findByChannelIdBeforeCursor(UUID channelId, Instant cursor, Pageable pageable);
 
 
   void deleteAllByChannelId(UUID channelId);

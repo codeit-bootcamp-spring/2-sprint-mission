@@ -6,9 +6,11 @@ import com.sprint.mission.discodeit.dto.Message.MessageDto;
 import com.sprint.mission.discodeit.dto.Message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,8 +32,11 @@ public class MessageController {
 
   @RequestMapping(value = "", method = RequestMethod.GET)
   public ResponseEntity<List<MessageDto>> findAllByChannelId(
-      @RequestParam("channelId") UUID channelId) {
-    return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
+      @RequestParam("channelId") UUID channelId,
+      @RequestParam(value = "cursor", required = false) Instant cursor,
+      @RequestParam("pageable") Pageable pageable
+  ) {
+    return ResponseEntity.ok(messageService.findMessagesByCursor(channelId, cursor, pageable));
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST)

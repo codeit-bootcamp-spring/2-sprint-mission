@@ -22,10 +22,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 
@@ -103,15 +101,14 @@ public class BasicMessageService implements MessageService {
 //  }
 
   @Override
-  public PageResponse<MessageDto> findMessagesByCursor(UUID channelId, Instant cursor) {
-    Pageable pageable = PageRequest.of(0, 50, Sort.by(Sort.Direction.DESC, "createdAt"));
-
+  public PageResponse<MessageDto> findMessagesByCursor(UUID channelId, Instant cursor,
+      Pageable pageable) {
     Slice<Message> messages;
 
     if (cursor == null) {
-      messages = messageRepository.findTop50ByChannelIdOrderByCreatedAtDesc(channelId, pageable);
+      messages = messageRepository.findByChannelId(channelId, pageable);
     } else {
-      messages = messageRepository.findTop50ByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc(
+      messages = messageRepository.findByChannelIdBeforeCursor(
           channelId, cursor, pageable);
     }
 

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 
 public interface MessageService {
 
@@ -24,7 +25,7 @@ public interface MessageService {
 
   //PageResponse<MessageDto> findMessagesByPage(UUID channelId, int page);
 
-  PageResponse<MessageDto> findMessagesByCursor(UUID channelId, Instant cursor);
+  PageResponse<MessageDto> findMessagesByCursor(UUID channelId, Instant cursor, Pageable pageable);
 
   List<MessageDto> findAllByUserId(UUID authorId); // 유저의 모든 메세지 확인
 
