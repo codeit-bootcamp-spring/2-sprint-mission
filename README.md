@@ -63,3 +63,5 @@ BasicUserService userService = context.getBean(BasicUserService.class);
 - 노출할 필요 없는 민감한 정보를 쉽게 제외할 수 있다.
 - 트랜잭션 범위 밖에서 Lazy 필드에 접근할 일이 줄어들어, `LazyInitializationException`을 방지할 수 있다.
 - Entity 간의 복잡한 연관관계로부터 독립적인 구조를 구성할 수 있어, 직렬화 이슈를 피할 수 있다.
+
+-테스트
