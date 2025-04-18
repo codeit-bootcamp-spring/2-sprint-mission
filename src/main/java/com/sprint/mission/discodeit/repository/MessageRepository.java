@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +30,13 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
   @EntityGraph(attributePaths = {"author", "channel"})
   Slice<Message> findByChannelIdOrderByCreatedAtDesc(UUID channelId, Pageable pageable);
 
+  @EntityGraph(attributePaths = {"author", "channel"})
+  Slice<Message> findTop50ByChannelIdOrderByCreatedAtDesc(UUID channelId, Pageable pageable);
+
+  @EntityGraph(attributePaths = {"author", "channel"})
+  Slice<Message> findTop50ByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc(UUID channelId,
+      Instant cursor, Pageable pageable);
+
+
   void deleteAllByChannelId(UUID channelId);
-
-
 }

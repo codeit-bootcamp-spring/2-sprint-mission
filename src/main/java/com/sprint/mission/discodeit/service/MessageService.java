@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.Message.MessageDto;
 import com.sprint.mission.discodeit.dto.Message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +22,9 @@ public interface MessageService {
 
   List<MessageDto> findAllByChannelId(UUID channelId); // 채널 내 모든 메세지 확인
 
-  PageResponse<MessageDto> findMessagesByPage(UUID channelId, int page);
+  //PageResponse<MessageDto> findMessagesByPage(UUID channelId, int page);
+
+  PageResponse<MessageDto> findMessagesByCursor(UUID channelId, Instant cursor);
 
   List<MessageDto> findAllByUserId(UUID authorId); // 유저의 모든 메세지 확인
 
