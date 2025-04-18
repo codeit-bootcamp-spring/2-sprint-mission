@@ -102,6 +102,17 @@ public class BinaryContentController {
   }
 
   @GetMapping("/{binaryContentId}/download")
+  @Operation(summary = "파일 다운로드", operationId = "download")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "파일 다운로드 성공",
+          content = @Content(
+              mediaType = "*/*",
+              schema = @Schema(type = "string", format = "binary")
+          )
+      )
+  })
   public ResponseEntity<Resource> binaryContentDownload(
       @PathVariable("binaryContentId") UUID binaryContentId
   ) {

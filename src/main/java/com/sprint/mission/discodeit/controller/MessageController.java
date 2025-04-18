@@ -57,7 +57,7 @@ public class MessageController {
           responseCode = "201",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageDto.class)
           )
       ),
       @ApiResponse(
@@ -101,7 +101,7 @@ public class MessageController {
           description = "메세지가 성공적으로 수정됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageDto.class)
           )
       ),
       @ApiResponse(
@@ -170,7 +170,7 @@ public class MessageController {
           description = "Message목록 조회 성공",
           content = @Content(
               mediaType = "*/*",
-              array = @ArraySchema(schema = @Schema(implementation = Message.class))
+              schema = @Schema(implementation = PageResponse.class)
           )
       )
   })

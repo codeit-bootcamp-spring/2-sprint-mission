@@ -43,7 +43,7 @@ public class AuthController {
           responseCode = "200",
           description = "로그인 성공",
           content = @Content(
-              schema = @Schema(implementation = LoginResponse.class)
+              schema = @Schema(implementation = UserDto.class)
           )
       ),
       @ApiResponse(

@@ -55,7 +55,7 @@ public class ChannelController {
           description = "Public Channel이 성공적으로 생성됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = Channel.class)
+              schema = @Schema(implementation = ChannelDto.class)
           )
       )
   })
@@ -82,7 +82,7 @@ public class ChannelController {
           responseCode = "201",
           description = "Private Channel이 성공적으로 생성됨",
           content = @Content(
-              schema = @Schema(implementation = Channel.class)
+              schema = @Schema(implementation = ChannelDto.class)
           )
       )
   })
@@ -118,7 +118,7 @@ public class ChannelController {
           description = "Channel 정보가 성공적으로 수정됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = Channel.class)
+              schema = @Schema(implementation = ChannelDto.class)
           )
       ),
       @ApiResponse(
