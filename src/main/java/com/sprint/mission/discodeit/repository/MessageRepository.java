@@ -12,7 +12,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   Optional<Message> findTop1ByChannelOrderByCreatedAtDesc(Channel channel);
 
-  List<Message> findAllByChannelId(UUID channelId);
+  List<Message> findAllByChannel_Id(UUID channelId);
 
-  void deleteByChannelId(UUID channelId);
+  void deleteByChannel_Id(UUID channelId);
 }

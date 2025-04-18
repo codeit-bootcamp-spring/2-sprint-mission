@@ -102,9 +102,9 @@ public class BasicChannelService implements ChannelService {
       throw new ResourceNotFoundException("Channel with id " + channelId + " not found");
     }
 
-    messageRepository.deleteByChannelId(channelId);
+    messageRepository.deleteByChannel_Id(channelId);
 
-    readStatusRepository.deleteByChannelId(channelId);
+    readStatusRepository.deleteByChannel_Id(channelId);
 
     channelRepository.deleteById(channelId);
   }

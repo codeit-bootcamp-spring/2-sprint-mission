@@ -9,14 +9,14 @@ import java.util.UUID;
 
 public interface UserService {
 
-  UserCreateResponse create(UserCreateRequest userCreateRequest,
+  UserResponse create(UserCreateRequest userCreateRequest,
       BinaryContentCreateRequest profileCreateRequest);
 
   UserResponse find(UUID userId);
 
   List<UserResponse> findAll();
 
-  UserUpdateResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
+  UserResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
       BinaryContentCreateRequest profileCreateRequest);
 
   void delete(UUID userId);

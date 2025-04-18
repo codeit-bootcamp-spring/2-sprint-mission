@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponse;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.common.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -20,21 +21,21 @@ public class ReadStatusController {
   private final ReadStatusService readStatusService;
 
   @GetMapping
-  public ResponseEntity<List<ReadStatus>> findAllByUser(@RequestParam UUID userId) {
-    List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
+  public ResponseEntity<List<ReadStatusResponse>> findAllByUser(@RequestParam UUID userId) {
+    List<ReadStatusResponse> statuses = readStatusService.findAllByUserId(userId);
     return ResponseEntity.ok(statuses);
   }
 
   @PostMapping
-  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
-    ReadStatus readStatus = readStatusService.create(request);
+  public ResponseEntity<ReadStatusResponse> create(@RequestBody ReadStatusCreateRequest request) {
+    ReadStatusResponse readStatus = readStatusService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
   }
 
   @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatus> update(@PathVariable UUID readStatusId,
+  public ResponseEntity<ReadStatusResponse> update(@PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
-    ReadStatus updatedStatus = readStatusService.update(readStatusId,
+    ReadStatusResponse updatedStatus = readStatusService.update(readStatusId,
         readStatusUpdateRequest.newLastReadAt());
     return ResponseEntity.ok(updatedStatus);
   }

@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -25,9 +27,10 @@ public class BasicReadStatusService implements ReadStatusService {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final ReadStatusRepository readStatusRepository;
+  private final ReadStatusMapper readStatusMapper;
 
   @Override
-  public ReadStatus create(ReadStatusCreateRequest request) {
+  public ReadStatusResponse create(ReadStatusCreateRequest request) {
     User user = userRepository.getReferenceById(request.userId());
     Channel channel = channelRepository.getReferenceById(request.channelId());
 
@@ -37,27 +40,31 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     ReadStatus readStatus = new ReadStatus(user, channel, request.lastReadAt());
-    return readStatusRepository.save(readStatus);
+    readStatusRepository.save(readStatus);
+    return readStatusMapper.toResponse(readStatus);
   }
 
   @Override
-  public ReadStatus find(UUID readStatusId) {
-    return readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new ResourceNotFoundException("해당 ReadStatus 없음"));
+  public ReadStatusResponse find(UUID readStatusId) {
+    return readStatusMapper.toResponse(readStatusRepository.findById(readStatusId)
+        .orElseThrow(() -> new ResourceNotFoundException("해당 ReadStatus 없음")));
   }
 
   @Override
-  public List<ReadStatus> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId);
+  public List<ReadStatusResponse> findAllByUserId(UUID userId) {
+    return readStatusRepository.findAllByUser_Id(userId).stream()
+        .map(readStatusMapper::toResponse)
+        .toList();
   }
 
   @Override
-  public ReadStatus update(UUID readStatusId, Instant newLastReadAt) {
+  public ReadStatusResponse update(UUID readStatusId, Instant newLastReadAt) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> new ResourceNotFoundException("해당 ReadStatus 없음"));
 
     readStatus.updateLastReadAt(newLastReadAt);
-    return readStatusRepository.save(readStatus);
+    readStatusRepository.save(readStatus);
+    return readStatusMapper.toResponse(readStatus);
   }
 
   @Override

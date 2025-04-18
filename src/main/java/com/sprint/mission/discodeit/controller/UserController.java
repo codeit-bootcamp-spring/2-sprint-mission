@@ -42,7 +42,7 @@ public class UserController {
   }
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserCreateResponse> create(
+  public ResponseEntity<UserResponse> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileRequest) {
 
@@ -51,12 +51,12 @@ public class UserController {
             ? null
             : BinaryContentCreateRequest.fromMultipartFile(profileRequest);
 
-    UserCreateResponse response = userService.create(userCreateRequest, profileCreateRequest);
+    UserResponse response = userService.create(userCreateRequest, profileCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserUpdateResponse> update(
+  public ResponseEntity<UserResponse> update(
       @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileRequest
@@ -66,7 +66,7 @@ public class UserController {
             ? null
             : BinaryContentCreateRequest.fromMultipartFile(profileRequest);
 
-    UserUpdateResponse response = userService.update(userId, userUpdateRequest,
+    UserResponse response = userService.update(userId, userUpdateRequest,
         profileCreateRequest);
     return ResponseEntity.ok(response);
   }

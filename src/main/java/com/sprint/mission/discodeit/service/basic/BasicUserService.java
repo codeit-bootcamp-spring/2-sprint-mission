@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.DuplicateResourceException;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -28,9 +29,10 @@ public class BasicUserService implements UserService {
   private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
   private final BinaryContentRepository binaryContentRepository;
+  private final UserMapper userMapper;
 
   @Override
-  public UserCreateResponse create(UserCreateRequest userCreateRequest,
+  public UserResponse create(UserCreateRequest userCreateRequest,
       BinaryContentCreateRequest profileCreateRequest) {
     validateUsernameDuplicate(userCreateRequest.username());
     validateEmailDuplicate(userCreateRequest.email());
@@ -45,25 +47,24 @@ public class BasicUserService implements UserService {
 
     userStatusService.create(new UserStatusCreateRequest(user.getId()));
 
-    return UserCreateResponse.fromEntity(user);
+    return userMapper.toResponse(user);
   }
 
   @Override
   public UserResponse find(UUID userId) {
     User user = getUserBy(userId);
 
-    return UserResponse.fromEntity(user, isOnline(userId));
+    return userMapper.toResponse(user);
   }
 
   @Override
   public List<UserResponse> findAll() {
     return userRepository.findAll().stream()
-        .map(user -> UserResponse.fromEntity(user, isOnline(user.getId())))
-        .toList();
+        .map(userMapper::toResponse).toList();
   }
 
   @Override
-  public UserUpdateResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
+  public UserResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
       BinaryContentCreateRequest profileCreateRequest) {
     User user = getUserBy(userId);
 
@@ -84,7 +85,7 @@ public class BasicUserService implements UserService {
         userUpdateRequest.newPassword(), newProfile);
     userRepository.save(user);
 
-    return UserUpdateResponse.fromEntity(user);
+    return userMapper.toResponse(user);
   }
 
   @Override
