@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.auth.LoginRequest;
-import com.sprint.mission.discodeit.dto.auth.AuthLoginResponse;
+import com.sprint.mission.discodeit.dto.auth.AuthLoginDto;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +18,9 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping("/login")
-  public ResponseEntity<AuthLoginResponse> login(
+  public ResponseEntity<AuthLoginDto> login(
       @RequestBody LoginRequest request) {
-    AuthLoginResponse response = authService.login(request);
+    AuthLoginDto response = authService.login(request);
     return ResponseEntity.ok().body(response);
   }
 }

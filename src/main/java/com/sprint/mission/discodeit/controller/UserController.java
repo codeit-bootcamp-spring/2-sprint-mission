@@ -2,9 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.*;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateResponse;
 import com.sprint.mission.discodeit.entity.user.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -28,21 +29,22 @@ public class UserController {
   private final UserStatusService userStatusService;
   private final ChannelService channelService;
   private final ReadStatusService readStatusService;
+  private final UserStatusMapper userStatusMapper;
 
   @GetMapping("/{userId}")
-  public ResponseEntity<UserResponse> find(@PathVariable UUID userId) {
-    UserResponse response = userService.find(userId);
+  public ResponseEntity<UserDto> find(@PathVariable UUID userId) {
+    UserDto response = userService.find(userId);
     return ResponseEntity.ok(response);
   }
 
   @GetMapping
-  public ResponseEntity<List<UserResponse>> findAll() {
-    List<UserResponse> response = userService.findAll();
+  public ResponseEntity<List<UserDto>> findAll() {
+    List<UserDto> response = userService.findAll();
     return ResponseEntity.ok(response);
   }
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserResponse> create(
+  public ResponseEntity<UserDto> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileRequest) {
 
@@ -51,12 +53,12 @@ public class UserController {
             ? null
             : BinaryContentCreateRequest.fromMultipartFile(profileRequest);
 
-    UserResponse response = userService.create(userCreateRequest, profileCreateRequest);
+    UserDto response = userService.create(userCreateRequest, profileCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserResponse> update(
+  public ResponseEntity<UserDto> update(
       @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileRequest
@@ -66,18 +68,18 @@ public class UserController {
             ? null
             : BinaryContentCreateRequest.fromMultipartFile(profileRequest);
 
-    UserResponse response = userService.update(userId, userUpdateRequest,
+    UserDto response = userService.update(userId, userUpdateRequest,
         profileCreateRequest);
     return ResponseEntity.ok(response);
   }
 
   @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatusUpdateResponse> updateStatus(@PathVariable UUID userId,
+  public ResponseEntity<UserStatusDto> updateStatus(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
     UserStatus updatedStatus = userStatusService.updateByUserId(userId,
         userStatusUpdateRequest.newLastActiveAt());
 
-    UserStatusUpdateResponse response = UserStatusUpdateResponse.fromEntity(updatedStatus);
+    UserStatusDto response = userStatusMapper.toResponse(updatedStatus);
     return ResponseEntity.ok(response);
   }
 

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
@@ -38,14 +38,14 @@ public class BasicChannelService implements ChannelService {
 
 
   @Override
-  public ChannelResponse createPublicChannel(PublicChannelCreateRequest request) {
+  public ChannelDto createPublicChannel(PublicChannelCreateRequest request) {
     Channel channel = new Channel(ChannelType.PUBLIC, request.name(), request.description());
     channelRepository.save(channel);
     return channelMapper.toResponse(channel);
   }
 
   @Override
-  public ChannelResponse createPrivateChannel(PrivateChannelCreateRequest request) {
+  public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
     List<UUID> participantIds = request.participantIds();
     validateParticipantExistence(participantIds);
 
@@ -58,12 +58,12 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public ChannelResponse find(UUID channelId) {
+  public ChannelDto find(UUID channelId) {
     return channelMapper.toResponse(getChannel(channelId));
   }
 
   @Override
-  public List<ChannelResponse> findAllByUserId(UUID userId) {
+  public List<ChannelDto> findAllByUserId(UUID userId) {
     validateUserExistence(userId);
     List<Channel> allChannels = channelRepository.findAll();
 
@@ -76,14 +76,14 @@ public class BasicChannelService implements ChannelService {
             && getParticipantIds(channel).contains(userId))
         .toList();
 
-    List<ChannelResponse> publicChannelDtoList = getDtoList(publicChannels);
-    List<ChannelResponse> privateChannelDtoList = getDtoList(privateChannels);
+    List<ChannelDto> publicChannelDtoList = getDtoList(publicChannels);
+    List<ChannelDto> privateChannelDtoList = getDtoList(privateChannels);
 
     return Stream.concat(publicChannelDtoList.stream(), privateChannelDtoList.stream()).toList();
   }
 
   @Override
-  public ChannelResponse update(UUID channelId, PublicChannelUpdateRequest request) {
+  public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new ResourceNotFoundException("해당 채널 없음"));
 
@@ -110,7 +110,7 @@ public class BasicChannelService implements ChannelService {
   }
 
 
-  private List<ChannelResponse> getDtoList(List<Channel> publicChannels) {
+  private List<ChannelDto> getDtoList(List<Channel> publicChannels) {
     return publicChannels.stream()
         .map(channelMapper::toResponse)
         .toList();

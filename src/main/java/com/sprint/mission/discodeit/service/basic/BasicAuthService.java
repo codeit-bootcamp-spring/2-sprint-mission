@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.auth.LoginRequest;
-import com.sprint.mission.discodeit.dto.auth.AuthLoginResponse;
+import com.sprint.mission.discodeit.dto.auth.AuthLoginDto;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.InvalidCredentialsException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -21,13 +21,13 @@ public class BasicAuthService implements AuthService {
   private final UserStatusService userStatusService;
 
   @Override
-  public AuthLoginResponse login(LoginRequest request) {
+  public AuthLoginDto login(LoginRequest request) {
     User user = userRepository.findByUsername(request.username())
         .filter(u -> u.getPassword().equals(request.password()))
         .orElseThrow(() -> new InvalidCredentialsException("로그인 실패"));
 
     userStatusService.updateByUserId(user.getId(), Instant.now());
 
-    return AuthLoginResponse.fromEntity(user);
+    return AuthLoginDto.fromEntity(user);
   }
 }

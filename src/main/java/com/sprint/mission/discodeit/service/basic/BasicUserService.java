@@ -32,17 +32,18 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
 
   @Override
-  public UserResponse create(UserCreateRequest userCreateRequest,
+  public UserDto create(UserCreateRequest userCreateRequest,
       BinaryContentCreateRequest profileCreateRequest) {
-    validateUsernameDuplicate(userCreateRequest.username());
-    validateEmailDuplicate(userCreateRequest.email());
-
     BinaryContent profile = (profileCreateRequest != null)
         ? binaryContentService.create(profileCreateRequest)
         : null;
 
     User user = new User(userCreateRequest.username(),
         userCreateRequest.email(), userCreateRequest.password(), profile);
+
+    User other = userRepository.findByUsername(userCreateRequest.username()).orElse(null);
+    user.validateNotDuplicateWith(other);
+
     userRepository.save(user);
 
     userStatusService.create(new UserStatusCreateRequest(user.getId()));
@@ -51,20 +52,20 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserResponse find(UUID userId) {
+  public UserDto find(UUID userId) {
     User user = getUserBy(userId);
 
     return userMapper.toResponse(user);
   }
 
   @Override
-  public List<UserResponse> findAll() {
+  public List<UserDto> findAll() {
     return userRepository.findAll().stream()
         .map(userMapper::toResponse).toList();
   }
 
   @Override
-  public UserResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
+  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       BinaryContentCreateRequest profileCreateRequest) {
     User user = getUserBy(userId);
 
@@ -78,6 +79,9 @@ public class BasicUserService implements UserService {
 
     BinaryContent newProfile = null;
     if (profileCreateRequest != null) {
+      if (user.getProfile() != null) {
+        binaryContentService.delete(user.getProfile());
+      }
       newProfile = binaryContentService.create(profileCreateRequest);
     }
 

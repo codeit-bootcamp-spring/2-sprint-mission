@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponse;
-import com.sprint.mission.discodeit.dto.message.MessageResponse;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.entity.message.Message;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +14,12 @@ public class MessageMapper {
   private final UserMapper userMapper;
   private final BinaryContentMapper binaryContentMapper;
 
-  public MessageResponse toResponse(Message message) {
-    List<BinaryContentResponse> attachments = message.getAttachments().stream()
-        .map(binaryContentMapper::toResponse)
+  public MessageDto toResponse(Message message) {
+    List<BinaryContentDto> attachments = message.getAttachments().stream()
+        .map(binaryContentMapper::toDto)
         .toList();
 
-    return new MessageResponse(
+    return new MessageDto(
         message.getId(),
         message.getCreatedAt(),
         message.getUpdatedAt(),

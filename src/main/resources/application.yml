@@ -25,3 +25,9 @@ logging:
       hibernate:
         SQL: DEBUG
         orm.jdbc.bind: TRACE
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: ./local-storages

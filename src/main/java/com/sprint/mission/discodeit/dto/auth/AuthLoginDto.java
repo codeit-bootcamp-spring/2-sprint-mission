@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.user.User;
 import java.time.Instant;
 import java.util.UUID;
 
-public record AuthLoginResponse(
+public record AuthLoginDto(
     UUID id,
     Instant createdAt,
     Instant updatedAt,
@@ -13,8 +13,8 @@ public record AuthLoginResponse(
     UUID profileId
 ) {
 
-  public static AuthLoginResponse fromEntity(User user) {
-    return new AuthLoginResponse(
+  public static AuthLoginDto fromEntity(User user) {
+    return new AuthLoginDto(
         user.getId(),
         user.getCreatedAt(),
         user.getUpdatedAt(),

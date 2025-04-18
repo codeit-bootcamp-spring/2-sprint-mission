@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.user;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
+import com.sprint.mission.discodeit.exception.DuplicateResourceException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -55,6 +56,20 @@ public class User extends BaseUpdatableEntity {
     }
     if (profile != null && !profile.equals(this.profile)) {
       this.profile = profile;
+    }
+  }
+
+  public void validateNotDuplicateWith(User other) {
+    if (other == null) {
+      return;
+    }
+
+    if (this.username.equals(other.username)) {
+      throw new DuplicateResourceException("이미 존재하는 username입니다.");
+    }
+
+    if (this.email.equals(other.email)) {
+      throw new DuplicateResourceException("이미 존재하는 email입니다.");
     }
   }
 

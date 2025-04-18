@@ -2,9 +2,8 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageResponse;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +23,14 @@ public class MessageController {
   private final MessageService messageService;
 
   @GetMapping
-  public ResponseEntity<List<MessageResponse>> findAllMessagesByChannel(
+  public ResponseEntity<List<MessageDto>> findAllMessagesByChannel(
       @RequestParam UUID channelId) {
-    List<MessageResponse> messages = messageService.findAllByChannelId(channelId);
+    List<MessageDto> messages = messageService.findAllByChannelId(channelId);
     return ResponseEntity.ok(messages);
   }
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<MessageResponse> create(
+  public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachmentFiles) {
 
@@ -43,15 +42,15 @@ public class MessageController {
           .toList();
     }
 
-    MessageResponse message = messageService.create(messageCreateRequest, attachmentsCreateRequest);
+    MessageDto message = messageService.create(messageCreateRequest, attachmentsCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 
   @PatchMapping("/{messageId}")
-  public ResponseEntity<MessageResponse> update(
+  public ResponseEntity<MessageDto> update(
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest) {
-    MessageResponse updatedMessage = messageService.update(messageId, messageUpdateRequest);
+    MessageDto updatedMessage = messageService.update(messageId, messageUpdateRequest);
     return ResponseEntity.ok(updatedMessage);
   }
 

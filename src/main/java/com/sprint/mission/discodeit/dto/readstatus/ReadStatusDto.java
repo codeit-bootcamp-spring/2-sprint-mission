@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.dto.readstatus;
 import java.time.Instant;
 import java.util.UUID;
 
-public record ReadStatusResponse(
+public record ReadStatusDto(
     UUID id,
     UUID userId,
     UUID channelId,

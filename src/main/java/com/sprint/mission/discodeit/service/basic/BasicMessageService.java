@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageResponse;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -31,12 +30,11 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
-  private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentService binaryContentService;
   private final MessageMapper messageMapper;
 
   @Override
-  public MessageResponse create(MessageCreateRequest messageCreateRequest,
+  public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> attachmentsCreateRequest) {
     Channel channel = channelRepository.getReferenceById(messageCreateRequest.channelId());
     User author = userRepository.getReferenceById(messageCreateRequest.authorId());
@@ -55,21 +53,21 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public MessageResponse find(UUID messageId) {
+  public MessageDto find(UUID messageId) {
     return messageMapper.toResponse(messageRepository.findById(messageId)
         .orElseThrow(
             () -> new ResourceNotFoundException("Message with id " + messageId + " not found")));
   }
 
   @Override
-  public List<MessageResponse> findAllByChannelId(UUID channelId) {
+  public List<MessageDto> findAllByChannelId(UUID channelId) {
     validateChannelExistence(channelId);
     List<Message> messages = messageRepository.findAllByChannel_Id(channelId);
     return messages.stream().map(messageMapper::toResponse).toList();
   }
 
   @Override
-  public MessageResponse update(UUID messageId, MessageUpdateRequest request) {
+  public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     Message message = getMessage(messageId);
     message.update(request.newContent());
     return messageMapper.toResponse(message);
@@ -84,12 +82,7 @@ public class BasicMessageService implements MessageService {
       return;
     }
 
-    message.getAttachments()
-        .forEach(attachment -> {
-          if (binaryContentRepository.existsById(attachment.getId())) {
-            binaryContentRepository.delete(attachment);
-          }
-        });
+    message.getAttachments().forEach(binaryContentService::delete);
     messageRepository.delete(message);
   }
 
@@ -98,11 +91,6 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new ResourceNotFoundException("해당 메세지 없음"));
   }
 
-  private void validateUserExistence(UUID authorId) {
-    if (!userRepository.existsById(authorId)) {
-      throw new ResourceNotFoundException("해당 유저 없음");
-    }
-  }
 
   private void validateChannelExistence(UUID channelId) {
     if (!channelRepository.existsById(channelId)) {
