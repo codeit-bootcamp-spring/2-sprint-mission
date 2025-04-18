@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -22,6 +23,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentStorage binaryContentStorage;
 
   @Override
+  @Transactional(readOnly = true)
   public BinaryContentDto findById(UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
         .orElseThrow(
@@ -31,10 +33,13 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<BinaryContentDto> findByIdIn(List<UUID> binaryContentIdList) {
-    return binaryContentRepository.findAll().stream()
-        .filter(binaryContent -> binaryContentIdList.contains(binaryContent.getId()))
-        .map(binaryContent -> findById(binaryContent.getId()))
+    return binaryContentRepository.findByIdIn(binaryContentIdList).stream()
+        .map(binaryContent -> {
+          InputStream is = binaryContentStorage.get(binaryContent.getId());
+          return binaryContentMapper.toDto(binaryContent, is);
+        })
         .toList();
   }
 }

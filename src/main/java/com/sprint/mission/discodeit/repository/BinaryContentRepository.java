@@ -10,4 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BinaryContentRepository extends JpaRepository<BinaryContent, UUID> {
 
+  List<BinaryContent> findByIdIn(List<UUID> binaryContentIdList);
 }
