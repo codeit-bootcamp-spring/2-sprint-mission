@@ -14,15 +14,14 @@ import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-17T11:40:12+0900",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
+    date = "2025-04-18T23:43:23+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
 )
 @Component
 public class UserMapperImpl implements UserMapper {
@@ -215,18 +214,13 @@ public class UserMapperImpl implements UserMapper {
         String filename = null;
         long size = 0L;
         String contentType = null;
-        byte[] bytes = null;
 
         id = binaryContent.getId();
         filename = binaryContent.getFilename();
         size = binaryContent.getSize();
         contentType = binaryContent.getContentType();
-        byte[] bytes1 = binaryContent.getBytes();
-        if ( bytes1 != null ) {
-            bytes = Arrays.copyOf( bytes1, bytes1.length );
-        }
 
-        FindBinaryContentResult findBinaryContentResult = new FindBinaryContentResult( id, filename, size, contentType, bytes );
+        FindBinaryContentResult findBinaryContentResult = new FindBinaryContentResult( id, filename, size, contentType );
 
         return findBinaryContentResult;
     }

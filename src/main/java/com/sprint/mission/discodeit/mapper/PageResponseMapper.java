@@ -20,7 +20,7 @@ public interface PageResponseMapper {
   }
 
   default <T extends HasCursor> PageResponse<T> fromSlice(Slice<T> slice) {
-    // nextCursor 추출, content의 마지막 createdAt값
+    // nextCursor 추출, content의 가장 오래된 createdAt값
     T last = slice.getContent().isEmpty() ? null :
         slice.getContent().get(slice.getContent().size() - 1);
 
