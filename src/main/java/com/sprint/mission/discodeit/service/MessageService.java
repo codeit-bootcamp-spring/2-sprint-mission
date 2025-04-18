@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.dto.service.message.CreateMessageResult;
 import com.sprint.mission.discodeit.dto.service.message.FindMessageResult;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageCommand;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageResult;
-import org.springframework.data.domain.Pageable;
+import java.time.Instant;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +20,9 @@ public interface MessageService {
 
   FindMessageResult find(UUID id);
 
-  Slice<FindMessageResult> findAllByChannelId(UUID channelId, Pageable pageable);
+  Slice<FindMessageResult> findAllByChannelIdInitial(UUID channelId, int limit);
+
+  Slice<FindMessageResult> findAllByChannelIdAfterCursor(UUID channelId, Instant cursor, int limit);
 
   UpdateMessageResult update(UUID id, UpdateMessageCommand updateMessageCommand,
       List<MultipartFile> multipartFiles);

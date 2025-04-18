@@ -97,3 +97,6 @@ CREATE TABLE message_attachments
             REFERENCES binary_contents (id)
             ON DELETE CASCADE
 );
+
+CREATE INDEX idx_channel_id_created_at_asc
+    ON messages (channel_id, created_at ASC);

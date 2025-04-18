@@ -10,12 +10,9 @@ import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.swagger.MessageApi;
 import jakarta.validation.Valid;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -72,8 +69,17 @@ public class MessageController implements MessageApi {
   @GetMapping
   public ResponseEntity<PageResponse<FindMessageResponseDTO>> getChannelMessages(
       @RequestParam("channelId") UUID id,
-      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
-    Slice<FindMessageResult> messageResults = messageService.findAllByChannelId(id, pageable);
+      @RequestParam(value = "cursor", required = false) Instant cursor,
+      // 클라이언트 측에서는 이전 응답의 nextCursor값을 cursor로 넘겨준다.
+      @RequestParam(value = "limit", defaultValue = "10") int limit) {
+    Slice<FindMessageResult> messageResults;
+
+    // 첫 페이징이라면 cursor가 존재하지 않으므로, cursor를 기준이 아닌 첫 페이지를 반환
+    if (cursor == null) {
+      messageResults = messageService.findAllByChannelIdInitial(id, limit);
+    } else {
+      messageResults = messageService.findAllByChannelIdAfterCursor(id, cursor, limit);
+    }
     Slice<FindMessageResponseDTO> messageResponseDTOPage = messageResults.map(
         messageMapper::toFindMessageResponseDTO);
 

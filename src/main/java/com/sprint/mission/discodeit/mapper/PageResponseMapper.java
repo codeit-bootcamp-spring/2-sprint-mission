@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.util.HasCursor;
 import org.mapstruct.Mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
@@ -18,10 +19,16 @@ public interface PageResponseMapper {
     );
   }
 
-  default <T> PageResponse<T> fromSlice(Slice<T> slice) {
+  default <T extends HasCursor> PageResponse<T> fromSlice(Slice<T> slice) {
+    // nextCursor 추출, content의 마지막 createdAt값
+    T last = slice.getContent().isEmpty() ? null :
+        slice.getContent().get(slice.getContent().size() - 1);
+
+    Object nextCursor = last != null ? last.getCursor() : null;
+
     return new PageResponse<>(
         slice.getContent(),
-        slice.getNumber(),
+        nextCursor,
         slice.getSize(),
         slice.hasNext(),
         null
