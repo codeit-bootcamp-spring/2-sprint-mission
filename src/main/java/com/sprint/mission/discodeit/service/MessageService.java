@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,4 +16,5 @@ public interface MessageService {
     List<MessageDto> findAllByChannelId(UUID channelId);
     MessageDto update(UUID messageId, MessageUpdateRequest request);
     void delete(UUID messageId);
+    PageResponse<MessageDto> findAllByChannelIdWithPaging(UUID channelId, int page);
 }
