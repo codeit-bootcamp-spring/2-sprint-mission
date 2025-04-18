@@ -115,7 +115,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public PageResponse<MessageDto> findAllByChannelIdWithPaging(UUID channelId, int page) {
-        Pageable pageable = (Pageable) PageRequest.of(page, 50, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(page, 50, Sort.by("createdAt").descending());
         Slice<Message> messageSlice = messageRepository.findAllByChannelIdOrderByCreatedAtDesc(channelId, pageable);
         return pageResponseMapper.toDto(messageSlice, messageMapper::toDto);
     }
