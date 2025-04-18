@@ -26,14 +26,17 @@ public class BasicAuthService implements AuthService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
+        UserStatus status = userStatusRepository.findById(user.getId())
+            .orElseThrow(() -> new IllegalArgumentException("사용자 상태 정보를 찾을 수 없습니다."));
+
         return new UserResponse(
             user.getId(),
             user.getCreatedAt(),
             user.getUpdatedAt(),
             user.getUsername(),
             user.getEmail(),
-            user.getProfileId(),
-            userStatusRepository.getById(user.getId()).online(),
+            user.getProfile() != null ? user.getProfile().getId() : null,
+            status.online(),
             user.getPassword()
         );
     }

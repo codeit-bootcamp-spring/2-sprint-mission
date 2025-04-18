@@ -4,21 +4,22 @@ import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.handler.MessageNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -27,10 +28,11 @@ public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final UserService userService;
-    private final ChannelService channelService;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
 
     @Override
+    @Transactional
     public Message createMessage(CreateMessageRequest request, List<MultipartFile> attachments) {
         if (request.authorId() == null) {
             throw new IllegalArgumentException("사용자 ID는 null일 수 없습니다.");
@@ -39,86 +41,85 @@ public class BasicMessageService implements MessageService {
             throw new IllegalArgumentException("채널 ID는 null일 수 없습니다.");
         }
 
-        if (!userService.getUserById(request.authorId()).isPresent()) {
-            throw new IllegalArgumentException("존재하지 않는 사용자입니다: " + request.authorId());
-        }
-        if (!channelService.getChannelById(request.channelId()).isPresent()) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다: " + request.channelId());
-        }
+        User author = userRepository.findById(request.authorId())
+            .orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 사용자입니다: " + request.authorId()));
 
-        List<UUID> attachmentIds = new ArrayList<>();
+        Channel channel = channelRepository.findById(request.channelId())
+            .orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 채널입니다: " + request.channelId()));
 
+        List<BinaryContent> attachmentIds = new ArrayList<>();
         if (attachments != null && !attachments.isEmpty()) {
             for (MultipartFile file : attachments) {
                 try {
                     BinaryContent content = new BinaryContent(
                         file.getOriginalFilename(),
                         file.getSize(),
-                        file.getContentType(),
-                        file.getBytes()
+                        file.getContentType()
                     );
                     binaryContentRepository.save(content);
-                    attachmentIds.add(content.getId());
+                    attachmentIds.add(content);
                 } catch (Exception e) {
                     throw new RuntimeException("첨부 파일 저장 실패", e);
                 }
             }
         }
 
-        Message message = new Message(
-            request.authorId(),
-            request.channelId(),
-            request.content(),
-            attachmentIds
-        );
-        messageRepository.save(message);
-        return message;
+        Message message = new Message(author, channel, request.content(), attachmentIds);
+        return messageRepository.save(message);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MessageResponse getMessageById(UUID messageId) {
-        return messageRepository.getMessageById(messageId)
-            .map(message -> new MessageResponse(
-                message.getId(),
-                message.getUserId(),
-                message.getChannelId(),
-                message.getText(),
-                message.getAttachmentIds(),
-                message.getCreatedAt(),
-                message.getUpdatedAt()
-            ))
+        return messageRepository.findById(messageId)
+            .map(this::toResponse)
             .orElseThrow(() -> new MessageNotFoundException(messageId.toString()));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MessageResponse> findAllByChannelId(UUID channelId) {
-        return messageRepository.getAllMessagesByChannel(channelId).stream()
-            .map(message -> new MessageResponse(
-                message.getId(),
-                message.getUserId(),
-                message.getChannelId(),
-                message.getText(),
-                message.getAttachmentIds(),
-                message.getCreatedAt(),
-                message.getUpdatedAt()
-            ))
+        Channel channel = channelRepository.findById(channelId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다: " + channelId));
+
+        return messageRepository.findAllByChannel(channel).stream()
+            .map(this::toResponse)
             .toList();
     }
 
+    private MessageResponse toResponse(Message message) {
+        List<UUID> attachmentIds = message.getAttachments().stream()
+            .map(BinaryContent::getId)
+            .toList();
+
+        return new MessageResponse(
+            message.getId(),
+            message.getAuthor().getId(),
+            message.getChannel().getId(),
+            message.getContent(),
+            attachmentIds,
+            message.getCreatedAt(),
+            message.getUpdatedAt()
+        );
+    }
+
     @Override
+    @Transactional
     public void updateMessage(UpdateMessageRequest request) {
-        messageRepository.getMessageById(request.messageId()).ifPresent(message -> {
-            Instant updatedTime = Instant.now();
-            message.update(request.newContent(), updatedTime);
+        messageRepository.findById(request.messageId()).ifPresent(message -> {
+            message.update(request.newContent(), message.getAttachments());
             messageRepository.save(message);
         });
     }
 
     @Override
+    @Transactional
     public void deleteMessage(UUID messageId) {
-        messageRepository.getMessageById(messageId).ifPresent(message -> {
-            message.getAttachmentIds().forEach(binaryContentRepository::deleteById);
-            messageRepository.deleteMessage(messageId);
+        messageRepository.findById(messageId).ifPresent(message -> {
+            message.getAttachments().forEach(binaryContentRepository::delete);
+            messageRepository.deleteById(messageId);
         });
     }
 }

@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 

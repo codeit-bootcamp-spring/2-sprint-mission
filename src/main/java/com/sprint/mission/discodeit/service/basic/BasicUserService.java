@@ -14,11 +14,10 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,56 +28,57 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
+    @Transactional
     public User createUser(CreateUserRequest request,
         Optional<CreateBinaryContentRequest> profileOpt) {
-        if (userRepository.getAllUsers().stream().anyMatch(
+        if (userRepository.findAll().stream().anyMatch(
             user -> user.getUsername().equals(request.username()) || user.getEmail()
                 .equals(request.email())
         )) {
             throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
         }
 
-        UUID profileId = profileOpt.map(profile -> {
+        BinaryContent profile = profileOpt.map(p -> {
             BinaryContent binaryContent = new BinaryContent(
-                profile.fileName(),
-                (long) profile.bytes().length,
-                profile.contentType(),
-                profile.bytes()
+                p.fileName(),
+                (long) p.bytes().length,
+                p.contentType()
             );
-            return binaryContentRepository.save(binaryContent).getId();
+            return binaryContentRepository.save(binaryContent);
         }).orElse(null);
 
         User user = new User(
             request.username(),
             request.password(),
             request.email(),
-            profileId
+            profile
         );
         userRepository.save(user);
-
-        userStatusRepository.save(new UserStatus(user.getId()));
+        userStatusRepository.save(new UserStatus(user));
 
         return user;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<UserResponse> getUserById(UUID userId) {
-        return userRepository.getUserById(userId)
+        return userRepository.findById(userId)
             .map(user -> new UserResponse(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getProfileId(),
-                userStatusRepository.getById(userId).online(),
+                user.getProfile() != null ? user.getProfile().getId() : null,
+                user.getStatus() != null && user.getStatus().online(),
                 user.getPassword()
             ));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserResponse> getUsersByName(String name) {
-        return userRepository.getAllUsers().stream()
+        return userRepository.findAll().stream()
             .filter(user -> user.getUsername().equals(name))
             .map(user -> new UserResponse(
                 user.getId(),
@@ -86,69 +86,63 @@ public class BasicUserService implements UserService {
                 user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getProfileId(),
-                userStatusRepository.getById(user.getId()).online(),
+                user.getProfile() != null ? user.getProfile().getId() : null,
+                user.getStatus() != null && user.getStatus().online(),
                 user.getPassword()
             ))
             .toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserResponse> getAllUsers() {
-        return userRepository.getAllUsers().stream()
+        return userRepository.findAll().stream()
             .map(user -> new UserResponse(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getProfileId(),
-                userStatusRepository.getById(user.getId()).online(),
+                user.getProfile() != null ? user.getProfile().getId() : null,
+                user.getStatus() != null && user.getStatus().online(),
                 user.getPassword()
             ))
             .toList();
     }
 
     @Override
+    @Transactional
     public void updateUser(UpdateUserRequest request,
         Optional<CreateBinaryContentRequest> profileOpt) {
-        userRepository.getUserById(request.userId()).ifPresent(user -> {
-            Instant updatedTime = Instant.now();
-
-            UUID newProfileId = profileOpt.map(profile -> {
-                Optional.ofNullable(user.getProfileId())
-                    .ifPresent(binaryContentRepository::deleteById);
-
+        userRepository.findById(request.userId()).ifPresent(user -> {
+            BinaryContent newProfile = profileOpt.map(profile -> {
+                Optional.ofNullable(user.getProfile()).ifPresent(binaryContentRepository::delete);
                 BinaryContent binaryContent = new BinaryContent(
                     profile.fileName(),
                     (long) profile.bytes().length,
-                    profile.contentType(),
-                    profile.bytes()
+                    profile.contentType()
                 );
-
-                return binaryContentRepository.save(binaryContent).getId();
-            }).orElse(user.getProfileId());
+                return binaryContentRepository.save(binaryContent);
+            }).orElse(user.getProfile());
 
             user.update(
                 request.newUsername(),
                 request.newPassword(),
                 request.newEmail(),
-                updatedTime,
-                newProfileId
+                newProfile
             );
-
-            userRepository.save(user);
+//            userRepository.save(user);
         });
     }
 
     @Override
+    @Transactional
     public void deleteUser(UUID userId) {
-        userRepository.getUserById(userId).ifPresent(user -> {
-            if (user.getProfileId() != null) {
-                binaryContentRepository.deleteById(user.getProfileId());
+        userRepository.findById(userId).ifPresent(user -> {
+            if (user.getProfile() != null) {
+                binaryContentRepository.delete(user.getProfile());
             }
+            userRepository.delete(user);
         });
-        userStatusRepository.deleteById(userId);
-        userRepository.deleteUser(userId);
     }
 }
