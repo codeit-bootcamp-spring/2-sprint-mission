@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,5 +31,5 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
     @Transactional(readOnly = true)
     @Query("SELECT c FROM Channel c JOIN c.participants uc WHERE uc.user.id = :userId")
-    Page<Channel> findChannelsByUserId(@Param("userId") UUID userId, Pageable pageable);
+    List<Channel> findChannelsByUserId(@Param("userId") UUID userId);
 }

@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 
@@ -17,8 +16,7 @@ public interface UserService {
         Optional<BinaryContentCreateRequest> profileCreateRequest);
 
     UserDto find(UUID userId);
-
-    PageResponse<UserDto> findAll(Pageable pageable);
+    
 
     UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
         Optional<BinaryContentCreateRequest> profileCreateRequest);

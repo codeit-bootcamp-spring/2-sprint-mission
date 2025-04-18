@@ -3,25 +3,26 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.MessageService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import java.time.Instant;
+import org.mapstruct.*;
+import java.util.List;
 
-@Component
-@RequiredArgsConstructor
-public class ChannelMapper {
+// 추상클래스는 오토 주입 x
+@Mapper(componentModel = "spring")
+public abstract class ChannelMapper {
 
-    private final MessageService messageService;
+    private MessageService messageService;
 
-    public ChannelDto toDto(Channel channel) {
-        return new ChannelDto(
-            channel.getId(),
-            channel.getType(),
-            channel.getName(),
-            channel.getDescription(),
-            channel.getParticipants(),
-            messageService.lastMessageTime(channel.getId())
-        );
 
+    @Mapping(target = "lastMessageAt",
+        expression = "java(getLastMessageTime(channel))")
+    public abstract ChannelDto toDto(Channel channel);
+
+
+    public abstract List<ChannelDto> toDto(List<Channel> channels);
+
+
+    protected Instant getLastMessageTime(Channel channel) {
+        return messageService.lastMessageTime(channel.getId());
     }
-
 }

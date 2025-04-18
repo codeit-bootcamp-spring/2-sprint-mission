@@ -36,7 +36,6 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
-    private PageResponseMapper pageMapper;
 
     @Transactional
     @Override
@@ -112,17 +111,15 @@ public class BasicChannelService implements ChannelService {
 
     @Transactional(readOnly = true)
     @Override
-    public PageResponse<ChannelDto> findAllByUserId(UUID userId, Pageable pageable) {
+    public List<ChannelDto> findAllByUserId(UUID userId) {
 
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("User with id " + userId + " not found");
         }
 
-        Page<Channel> channelPage = channelRepository.findChannelsByUserId(userId, pageable);
+        List<Channel> channelList = channelRepository.findChannelsByUserId(userId);
 
-        PageResponse<ChannelDto> response = pageMapper.fromPage(channelPage, channelMapper::toDto);
-
-        return response;
+        return channelMapper.toDto(channelList);
     }
 
     @Transactional

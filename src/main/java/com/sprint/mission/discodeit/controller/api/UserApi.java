@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller.api;
 
-import com.sprint.mission.discodeit.dto.data.PageResponse;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
@@ -16,12 +15,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
+import java.util.*;
 
 @Tag(name = "User", description = "User API")
 public interface UserApi {
@@ -92,7 +91,7 @@ public interface UserApi {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class)))
         )
     })
-    ResponseEntity<PageResponse<UserDto>> findAll(Pageable pegeable);
+    ResponseEntity<List<UserDto>> findAll();
 
     @Operation(summary = "User 온라인 상태 업데이트")
     @ApiResponses(value = {

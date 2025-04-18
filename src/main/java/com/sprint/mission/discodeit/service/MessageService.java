@@ -23,6 +23,8 @@ public interface MessageService {
 
     Message find(UUID messageId);
 
+
+    @Transactional(readOnly = true)
     PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable);
 
     Instant lastMessageTime(UUID channelId);

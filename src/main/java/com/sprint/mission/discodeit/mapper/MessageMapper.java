@@ -4,40 +4,34 @@ import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
+import java.util.*;
 
-@Component
-@RequiredArgsConstructor
-public class MessageMapper {
+@Mapper(componentModel = "spring", uses = {BinaryContentMapper.class, UserMapper.class})
+public interface MessageMapper {
+    @Mapping(target = "attachments", expression = "java(mapAttachments(message.getAttachments(), binaryContentMapper))")
+    MessageDto toDto(Message message, @Context BinaryContentMapper binaryContentMapper, @Context UserMapper userMapper);
 
-    BinaryContentMapper binaryContentMapper;
-    UserMapper userMapper;
-
-    public MessageDto toDto(Message message) {
-        List<BinaryContentDto> binaryContentDtos = new ArrayList<>();
-        List<BinaryContent> binaryContentList = Optional.ofNullable(message.getAttachments())
-            .orElse(new ArrayList<>());
-        if (!binaryContentList.isEmpty() && binaryContentList.size() >= 2) {
-            for (BinaryContent binaryContent : binaryContentList) {
-                BinaryContentDto binaryContentDto = binaryContentMapper.toDto(binaryContent);
-                binaryContentDtos.add(binaryContentDto);
-            }
-        }
-        return new MessageDto(
-            message.getId(),
-            message.getCreatedAt(),
-            message.getUpdatedAt(),
-            message.getContent(),
-            message.getChannel().getId(),
-            userMapper.toDto(message.getAuthor()),
-            binaryContentDtos
-
-        );
-
+    // context 없는 기본 변환 메서드 추가
+    default MessageDto toDto(Message message) {
+        return toDto(message, null, null);
     }
 
+    // 리스트 변환도 context 없이
+    default List<MessageDto> toDto(List<Message> messages) {
+        List<MessageDto> result = new ArrayList<>();
+        for (Message m : messages) {
+            result.add(toDto(m));
+        }
+        return result;
+    }
+
+    default List<BinaryContentDto> mapAttachments(List<BinaryContent> attachments, BinaryContentMapper binaryContentMapper) {
+        if (attachments == null) return Collections.emptyList();
+        List<BinaryContentDto> result = new ArrayList<>();
+        for (BinaryContent binaryContent : attachments) {
+            result.add(binaryContentMapper.toDto(binaryContent));
+        }
+        return result;
+    }
 }

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.data.PageResponse;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -15,14 +14,13 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentStorage;
 import com.sprint.mission.discodeit.service.UserService;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,11 +97,9 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<UserDto> findAll(Pageable pageable) {
-        //page로 받은 후 -> 다시 변환
-        Page<User> userPage = userRepository.findAll(pageable);
-        PageResponse<UserDto> response = pageResponseMapper.fromPage(userPage, userMapper::toDto);
-        return response;
+    public List<UserDto> findAll() {
+        List<User> users = userRepository.findAll();
+        return userMapper.toDto(users);
     }
 
 

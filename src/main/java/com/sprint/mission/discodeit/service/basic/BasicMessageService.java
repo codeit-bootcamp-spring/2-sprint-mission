@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Use Spring's Transactional
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
@@ -113,8 +113,8 @@ public class BasicMessageService implements MessageService {
                 () -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
-    @Override
     @Transactional(readOnly = true)
+    @Override
     public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
 
         if (!channelRepository.existsById(channelId)) {
@@ -123,10 +123,10 @@ public class BasicMessageService implements MessageService {
 
         Page<Message> messagePage = messageRepository.findAllByChannelId(channelId, pageable);
 
-        PageResponse<MessageDto> response = pageMapper.fromPage(messagePage, messageMapper::toDto);
-
-        return response;
+        /* 핵심: 엔티티 → DTO 변환 함수를 람다나 메서드 레퍼런스로 넘김 */
+        return pageMapper.fromPage(messagePage, messageMapper::toDto);
     }
+
 
     @Override
     @Transactional(readOnly = true)

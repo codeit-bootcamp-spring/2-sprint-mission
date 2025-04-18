@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -77,13 +78,16 @@ public class MessageController implements MessageApi {
         return null;
     }
 
-    @GetMapping(path = "{channelId}")
+
+    @GetMapping("/{channelId}")
     public ResponseEntity<PageResponse<MessageDto>> getMessages(
         @PathVariable UUID channelId,
-        Pageable pageable) {
+        @PageableDefault(size = 20) Pageable pageable) {
 
-        PageResponse<MessageDto> messageResponse = messageService.findAllByChannelId(channelId,
-            pageable);
-        return ResponseEntity.ok(messageResponse);
+        PageResponse<MessageDto> response =
+            messageService.findAllByChannelId(channelId, pageable);
+
+        return ResponseEntity.ok(response);
     }
+
 }

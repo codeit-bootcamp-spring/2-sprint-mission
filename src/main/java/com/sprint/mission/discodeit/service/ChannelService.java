@@ -26,14 +26,12 @@ public interface ChannelService {
     ChannelDto find(UUID channelId);
 
 
-    @Transactional(readOnly = true)
-    PageResponse<ChannelDto> findAllByUserId(UUID userId, Pageable pageable);
-
     @Transactional
     Channel update(UUID channelId, PublicChannelUpdateRequest request);
 
     @Transactional
     void delete(UUID channelId);
 
+    @Transactional(readOnly = true)
     List<ChannelDto> findAllByUserId(UUID userId);
 }
