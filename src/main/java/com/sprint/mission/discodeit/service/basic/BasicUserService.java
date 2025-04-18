@@ -92,7 +92,7 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   @Cacheable(value = "allUsers")
   public List<FindUserResult> findAll() {
-    List<User> users = userRepository.findAll();
+    List<User> users = userRepository.findAllFetch();
 
     return users.stream()
         .map(user -> userMapper.toFindUserResult(user))
