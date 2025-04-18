@@ -15,14 +15,19 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(componentModel = "spring")
-@RequiredArgsConstructor
+@Mapper(componentModel = "spring", uses = {UserMapper.class})
 public abstract class ChannelMapper {
 
-  private final MessageRepository messageRepository;
-  private final ReadStatusRepository readStatusRepository;
-  private final UserMapper userMapper;
+  @Autowired
+  private MessageRepository messageRepository;
+
+  @Autowired
+  private ReadStatusRepository readStatusRepository;
+
+  @Autowired
+  private UserMapper userMapper;
 
   @Mapping(target = "lastMessageAt", expression = "java(getLastMessageAt(channel))")
   @Mapping(target = "participants", expression = "java(getParticipants(channel))")

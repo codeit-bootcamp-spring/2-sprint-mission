@@ -35,13 +35,13 @@ public class BasicReadStatusService implements ReadStatusService {
     UUID userId = request.userId();
     UUID channelId = request.channelId();
 
-    User user = userRepository.findById(request.userId())
-        .orElseThrow(() -> new NoSuchElementException(
-            "User with id " + userId + " does not exist"));
+    User user = userRepository.findById(userId)
+        .orElseThrow(
+            () -> new NoSuchElementException("User with id " + userId + " does not exist"));
 
-    Channel channel = channelRepository.findById(request.channelId())
-        .orElseThrow(() -> new NoSuchElementException(
-            "Channel with id " + channelId + " does not exist"));
+    Channel channel = channelRepository.findById(channelId)
+        .orElseThrow(
+            () -> new NoSuchElementException("Channel with id " + channelId + " does not exist"));
 
     if (readStatusRepository.findAllByUserId(userId).stream()
         .anyMatch(readStatus -> readStatus.getChannel().equals(channel))) {

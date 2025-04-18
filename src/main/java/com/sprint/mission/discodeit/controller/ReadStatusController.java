@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
+import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -16,17 +17,17 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/readStatus")
+@RequestMapping("/api/readStatuses")
 public class ReadStatusController implements ReadStatusApi {
 
   private final BasicReadStatusService readStatusService;
 
   @Override
   @PostMapping
-  public ResponseEntity<ReadStatus> create(
+  public ResponseEntity<ReadStatusDto> create(
       @RequestBody ReadStatusCreateRequest readStatusCreateRequest) {
 
-    ReadStatus createdReadStatus = readStatusService.create(readStatusCreateRequest);
+    ReadStatusDto createdReadStatus = readStatusService.create(readStatusCreateRequest);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -35,11 +36,12 @@ public class ReadStatusController implements ReadStatusApi {
 
   @Override
   @PutMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatus> update(
+  public ResponseEntity<ReadStatusDto> update(
       @PathVariable("readStatusId") UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
 
-    ReadStatus updatedReadStatus = readStatusService.update(readStatusId, readStatusUpdateRequest);
+    ReadStatusDto updatedReadStatus = readStatusService.update(readStatusId,
+        readStatusUpdateRequest);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -48,10 +50,10 @@ public class ReadStatusController implements ReadStatusApi {
 
   @Override
   @GetMapping
-  public ResponseEntity<List<ReadStatus>> findAllByUserId(
-      @RequestParam("userId") UUID userId) {
+  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(
+      @RequestParam(value = "userId", required = true) UUID userId) {
 
-    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+    List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
 
     return ResponseEntity
         .status(HttpStatus.OK)

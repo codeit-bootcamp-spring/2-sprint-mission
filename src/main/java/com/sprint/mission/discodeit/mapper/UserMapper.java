@@ -9,6 +9,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = {BinaryContent.class, UserStatusMapper.class})
 public interface UserMapper {
 
-  @Mapping(source = "status", target = "online")
+  @Mapping(source = "status.online", target = "online")
   UserDto toDto(User user);
 }

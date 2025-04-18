@@ -32,10 +32,10 @@ public class ChannelController implements ChannelApi {
 
   @Override
   @PostMapping("/public")
-  public ResponseEntity<Channel> create(
+  public ResponseEntity<ChannelDto> create(
       @RequestBody PublicChannelCreateRequest publicChannelCreateRequest) {
 
-    Channel createdChannel = channelService.create(publicChannelCreateRequest);
+    ChannelDto createdChannel = channelService.create(publicChannelCreateRequest);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -44,10 +44,10 @@ public class ChannelController implements ChannelApi {
 
   @Override
   @PostMapping("/Private")
-  public ResponseEntity<Channel> create(
+  public ResponseEntity<ChannelDto> create(
       @RequestBody PrivateChannelCreateRequest privateChannelCreateRequest) {
 
-    Channel createdChannel = channelService.create(privateChannelCreateRequest);
+    ChannelDto createdChannel = channelService.create(privateChannelCreateRequest);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -56,11 +56,11 @@ public class ChannelController implements ChannelApi {
 
   @Override
   @PutMapping("/{channelId}")
-  public ResponseEntity<Channel> update(
+  public ResponseEntity<ChannelDto> update(
       @PathVariable("channelId") UUID channelId,
       @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
 
-    Channel udpatedChannel = channelService.update(channelId, publicChannelUpdateRequest);
+    ChannelDto udpatedChannel = channelService.update(channelId, publicChannelUpdateRequest);
 
     return ResponseEntity
         .status(HttpStatus.OK)

@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -50,21 +52,26 @@ public class BasicUserService implements UserService {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
+
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
+              contentType);
           binaryContentRepository.save(binaryContent);
+
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+
           return binaryContent;
         })
         .orElse(null);
+
     String password = userCreateRequest.password();
 
     User user = new User(username, email, password, nullableProfileId);
-
     Instant now = Instant.now();
-    UserStatus userStatus = new UserStatus(user, now);
-    userStatusRepository.save(userStatus);
+    UserStatus userStatus = new UserStatus(user, Instant.now());
 
     userRepository.save(user);
+    userStatusRepository.save(userStatus);
+
     return userMapper.toDto(user);
   }
 
@@ -109,9 +116,13 @@ public class BasicUserService implements UserService {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
+
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
+              contentType);
           binaryContentRepository.save(binaryContent);
+
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+
           return binaryContent;
         })
         .orElse(null);
@@ -130,6 +141,7 @@ public class BasicUserService implements UserService {
 
     Optional.ofNullable(user.getProfile())
         .ifPresent(existingProfile -> binaryContentRepository.deleteById(existingProfile.getId()));
+
     userStatusRepository.deleteByUserId(userId);
 
     userRepository.deleteById(userId);

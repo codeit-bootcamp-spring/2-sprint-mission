@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,6 +12,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -28,10 +30,12 @@ public class User extends BaseUpdatableEntity {
   private String password;
 
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-  @JoinColumn(name = "profile_id", columnDefinition = "uuid")
+  @JoinColumn(name = "profile_id", columnDefinition = "uuid", nullable = true)
   private BinaryContent profile;
 
-  @OneToOne(mappedBy = "userStatus", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonManagedReference
+  @Setter(AccessLevel.PROTECTED)
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "id", columnDefinition = "uuid")
   private UserStatus status;
 
