@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final ReadStatusMapper readStatusMapper;
 
+    @Transactional
     @Override
     public ReadStatusDto create(ReadStatusCreateDto readStatusCreateDto) {
         User user = userRepository.findById(readStatusCreateDto.userId())
@@ -46,6 +48,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusMapper.toDto(newReadStatus);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ReadStatusDto findById(UUID id) {
         ReadStatus readStatus = readStatusRepository.findById(id)
@@ -54,6 +57,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusMapper.toDto(readStatus);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ReadStatusDto> findAll() {
         return readStatusRepository.findAll().stream()
@@ -61,6 +65,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ReadStatusDto> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(userId).stream()
@@ -68,6 +73,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ReadStatusDto> findAllByChannelId(UUID channelId) {
         return readStatusRepository.findAllByChannelId(channelId).stream()
@@ -75,6 +81,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateDto readStatusUpdateDto) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
@@ -84,6 +91,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusMapper.toDto(readStatus);
     }
 
+    @Transactional
     @Override
     public void delete(UUID id) {
         ReadStatus readStatus = readStatusRepository.findById(id)
