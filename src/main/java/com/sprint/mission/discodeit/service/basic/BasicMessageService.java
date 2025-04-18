@@ -87,18 +87,17 @@ public class BasicMessageService implements MessageService {
 
   @Transactional(readOnly = true)
   @Override
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, int size) {
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor,
+      Pageable pageable) {
 
     Instant cursorToUse = cursor == null ? Instant.now() : cursor;
-    Pageable pageable = PageRequest.of(0, size + 1,
-        Sort.by(Sort.Direction.DESC, "createdAt"));    // createdAt은 DB의 컬럼명이 아닌 Entity의 필드명과 일치하도록.
 
     Slice<Message> slice = messageRepository.findAllByChannelIdAndCreatedAtLessThan(
         channelId, cursorToUse, pageable);
 
     return pageResponseMapper.fromSliceWithCursor(
         slice.map(messageMapper::toDto),
-        size,
+        pageable.getPageSize(),
         MessageDto::createdAt
     );
   }
