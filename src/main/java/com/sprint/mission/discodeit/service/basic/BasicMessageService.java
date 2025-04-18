@@ -17,6 +17,10 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -45,6 +49,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
+  @CacheEvict(value = "allMessages", allEntries = true)
   public CreateMessageResult create(CreateMessageCommand createMessageCommand,
       List<MultipartFile> multipartFiles) {
     // 유저와 채널이 실제로 존재하는지 검증
@@ -76,6 +81,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "message", key = "#p0")
   public FindMessageResult find(UUID messageId) {
     Message message = findMessageById(messageId);
     return messageMapper.toFindMessageResult(message);
@@ -83,13 +89,19 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public Slice<FindMessageResult> findAllByChannelId(UUID channelId, Pageable pageable) {
-    Slice<Message> messages = messageRepository.findAllByChannelId(channelId, pageable);
+  @Cacheable(value = "allMessages", key = "#p0 + '_' + #p1.pageNumber")
+  // 프론트엔드 웹소켓 기반 실시간 통신이라 그런지 조회 쿼리가 시간마다 반복적으로 호출됨 -> 캐싱을 통해 해결
+  public Slice<FindMessageResult> findAllByChannelId(UUID channelId,
+      Pageable pageable) {
+    Slice<Message> messages = messageRepository.findAllByChannelId(channelId,
+        pageable);
     return messages.map(messageMapper::toFindMessageResult);
   }
 
   @Override
   @Transactional
+  @CachePut(value = "message", key = "#p0")
+  @CacheEvict(value = "allMessages", allEntries = true)
   public UpdateMessageResult update(UUID id, UpdateMessageCommand updateMessageCommand,
       List<MultipartFile> multipartFiles) {
     Message message = findMessageById(id);
@@ -101,6 +113,10 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
+  @Caching(evict = {
+      @CacheEvict(value = "allMessages", allEntries = true),
+      @CacheEvict(value = "message", key = "#p0")
+  })
   public void delete(UUID messageId) {
     Message message = findMessageById(messageId);
     if (message.getAttachments() != null) {

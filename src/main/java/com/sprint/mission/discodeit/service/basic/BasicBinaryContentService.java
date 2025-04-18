@@ -10,6 +10,9 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +28,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   @Transactional
+  @CacheEvict(value = "allBinaryContents", allEntries = true)
   public CreateBinaryContentResult create(BinaryContent binaryContent) {
     BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
 
@@ -33,6 +37,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "binaryContent", key = "#p0")
   public FindBinaryContentResult find(UUID id) {
     BinaryContent binaryContent = findBinaryContentById(id);
     return binaryContentMapper.toFindBinaryContentResult(binaryContent);
@@ -40,6 +45,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "allBinaryContents", key = "#p0")
   // attachmentIds를 받아서 리스트를 조회
   public List<FindBinaryContentResult> findAllByIdIn(List<UUID> attachmentsId) {
     return attachmentsId.stream()
@@ -49,6 +55,10 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
+  @Caching(evict = {
+      @CacheEvict(value = "binaryContent", key = "#p0"),
+      @CacheEvict(value = "allBinaryContents", allEntries = true)
+  })
   public void delete(UUID id) {
     binaryContentRepository.deleteById(id);
   }

@@ -17,6 +17,10 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -37,6 +41,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
+  @CacheEvict(value = "allChannels", allEntries = true)
   public CreatePublicChannelResult createPublicChannel(
       CreatePublicChannelCommand createPublicChannelCommand) {
     Channel channel = createPublicChannelEntity(createPublicChannelCommand);
@@ -46,6 +51,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
+  @CacheEvict(value = "allChannels", allEntries = true)
   public CreatePrivateChannelResult createPrivateChannel(
       CreatePrivateChannelCommand createPrivateChannelCommand) {
     Channel channel = createPrivateChannelEntity();
@@ -63,6 +69,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "channel", key = "#p0")
   public FindChannelResult find(UUID channelId) {
     Channel channel = findChannelById(channelId);
     Instant latestMessageTime = findMessageLatestTimeInChannel(channelId);
@@ -77,6 +84,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "allChannels", key = "#p0")
   public List<FindChannelResult> findAllByUserId(UUID userId) {
     List<Channel> channels = channelRepository.findAll();
     return channels.stream()
@@ -94,6 +102,8 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
+  @CachePut(value = "channel", key = "#p0")
+  @CacheEvict(value = "allChannels", allEntries = true)
   public UpdateChannelResult update(UUID id, UpdateChannelCommand updateChannelCommand) {
     Channel channel = findChannelById(id);
     if (channel.getType() == ChannelType.PRIVATE) {
@@ -107,6 +117,10 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
+  @Caching(evict = {
+      @CacheEvict(value = "channel", key = "#p0"),
+      @CacheEvict(value = "allChannels", allEntries = true)
+  })
   public void delete(UUID channelId) {
     // 연관관계 구조상 Cascade 사용 불가하여 명시적으로 삭제
     readStatusService.deleteByChannelId(channelId);

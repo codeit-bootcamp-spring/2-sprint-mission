@@ -11,10 +11,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.RestExceptions;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -25,6 +23,10 @@ import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,6 +82,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "user", key = "#p0")
   public FindUserResult find(UUID userId) {
     User findUser = findUserById(userId);
     return userMapper.toFindUserResult(findUser);
@@ -87,6 +90,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = "allUsers")
   public List<FindUserResult> findAll() {
     List<User> users = userRepository.findAll();
 
@@ -97,6 +101,8 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
+  @CachePut(value = "user", key = "#p0")
+  @CacheEvict(value = "allUsers", allEntries = true)
   public UpdateUserResult update(UUID userId, UpdateUserCommand updateUserCommand,
       MultipartFile multipartFile) {
     User findUser = findUserById(userId);
@@ -130,6 +136,10 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
+  @Caching(evict = {
+      @CacheEvict(value = "user", key = "#p0"),
+      @CacheEvict(value = "allUsers", allEntries = true)
+  })
   public void delete(UUID userId) {
     User user = findUserById(userId);
     userRepository.deleteById(userId);

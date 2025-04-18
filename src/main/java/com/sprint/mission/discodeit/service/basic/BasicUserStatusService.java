@@ -16,6 +16,8 @@ import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,6 +55,8 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   @Transactional
+  @CachePut(value = "user", key = "#p0")
+  @CacheEvict(value = "allUsers", allEntries = true)
   public UpdateUserStatusResult updateByUserId(UUID id) {
     UserStatus userStatus = findUserStatusByUserId(id);
     userStatus.updateUserStatus();
