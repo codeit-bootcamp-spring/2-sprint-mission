@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.service.binarycontent.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.dto.service.binarycontent.CreateBinaryContentResult;
 import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -62,12 +61,5 @@ public class BasicBinaryContentService implements BinaryContentService {
         });
   }
 
-  private BinaryContent createBinaryContentEntity(
-      CreateBinaryContentCommand createBinaryContentCommand) {
-    return BinaryContent.builder()
-        .filename(createBinaryContentCommand.filename())
-        .size(createBinaryContentCommand.size())
-        .contentType(createBinaryContentCommand.contentType())
-        .build();
-  }
+
 }
