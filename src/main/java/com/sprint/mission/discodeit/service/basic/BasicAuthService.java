@@ -41,15 +41,15 @@ public class BasicAuthService implements AuthService {
         .email(request.email())
         .password(hashedPassword)
         .build();
+    userRepository.save(user);
 
     UserStatus userStatus = UserStatus.builder()
         .user(user)
         .lastActiveAt(Instant.now())
         .build();
 
-    user.setStatus(userStatus);
-    userRepository.save(user);
     userStatusRepository.save(userStatus);
+    user.setStatus(userStatus);
 
     return userMapper.toDto(user);
   }
