@@ -4,6 +4,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.Message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.Message.MessageDto;
 import com.sprint.mission.discodeit.dto.Message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
@@ -31,7 +32,7 @@ public class MessageController {
   private final BinaryContentService binaryContentService;
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<List<MessageDto>> findAllByChannelId(
+  public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
       @RequestParam("channelId") UUID channelId,
       @RequestParam(value = "cursor", required = false) Instant cursor,
       @RequestParam("pageable") Pageable pageable
