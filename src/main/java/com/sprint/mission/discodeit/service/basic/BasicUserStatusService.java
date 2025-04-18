@@ -56,6 +56,9 @@ public class BasicUserStatusService implements UserStatusService {
   public UpdateUserStatusResult updateByUserId(UUID id) {
     UserStatus userStatus = findUserStatusByUserId(id);
     userStatus.updateUserStatus();
+
+    User user = userStatus.getUser();
+    user.updateUserStatus(userStatus);
     return userStatusMapper.toUpdateUserStatusResult(userStatus);
   }
 
