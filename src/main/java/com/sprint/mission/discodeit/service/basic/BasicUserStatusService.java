@@ -68,7 +68,9 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatusDto update(UUID userId, UserStatusUpdateRequest request) {
-    UserStatus status = findUserStatusOrThrow(userId);
+    UserStatus status = userStatusRepository.findByUserId(userId)
+        .orElseThrow(
+            () -> new NoSuchElementException("UserId: " + userId + " UserStatus not found"));
     status.setLastActiveAt(request.newLastActiveAt());
 
     return userStatusMapper.toDto(status);
