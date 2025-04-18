@@ -5,8 +5,7 @@ create table binary_contents
     created_at   timestamp    not null,
     file_name    varchar(255) not null,
     size         bigint       not null,
-    content_type varchar(100) not null,
-    bytes        bytea        not null
+    content_type varchar(100) not null
 );
 
 alter table binary_contents
