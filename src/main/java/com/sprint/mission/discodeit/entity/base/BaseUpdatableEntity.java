@@ -2,16 +2,13 @@ package com.sprint.mission.discodeit.entity.base;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import java.io.Serializable;
 import java.time.Instant;
 import lombok.Getter;
 import org.springframework.data.annotation.LastModifiedDate;
 
 @Getter
 @MappedSuperclass
-public abstract class BaseUpdatableEntity extends BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public abstract class BaseUpdatableEntity extends BaseEntity {
     @LastModifiedDate
     @Column(nullable = false)
     protected Instant updatedAt;
