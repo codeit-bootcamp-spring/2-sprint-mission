@@ -17,8 +17,12 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -83,10 +87,20 @@ public class BasicMessageService implements MessageService {
 
   @Transactional(readOnly = true)
   @Override
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-    return pageResponseMapper.fromSlice(messageRepository.findAllByChannelId(channelId, pageable)
-        .map(messageMapper::toDto));
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, int size) {
 
+    Instant cursorToUse = cursor == null ? Instant.now() : cursor;
+    Pageable pageable = PageRequest.of(0, size + 1,
+        Sort.by(Sort.Direction.DESC, "createdAt"));    // createdAt은 DB의 컬럼명이 아닌 Entity의 필드명과 일치하도록.
+
+    Slice<Message> slice = messageRepository.findAllByChannelIdAndCreatedAtLessThan(
+        channelId, cursorToUse, pageable);
+
+    return pageResponseMapper.fromSliceWithCursor(
+        slice.map(messageMapper::toDto),
+        size,
+        MessageDto::createdAt
+    );
   }
 
   @Override
