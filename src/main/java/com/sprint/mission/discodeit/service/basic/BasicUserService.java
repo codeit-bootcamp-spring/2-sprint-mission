@@ -60,6 +60,7 @@ public class BasicUserService implements UserService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponseDto find(UUID userId) {
         User matchingUser = userJpaRepository.findByIdWithProfile(userId)
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
@@ -68,6 +69,7 @@ public class BasicUserService implements UserService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserResponseDto> findAllUser() {
         List<UserResponseDto> userAllList = new ArrayList<>();
         userJpaRepository.findAllUsers().stream()

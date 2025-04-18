@@ -44,6 +44,7 @@ public class BasicUserStatusService implements UserStatusService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public UserStatusResponseDto find(UserStatusFindDto userStatusFindDto) {
         UserStatus userStatus = userStatusJPARepository.findByUser_Id(userStatusFindDto.userId())
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
@@ -52,6 +53,7 @@ public class BasicUserStatusService implements UserStatusService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserStatusResponseDto> findAll() {
         List<UserStatusResponseDto> userStatusList = new ArrayList<>();
         userStatusJPARepository.findAll().stream()

@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryC
 import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageCreateDto;
 import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageUpdateDto;
 import com.sprint.mission.discodeit.service.dto.response.MessageResponseDto;
+import com.sprint.mission.discodeit.service.dto.response.PageResponseDto;
 import com.sprint.mission.discodeit.service.dto.response.PageableResponseDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,7 +74,8 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public PageableResponseDto<MessageResponseDto> find(UUID messageId, int page, int size) {
+    @Transactional(readOnly = true)
+    public PageResponseDto<MessageResponseDto> find(UUID messageId, int page, int size) {
         Page<MessageResponseDto> matchingMessage = messageJpaRepository
                 .findByIdEntityGraph(messageId, pageRequestSortByCreatedAt(page, size))
                 .map(messageMapper::toDto);
@@ -84,9 +87,11 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public PageableResponseDto<MessageResponseDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-        Page<MessageResponseDto> matchingMessageAll = messageJpaRepository.findByChannel_IdEntityGraph(channelId, pageable)
-                .map(messageMapper::toDto);
+    @Transactional(readOnly = true)
+    public PageResponseDto<MessageResponseDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
+        Page<MessageResponseDto> matchingMessageAll = cursor != null
+                ? messageJpaRepository.findByChannel_IdEntityGraphCursor(channelId, cursor, pageable).map(messageMapper::toDto)
+                : messageJpaRepository.findByChannel_IdEntityGraph(channelId, pageable).map(messageMapper::toDto) ;
         return pageMapper.fromPage(matchingMessageAll);
     }
 

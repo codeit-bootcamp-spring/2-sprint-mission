@@ -19,7 +19,7 @@ public interface UserJPARepository extends JpaRepository<User, UUID> {
     @Query("select u from User u left join fetch u.profile where u.id = :id")
     Optional<User> findByIdWithProfile(@Param("id") UUID userId);
 
-    @Query("select u from User u left join fetch u.profile")
+    @Query("select u from User u left join fetch u.profile left join fetch u.status")
     List<User> findAllUsers();
 
 }

@@ -56,6 +56,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public ReadStatusResponseDto find(ReadStatusFindDto readStatusFindDto) {
         ReadStatus readStatus = readStatusJpaRepository.findById(readStatusFindDto.Id())
                 .orElseThrow(() -> new NotFoundException("readStatus not found"));
@@ -65,6 +66,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReadStatusResponseDto> findAllByUserId(UUID userId) {
         List<ReadStatusResponseDto> readStatusAllList = new ArrayList<>();
         readStatusJpaRepository.findByUser_Id(userId).stream()

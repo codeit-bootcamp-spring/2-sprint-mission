@@ -8,19 +8,26 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 public interface MessageJPARepository extends JpaRepository<Message, UUID> {
 
+    @Query("select m from Message m where m.channel.id = :channel_id and (m.createdAt < :cursor or m.createdAt = :cursor)")
+    @EntityGraph(attributePaths = {"attachments", "author", "channel"})
+    Page<Message> findByChannel_IdEntityGraphCursor(@Param("channel_id") UUID channelId, @Param("cursor") Instant cursor, Pageable pageable);
+
     @Query("select m from Message m where m.channel.id = :channel_id")
     @EntityGraph(attributePaths = {"attachments", "author", "channel"})
     Page<Message> findByChannel_IdEntityGraph(@Param("channel_id") UUID channelId, Pageable pageable);
 
+    @Query("select m from Message m where m.id = :messageId")
+    @EntityGraph(attributePaths = {"attachments", "author", "channel"})
+    Page<Message> findByIdEntityGraph(@Param("messageId") UUID id, Pageable pageable);
+
     @Query("select m from Message m where m.channel.id = :channel_id")
     @EntityGraph(attributePaths = {"attachments", "author", "channel"})
-    Page<Message> findByIdEntityGraph(@Param("id") UUID id, Pageable pageable);
-
-    List<Message> findByChannel_Id(UUID channelId);
+    List<Message> findByChannel_Id(@Param("channel_id") UUID channelId);
 
 }

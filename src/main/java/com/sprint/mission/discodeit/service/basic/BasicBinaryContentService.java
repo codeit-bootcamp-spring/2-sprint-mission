@@ -47,6 +47,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseEntity<?> download(UUID binaryContentId) {
         BinaryContent findBinaryContent = binaryContentJPARepository.findById(binaryContentId)
                 .orElseThrow(() -> new NotFoundException("Profile not found"));
@@ -56,6 +57,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public BinaryContentResponseDto find(UUID binaryContentId) {
         BinaryContent findBinaryContent = binaryContentJPARepository.findById(binaryContentId)
                 .orElseThrow(() -> new NotFoundException("Profile not found"));
@@ -64,6 +66,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<BinaryContentResponseDto> findAll(List<UUID> binaryContentIds) {
         List<BinaryContentResponseDto> binaryContentList = new ArrayList<>();
         binaryContentJPARepository.findAllById(binaryContentIds).stream()

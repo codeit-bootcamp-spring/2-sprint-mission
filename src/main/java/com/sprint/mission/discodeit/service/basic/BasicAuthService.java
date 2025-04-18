@@ -16,7 +16,7 @@ public class BasicAuthService implements AuthService {
     private final UserJPARepository userJpaRepository;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public User login(AuthServiceLoginDto authServiceLoginDto) {
         User matchingUserUser = userJpaRepository.findByUsername(authServiceLoginDto.username())
                 .orElseThrow(() -> new AuthException("User not found"));

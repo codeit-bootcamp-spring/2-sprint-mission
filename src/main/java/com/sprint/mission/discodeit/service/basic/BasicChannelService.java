@@ -63,6 +63,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public ChannelResponseDto find(ChannelFindDto channelFindDto) {
         Channel matchingChannel = channelJpaRepository.findById(channelFindDto.channelId())
                 .orElse(null);
@@ -72,12 +73,12 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<ChannelResponseDto> findAllByUserId(UUID userId) {
         List<UUID> matchingChannelIdList = readStatusJpaRepository.findByUser_Id(userId).stream()
                 .map(ReadStatus::getChannel)
                 .map(BaseEntity::getId)
                 .toList();
-
 
         return channelJpaRepository
                 .findByTypeOrIdIn(ChannelType.PUBLIC, matchingChannelIdList).stream()
