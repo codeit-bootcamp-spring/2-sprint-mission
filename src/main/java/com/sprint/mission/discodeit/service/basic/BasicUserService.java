@@ -4,16 +4,16 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.LogicException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final UserStatusService userStatusService;
+    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final UserMapper userMapper;
@@ -45,21 +45,31 @@ public class BasicUserService implements UserService {
 
         BinaryContent nullableProfile = null;
 
-        if (binaryContentCreateDto != null) {
-            String fileName = binaryContentCreateDto.fileName();
-            String contentType = binaryContentCreateDto.contentType();
-            byte[] bytes = binaryContentCreateDto.bytes();
-            nullableProfile = new BinaryContent(fileName, (long) bytes.length, contentType);
-            binaryContentRepository.save(nullableProfile);
-            binaryContentStorage.put(nullableProfile.getId(), bytes);
+        try {
+            if (binaryContentCreateDto != null) {
+                String fileName = binaryContentCreateDto.fileName();
+                String contentType = binaryContentCreateDto.contentType();
+                byte[] bytes = binaryContentCreateDto.bytes();
+                nullableProfile = new BinaryContent(fileName, (long) bytes.length, contentType);
+                binaryContentRepository.save(nullableProfile);
+                binaryContentStorage.put(nullableProfile.getId(), bytes);
+            }
+
+            User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(),
+                    nullableProfile);
+            userRepository.save(newUser);
+
+            UserStatus status = new UserStatus(newUser, Instant.now());
+            newUser.setStatus(status);
+            userStatusRepository.save(status);
+
+            return userMapper.toDto(newUser);
+        } catch (Exception e) {
+            if (nullableProfile != null) {
+                binaryContentStorage.delete(nullableProfile.getId());
+            }
+            throw e;
         }
-
-        User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(),
-                nullableProfile);
-        userRepository.save(newUser);
-        userStatusService.create(new UserStatusCreateDto(newUser.getId(), Instant.MIN));
-
-        return userMapper.toDto(newUser);
     }
 
     @Transactional(readOnly = true)
@@ -94,20 +104,33 @@ public class BasicUserService implements UserService {
             throw new LogicException(ErrorCode.USER_NAME_EXISTS);
         }
 
+        BinaryContent originalProfile = user.getProfile();
         BinaryContent newProfile = null;
-        if (binaryContentCreateDto != null) {
-            String fileName = binaryContentCreateDto.fileName();
-            String contentType = binaryContentCreateDto.contentType();
-            byte[] bytes = binaryContentCreateDto.bytes();
-            newProfile = new BinaryContent(fileName, (long) bytes.length, contentType);
-            binaryContentRepository.save(newProfile);
-            binaryContentStorage.put(newProfile.getId(), bytes);
+
+        try {
+            if (binaryContentCreateDto != null) {
+                String fileName = binaryContentCreateDto.fileName();
+                String contentType = binaryContentCreateDto.contentType();
+                byte[] bytes = binaryContentCreateDto.bytes();
+                newProfile = new BinaryContent(fileName, (long) bytes.length, contentType);
+                user.setProfile(newProfile);
+                binaryContentStorage.put(newProfile.getId(), bytes);
+
+                if (originalProfile != null) { // 기존 저장된 프로필이 있다면 삭제
+                    binaryContentStorage.delete(originalProfile.getId());
+                }
+            }
+
+            user.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(),
+                    newProfile);
+
+            return userMapper.toDto(user);
+        } catch (Exception e) {
+            if (newProfile != null) {
+                binaryContentStorage.delete(newProfile.getId());
+            }
+            throw e;
         }
-
-        user.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(),
-                newProfile);
-
-        return userMapper.toDto(user);
     }
 
     @Transactional
@@ -115,6 +138,10 @@ public class BasicUserService implements UserService {
     public void delete(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new LogicException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getProfile() != null) {
+            binaryContentStorage.delete(user.getProfile().getId());
+        }
 
         userRepository.delete(user);
     }
