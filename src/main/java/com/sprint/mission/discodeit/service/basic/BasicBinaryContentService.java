@@ -32,8 +32,8 @@ public class BasicBinaryContentService implements BinaryContentService {
           .size(profile.getSize())
           .contentType(profile.getContentType())
           .build();
-      binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
       binaryContentRepository.save(binaryContent);
+      binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
 
       return binaryContent;
     } catch (IOException e) {
