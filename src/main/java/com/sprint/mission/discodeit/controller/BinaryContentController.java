@@ -55,9 +55,8 @@ public class BinaryContentController {
         .body(binaryContentDtos);
   }
 
-  @GetMapping(path = "{binaryContentId}download")
-  public ResponseEntity<Resource> downloadBinaryContent(@PathVariable UUID binaryContentId) {
+  @GetMapping(path = "{binaryContentId}/download")
+  public ResponseEntity<Resource> download(@PathVariable UUID binaryContentId) {
     return binaryContentService.download(binaryContentId);
   }
-
 }
