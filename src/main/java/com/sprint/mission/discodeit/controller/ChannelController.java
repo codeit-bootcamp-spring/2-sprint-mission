@@ -32,7 +32,7 @@ public class ChannelController {
 
     @Operation(summary = "Public Channel 생성")
     @PostMapping("/public")
-    public ResponseEntity<ChannelDto> createUser(@RequestBody ChannelCreatePublicDto channelCreatePublicDto) {
+    public ResponseEntity<ChannelDto> createPublic(@RequestBody ChannelCreatePublicDto channelCreatePublicDto) {
         ChannelDto channelDto = channelService.createPublic(channelCreatePublicDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
@@ -40,7 +40,7 @@ public class ChannelController {
 
     @Operation(summary = "Private Channel 생성")
     @PostMapping("/private")
-    public ResponseEntity<ChannelDto> createUser(@RequestBody ChannelCreatePrivateDto channelCreatePrivateDto) {
+    public ResponseEntity<ChannelDto> createPrivate(@RequestBody ChannelCreatePrivateDto channelCreatePrivateDto) {
         ChannelDto channelDto = channelService.createPrivate(channelCreatePrivateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
     }

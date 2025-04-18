@@ -55,6 +55,7 @@ public class BasicChannelService implements ChannelService {
         }
 
         Channel newChannel = Channel.createPublic(channelCreatePublicDto.name(), channelCreatePublicDto.description());
+        channelRepository.save(newChannel);
 
         return channelMapper.toDto(newChannel);
     }
