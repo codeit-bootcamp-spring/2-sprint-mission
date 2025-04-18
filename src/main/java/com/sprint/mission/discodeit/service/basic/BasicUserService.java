@@ -55,6 +55,8 @@ public class BasicUserService implements UserService {
 
     BinaryContent binaryContent = createBinaryContentEntity(multipartFile);
     if (binaryContent != null) {
+      // 파일 저장 <-> 메타데이터 저장 책임 분리가 필요하다고 생각하여,
+      // BinaryContentService에서 BinaryContentStorage를 호출하여 함께 저장하는 구조가 아닌, 상위 서비스에서 두 기능을 조합하여 호출하는 구조로 설계함.
       CreateBinaryContentResult createBinaryContentResult = binaryContentService.create(
           binaryContent);
       try {
@@ -70,7 +72,6 @@ public class BasicUserService implements UserService {
 
     // GenerationType.UUID의 경우, save()만 해줘도 User의 id를 DB가 아닌 자바에서 직접 생성
     // IDENTITY와 다르게 flush()를 안해줘도 user.getId()로 접근이 가능하다.
-
     UserStatus userStatus = new UserStatus(user, Instant.now());
     userStatusService.create(userStatusMapper.toCreateUserStatusCommand(userStatus));
 
