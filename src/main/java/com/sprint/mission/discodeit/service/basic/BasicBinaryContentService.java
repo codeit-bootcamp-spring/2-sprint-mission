@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.file.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.file.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,16 +20,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentMapper binaryContentMapper;
 
     @Override
     @Transactional
-    public BinaryContent create(CreateBinaryContentRequest request) {
-        BinaryContent binaryContent = new BinaryContent(
-            request.fileName(),
-            (long) request.bytes().length,
-            request.contentType()
-        );
-        return binaryContentRepository.save(binaryContent);
+    public BinaryContentDto create(CreateBinaryContentRequest request) {
+        String filename = request.fileName();
+        String contentType = request.contentType();
+        byte[] bytes = request.bytes();
+
+        BinaryContent binaryContent = new BinaryContent(filename, (long) bytes.length, contentType);
+        BinaryContent saved = binaryContentRepository.save(binaryContent);
+        UUID id = saved.getId();
+
+        binaryContentStorage.put(id, bytes);
+        return binaryContentMapper.toDto(saved);
     }
 
     @Override
