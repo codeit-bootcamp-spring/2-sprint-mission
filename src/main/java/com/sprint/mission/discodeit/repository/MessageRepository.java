@@ -4,9 +4,13 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
     List<Message> findAllByChannel(Channel channel);
+
+    Slice<Message> findAllByChannelOrderByCreatedAtDesc(Channel channel, Pageable pageable);
 }

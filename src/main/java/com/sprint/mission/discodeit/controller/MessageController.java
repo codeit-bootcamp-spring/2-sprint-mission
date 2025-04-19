@@ -1,13 +1,18 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,5 +74,16 @@ public class MessageController {
     public ResponseEntity<List<MessageResponse>> getMessagesByChannel(
         @RequestParam UUID channelId) {
         return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
+    }
+
+    @Operation(summary = "채널 메시지 목록 페이징 조회")
+    @GetMapping("/paged")
+    public ResponseEntity<PageResponse<MessageDto>> getPageMessagesByChannel(
+        @RequestParam UUID channelId,
+        @RequestParam(defaultValue = "0") int page
+    ) {
+        Pageable pageable = PageRequest.of(page, 50, Sort.by("createdAt").descending());
+        PageResponse<MessageDto> response = messageService.findPageByChannelId(channelId, pageable);
+        return ResponseEntity.ok(response);
     }
 }
