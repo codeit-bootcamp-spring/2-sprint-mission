@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
@@ -9,6 +10,7 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -31,6 +33,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final ChannelMapper channelMapper;
 
     @Override
     @Transactional
@@ -58,9 +61,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ChannelResponse> getChannelById(UUID channelId) {
+    public Optional<ChannelDto> getChannelById(UUID channelId) {
         return channelRepository.findById(channelId)
-            .map(this::convertToChannelResponse);
+            .map(channelMapper::toDto);
     }
 
     @Override
@@ -73,10 +76,10 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ChannelResponse> findAllByUserId(UUID userId) {
+    public List<ChannelDto> findAllByUserId(UUID userId) {
         return channelRepository.findAll().stream()
             .filter(channel -> canUserAccessChannel(channel, userId))
-            .map(this::convertToChannelResponse)
+            .map(channelMapper::toDto)
             .toList();
     }
 

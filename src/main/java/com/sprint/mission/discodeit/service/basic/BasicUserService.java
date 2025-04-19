@@ -3,10 +3,12 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.file.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -26,6 +28,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -61,52 +64,25 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UserResponse> getUserById(UUID userId) {
+    public Optional<UserDto> getUserById(UUID userId) {
         return userRepository.findById(userId)
-            .map(user -> new UserResponse(
-                user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getProfile() != null ? user.getProfile().getId() : null,
-                user.getStatus() != null && user.getStatus().online(),
-                user.getPassword()
-            ));
+            .map(userMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> getUsersByName(String name) {
+    public List<UserDto> getUsersByName(String name) {
         return userRepository.findAll().stream()
             .filter(user -> user.getUsername().equals(name))
-            .map(user -> new UserResponse(
-                user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getProfile() != null ? user.getProfile().getId() : null,
-                user.getStatus() != null && user.getStatus().online(),
-                user.getPassword()
-            ))
+            .map(userMapper::toDto)
             .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
-            .map(user -> new UserResponse(
-                user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getProfile() != null ? user.getProfile().getId() : null,
-                user.getStatus() != null && user.getStatus().online(),
-                user.getPassword()
-            ))
+            .map(userMapper::toDto)
             .toList();
     }
 

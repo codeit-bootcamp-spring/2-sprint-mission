@@ -16,13 +16,11 @@ public interface MessageService {
 
     Message createMessage(CreateMessageRequest request, List<MultipartFile> attachments);
 
-    MessageResponse getMessageById(UUID messageId);
+    MessageDto getMessageById(UUID messageId);
 
-    List<MessageResponse> findAllByChannelId(UUID channelId);
+    PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable);
 
     void updateMessage(UpdateMessageRequest request);
 
     void deleteMessage(UUID messageId);
-
-    PageResponse<MessageDto> findPageByChannelId(UUID channelId, Pageable pageable);
 }

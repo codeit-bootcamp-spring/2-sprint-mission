@@ -59,7 +59,7 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus userStatus = userStatusRepository.findById(request.userId())
             .orElseThrow(
                 () -> new UserStatusNotFoundException(request.userId()));
-        userStatus.updateLastActiveAt(request.lastAccessAt());
+        userStatus.updateLastActiveAt(request.newLastActiveAt());
 //        userStatusRepository.save(userStatus);
     }
 

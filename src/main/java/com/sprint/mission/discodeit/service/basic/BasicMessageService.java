@@ -81,37 +81,22 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public MessageResponse getMessageById(UUID messageId) {
+    public MessageDto getMessageById(UUID messageId) {
         return messageRepository.findById(messageId)
-            .map(this::toResponse)
+            .map(messageMapper::toDto)
             .orElseThrow(() -> new MessageNotFoundException(messageId.toString()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<MessageResponse> findAllByChannelId(UUID channelId) {
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다: " + channelId));
 
-        return messageRepository.findAllByChannel(channel).stream()
-            .map(this::toResponse)
-            .toList();
-    }
-
-    private MessageResponse toResponse(Message message) {
-        List<UUID> attachmentIds = message.getAttachments().stream()
-            .map(BinaryContent::getId)
-            .toList();
-
-        return new MessageResponse(
-            message.getId(),
-            message.getAuthor().getId(),
-            message.getChannel().getId(),
-            message.getContent(),
-            attachmentIds,
-            message.getCreatedAt(),
-            message.getUpdatedAt()
-        );
+        Slice<Message> slice = messageRepository.findAllByChannelOrderByCreatedAtDesc(channel,
+            pageable);
+        Slice<MessageDto> messageDtos = slice.map(messageMapper::toDto);
+        return pageResponseMapper.fromSlice(messageDtos);
     }
 
     @Override
@@ -130,19 +115,5 @@ public class BasicMessageService implements MessageService {
             message.getAttachments().forEach(binaryContentRepository::delete);
             messageRepository.deleteById(messageId);
         });
-    }
-
-    // 특정 채널의 메시지를 페이지 단위로 조회
-    @Override
-    @Transactional(readOnly = true)
-    public PageResponse<MessageDto> findPageByChannelId(UUID channelId, Pageable pageable) {
-        Channel channel = channelRepository.findById(channelId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다: " + channelId));
-
-        Slice<Message> slice = messageRepository.findAllByChannelOrderByCreatedAtDesc(channel,
-            pageable);
-
-        Slice<MessageDto> messageDtos = slice.map(messageMapper::toDto);
-        return pageResponseMapper.fromSlice(messageDtos);
     }
 }

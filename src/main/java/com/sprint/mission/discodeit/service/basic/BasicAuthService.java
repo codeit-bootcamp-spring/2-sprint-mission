@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.LoginRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -16,9 +18,10 @@ public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private final UserMapper userMapper;
 
     @Override
-    public UserResponse login(LoginRequest request) {
+    public UserDto login(LoginRequest request) {
         User user = userRepository.findByUsername(request.username())
             .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -29,15 +32,6 @@ public class BasicAuthService implements AuthService {
         UserStatus status = userStatusRepository.findById(user.getId())
             .orElseThrow(() -> new IllegalArgumentException("사용자 상태 정보를 찾을 수 없습니다."));
 
-        return new UserResponse(
-            user.getId(),
-            user.getCreatedAt(),
-            user.getUpdatedAt(),
-            user.getUsername(),
-            user.getEmail(),
-            user.getProfile() != null ? user.getProfile().getId() : null,
-            status.online(),
-            user.getPassword()
-        );
+        return userMapper.toDto(user);
     }
 }

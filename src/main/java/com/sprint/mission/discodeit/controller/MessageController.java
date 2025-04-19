@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +36,12 @@ public class MessageController {
         description = "메시지 생성 성공"
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MessageResponse> createMessage(
+    public ResponseEntity<MessageDto> createMessage(
         @RequestPart("messageCreateRequest") CreateMessageRequest request,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
         UUID messageId = messageService.createMessage(request, attachments).getId();
-        MessageResponse response = messageService.getMessageById(messageId);
+        MessageDto response = messageService.getMessageById(messageId);
         return ResponseEntity.status(201).body(response);
     }
 
@@ -70,20 +72,24 @@ public class MessageController {
     }
 
     @Operation(summary = "채널 메시지 목록 조회")
+    @ApiResponse(
+        responseCode = "200",
+        description = "채널 메시지 목록 조회 성공",
+        content = @Content(mediaType = "*/*")
+    )
     @GetMapping
-    public ResponseEntity<List<MessageResponse>> getMessagesByChannel(
-        @RequestParam UUID channelId) {
-        return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
-    }
-
-    @Operation(summary = "채널 메시지 목록 페이징 조회")
-    @GetMapping("/paged")
-    public ResponseEntity<PageResponse<MessageDto>> getPageMessagesByChannel(
+    public ResponseEntity<PageResponse<MessageDto>> getMessagesByChannel(
         @RequestParam UUID channelId,
-        @RequestParam(defaultValue = "0") int page
+        Pageable pageable
     ) {
-        Pageable pageable = PageRequest.of(page, 50, Sort.by("createdAt").descending());
-        PageResponse<MessageDto> response = messageService.findPageByChannelId(channelId, pageable);
+        Pageable modified = PageRequest.of(
+            pageable.getPageNumber(),
+            50,
+            Sort.by("createdAt").descending()
+        );
+
+        PageResponse<MessageDto> response = messageService.findAllByChannelId(channelId,
+            modified);
         return ResponseEntity.ok(response);
     }
 }
