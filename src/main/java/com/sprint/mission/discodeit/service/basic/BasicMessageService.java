@@ -44,7 +44,7 @@ public class BasicMessageService implements MessageService {
 
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException(channelId + " 에 해당하는 Channel를 찾을 수 없음"));
-    User author = userRepository.findById(authorId)
+    User author = userRepository.findByIdWithProfileAndUserStatus(authorId)
         .orElseThrow(() -> new NoSuchElementException(authorId + " 에 해당하는 Author를 찾을 수 없음"));
 
     List<BinaryContent> attachmentList = binaryRequestList.stream()
@@ -65,17 +65,17 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional(readOnly = true)
   public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-    Slice<MessageDto> messageDtos = messageRepository
-        .findAllByChannelId(channelId, pageable)
+    Slice<MessageDto> messageDtoSlice = messageRepository
+        .findAllByChannelIdWithAuthor(channelId, pageable)
         .map(messageMapper::toDto);
 
-    return pageResponseMapper.fromSlice(messageDtos);
+    return pageResponseMapper.fromSlice(messageDtoSlice);
   }
 
   @Override
   @Transactional
   public MessageDto update(UUID id, MessageUpdateRequest updateRequest) {
-    Message message = messageRepository.findById(id)
+    Message message = messageRepository.findByIdWithAuthorAndAttachments(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 Message를 찾을 수 없음"));
     message.update(updateRequest.newContent());
 

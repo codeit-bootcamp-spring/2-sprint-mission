@@ -39,7 +39,7 @@ public abstract class ChannelMapper {
   private List<UserDto> findParticipants(Channel channel) {
     List<UserDto> participants = new ArrayList<>();
     if (channel.getType().equals(ChannelType.PRIVATE)) {
-      readStatusRepository.findAllUserByChannelId(channel.getId()).stream()
+      readStatusRepository.findAllUserByChannelIdWithProfileAndStatus(channel.getId()).stream()
           .map(user -> userMapper.toDto(user))
           .forEach(participants::add);
     }

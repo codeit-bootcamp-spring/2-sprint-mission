@@ -48,13 +48,14 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional(readOnly=true)
   public ReadStatus find(UUID id) {
     return readStatusRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 ReadStatusId를 찾을 수 없음"));
   }
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional(readOnly=true)
   public List<ReadStatusDto> findAllByUserId(UUID userId) {
     if (!userRepository.existsById(userId)) {
       throw new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음.");

@@ -48,16 +48,15 @@ public class BasicUserService implements UserService {
 
   @Override
   public UserDto find(UUID userId) {
-    if (!userRepository.existsById(userId)) {
-      throw new NoSuchElementException(userId + " 에 해당하는 User를 찾을 수 없음");
-    }
-    User user = userRepository.findByIdWithProfile(userId);
+    User user = userRepository.findByIdWithProfileAndUserStatus(userId)
+        .orElseThrow(() -> new NoSuchElementException(
+            userId + " 에 해당하는 User를 찾을 수 없음"));
     return userMapper.toDto(user);
   }
 
   @Override
   public List<UserDto> findAll() {
-    List<User> userList = userRepository.findAllWithProfile();
+    List<User> userList = userRepository.findAllWithProfileAndUserStatus();
     return userMapper.toDtoList(userList);
   }
 
@@ -65,7 +64,7 @@ public class BasicUserService implements UserService {
   @Transactional
   public UserDto update(UUID userId, UserUpdateRequest updateRequest,
       BinaryContentCreateRequest binaryRequest) {
-    User user = userRepository.findById(userId)
+    User user = userRepository.findByIdWithProfileAndUserStatus(userId)
         .orElseThrow(() -> new NoSuchElementException(
             userId + " 에 해당하는 User를 찾을 수 없음"));
     String newUsername = updateRequest.newUsername();

@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class BasicAuthService implements AuthService {
   private final UserMapper userMapper;
 
   @Override
+  @Transactional(readOnly = true)
   public UserDto login(LoginRequest loginRequest) {
     User user = userService.findByUsername(loginRequest.username())
         .orElseThrow(() -> new NoSuchElementException("{username}에 해당하는 User가 없음"));

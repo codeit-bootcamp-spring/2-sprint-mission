@@ -41,7 +41,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional(readOnly=true)
   public UserStatusDto find(UUID id) {
     UserStatus userStatus = userStatusRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 UserStatus를 찾을 수 없음"));
@@ -49,7 +49,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional(readOnly=true)
   public List<UserStatusDto> findAll() {
     List<UserStatus> userStatusList = userStatusRepository.findAll();
     return userStatusMapper.toDtoList(userStatusList);
