@@ -18,7 +18,7 @@ public record UserResult(
     @Schema(description = "User 이메일", example = "string")
     String email,
 
-    @Schema(description = "User 프로필 Id", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    @Schema(description = "User 프로필")
     BinaryContentResult profile,
 
     @Schema(description = "User 온라인 상태", example = "true")

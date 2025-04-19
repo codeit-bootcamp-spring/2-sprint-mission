@@ -12,6 +12,7 @@ import java.time.Instant;
 import jdk.jfr.Timestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Getter
 @NoArgsConstructor
@@ -42,7 +43,8 @@ public class UserStatus extends BaseUpdatableEntity {
       this.lastActiveAt = lastActiveAt;
     }
   }
-
+  
+  @Transactional
   public void setOffline() {
     updateTime(Instant.now().minus(Duration.ofMinutes(6)));
   }

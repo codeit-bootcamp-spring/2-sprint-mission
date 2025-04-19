@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.core.status.usecase.user;
 
 import static com.sprint.mission.discodeit.exception.status.user.UserStatusErrors.userStatusAlreadyExistsError;
 import static com.sprint.mission.discodeit.exception.status.user.UserStatusErrors.userStatusIdNotFoundError;
-import static com.sprint.mission.discodeit.exception.user.UserErrors.userIdNotFoundError;
 
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.port.UserStatusRepositoryPort;
@@ -11,8 +10,6 @@ import com.sprint.mission.discodeit.core.status.usecase.user.dto.UpdateUserStatu
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.exception.status.user.UserStatusError;
-import com.sprint.mission.discodeit.logging.CustomLogging;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,26 +22,30 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserRepositoryPort userRepository;
   private final UserStatusRepositoryPort userStatusRepository;
 
-  @CustomLogging
+  /**
+   * <h2>유저 상태 생성 메서드</h2>
+   * 유저 상태를 생성하는 메서드 <br> 단독으로 쓸 일이 없기에 최소한의 검증만 진행
+   *
+   * @param command 유저 아이디, 시각 정보
+   * @return 유저 상태
+   */
   @Transactional
   @Override
   public UserStatus create(CreateUserStatusCommand command) {
-    User user = userRepository.findById(command.userId()).orElseThrow(
-        () -> userIdNotFoundError(command.userId())
-    );
-
-    //있으면 진행 X
-    if (userStatusRepository.findByUserId(command.userId()).isPresent()) {
-      userStatusAlreadyExistsError(command.userId());
+    User user = command.user();
+    //유저 상태가 이미 존재하면 오류 발생
+    if (userStatusRepository.findByUserId(user.getId()).isPresent()) {
+      userStatusAlreadyExistsError(user.getUserStatus().getId());
     }
 
-    //없으면 진행
+    //유저 상태가 존재하지 않으면 진행
     UserStatus userStatus = UserStatus.create(user, command.lastActiveAt());
     userStatusRepository.save(userStatus);
     return userStatus;
   }
 
-
+/*
+ 한번도 사용한 적이 없는 코드들
   @Override
   @Transactional(readOnly = true)
   public UserStatus findByUserId(UUID userId) {
@@ -57,7 +58,6 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatus findByStatusId(UUID userStatusId) {
     return userStatusRepository.findByStatusId(userStatusId)
         .orElseThrow(() -> userStatusIdNotFoundError(userStatusId));
-
   }
 
   @Override
@@ -65,17 +65,25 @@ public class BasicUserStatusService implements UserStatusService {
   public List<UserStatus> findAll() {
     return userStatusRepository.findAll();
   }
+*/
 
+  /**
+   * <h2>유저 상태 업데이트 메서드</h2>
+   * 유저의 상태를 업데이트함
+   *
+   * @param command 유저 id, 유저 상태 id, 날짜정보
+   * @return 유저 상태
+   */
   @Override
-  @CustomLogging
   @Transactional
   public UserStatus update(UpdateUserStatusCommand command) {
     UserStatus userStatus;
+    //dto에 유저 아이디가 존재하면 repo에서 유저 아이디를 바탕으로 유저 상태를 검색
     if (command.userId() != null) {
       userStatus = userStatusRepository.findByUserId(command.userId()).orElseThrow(
           () -> userStatusIdNotFoundError(command.userId())
       );
-
+      //dto에 유저 상태 아이디가 존재하면 repo에서 유저 상태를 바탕으로 유저 상태를 검색
     } else if (command.userStatusId() != null) {
       userStatus = userStatusRepository.findByStatusId(command.userStatusId()).orElseThrow(
           () -> userStatusIdNotFoundError(command.userStatusId())
@@ -83,11 +91,18 @@ public class BasicUserStatusService implements UserStatusService {
     } else {
       throw new UserStatusError("Update Error");
     }
-
+    //업데이트 진행
     userStatus.update(command.newLastActiveAt());
     return userStatus;
   }
 
+  /**
+   * <h2>유저 상태 온라인 확인 메서드</h2>
+   * 유저 상태가 온라인인지 아닌 지 확인
+   *
+   * @param userId
+   * @return 현재시각 기준, 유저가 로그인한 지 5분 이내이다 = true, 5분 이후이다 = false
+   */
   @Override
   public boolean isOnline(UUID userId) {
     UserStatus status = userStatusRepository.findByUserId(userId).orElseThrow(
@@ -96,8 +111,13 @@ public class BasicUserStatusService implements UserStatusService {
     return status.isOnline();
   }
 
+  /**
+   * <h2>유저 상태 제거 메서드</h2>
+   * 유저 상태를 제거하는 메서드 <br> 단독으로 쓰일 일 거의 없음
+   *
+   * @param userId 삭제할 아이디
+   */
   @Override
-  @CustomLogging
   @Transactional
   public void delete(UUID userId) {
     UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(

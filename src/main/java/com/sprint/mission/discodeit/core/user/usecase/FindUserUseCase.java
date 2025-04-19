@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.core.user.usecase;
 
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserListResult;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
+import java.util.List;
 import java.util.UUID;
 
 public interface FindUserUseCase {
@@ -10,6 +10,6 @@ public interface FindUserUseCase {
 
   boolean existsById(UUID userId);
 
-  UserListResult findAll();
+  List<UserResult> findAll();
 
 }
