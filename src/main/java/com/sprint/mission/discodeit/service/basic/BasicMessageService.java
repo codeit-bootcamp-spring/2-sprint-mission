@@ -4,12 +4,16 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +33,8 @@ public class BasicMessageService implements MessageService {
     private final MessageMapper messageMapper;
 
     private final BinaryContentStorage binaryContentStorage;
+
+    private final PageResponseMapper pageResponseMapper;
 
     @Transactional
     @Override
@@ -77,10 +83,11 @@ public class BasicMessageService implements MessageService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<MessageDto> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannelId(channelId).stream()
-                .map(messageMapper::toDto)
-                .toList();
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+
+        Slice<Message> slice = messageRepository.findAllByChannelId(channelId, pageable);
+        Slice<MessageDto> dtoSlice = slice.map(messageMapper::toDto);
+        return pageResponseMapper.fromSlice(dtoSlice);
     }
 
     @Transactional

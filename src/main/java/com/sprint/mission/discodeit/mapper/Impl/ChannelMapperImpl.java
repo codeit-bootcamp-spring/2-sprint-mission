@@ -9,10 +9,11 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Comparator;
 
 @Component
 @RequiredArgsConstructor
@@ -30,9 +31,9 @@ public class ChannelMapperImpl implements ChannelMapper {
                 channel.getName(),
                 channel.getDescription(),
                 readStatusRepository.findAllByChannel_Id(channel.getId()).stream().map(ReadStatus::getUser).map(userMapper::toDto).toList(),
-                messageRepository.findAllByChannelId(channel.getId()).stream().sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+                messageRepository.findAllByChannelId(channel.getId(), PageRequest.of(0,1,Sort.by(Sort.Direction.DESC,"createdAt")))
+                        .stream()
                         .map(Message::getCreatedAt)
-                        .limit(1)
                         .findFirst()
                         .orElse(Instant.MIN)
         );
