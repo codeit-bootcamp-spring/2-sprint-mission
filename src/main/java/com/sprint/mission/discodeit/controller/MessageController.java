@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.service.message.MessageDto;
 import com.sprint.mission.discodeit.dto.service.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -74,14 +75,16 @@ public class MessageController implements MessageApi {
   // 특정 채널의 메시지 목록 조회 - 고치기 - 페이징, binaryContent storage 필요한 듯?
   @Override
   @GetMapping
-  public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(@RequestParam UUID channelId,
+  public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+      @RequestParam UUID channelId,
+      @RequestParam Instant cursor,
       @PageableDefault(
           size = 50,
           sort = "createdAt",
           direction = Direction.DESC
-      ) Pageable pageable
+      )@RequestParam Pageable pageable
   ) {
-    PageResponse<MessageDto> response = messageService.findAllByChannelId(channelId, pageable);
+    PageResponse<MessageDto> response = messageService.findAllByChannelId(channelId, cursor, pageable);
     return ResponseEntity.ok(response);
   }
 }

@@ -17,8 +17,8 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
           + "left join m.author a "
           + "left join fetch a.profile "
           + "join fetch a.userStatus "
-          + "where m.channel.id = :channelId")
-  Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId, Pageable pageable);
+          + "where m.channel.id = :channelId and m.createdAt < :cursor")
+  Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId, @Param("cursor") Instant cursor, Pageable pageable);
 
   @Query(
       "select m from Message m "
