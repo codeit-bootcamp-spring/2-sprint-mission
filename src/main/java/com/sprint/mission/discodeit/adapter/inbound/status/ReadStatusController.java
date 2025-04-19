@@ -45,7 +45,7 @@ public class ReadStatusController {
       @RequestBody ReadStatusUpdateRequest requestBody) {
     UpdateReadStatusCommand command = ReadStatusDtoMapper.toUpdateReadStatusCommand(readStatusId,
         requestBody);
-    ReadStatusResult result = readStatusService.updateReadStatus(command);
+    ReadStatusResult result = readStatusService.update(command);
     return ResponseEntity.ok(ReadStatusDtoMapper.toCreateResponse(result));
   }
 

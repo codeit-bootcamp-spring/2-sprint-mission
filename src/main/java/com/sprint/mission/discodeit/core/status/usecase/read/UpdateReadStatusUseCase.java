@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatu
 
 public interface UpdateReadStatusUseCase {
 
-  ReadStatusResult updateReadStatus(UpdateReadStatusCommand command);
+  ReadStatusResult update(UpdateReadStatusCommand command);
 
 
 }

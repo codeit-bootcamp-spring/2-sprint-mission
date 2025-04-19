@@ -40,6 +40,14 @@ public class UserController {
 
   private final UserService userService;
 
+  /**
+   * <h2>유저 등록 메서드</h2>
+   * 유저를 등록한다.
+   *
+   * @param requestBody 유저 이름, 이메일, 패스워드
+   * @param file        이미지 데이터
+   * @return 유저 아이디, 이름, 이메일, 프로필 이미지 메타 데이터, 유저 온라인 여부
+   */
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserResponse> register(
       @RequestPart("userCreateRequest") @Valid UserCreateRequest requestBody,
