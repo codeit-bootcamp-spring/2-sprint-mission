@@ -27,6 +27,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 
 discodeit:
-  repository:
-    type: jcf
-    file-directory: .discodeit
+  storage:
+    type: local
+    local:
+      root-path: ./uploads
