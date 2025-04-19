@@ -55,4 +55,19 @@ public interface BinaryContentApi {
             )
             @RequestParam List<UUID> binaryContentIds
     );
+
+    @Operation(summary = "파일 다운로드", operationId = "download")
+    @ApiResponse(
+            responseCode = "200", description = "파일 다운로드 성공",
+            content = @Content(schema = @Schema(implementation = BinaryContent.class))
+    )
+    ResponseEntity<?> download(
+            @Parameter(
+                    name = "binaryContentId",
+                    description = "다운로드 할 파일 ID",
+                    required = true,
+                    schema = @Schema(type = "string", format = "uuid")
+            )
+            @PathVariable UUID binaryContentId
+    );
 }

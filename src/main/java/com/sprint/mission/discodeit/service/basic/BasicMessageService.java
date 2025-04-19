@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,8 @@ public class BasicMessageService implements MessageService {
 
     private final MessageMapper messageMapper;
 
+    private final BinaryContentStorage binaryContentStorage;
+
     @Transactional
     @Override
     public MessageDto create(
@@ -44,13 +47,16 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
 
         List<BinaryContent> attachments = binaryContentCreateRequests.stream()
-                .map(request -> new BinaryContent(
-                        request.fileName(),
-                        (long) request.bytes().length,
-                        request.contentType(),
-                        request.bytes()
-                ))
-                .map(binaryContentRepository::save)
+                .map(request -> {
+                    BinaryContent binaryContent = new BinaryContent(
+                            request.fileName(),
+                            (long) request.bytes().length,
+                            request.contentType()
+                    );
+                    binaryContentRepository.save(binaryContent);
+                    binaryContentStorage.put(binaryContent.getId(), request.bytes());
+                    return binaryContent;
+                })
                 .toList();
 
         Message message = new Message(

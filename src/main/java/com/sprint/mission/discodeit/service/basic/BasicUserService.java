@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,8 @@ public class BasicUserService implements UserService {
 
     private final UserMapper userMapper;
 
+    private final BinaryContentStorage binaryContentStorage;
+
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
@@ -47,6 +50,7 @@ public class BasicUserService implements UserService {
         }
 
         BinaryContent profile = toBinaryContent(profileCreateRequest);
+        binaryContentStorage.put(profile.getId(),profileCreateRequest.bytes());
 
         User user = new User(username, email, userCreateRequest.password(), profile);
         userRepository.save(user);
@@ -100,6 +104,7 @@ public class BasicUserService implements UserService {
                 .ifPresent(binaryContentRepository::delete);
 
         BinaryContent profile = toBinaryContent(profileCreateRequest);
+        binaryContentStorage.put(profile.getId(),profileCreateRequest.bytes());
 
         user.updateUser(newUsername, newEmail, userUpdateRequest.newPassword(), profile);
         return userMapper.toDto(user);
@@ -128,8 +133,7 @@ public class BasicUserService implements UserService {
         BinaryContent binaryContent = new BinaryContent(
                 profileCreateRequest.fileName(),
                 (long) profileCreateRequest.bytes().length,
-                profileCreateRequest.contentType(),
-                profileCreateRequest.bytes()
+                profileCreateRequest.contentType()
         );
         return binaryContentRepository.save(binaryContent);
     }
