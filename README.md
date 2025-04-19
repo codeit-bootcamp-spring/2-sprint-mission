@@ -17,11 +17,11 @@
 
 #### 1. 데이터베이스
 
-- [ ] 아래와 같이 데이터베이스 환경을 설정하세요.
+- [x] 아래와 같이 데이터베이스 환경을 설정하세요.
     - 데이터베이스: discodeit
     - 유저: discodeit_user
     - 패스워드: discodeit1234
-- [ ] ERD를 참고하여 DDL을 작성하고, 테이블을 생성하세요.
+- [x] ERD를 참고하여 DDL을 작성하고, 테이블을 생성하세요.
     - 작성한 DDL 파일은 /src/main/resources/schema.sql 경로에 포함하세요.
         - PK: Primary Key
         - UK: Unique Key
@@ -32,9 +32,9 @@
 
 #### 2. Spring Data JPA 적용하기
 
-- [ ] Spring Data JPA와 PostgreSQL을 위한 의존성을 추가하세요.
-- [ ] 앞서 구성한 데이터베이스에 연결하기 위한 설정값을 application.yaml 파일에 작성하세요.
-- [ ] 디버깅을 위해 SQL 로그와 관련된 설정값을 application.yaml 파일에 작성하세요.
+- [x] Spring Data JPA와 PostgreSQL을 위한 의존성을 추가하세요.
+- [x] 앞서 구성한 데이터베이스에 연결하기 위한 설정값을 application.yaml 파일에 작성하세요.
+- [x] 디버깅을 위해 SQL 로그와 관련된 설정값을 application.yaml 파일에 작성하세요.
 
 #### 3. 엔티티 정의하기
 
@@ -62,7 +62,6 @@
     - FileRepository와 JCFRepository 구현체는 삭제합니다.
 - [ ] 영속성 컨텍스트의 특징에 맞추어 서비스 레이어를 수정해보세요.
     - 힌트: 트랜잭션, 영속성 전이, 변경 감지, 지연로딩
-
 
 
 #### 5. DTO 적극 도입하기
