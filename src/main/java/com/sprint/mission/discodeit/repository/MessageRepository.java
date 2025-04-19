@@ -1,22 +1,29 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.domain.Message;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-public interface MessageRepository {
+public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-  Message save(Message message);
+  boolean existsByChannelId(UUID channelId);
 
-  Optional<Message> findById(UUID id);
-
-  List<Message> findAllByChannelId(UUID channelId);
-
-  void deleteById(UUID id);
+  @EntityGraph(attributePaths = {
+      "author",
+      "author.profile",
+      "author.status",
+      "attachments"
+  })
+  Slice<Message> findAllByChannelId(UUID channelId, Pageable pageable);
 
   void deleteAllByChannelId(UUID channelId);
 
+  @Query("SELECT MAX(m.createdAt) FROM Message m WHERE m.channel.id = :channelId")
   Optional<Instant> findLatestCreatedAtByChannelId(UUID channelId);
 }
