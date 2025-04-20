@@ -6,6 +6,7 @@ public record MessageCreateRequest(
     String content,
     UUID channelId,
     UUID authorId
+    
 ) {
 
 }

@@ -4,139 +4,131 @@ import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
-  private final UserStatusService userStatusService;
   private final BinaryContentRepository binaryContentRepository;
-  private final BinaryContentService binaryContentService;
+  private final UserMapper userMapper;
 
   @Override
   public UserDto create(UserCreateRequest userRequest, BinaryContentCreateRequest profileRequest) {
-    UUID profileImageKey = null;
-    if (userRepository.existsByName(userRequest.username())) {
-      throw new IllegalStateException("[Error] 동일한 name");
+    if (userRepository.existsByUsername(userRequest.username())) {
+      throw new IllegalStateException("[Error] 동일한 username");
     }
-    if (userRepository.existsByEmail(userRequest.email())) {
+    if (userRepository.existsByEmail((userRequest.email()))) {
       throw new IllegalStateException("[Error] 동일한 email");
     }
+
+    BinaryContent profile = null;
     if (isValidBinaryContent(profileRequest)) {
-      profileImageKey = binaryContentService.create(profileRequest).getId();
+      profile = new BinaryContent(
+          profileRequest.fileName(),
+          profileRequest.file().getSize(),
+          profileRequest.contentType()
+      );
+      binaryContentRepository.save(profile);
     }
 
-    User user = new User(userRequest.username(), userRequest.password(), userRequest.email(),
-        profileImageKey);
-    userRepository.save(user);
+    User newUser = userMapper.toEntity(userRequest);
+    newUser.updateProfile(profile);
 
-    UserStatus userStatus = new UserStatus(user.getId(), Instant.EPOCH);
-    userStatusRepository.save(userStatus);
+    UserStatus newUserStatus = new UserStatus(newUser);
+    newUser.updateUserStatus(newUserStatus);
 
-    return new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
-        user.getEmail(), user.getProfileId(), userStatus.isOnline());
+    User savedUser = userRepository.save(newUser);
+    return userMapper.toDto(savedUser);
   }
 
+  @Transactional(readOnly = true)
   @Override
-  public UserDto read(UUID userKey) {
-    User user = userRepository.findByKey(userKey);
-    UserStatus userStatus = userStatusRepository.findByUserKey(user.getId());
-
-    if (user.getId() == null) {
-      throw new IllegalArgumentException("[Error] 조회할 사용자가 존재하지 않습니다.");
-    }
-
-    return new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
-        user.getEmail(), user.getProfileId(), userStatus.isOnline());
+  public UserDto read(UUID userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("[Error] 조회할 사용자가 존재하지 않습니다."));
+    return userMapper.toDto(user);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public List<UserDto> readAll() {
     List<User> users = userRepository.findAll();
+
     if (users.isEmpty()) {
       throw new IllegalArgumentException("[Error] 조회할 사용자가 존재하지 않습니다.");
     }
-    return users.stream().map(user -> {
-          UserStatus userStatus = userStatusRepository.findByUserKey(user.getId());
-          return new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
-              user.getEmail(), user.getProfileId(), userStatus.isOnline());
-        })
+    return users.stream()
+        .map(userMapper::toDto)
         .toList();
   }
 
+  @Transactional
   @Override
-  public User update(UUID userKey, UserUpdateRequest request,
+  public UserDto update(UUID userId, UserUpdateRequest request,
       BinaryContentCreateRequest profileRequest) {
-    User user = userRepository.findByKey(userKey);
-    UUID updateProfileKey;
-    if (user == null) {
-      throw new IllegalStateException("[Error] user not found");
-    }
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new IllegalStateException("[Error] user not found"));
 
-    String newUsername = request.newUsername();
-    String newEmail = request.newEmail();
-
-    if (request.newUsername() != null) {
-      if (userRepository.existsByName(newUsername)) {
-        throw new IllegalArgumentException("User with username " + newUsername + " already exists");
+    if (request.newUsername() != null && !request.newUsername().equals(user.getUsername())) {
+      if (userRepository.existsByUsername(request.newUsername())) {
+        throw new IllegalArgumentException(
+            "User with username " + request.newUsername() + " already exists");
       }
       user.updateName(request.newUsername());
     }
-    if (newEmail != null && !newEmail.isEmpty()) {
-      if (userRepository.existsByEmail(newEmail)) {
-        throw new IllegalArgumentException("User with email " + newEmail + " already exists");
+    if (request.newEmail() != null && !request.newEmail().equals(user.getEmail())) {
+      if (userRepository.existsByEmail(request.newEmail())) {
+        throw new IllegalArgumentException(
+            "User with email " + request.newEmail() + " already exists");
       }
       user.updateEmail(request.newEmail());
     }
     if (request.newPassword() != null && !request.newPassword().isEmpty()) {
-      user.updatePwd(request.newPassword());
+      user.updatePassword(request.newPassword());
     }
 
     if (isValidBinaryContent(profileRequest)) {
-      UUID currentProfileId = user.getProfileId();
-      if (currentProfileId != null) {
-        binaryContentRepository.delete(currentProfileId);
-      }
-      updateProfileKey = binaryContentService.create(profileRequest).getId();
-      user.updateProfileId(updateProfileKey);
+      BinaryContent newProfile = new BinaryContent(
+          profileRequest.fileName(),
+          profileRequest.file().getSize(),
+          profileRequest.contentType()
+      );
+      binaryContentRepository.save(newProfile);
+
+      user.updateProfile(newProfile);
     }
 
-    return userRepository.save(user);
+    return userMapper.toDto(user);
   }
 
   @Override
-  public void delete(UUID userKey) {
-    User user = userRepository.findByKey(userKey);
+  public void delete(UUID userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new IllegalStateException("[Error] 유저가 존재하지 않습니다."));
 
-    if (user == null) {
-      throw new IllegalStateException("[Error] 유저가 존재하지 않습니다.");
+    if (user.getProfile() != null) {
+      binaryContentRepository.delete(user.getProfile());
     }
-    if (user.getProfileId() != null) {
-      binaryContentRepository.delete(user.getProfileId());
-    }
-    userStatusService.deleteByUserKey(userKey);
-    userRepository.delete(userKey);
+    userRepository.delete(user);
   }
 
   private boolean isValidBinaryContent(BinaryContentCreateRequest request) {
     return request != null &&
-        request.bytes() != null &&
-        request.bytes().length > 0 &&
         request.fileName() != null &&
         !request.fileName().isBlank();
   }

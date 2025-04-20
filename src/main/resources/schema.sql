@@ -1,5 +1,5 @@
 -- binary_contents
-CREATE TABLE binary_contents
+CREATE TABLE IF NOT EXISTS binary_contents
 (
     id           uuid,
     created_at   timestamptz  NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE binary_contents
 );
 
 -- users
-CREATE TABLE users
+CREATE TABLE IF NOT EXISTS users
 (
     id         uuid,
     created_at timestamptz  NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE users
 
 
 -- channels
-CREATE TABLE channels
+CREATE TABLE IF NOT EXISTS channels
 (
     id          uuid,
     created_at  timestamptz NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE channels
 );
 
 -- messages
-CREATE TABLE messages
+CREATE TABLE IF NOT EXISTS messages
 (
     id         uuid PRIMARY KEY,
     created_at timestamptz NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE messages
 );
 
 -- user_statuses
-CREATE TABLE user_statuses
+CREATE TABLE IF NOT EXISTS user_statuses
 (
     id             uuid,
     created_at     timestamptz NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE user_statuses
 
 
 -- read_statuses
-CREATE TABLE read_statuses
+CREATE TABLE IF NOT EXISTS read_statuses
 (
     id           uuid,
     created_at   timestamptz NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE read_statuses
 );
 
 -- message_attachments
-CREATE TABLE message_attachments
+CREATE TABLE IF NOT EXISTS message_attachments
 (
     message_id    uuid,
     attachment_id uuid,

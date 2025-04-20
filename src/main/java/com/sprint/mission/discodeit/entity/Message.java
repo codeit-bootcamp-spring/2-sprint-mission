@@ -1,5 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -7,37 +14,30 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@Entity
+@Table(name = "messages")
 @Getter
-public class Message extends SharedEntity implements Serializable {
+@Setter
+@NoArgsConstructor
+@ToString
+public class Message extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
+  @Column(columnDefinition = "text")
+  private String text;
 
-  private String content;
-  private final UUID authorId;
-  private final UUID channelId;
-  private final List<UUID> attachmentIds;
+  @ManyToOne
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
 
-  public Message(String content, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
-    super();
-    this.content = content;
-    this.authorId = authorId;
-    this.channelId = channelId;
-    this.attachmentIds = attachmentIds != null ? attachmentIds : new ArrayList<>();
-  }
+  @ManyToOne
+  @JoinColumn(name = "author_id")
+  private User author;
 
-  public void updateContent(String content) {
-    this.content = content;
-    setUpdatedAt(Instant.now());
-  }
-
-  public void addAttachment(UUID attachmentKey) {
-    this.attachmentIds.add(attachmentKey);
-  }
-
-  @Override
-  public String toString() {
-    return String.format("\n key= %s\n content= %s\n createdAt= %s\n updatedAt= %s\n",
-        id, content, createdAt, updatedAt);
-  }
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "message_id")
+  private List<BinaryContent> attachments = new ArrayList<>();
 }

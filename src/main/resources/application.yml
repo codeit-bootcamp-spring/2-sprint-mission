@@ -46,6 +46,7 @@ logging:
         jpa_demo: DEBUG
 
 discodeit:
-  repository:
-    type: file
-    file-dir: .discodeit
+  storage:
+    type: local
+    local:
+      root-path: ./storage  # 저장 디렉토리 경로
