@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageCreate
 import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageUpdateDto;
 import com.sprint.mission.discodeit.service.dto.response.MessageResponseDto;
 import com.sprint.mission.discodeit.service.dto.response.PageResponseDto;
-import com.sprint.mission.discodeit.service.dto.response.PageableResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

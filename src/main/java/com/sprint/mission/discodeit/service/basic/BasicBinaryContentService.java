@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
 import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryContentCreateDto;
@@ -26,6 +27,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentJPARepository binaryContentJPARepository;
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
+    private final ResponseMapStruct responseMapStruct;
 
 
     @Override
@@ -42,7 +44,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         BinaryContent createBinaryContent = binaryContentJPARepository.save(binaryContent);
         binaryContentStorage.put(createBinaryContent.getId(), bytes);
-        return binaryContentMapper.toDto(createBinaryContent);
+        return responseMapStruct.toBinaryContentDto(createBinaryContent);
     }
 
 
@@ -51,7 +53,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public ResponseEntity<?> download(UUID binaryContentId) {
         BinaryContent findBinaryContent = binaryContentJPARepository.findById(binaryContentId)
                 .orElseThrow(() -> new NotFoundException("Profile not found"));
-        BinaryContentResponseDto response = binaryContentMapper.toDto(findBinaryContent);
+        BinaryContentResponseDto response = responseMapStruct.toBinaryContentDto(findBinaryContent);
         return binaryContentStorage.download(response);
     }
 
@@ -61,7 +63,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public BinaryContentResponseDto find(UUID binaryContentId) {
         BinaryContent findBinaryContent = binaryContentJPARepository.findById(binaryContentId)
                 .orElseThrow(() -> new NotFoundException("Profile not found"));
-        return binaryContentMapper.toDto(findBinaryContent);
+        return responseMapStruct.toBinaryContentDto(findBinaryContent);
     }
 
 
@@ -70,7 +72,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public List<BinaryContentResponseDto> findAll(List<UUID> binaryContentIds) {
         List<BinaryContentResponseDto> binaryContentList = new ArrayList<>();
         binaryContentJPARepository.findAllById(binaryContentIds).stream()
-                .map(binaryContentMapper::toDto)
+                .map(responseMapStruct::toBinaryContentDto)
                 .forEach(binaryContentList::add);
         return binaryContentList;
     }
@@ -87,7 +89,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         String contentType = binaryContentUpdateDto.newContentType();
 
         matchingBinaryContent.updateBinaryContent(fileName, (long) bytes.length, contentType);
-        return binaryContentMapper.toDto(matchingBinaryContent);
+        return responseMapStruct.toBinaryContentDto(matchingBinaryContent);
     }
 
 

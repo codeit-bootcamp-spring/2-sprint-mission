@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
+import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.repository.UserStatusJPARepository;
@@ -28,6 +29,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusJPARepository userStatusJPARepository;
     private final UserJPARepository userJPARepository;
     private final UserStatusMapper userStatusMapper;
+    private final ResponseMapStruct responseMapStruct;
 
     @Override
     @Transactional
@@ -39,7 +41,7 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus userStatus = new UserStatus(matchingUser, currentTime);
         userStatusJPARepository.save(userStatus);
 
-        return userStatusMapper.toDto(userStatus);
+        return responseMapStruct.toUserStatusDto(userStatus);
     }
 
 
@@ -48,7 +50,7 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatusResponseDto find(UserStatusFindDto userStatusFindDto) {
         UserStatus userStatus = userStatusJPARepository.findByUser_Id(userStatusFindDto.userId())
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
-        return userStatusMapper.toDto(userStatus);
+        return responseMapStruct.toUserStatusDto(userStatus);
     }
 
 
@@ -57,7 +59,7 @@ public class BasicUserStatusService implements UserStatusService {
     public List<UserStatusResponseDto> findAll() {
         List<UserStatusResponseDto> userStatusList = new ArrayList<>();
         userStatusJPARepository.findAll().stream()
-                .map(userStatusMapper::toDto)
+                .map(responseMapStruct::toUserStatusDto)
                 .forEach(userStatusList::add);
         return userStatusList;
     }
@@ -72,7 +74,7 @@ public class BasicUserStatusService implements UserStatusService {
         Instant currentTime = userStatusUpdateRequest.newLastActiveAt();
         matchingUserStatus.updateLastConnectionTime(currentTime);
         UserStatus updateUserStatus = userStatusJPARepository.save(matchingUserStatus);
-        return userStatusMapper.toDto(updateUserStatus);
+        return responseMapStruct.toUserStatusDto(updateUserStatus);
     }
 
 

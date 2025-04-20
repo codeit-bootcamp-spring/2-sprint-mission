@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exceptions.InvalidInputException;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
+import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
 import com.sprint.mission.discodeit.repository.ChannelJPARepository;
 import com.sprint.mission.discodeit.repository.ReadStatusJPARepository;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
@@ -32,6 +33,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserJPARepository userJpaRepository;
     private final ChannelJPARepository channelJpaRepository;
     private final ReadStatusMapper readStatusMapper;
+    private final ResponseMapStruct responseMapStruct;
 
     @Override
     @Transactional
@@ -50,7 +52,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = new ReadStatus(matchingUser, matchingChannel, lastReadAt);
         readStatusJpaRepository.save(readStatus);
 
-        return readStatusMapper.toDto(readStatus);
+        return responseMapStruct.toReadStatusDto(readStatus);
 
     }
 
@@ -61,7 +63,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = readStatusJpaRepository.findById(readStatusFindDto.Id())
                 .orElseThrow(() -> new NotFoundException("readStatus not found"));
 
-        return readStatusMapper.toDto(readStatus);
+        return responseMapStruct.toReadStatusDto(readStatus);
     }
 
 
@@ -70,7 +72,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public List<ReadStatusResponseDto> findAllByUserId(UUID userId) {
         List<ReadStatusResponseDto> readStatusAllList = new ArrayList<>();
         readStatusJpaRepository.findByUser_Id(userId).stream()
-                .map(readStatusMapper::toDto)
+                .map(responseMapStruct::toReadStatusDto)
                 .forEach(readStatusAllList::add);
         return readStatusAllList;
     }
@@ -84,7 +86,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
         matchingReadStatus.readStatusUpdate(readStatusUpdateDto.newLastReadAt());
         readStatusJpaRepository.save(matchingReadStatus);
-        return readStatusMapper.toDto(matchingReadStatus);
+        return responseMapStruct.toReadStatusDto(matchingReadStatus);
     }
 
 

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageMapper;
+import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
 import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
 import com.sprint.mission.discodeit.repository.ChannelJPARepository;
 import com.sprint.mission.discodeit.repository.MessageJPARepository;
@@ -18,7 +19,6 @@ import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageCreate
 import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageUpdateDto;
 import com.sprint.mission.discodeit.service.dto.response.MessageResponseDto;
 import com.sprint.mission.discodeit.service.dto.response.PageResponseDto;
-import com.sprint.mission.discodeit.service.dto.response.PageableResponseDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,6 +44,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentStorage binaryContentStorage;
     private final MessageMapper messageMapper;
     private final PageMapper pageMapper;
+    private final ResponseMapStruct responseMapStruct;
 
     @Override
     @Transactional
@@ -69,7 +70,7 @@ public class BasicMessageService implements MessageService {
         Message messages = new Message(messageCreateDto.content(), matchingChannel, matchingUser, attachments);
         messageJpaRepository.save(messages);
 
-        return messageMapper.toDto(messages);
+        return responseMapStruct.toMessageDto(messages);
     }
 
 
@@ -78,7 +79,7 @@ public class BasicMessageService implements MessageService {
     public PageResponseDto<MessageResponseDto> find(UUID messageId, int page, int size) {
         Page<MessageResponseDto> matchingMessage = messageJpaRepository
                 .findByIdEntityGraph(messageId, pageRequestSortByCreatedAt(page, size))
-                .map(messageMapper::toDto);
+                .map(responseMapStruct::toMessageDto);
         if (matchingMessage.isEmpty()) {
             throw new NotFoundException("Message not found.");
         }
@@ -90,8 +91,8 @@ public class BasicMessageService implements MessageService {
     @Transactional(readOnly = true)
     public PageResponseDto<MessageResponseDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
         Page<MessageResponseDto> matchingMessageAll = cursor != null
-                ? messageJpaRepository.findByChannel_IdEntityGraphCursor(channelId, cursor, pageable).map(messageMapper::toDto)
-                : messageJpaRepository.findByChannel_IdEntityGraph(channelId, pageable).map(messageMapper::toDto) ;
+                ? messageJpaRepository.findByChannel_IdEntityGraphCursor(channelId, cursor, pageable).map(responseMapStruct::toMessageDto)
+                : messageJpaRepository.findByChannel_IdEntityGraph(channelId, pageable).map(responseMapStruct::toMessageDto) ;
         return pageMapper.fromPage(matchingMessageAll);
     }
 
@@ -104,7 +105,7 @@ public class BasicMessageService implements MessageService {
 
         matchingMessage.updateMessage(messageUpdateDto.newContent());
         Message updateMessage = messageJpaRepository.save(matchingMessage);
-        return messageMapper.toDto(updateMessage);
+        return responseMapStruct.toMessageDto(updateMessage);
     }
 
 

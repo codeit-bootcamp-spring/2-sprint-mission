@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exceptions.InvalidInputException;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
-import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
 import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -31,7 +31,7 @@ public class BasicUserService implements UserService {
     private final UserJPARepository userJpaRepository;
     private final BinaryContentJPARepository binaryContentJpaRepository;
     private final BinaryContentStorage binaryContentStorage;
-    private final UserMapper userMapper;
+    private final ResponseMapStruct responseMapStruct;
 
     @Override
     @Transactional
@@ -55,7 +55,7 @@ public class BasicUserService implements UserService {
         User user = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(), nullableProfile);
         new UserStatus(user, Instant.now());
         User createdUser = userJpaRepository.save(user);
-        return userMapper.toDto(createdUser);
+        return responseMapStruct.toUserDto(createdUser);
     }
 
 
@@ -64,7 +64,7 @@ public class BasicUserService implements UserService {
     public UserResponseDto find(UUID userId) {
         User matchingUser = userJpaRepository.findByIdWithProfile(userId)
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
-        return userMapper.toDto(matchingUser);
+        return responseMapStruct.toUserDto(matchingUser);
     }
 
 
@@ -73,7 +73,7 @@ public class BasicUserService implements UserService {
     public List<UserResponseDto> findAllUser() {
         List<UserResponseDto> userAllList = new ArrayList<>();
         userJpaRepository.findAllUsers().stream()
-                .map(userMapper::toDto)
+                .map(responseMapStruct::toUserDto)
                 .forEach(userAllList::add);
         if (userAllList.isEmpty()) {
             throw new NotFoundException("User list is empty.");
@@ -107,7 +107,7 @@ public class BasicUserService implements UserService {
             matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(), nullableProfile);
         }
         userJpaRepository.save(matchingUser);
-        return userMapper.toDto(matchingUser);
+        return responseMapStruct.toUserDto(matchingUser);
     }
 
 
