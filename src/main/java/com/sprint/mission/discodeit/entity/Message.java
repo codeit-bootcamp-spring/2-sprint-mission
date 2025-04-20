@@ -1,35 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Entity
+@NoArgsConstructor
 @Getter
-public class Message implements Serializable {
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
   private String content;
-  //
-  private UUID channelId;
-  private UUID authorId;
-  private List<UUID> attachmentIds;
 
-  public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "channel_id", foreignKey = @ForeignKey(name = "fk_message_channel"))
+  private Channel channel;
+
+  @ManyToOne(optional = true)
+  @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "fk_message_author"))
+  private User author;
+
+  @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+  private List<MessageAttachment> attachments = new ArrayList<>();
+
+
+  public Message(String content, Channel channel, User author) {
     this.content = content;
-    this.channelId = channelId;
-    this.authorId = authorId;
-    this.attachmentIds = attachmentIds;
+    this.channel = channel;
+    this.author = author;
   }
 
   public void update(String newContent) {
@@ -39,8 +43,5 @@ public class Message implements Serializable {
       anyValueUpdated = true;
     }
 
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
-    }
   }
 }
