@@ -4,7 +4,8 @@ import com.sprint.mission.discodeit.adapter.inbound.content.response.BinaryConte
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
-import com.sprint.mission.discodeit.exception.content.BinaryContentErrors;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
   private Path resolvePath(UUID id) {
     //확장자명을 추출하기 위해, 바이너리 메타 데이터를 가져온다.
     BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(
-        () -> BinaryContentErrors.binaryContentNotFoundError(id)
+        () -> new NotFoundException(ErrorCode.FILE_NOT_FOUND, id)
     );
     //가져온 바이너리 메타 데이터에서 확장자명을 추출한다.
     String extension = binaryContent.getExtension();

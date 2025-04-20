@@ -4,7 +4,8 @@ import com.sprint.mission.discodeit.adapter.outbound.content.LocalBinaryContentS
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
-import com.sprint.mission.discodeit.exception.content.BinaryContentErrors;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +57,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional(readOnly = true)
   public BinaryContent findById(UUID binaryId) {
     return binaryContentMetaRepository.findById(binaryId).orElseThrow(
-        () -> BinaryContentErrors.binaryContentNotFoundError(binaryId)
+        () -> new NotFoundException(ErrorCode.FILE_NOT_FOUND, binaryId)
     );
   }
 
@@ -83,7 +84,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional
   public void delete(UUID binaryId) {
     if (!binaryContentMetaRepository.existsId(binaryId)) {
-      BinaryContentErrors.binaryContentNotFoundError(binaryId);
+      throw new NotFoundException(ErrorCode.FILE_NOT_FOUND, binaryId);
     }
     binaryContentMetaRepository.delete(binaryId);
   }

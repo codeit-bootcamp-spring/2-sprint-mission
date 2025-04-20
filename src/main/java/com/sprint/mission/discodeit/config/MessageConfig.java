@@ -16,5 +16,4 @@ public class MessageConfig {
     messageSource.setUseCodeAsDefaultMessage(true);
     return messageSource;
   }
-
 }

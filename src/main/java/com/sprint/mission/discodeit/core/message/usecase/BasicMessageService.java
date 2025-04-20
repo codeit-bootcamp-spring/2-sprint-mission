@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.core.message.usecase;
 
-import static com.sprint.mission.discodeit.exception.message.MessageErrors.messageIdNotFoundError;
-
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
@@ -15,8 +13,8 @@ import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
-import com.sprint.mission.discodeit.exception.channel.ChannelErrors;
-import com.sprint.mission.discodeit.exception.user.UserErrors;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -55,11 +53,11 @@ public class BasicMessageService implements MessageService {
       List<CreateBinaryContentCommand> binaryContentCommands) {
     //작성자가 존재하는 지 확인
     User user = userRepository.findById(command.authorId()).orElseThrow(
-        () -> UserErrors.userIdNotFoundError(command.authorId())
+        () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, command.authorId())
     );
     // 채널이 존재하는 지 확인
     Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
-        () -> ChannelErrors.channelIdNotFoundError(command.channelId())
+        () -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
     );
 
     //첨부파일을 각각 조회해서 생성한 뒤 리스트로 변환
@@ -125,7 +123,7 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public MessageResult update(UpdateMessageCommand command) {
     Message message = messageRepository.findById(command.messageId())
-        .orElseThrow(() -> messageIdNotFoundError(command.messageId()));
+        .orElseThrow(() -> new NotFoundException(ErrorCode.MESSAGE_NOT_FOUND, command.messageId()));
 
     message.update(command.newText());
     return MessageResult.create(message, message.getAuthor());
@@ -143,7 +141,7 @@ public class BasicMessageService implements MessageService {
   public void delete(UUID messageId) {
     //메시지 조회
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> messageIdNotFoundError(messageId));
+        .orElseThrow(() -> new NotFoundException(ErrorCode.MESSAGE_NOT_FOUND, messageId));
     //메시지 내 첨부파일들 삭제
     message.getAttachment()
         .forEach(binaryContent -> deleteBinaryContentUseCase.delete(binaryContent.getId())
