@@ -11,9 +11,11 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -31,6 +33,7 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
 
+    @Transactional
     @Override
     public UserResult register(UserCreateRequest userRequest, BinaryContentRequest binaryContentRequest) {
         validateDuplicateEmail(userRequest.email());
@@ -57,57 +60,62 @@ public class BasicUserService implements UserService {
         return UserResult.fromEntity(savedUser, userStatus.isOnline(now));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserResult getById(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+                .orElseThrow(() -> new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저Id를 가진 UserStatus가 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
         return UserResult.fromEntity(user, userStatus.isOnline(Instant.now()));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserResult getByName(String name) {
         User user = userRepository.findByName(name)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저Id를 가진 UserStatus가 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
         return UserResult.fromEntity(user, userStatus.isOnline(Instant.now()));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserResult> getAll() {
         return userRepository.findAll()
                 .stream()
                 .map(user -> {
                     UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
-                            .orElseThrow(() -> new IllegalArgumentException("해당 유저Id를 가진 UserStatus가 없습니다."));
+                            .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
                     return UserResult.fromEntity(user, userStatus.isOnline(Instant.now()));
                 })
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserResult getByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(
-                        () -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
+                        () -> new EntityNotFoundException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
 
         UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저Id를 가진 UserStatus가 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
         return UserResult.fromEntity(user, userStatus.isOnline(Instant.now()));
     }
 
+    @Transactional
     @Override
     public UserResult update(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContentRequest binaryContentRequest) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+                .orElseThrow(() -> new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         BinaryContent savedBinaryContent = null;
         if (binaryContentRequest != null) {
@@ -121,20 +129,20 @@ public class BasicUserService implements UserService {
         }
 
         user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword(), savedBinaryContent);
-        User savedUser = userRepository.save(user);
 
-        UserStatus userStatus = userStatusRepository.findByUser_Id(savedUser.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저Id를 가진 UserStatus가 없습니다."));
+        UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
-        return UserResult.fromEntity(savedUser, userStatus.isOnline(Instant.now()));
+        return UserResult.fromEntity(user, userStatus.isOnline(Instant.now()));
     }
 
+    @Transactional
     @Override
     public void delete(UUID userId) {
         userRepository.deleteById(userId);
 
         UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+                .orElseThrow(() -> new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         userStatusRepository.deleteById(userStatus.getId());
     }

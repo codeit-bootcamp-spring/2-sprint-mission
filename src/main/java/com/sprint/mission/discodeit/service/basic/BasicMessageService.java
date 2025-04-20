@@ -12,8 +12,10 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -31,12 +33,13 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public MessageResult create(MessageCreateRequest messageCreateRequest,
                                 List<BinaryContentRequest> files) {
 
         Channel channel = channelRepository.findById(messageCreateRequest.channelId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 채널이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("해당 ID의 채널이 존재하지 않습니다."));
 
         List<BinaryContent> attachments;
         if (files != null) {
@@ -55,7 +58,7 @@ public class BasicMessageService implements MessageService {
         }
 
         User user = userRepository.findById(messageCreateRequest.authorId())
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+                .orElseThrow(() -> new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         Message message = messageRepository.save(
                 new Message(channel, user, messageCreateRequest.content(), attachments));
@@ -63,14 +66,16 @@ public class BasicMessageService implements MessageService {
         return MessageResult.fromEntity(message);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public MessageResult getById(UUID id) {
         Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
+                .orElseThrow(() -> new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
         return MessageResult.fromEntity(message);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<MessageResult> getAllByChannelId(UUID channelId) {
         return messageRepository.findAll()
@@ -81,23 +86,24 @@ public class BasicMessageService implements MessageService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public MessageResult updateContext(UUID id, String context) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(
-                        () -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
+                        () -> new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
         message.updateContext(context);
-        Message savedMessage = messageRepository.save(message);
 
-        return MessageResult.fromEntity(savedMessage);
+        return MessageResult.fromEntity(message);
     }
 
+    @Transactional
     @Override
     public void delete(UUID id) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(
-                        () -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
+                        () -> new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
 
         List<UUID> attachmentIds = message.getAttachments()

@@ -5,8 +5,10 @@ import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentR
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +19,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
 
+    @Transactional
     @Override
     public BinaryContentResult createProfileImage(BinaryContentRequest binaryContentRequest) {
         if (binaryContentRequest == null) {
@@ -33,14 +36,16 @@ public class BasicBinaryContentService implements BinaryContentService {
         return BinaryContentResult.fromEntity(savedBinaryContent);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public BinaryContentResult getById(UUID id) {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("해당 ID를 가진 컨텐츠가 없습니다."));
 
         return BinaryContentResult.fromEntity(binaryContent);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<BinaryContentResult> getByIdIn(List<UUID> ids) {
         return ids.stream()
@@ -48,6 +53,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .toList();
     }
 
+    @Transactional
     @Override
     public void delete(UUID id) {
         binaryContentRepository.deleteById(id);

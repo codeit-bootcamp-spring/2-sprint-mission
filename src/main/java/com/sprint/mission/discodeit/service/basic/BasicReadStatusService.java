@@ -9,8 +9,10 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,12 +25,13 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public ReadStatusResult create(ReadStatusCreateRequest readStatusCreateRequest) {
         Channel channel = channelRepository.findById(readStatusCreateRequest.channelId())
-                .orElseThrow(() -> new IllegalArgumentException("readStaus에 해당하는 채널이 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("readStaus에 해당하는 채널이 없습니다."));
         User user = userRepository.findById(readStatusCreateRequest.userId())
-                .orElseThrow(() -> new IllegalArgumentException("readStatus에 해당하는 유저가 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("readStatus에 해당하는 유저가 없습니다."));
 
         readStatusRepository.findByChannelIdAndUserId(readStatusCreateRequest.channelId(),
                         readStatusCreateRequest.userId())
@@ -42,23 +45,26 @@ public class BasicReadStatusService implements ReadStatusService {
         return ReadStatusResult.fromEntity(readStatus);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ReadStatusResult> getAllByUserId(UUID userId) {
         List<ReadStatus> readStatuses = readStatusRepository.findByUser_Id(userId);
+
         return ReadStatusResult.fromEntity(readStatuses);
     }
 
+    @Transactional
     @Override
     public ReadStatusResult updateLastReadTime(UUID readStatusId) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 Id의 객체가 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("해당 Id의 객체가 없습니다."));
 
         readStatus.updateLastReadTime();
-        ReadStatus savedReadStatus = readStatusRepository.save(readStatus);
 
-        return ReadStatusResult.fromEntity(savedReadStatus);
+        return ReadStatusResult.fromEntity(readStatus);
     }
 
+    @Transactional
     @Override
     public void delete(UUID readStatusId) {
         readStatusRepository.deleteById(readStatusId);
