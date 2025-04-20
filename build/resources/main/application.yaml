@@ -27,6 +27,7 @@ logging:
     org.hibernate.SQL: debug
 
 discodeit:
-  repository:
-    type: file   # jcf | file
-    file-directory: .discodeit
+  storage:
+    type: local
+    local:
+      root-path: /Users/jasonheo/discodeit-storage

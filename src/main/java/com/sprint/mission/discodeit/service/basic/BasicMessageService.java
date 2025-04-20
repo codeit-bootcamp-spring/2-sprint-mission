@@ -37,7 +37,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new NoSuchElementException("User with id " + request.authorId() + " does not exist"));
 
     List<BinaryContent> attachments = binaryRequests.stream()
-        .map(req -> new BinaryContent(req.fileName(), (long) req.bytes().length, req.contentType(), req.bytes()))
+        .map(req -> new BinaryContent(req.fileName(), (long) req.bytes().length, req.contentType()))
         .map(binaryContentRepository::save)
         .toList();
 

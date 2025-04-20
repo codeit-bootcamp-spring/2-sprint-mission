@@ -50,9 +50,8 @@ public class BasicUserService implements UserService {
           BinaryContent binaryContent = new BinaryContent(
               profileRequest.fileName(),
               (long) profileRequest.bytes().length,
-              profileRequest.contentType(),
-              profileRequest.bytes()
-          );
+              profileRequest.contentType()
+              );
           return binaryContentRepository.save(binaryContent);
         })
         .orElse(null);
@@ -107,8 +106,7 @@ public class BasicUserService implements UserService {
           BinaryContent binaryContent = new BinaryContent(
               profileRequest.fileName(),
               (long) profileRequest.bytes().length,
-              profileRequest.contentType(),
-              profileRequest.bytes()
+              profileRequest.contentType()
           );
           return binaryContentRepository.save(binaryContent);
         })
