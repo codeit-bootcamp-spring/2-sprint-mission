@@ -3,20 +3,16 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.application.dto.message.MessageResult;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.application.dto.user.UserResult;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +28,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
 
     @Transactional
     @Override
@@ -63,7 +60,10 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.save(
                 new Message(channel, user, messageCreateRequest.content(), attachments));
 
-        return MessageResult.fromEntity(message);
+        UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
+
+        return MessageResult.fromEntity(message, UserResult.fromEntity(user, userStatus.isOnline(Instant.now())));
     }
 
     @Transactional(readOnly = true)
@@ -72,7 +72,11 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
-        return MessageResult.fromEntity(message);
+        User user = message.getUser();
+        UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
+
+        return MessageResult.fromEntity(message, UserResult.fromEntity(user, userStatus.isOnline(Instant.now())));
     }
 
     @Transactional(readOnly = true)
@@ -82,7 +86,13 @@ public class BasicMessageService implements MessageService {
                 .stream()
                 .filter(message -> message.getChannel().getId().equals(channelId))
                 .sorted(Comparator.comparing(Message::getCreatedAt))
-                .map(MessageResult::fromEntity)
+                .map(message -> {
+                    User user = message.getUser();
+                    UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
+                            .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
+
+                    return MessageResult.fromEntity(message, UserResult.fromEntity(user, userStatus.isOnline(Instant.now())));
+                })
                 .toList();
     }
 
@@ -95,7 +105,11 @@ public class BasicMessageService implements MessageService {
 
         message.updateContext(context);
 
-        return MessageResult.fromEntity(message);
+        User user = message.getUser();
+        UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
+
+        return MessageResult.fromEntity(message, UserResult.fromEntity(user, userStatus.isOnline(Instant.now())));
     }
 
     @Transactional

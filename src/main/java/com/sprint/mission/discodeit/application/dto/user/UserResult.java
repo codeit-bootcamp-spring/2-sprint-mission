@@ -1,11 +1,17 @@
 package com.sprint.mission.discodeit.application.dto.user;
 
+import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public record UserResult(UUID id, Instant createdAt, Instant updatedAt, String username, String email, UUID profileId,
+public record UserResult(UUID id,
+                         Instant createdAt,
+                         Instant updatedAt,
+                         String username,
+                         String email,
+                         BinaryContentResult profile,
                          boolean online) {
 
     public static UserResult fromEntity(User user, boolean isOnline) {
@@ -14,7 +20,7 @@ public record UserResult(UUID id, Instant createdAt, Instant updatedAt, String u
                 user.getUpdatedAt(),
                 user.getName(),
                 user.getEmail(),
-                user.getBinaryContent().getId(),
+                BinaryContentResult.fromEntity(user.getBinaryContent()),
                 isOnline);
     }
 }
