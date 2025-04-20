@@ -49,7 +49,7 @@
 
 - [x]  ERD와 클래스 다이어그램을 토대로 연관관계 매핑 정보를 표로 정리해보세요.(이 내용은 PR에 첨부해주세요.)
 
-- [ ] JPA 주요 어노테이션을 활용해 ERD, 연관관계 매핑 정보를 도메인 모델에 반영해보세요.
+- [x] JPA 주요 어노테이션을 활용해 ERD, 연관관계 매핑 정보를 도메인 모델에 반영해보세요.
     - @Entity, @Table
     - @Column, @Enumerated
     - @OneToMany, @OneToOne, @ManyToOne
@@ -76,7 +76,6 @@
 - [ ] 다음의 클래스 다이어그램을 참고하여 DTO를 정의하세요.
 
 - [ ]  Entity를 DTO로 매핑하는 로직을 책임지는 Mapper 컴포넌트를 정의해 반복되는 코드를 줄여보세요.
-- 패키지명: com.sprint.mission.discodeit.mapper buo7cmjvp-image.png
 
 #### 6. BinaryContent 저장 로직 고도화
 

@@ -1,18 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.List;
 
 @Getter
+@Entity
+@Table(name = "messages")
 public class Message extends BaseUpdatableEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
     private Channel channel;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id")
     private User user;
+
+    @Column(name = "content")
     private String context;
+
+    @ManyToMany
+    @JoinTable(
+            name = "message_attachments",
+            joinColumns = @JoinColumn(name = "message_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id")
+    )
     private List<BinaryContent> attachments;
+
+    protected Message() {
+    }
 
     public Message(Channel channel, User user, String context, List<BinaryContent> attachments) {
         this.channel = channel;
