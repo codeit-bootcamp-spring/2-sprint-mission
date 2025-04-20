@@ -13,7 +13,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table
+@Table(name = "read_statuses")
 public class ReadStatus extends BaseUpdatableEntity {
 
     // 1대 다 자식에서 관리(단방향) 유저는 @ 추가 필요 x

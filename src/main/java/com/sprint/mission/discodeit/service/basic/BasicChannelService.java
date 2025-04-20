@@ -1,14 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
-import com.sprint.mission.discodeit.dto.data.PageResponse;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
-import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -16,8 +14,6 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -47,7 +43,7 @@ public class BasicChannelService implements ChannelService {
             throw new IllegalArgumentException("Public channel name must be provided.");
         }
 
-        if (channelRepository.findByName(channelName)) {
+        if (channelRepository.existsByName(channelName)) {
             throw new RuntimeException("Channel with name '" + channelName + "' already exists.");
         }
 
@@ -73,10 +69,10 @@ public class BasicChannelService implements ChannelService {
 
         String channelName = request.channelName();
         if (!StringUtils.hasText(channelName)) {
-            throw new IllegalArgumentException("Private channel name must be provided.");
+            channelName = generatePrivateChannelName(request.ownerId(), request.participantIds());
         }
 
-        if (channelRepository.findByName(channelName)) {
+        if (channelRepository.existsByName(channelName)) {
             throw new RuntimeException("Channel with name '" + channelName + "' already exists.");
         }
 
@@ -124,7 +120,7 @@ public class BasicChannelService implements ChannelService {
 
     @Transactional
     @Override
-    public Channel update(UUID channelId, PublicChannelUpdateRequest request) {
+    public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
         Channel channel = findChannelByIdOrThrow(channelId);
 
         if (channel.isPrivate()) {
@@ -135,9 +131,9 @@ public class BasicChannelService implements ChannelService {
 
         if (updated) {
             Channel updatedChannel = channelRepository.save(channel);
-            return updatedChannel;
+            return channelMapper.toDto(updatedChannel);
         } else {
-            return channel;
+            return channelMapper.toDto(channel);
         }
     }
 

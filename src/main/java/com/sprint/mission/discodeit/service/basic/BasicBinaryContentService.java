@@ -9,10 +9,13 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.ArrayList;
 
 @RequiredArgsConstructor
 @Service
@@ -23,6 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
 
+    @Transactional
     @Override
     public BinaryContentDto create(BinaryContentCreateRequest biRequest) {
         // 메타 데이터 정보 생성
@@ -31,12 +35,14 @@ public class BasicBinaryContentService implements BinaryContentService {
             biRequest.contentType(),
             biRequest.bytes().length
         );
-        // 실제 콘텐츠 저장(id로 찾기)
-        binaryContentStorage.put(binaryContent.getId(), biRequest.bytes());
+       
         // 메타 데이터 저장
-        binaryContentRepository.save(binaryContent);
+        BinaryContent savedMetadata = binaryContentRepository.save(binaryContent);
 
-        return binaryContentMapper.toDto(binaryContent);
+        //파일 저장
+        binaryContentStorage.put(savedMetadata.getId(), biRequest.bytes());
+
+        return binaryContentMapper.toDto(savedMetadata);
     }
 
     @Override

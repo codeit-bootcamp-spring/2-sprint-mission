@@ -6,11 +6,8 @@ import com.sprint.mission.discodeit.dto.data.PageResponse;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -57,9 +54,9 @@ public class MessageController implements MessageApi {
     }
 
     @PatchMapping(path = "{messageId}")
-    public ResponseEntity<Message> update(@PathVariable("messageId") UUID messageId,
+    public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
         @RequestBody MessageUpdateRequest request) {
-        Message updatedMessage = messageService.update(messageId, request);
+        MessageDto updatedMessage = messageService.update(messageId, request);
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(updatedMessage);
@@ -73,21 +70,16 @@ public class MessageController implements MessageApi {
             .build();
     }
 
-    @Override
-    public ResponseEntity<List<Message>> findAllByChannelId(UUID channelId) {
-        return null;
-    }
 
+    @GetMapping
+    public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+        @RequestParam("channelId") UUID channelId,
+        @RequestParam(value = "cursor", required = false) String cursor,
+        @RequestParam(value = "size", defaultValue = "20") int size) {
 
-    @GetMapping("/{channelId}")
-    public ResponseEntity<PageResponse<MessageDto>> getMessages(
-        @PathVariable UUID channelId,
-        @PageableDefault(size = 20) Pageable pageable) {
-
-        PageResponse<MessageDto> response =
-            messageService.findAllByChannelId(channelId, pageable);
+        PageResponse<MessageDto> response = messageService.findAllByChannelId(
+            channelId, cursor, size);
 
         return ResponseEntity.ok(response);
     }
-
 }

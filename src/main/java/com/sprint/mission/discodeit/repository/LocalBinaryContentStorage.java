@@ -1,11 +1,9 @@
-package com.sprint.mission.discodeit.service.basic;
+package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 
 import com.sprint.mission.discodeit.service.BinaryContentStorage;
-import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @jakarta.annotation.Resource

@@ -7,13 +7,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public record ChannelDto(
     UUID id,
     ChannelType type,
     String name,
     String description,
-    Set<UserChannel> participants,
+    Set<UserDto> participants,
     Instant lastMessageAt
 ) {
 

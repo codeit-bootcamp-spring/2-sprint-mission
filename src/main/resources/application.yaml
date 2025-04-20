@@ -1,15 +1,24 @@
+# src/main/resources/application.yml
+
 spring:
   application:
     name: discodeit
+
   servlet:
     multipart:
       maxFileSize: 10MB
       maxRequestSize: 30MB
+
   data:
     web:
       pageable:
         default-page-size: 50
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit1234
+    username: discodeit
+    password: decodeit_user
+    driver-class-name: org.postgresql.Driver
 
 discodeit:
   storage:

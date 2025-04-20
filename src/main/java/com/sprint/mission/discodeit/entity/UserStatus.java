@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -14,48 +15,33 @@ import java.util.UUID;
 @Setter
 @Entity
 @NoArgsConstructor
+@Table(name = "user_statuses")
 public class UserStatus extends BaseUpdatableEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true, nullable = false)
-    // 외래키 소유(주인)
-    private User user;
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JsonIgnore
+    private User user;                // 주인 필드(외래키 소유)
 
     @Column(nullable = false)
-    private Instant lastActiveAt;
+    private Instant lastActiveAt = Instant.now();
 
-
+    //1대1로 매핑
     public UserStatus(User user) {
-        super();
-        this.user = user;
-        this.lastActiveAt = Instant.now();
+        setUser(user);
     }
 
-    public UserStatus(User user, Instant lastActiveAt) {
-        super();
+    public void setUser(User user) {
         this.user = user;
-        this.lastActiveAt = lastActiveAt;
-    }
-
-    // update 메서드 수정
-    public boolean update(Instant newLastActiveAt) {
-        boolean anyValueUpdated = false;
-
-        if (newLastActiveAt != null && !newLastActiveAt.equals(this.lastActiveAt)) {
-            this.lastActiveAt = newLastActiveAt;
-            anyValueUpdated = true;
+        if (user != null && user.getUserStatus() != this) {
+            user.setUserStatus(this);
         }
-
-        return anyValueUpdated;
     }
 
-    // isOnline 메서드는 그대로 유지
     @Transient
-    public Boolean isOnline() {
-        if (this.lastActiveAt == null) {
-            return false;
-        }
-        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
-        return lastActiveAt.isAfter(instantFiveMinutesAgo);
+    public boolean isOnline() {
+        return lastActiveAt != null &&
+            lastActiveAt.isAfter(Instant.now().minus(Duration.ofMinutes(5)));
     }
 }
+

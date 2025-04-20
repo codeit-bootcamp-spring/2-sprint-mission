@@ -16,6 +16,7 @@ import java.util.HashSet;
 @Table(name = "users")
 public class User extends BaseUpdatableEntity {
 
+    @Column(nullable = false)
     private String username;
 
     @Column(unique = true, nullable = false)

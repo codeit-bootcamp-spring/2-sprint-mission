@@ -59,7 +59,7 @@ public interface ChannelApi {
             content = @Content(examples = @ExampleObject(value = "Private channel cannot be updated"))
         )
     })
-    ResponseEntity<Channel> update(
+    ResponseEntity<ChannelDto> update(
         @Parameter(description = "수정할 Channel ID") UUID channelId,
         @Parameter(description = "수정할 Channel 정보") PublicChannelUpdateRequest request
     );

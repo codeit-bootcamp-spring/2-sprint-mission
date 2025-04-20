@@ -27,7 +27,9 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
     void deleteById(@NonNull UUID channelId);
 
-    boolean findByName(@NonNull String name);
+    Optional<Channel> findByName(@NonNull String name);
+
+    boolean existsByName(@NonNull String name);
 
     @Transactional(readOnly = true)
     @Query("SELECT c FROM Channel c JOIN c.participants uc WHERE uc.user.id = :userId")

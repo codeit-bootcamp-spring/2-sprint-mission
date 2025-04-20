@@ -12,6 +12,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @NoArgsConstructor
+@Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {
     // 조인 테이블 생성 시 부모가 관리
 

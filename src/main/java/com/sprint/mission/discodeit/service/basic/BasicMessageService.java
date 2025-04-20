@@ -20,8 +20,9 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -32,7 +33,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@RequiredArgsConstructor
+
 @Service
 public class BasicMessageService implements MessageService {
 
@@ -46,6 +47,24 @@ public class BasicMessageService implements MessageService {
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageMapper;
 
+    @Autowired
+    public BasicMessageService(
+        MessageRepository messageRepository,
+        ChannelRepository channelRepository,
+        UserRepository userRepository,
+        BinaryContentRepository binaryContentRepository,
+        BinaryContentStorage binaryContentStorage,
+        MessageMapper messageMapper,
+        @Qualifier("pageResponseMapperImpl") PageResponseMapper pageMapper
+    ) {
+        this.messageRepository = messageRepository;
+        this.channelRepository = channelRepository;
+        this.userRepository = userRepository;
+        this.binaryContentRepository = binaryContentRepository;
+        this.binaryContentStorage = binaryContentStorage;
+        this.messageMapper = messageMapper;
+        this.pageMapper = pageMapper;
+    }
 
     @Transactional
     @Override
@@ -77,10 +96,10 @@ public class BasicMessageService implements MessageService {
                     metadata.setContentType(contentType);
                     metadata.setSize(fileSize);
 
-                    //실제 저장
-                    binaryContentStorage.put(metadata.getId(), fileData);
-                    //메타데이터 저장
                     BinaryContent savedMetadata = binaryContentRepository.save(metadata);
+
+                    // 생성된 ID로 파일 저장
+                    binaryContentStorage.put(savedMetadata.getId(), fileData);
 
                     savedAttachmentEntities.add(savedMetadata);
 
@@ -107,26 +126,35 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public Message find(UUID messageId) {
-        return messageRepository.findById(messageId)
+    public MessageDto find(UUID messageId) {
+        Message message = messageRepository.findById(messageId)
             .orElseThrow(
                 () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        return messageMapper.toDto(message);
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-
+    @Transactional(readOnly = true)
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, String cursor, int size) {
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
 
-        Page<Message> messagePage = messageRepository.findAllByChannelId(channelId, pageable);
+        List<Message> messages;
+        if (cursor != null) {
+            Instant cursorTime = Instant.parse(cursor);
+            messages = messageRepository.findByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc(
+                channelId, cursorTime, PageRequest.of(0, size + 1));
+        } else {
+            messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId,
+                PageRequest.of(0, size + 1));
+        }
 
-        /* 핵심: 엔티티 → DTO 변환 함수를 람다나 메서드 레퍼런스로 넘김 */
-        return pageMapper.fromPage(messagePage, messageMapper::toDto);
+        boolean hasNext = messages.size() > size;
+        List<Message> pageContent = hasNext ? messages.subList(0, size) : messages;
+
+        return pageMapper.messageListToPageResponse(pageContent, size, hasNext);
     }
-
 
     @Override
     @Transactional(readOnly = true)
@@ -134,12 +162,12 @@ public class BasicMessageService implements MessageService {
         return messageRepository
             .findTopByChannelIdOrderByCreatedAtDesc(channelId)
             .map(Message::getCreatedAt)
-            .orElseThrow(() -> new NoSuchElementException("채널에 메시지가 존재하지 않습니다: ID=" + channelId));
+            .orElse(Instant.now());
     }
 
     @Override
     @Transactional
-    public Message update(UUID messageId, MessageUpdateRequest request) {
+    public MessageDto update(UUID messageId, MessageUpdateRequest request) {
         String newContent = request.newContent();
         Message message = messageRepository.findById(messageId)
             .orElseThrow(
@@ -147,8 +175,8 @@ public class BasicMessageService implements MessageService {
 
         message.update(newContent);
         Message updatedMessage = messageRepository.save(message);
-        log.info("메시지 업데이트 완료: ID={}", messageId);
-        return updatedMessage;
+
+        return messageMapper.toDto(updatedMessage);
     }
 
     @Override
@@ -171,9 +199,7 @@ public class BasicMessageService implements MessageService {
     private User findUserOrThrow(UUID userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> {
-
                 return new NoSuchElementException("작성자를 찾을 수 없습니다");
             });
     }
-
 }

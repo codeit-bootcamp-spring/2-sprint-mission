@@ -14,9 +14,11 @@ import java.util.ArrayList;
 @Setter
 @Entity
 @NoArgsConstructor
+@Table(name = "messages")
 public class Message extends BaseUpdatableEntity {
 
     @Lob
+    @Column(name = "text")
     private String content;
 
     // message-> channel 단방향

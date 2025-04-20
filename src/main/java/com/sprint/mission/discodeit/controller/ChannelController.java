@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.time.Instant;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -24,7 +27,13 @@ public class ChannelController implements ChannelApi {
 
     @PostMapping(path = "public")
     public ResponseEntity<ChannelDto> create(@RequestBody PublicChannelCreateRequest request) {
-        ChannelDto createdChannel = channelService.create(request);
+        UUID fixedOwnerId = UUID.fromString("e208797d-0eea-4575-bbc3-2af65c468125");
+        PublicChannelCreateRequest fixedRequest = new PublicChannelCreateRequest(
+            request.name(),
+            request.description(),
+            fixedOwnerId
+        );
+        ChannelDto createdChannel = channelService.create(fixedRequest);
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(createdChannel);
@@ -32,19 +41,25 @@ public class ChannelController implements ChannelApi {
 
     @PostMapping(path = "private")
     public ResponseEntity<ChannelDto> create(@RequestBody PrivateChannelCreateRequest request) {
-        ChannelDto createdChannel = channelService.create(request);
+        UUID fixedOwnerId = UUID.fromString("e208797d-0eea-4575-bbc3-2af65c468125");
+        PrivateChannelCreateRequest fixedRequest = new PrivateChannelCreateRequest(
+            fixedOwnerId,
+            request.participantIds(),
+            request.channelName()
+        );
+        ChannelDto createdChannel = channelService.create(fixedRequest);
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(createdChannel);
     }
 
     @PatchMapping(path = "{channelId}")
-    public ResponseEntity<Channel> update(@PathVariable("channelId") UUID channelId,
+    public ResponseEntity<ChannelDto> update(@PathVariable("channelId") UUID channelId,
         @RequestBody PublicChannelUpdateRequest request) {
-        Channel udpatedChannel = channelService.update(channelId, request);
+        ChannelDto udpatedChannelDto = channelService.update(channelId, request);
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(udpatedChannel);
+            .body(udpatedChannelDto);
     }
 
     @DeleteMapping(path = "{channelId}")

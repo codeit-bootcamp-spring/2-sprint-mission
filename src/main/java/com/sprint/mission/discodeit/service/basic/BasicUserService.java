@@ -36,9 +36,8 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentStorage binaryContentStorage;// 실제 데이터 관리
     private final UserMapper userMapper;
-    private final PageResponseMapper pageResponseMapper;
 
-    @Transactional // 데이터 변경 작업
+    @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -47,7 +46,6 @@ public class BasicUserService implements UserService {
         String email = userCreateRequest.email();
         String password = userCreateRequest.password();
 
-        log.info("사용자 생성 시작: email={}", email);
         validateUserDoesNotExist(username, email);
 
         // 프로필 존재 시
@@ -83,6 +81,7 @@ public class BasicUserService implements UserService {
         // 유저 스테이터스 생성
         UserStatus userStatus = new UserStatus(createdUser);
         userStatusRepository.save(userStatus);
+        createdUser.setUserStatus(userStatus);
 
         return userMapper.toDto(createdUser);
     }
@@ -122,32 +121,37 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("Email '" + newEmail + "' is already taken");
         }
 
-        BinaryContent newProfileEntity = null;
-        boolean profileChanged = optionalProfileCreateRequest.isPresent();
+        // 기존 프로필 처리
         user.setProfile(null);
 
-        //  새 프로필 처리
-        BinaryContentCreateRequest profileRequest = optionalProfileCreateRequest.get();
-        byte[] bytes = profileRequest.bytes();
-        if (bytes != null && bytes.length > 0) {
+        // 새 프로필 처리 - isPresent 확인 후 진행
+        if (optionalProfileCreateRequest.isPresent()) {
+            BinaryContentCreateRequest profileRequest = optionalProfileCreateRequest.get();
+            byte[] bytes = profileRequest.bytes();
+            if (bytes != null && bytes.length > 0) {
+                BinaryContent newProfileEntity = new BinaryContent(
+                    profileRequest.contentType(),
+                    profileRequest.fileName(),
+                    (long) bytes.length
+                );
+                BinaryContent savedEntity = binaryContentRepository.save(newProfileEntity);
 
-            newProfileEntity = new BinaryContent(
-                profileRequest.contentType(),
-                profileRequest.fileName(),
-                (long) bytes.length
-            );
-            UUID newProfileId = newProfileEntity.getId();
-
-            try {
-                binaryContentStorage.put(newProfileId, bytes);
-                user.setProfile(newProfileEntity);
-            } catch (Exception e) {
-                throw new RuntimeException("새 프로필 이미지 저장 중 오류 발생" + e.getMessage());
+                try {
+                    binaryContentStorage.put(savedEntity.getId(), bytes);
+                    user.setProfile(savedEntity);
+                } catch (Exception e) {
+                    throw new RuntimeException("새 프로필 이미지 저장 중 오류 발생" + e.getMessage());
+                }
             }
         }
 
-        user.setUsername(newUsername);
-        user.setEmail(newEmail);
+        if (newUsername != null && !newUsername.isEmpty()) {
+            user.setUsername(newUsername);
+        }
+
+        if (newEmail != null && !newEmail.isEmpty()) {
+            user.setEmail(newEmail);
+        }
         if (userUpdateRequest.newPassword() != null && !userUpdateRequest.newPassword().isEmpty()) {
             user.setPassword(userUpdateRequest.newPassword());
         }
