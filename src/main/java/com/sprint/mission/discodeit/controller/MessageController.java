@@ -35,9 +35,11 @@ public class MessageController {
   public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
       @RequestParam("channelId") UUID channelId,
       @RequestParam(value = "cursor", required = false) Instant cursor,
-      @RequestParam("pageable") Pageable pageable
+      Pageable pageable
   ) {
-    return ResponseEntity.ok(messageService.findMessagesByCursor(channelId, cursor, pageable));
+    PageResponse<MessageDto> messageDtoPageResponse = messageService.findMessagesByCursor(channelId,
+        cursor, pageable);
+    return ResponseEntity.ok(messageDtoPageResponse);
   }
 
   @RequestMapping(value = "", method = RequestMethod.POST)
@@ -46,7 +48,7 @@ public class MessageController {
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
     MessageDto messageDto = messageService.createMessage(request);
-    if (!attachments.isEmpty()) {
+    if (attachments != null && !attachments.isEmpty()) {
       attachments.stream()
           .map(binaryContentService::createBinaryContent)
           .forEach(binaryId -> messageService.addAttachment(messageDto.id(), binaryId));

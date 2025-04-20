@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -19,6 +18,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -53,6 +53,7 @@ public class BasicUserService implements UserService {
 
     userRepository.save(user);
     userStatusRepository.save(userStatus);
+    user.setStatus(userStatus);
 
     return userMapper.toDto(user);
   }
@@ -76,7 +77,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public List<UserDto> getAllUsers() {
-    return userRepository.findAll().stream()
+    return userRepository.findAllWithDetails().stream()
         .map(userMapper::toDto)
         .toList();
   }
@@ -126,7 +127,7 @@ public class BasicUserService implements UserService {
   }
 
   private User findUserOrThrow(UUID userId) {
-    return userRepository.findById(userId)
+    return userRepository.findWithDetailsById(userId)
         .orElseThrow(() -> new NoSuchElementException("UserId: " + userId + " not found"));
   }
 }

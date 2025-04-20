@@ -12,12 +12,10 @@ import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.MessageRepositoryCustom;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -39,7 +38,6 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final MessageMapper messageMapper;
   private final PageResponseMapper pageResponseMapper;
-  private final MessageRepositoryCustom messageRepositoryCustom;
 
   @Transactional
   @Override
@@ -102,6 +100,7 @@ public class BasicMessageService implements MessageService {
 //    return pageResponseMapper.fromSlice(dtoSlice);
 //  }
 
+  @Transactional(readOnly = true)
   @Override
   public PageResponse<MessageDto> findMessagesByCursor(UUID channelId, Instant cursor,
       Pageable pageable) {
@@ -110,7 +109,7 @@ public class BasicMessageService implements MessageService {
     if (cursor == null) {
       messages = messageRepository.findByChannelId(channelId, pageable);
     } else {
-      messages = messageRepositoryCustom.findByChannelIdBeforeCursor(
+      messages = messageRepository.findByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc(
           channelId, cursor, pageable);
     }
 
