@@ -28,4 +28,15 @@ public interface PageResponseMapper {
         null
     );
   }
+
+//  default <T, R> PageResponse<R> fromSliceWithCursor(Slice<T> slice, List<R> content,
+//      Object nextCursor) {
+//    return new PageResponse<>(
+//        content,
+//        nextCursor,
+//        slice.getSize(),
+//        slice.hasNext(),
+//        null
+//    );
+//  }
 }

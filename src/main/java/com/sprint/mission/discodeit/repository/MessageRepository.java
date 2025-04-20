@@ -22,6 +22,12 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
   })
   Slice<Message> findAllByChannelId(UUID channelId, Pageable pageable);
 
+  Slice<Message> findByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc(
+      UUID channelId,
+      Instant cursor,
+      Pageable pageable
+  );
+
   void deleteAllByChannelId(UUID channelId);
 
   @Query("SELECT MAX(m.createdAt) FROM Message m WHERE m.channel.id = :channelId")

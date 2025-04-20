@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.util.FileUtil;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -66,11 +67,23 @@ public class MessageController {
   }
 
   @GetMapping
-  public ResponseEntity<PageResponse<MessageDto>> getAllByChannelId(
+  public ResponseEntity<PageResponse<MessageDto>> getAllByChannelIdByOffset(
       @RequestParam("channelId") UUID channelId,
       @RequestParam(defaultValue = "0") int page) {
     PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, page);
     return ResponseEntity.ok(messages);
   }
+
+//  @GetMapping
+//  public ResponseEntity<PageResponse<MessageDto>> getAllByChannelIdByCursor(
+//      @RequestParam("channelId") UUID channelId,
+//      @RequestParam("createdAt") Instant createdAt) {
+//
+//    Instant cursor = createdAt != null ? createdAt : Instant.now();
+//    PageResponse<MessageDto> messages = messageService.findALLByChannelIdWithCursor(channelId,
+//        cursor);
+//
+//    return ResponseEntity.ok(messages);
+//  }
 
 }
