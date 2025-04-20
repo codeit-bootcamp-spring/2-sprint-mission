@@ -33,20 +33,19 @@ BasicUserService userService = context.getBean(BasicUserService.class);
 
 # Sprint6
 
-## ERD와 클래스 다이어그램을 토대로 연관관계 매핑 정보
+## ✅ ERD와 클래스 다이어그램을 토대로 연관관계 매핑 정보
 
-| 엔티티 관계           	                 | 다중성 	    | 방향성                        	            | 부모-자식 관계                     	              | 연관관계의 주인 	          |
-|------------------------------------|----------|-----------------------------------------|---------------------------------------------|---------------------|
-| users:binary_contents 	            | 1:1    	 | users->binary_contents 단방향 	            | 부모: users, 자식: binary_contents 	            | users           	   |
-| messages:users        	            | N:1    	 | messages->users 단방향                     | 부모: users, 자식: messages 	                   | messages 	          |
-| messages:channels	                 | N:1 	    | messages->channels 단방향 	                | 부모: channels, 자식: messages	                 | messages 	          |
-| messages:message_attachment        | 1:N	     | message_attachment->messages 단방향 	      | 부모: messages, 자식: message_attachment	       | message_attachment	 |
-| message_attachment:binary_contents | 1:1 	    | message_attachment->binary_contents 단방향 | 부모: binary_contents, 자식: message_attachment | message_attachment  |
-| user_statuses:users	               | 1:1 	    | user_statuses->users 단방향                | 부모: users, 자식: user_statuses                | user_statuses       |
-| read_statuses:users	               | N:1 	    | read_statuses->users 단방향                | 부모: users, 자식: read_statuses                | read_statuses       |
-| read_statuses:channels	            | N:1 	    | read_statuses->channels 단방향	            | 부모: channels, 자식: read_statuses             | read_statuses       |
+| 엔티티 관계           	    | 다중성 	    | 방향성                        	 | 부모-자식 관계                     	              | 연관관계의 주인 	          |
+|-----------------------|----------|------------------------------|---------------------------------------------|---------------------|
+| User:BinaryContent 	  | 1:1    	 | User->BinaryContent 단방향 	    | 부모: User, 자식: BinaryContent 	            | User           	   |
+| Message:User        	 | N:1    	 | Message->User 단방향            | 부모: User, 자식: Message 	                   | Message 	          |
+| Message:Channel	      | N:1 	    | Message->Channel 단방향 	       | 부모: Channel, 자식: Message	                 | Message 	          |
+| BinaryContent:Message | N:1	     | Message->BinaryContent 단방향 	 | 부모: BinaryContent, 자식: Message	       | Message	 |
+| UserStatus:User	      | 1:1 	    | UserStatus<->User 양방향        | 부모: User, 자식: UserStatus                | UserStatus       |
+| ReadStatus:User	      | N:1 	    | ReadStatus->User 단방향         | 부모: User, 자식: ReadStatus                | ReadStatus       |
+| ReadStatus:Channel	   | N:1 	    | ReadStatus->Channel 단방향	     | 부모: Channel, 자식: ReadStatus             | ReadStatus       |
 
-## DTO 적극 도입하기
+## ✅ DTO 적극 도입하기
 
 ### Entity를 Controller까지 노출했을 때 발생할 수 있는 문제점
 
@@ -64,7 +63,7 @@ BasicUserService userService = context.getBean(BasicUserService.class);
 - 트랜잭션 범위 밖에서 Lazy 필드에 접근할 일이 줄어들어, `LazyInitializationException`을 방지할 수 있다.
 - Entity 간의 복잡한 연관관계로부터 독립적인 구조를 구성할 수 있어, 직렬화 이슈를 피할 수 있다.
 
-## 오프셋 페이지네이션과 커서 페이지네이션 방식의 차이
+## ✅ 오프셋 페이지네이션과 커서 페이지네이션 방식의 차이
 
 
 ### 오프셋 페이지네이션 (Offset Pagination)
