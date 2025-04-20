@@ -13,22 +13,14 @@ import org.springframework.data.repository.query.Param;
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   @Query(
-      value = """
-    SELECT m
-      FROM Message m
-      LEFT JOIN FETCH m.author a
-      LEFT JOIN FETCH a.profile
-      JOIN FETCH a.userStatus
-     WHERE m.channel.id    = :channelId
-       AND m.createdAt     < :createdAt
-     ORDER BY m.createdAt DESC
-  """,
-      countQuery = """
-    SELECT COUNT(m)
-      FROM Message m
-     WHERE m.channel.id    = :channelId
-       AND m.createdAt     < :createdAt
-  """)
+      "select m "
+          + "from Message m "
+          + "left join fetch m.author a "
+          + "left join fetch a.profile "
+          + "join fetch a.userStatus "
+          + "where m.channel.id = :channelId "
+          + "and m.createdAt < :createdAt "
+          + "order by m.createdAt desc")
   Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId, @Param("createdAt") Instant createdAt, Pageable pageable);
 
   @Query(
