@@ -2,19 +2,14 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -80,16 +75,11 @@ public class MessageController {
     @GetMapping
     public ResponseEntity<PageResponse<MessageDto>> getMessagesByChannel(
         @RequestParam UUID channelId,
-        Pageable pageable
+        @RequestParam(required = false) Instant cursor,
+        @RequestParam(defaultValue = "50") int size
     ) {
-        Pageable modified = PageRequest.of(
-            pageable.getPageNumber(),
-            50,
-            Sort.by("createdAt").descending()
-        );
-
-        PageResponse<MessageDto> response = messageService.findAllByChannelId(channelId,
-            modified);
+        PageResponse<MessageDto> response = messageService.findAllByChannelId(channelId, cursor,
+            size);
         return ResponseEntity.ok(response);
     }
 }

@@ -20,7 +20,9 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -96,14 +98,40 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, int size) {
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다: " + channelId));
 
-        Slice<Message> slice = messageRepository.findAllByChannelOrderByCreatedAtDesc(channel,
-            pageable);
-        Slice<MessageDto> messageDtos = slice.map(messageMapper::toDto);
-        return pageResponseMapper.fromSlice(messageDtos);
+        PageRequest pageRequest = PageRequest.of(0, size + 1); // +1로 hasNext 판단
+        List<Message> messages;
+
+        if (cursor == null) {
+            messages = messageRepository.findFirstPageByChannel(channel, pageRequest);
+        } else {
+            messages = messageRepository.findNextPageByChannelAndCursor(channel, cursor,
+                pageRequest);
+        }
+
+        boolean hasNext = messages.size() > size;
+        if (hasNext) {
+            messages = messages.subList(0, size); // 초과분 제거
+        }
+
+        List<MessageDto> messageDtos = messages.stream()
+            .map(messageMapper::toDto)
+            .toList();
+
+        Instant nextCursor = !messageDtos.isEmpty()
+            ? messageDtos.get(messageDtos.size() - 1).createdAt()
+            : null;
+
+        return new PageResponse<>(
+            messageDtos,
+            nextCursor, // 커서
+            size,
+            hasNext,
+            null
+        );
     }
 
     @Override

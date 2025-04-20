@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.status.CreateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.status.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.status.ReadStatusResponse;
 import com.sprint.mission.discodeit.dto.status.UpdateReadStatusRequest;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -24,11 +25,10 @@ public class ReadStatusController {
     @PostMapping
     @Operation(summary = "읽음 상태 생성")
     @ApiResponse(responseCode = "201", description = "읽음 상태 생성 성공")
-    public ResponseEntity<ReadStatusResponse> create(@RequestBody CreateReadStatusRequest request) {
-        UUID id = readStatusService.create(request).getId();
-        return readStatusService.findById(id)
-            .map(response -> ResponseEntity.status(201).body(response))
-            .orElse(ResponseEntity.badRequest().build());
+    public ResponseEntity<ReadStatusDto> create(@RequestBody CreateReadStatusRequest request) {
+        ReadStatusDto readStatusDto = readStatusService.create(request);
+        System.out.println("[DEBUG] Created ReadStatus ID = " + readStatusDto.id());
+        return ResponseEntity.status(201).body(readStatusDto);
     }
 
 
@@ -39,17 +39,17 @@ public class ReadStatusController {
         content = @Content(mediaType = "*/*") // 이것만 추가!
     )
     @PatchMapping("/{readStatusId}")
-    public ResponseEntity<Void> update(
+    public ResponseEntity<ReadStatusDto> update(
         @PathVariable UUID readStatusId,
         @RequestBody UpdateReadStatusRequest request
     ) {
-        readStatusService.update(readStatusId, request.newLastReadAt());
-        return ResponseEntity.ok().build();
+        ReadStatusDto updated = readStatusService.update(readStatusId, request);
+        return ResponseEntity.ok(updated);
     }
 
     @GetMapping
     @Operation(summary = "사용자의 모든 읽음 상태 조회")
-    public ResponseEntity<List<ReadStatusResponse>> findbyUserId(@RequestParam UUID userId) {
+    public ResponseEntity<List<ReadStatusDto>> findbyUserId(@RequestParam UUID userId) {
         return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
     }
 }
