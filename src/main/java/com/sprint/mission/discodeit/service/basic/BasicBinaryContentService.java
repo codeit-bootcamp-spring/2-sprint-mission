@@ -7,13 +7,13 @@ import com.sprint.mission.discodeit.exception.ResultCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @RequiredArgsConstructor
@@ -41,12 +41,14 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public BinaryContent find(UUID binaryContentId) {
     return binaryContentRepository.findById(binaryContentId)
         .orElseThrow(() -> new RestException(ResultCode.NOT_FOUND));
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
     return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
         .toList();

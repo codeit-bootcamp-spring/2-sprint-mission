@@ -6,6 +6,7 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update # 개발 중에는 update, 운영에는 validate or none 권장
     properties:

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
@@ -22,7 +23,7 @@ public class Message extends BaseUpdatableEntity {
   @Column(name = "content", columnDefinition = "TEXT")
   private String content;
 
-  @ManyToOne(optional = false)
+  @ManyToOne
   @JoinColumn(name = "channel_id", nullable = false)
   @OnDelete(action = OnDeleteAction.CASCADE)
   private Channel channel;
@@ -32,7 +33,7 @@ public class Message extends BaseUpdatableEntity {
   @OnDelete(action = OnDeleteAction.SET_NULL)
   private User author;
 
-  @OneToMany
+  @OneToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id"),
