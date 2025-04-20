@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.common.PageableRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.entity.message.Message;
@@ -17,6 +19,10 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -60,10 +66,26 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<MessageDto> findAllByChannelId(UUID channelId) {
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, PageableRequest page) {
     validateChannelExistence(channelId);
-    List<Message> messages = messageRepository.findAllByChannel_Id(channelId);
-    return messages.stream().map(messageMapper::toResponse).toList();
+
+    System.out.println("############################");
+    System.out.println("############################");
+    System.out.println(page.getSort());
+    System.out.println("############################");
+    System.out.println("############################");
+    String[] sortParams = page.getSort().split(",");
+    String sortProperty = sortParams[0];
+    Sort.Direction direction =
+        sortParams.length > 1 && sortParams[1].trim().equalsIgnoreCase("desc")
+            ? Sort.Direction.DESC
+            : Sort.Direction.ASC;
+
+//    Sort.Direction direction = Sort.Direction.DESC;
+    Pageable pageable = PageRequest.of(page.getPage(), page.getSize(),
+        Sort.by(direction, sortProperty));
+    Slice<Message> slice = messageRepository.findByChannel_Id(channelId, pageable);
+    return messageMapper.toSliceResponse(slice);
   }
 
   @Override

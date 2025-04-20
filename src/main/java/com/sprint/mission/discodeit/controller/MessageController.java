@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.common.PageableRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +25,10 @@ public class MessageController {
   private final MessageService messageService;
 
   @GetMapping
-  public ResponseEntity<List<MessageDto>> findAllMessagesByChannel(
-      @RequestParam UUID channelId) {
-    List<MessageDto> messages = messageService.findAllByChannelId(channelId);
+  public ResponseEntity<PageResponse<MessageDto>> findAllMessagesByChannel(
+      @RequestParam UUID channelId,
+      @ModelAttribute PageableRequest pageable) {
+    PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, pageable);
     return ResponseEntity.ok(messages);
   }
 

@@ -5,12 +5,15 @@ import com.sprint.mission.discodeit.entity.common.BinaryContent;
 
 import java.util.UUID;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 
 public interface BinaryContentService {
 
   BinaryContent create(BinaryContentCreateRequest request);
 
   BinaryContent find(UUID binaryContentId);
+
+  ResponseEntity<?> download(UUID binaryContentId);
 
   List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds);
 
