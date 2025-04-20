@@ -68,12 +68,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public PageResponse<MessageDto> findAllByChannelId(UUID channelId, PageableRequest page) {
     validateChannelExistence(channelId);
-
-    System.out.println("############################");
-    System.out.println("############################");
-    System.out.println(page.getSort());
-    System.out.println("############################");
-    System.out.println("############################");
+    
     String[] sortParams = page.getSort().split(",");
     String sortProperty = sortParams[0];
     Sort.Direction direction =
