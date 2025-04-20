@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -16,8 +15,7 @@ import java.time.Instant;
 @Getter
 public class UserStatus extends BaseUpdatableEntity {
 
-  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-  // orphanRemoval이 필요한가? 혹시라도 User가 삭제되지 않는데 status를 끊을 상황이 발생하는가?
+  @OneToOne
   @JoinColumn(name = "user_id", unique = true, nullable = false)
   private User user;
 
@@ -32,6 +30,7 @@ public class UserStatus extends BaseUpdatableEntity {
     super();
     this.user = user;
     this.lastActiveAt = lastActiveAt;
+    user.setStatus(this);
   }
 
   public void update(Instant lastActiveAt) {
