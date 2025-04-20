@@ -77,12 +77,12 @@ public class MessageController implements MessageApi {
   @GetMapping
   public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
       @RequestParam UUID channelId,
-      @RequestParam Instant cursor,
+      @RequestParam(value = "cursor", required = false) Instant cursor,
       @PageableDefault(
           size = 50,
           sort = "createdAt",
           direction = Direction.DESC
-      )@RequestParam Pageable pageable
+      )Pageable pageable
   ) {
     PageResponse<MessageDto> response = messageService.findAllByChannelId(channelId, cursor, pageable);
     return ResponseEntity.ok(response);

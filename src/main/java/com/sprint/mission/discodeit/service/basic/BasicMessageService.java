@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -67,12 +68,13 @@ public class BasicMessageService implements MessageService {
   @Transactional(readOnly = true)
   public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
     Slice<MessageDto> messageDtoSlice = messageRepository
-        .findAllByChannelIdWithAuthor(channelId, cursor, pageable)
+        .findAllByChannelIdWithAuthor(
+            channelId, Optional.ofNullable(cursor).orElse(Instant.now()), pageable)
         .map(messageMapper::toDto);
 
     Instant nextCursor = null;
     if(!messageDtoSlice.isEmpty()){
-      nextCursor = messageDtoSlice.getContent().get(messageDtoSlice.getSize() - 1).createdAt();
+      nextCursor = messageDtoSlice.getContent().get(messageDtoSlice.getContent().size() - 1).createdAt();
     }
 
     return pageResponseMapper.fromSlice(messageDtoSlice, nextCursor);

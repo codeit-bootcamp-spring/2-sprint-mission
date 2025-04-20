@@ -36,7 +36,7 @@ public abstract class ChannelMapper {
   })
   abstract public List<ChannelDto> toDtoList(List<Channel> channel);
 
-  private List<UserDto> findParticipants(Channel channel) {
+  protected List<UserDto> findParticipants(Channel channel) {
     List<UserDto> participants = new ArrayList<>();
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       readStatusRepository.findAllUserByChannelIdWithProfileAndStatus(channel.getId()).stream()
@@ -46,7 +46,7 @@ public abstract class ChannelMapper {
     return participants;
   }
 
-  private Instant findLastMessageAt(Channel channel) {
+  protected Instant findLastMessageAt(Channel channel) {
     return messageRepository.findLastMessageTimeByChannelId(channel.getId());
   }
 }

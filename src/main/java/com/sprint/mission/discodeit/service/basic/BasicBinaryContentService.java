@@ -39,10 +39,10 @@ public class BasicBinaryContentService implements BinaryContentService {
     if (originalFilename != null && !FileUtil.isAllowedExtension(originalFilename)) {
       throw new IllegalArgumentException("허용하지 않는 파일");
     }
-    BinaryContent binaryContent = new BinaryContent(originalFilename, contentType, size, bytes);
+    BinaryContent binaryContent = new BinaryContent(originalFilename, contentType, size);
 
     binaryContentRepository.save(binaryContent);
-    binaryContentStorage.put(binaryContent.getId(), binaryContent.getBytes());
+    binaryContentStorage.put(binaryContent.getId(), bytes);
     return binaryContent;
   }
 

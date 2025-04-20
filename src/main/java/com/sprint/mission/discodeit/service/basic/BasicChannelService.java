@@ -38,7 +38,7 @@ public class BasicChannelService implements ChannelService {
 
     List<UUID> participantIds = privateRequest.participantIds();
     List<ReadStatus> readStatusList = userRepository.findAllById(participantIds).stream()
-        .map(user -> new ReadStatus(user, channel, null))
+        .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
         .toList();
     readStatusRepository.saveAll(readStatusList);
 

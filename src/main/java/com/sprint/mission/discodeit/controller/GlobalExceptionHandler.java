@@ -1,39 +1,35 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.controller.ErrorResponse;
 import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
-@ResponseBody
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(IllegalArgumentException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ErrorResponse handleIllegalArgument(IllegalArgumentException e) {
-    return ErrorResponse.of(e.getMessage());
+  public ResponseEntity<String> handleException(IllegalArgumentException e) {
+    e.printStackTrace();
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(e.getMessage());
   }
 
   @ExceptionHandler(NoSuchElementException.class)
-  @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ErrorResponse handleNoSuchElement(NoSuchElementException e) {
-    return ErrorResponse.of(e.getMessage());
+  public ResponseEntity<String> handleException(NoSuchElementException e) {
+    e.printStackTrace();
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(e.getMessage());
   }
 
-  @ExceptionHandler(RuntimeException.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ErrorResponse handleRuntime(RuntimeException e) {
-    return ErrorResponse.of(e.getMessage());
-  }
-
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ErrorResponse handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
-    return ErrorResponse.of(e.getBindingResult());
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<String> handleException(Exception e) {
+    e.printStackTrace();
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(e.getMessage());
   }
 }

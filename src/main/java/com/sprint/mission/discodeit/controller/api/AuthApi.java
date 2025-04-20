@@ -24,9 +24,8 @@ public interface AuthApi {
               @ExampleObject(value = "비밀번호가 일치하지 않음")
           })),
       @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음",
-          content = @Content(mediaType = "*/*", examples = {
-              @ExampleObject(value = "{username}에 해당하는 User가 없음")
-          }))
+          content = @Content(examples = @ExampleObject(value = "{username}에 해당하는 User가 없음")
+          ))
   })
   ResponseEntity<UserDto> login(LoginRequest request);
 }
