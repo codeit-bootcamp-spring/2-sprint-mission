@@ -70,6 +70,7 @@ public class BasicChannelService implements ChannelService {
         .map(readStatus -> readStatus.getChannel().getId())
         .toList();
 
+    // 여기서 N+1 문제가 발생하는데 어떻게 해결해야될지 모르겠다.
     return channelRepository.findAll().stream()
         .filter(channel ->
             channel.getType().equals(ChannelType.PUBLIC)
