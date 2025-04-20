@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.repository.springjpa.SpringDataMessageReposi
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,6 +34,11 @@ public class JpaMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         return messageRepository.findAllByChannel_Id(channelId);
+    }
+
+    @Override
+    public Page<Message> findAllByChannelIdPaging(UUID channelId, Pageable pageable) {
+        return messageRepository.findAllByChannel_IdOrderByCreatedAtDesc(channelId, pageable);
     }
 
     @Override

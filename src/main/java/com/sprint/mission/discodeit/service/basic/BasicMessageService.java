@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.Mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.Mapper.MessageMapper;
+import com.sprint.mission.discodeit.Mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.springjpa.SpringDataMessageAttachmentRepository;
@@ -12,6 +15,8 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,8 +34,8 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final SpringDataMessageAttachmentRepository messageAttachmentRepository;
-  private final UserStatusRepository userStatusRepository;
   private final MessageMapper messageMapper;
+  private final PageResponseMapper pageResponseMapper;
   private final BinaryContentStorage binaryContentStorage;
 
   @Override
@@ -89,12 +94,13 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<MessageDto> findAllByChannelId(UUID channelId) {
-    return messageRepository
-            .findAllByChannelId(channelId)
-            .stream()
-            .map(messageMapper::toDto)
-            .collect(Collectors.toList());
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+    Page<MessageDto> messages = messageRepository
+            .findAllByChannelIdPaging(channelId, pageable)
+            .map(messageMapper::toDto);
+
+    return pageResponseMapper.fromPage(messages);
+
   }
 
   @Override
