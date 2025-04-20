@@ -20,13 +20,15 @@ CREATE TABLE users (
         ON DELETE SET NULL
 );
 
+CREATE TYPE channel_type AS ENUM ('PUBLIC', 'PRIVATE');
+
 CREATE TABLE channels (
     id UUID PRIMARY KEY,
     created_at TIMESTAMPTZ NOT NULL,
     updated_at TIMESTAMPTZ,
     name VARCHAR(100),
     description VARCHAR(500),
-    type VARCHAR(10) NOT NULL CHECK (type IN ('PUBLIC', 'PRIVATE'))
+    type channel_type NOT NULL
 );
 
 CREATE TABLE user_statuses (

@@ -1,50 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
-public class UserStatus extends BaseEntity implements Serializable {
+@NoArgsConstructor
+public class UserStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
   private static final int ONLINE_TIME = 5;
   //
-  private UserStatusType type;
-  private Instant activatedAt;
-  private final UUID userId;
+  @Column(name = "last_active_at", nullable = false)
+  private Instant lastActiveAt;
 
-  public UserStatus(UUID userId, Instant activatedAt) {
-    super();
-    this.type = UserStatusType.OFFLINE;
-    this.userId = userId;
-    this.activatedAt = activatedAt;
+  @OneToOne
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;
+
+  public UserStatus(User user, Instant lastActiveAt) {
+    this.user = user;
+    this.lastActiveAt = lastActiveAt;
   }
 
-  public void update(Instant newActivatedAt) {
-    boolean anyValueUpdated = false;
-    if (newActivatedAt != null && !newActivatedAt.equals(activatedAt)) {
-      this.activatedAt = newActivatedAt;
-      anyValueUpdated = true;
-    }
-    if (anyValueUpdated) {
-      update();
+  public void update(Instant newLastActiveAt) {
+    if (newLastActiveAt != null && !newLastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = newLastActiveAt;
     }
   }
 
   public boolean isOnline() {
-    Duration duration = Duration.between(activatedAt, Instant.now());
-    if (duration.toMinutes() <= ONLINE_TIME) {
-      if (type != UserStatusType.ONLINE) {
-        type = UserStatusType.ONLINE;
-      }
-      return true;
-    }
-    if (type != UserStatusType.OFFLINE) {
-      type = UserStatusType.OFFLINE;
-    }
-    return false;
+    Duration duration = Duration.between(lastActiveAt, Instant.now());
+    return duration.toMinutes() <= ONLINE_TIME;
   }
 }
