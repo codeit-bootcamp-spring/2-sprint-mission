@@ -25,7 +25,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,7 +51,11 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
-  @CacheEvict(value = "allMessages", allEntries = true)
+  @Caching(evict = {
+      @CacheEvict(value = "allMessages", allEntries = true),
+      @CacheEvict(value = "allChannels", allEntries = true)
+  }
+  )
   public CreateMessageResult create(CreateMessageCommand createMessageCommand,
       List<MultipartFile> multipartFiles) {
     // 유저와 채널이 실제로 존재하는지 검증
@@ -89,7 +92,7 @@ public class BasicMessageService implements MessageService {
     Message message = findMessageById(messageId);
     return messageMapper.toFindMessageResult(message);
   }
-  
+
   // 첫 페이징인 경우 (cursor 존재 X)
   @Override
   @Transactional(readOnly = true)
